@@ -23,13 +23,13 @@ import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.utils.getDisplayCompat
 import app.atomofiron.searchboxapp.utils.isLayoutRtl
 import app.atomofiron.searchboxapp.utils.isRtl
+import com.google.android.material.R as MaterialR
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.navigation.NavigationView
 import com.google.android.material.navigationrail.NavigationRailView
-import lib.atomofiron.android_window_insets_compat.consumeInsets
 
 
 @SuppressLint("PrivateResource")
@@ -49,8 +49,8 @@ class LayoutDelegate constructor(
 ) : OnApplyWindowInsetsListener {
 
     private val resources = parent.resources
-    private val railSize = resources.getDimensionPixelSize(R.dimen.m3_navigation_rail_default_width)
-    private val bottomSize = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
+    private val railSize = resources.getDimensionPixelSize(MaterialR.dimen.m3_navigation_rail_default_width)
+    private val bottomSize = resources.getDimensionPixelSize(MaterialR.dimen.m3_bottom_nav_min_height)
     private val withBottomInset get() = layout.isBottom && (layout.withJoystick || bottomView != null)
     private val withFlankInset get() = !layout.isBottom && (layout.withJoystick || railView != null)
     private val currentBottomSize get() = if (withBottomInset) bottomSize else 0
@@ -67,7 +67,7 @@ class LayoutDelegate constructor(
             parent.requestApplyInsets()
             setLayout(layout)
         }
-        railView?.consumeInsets()
+        // todo railView?.consumeInsets()
     }
 
     private fun NavigationRailView.applyGround(ground: Layout.Ground) {
@@ -217,7 +217,7 @@ class LayoutDelegate constructor(
         val custom = insets.getToolbarInsets()
         val collapsingLayout: CollapsingToolbarLayout? = this.findViewById(R.id.collapsing_layout)
         collapsingLayout?.run {
-            val defaultMargin = resources.getDimensionPixelSize(R.dimen.m3_appbar_expanded_title_margin_horizontal)
+            val defaultMargin = resources.getDimensionPixelSize(MaterialR.dimen.m3_appbar_expanded_title_margin_horizontal)
 
             val start = defaultMargin + if (resources.isRtl()) custom.right else custom.left
             val end = defaultMargin + if (resources.isRtl()) custom.left else custom.right

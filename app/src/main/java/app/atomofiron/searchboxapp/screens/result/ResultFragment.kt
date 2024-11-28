@@ -22,7 +22,6 @@ import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.model.textviewer.SearchTask
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
 import com.google.android.material.navigation.NavigationBarView
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
 
 class ResultFragment : Fragment(R.layout.fragment_result),
     BaseFragment<ResultFragment, ResultViewState, ResultPresenter> by BaseFragmentImpl()
@@ -83,7 +82,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
 
     override fun onApplyInsets(root: View) {
         binding.run {
-            recyclerView.applyPaddingInsets()
+            // todo recyclerView.applyPaddingInsets()
             LayoutDelegate(
                 root as ViewGroup,
                 recyclerView = recyclerView,

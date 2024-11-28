@@ -17,12 +17,15 @@ import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.getMarketIntent
 import app.atomofiron.searchboxapp.utils.immutable
+import com.google.android.material.R as MaterialR
 import com.google.android.material.color.DynamicColors
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.UpdateAvailability
 import javax.inject.Inject
 
 class App : Application(), Configuration.Provider {
+
+    override val workManagerConfiguration = Configuration.Builder().build()
 
     @Inject
     lateinit var initialDelegate: InitialDelegate
@@ -39,8 +42,6 @@ class App : Application(), Configuration.Provider {
 
         checkForUpdate(this)
     }
-
-    override fun getWorkManagerConfiguration(): Configuration = Configuration.Builder().build()
 
     private fun checkForUpdate(context: Context) {
         val appUpdateManager = AppUpdateManagerFactory.create(context)
@@ -85,7 +86,7 @@ class App : Application(), Configuration.Provider {
                 .setSmallIcon(R.drawable.ic_notification_update)
                 .setContentIntent(notificationIntent)
                 .addAction(0, getString(R.string.get_update), actionIntent)
-                .setColor(findColorByAttr(R.attr.colorPrimary))
+                .setColor(findColorByAttr(MaterialR.attr.colorPrimary))
                 .build()
 
         // todo check permission

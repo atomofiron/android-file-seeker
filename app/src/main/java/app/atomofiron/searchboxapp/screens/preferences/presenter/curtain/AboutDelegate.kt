@@ -9,7 +9,7 @@ import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.CurtainAboutBinding
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.utils.Const
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
+import com.google.android.material.R as MaterialR
 
 class AboutDelegate : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
     companion object {
@@ -22,7 +22,7 @@ class AboutDelegate : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
         val binding = CurtainAboutBinding.inflate(inflater, null, false)
         binding.init()
-        binding.root.applyPaddingInsets(vertical = true)
+        // todo binding.root.applyPaddingInsets(vertical = true)
         return CurtainApi.ViewHolder(binding.root)
     }
 
@@ -31,7 +31,7 @@ class AboutDelegate : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
         var componentName = githubIntent.resolveActivity(context.packageManager)
         aboutTvGithub.isEnabled = componentName != null
         aboutTvGithub.alpha = if (componentName == null) ALPHA_DISABLED else ALPHA_ENABLED
-        val tint = context.findColorByAttr(R.attr.colorOnSurface)
+        val tint = context.findColorByAttr(MaterialR.attr.colorOnSurface)
         aboutTvGithub.compoundDrawablesRelative[0].setTint(tint)
         aboutTvForpda.compoundDrawablesRelative[0].setTint(tint)
 

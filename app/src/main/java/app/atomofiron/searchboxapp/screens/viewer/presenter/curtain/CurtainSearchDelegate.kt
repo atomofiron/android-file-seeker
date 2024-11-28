@@ -12,7 +12,6 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState
 import kotlinx.coroutines.CoroutineScope
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
 
 class CurtainSearchDelegate(
     output: FinderAdapterOutput,
@@ -45,8 +44,8 @@ class CurtainSearchDelegate(
         binding.sheetViewerSearchRv.adapter = finderAdapter
         binding.sheetViewerSearchRv.itemAnimator = null
 
-        binding.root.applyPaddingInsets(top = true, withProxying = true)
-        binding.sheetViewerSearchRv.applyPaddingInsets(bottom = true)
+        // todo binding.root.applyPaddingInsets(top = true, withProxying = true)
+        // todo binding.sheetViewerSearchRv.applyPaddingInsets(bottom = true)
 
         return CurtainApi.ViewHolder(binding.root)
     }

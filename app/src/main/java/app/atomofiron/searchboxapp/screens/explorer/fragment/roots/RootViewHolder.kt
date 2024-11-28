@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.convert
+import com.google.android.material.R as MaterialR
 
 class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     companion object {
@@ -38,7 +39,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     private val colors = ColorStateList(
         arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf(0)),
         intArrayOf(
-            context.getColorByAttr(R.attr.colorPrimary),
+            context.getColorByAttr(MaterialR.attr.colorPrimary),
             binding.cardTitle.textColors.defaultColor,
         )
     )

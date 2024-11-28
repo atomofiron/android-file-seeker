@@ -24,8 +24,6 @@ import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.main.util.offerKeyCodeToChildren
 import com.google.android.material.color.DynamicColors
-import lib.atomofiron.android_window_insets_compat.applyMarginInsets
-import lib.atomofiron.android_window_insets_compat.insetsProxying
 
 class MainActivity : AppCompatActivity() {
 
@@ -94,12 +92,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyInsets() {
-        binding.root.insetsProxying()
-        binding.navHostFragment.insetsProxying()
-        binding.joystick.applyMarginInsets()
+        // todo binding.joystick.applyMarginInsets()
     }
 
-    override fun onNewIntent(intent: Intent?) {
+    override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         onIntent(intent)
     }

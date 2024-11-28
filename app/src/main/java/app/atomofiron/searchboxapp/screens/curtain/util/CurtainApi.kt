@@ -12,7 +12,6 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.Unique
 import app.atomofiron.common.util.Equality
 import com.google.android.material.snackbar.Snackbar
-import lib.atomofiron.android_window_insets_compat.insetsProxying
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -102,7 +101,6 @@ private fun View.makeScrollable(): View {
         else -> NestedScrollView(context).apply {
             this@makeScrollable.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT)
             addView(this@makeScrollable)
-            insetsProxying()
         }
     }
     // WRAP_CONTENT is necessary to the horizontal transitions in curtain

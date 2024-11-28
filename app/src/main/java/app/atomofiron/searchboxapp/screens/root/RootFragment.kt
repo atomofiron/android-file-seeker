@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseFragment
@@ -12,8 +13,7 @@ import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.Companion.getLayout
 import app.atomofiron.searchboxapp.databinding.FragmentRootBinding
 import app.atomofiron.searchboxapp.screens.main.fragment.SnackbarCallbackFragmentDelegate.SnackbarCallbackOutput
-import lib.atomofiron.android_window_insets_compat.defaultTypeMask
-import lib.atomofiron.android_window_insets_compat.insetsProxying
+import com.google.android.material.R as MaterialR
 
 class RootFragment : Fragment(R.layout.fragment_root),
     BaseFragment<RootFragment, RootViewState, RootPresenter> by BaseFragmentImpl()
@@ -35,19 +35,17 @@ class RootFragment : Fragment(R.layout.fragment_root),
     }
 
     private fun FragmentRootBinding.applyInsets() {
-        root.insetsProxying()
-        rootFlContainer.insetsProxying()
         applyToSnackbarContainer()
     }
 
     override fun onBack(): Boolean = presenter.onBack()
 
     private fun FragmentRootBinding.applyToSnackbarContainer() {
-        val railSize = resources.getDimensionPixelSize(R.dimen.m3_navigation_rail_default_width)
-        val bottomSize = resources.getDimensionPixelSize(R.dimen.m3_bottom_nav_min_height)
+        val railSize = resources.getDimensionPixelSize(MaterialR.dimen.m3_navigation_rail_default_width)
+        val bottomSize = resources.getDimensionPixelSize(MaterialR.dimen.m3_bottom_nav_min_height)
         ViewCompat.setOnApplyWindowInsetsListener(snackbarContainer) { container, windowInsets ->
             val layout = root.getLayout()
-            val insets = windowInsets.getInsets(defaultTypeMask)
+            val insets = windowInsets.getInsets(Type.systemBars() or Type.displayCutout())
             container.updatePadding(
                 left = insets.left + if (layout.isLeft) railSize else 0,
                 right = insets.right + if (layout.isRight) railSize else 0,

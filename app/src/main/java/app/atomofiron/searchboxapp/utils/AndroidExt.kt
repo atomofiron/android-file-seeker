@@ -41,6 +41,7 @@ import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable.Companion.setBallsDrawable
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import com.google.android.material.R as MaterialR
 import com.google.android.material.navigation.NavigationBarView
 import java.io.Serializable
 import java.util.*
@@ -94,7 +95,7 @@ fun <T> List<T>.subListLastReversedWhile(predicate: (T) -> Boolean): List<T> {
     return list
 }
 
-fun <I> ActivityResultLauncher<I>.resolve(context: Context, input: I?): Boolean {
+fun <I> ActivityResultLauncher<I>.resolve(context: Context, input: I): Boolean {
     val intent = contract.createIntent(context, input)
     val info = intent.resolveActivity(context.packageManager)
     return info != null
@@ -156,7 +157,7 @@ private fun NavigationBarView.updateItem(itemId: Int, iconId: Int, icon: Drawabl
         val drawable = when {
             icon != null -> icon
             iconId == R.drawable.progress_loop -> {
-                val iv = itemView.findViewById<ImageView>(R.id.navigation_bar_item_icon_view)
+                val iv = itemView.findViewById<ImageView>(MaterialR.id.navigation_bar_item_icon_view)
                 iv.setBallsDrawable()
             }
             else -> ContextCompat.getDrawable(context, iconId)

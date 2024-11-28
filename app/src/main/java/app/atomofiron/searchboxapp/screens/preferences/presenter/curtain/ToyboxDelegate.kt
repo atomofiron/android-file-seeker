@@ -11,7 +11,6 @@ import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.Shell
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
 import java.io.File
 
 class ToyboxDelegate(
@@ -32,7 +31,7 @@ class ToyboxDelegate(
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
         val binding = CurtainPreferenceToyboxBinding.inflate(inflater, null, false)
         binding.init()
-        binding.root.applyPaddingInsets(vertical = true)
+        // todo binding.root.applyPaddingInsets(vertical = true)
         return CurtainApi.ViewHolder(binding.root)
     }
 

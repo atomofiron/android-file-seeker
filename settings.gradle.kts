@@ -1,9 +1,14 @@
 pluginManagement {
     repositories {
-        google()
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
         mavenCentral()
         gradlePluginPortal()
-        maven { url "https://jitpack.io" }
         jcenter()
     }
 }
@@ -12,9 +17,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://jitpack.io" }
         jcenter()
     }
 }
-rootProject.name = "android-search-box-app"
-include ':app'
+
+rootProject.name = "File Seeker"
+include(":app")

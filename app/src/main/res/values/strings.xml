@@ -1,4 +1,5 @@
 <resources>
+    <string name="app_name" translatable="false">File Seeker</string>
     <string name="tips">Tips</string>
 
     <string name="case_sens">Case sensitivity</string>

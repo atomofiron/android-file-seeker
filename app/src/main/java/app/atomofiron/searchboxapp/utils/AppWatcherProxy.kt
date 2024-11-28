@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.utils
 
 import leakcanary.LeakCanary
 
+// todo add wrappers for build variants
 class AppWatcherProxy {
 
     var isEnabled: Boolean

@@ -21,7 +21,6 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapte
 import app.atomofiron.searchboxapp.screens.main.util.KeyCodeConsumer
 import app.atomofiron.searchboxapp.utils.getString
 import com.google.android.material.snackbar.Snackbar
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
 
 class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     BaseFragment<ExplorerFragment, ExplorerViewState, ExplorerPresenter> by BaseFragmentImpl(),
@@ -114,9 +113,9 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     override fun onApplyInsets(root: View) {
         binding.run {
-            explorerTabs.applyPaddingInsets(start = true, top = true, end = true)
-            bottomBar.applyPaddingInsets(start = true, bottom = true, end = true)
-            navigationRail.applyPaddingInsets()
+            // todo explorerTabs.applyPaddingInsets(start = true, top = true, end = true)
+            // todo bottomBar.applyPaddingInsets(start = true, bottom = true, end = true)
+            // todo navigationRail.applyPaddingInsets()
             LayoutDelegate(
                 this.root,
                 explorerViews,

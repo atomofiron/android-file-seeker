@@ -14,7 +14,7 @@ class DropDownPreference(
 ) : DropDownPreference(context, attrs) {
 
     init {
-        layoutResource = R.layout.preference_material
+        layoutResource = androidx.preference.R.layout.preference_material
         widgetLayoutResource = R.layout.widget_spinner
         super.setSummary(null)
     }

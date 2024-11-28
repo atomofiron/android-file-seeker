@@ -9,6 +9,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.NotificationManagerCompat.IMPORTANCE_HIGH
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.searchboxapp.R
+import com.google.android.material.R as MaterialR
 
 object Notifications {
     const val NOTIFICATION_CHANNEL_ID_UPDATE = "channel_update"
@@ -31,7 +32,7 @@ object Notifications {
             .setSmallIcon(R.drawable.ic_explorer_folder)
             .setContentIntent(notificationIntent)
             .addAction(0, context.getString(actionId), actionIntent)
-            .setColor(context.findColorByAttr(R.attr.colorPrimary))
+            .setColor(context.findColorByAttr(MaterialR.attr.colorPrimary))
             .build()
         notificationManager.notify(NOTIFICATION_ID_UPDATE, notification)
     }

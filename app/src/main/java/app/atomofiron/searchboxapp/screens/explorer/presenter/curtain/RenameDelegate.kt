@@ -11,7 +11,6 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMenuDelegate
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
 
 class RenameDelegate(
     private val output: ExplorerCurtainMenuDelegate,
@@ -26,7 +25,7 @@ class RenameDelegate(
     }
 
     private fun CurtainExplorerRenameBinding.init(data: RenameData) {
-        root.applyPaddingInsets(vertical = true)
+        // todo root.applyPaddingInsets(vertical = true)
         val holder = ExplorerHolder(explorerRenameItem.root)
         holder.bind(data.item)
         holder.bindComposition(data.composition)

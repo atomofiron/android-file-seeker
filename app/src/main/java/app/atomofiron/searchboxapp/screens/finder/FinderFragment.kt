@@ -20,7 +20,6 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderSpanSizeLookup
 import app.atomofiron.searchboxapp.screens.finder.history.adapter.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
 
 class FinderFragment : Fragment(R.layout.fragment_finder),
     BaseFragment<FinderFragment, FinderViewState, FinderPresenter> by BaseFragmentImpl()
@@ -115,9 +114,9 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
     override fun onApplyInsets(root: View) {
         binding.run {
-            recyclerView.applyPaddingInsets()
-            bottomBar.applyPaddingInsets(start = true, bottom = true, end = true)
-            navigationRail.applyPaddingInsets()
+            // todo recyclerView.applyPaddingInsets()
+            // todo bottomBar.applyPaddingInsets(start = true, bottom = true, end = true)
+            // todo navigationRail.applyPaddingInsets()
             LayoutDelegate(
                 coordinator,
                 recyclerView = recyclerView,

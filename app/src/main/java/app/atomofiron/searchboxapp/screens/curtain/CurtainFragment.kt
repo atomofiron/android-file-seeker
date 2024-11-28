@@ -29,9 +29,8 @@ import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.curtain.fragment.TransitionAnimator
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainBackground
+import com.google.android.material.R as MaterialR
 import com.google.android.material.snackbar.Snackbar
-import lib.atomofiron.android_window_insets_compat.defaultTypeMask
-import lib.atomofiron.android_window_insets_compat.dispatchChildrenWindowInsets
 import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.min
@@ -113,7 +112,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         val verticalPadding = resources.getDimensionPixelSize(R.dimen.curtain_padding_top)
         root.setLayoutListener { root.requestApplyInsets() }
         ViewCompat.setOnApplyWindowInsetsListener(root) { root, windowInsets ->
-            val insets = windowInsets.getInsets(defaultTypeMask)
+            val insets = windowInsets.getInsets(Type.systemBars() or Type.displayCutout())
             val builder = WindowInsetsCompat.Builder()
             var navigationBars = windowInsets.getInsets(Type.navigationBars())
             val layout = root.getLayout()
@@ -130,7 +129,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
             builder.setInsets(Type.ime(), Insets.of(0, 0, 0, ime.bottom + bottomPadding))
             builder.setInsets(Type.statusBars(), Insets.of(0, verticalPadding, 0, 0))
             val sheetInsets = builder.build()
-            curtainSheet.dispatchChildrenWindowInsets(sheetInsets)
+            // todo curtainSheet.dispatchChildrenWindowInsets(sheetInsets)
             val horizontal = when {
                 !layout.withJoystick -> 0 to 0
                 layout.isLeft -> joystickSize to 0
@@ -211,10 +210,10 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         val context = context ?: return
         val snackbar = provider.getSnackbar(binding.root)
         if (!context.isDarkTheme()) {
-            val colorSurface = context.findColorByAttr(R.attr.colorSurface)
-            val colorOnSurface = context.findColorByAttr(R.attr.colorOnSurface)
-            val colorPrimaryDark = context.findColorByAttr(R.attr.colorPrimaryDark)
-            val alpha = ResourcesCompat.getFloat(resources, R.dimen.mtrl_snackbar_background_overlay_color_alpha)
+            val colorSurface = context.findColorByAttr(MaterialR.attr.colorSurface)
+            val colorOnSurface = context.findColorByAttr(MaterialR.attr.colorOnSurface)
+            val colorPrimaryDark = context.findColorByAttr(MaterialR.attr.colorPrimaryDark)
+            val alpha = ResourcesCompat.getFloat(resources, MaterialR.dimen.mtrl_snackbar_background_overlay_color_alpha)
             val backgroundColor = MaterialColors.layer(colorOnSurface, colorSurface, alpha)
             snackbar
                 .setBackgroundTint(backgroundColor)

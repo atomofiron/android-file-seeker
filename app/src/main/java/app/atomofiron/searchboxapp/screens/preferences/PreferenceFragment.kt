@@ -28,7 +28,7 @@ import app.atomofiron.searchboxapp.screens.preferences.fragment.*
 import app.atomofiron.searchboxapp.utils.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.Shell
 import com.google.android.material.appbar.AppBarLayout
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
+import com.google.android.material.R as MaterialR
 
 class PreferenceFragment : PreferenceFragmentCompat(),
     BaseFragment<PreferenceFragment, PreferenceViewState, PreferencePresenter> by BaseFragmentImpl()
@@ -75,7 +75,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         preferenceScreen.fixIcons()
         recyclerView.clipToPadding = false
         recyclerView.updatePadding(top = resources.getDimensionPixelSize(R.dimen.content_margin_half))
-        recyclerView.applyPaddingInsets(start = true, end = true, bottom = true)
+        // todo recyclerView.applyPaddingInsets(start = true, end = true, bottom = true)
         toolbar.setNavigationOnClickListener { presenter.onNavigationClick() }
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -94,7 +94,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
 
     private fun PreferenceGroup.fixIcons() {
         // todo foresee NoticeableDrawable and colored icons
-        val iconTint = requireContext().findColorByAttr(R.attr.colorControlNormal)
+        val iconTint = requireContext().findColorByAttr(MaterialR.attr.colorControlNormal)
         forEach {
             it.icon?.setTint(iconTint)
             if (it is PreferenceGroup) it.fixIcons()

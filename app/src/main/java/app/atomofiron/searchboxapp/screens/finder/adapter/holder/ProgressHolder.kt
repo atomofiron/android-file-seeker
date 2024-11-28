@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.textviewer.SearchState
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
 import app.atomofiron.searchboxapp.utils.Const
+import com.google.android.material.R as MaterialR
 
 class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListener) : CardViewHolder(parent, layoutId) {
     private val tvLabel = itemView.findViewById<TextView>(R.id.progress_tv_label)
@@ -55,8 +56,8 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
             else -> R.string.done
         }
         val colorLabel = when {
-            task.isError -> context.findColorByAttr(R.attr.colorError)
-            else -> context.findColorByAttr(R.attr.colorAccent)
+            task.isError -> context.findColorByAttr(MaterialR.attr.colorError)
+            else -> context.findColorByAttr(MaterialR.attr.colorAccent)
         }
         tvLabel.setText(idLabel)
         tvLabel.setTextColor(colorLabel)

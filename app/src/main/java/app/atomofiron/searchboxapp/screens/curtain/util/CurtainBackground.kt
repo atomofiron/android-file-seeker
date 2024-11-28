@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.utils.getColorByAttr
 import app.atomofiron.searchboxapp.utils.setColorAlpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.asOverlayOn
+import com.google.android.material.R as MaterialR
 
 open class CurtainBackground(context: Context) : Drawable() {
 
@@ -17,13 +18,13 @@ open class CurtainBackground(context: Context) : Drawable() {
     private val cornerRadius = context.resources.getDimension(R.dimen.corner_extra_large)
     private val curtainColor = context.getColorByAttr(R.attr.colorBackground)
     private val strokeWidth = if (isBlackDeep) context.resources.getDimensionPixelSize(R.dimen.stroke_width) else 0
-    private val dragHandleColor = ColorUtils.setAlphaComponent(context.getColorByAttr(R.attr.colorOnSurfaceVariant), 102)
+    private val dragHandleColor = ColorUtils.setAlphaComponent(context.getColorByAttr(MaterialR.attr.colorOnSurfaceVariant), 102)
     private val dragHandleRect = RectF()
     private val dragHandleWidth = context.resources.getDimension(R.dimen.drag_handle_width)
     private val dragHandleMargin = context.resources.getDimension(R.dimen.drag_handle_margin)
     private val strokeColor = when {
         isBlackDeep -> context
-            .getColorByAttr(R.attr.strokeColor)
+            .getColorByAttr(MaterialR.attr.strokeColor)
             .setColorAlpha(Const.ALPHA_50_PERCENT)
             .asOverlayOn(curtainColor)
         else -> Color.TRANSPARENT

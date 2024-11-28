@@ -25,7 +25,6 @@ import app.atomofiron.searchboxapp.utils.updateItem
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_NO_SCROLL
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
 
 class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
     BaseFragment<TextViewerFragment, TextViewerViewState, TextViewerPresenter> by BaseFragmentImpl()
@@ -87,7 +86,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
 
     override fun onApplyInsets(root: View) {
         binding.run {
-            recyclerView.applyPaddingInsets(start = true, end = true, bottom = true)
+            // todo recyclerView.applyPaddingInsets(start = true, end = true, bottom = true)
             LayoutDelegate(
                 root as ViewGroup,
                 recyclerView = recyclerView,

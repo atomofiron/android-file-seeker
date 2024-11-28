@@ -12,6 +12,7 @@ import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
+import com.google.android.material.R as MaterialR
 import kotlin.math.max
 import kotlin.math.min
 
@@ -42,7 +43,7 @@ class ItemBorderDecorator(
         paint.style = Paint.Style.FILL
         paint.strokeCap = Paint.Cap.ROUND
         paint.strokeWidth = borderWidth
-        paint.color = headerView.context.findColorByAttr(R.attr.colorSecondary)
+        paint.color = headerView.context.findColorByAttr(MaterialR.attr.colorSecondary)
     }
 
     fun setCurrentDir(item: Node?) {

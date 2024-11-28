@@ -19,7 +19,6 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.OnScrollI
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.scrollToTop
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
 
 @SuppressLint("ViewConstructor")
 class ExplorerView(
@@ -73,8 +72,8 @@ class ExplorerView(
     }
 
     private fun ViewExplorerBinding.applyInsets() {
-        recyclerView.applyPaddingInsets()
-        explorerHeader.applyPaddingInsets(start = true, top = true, end = true)
+        // todo recyclerView.applyPaddingInsets()
+        // todo explorerHeader.applyPaddingInsets(start = true, top = true, end = true)
     }
 
     fun onInsetsApplied() = spanSizeLookup.updateSpanCount(recyclerView)

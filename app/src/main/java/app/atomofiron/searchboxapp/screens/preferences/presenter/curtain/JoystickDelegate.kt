@@ -12,14 +12,14 @@ import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import app.atomofiron.searchboxapp.databinding.CurtainPreferenceJoystickBinding
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
+import com.google.android.material.R as MaterialR
 
 class JoystickDelegate(
     private val preferenceStore: PreferenceStore,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
     companion object {
         private fun JoystickComposition.withPrimary(context: Context): JoystickComposition {
-            val color = context.findColorByAttr(R.attr.colorPrimary)
+            val color = context.findColorByAttr(MaterialR.attr.colorPrimary)
             return copy(red = Color.red(color), green = Color.green(color), blue = Color.blue(color))
         }
     }
@@ -29,7 +29,7 @@ class JoystickDelegate(
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
         val binding = CurtainPreferenceJoystickBinding.inflate(inflater, null, false)
         binding.init()
-        binding.root.applyPaddingInsets(vertical = true)
+        // todo binding.root.applyPaddingInsets(vertical = true)
         return CurtainApi.ViewHolder(binding.root)
     }
 

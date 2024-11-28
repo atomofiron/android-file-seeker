@@ -6,6 +6,7 @@ import android.content.res.AssetManager
 import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
+import androidx.core.content.pm.PackageInfoCompat
 import androidx.room.util.copy
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.set
@@ -786,15 +787,17 @@ class ExplorerService(
         val content = content
         return when {
             content is NodeContent.File.Apk && content.thumbnail == null -> {
-                val info = packageManager.getPackageArchiveInfo(path, 0)
+                val packageInfo = packageManager.getPackageArchiveInfo(path, 0)
+                val info = packageInfo?.applicationInfo
                 info ?: return this
-                info.applicationInfo.sourceDir = path
-                info.applicationInfo.publicSourceDir = path
+                info.sourceDir = path
+                info.publicSourceDir = path
+
                 val new = NodeContent.File.Apk(
-                    thumbnail = info.applicationInfo.loadIcon(packageManager),
-                    appName = info.applicationInfo.loadLabel(packageManager).toString(),
-                    versionName = info.versionName,
-                    versionCode = info.versionCode,
+                    thumbnail = info.loadIcon(packageManager),
+                    appName = info.loadLabel(packageManager).toString(),
+                    versionName = packageInfo.versionName.toString(),
+                    versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt(),
                 )
                 copy(content = new)
             }

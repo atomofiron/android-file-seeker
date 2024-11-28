@@ -93,7 +93,7 @@ class CustomFragmentNavigator(
       {@link FragmentManager#setFragmentFactory(FragmentFactory)} to control
       instantiation of Fragments."""
     )
-    public open fun instantiateFragment(
+    open fun instantiateFragment(
         context: Context,
         fragmentManager: FragmentManager,
         className: String,
@@ -225,14 +225,14 @@ class CustomFragmentNavigator(
         }
     }
 
-    public override fun onSaveState(): Bundle? {
+    override fun onSaveState(): Bundle? {
         if (savedIds.isEmpty()) {
             return null
         }
         return bundleOf(KEY_SAVED_IDS to ArrayList(savedIds))
     }
 
-    public override fun onRestoreState(savedState: Bundle) {
+    override fun onRestoreState(savedState: Bundle) {
         val savedIds = savedState.getStringArrayList(KEY_SAVED_IDS)
         if (savedIds != null) {
             this.savedIds.clear()

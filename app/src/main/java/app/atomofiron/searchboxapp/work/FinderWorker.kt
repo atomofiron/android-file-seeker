@@ -60,7 +60,7 @@ class FinderWorker(
 
         fun inputData(
             query: String, useSu: Boolean, useRegex: Boolean, maxSize: Int, ignoreCase: Boolean, excludeDirs: Boolean,
-            isMultiline: Boolean, forContent: Boolean, maxDepth: Int, where: Array<String>,
+            isMultiline: Boolean, forContent: Boolean, maxDepth: Int, where: Array<String?>,
         ) = Data.Builder()
             .putString(KEY_QUERY, query)
             .putBoolean(KEY_USE_SU, useSu)

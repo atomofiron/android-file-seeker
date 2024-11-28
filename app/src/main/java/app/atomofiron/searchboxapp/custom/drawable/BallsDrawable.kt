@@ -10,6 +10,7 @@ import android.widget.ImageView
 import app.atomofiron.common.util.WeakDrawableCallback
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.searchboxapp.R
+import com.google.android.material.R as MaterialR
 import kotlin.math.min
 
 class BallsDrawable private constructor(context: Context) : Drawable(), ValueAnimator.AnimatorUpdateListener, View.OnAttachStateChangeListener {
@@ -37,7 +38,7 @@ class BallsDrawable private constructor(context: Context) : Drawable(), ValueAni
     private val animator = ValueAnimator.ofFloat(0f, Math.PI.toFloat())
 
     init {
-        val colorAccent = context.findColorByAttr(R.attr.colorAccent)
+        val colorAccent = context.findColorByAttr(MaterialR.attr.colorAccent)
         paintCircle.color = colorAccent
         paintBall.color = colorAccent
         if (oneBall) {

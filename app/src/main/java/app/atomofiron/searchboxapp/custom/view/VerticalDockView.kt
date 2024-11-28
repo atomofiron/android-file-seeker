@@ -14,8 +14,6 @@ import com.google.android.material.navigation.NavigationView
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.LayoutDrawerNavigationBinding
 import app.atomofiron.searchboxapp.utils.Const
-import lib.atomofiron.android_window_insets_compat.applyPaddingInsets
-import lib.atomofiron.android_window_insets_compat.insetsProxying
 
 class VerticalDockView @JvmOverloads constructor(
     context: Context,
@@ -50,9 +48,8 @@ class VerticalDockView @JvmOverloads constructor(
             background = background.mutate()
             background.alpha = Const.ALPHA_80_PERCENT
         }
-        this.insetsProxying()
-        binding.drawerTitleContainer.applyPaddingInsets(start = true, top = true, end = true)
-        binding.drawerRv.applyPaddingInsets()
+        // todo binding.drawerTitleContainer.applyPaddingInsets(start = true, top = true, end = true)
+        // todo binding.drawerRv.applyPaddingInsets()
     }
 
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {

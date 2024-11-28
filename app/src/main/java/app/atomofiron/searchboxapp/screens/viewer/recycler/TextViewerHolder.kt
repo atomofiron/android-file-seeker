@@ -10,37 +10,38 @@ import app.atomofiron.searchboxapp.custom.view.style.EntireLineSpan
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
+import com.google.android.material.R as MaterialR
 
 class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>(textView) {
     private val spanPart: RoundedBackgroundSpan
         get() = RoundedBackgroundSpan(
-            backgroundColor = context.findColorByAttr(R.attr.colorSurfaceVariant),
-            borderColor = context.findColorByAttr(R.attr.colorSecondary),
-            textColor = context.findColorByAttr(R.attr.colorOnSurfaceVariant),
+            backgroundColor = context.findColorByAttr(MaterialR.attr.colorSurfaceVariant),
+            borderColor = context.findColorByAttr(MaterialR.attr.colorSecondary),
+            textColor = context.findColorByAttr(MaterialR.attr.colorOnSurfaceVariant),
             context.resources.getDimension(R.dimen.background_span_corner_radius),
             context.resources.getDimension(R.dimen.background_span_border_thickness),
     )
 
     private val spanPartFocus: RoundedBackgroundSpan
         get() = RoundedBackgroundSpan(
-            backgroundColor = context.findColorByAttr(R.attr.colorSecondary),
-            borderColor = context.findColorByAttr(R.attr.colorPrimary),
-            textColor = context.findColorByAttr(R.attr.colorOnSecondary),
+            backgroundColor = context.findColorByAttr(MaterialR.attr.colorSecondary),
+            borderColor = context.findColorByAttr(MaterialR.attr.colorPrimary),
+            textColor = context.findColorByAttr(MaterialR.attr.colorOnSecondary),
             context.resources.getDimension(R.dimen.background_span_corner_radius),
             context.resources.getDimension(R.dimen.background_span_border_thickness),
     )
 
     private val spanLine: EntireLineSpan
         get() = EntireLineSpan(
-            context.findColorByAttr(R.attr.colorSecondary),
-            context.findColorByAttr(R.attr.colorOnSecondary),
+            context.findColorByAttr(MaterialR.attr.colorSecondary),
+            context.findColorByAttr(MaterialR.attr.colorOnSecondary),
             context.resources.getDimension(R.dimen.background_span_corner_radius)
     )
 
     private val spanLineFocus: EntireLineSpan
         get() = EntireLineSpan(
-            context.findColorByAttr(R.attr.colorTertiary),
-            context.findColorByAttr(R.attr.colorOnTertiary),
+            context.findColorByAttr(MaterialR.attr.colorTertiary),
+            context.findColorByAttr(MaterialR.attr.colorOnTertiary),
             context.resources.getDimension(R.dimen.background_span_corner_radius)
     )
 
