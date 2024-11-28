@@ -52,10 +52,9 @@ class PreferenceModule {
         scope: CoroutineScope,
         viewState: PreferenceViewState,
         preferenceService: PreferenceService,
-        preferenceStore: PreferenceStore,
         preferenceChannel: PreferenceChannel,
     ): ExportImportDelegate.ExportImportOutput {
-        return ExportImportPresenterDelegate(scope, viewState, preferenceService, preferenceStore, preferenceChannel)
+        return ExportImportPresenterDelegate(scope, viewState, preferenceService, preferenceChannel)
     }
 
     @Provides
