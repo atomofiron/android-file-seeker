@@ -1,5 +1,6 @@
 /build
 /.idea
+!/.idea/icon.png
 *.iml
 /gradle/wrapper/gradle-wrapper.jar
 gradlew*
