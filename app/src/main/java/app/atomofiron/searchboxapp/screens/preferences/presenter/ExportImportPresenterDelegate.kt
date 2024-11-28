@@ -1,12 +1,9 @@
 package app.atomofiron.searchboxapp.screens.preferences.presenter
 
-import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.service.PreferenceService
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
-import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState
 import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExportImportDelegate
 import app.atomofiron.searchboxapp.utils.Shell
@@ -16,15 +13,8 @@ class ExportImportPresenterDelegate(
     private val scope: CoroutineScope,
     private val viewState: PreferenceViewState,
     private val preferenceService: PreferenceService,
-    private val preferenceStore: PreferenceStore,
     private val preferenceChannel: PreferenceChannel,
 ) : ExportImportDelegate.ExportImportOutput {
-
-    init {
-        preferenceStore.appTheme.collect(scope) {
-            viewState.showDeepBlack.value = it !is AppTheme.Light
-        }
-    }
 
     override fun exportPreferences() {
         val output = preferenceService.exportPreferences()

@@ -17,7 +17,7 @@ class PreferencePresenter(
     exportImportDelegate: ExportImportDelegate.ExportImportOutput,
     preferenceClickOutput: PreferenceClickOutput,
     private val preferenceStore: PreferenceStore,
-    private val appStore: AppStore,
+    appStore: AppStore,
 ) : BasePresenter<PreferenceViewModel, PreferenceRouter>(scope, router),
     ExportImportDelegate.ExportImportOutput by exportImportDelegate,
     PreferenceClickOutput by preferenceClickOutput
@@ -26,6 +26,9 @@ class PreferencePresenter(
     val resources by appStore.resourcesProperty
 
     init {
+        preferenceStore.appTheme.collect(scope) {
+            viewState.showDeepBlack.value = it !is AppTheme.Light
+        }
         onSubscribeData()
     }
 
