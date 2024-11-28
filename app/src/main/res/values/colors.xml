@@ -32,10 +32,6 @@
 	<color name="accent_red">#ffad7874</color>
 	<color name="accent_yellow">#ffada874</color>
 
-	<!--todo try remove-->
-	<color name="colorSurface">@color/white</color>
-	<color name="colorOnSurface">@color/black</color>
-
 	<!-- -->
 
 	<color name="transparent">#00000000</color>
