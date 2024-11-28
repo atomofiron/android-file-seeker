@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.annotation.SuppressLint
+import android.app.Notification
 import android.app.NotificationChannel
 import android.content.Context
 import android.content.Intent
@@ -27,6 +28,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.annotation.StyleableRes
+import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
@@ -266,8 +268,24 @@ inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String, 
     else -> getSerializable(key) as T?
 }
 
-fun Context.canNotifications(): Boolean {
+fun Context.canNotice(): Boolean {
     return SDK_INT < TIRAMISU || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED
+}
+
+inline fun Context.ifCanNotice(action: () -> Unit): Boolean {
+    return canNotice().also { if (it) action() }
+}
+
+typealias IdNotification = Pair<Int, Notification>
+
+inline fun Context.showIfAllowed(action: NotificationManagerCompat.() -> IdNotification): Boolean {
+    if (SDK_INT < TIRAMISU || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
+        val manager = NotificationManagerCompat.from(this)
+        val (id, notification) = manager.action()
+        manager.notify(id, notification)
+        return true
+    }
+    return false
 }
 
 fun Context.canForegroundService(): Boolean {

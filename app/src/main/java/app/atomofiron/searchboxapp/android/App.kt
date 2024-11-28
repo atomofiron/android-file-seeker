@@ -5,7 +5,8 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES.O
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.Configuration
@@ -15,13 +16,15 @@ import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.IdNotification
 import app.atomofiron.searchboxapp.utils.getMarketIntent
 import app.atomofiron.searchboxapp.utils.immutable
-import com.google.android.material.R as MaterialR
+import app.atomofiron.searchboxapp.utils.showIfAllowed
 import com.google.android.material.color.DynamicColors
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.UpdateAvailability
 import javax.inject.Inject
+import com.google.android.material.R as MaterialR
 
 class App : Application(), Configuration.Provider {
 
@@ -50,7 +53,7 @@ class App : Application(), Configuration.Provider {
             val availability = appUpdateInfo.updateAvailability()
             val isAvailable = availability == UpdateAvailability.UPDATE_AVAILABLE
             when {
-                isAvailable -> showNotificationForUpdate()
+                isAvailable -> showIfAllowed(::showNotificationForUpdate)
                 !BuildConfig.DEBUG -> {
                     val throwable = Throwable("${Const.ERROR_UPDATE_AVAILABILITY} Availability: $availability")
                     // reportError(Const.ERROR_UPDATE_AVAILABILITY, throwable)
@@ -64,17 +67,16 @@ class App : Application(), Configuration.Provider {
         }
     }
 
-    private fun showNotificationForUpdate() {
-        val notificationManager = NotificationManagerCompat.from(this)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            var channel = notificationManager.getNotificationChannel(Const.NOTIFICATION_CHANNEL_UPDATE_ID)
+    private fun showNotificationForUpdate(manager: NotificationManagerCompat): IdNotification {
+        if (SDK_INT >= O) {
+            var channel = manager.getNotificationChannel(Const.NOTIFICATION_CHANNEL_UPDATE_ID)
             if (channel == null) {
                 channel = NotificationChannel(
-                        Const.NOTIFICATION_CHANNEL_UPDATE_ID,
-                        getString(R.string.channel_name_updates),
-                        NotificationManager.IMPORTANCE_HIGH
+                    Const.NOTIFICATION_CHANNEL_UPDATE_ID,
+                    getString(R.string.channel_name_updates),
+                    NotificationManager.IMPORTANCE_HIGH
                 )
-                notificationManager.createNotificationChannel(channel)
+                manager.createNotificationChannel(channel)
             }
         }
         val flag = PendingIntent.FLAG_UPDATE_CURRENT.immutable()
@@ -88,8 +90,6 @@ class App : Application(), Configuration.Provider {
                 .addAction(0, getString(R.string.get_update), actionIntent)
                 .setColor(findColorByAttr(MaterialR.attr.colorPrimary))
                 .build()
-
-        // todo check permission
-        notificationManager.notify(Const.NOTIFICATION_ID_UPDATE, notification)
+         return Const.NOTIFICATION_ID_UPDATE to notification
     }
 }

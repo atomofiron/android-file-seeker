@@ -269,16 +269,13 @@ class FinderWorker(
             }
             dataBuilder.putString(KEY_EXCEPTION, e.toString())
         } finally {
-            if (context.canNotifications()) {
-                showNotification()
-            }
+            context.ifCanNotice(::showNotification)
         }
         return Result.success(dataBuilder.build())
     }
 
     override suspend fun getForegroundInfo() = ForegroundInfo(Const.FOREGROUND_NOTIFICATION_ID, foregroundNotification())
 
-    @SuppressLint("MissingPermission")
     private fun showNotification() {
         val task = task
         task.state as SearchState.Ended
@@ -307,7 +304,8 @@ class FinderWorker(
         } ?: (null to null)
         val error = task.error?.let { context.getString(R.string.search_error, it) }
         text = arrayOf(text, error).filterNotNull().joinToString(separator = ".\n")
-        val notification = NotificationCompat.Builder(context, Const.RESULT_NOTIFICATION_CHANNEL_ID)
+        context.showIfAllowed {
+            val notification = NotificationCompat.Builder(context, Const.RESULT_NOTIFICATION_CHANNEL_ID)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setContentTitle(context.getString(titleId))
                 .setSubText(subText)
@@ -318,15 +316,15 @@ class FinderWorker(
                 .setContentIntent(pendingIntent)
                 .build()
 
-        notification.flags = notification.flags or NotificationCompat.FLAG_AUTO_CANCEL
+            notification.flags = notification.flags or NotificationCompat.FLAG_AUTO_CANCEL
 
-        context.updateNotificationChannel(
-            Const.RESULT_NOTIFICATION_CHANNEL_ID,
-            context.getString(R.string.result_notification_name),
-            NotificationManagerCompat.IMPORTANCE_DEFAULT,
-        )
-
-        notificationManager.notify(id, notification)
+            context.updateNotificationChannel(
+                Const.RESULT_NOTIFICATION_CHANNEL_ID,
+                context.getString(R.string.result_notification_name),
+                NotificationManagerCompat.IMPORTANCE_DEFAULT,
+            )
+            id to notification
+        }
     }
 
     private fun foregroundNotification(): Notification {

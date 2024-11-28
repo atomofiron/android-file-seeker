@@ -1,11 +1,8 @@
 package app.atomofiron.common.util.permission
 
 import android.content.pm.PackageManager
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.M
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.property.WeakProperty
@@ -41,7 +38,6 @@ class PermissionDelegate private constructor(
     }
 
     override fun check(vararg permissions: String): PermissionDelegateApi {
-        if (SDK_INT < M) return this
         val notGranted = activity?.filterNotGranted(*permissions)
         notGranted?.forEach { permission ->
             activity?.run {
@@ -53,7 +49,6 @@ class PermissionDelegate private constructor(
     }
 
     override fun request(vararg permissions: String): PermissionDelegateApi {
-        if (SDK_INT < M) return this
         val contract = contractLauncher ?: return this
         val notGranted = activity?.filterNotGranted(*permissions)
         requestedPermissions.clear()
@@ -73,7 +68,7 @@ class PermissionDelegate private constructor(
                     notifyGranted(entry.key)
                 }
                 else -> {
-                    val should = (SDK_INT > M) && activity?.shouldShowRequestPermissionRationale(entry.key) != false
+                    val should = activity?.shouldShowRequestPermissionRationale(entry.key) != false
                     rememberStatus(Status.Denied(entry.key, should))
                     notifyDenied(entry.key, should)
                 }
@@ -81,7 +76,6 @@ class PermissionDelegate private constructor(
         }
     }
 
-    @RequiresApi(M)
     private fun FragmentActivity.filterNotGranted(vararg permissions: String): List<String> {
         val notGranted = mutableListOf<String>()
         for (permission in permissions) {
@@ -97,7 +91,6 @@ class PermissionDelegate private constructor(
     override fun granted(callback: GrantedCallback): PermissionDelegateApi {
         requestedPermissions.forEach { permission ->
             when {
-                SDK_INT < M -> callback(permission)
                 isGranted(permission) -> callback(permission)
                 requestedPermissions.contains(permission) -> grantedCallbacks.add(permission, callback)
             }
@@ -108,7 +101,6 @@ class PermissionDelegate private constructor(
     override fun denied(callback: DeniedCallback): PermissionDelegateApi {
         requestedPermissions.forEach { permission ->
             when {
-                SDK_INT < M -> Unit
                 isGranted(permission) -> Unit
                 requestedPermissions.contains(permission) -> deniedCallbacks.add(permission, callback)
                 else -> when (val status = getStatus(permission)) {
@@ -128,7 +120,6 @@ class PermissionDelegate private constructor(
 
     override fun granted(permission: String, callback: ExactGrantedCallback): PermissionDelegateApi {
         when {
-            SDK_INT < M -> callback()
             isGranted(permission) -> callback()
             requestedPermissions.contains(permission) -> grantedCallbacks.add(permission, callback)
         }
@@ -137,7 +128,6 @@ class PermissionDelegate private constructor(
 
     override fun denied(permission: String, callback: ExactDeniedCallback): PermissionDelegateApi {
         when {
-            SDK_INT < M -> Unit
             isGranted(permission) -> Unit
             requestedPermissions.contains(permission) -> deniedCallbacks.add(permission, callback)
             else -> when (val status = getStatus(permission)) {
