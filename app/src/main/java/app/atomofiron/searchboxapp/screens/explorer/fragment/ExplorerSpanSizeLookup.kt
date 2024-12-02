@@ -51,7 +51,7 @@ class ExplorerSpanSizeLookup(
                 else -> min(itemCount, calculated)
             }
         }
-        if (spanCount != this.spanCount) {
+        if (spanCount > 0 && spanCount != this.spanCount) {
             layoutManager.spanCount = spanCount
             val remnant = itemCount % spanCount
             rootsAdapter.verticalCount = itemCount - if (remnant > spanCount / 2) 0 else remnant

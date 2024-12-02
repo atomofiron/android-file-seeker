@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,6 +21,7 @@ import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.model.textviewer.SearchTask
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
 import com.google.android.material.navigation.NavigationBarView
+import lib.atomofiron.insets.insetsPadding
 
 class ResultFragment : Fragment(R.layout.fragment_result),
     BaseFragment<ResultFragment, ResultViewState, ResultPresenter> by BaseFragmentImpl()
@@ -82,13 +82,11 @@ class ResultFragment : Fragment(R.layout.fragment_result),
 
     override fun onApplyInsets(root: View) {
         binding.run {
-            // todo recyclerView.applyPaddingInsets()
             LayoutDelegate(
-                root as ViewGroup,
+                this.root,
                 recyclerView = recyclerView,
                 bottomView = bottomBar,
                 railView = navigationRail,
-                systemUiView = systemUiBackground,
                 snackbarContainer = binding.snackbarContainer,
             ) {
                 bottomBar.menu.findItem(R.id.stub).isVisible = it

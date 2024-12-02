@@ -4,11 +4,14 @@ import android.app.Service
 import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.Insets
 import androidx.core.view.WindowCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -18,12 +21,18 @@ import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.custom.LayoutDelegate.Companion.syncWithLayout
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.getLayout
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.syncWithLayout
 import app.atomofiron.searchboxapp.databinding.ActivityMainBinding
+import app.atomofiron.searchboxapp.model.Layout.Ground
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.main.util.offerKeyCodeToChildren
+import app.atomofiron.searchboxapp.utils.ExtType
 import com.google.android.material.color.DynamicColors
+import lib.atomofiron.insets.InsetsSource
+import lib.atomofiron.insets.insetsMargin
+import lib.atomofiron.insets.insetsSource
 
 class MainActivity : AppCompatActivity() {
 
@@ -61,6 +70,24 @@ class MainActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         binding.joystick.setOnClickListener { onEscClick() }
         binding.joystick.syncWithLayout(binding.root)
+        binding.joystick.insetsMargin()
+        binding.joystick.insetsSource { view ->
+            if (!view.isVisible) {
+                return@insetsSource InsetsSource.submit(ExtType.joystickBottom, Insets.NONE)
+            }
+            val parent = view.parent as View
+            val layout = parent.getLayout()
+            when (layout.ground) {
+                Ground.Bottom -> InsetsSource
+                    .submit(ExtType.joystickBottom, Insets.of(0, 0, 0, parent.height - view.top))
+                Ground.Left -> InsetsSource
+                    .submit(ExtType.joystickTop, Insets.of(0, view.bottom, 0, 0))
+                    .submit(ExtType.joystickFlank, Insets.of(view.right, 0, 0, 0))
+                Ground.Right -> InsetsSource
+                    .submit(ExtType.joystickTop, Insets.of(0, view.bottom, 0, 0))
+                    .submit(ExtType.joystickFlank, Insets.of(0, 0, parent.width - view.left, 0))
+            }
+        }
 
         if (savedInstanceState == null) onIntent(intent)
 
@@ -92,7 +119,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun applyInsets() {
-        // todo binding.joystick.applyMarginInsets()
+        binding.joystick.insetsMargin()
     }
 
     override fun onNewIntent(intent: Intent) {

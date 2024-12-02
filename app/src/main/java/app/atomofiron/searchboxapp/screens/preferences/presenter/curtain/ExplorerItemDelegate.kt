@@ -12,6 +12,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.utils.Const
+import lib.atomofiron.insets.insetsPadding
 
 class ExplorerItemDelegate(
     private val preferenceStore: PreferenceStore
@@ -28,7 +29,7 @@ class ExplorerItemDelegate(
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
         val binding = CurtainPreferenceExplorerItemBinding.inflate(inflater, null, false)
         binding.init()
-        // todo binding.root.applyPaddingInsets(vertical = true)
+        binding.root.insetsPadding(vertical = true)
         return CurtainApi.ViewHolder(binding.root)
     }
 

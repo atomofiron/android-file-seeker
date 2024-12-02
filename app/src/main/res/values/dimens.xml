@@ -58,7 +58,7 @@
 	<dimen name="screen_medium">600dp</dimen>
 	<dimen name="finder_column_width">300dp</dimen>
 	<dimen name="curtain_max_width">480dp</dimen>
-	<dimen name="curtain_padding_top">48dp</dimen>
+	<dimen name="curtain_padding">48dp</dimen>
 	<dimen name="drag_handle_width">32dp</dimen>
 	<dimen name="drag_handle_height">4dp</dimen>
 	<dimen name="drag_handle_margin">22dp</dimen>

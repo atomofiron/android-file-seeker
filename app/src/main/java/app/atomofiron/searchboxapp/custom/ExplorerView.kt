@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.custom
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
@@ -18,7 +19,10 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemAc
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.OnScrollIdleSubmitter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
+import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.scrollToTop
+import lib.atomofiron.insets.findInsetsProvider
+import lib.atomofiron.insets.insetsPadding
 
 @SuppressLint("ViewConstructor")
 class ExplorerView(
@@ -72,11 +76,27 @@ class ExplorerView(
     }
 
     private fun ViewExplorerBinding.applyInsets() {
-        // todo recyclerView.applyPaddingInsets()
-        // todo explorerHeader.applyPaddingInsets(start = true, top = true, end = true)
+        recyclerView.insetsPadding(ExtType { barsWithCutout + navigation + rail + joystickFlank + joystickBottom })
+        explorerHeader.insetsPadding(ExtType { barsWithCutout + rail }, start = true, top = true, end = true)
+        root.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
+            override fun onViewAttachedToWindow(view: View) {
+                view.findInsetsProvider()!!.addInsetsListener(systemUiView)
+            }
+            override fun onViewDetachedFromWindow(view: View) {
+                view.findInsetsProvider()!!.removeInsetsListener(systemUiView)
+            }
+        })
     }
 
-    fun onInsetsApplied() = spanSizeLookup.updateSpanCount(recyclerView)
+    override fun setPaddingRelative(start: Int, top: Int, end: Int, bottom: Int) {
+        super.setPaddingRelative(start, top, end, bottom)
+        spanSizeLookup.updateSpanCount(recyclerView)
+    }
+
+    override fun setPadding(left: Int, top: Int, right: Int, bottom: Int) {
+        super.setPadding(left, top, right, bottom)
+        spanSizeLookup.updateSpanCount(recyclerView)
+    }
 
     fun scrollTo(item: Node) = listDelegate.scrollTo(item)
 

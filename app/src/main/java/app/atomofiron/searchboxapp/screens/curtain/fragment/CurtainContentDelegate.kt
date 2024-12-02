@@ -21,7 +21,6 @@ class CurtainContentDelegate(
             node.removeParent()
             binding.curtainSheet.removeAllViews()
             binding.curtainSheet.addView(holder.view)
-            binding.curtainSheet.requestApplyInsets()
         }
     }
 
@@ -35,7 +34,6 @@ class CurtainContentDelegate(
         stack.add(node)
         node.removeParent()
         binding.curtainSheet.addView(view)
-        view.requestApplyInsets()
         transitionAnimator.startTransition(forward = true)
     }
 

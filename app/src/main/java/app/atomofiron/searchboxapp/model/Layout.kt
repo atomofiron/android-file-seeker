@@ -6,20 +6,21 @@ value class Layout private constructor(val value: Int = 0) {
         Left, Bottom(true), Right,
     }
     companion object {
-        private const val JOYSTICK =    0b001
-        private const val GROUND_MASK = 0b110
-        private const val LEFT =        0b010
-        private const val RIGHT =       0b100
-        private const val BOTTOM =      0b110
+        private const val JOYSTICK =    0b0001
+        private const val GROUND_MASK = 0b0110
+        private const val LEFT =        0b0010
+        private const val RIGHT =       0b0100
+        private const val BOTTOM =      0b0110
+        private const val RTL =         0b1000
 
-        private fun get(ground: Ground, withJoystick: Boolean): Int {
+        private fun get(ground: Ground, withJoystick: Boolean, rtl: Boolean): Int {
             var value = if (withJoystick) JOYSTICK else 0
             value = when (ground) {
                 Ground.Left -> value or LEFT
                 Ground.Right -> value or RIGHT
                 Ground.Bottom -> value or BOTTOM
             }
-            return value
+            return if (rtl) (value or RTL) else value
         }
     }
 
@@ -27,6 +28,9 @@ value class Layout private constructor(val value: Int = 0) {
     val isLeft: Boolean get() = (value and GROUND_MASK) == LEFT
     val isRight: Boolean get() = (value and GROUND_MASK) == RIGHT
     val isBottom: Boolean get() = (value and GROUND_MASK) == BOTTOM
+    val isRtl: Boolean get() = (value and RTL) == RTL
+    val isStart: Boolean get() = if (isRtl) isRight else isLeft
+    val isEnd: Boolean get() = if (isRtl) isLeft else isRight
     val isWide: Boolean get() = !isBottom
     val ground: Ground get() = when {
         isLeft -> Ground.Left
@@ -34,5 +38,5 @@ value class Layout private constructor(val value: Int = 0) {
         else -> Ground.Bottom
     }
 
-    constructor(side: Ground, withJoystick: Boolean) : this(get(side, withJoystick))
+    constructor(side: Ground, withJoystick: Boolean, rtl: Boolean) : this(get(side, withJoystick, rtl))
 }

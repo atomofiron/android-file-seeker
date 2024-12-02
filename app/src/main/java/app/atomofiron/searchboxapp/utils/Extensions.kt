@@ -1,8 +1,6 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.app.PendingIntent
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.M
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.searchboxapp.R
@@ -81,10 +79,7 @@ fun BaseRouter.showCurtain(recipient: String, layoutId: Int) {
     }
 }
 
-fun Int.immutable(): Int = when {
-    SDK_INT >= M -> this or PendingIntent.FLAG_IMMUTABLE
-    else -> this
-}
+fun Int.immutable(): Int = this or PendingIntent.FLAG_IMMUTABLE
 
 inline fun <E> Iterable<E>.findIndexed(predicate: (E) -> Boolean): Pair<Int, E?> {
     for ((index, item) in this.withIndex()) {

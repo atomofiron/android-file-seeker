@@ -5,18 +5,19 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
-import android.view.WindowInsets
 import androidx.core.graphics.ColorUtils
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsCompat.Type
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 import app.atomofiron.searchboxapp.utils.obtainStyledAttributes
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.isLayoutRtl
+import lib.atomofiron.insets.ExtendedWindowInsets
+import lib.atomofiron.insets.ExtendedWindowInsets.Type
+import lib.atomofiron.insets.InsetsListener
+import lib.atomofiron.insets.attachInsetsListener
 import kotlin.math.max
 
-class SystemBarsBackgroundView : View {
+class SystemBarsBackgroundView : View, InsetsListener {
     companion object {
         fun Context.getSystemBarsColor(): Int {
             val color = getColorByAttr(R.attr.colorBackground)
@@ -41,6 +42,8 @@ class SystemBarsBackgroundView : View {
         constructor(value: Int, rtl: Boolean) : this(value + if(rtl) RTL else 0)
     }
 
+    override val types = Type.systemBars
+
     private var leftInset = 0
     private var topInset = 0
     private var rightInset = 0
@@ -62,18 +65,18 @@ class SystemBarsBackgroundView : View {
                 Sides(it, isLayoutRtl)
             }
         }
+        attachInsetsListener(this)
     }
 
-    override fun onApplyWindowInsets(insets: WindowInsets): WindowInsets {
-        val statusBars = WindowInsetsCompat.toWindowInsetsCompat(insets).getInsets(Type.statusBars())
-        val navigationBars = WindowInsetsCompat.toWindowInsetsCompat(insets).getInsets(Type.navigationBars())
-        val tappableElement = WindowInsetsCompat.toWindowInsetsCompat(insets).getInsets(Type.tappableElement())
+    override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
+        val statusBars = windowInsets[Type.statusBars]
+        val navigationBars = windowInsets[Type.navigationBars]
+        val tappableElement = windowInsets[Type.tappableElement]
         leftInset = max(statusBars.left, navigationBars.left.only(tappableElement.left))
         topInset = statusBars.top
         rightInset = max(statusBars.right, navigationBars.right.only(tappableElement.right))
         bottomInset = max(statusBars.bottom, navigationBars.bottom.only(tappableElement.bottom))
         invalidate()
-        return insets
     }
 
     override fun onDraw(canvas: Canvas) {

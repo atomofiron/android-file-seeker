@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.screens.preferences
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,12 +21,13 @@ import app.atomofiron.common.util.flow.viewCollect
 import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.utils.anchorView
-import app.atomofiron.searchboxapp.custom.LayoutDelegate
-import app.atomofiron.searchboxapp.custom.view.SystemBarsBackgroundView
 import app.atomofiron.searchboxapp.screens.preferences.fragment.*
+import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.Shell
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.CollapsingToolbarLayout
+import lib.atomofiron.insets.insetsPadding
 import com.google.android.material.R as MaterialR
 
 class PreferenceFragment : PreferenceFragmentCompat(),
@@ -49,7 +49,6 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         }
     }
 
-    @SuppressLint("InlinedApi")
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val root = inflater.inflate(R.layout.fragment_preference, container, false)
         root as ViewGroup
@@ -66,16 +65,14 @@ class PreferenceFragment : PreferenceFragmentCompat(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val toolbarLayout = view.findViewById<CollapsingToolbarLayout>(R.id.collapsing_layout)
         val appBarLayout = view.findViewById<AppBarLayout>(R.id.appbar_layout)
         val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-        val systemUiView = view.findViewById<SystemBarsBackgroundView>(R.id.system_ui_background)
-        LayoutDelegate(view as ViewGroup, appBarLayout = appBarLayout, recyclerView = recyclerView, systemUiView = systemUiView)
         view.setBackgroundColor(view.context.findColorByAttr(R.attr.colorBackground))
         preferenceScreen.fixIcons()
         recyclerView.clipToPadding = false
         recyclerView.updatePadding(top = resources.getDimensionPixelSize(R.dimen.content_margin_half))
-        // todo recyclerView.applyPaddingInsets(start = true, end = true, bottom = true)
         toolbar.setNavigationOnClickListener { presenter.onNavigationClick() }
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
@@ -83,6 +80,9 @@ class PreferenceFragment : PreferenceFragmentCompat(),
             }
             true
         }
+        recyclerView?.insetsPadding(ExtType { barsWithCutout + joystickBottom + joystickFlank }, start = true, end = true, bottom = true)
+        appBarLayout?.insetsPadding(ExtType { barsWithCutout + joystickFlank }, top = true)
+        toolbarLayout?.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, end = true)
         viewState.onViewCollect()
     }
 

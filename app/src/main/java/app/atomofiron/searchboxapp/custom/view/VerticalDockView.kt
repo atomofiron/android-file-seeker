@@ -14,6 +14,8 @@ import com.google.android.material.navigation.NavigationView
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.LayoutDrawerNavigationBinding
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.ExtType
+import lib.atomofiron.insets.insetsPadding
 
 class VerticalDockView @JvmOverloads constructor(
     context: Context,
@@ -22,6 +24,8 @@ class VerticalDockView @JvmOverloads constructor(
 ) : NavigationView(context, attrs, defStyleAttr) {
 
     private val binding = LayoutDrawerNavigationBinding.inflate(LayoutInflater.from(context), this)
+    private val titleInsetsDelegate = binding.drawerTitleContainer.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
+    private val rvInsetsDelegate = binding.drawerRv.insetsPadding(ExtType { barsWithCutout + joystickFlank })
 
     private val ibDockSide: ImageButton = findViewById(R.id.drawer_ib_dock_side)
     val recyclerView: RecyclerView = findViewById(R.id.drawer_rv)
@@ -48,8 +52,6 @@ class VerticalDockView @JvmOverloads constructor(
             background = background.mutate()
             background.alpha = Const.ALPHA_80_PERCENT
         }
-        // todo binding.drawerTitleContainer.applyPaddingInsets(start = true, top = true, end = true)
-        // todo binding.drawerRv.applyPaddingInsets()
     }
 
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
@@ -77,7 +79,22 @@ class VerticalDockView @JvmOverloads constructor(
     }
 
     private fun updateGravity(gravity: Int) {
-        (layoutParams as DrawerLayout.LayoutParams).gravity = gravity
+        (layoutParams as DrawerLayout.LayoutParams).run {
+            if (this.gravity == gravity) return
+            this.gravity = gravity
+        }
         layoutParams = layoutParams
+        titleInsetsDelegate.changeInsets {
+            when (gravity) {
+                Gravity.START -> padding(start, top)
+                Gravity.END -> padding(top, end)
+            }
+        }
+        rvInsetsDelegate.changeInsets {
+            when (gravity) {
+                Gravity.START -> padding(start, top, bottom)
+                Gravity.END -> padding(top, end, bottom)
+            }
+        }
     }
 }

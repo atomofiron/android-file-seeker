@@ -9,7 +9,6 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.Insets
 import androidx.core.view.*
-import androidx.core.view.WindowInsetsCompat.Type
 import androidx.fragment.app.DialogFragment
 import app.atomofiron.common.arch.*
 import app.atomofiron.common.util.findColorByAttr
@@ -19,8 +18,6 @@ import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.custom.LayoutDelegate.Companion.getLayout
-import app.atomofiron.searchboxapp.custom.LayoutDelegate.Companion.setLayoutListener
 import app.atomofiron.searchboxapp.databinding.FragmentCurtainBinding
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 import app.atomofiron.searchboxapp.screens.curtain.fragment.CurtainContentDelegate
@@ -29,8 +26,11 @@ import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.curtain.fragment.TransitionAnimator
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainBackground
+import app.atomofiron.searchboxapp.utils.ExtType
 import com.google.android.material.R as MaterialR
 import com.google.android.material.snackbar.Snackbar
+import lib.atomofiron.insets.builder
+import lib.atomofiron.insets.insetsPadding
 import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.min
@@ -108,42 +108,24 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     }
 
     private fun FragmentCurtainBinding.onApplyInsets() {
-        val joystickSize = resources.getDimensionPixelSize(R.dimen.joystick_size)
-        val verticalPadding = resources.getDimensionPixelSize(R.dimen.curtain_padding_top)
-        root.setLayoutListener { root.requestApplyInsets() }
-        ViewCompat.setOnApplyWindowInsetsListener(root) { root, windowInsets ->
-            val insets = windowInsets.getInsets(Type.systemBars() or Type.displayCutout())
-            val builder = WindowInsetsCompat.Builder()
-            var navigationBars = windowInsets.getInsets(Type.navigationBars())
-            val layout = root.getLayout()
-            val ime = windowInsets.getInsets(Type.ime())
+        root.insetsPadding(ExtType { barsWithCutout + joystickFlank + ime }, start = true, top = true, end = true)
+        val verticalPadding = resources.getDimensionPixelSize(R.dimen.curtain_padding)
+        root.setInsetsModifier { _, windowInsets ->
+            // todo val ime = windowInsets[ExtType.ime]
+            val navigationBars = windowInsets[ExtType.navigationBars]
+            val joystick = windowInsets[ExtType.joystickBottom]
             val bottomPadding = when {
-                ime.bottom > 0 && layout.withJoystick && layout.isBottom -> joystickSize
-                ime.bottom > 0 -> 0
-                !layout.withJoystick -> verticalPadding
-                !layout.isBottom -> verticalPadding
-                else -> joystickSize
+                joystick.bottom > 0 -> joystick.bottom
+                else -> navigationBars.bottom + verticalPadding
             }
-            navigationBars = Insets.of(0, 0, 0, navigationBars.bottom + bottomPadding)
-            builder.setInsets(Type.navigationBars(), navigationBars)
-            builder.setInsets(Type.ime(), Insets.of(0, 0, 0, ime.bottom + bottomPadding))
-            builder.setInsets(Type.statusBars(), Insets.of(0, verticalPadding, 0, 0))
-            val sheetInsets = builder.build()
-            // todo curtainSheet.dispatchChildrenWindowInsets(sheetInsets)
-            val horizontal = when {
-                !layout.withJoystick -> 0 to 0
-                layout.isLeft -> joystickSize to 0
-                layout.isRight -> 0 to joystickSize
-                else -> 0 to 0
+            windowInsets.builder().run {
+                set(ExtType.displayCutout, Insets.NONE)
+                set(ExtType.navigationBars, Insets.of(0, 0, 0, bottomPadding))
+                set(ExtType.statusBars, Insets.of(0, verticalPadding, 0, 0))
+                set(ExtType.curtain, Insets.of(0, verticalPadding, 0, bottomPadding))
+                set(ExtType.ime, Insets.NONE)//Insets.of(0, 0, 0, ime.bottom + bottomPadding)
+                build()
             }
-            // don not consume ime to let scrolling to text field on keyboard show
-            root.updatePadding(
-                left = insets.left + horizontal.first,
-                top = insets.top,
-                right = insets.right + horizontal.second,
-                bottom = 0,
-            )
-            WindowInsetsCompat.CONSUMED
         }
     }
 

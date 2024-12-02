@@ -15,7 +15,7 @@ import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
-import app.atomofiron.searchboxapp.custom.LayoutDelegate.Companion.setScreenSizeListener
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.setScreenSizeListener
 import app.atomofiron.searchboxapp.databinding.FragmentTextViewerBinding
 import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.model.finder.SearchResult
@@ -86,7 +86,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
 
     override fun onApplyInsets(root: View) {
         binding.run {
-            // todo recyclerView.applyPaddingInsets(start = true, end = true, bottom = true)
+            //recyclerView.insetsPadding(start = true, end = true, bottom = true)
             LayoutDelegate(
                 root as ViewGroup,
                 recyclerView = recyclerView,
