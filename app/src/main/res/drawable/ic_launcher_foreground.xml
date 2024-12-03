@@ -11,7 +11,7 @@
             android:pathData="M50 38H38c-2.2 0-3.98 1.8-3.98 4 V66 c0 2.2 1.8 4 4 4H52 c 0 0 8 0 8-8 A 16,24 0 0 0 50,38z"
             />
         <path
-            android:fillColor="@color/primary_day"
+            android:fillColor="@color/app_icon"
             android:fillAlpha="0.7"
             android:pathData="M50 38H38c-2.2 0-3.98 1.8-3.98 4 V66 c0 2.2 1.8 4 4 4H52 c 0 0 8 0 8-8 A 16,24 0 0 0 50,38z"
             />

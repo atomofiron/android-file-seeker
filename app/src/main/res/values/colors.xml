@@ -11,6 +11,8 @@
 	<color name="day_night_field_divider_amoled">@color/grey_light</color>
 	<color name="day_night_bone">@color/grey_light</color>
 
+	<color name="app_icon">@color/primary_day</color>
+
 	<!-- -->
 
 	<color name="status_bar">@color/black</color>
