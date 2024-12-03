@@ -114,6 +114,12 @@ fun <E> MutableList<E>.removeOneIf(predicate: (E) -> Boolean): E? {
     return null
 }
 
+inline fun <T> List<T>.mutate(action: MutableList<T>.() -> Unit): MutableList<T> {
+    val list = if (this is ArrayList<T>) this else toMutableList()
+    list.action()
+    return list
+}
+
 fun Float.toIntAlpha(): Int = (Const.ALPHA_VISIBLE_INT * this).toInt().coerceIn(0, 255)
 
 fun Int.setColorAlpha(alpha: Float): Int = setColorAlpha(alpha.toIntAlpha())

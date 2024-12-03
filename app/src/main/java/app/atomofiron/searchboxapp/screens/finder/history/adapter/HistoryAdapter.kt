@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.finder.history.adapter
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import app.atomofiron.searchboxapp.R
@@ -10,11 +11,12 @@ import app.atomofiron.searchboxapp.screens.finder.history.dao.HistoryDao
 import app.atomofiron.searchboxapp.screens.finder.history.dao.HistoryDatabase
 import app.atomofiron.searchboxapp.screens.finder.history.dao.ItemHistory
 import app.atomofiron.searchboxapp.screens.finder.history.dao.Migrations
+import app.atomofiron.searchboxapp.utils.mutate
 
 class HistoryAdapter(
     context: Context,
     private val onItemClickListener: OnItemClickListener
-) : RecyclerView.Adapter<HistoryHolder>(), HistoryHolder.OnItemActionListener {
+) : ListAdapter<ItemHistory, HistoryHolder>(HistoryItemCallback), HistoryHolder.OnItemActionListener {
     companion object {
         private const val DB_NAME = "history"
         private const val UNDEFINED = -1
@@ -25,7 +27,6 @@ class HistoryAdapter(
         .allowMainThreadQueries()
         .build()
     private lateinit var dao: HistoryDao
-    private val items = mutableListOf<ItemHistory>()
 
     init {
         setHasStableIds(true)
@@ -48,21 +49,19 @@ class HistoryAdapter(
         if (string.isBlank()) {
             return
         }
-        var index = items.indexOfFirst { !it.pinned }
+        var index = currentList.indexOfFirst { !it.pinned }
         if (index == UNDEFINED) {
-            index = items.size
+            index = itemCount
         }
         var item = ItemHistory(title = string)
         item = item.copy(id = dao.insert(item))
-        items.add(index, item)
-        notifyItemInserted(index)
+        currentList.mutate {
+            add(index, item)
+            submitList(this)
+        }
     }
 
-    fun reload(unit: Unit = Unit) {
-        items.clear()
-        items.addAll(dao.all)
-        notifyDataSetChanged()
-    }
+    fun reload(unit: Unit = Unit) = submitList(dao.all)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HistoryHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -70,38 +69,39 @@ class HistoryAdapter(
         return HistoryHolder(view, this)
     }
 
-    override fun getItemCount(): Int = items.size
 
-    override fun getItemId(position: Int): Long = items[position].id
+    override fun getItemId(position: Int): Long = getItem(position).id
 
     override fun onBindViewHolder(holder: HistoryHolder, position: Int) {
-        val item = items[position]
+        val item = getItem(position)
         holder.onBind(item.title, item.pinned)
     }
 
     override fun onItemClick(position: Int) {
-        val item = items[position]
+        val item = getItem(position)
         onItemClickListener.onItemClick(item.title)
     }
 
     override fun onItemPin(position: Int) {
-        val item = items[position]
-        val nextPosition = if (item.pinned) items.indexOfLast { it.pinned } else FIRST
+        val item = getItem(position)
+        val nextPosition = if (item.pinned) currentList.indexOfLast { it.pinned } else FIRST
         dao.delete(item)
         var new = item.copy(id = 0, pinned = !item.pinned)
         new = new.copy(id = dao.insert(new))
-        notifyItemChanged(position)
-
-        items.removeAt(position)
-        items.add(nextPosition, new)
-        notifyItemMoved(position, nextPosition)
+        currentList.mutate {
+            removeAt(position)
+            add(nextPosition, new)
+            submitList(this)
+        }
     }
 
     override fun onItemRemove(position: Int) {
-        val item = items[position]
+        val item = getItem(position)
         dao.delete(item)
-        items.removeAt(position)
-        notifyItemRemoved(position)
+        currentList.mutate {
+            removeAt(position)
+            submitList(this)
+        }
     }
 
     interface OnItemClickListener {
