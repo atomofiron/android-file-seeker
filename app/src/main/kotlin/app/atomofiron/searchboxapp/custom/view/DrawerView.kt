@@ -17,7 +17,7 @@ import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 
-class VerticalDockView @JvmOverloads constructor(
+class DrawerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = com.google.android.material.R.attr.navigationViewStyle
@@ -96,5 +96,6 @@ class VerticalDockView @JvmOverloads constructor(
                 Gravity.END -> padding(top, end, bottom)
             }
         }
+        onSizeChanged(width, height, width, height) // trigger maybeClearCornerSizeAnimationForDrawerLayout()
     }
 }

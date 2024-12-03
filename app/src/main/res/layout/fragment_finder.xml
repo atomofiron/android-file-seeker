@@ -47,7 +47,7 @@
 			app:elevation="3dp"
 			/>
 	</FrameLayout>
-	<app.atomofiron.searchboxapp.custom.view.VerticalDockView
+	<app.atomofiron.searchboxapp.custom.view.DrawerView
 		android:id="@+id/vertical_dock"
 		android:layout_width="wrap_content"
 		android:layout_height="match_parent"
