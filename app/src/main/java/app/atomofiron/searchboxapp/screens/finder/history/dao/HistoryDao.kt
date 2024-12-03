@@ -1,32 +1,28 @@
-package app.atomofiron.searchboxapp.screens.finder.history.dao;
+package app.atomofiron.searchboxapp.screens.finder.history.dao
 
-import androidx.room.Dao;
-import androidx.room.Delete;
-import androidx.room.Insert;
-import androidx.room.Query;
-import androidx.room.Update;
-
-import java.util.List;
+import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
+import androidx.room.OnConflictStrategy
+import androidx.room.Query
 
 @Dao
-public interface HistoryDao {
- 
-   @Query("SELECT * FROM ItemHistory order by pinned desc, id desc")
-   List<ItemHistory> getAll();
- 
-   @Query("SELECT * FROM ItemHistory WHERE id = :id")
-   ItemHistory getById(long id);
+interface HistoryDao {
+    companion object {
+        const val TABLE_NAME = "SearchHistory"
+    }
+    @get:Query("SELECT * FROM $TABLE_NAME order by pinned desc, id desc")
+    val all: List<ItemHistory>
 
-   @Query("SELECT COUNT(*) FROM ItemHistory")
-   int count();
+    @Query("SELECT * FROM $TABLE_NAME WHERE id = :id")
+    fun getById(id: Long): ItemHistory
 
-   @Insert
-   long insert(ItemHistory employee);
- 
-   @Update
-   void update(ItemHistory employee);
- 
-   @Delete
-   void delete(ItemHistory employee);
- 
+    @Query("SELECT COUNT(*) FROM $TABLE_NAME")
+    fun count(): Int
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(item: ItemHistory): Long
+
+    @Delete
+    fun delete(item: ItemHistory)
 }

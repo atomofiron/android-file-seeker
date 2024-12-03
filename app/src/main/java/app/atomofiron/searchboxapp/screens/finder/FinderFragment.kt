@@ -8,6 +8,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.flow.viewCollect
@@ -29,12 +30,14 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     private val finderAdapter = FinderAdapter()
     private lateinit var layoutManager: GridLayoutManager
 
-    private val historyAdapter: HistoryAdapter = HistoryAdapter(object : HistoryAdapter.OnItemClickListener {
-        override fun onItemClick(node: String) {
-            binding.verticalDock.close()
-            presenter.onHistoryItemClick(node)
-        }
-    })
+    private val historyAdapter: HistoryAdapter by lazy {
+        HistoryAdapter(requireContext(), object : HistoryAdapter.OnItemClickListener {
+            override fun onItemClick(node: String) {
+                binding.verticalDock.close()
+                presenter.onHistoryItemClick(node)
+            }
+        })
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +68,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
         binding.verticalDock.run {
             onGravityChangeListener = presenter::onDockGravityChange
+            recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = historyAdapter
         }
 

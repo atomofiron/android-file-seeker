@@ -1,16 +1,18 @@
 package app.atomofiron.searchboxapp.screens.finder.history.adapter
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.screens.finder.history.dao.HistoryDao
 import app.atomofiron.searchboxapp.screens.finder.history.dao.HistoryDatabase
 import app.atomofiron.searchboxapp.screens.finder.history.dao.ItemHistory
+import app.atomofiron.searchboxapp.screens.finder.history.dao.Migrations
 
 class HistoryAdapter(
+    context: Context,
     private val onItemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<HistoryHolder>(), HistoryHolder.OnItemActionListener {
     companion object {
@@ -18,12 +20,12 @@ class HistoryAdapter(
         private const val UNDEFINED = -1
         private const val FIRST = 0
     }
-
-    private lateinit var db: HistoryDatabase
+    private val db = Room.databaseBuilder(context, HistoryDatabase::class.java, DB_NAME)
+        .addMigrations(Migrations.MIGRATION_1_2)
+        .allowMainThreadQueries()
+        .build()
     private lateinit var dao: HistoryDao
-    private lateinit var items: ArrayList<ItemHistory>
-
-    private var recyclerView: RecyclerView? = null
+    private val items = mutableListOf<ItemHistory>()
 
     init {
         setHasStableIds(true)
@@ -31,13 +33,7 @@ class HistoryAdapter(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
-        this.recyclerView = recyclerView
 
-        recyclerView.layoutManager ?: { recyclerView.layoutManager = LinearLayoutManager(recyclerView.context) }()
-
-        db = Room.databaseBuilder(recyclerView.context, HistoryDatabase::class.java, DB_NAME)
-                .allowMainThreadQueries()
-                .build()
         dao = db.historyDao()
         reload()
     }
@@ -46,39 +42,25 @@ class HistoryAdapter(
         super.onDetachedFromRecyclerView(recyclerView)
 
         db.close()
-        this.recyclerView = null
     }
 
     fun add(string: String) {
         if (string.isBlank()) {
             return
         }
-        if (recentlyContains(string)) {
-            return
-        }
         var index = items.indexOfFirst { !it.pinned }
         if (index == UNDEFINED) {
             index = items.size
         }
-        val item = ItemHistory()
-        item.title = string
+        var item = ItemHistory(title = string)
+        item = item.copy(id = dao.insert(item))
         items.add(index, item)
-        item.id = dao.insert(item)
         notifyItemInserted(index)
     }
 
-    private fun recentlyContains(string: String): Boolean {
-        val limit = Math.min(items.size, recyclerView?.childCount ?: 1)
-        for (i in 0 until limit) {
-            if (items[i].title == string) {
-                return true
-            }
-        }
-        return false
-    }
-
     fun reload(unit: Unit = Unit) {
-        items = ArrayList(dao.all)
+        items.clear()
+        items.addAll(dao.all)
         notifyDataSetChanged()
     }
 
@@ -99,20 +81,19 @@ class HistoryAdapter(
 
     override fun onItemClick(position: Int) {
         val item = items[position]
-        onItemClickListener.onItemClick(item.title!!)
+        onItemClickListener.onItemClick(item.title)
     }
 
     override fun onItemPin(position: Int) {
         val item = items[position]
         val nextPosition = if (item.pinned) items.indexOfLast { it.pinned } else FIRST
-        item.pinned = !item.pinned
         dao.delete(item)
-        item.id = 0L
-        item.id = dao.insert(item)
+        var new = item.copy(id = 0, pinned = !item.pinned)
+        new = new.copy(id = dao.insert(new))
         notifyItemChanged(position)
 
         items.removeAt(position)
-        items.add(nextPosition, item)
+        items.add(nextPosition, new)
         notifyItemMoved(position, nextPosition)
     }
 
