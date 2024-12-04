@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.databinding.CurtainExplorerOptionsBinding
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
+import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 
 class OptionsDelegate(
@@ -26,8 +27,8 @@ class OptionsDelegate(
             markAsDangerous(R.id.menu_remove)
         }
         binding.init(options)
-        binding.root.insetsPadding(top = true)
-        binding.menuView.insetsPadding(bottom = true)
+        binding.root.insetsPadding(ExtType.curtain, top = true)
+        binding.menuView.insetsPadding(ExtType.curtain, bottom = true)
         return binding.root
     }
 

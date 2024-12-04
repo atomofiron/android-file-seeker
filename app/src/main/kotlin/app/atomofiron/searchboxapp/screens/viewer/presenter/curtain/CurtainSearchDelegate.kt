@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.Explore
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState
+import app.atomofiron.searchboxapp.utils.ExtType
 import kotlinx.coroutines.CoroutineScope
 import lib.atomofiron.insets.insetsPadding
 
@@ -41,12 +42,11 @@ class CurtainSearchDelegate(
         holder.hideCheckBox()
         holder.setGreyBackgroundColor()
 
-        // todo inverse
         binding.sheetViewerSearchRv.adapter = finderAdapter
         binding.sheetViewerSearchRv.itemAnimator = null
 
-        binding.root.insetsPadding(top = true)
-        binding.sheetViewerSearchRv.insetsPadding(bottom = true)
+        binding.root.insetsPadding(ExtType.curtain, top = true)
+        binding.sheetViewerSearchRv.insetsPadding(ExtType.curtain, bottom = true)
 
         return CurtainApi.ViewHolder(binding.root)
     }

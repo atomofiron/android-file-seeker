@@ -108,22 +108,20 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     }
 
     private fun FragmentCurtainBinding.onApplyInsets() {
-        root.insetsPadding(ExtType { barsWithCutout + joystickFlank + ime }, start = true, top = true, end = true)
+        root.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
         val verticalPadding = resources.getDimensionPixelSize(R.dimen.curtain_padding)
+        val minPadding = resources.getDimensionPixelSize(R.dimen.content_margin)
         root.setInsetsModifier { _, windowInsets ->
-            // todo val ime = windowInsets[ExtType.ime]
-            val navigationBars = windowInsets[ExtType.navigationBars]
-            val joystick = windowInsets[ExtType.joystickBottom]
+            val ime = windowInsets[ExtType.ime]
+            curtainSheet.updatePaddingRelative(bottom = ime.bottom)
+            val navigationBars = max(0, windowInsets[ExtType.navigationBars].bottom - ime.bottom)
+            val joystick = max(0, windowInsets[ExtType.joystickBottom].bottom - ime.bottom)
             val bottomPadding = when {
-                joystick.bottom > 0 -> joystick.bottom
-                else -> navigationBars.bottom + verticalPadding
+                joystick > 0 -> joystick
+                else -> navigationBars + max(verticalPadding - ime.bottom, minPadding)
             }
             windowInsets.builder().run {
-                set(ExtType.displayCutout, Insets.NONE)
-                set(ExtType.navigationBars, Insets.of(0, 0, 0, bottomPadding))
-                set(ExtType.statusBars, Insets.of(0, verticalPadding, 0, 0))
                 set(ExtType.curtain, Insets.of(0, verticalPadding, 0, bottomPadding))
-                set(ExtType.ime, Insets.NONE)//Insets.of(0, 0, 0, ime.bottom + bottomPadding)
                 build()
             }
         }

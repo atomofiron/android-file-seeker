@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.CurtainPreferenceExportImportBinding
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
+import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 
 class ExportImportDelegate(
@@ -13,7 +14,7 @@ class ExportImportDelegate(
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
         val binding = CurtainPreferenceExportImportBinding.inflate(inflater, null, false)
         binding.init()
-        binding.root.insetsPadding(vertical = true)
+        binding.root.insetsPadding(ExtType.curtain, vertical = true)
         return CurtainApi.ViewHolder(binding.root)
     }
 

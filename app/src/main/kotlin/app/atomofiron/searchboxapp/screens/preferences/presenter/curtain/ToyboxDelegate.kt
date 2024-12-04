@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.Shell
 import lib.atomofiron.insets.insetsPadding
 import java.io.File
@@ -32,7 +33,7 @@ class ToyboxDelegate(
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
         val binding = CurtainPreferenceToyboxBinding.inflate(inflater, null, false)
         binding.init()
-        binding.root.insetsPadding(vertical = true)
+        binding.root.insetsPadding(ExtType.curtain, vertical = true)
         return CurtainApi.ViewHolder(binding.root)
     }
 

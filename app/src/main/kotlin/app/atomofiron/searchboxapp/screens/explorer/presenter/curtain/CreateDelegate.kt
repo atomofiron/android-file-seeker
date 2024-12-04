@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.CurtainExplorerCreateBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMenuDelegate
+import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 
 class CreateDelegate(
@@ -25,7 +26,7 @@ class CreateDelegate(
     }
 
     private fun CurtainExplorerCreateBinding.init(dir: Node, dirFiles: List<String>) {
-        root.insetsPadding(vertical = true)
+        root.insetsPadding(ExtType.curtain, vertical = true)
         explorerCreateEt.text?.clear()
         explorerCreateEt.inputType = EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         val textListener = ButtonState(dirFiles, arrayOf(explorerCreateDirBtn, explorerCreateFileBtn))
