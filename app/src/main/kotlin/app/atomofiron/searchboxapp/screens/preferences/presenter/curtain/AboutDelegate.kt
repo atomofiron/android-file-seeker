@@ -9,15 +9,13 @@ import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.CurtainAboutBinding
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.resolve
 import lib.atomofiron.insets.insetsPadding
 
 class AboutDelegate : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
-    companion object {
-        private const val ALPHA_ENABLED = 1f
-        private const val ALPHA_DISABLED = 0.5f
-    }
     private val githubIntent = Intent(Intent.ACTION_VIEW, Uri.parse(Const.GITHUB_URL))
     private val forpdaIntent = Intent(Intent.ACTION_VIEW, Uri.parse(Const.FORPDA_URL))
 
@@ -30,16 +28,16 @@ class AboutDelegate : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
 
     private fun CurtainAboutBinding.init() {
         val context = root.context
-        var componentName = githubIntent.resolveActivity(context.packageManager)
-        aboutTvGithub.isEnabled = componentName != null
-        aboutTvGithub.alpha = if (componentName == null) ALPHA_DISABLED else ALPHA_ENABLED
+        var available = context.resolve(forpdaIntent)
+        aboutTvGithub.isEnabled = available
+        aboutTvGithub.alpha = Alpha.enabled(available)
         val tint = context.findColorByAttr(MaterialAttr.colorOnSurface)
         aboutTvGithub.compoundDrawablesRelative[0].setTint(tint)
         aboutTvForpda.compoundDrawablesRelative[0].setTint(tint)
 
-        componentName = forpdaIntent.resolveActivity(context.packageManager)
-        aboutTvForpda.isEnabled = componentName != null
-        aboutTvForpda.alpha = if (componentName == null) ALPHA_DISABLED else ALPHA_ENABLED
+        available = context.resolve(forpdaIntent)
+        aboutTvForpda.isEnabled = available
+        aboutTvForpda.alpha = Alpha.enabled(available)
 
         val listener = ::onClick
         aboutTvGithub.setOnClickListener(listener)

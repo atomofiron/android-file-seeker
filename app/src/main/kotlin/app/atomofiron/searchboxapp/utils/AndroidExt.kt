@@ -5,6 +5,7 @@ import android.app.Notification
 import android.app.NotificationChannel
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Resources
 import android.content.res.TypedArray
@@ -96,6 +97,10 @@ fun <I> ActivityResultLauncher<I>.resolve(context: Context, input: I): Boolean {
     val intent = contract.createIntent(context, input)
     val info = intent.resolveActivity(context.packageManager)
     return info != null
+}
+
+fun Context.resolve(intent: Intent): Boolean {
+    return packageManager.queryIntentActivities(intent, PackageManager.MATCH_ALL).isNotEmpty()
 }
 
 fun Context.getMarketIntent() = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName"))
