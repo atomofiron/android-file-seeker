@@ -101,10 +101,7 @@ class ExplorerItemBinderImpl(
         ivThumbnail.isVisible = withThumbnail
         tvError.isVisible = error != null
         psProgress.isVisible = item.withOperation
-        when {
-            item.withOperation -> cbBox.isInvisible = true
-            else -> cbBox.isVisible = true
-        }
+        cbBox.isInvisible = item.withOperation
     }
 
     override fun setOnItemActionListener(listener: ExplorerItemActionListener?) {
