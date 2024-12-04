@@ -28,7 +28,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
 import androidx.annotation.StyleRes
 import androidx.annotation.StyleableRes
-import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
@@ -39,21 +38,17 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import app.atomofiron.common.util.Android
+import app.atomofiron.searchboxapp.MaterialId
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable.Companion.setBallsDrawable
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
-import com.google.android.material.R as MaterialR
 import com.google.android.material.navigation.NavigationBarView
 import java.io.Serializable
-import java.util.*
-import kotlin.collections.ArrayList
+import java.util.Locale
 import kotlin.math.max
 
-fun Resources.getLocale(): Locale = when {
-    SDK_INT >= Build.VERSION_CODES.N -> configuration.locales.get(0)
-    else -> configuration.locale
-}
+fun Resources.getLocale(): Locale = configuration.locales.get(0)
 
 fun Context.findResIdByAttr(@AttrRes attr: Int): Int = findResIdsByAttr(attr)[0]
 
@@ -134,7 +129,7 @@ const val DEFAULT_FREQUENCY = 60
 
 fun Context.getFrequency(): Int {
     val refreshRate = when {
-        SDK_INT >= Build.VERSION_CODES.R -> display?.refreshRate
+        SDK_INT >= Build.VERSION_CODES.R -> display.refreshRate
         else -> {
             val manager = getSystemService(Context.WINDOW_SERVICE) as WindowManager?
             manager?.defaultDisplay?.refreshRate
@@ -159,7 +154,7 @@ private fun NavigationBarView.updateItem(itemId: Int, iconId: Int, icon: Drawabl
         val drawable = when {
             icon != null -> icon
             iconId == R.drawable.progress_loop -> {
-                val iv = itemView.findViewById<ImageView>(MaterialR.id.navigation_bar_item_icon_view)
+                val iv = itemView.findViewById<ImageView>(MaterialId.navigation_bar_item_icon_view)
                 iv.setBallsDrawable()
             }
             else -> ContextCompat.getDrawable(context, iconId)

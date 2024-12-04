@@ -2,15 +2,20 @@ package app.atomofiron.searchboxapp.custom.drawable
 
 import android.animation.ValueAnimator
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.ColorFilter
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.PixelFormat
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import app.atomofiron.common.util.WeakDrawableCallback
 import app.atomofiron.common.util.findColorByAttr
-import app.atomofiron.searchboxapp.R
-import com.google.android.material.R as MaterialR
+import app.atomofiron.searchboxapp.MaterialAttr
 import kotlin.math.min
 
 class BallsDrawable private constructor(context: Context) : Drawable(), ValueAnimator.AnimatorUpdateListener, View.OnAttachStateChangeListener {
@@ -38,7 +43,7 @@ class BallsDrawable private constructor(context: Context) : Drawable(), ValueAni
     private val animator = ValueAnimator.ofFloat(0f, Math.PI.toFloat())
 
     init {
-        val colorAccent = context.findColorByAttr(MaterialR.attr.colorAccent)
+        val colorAccent = context.findColorByAttr(MaterialAttr.colorAccent)
         paintCircle.color = colorAccent
         paintBall.color = colorAccent
         if (oneBall) {

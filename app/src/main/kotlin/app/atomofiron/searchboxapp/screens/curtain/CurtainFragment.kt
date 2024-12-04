@@ -8,26 +8,30 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.Insets
-import androidx.core.view.*
+import androidx.core.view.doOnNextLayout
+import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.DialogFragment
-import app.atomofiron.common.arch.*
+import app.atomofiron.common.arch.BaseFragment
+import app.atomofiron.common.arch.BaseFragmentImpl
+import app.atomofiron.common.arch.TranslucentFragment
 import app.atomofiron.common.util.findColorByAttr
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.color.MaterialColors
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.searchboxapp.BuildConfig
+import app.atomofiron.searchboxapp.MaterialAttr
+import app.atomofiron.searchboxapp.MaterialDimen
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.FragmentCurtainBinding
-import app.atomofiron.searchboxapp.utils.getColorByAttr
 import app.atomofiron.searchboxapp.screens.curtain.fragment.CurtainContentDelegate
 import app.atomofiron.searchboxapp.screens.curtain.fragment.CurtainNode
+import app.atomofiron.searchboxapp.screens.curtain.fragment.TransitionAnimator
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
-import app.atomofiron.searchboxapp.screens.curtain.fragment.TransitionAnimator
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainBackground
 import app.atomofiron.searchboxapp.utils.ExtType
-import com.google.android.material.R as MaterialR
+import app.atomofiron.searchboxapp.utils.getColorByAttr
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.builder
 import lib.atomofiron.insets.insetsPadding
@@ -190,10 +194,10 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         val context = context ?: return
         val snackbar = provider.getSnackbar(binding.root)
         if (!context.isDarkTheme()) {
-            val colorSurface = context.findColorByAttr(MaterialR.attr.colorSurface)
-            val colorOnSurface = context.findColorByAttr(MaterialR.attr.colorOnSurface)
-            val colorPrimaryDark = context.findColorByAttr(MaterialR.attr.colorPrimaryDark)
-            val alpha = ResourcesCompat.getFloat(resources, MaterialR.dimen.mtrl_snackbar_background_overlay_color_alpha)
+            val colorSurface = context.findColorByAttr(MaterialAttr.colorSurface)
+            val colorOnSurface = context.findColorByAttr(MaterialAttr.colorOnSurface)
+            val colorPrimaryDark = context.findColorByAttr(MaterialAttr.colorPrimaryDark)
+            val alpha = ResourcesCompat.getFloat(resources, MaterialDimen.mtrl_snackbar_background_overlay_color_alpha)
             val backgroundColor = MaterialColors.layer(colorOnSurface, colorSurface, alpha)
             snackbar
                 .setBackgroundTint(backgroundColor)

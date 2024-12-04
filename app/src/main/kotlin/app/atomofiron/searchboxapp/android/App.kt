@@ -12,6 +12,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.Configuration
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.searchboxapp.BuildConfig
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
@@ -24,7 +25,6 @@ import com.google.android.material.color.DynamicColors
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.model.UpdateAvailability
 import javax.inject.Inject
-import com.google.android.material.R as MaterialR
 
 class App : Application(), Configuration.Provider {
 
@@ -88,7 +88,7 @@ class App : Application(), Configuration.Provider {
                 .setSmallIcon(R.drawable.ic_notification_update)
                 .setContentIntent(notificationIntent)
                 .addAction(0, getString(R.string.get_update), actionIntent)
-                .setColor(findColorByAttr(MaterialR.attr.colorPrimary))
+                .setColor(findColorByAttr(MaterialAttr.colorPrimary))
                 .build()
          return Const.NOTIFICATION_ID_UPDATE to notification
     }

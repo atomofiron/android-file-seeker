@@ -8,17 +8,17 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.ItemExplorerBinding
 import app.atomofiron.searchboxapp.databinding.ItemExplorerSeparatorBinding
 import app.atomofiron.searchboxapp.utils.Const
-import com.google.android.material.R as MaterialR
 
 const val TAG_EXPLORER_OPENED_ITEM = "TAG_EXPLORER_OPENED_ITEM"
 
 fun ItemExplorerSeparatorBinding.makeSeparator() {
-    val background = root.context.findColorByAttr(MaterialR.attr.colorOutline)
-    val content = root.context.findColorByAttr(MaterialR.attr.colorSurface)
+    val background = root.context.findColorByAttr(MaterialAttr.colorOutline)
+    val content = root.context.findColorByAttr(MaterialAttr.colorSurface)
     val cornerRadius = root.resources.getDimension(R.dimen.explorer_border_corner_radius)
     val drawable = GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, intArrayOf(background, background))
     drawable.cornerRadii = FloatArray(8) { cornerRadius }
@@ -29,16 +29,16 @@ fun ItemExplorerSeparatorBinding.makeSeparator() {
 }
 
 fun ItemExplorerBinding.makeOpened() {
-    val background = root.context.findColorByAttr(MaterialR.attr.colorOutline)
-    val content = root.context.findColorByAttr(MaterialR.attr.colorSurface)
-    val buttonIcon = root.context.findColorByAttr(MaterialR.attr.colorOnSurface)
+    val background = root.context.findColorByAttr(MaterialAttr.colorOutline)
+    val content = root.context.findColorByAttr(MaterialAttr.colorSurface)
+    val buttonIcon = root.context.findColorByAttr(MaterialAttr.colorOnSurface)
     makeOpposite(background, content, buttonIcon, topRadius = true, bottomRadius = true)
 }
 
 fun ItemExplorerBinding.makeOpenedCurrent() {
-    val background = root.context.findColorByAttr(MaterialR.attr.colorSecondary)
-    val content = root.context.findColorByAttr(MaterialR.attr.colorSurface)
-    val buttonIcon = root.context.findColorByAttr(MaterialR.attr.colorOnSurface)
+    val background = root.context.findColorByAttr(MaterialAttr.colorSecondary)
+    val content = root.context.findColorByAttr(MaterialAttr.colorSurface)
+    val buttonIcon = root.context.findColorByAttr(MaterialAttr.colorOnSurface)
     makeOpposite(background, content, buttonIcon, topRadius = true)
 }
 

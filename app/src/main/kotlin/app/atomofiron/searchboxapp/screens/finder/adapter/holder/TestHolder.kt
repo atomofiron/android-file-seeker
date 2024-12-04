@@ -7,18 +7,18 @@ import android.view.ViewGroup
 import android.widget.EditText
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
-import com.google.android.material.R as MaterialR
+import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
 import java.util.regex.Pattern
 
 class TestHolder(parent: ViewGroup, layoutId: Int) : GeneralHolder<FinderStateItem>(parent, layoutId), TextWatcher {
     private val editText: EditText
     private val span get() = RoundedBackgroundSpan(
-        backgroundColor = context.findColorByAttr(MaterialR.attr.colorSurfaceVariant),
-        borderColor = context.findColorByAttr(MaterialR.attr.colorSecondary),
-        textColor = context.findColorByAttr(MaterialR.attr.colorOnSurfaceVariant),
+        backgroundColor = context.findColorByAttr(MaterialAttr.colorSurfaceVariant),
+        borderColor = context.findColorByAttr(MaterialAttr.colorSecondary),
+        textColor = context.findColorByAttr(MaterialAttr.colorOnSurfaceVariant),
         context.resources.getDimension(R.dimen.background_span_corner_radius),
         context.resources.getDimension(R.dimen.background_span_border_thickness),
     )

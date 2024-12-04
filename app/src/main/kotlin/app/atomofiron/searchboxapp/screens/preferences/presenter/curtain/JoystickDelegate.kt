@@ -7,21 +7,21 @@ import android.view.View
 import android.widget.CompoundButton
 import android.widget.SeekBar
 import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import app.atomofiron.searchboxapp.databinding.CurtainPreferenceJoystickBinding
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
-import com.google.android.material.R as MaterialR
 
 class JoystickDelegate(
     private val preferenceStore: PreferenceStore,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
     companion object {
         private fun JoystickComposition.withPrimary(context: Context): JoystickComposition {
-            val color = context.findColorByAttr(MaterialR.attr.colorPrimary)
+            val color = context.findColorByAttr(MaterialAttr.colorPrimary)
             return copy(red = Color.red(color), green = Color.green(color), blue = Color.blue(color))
         }
     }

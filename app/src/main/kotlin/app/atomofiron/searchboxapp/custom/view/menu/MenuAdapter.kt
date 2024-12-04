@@ -8,8 +8,8 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
-import com.google.android.material.R as MaterialR
 
 @SuppressLint("RestrictedApi")
 class MenuAdapter(context: Context) : RecyclerView.Adapter<MenuHolder>() {
@@ -50,7 +50,7 @@ class MenuAdapter(context: Context) : RecyclerView.Adapter<MenuHolder>() {
         val context = holder.itemView.context
         when (item.itemId) {
             dangerousItemId -> {
-                val color = context.findColorByAttr(MaterialR.attr.colorError)
+                val color = context.findColorByAttr(MaterialAttr.colorError)
                 holder.icon.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC_IN)
                 holder.title.setTextColor(color)
             }

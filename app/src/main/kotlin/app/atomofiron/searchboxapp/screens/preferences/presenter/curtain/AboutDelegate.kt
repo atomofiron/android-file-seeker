@@ -5,13 +5,13 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.CurtainAboutBinding
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
-import com.google.android.material.R as MaterialR
 
 class AboutDelegate : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
     companion object {
@@ -33,7 +33,7 @@ class AboutDelegate : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
         var componentName = githubIntent.resolveActivity(context.packageManager)
         aboutTvGithub.isEnabled = componentName != null
         aboutTvGithub.alpha = if (componentName == null) ALPHA_DISABLED else ALPHA_ENABLED
-        val tint = context.findColorByAttr(MaterialR.attr.colorOnSurface)
+        val tint = context.findColorByAttr(MaterialAttr.colorOnSurface)
         aboutTvGithub.compoundDrawablesRelative[0].setTint(tint)
         aboutTvForpda.compoundDrawablesRelative[0].setTint(tint)
 

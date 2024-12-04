@@ -10,17 +10,18 @@ import android.widget.TextView
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.DrawerStateListenerImpl
-import com.google.android.material.navigation.NavigationView
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.LayoutDrawerNavigationBinding
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
+import com.google.android.material.navigation.NavigationView
 import lib.atomofiron.insets.insetsPadding
 
 class DrawerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = com.google.android.material.R.attr.navigationViewStyle
+    defStyleAttr: Int = MaterialAttr.navigationViewStyle,
 ) : NavigationView(context, attrs, defStyleAttr) {
 
     private val binding = LayoutDrawerNavigationBinding.inflate(LayoutInflater.from(context), this)

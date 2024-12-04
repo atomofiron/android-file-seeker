@@ -1,18 +1,22 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator
 
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.Path.Direction
+import android.graphics.Rect
+import android.graphics.RectF
 import android.view.View
 import androidx.core.view.iterator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
-import com.google.android.material.R as MaterialR
 import kotlin.math.max
 import kotlin.math.min
 
@@ -43,7 +47,7 @@ class ItemBorderDecorator(
         paint.style = Paint.Style.FILL
         paint.strokeCap = Paint.Cap.ROUND
         paint.strokeWidth = borderWidth
-        paint.color = headerView.context.findColorByAttr(MaterialR.attr.colorSecondary)
+        paint.color = headerView.context.findColorByAttr(MaterialAttr.colorSecondary)
     }
 
     fun setCurrentDir(item: Node?) {

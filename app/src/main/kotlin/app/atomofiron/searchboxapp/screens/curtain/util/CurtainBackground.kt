@@ -1,16 +1,23 @@
 package app.atomofiron.searchboxapp.screens.curtain.util
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.ColorFilter
+import android.graphics.Outline
+import android.graphics.Paint
+import android.graphics.PixelFormat
+import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findBooleanByAttr
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.utils.getColorByAttr
-import app.atomofiron.searchboxapp.utils.setColorAlpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.asOverlayOn
-import com.google.android.material.R as MaterialR
+import app.atomofiron.searchboxapp.utils.getColorByAttr
+import app.atomofiron.searchboxapp.utils.setColorAlpha
 
 open class CurtainBackground(context: Context) : Drawable() {
 
@@ -18,13 +25,13 @@ open class CurtainBackground(context: Context) : Drawable() {
     private val cornerRadius = context.resources.getDimension(R.dimen.corner_extra_large)
     private val curtainColor = context.getColorByAttr(R.attr.colorBackground)
     private val strokeWidth = if (isBlackDeep) context.resources.getDimensionPixelSize(R.dimen.stroke_width) else 0
-    private val dragHandleColor = ColorUtils.setAlphaComponent(context.getColorByAttr(MaterialR.attr.colorOnSurfaceVariant), 102)
+    private val dragHandleColor = ColorUtils.setAlphaComponent(context.getColorByAttr(MaterialAttr.colorOnSurfaceVariant), 102)
     private val dragHandleRect = RectF()
     private val dragHandleWidth = context.resources.getDimension(R.dimen.drag_handle_width)
     private val dragHandleMargin = context.resources.getDimension(R.dimen.drag_handle_margin)
     private val strokeColor = when {
         isBlackDeep -> context
-            .getColorByAttr(MaterialR.attr.strokeColor)
+            .getColorByAttr(MaterialAttr.strokeColor)
             .setColorAlpha(Const.ALPHA_50_PERCENT)
             .asOverlayOn(curtainColor)
         else -> Color.TRANSPARENT

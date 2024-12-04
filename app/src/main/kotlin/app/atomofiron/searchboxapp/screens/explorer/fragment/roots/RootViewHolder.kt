@@ -8,15 +8,15 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import app.atomofiron.common.recycler.GeneralHolder
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.ItemExplorerCardBinding
-import app.atomofiron.searchboxapp.utils.getColorByAttr
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.convert
-import com.google.android.material.R as MaterialR
+import app.atomofiron.searchboxapp.utils.getColorByAttr
 
 class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     companion object {
@@ -39,7 +39,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     private val colors = ColorStateList(
         arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf(0)),
         intArrayOf(
-            context.getColorByAttr(MaterialR.attr.colorPrimary),
+            context.getColorByAttr(MaterialAttr.colorPrimary),
             binding.cardTitle.textColors.defaultColor,
         )
     )

@@ -9,11 +9,16 @@ import android.util.AttributeSet
 import android.view.Gravity
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.utils.Const
-import com.google.android.material.R as MaterialR
 import com.google.android.material.textview.MaterialTextView
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.abs
+import kotlin.math.asin
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sign
 
 class ArcView : MaterialTextView {
     companion object {
@@ -26,7 +31,7 @@ class ArcView : MaterialTextView {
     private val rect = RectF()
     private val paint = Paint()
 
-    private val colorProgress = context.findColorByAttr(MaterialR.attr.colorPrimary)
+    private val colorProgress = context.findColorByAttr(MaterialAttr.colorPrimary)
     private val colorTrack = ColorUtils.setAlphaComponent(colorProgress, Const.ALPHA_30_PERCENT)
     private val strokeWidth = resources.getDimension(R.dimen.arc_stroke_width)
     private val strokeMargin = strokeWidth * 2
@@ -36,7 +41,7 @@ class ArcView : MaterialTextView {
     constructor(context: Context, attrs: AttributeSet?, defStyleRes: Int) : super(context, attrs, defStyleRes) {
         paint.style = Paint.Style.STROKE
         paint.strokeCap = Paint.Cap.ROUND
-        paint.color = context.findColorByAttr(MaterialR.attr.colorPrimary)
+        paint.color = context.findColorByAttr(MaterialAttr.colorPrimary)
         paint.strokeWidth = strokeWidth
 
         gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL

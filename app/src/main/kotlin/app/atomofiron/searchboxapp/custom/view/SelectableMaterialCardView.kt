@@ -1,11 +1,14 @@
 package app.atomofiron.searchboxapp.custom.view
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.RectF
 import android.util.AttributeSet
 import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
-import com.google.android.material.R as MaterialR
 import com.google.android.material.card.MaterialCardView
 
 class SelectableMaterialCardView : MaterialCardView {
@@ -23,7 +26,7 @@ class SelectableMaterialCardView : MaterialCardView {
     init {
         framePaint.isAntiAlias = true
         framePaint.style = Paint.Style.FILL
-        framePaint.color = context.findColorByAttr(MaterialR.attr.colorPrimary)
+        framePaint.color = context.findColorByAttr(MaterialAttr.colorPrimary)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

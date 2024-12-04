@@ -3,7 +3,13 @@ package app.atomofiron.searchboxapp.custom.view
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.BlurMaskFilter
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
@@ -11,9 +17,9 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
-import com.google.android.material.R as MaterialR
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sin
@@ -73,7 +79,7 @@ class JoystickView @JvmOverloads constructor(
         composition ?: return
         this.composition = composition
         val isDark = context.findBooleanByAttr(R.attr.isDarkTheme)
-        val colorPrimary = context.findColorByAttr(MaterialR.attr.colorPrimary)
+        val colorPrimary = context.findColorByAttr(MaterialAttr.colorPrimary)
 
         val circleColor = when {
             composition.overrideTheme -> composition.color(isDark)

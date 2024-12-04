@@ -11,24 +11,27 @@ import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.*
+import androidx.preference.Preference
+import androidx.preference.PreferenceFragmentCompat
+import androidx.preference.PreferenceGroup
+import androidx.preference.forEach
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.viewCollect
-import com.google.android.material.snackbar.Snackbar
+import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.utils.anchorView
-import app.atomofiron.searchboxapp.screens.preferences.fragment.*
+import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.Shell
+import app.atomofiron.searchboxapp.utils.anchorView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
+import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.insetsPadding
-import com.google.android.material.R as MaterialR
 
 class PreferenceFragment : PreferenceFragmentCompat(),
     BaseFragment<PreferenceFragment, PreferenceViewState, PreferencePresenter> by BaseFragmentImpl()
@@ -94,7 +97,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
 
     private fun PreferenceGroup.fixIcons() {
         // todo foresee NoticeableDrawable and colored icons
-        val iconTint = requireContext().findColorByAttr(MaterialR.attr.colorControlNormal)
+        val iconTint = requireContext().findColorByAttr(MaterialAttr.colorControlNormal)
         forEach {
             it.icon?.setTint(iconTint)
             if (it is PreferenceGroup) it.fixIcons()
