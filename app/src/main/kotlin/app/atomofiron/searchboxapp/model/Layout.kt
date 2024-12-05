@@ -39,4 +39,10 @@ value class Layout private constructor(val value: Int = 0) {
     }
 
     constructor(side: Ground, withJoystick: Boolean, rtl: Boolean) : this(get(side, withJoystick, rtl))
+
+    override fun toString(): String = when {
+        isLeft -> "Layout.Left(withJoystick = $withJoystick)"
+        isRight -> "Layout.Right(withJoystick = $withJoystick)"
+        else -> "Layout.Bottom(withJoystick = $withJoystick)"
+    }
 }
