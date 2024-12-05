@@ -1,6 +1,9 @@
 package app.atomofiron.searchboxapp
 
 import android.os.Build
+import kotlin.collections.removeLast as dropLast
+
+fun <T> MutableList<T>.dropLast() = dropLast()
 
 typealias MaterialId = com.google.android.material.R.id
 typealias MaterialAttr = com.google.android.material.R.attr

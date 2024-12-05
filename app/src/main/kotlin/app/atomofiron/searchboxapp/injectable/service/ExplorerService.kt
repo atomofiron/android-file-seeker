@@ -7,11 +7,11 @@ import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
 import androidx.core.content.pm.PackageInfoCompat
-import androidx.room.util.copy
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.dropLast
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
@@ -546,7 +546,7 @@ class ExplorerService(
         val index = indexOfFirst { !it.hasOpened() }
         if (index < 0) return
         while (index.inc() != size) {
-            removeLast()
+            dropLast()
         }
     }
 

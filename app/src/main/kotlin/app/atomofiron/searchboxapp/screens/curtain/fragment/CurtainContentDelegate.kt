@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.curtain.fragment
 
 import app.atomofiron.searchboxapp.databinding.FragmentCurtainBinding
+import app.atomofiron.searchboxapp.dropLast
 import app.atomofiron.searchboxapp.screens.curtain.CurtainPresenter
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 
@@ -41,7 +42,7 @@ class CurtainContentDelegate(
         if (stack.size < 2) return false
         if (transitionAnimator.transitionIsRunning) return false
 
-        val last = stack.removeLast()
+        val last = stack.dropLast()
         adapter.drop(last.layoutId)
 
         val prev = stack.last()
