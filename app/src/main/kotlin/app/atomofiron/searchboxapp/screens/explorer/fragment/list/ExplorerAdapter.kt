@@ -16,10 +16,10 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.NodeCallb
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.RecycleItemViewFactory
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.isDot
 
-class ExplorerAdapter : ListAdapter<Node, GeneralHolder<Node>>(AsyncDifferConfig.Builder(NodeCallback()).build()) {
-
-    lateinit var itemActionListener: ExplorerItemActionListener
-    lateinit var separatorClickListener: (Node) -> Unit
+class ExplorerAdapter(
+    private val itemActionListener: ExplorerItemActionListener,
+    private val separatorClickListener: (Node) -> Unit,
+) : ListAdapter<Node, GeneralHolder<Node>>(AsyncDifferConfig.Builder(NodeCallback()).build()) {
 
     private lateinit var composition: ExplorerItemComposition
     private var viewCacheLimit = 5 // RecycledViewPool.DEFAULT_MAX_SCRAP
@@ -61,7 +61,7 @@ class ExplorerAdapter : ListAdapter<Node, GeneralHolder<Node>>(AsyncDifferConfig
             parent.recycledViewPool.setMaxRecycledViews(NodeItem.ordinal, viewCacheLimit)
             viewFactory.setLimit(viewCacheLimit)
         }
-        val enum = ExplorerItemViewFactory.values()[viewType]
+        val enum = ExplorerItemViewFactory.entries[viewType]
         val view = viewFactory.getOrCreate(enum.layoutId, parent)
         return enum.createHolder(view)
     }

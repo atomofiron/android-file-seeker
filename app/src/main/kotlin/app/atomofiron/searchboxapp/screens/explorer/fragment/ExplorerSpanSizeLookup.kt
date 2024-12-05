@@ -1,60 +1,40 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment
 
+import android.content.res.Resources
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
-import kotlin.math.min
+import kotlin.math.max
 
 class ExplorerSpanSizeLookup(
-    recyclerView: RecyclerView,
+    private val resources: Resources,
     private val layoutManager: GridLayoutManager,
     private val rootsAdapter: RootAdapter,
 ) : GridLayoutManager.SpanSizeLookup() {
+    private val minWidth = resources.getDimensionPixelSize(R.dimen.column_min_width)
+    private val maxWidth = resources.getDimensionPixelSize(R.dimen.column_max_width)
 
-    private val itemCount: Int get() = rootsAdapter.itemCount
+    private val rootCount: Int get() = rootsAdapter.itemCount
     private val spanCount: Int get() = layoutManager.spanCount
 
-    init {
-        recyclerView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            updateSpanCount(recyclerView)
-        }
-    }
-
-    override fun getSpanSize(position: Int): Int {
-        val remnant = itemCount % spanCount
-        return when {
-            position >= itemCount -> spanCount
-            position < (itemCount - remnant) -> 1
-            remnant > (spanCount / 2) -> 1
-            else -> 2
-        }
-    }
+    override fun getSpanSize(position: Int): Int = if (position < rootCount) 1 else spanCount
 
     fun updateSpanCount(recyclerView: RecyclerView) {
-        val spanCount = recyclerView.run {
-            val margin = resources.getDimensionPixelSize(R.dimen.content_margin)
-            val minWidth = margin + resources.getDimensionPixelSize(R.dimen.column_min_width)
-            var frameWidth = width
-            if (frameWidth == 0) {
-                frameWidth = resources.displayMetrics.widthPixels
-            }
-            frameWidth -= paddingStart + paddingEnd + margin
-
-            var calculated = frameWidth / minWidth
-            if (calculated < 3) {
-                val compactWidth = margin + resources.getDimensionPixelSize(R.dimen.compact_column_min_width)
-                calculated = frameWidth / compactWidth
-            }
-            when (val itemCount = itemCount) {
-                0 -> calculated
-                else -> min(itemCount, calculated)
-            }
+        val width = recyclerView.width
+        val padding = recyclerView.run { paddingStart + paddingEnd }
+        val frameWidth = let {
+            val layoutWidth = if (width == 0) resources.displayMetrics.widthPixels else width
+            layoutWidth - padding
+        }
+        var spanCount = frameWidth / minWidth
+        if (spanCount > rootCount) {
+            val minSpanCount = frameWidth / maxWidth
+            spanCount = max(minSpanCount, rootCount)
         }
         if (spanCount > 0 && spanCount != this.spanCount) {
             layoutManager.spanCount = spanCount
-            val remnant = itemCount % spanCount
-            rootsAdapter.verticalCount = itemCount - if (remnant > spanCount / 2) 0 else remnant
+            rootsAdapter.notifyItemRangeChanged(0, rootCount)
         }
     }
 }

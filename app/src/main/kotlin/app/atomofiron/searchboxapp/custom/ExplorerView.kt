@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.custom
 import android.annotation.SuppressLint
 import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
@@ -21,43 +20,44 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.scrollToTop
-import lib.atomofiron.insets.findInsetsProvider
+import lib.atomofiron.insets.attachInsetsListener
 import lib.atomofiron.insets.insetsPadding
 
 @SuppressLint("ViewConstructor")
 class ExplorerView(
     context: Context,
-    private val output: ExplorerViewOutput,
+    output: ExplorerViewOutput,
 ) : FrameLayout(context) {
 
     private val binding = ViewExplorerBinding.inflate(LayoutInflater.from(context), this)
     var title: String? = null
         private set
 
-    val recyclerView = binding.recyclerView
-    val headerView = binding.explorerHeader
-    val systemUiView = binding.systemUiBackground
-
-    private val rootAdapter = RootAdapter()
-    private val explorerAdapter = ExplorerAdapter()
-
-    private lateinit var listDelegate: ExplorerListDelegate
-    private lateinit var spanSizeLookup: ExplorerSpanSizeLookup
-
+    private val rootAdapter = RootAdapter(output)
+    private val explorerAdapter = ExplorerAdapter(output, ::onSeparatorClick)
+    private val layoutManager = GridLayoutManager(context, 1)
+    private val spanSizeLookup = ExplorerSpanSizeLookup(resources, layoutManager, rootAdapter)
     private val submitter = OnScrollIdleSubmitter(binding.recyclerView, explorerAdapter)
 
-    init {
-        explorerAdapter.itemActionListener = output
-        explorerAdapter.separatorClickListener = ::onSeparatorClick
-        rootAdapter.clickListener = output
+    private val listDelegate: ExplorerListDelegate = ExplorerListDelegate(
+        binding.recyclerView,
+        rootAdapter,
+        explorerAdapter,
+        binding.explorerHeader,
+        output,
+    )
 
+    init {
         binding.applyInsets()
         binding.init()
     }
 
+    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        spanSizeLookup.updateSpanCount(binding.recyclerView)
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+    }
+
     private fun ViewExplorerBinding.init() {
-        val layoutManager = GridLayoutManager(context, 1)
-        spanSizeLookup = ExplorerSpanSizeLookup(recyclerView, layoutManager, rootAdapter)
         layoutManager.spanSizeLookup = spanSizeLookup
         recyclerView.layoutManager = layoutManager
         val config = ConcatAdapter.Config.Builder()
@@ -65,42 +65,17 @@ class ExplorerView(
             .build()
         recyclerView.adapter = ConcatAdapter(config, rootAdapter, explorerAdapter)
         recyclerView.addOnItemTouchListener(SwipeMarkerDelegate(resources))
-
-        listDelegate = ExplorerListDelegate(
-            recyclerView,
-            rootAdapter,
-            explorerAdapter,
-            explorerHeader,
-            output,
-        )
     }
 
     private fun ViewExplorerBinding.applyInsets() {
-        recyclerView.insetsPadding(ExtType { barsWithCutout + navigation + rail + joystickFlank + joystickBottom })
+        recyclerView.insetsPadding(ExtType { barsWithCutout + navigation + rail })
         explorerHeader.insetsPadding(ExtType { barsWithCutout + rail }, start = true, top = true, end = true)
-        root.addOnAttachStateChangeListener(object : OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(view: View) {
-                view.findInsetsProvider()!!.addInsetsListener(systemUiView)
-            }
-            override fun onViewDetachedFromWindow(view: View) {
-                view.findInsetsProvider()!!.removeInsetsListener(systemUiView)
-            }
-        })
-    }
-
-    override fun setPaddingRelative(start: Int, top: Int, end: Int, bottom: Int) {
-        super.setPaddingRelative(start, top, end, bottom)
-        spanSizeLookup.updateSpanCount(recyclerView)
-    }
-
-    override fun setPadding(left: Int, top: Int, right: Int, bottom: Int) {
-        super.setPadding(left, top, right, bottom)
-        spanSizeLookup.updateSpanCount(recyclerView)
+        root.attachInsetsListener(binding.systemUiBackground)
     }
 
     fun scrollTo(item: Node) = listDelegate.scrollTo(item)
 
-    fun scrollToTop() = recyclerView.scrollToTop()
+    fun scrollToTop() = binding.recyclerView.scrollToTop()
 
     fun isCurrentDirVisible(): Boolean? = listDelegate.isCurrentDirVisible()
 

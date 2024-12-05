@@ -1,42 +1,85 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator
 
+import android.content.res.Resources
 import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.searchboxapp.R
-import kotlin.math.roundToInt
+import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.isRtl
+import lib.atomofiron.insets.ExtendedWindowInsets
+import lib.atomofiron.insets.InsetsListener
+import kotlin.math.max
 
-class RootItemMarginDecorator : RecyclerView.ItemDecoration() {
+class RootItemMarginDecorator(resources: Resources) : RecyclerView.ItemDecoration(), InsetsListener {
+
+    private val margin = resources.getDimensionPixelSize(R.dimen.content_margin)
+    private var margins = IntArray(2)
+    private val cellCount get() = margins.size / 2
+    private var leftMargin
+        get() = margins.first()
+        set(value) = margins.set(0, value)
+    private var rightMargin
+        get() = margins.last()
+        set(value) = margins.set(margins.lastIndex, value)
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-        super.getItemOffsets(outRect, view, parent, state)
-
-        if (view.id != R.id.item_explorer_card) return
-
+        if (view.id != R.id.item_explorer_card) {
+            return
+        }
+        val spanCount = (parent.layoutManager as GridLayoutManager).spanCount
+        update(cellCount = spanCount)
         var position = parent.getChildLayoutPosition(view)
-        val layoutManager = parent.layoutManager as GridLayoutManager
-        val spanCount = layoutManager.spanCount
-        val spanSize = layoutManager.spanSizeLookup.getSpanSize(position)
-        position += spanSize.dec()
-        val margin = parent.resources.getDimension(R.dimen.content_margin)
-        val count = spanCount / spanSize
-        val cellIndex = position % count
-        val sum = margin * count.inc()
-        val avg = sum / count
-        val piece = avg - margin
+        position %= spanCount
+        if (parent.isRtl()) {
+            position = spanCount - position
+        }
+        val index = position * 2
+        outRect.left = margins[index]
+        outRect.right = margins[index.inc()]
+    }
 
-        // распредиляем отступы так,
-        // чтобы ячейки стали одинаковой ширины
-        val left = when (position % count) {
-            0 -> margin
-            else -> (margin - piece * cellIndex)
+    override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
+        val cutout = windowInsets[ExtType.displayCutout]
+        update(leftMargin = max(margin - cutout.left, 0), rightMargin = max(margin - cutout.right, 0))
+    }
+
+    private fun update(
+        cellCount: Int = this.cellCount,
+        leftMargin: Int = this.leftMargin,
+        rightMargin: Int = this.rightMargin,
+    ) {
+        when {
+            cellCount != this.cellCount -> Unit
+            leftMargin != this.leftMargin -> Unit
+            rightMargin != this.rightMargin -> Unit
+            else -> return
         }
-        val right = when (position % count) {
-            count.dec() -> margin
-            else -> avg - left
+        margins = IntArray(cellCount * 2)
+        this.leftMargin = leftMargin
+        this.rightMargin = rightMargin
+        updateMargins()
+    }
+
+    private fun updateMargins() {
+        val spanCount = margins.size / 2
+        var internal = margin * spanCount.dec()
+        val sum = leftMargin + rightMargin + internal
+        val avg = sum / spanCount
+        // распределяем отступы так, чтобы ячейки стали одинаковой ширины
+        for (i in 0..<spanCount) {
+            if (i == 0) {
+                val other = avg - margins[0]
+                margins[1] = other
+                internal -= avg
+            } else {
+                val index = i * 2
+                val left = margin - margins[index.dec()]
+                margins[index] = left
+                margins[index.inc()] = avg - left
+                internal -= avg
+            }
         }
-        outRect.left = left.roundToInt()
-        outRect.right = right.roundToInt()
     }
 }

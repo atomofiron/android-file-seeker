@@ -48,8 +48,10 @@
 	<!-- ShapeAppearance.M3.Sys.Shape.Corner.ExtraLarge -->
 	<dimen name="corner_extra_large">28dp</dimen>
 
-	// (360 - 16 * 3) / 3 = 98.(6)
-	<dimen name="column_min_width">98dp</dimen>
+	// (320 - 16 - 16 * 3) / 3 + 16 = 101.(3)
+	<dimen name="column_min_width">108dp</dimen>
+	// (480 - 16 - 16 * 3) / 3 + 16 = 154.(6)
+	<dimen name="column_max_width">150dp</dimen>
 	<dimen name="compact_column_min_width">100dp</dimen>
 	<dimen name="item_ripple_corner_radius">16dp</dimen>
 	<dimen name="content_padding_bottom">32dp</dimen>

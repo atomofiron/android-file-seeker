@@ -155,6 +155,8 @@ object LayoutDelegate {
     }
 
     fun View.getLayout(display: Display? = context.getDisplayCompat()): Layout {
+        val width = if (width > 0) width else resources.displayMetrics.widthPixels
+        val height = if (height > 0) height else resources.displayMetrics.heightPixels
         val maxSize = resources.getDimensionPixelSize(R.dimen.bottom_bar_max_width)
         val atTheBottom = width < height && width < maxSize
         val ground = when {

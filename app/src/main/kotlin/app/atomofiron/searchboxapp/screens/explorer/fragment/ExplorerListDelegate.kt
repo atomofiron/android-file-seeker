@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.Root
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.withoutDot
+import lib.atomofiron.insets.attachInsetsListener
 import kotlin.math.min
 
 class ExplorerListDelegate(
@@ -25,11 +26,12 @@ class ExplorerListDelegate(
     private var currentDir: Node? = null
 
     private val headerDelegate = ExplorerHeaderDelegate(recyclerView, headerView, nodeAdapter)
-    private val rootMarginDecorator = RootItemMarginDecorator()
+    private val rootMarginDecorator = RootItemMarginDecorator(recyclerView.resources)
     private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = true)
     private val borderDecorator = ItemBorderDecorator(nodeAdapter, headerView, headerDelegate::onDecoratorDraw)
 
     init {
+        recyclerView.attachInsetsListener(rootMarginDecorator)
         recyclerView.addItemDecoration(rootMarginDecorator)
         recyclerView.addItemDecoration(backgroundDecorator)
         recyclerView.addItemDecoration(borderDecorator)

@@ -4,7 +4,6 @@ import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.view.View
-import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import app.atomofiron.common.recycler.GeneralHolder
@@ -47,12 +46,6 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     init {
         binding.cardTitle.setTextColor(colors)
         binding.cardThumbnail.clipToOutline = true
-    }
-
-    fun makeHorizontal() {
-        val set = ConstraintSet()
-        set.clone(context, R.layout.item_explorer_card_horizontal)
-        set.applyTo(binding.cardContent)
     }
 
     override fun onBind(item: NodeRoot, position: Int) {
