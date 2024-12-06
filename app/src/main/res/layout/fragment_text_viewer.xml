@@ -49,11 +49,12 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="end"
+        android:background="@color/transparent"
         app:menu="@menu/nav_text_viewer"
         app:itemTextColor="?android:textColorPrimary"
         app:itemIconTint="?android:textColorPrimary"
         app:labelVisibilityMode="unlabeled"
-        app:elevation="@dimen/design_appbar_elevation"
+        app:elevation="0dp"
         app:layout_constraintEnd_toEndOf="parent"
         />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

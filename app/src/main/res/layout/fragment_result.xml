@@ -33,11 +33,12 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="end"
+        android:background="@color/transparent"
         app:menu="@menu/nav_result"
         app:itemTextColor="?android:textColorPrimary"
         app:itemIconTint="?android:textColorPrimary"
         app:labelVisibilityMode="unlabeled"
-        app:elevation="3dp"
+        app:elevation="0dp"
         />
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:id="@+id/snackbar_container"
