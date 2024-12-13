@@ -8,7 +8,7 @@ import android.content.pm.PackageInstaller
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import app.atomofiron.searchboxapp.android.InstallReceiver
-import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.Codes
 
 class ApkService(
     private val context: Context,
@@ -32,7 +32,7 @@ class ApkService(
             val intent = Intent(context, InstallReceiver::class.java)
             val pendingIntent = PendingIntent.getBroadcast(
                 context,
-                Const.REQUEST_CODE_INSTALL,
+                Codes.InstallApk,
                 intent,
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
             )
