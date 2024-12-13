@@ -2,10 +2,10 @@ package app.atomofiron.common.util.property
 
 import kotlin.reflect.KProperty
 
-open class StrongProperty<T : Any?>() {
+open class StrongProperty<T : Any?>() : RoProperty<T> {
     private var nullable: T? = null
 
-    open var value: T
+    override var value: T
         get() = nullable as T
         protected set(value) {
             nullable = value
@@ -15,5 +15,5 @@ open class StrongProperty<T : Any?>() {
         nullable = value
     }
 
-    operator fun getValue(any: Any, property: KProperty<*>): T = value
+    override operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
 }
