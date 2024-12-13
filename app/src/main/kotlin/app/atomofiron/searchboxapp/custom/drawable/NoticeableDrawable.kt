@@ -10,7 +10,9 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.toIntAlpha
 
 class NoticeableDrawable(
     drawable: Drawable,
@@ -26,7 +28,7 @@ class NoticeableDrawable(
 
     private val dotRadius: Float get() = bounds.width().toFloat() / 6
     private val holeRadius: Float get() = bounds.width().toFloat() / 4
-    private var dotAlpha = Const.ALPHA_VISIBLE_INT
+    private var dotAlpha = Alpha.VisibleInt
     private val holeX: Float get() = bounds.right - dotRadius
     private val holeY: Float get() = dotRadius
 
@@ -61,10 +63,7 @@ class NoticeableDrawable(
     override fun onStateChange(state: IntArray): Boolean {
         drawDot = state.contains(state_activated)
         val isEnabled = state.contains(state_enabled)
-        dotAlpha = when {
-            isEnabled -> Const.ALPHA_VISIBLE_INT
-            else -> Const.ALPHA_DISABLED_INT
-        }
+        dotAlpha = Alpha.enabled(isEnabled).toIntAlpha()
         if (overrideAlpha) {
             alpha = dotAlpha
         }

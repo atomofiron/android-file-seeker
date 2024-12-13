@@ -7,9 +7,9 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 import app.atomofiron.searchboxapp.utils.obtainStyledAttributes
-import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.isLayoutRtl
 import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.ExtendedWindowInsets.Type
@@ -21,7 +21,7 @@ class SystemBarsBackgroundView : View, InsetsListener {
     companion object {
         fun Context.getSystemBarsColor(): Int {
             val color = getColorByAttr(R.attr.colorBackground)
-            return ColorUtils.setAlphaComponent(color, Const.ALPHA_67_PERCENT)
+            return ColorUtils.setAlphaComponent(color, Alpha.Level67)
         }
         private const val START =  0b00001
         private const val TOP =    0b00010

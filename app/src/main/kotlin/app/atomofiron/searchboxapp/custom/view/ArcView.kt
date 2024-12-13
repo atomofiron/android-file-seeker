@@ -11,7 +11,7 @@ import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.Alpha
 import com.google.android.material.textview.MaterialTextView
 import kotlin.math.PI
 import kotlin.math.abs
@@ -32,7 +32,7 @@ class ArcView : MaterialTextView {
     private val paint = Paint()
 
     private val colorProgress = context.findColorByAttr(MaterialAttr.colorPrimary)
-    private val colorTrack = ColorUtils.setAlphaComponent(colorProgress, Const.ALPHA_30_PERCENT)
+    private val colorTrack = ColorUtils.setAlphaComponent(colorProgress, Alpha.Level30)
     private val strokeWidth = resources.getDimension(R.dimen.arc_stroke_width)
     private val strokeMargin = strokeWidth * 2
 

@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.databinding.ItemExplorerCardBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.convert
 import app.atomofiron.searchboxapp.utils.getColorByAttr
@@ -53,7 +54,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
         binding.cardArc.isVisible = withArc
         binding.root.isSelected = item.isSelected
         binding.root.isEnabled = item.item.isCached
-        binding.root.alpha = if (item.item.isCached) Const.ALPHA_ENABLED else Const.ALPHA_DISABLED
+        binding.root.alpha = Alpha.enabled(item.item.isCached)
         binding.cardTitle.text = item.type.getTitle(itemView.resources)
         binding.cardThumbnail.imageTintList = if (item.withPreview) null else colors
         binding.cardThumbnail.background = item.getThumbnailBackground()

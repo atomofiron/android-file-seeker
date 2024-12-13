@@ -23,21 +23,6 @@ object Const {
 
     const val UNDEFINED = -1
     const val UNDEFINEDL = -1L
-    const val MAX_BYTE = 255
-    const val ALPHA_VISIBLE = 1f
-    const val ALPHA_INVISIBLE = 0f
-    const val ALPHA_ENABLED = 1f
-    const val ALPHA_DISABLED = 0.5f
-    const val ALPHA_VISIBLE_INT = 255
-    const val ALPHA_DISABLED_INT = 128
-    const val ALPHA_12_PERCENT = 31
-    const val ALPHA_30_PERCENT = 80
-    const val ALPHA_50_PERCENT = 128
-    const val ALPHA_67_PERCENT = 170
-    const val ALPHA_80_PERCENT = 200
-    const val ALPHA_90_PERCENT = 225
-    const val RIPPLE_ALPHA = 64
-    const val RIPPLE_ALPHA_HALF = 180
     const val COMMON_DURATION = 512L
     const val COMMON_DELAY = 256L
     const val CONFIRM_DELAY = 2000L

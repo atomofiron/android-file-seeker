@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.textviewer.SearchState
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 
 class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListener) : CardViewHolder(parent, layoutId) {
@@ -110,7 +111,7 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
         text = status
     }
 
-    private fun Spannable.setIcon(resId: Int, start: Int, end: Int, alpha: Int = Const.ALPHA_VISIBLE_INT) {
+    private fun Spannable.setIcon(resId: Int, start: Int, end: Int, alpha: Int = Alpha.VisibleInt) {
         val span = ImageSpan(context, resId, ImageSpan.ALIGN_BASELINE)
         span.drawable.alpha = alpha
         setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

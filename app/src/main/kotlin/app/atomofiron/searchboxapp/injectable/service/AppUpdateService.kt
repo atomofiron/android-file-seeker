@@ -23,6 +23,7 @@ import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
 import app.atomofiron.searchboxapp.model.other.UpdateType
+import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.immutable
 import app.atomofiron.searchboxapp.utils.tryShow
@@ -49,6 +50,7 @@ class AppUpdateService(
     private lateinit var launcher: ActivityResultLauncher<IntentSenderRequest>
 
     init {
+        poop("init registerListener")
         appUpdateManager.registerListener(this)
     }
 
@@ -57,6 +59,7 @@ class AppUpdateService(
     }
 
     override fun onStateUpdate(state: InstallState) {
+        poop("onStateUpdate ${state.installStatus()}")
         when (state.installStatus()) {
             InstallStatus.DOWNLOADING -> {
                 val bytes = state.bytesDownloaded()
@@ -75,13 +78,16 @@ class AppUpdateService(
     }
 
     override fun onActivityResult(result: ActivityResult) {
+        poop("onActivityResult ${result.resultCode}")
         if (result.resultCode != Activity.RESULT_OK) {
             store.fallback()
         }
     }
 
     fun check() {
+        poop("check")
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
+            poop("addOnSuccessListener ${appUpdateInfo.updateAvailability()} code ${appUpdateInfo.availableVersionCode()} installStatus ${appUpdateInfo.installStatus()}")
             this.appUpdateInfo = appUpdateInfo
             when (appUpdateInfo.updateAvailability()) {
                 UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> return@addOnSuccessListener
@@ -94,12 +100,14 @@ class AppUpdateService(
                 else -> return@addOnSuccessListener
             }.let { store.set(it) }
         }.addOnFailureListener {
+            poop("addOnFailureListener $it")
             store.set(AppUpdateState.Unknown)
         }
     }
 
     fun startUpdate(variant: UpdateType.Variant) {
-        val appUpdateInfo = appUpdateInfo ?: return
+        val appUpdateInfo = appUpdateInfo ?: return poop("startUpdate appUpdateInfo null")
+        poop("startUpdate startUpdateFlowForResult...")
         val type = when (variant) {
             UpdateType.Flexible -> AppUpdateType.FLEXIBLE
             UpdateType.Immediate -> AppUpdateType.IMMEDIATE
@@ -109,10 +117,12 @@ class AppUpdateService(
     }
 
     fun completeUpdate() {
+        poop("completeUpdate")
         appUpdateManager.completeUpdate()
     }
 
     private fun showNotificationForUpdate(versionCode: Int) = context.tryShow {
+        poop("showNotificationForUpdate")
         val manager = NotificationManagerCompat.from(context)
         if (Android.O) {
             var channel = manager.getNotificationChannel(Const.NOTIFICATION_CHANNEL_UPDATE_ID)

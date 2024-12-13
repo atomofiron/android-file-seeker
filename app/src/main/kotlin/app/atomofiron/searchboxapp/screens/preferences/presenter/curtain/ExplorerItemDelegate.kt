@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
@@ -60,7 +61,7 @@ class ExplorerItemDelegate(
         holder.disableClicks()
         holder.setGreyBackgroundColor(composition.visibleBg)
 
-        preferenceExplorerItem.itemExplorerIvIcon.alpha = Const.ALPHA_VISIBLE
+        preferenceExplorerItem.itemExplorerIvIcon.alpha = Alpha.Visible
         preferenceExplorerItem.itemExplorerTvSize.text = dir.size
     }
 

@@ -12,6 +12,7 @@ import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.ItemExplorerBinding
 import app.atomofiron.searchboxapp.databinding.ItemExplorerSeparatorBinding
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 
 const val TAG_EXPLORER_OPENED_ITEM = "TAG_EXPLORER_OPENED_ITEM"
@@ -60,7 +61,7 @@ private fun ItemExplorerBinding.makeOpposite(
     }
     val rippleMask = GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, intArrayOf(Color.BLACK, Color.BLACK))
     rippleMask.cornerRadius = cornerRadius
-    val rippleColor = ColorUtils.setAlphaComponent(content, Const.RIPPLE_ALPHA_HALF)
+    val rippleColor = ColorUtils.setAlphaComponent(content, Alpha.RippleInt)
     val rippleColorList = ColorStateList.valueOf(rippleColor)
     root.background = RippleDrawable(rippleColorList, drawable, rippleMask)
     val filter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(content, BlendModeCompat.SRC_IN)

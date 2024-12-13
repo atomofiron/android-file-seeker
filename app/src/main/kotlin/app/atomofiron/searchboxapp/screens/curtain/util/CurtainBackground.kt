@@ -14,7 +14,7 @@ import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.asOverlayOn
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 import app.atomofiron.searchboxapp.utils.setColorAlpha
@@ -32,7 +32,7 @@ open class CurtainBackground(context: Context) : Drawable() {
     private val strokeColor = when {
         isBlackDeep -> context
             .getColorByAttr(MaterialAttr.strokeColor)
-            .setColorAlpha(Const.ALPHA_50_PERCENT)
+            .setColorAlpha(Alpha.Level50)
             .asOverlayOn(curtainColor)
         else -> Color.TRANSPARENT
     }

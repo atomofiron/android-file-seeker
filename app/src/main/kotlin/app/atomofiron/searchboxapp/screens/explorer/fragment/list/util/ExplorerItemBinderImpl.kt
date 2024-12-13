@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.getString
 
@@ -81,7 +82,7 @@ class ExplorerItemBinderImpl(
         cbBox.setOnCheckedChangeListener(onCheckListener)
 
         ivIcon.setImageResource(item.getIcon())
-        ivIcon.alpha = if (item.isDirectory && !item.isCached) Const.ALPHA_DISABLED else Const.ALPHA_ENABLED
+        ivIcon.alpha = Alpha.enabled(!item.isDirectory || item.isCached)
         val thumbnail = (item.content as? NodeContent.File)?.thumbnail
         ivThumbnail.setImageDrawable(thumbnail)
 
