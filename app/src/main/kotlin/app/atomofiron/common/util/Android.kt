@@ -1,18 +1,23 @@
 package app.atomofiron.common.util
 
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
+import android.os.Build.VERSION_CODES
+
+typealias AndroidSdk = VERSION_CODES
 
 object Android {
-    const val L = Build.VERSION_CODES.LOLLIPOP
-    const val L_MR1 = Build.VERSION_CODES.LOLLIPOP_MR1
-    const val M = Build.VERSION_CODES.M
-    const val N = Build.VERSION_CODES.N
-    const val N_MR1 = Build.VERSION_CODES.N_MR1
-    const val O = Build.VERSION_CODES.O
-    const val O_MR1 = Build.VERSION_CODES.O_MR1
-    const val P = Build.VERSION_CODES.P
-    const val Q = Build.VERSION_CODES.Q
-    const val R = Build.VERSION_CODES.R
-    const val S = Build.VERSION_CODES.S
-    const val S_V2 = Build.VERSION_CODES.S_V2
+    val N_MR1 get() = SDK_INT >= VERSION_CODES.N_MR1
+    val O get() = SDK_INT >= VERSION_CODES.O
+    val O_MR1 get() = SDK_INT >= VERSION_CODES.O_MR1
+    val P get() = SDK_INT >= VERSION_CODES.P
+    val Q get() = SDK_INT >= VERSION_CODES.Q
+    val R get() = SDK_INT >= VERSION_CODES.R
+    val S get() = SDK_INT >= VERSION_CODES.S
+    val S_V2 get() = SDK_INT >= VERSION_CODES.S_V2
+    val T get() = SDK_INT >= VERSION_CODES.TIRAMISU
+    val U get() = SDK_INT >= VERSION_CODES.UPSIDE_DOWN_CAKE
+
+    object Below {
+        val R get() = SDK_INT < VERSION_CODES.R
+    }
 }

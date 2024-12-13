@@ -72,7 +72,7 @@ class FinderPresenter(
 
     fun onExplorerOptionSelected() {
         when {
-            Build.VERSION.SDK_INT < Android.R -> {
+            Android.Below.R -> {
                 router.permissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     .granted { router.showExplorer() }
                     .denied { _, _ ->

@@ -5,7 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
 import androidx.annotation.RequiresApi
-import app.atomofiron.common.util.Android
+import app.atomofiron.common.util.AndroidSdk
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Const
@@ -51,7 +51,7 @@ object Intents {
         }
 
     val storagePermissionIntent: Intent
-        @RequiresApi(Android.R)
+        @RequiresApi(AndroidSdk.O)
         get() = Intent(
             Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
             Uri.parse(PACKAGE_SCHEME + BuildConfig.APPLICATION_ID)

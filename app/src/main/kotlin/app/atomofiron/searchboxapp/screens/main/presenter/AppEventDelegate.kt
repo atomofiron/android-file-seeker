@@ -2,9 +2,9 @@ package app.atomofiron.searchboxapp.screens.main.presenter
 
 import android.content.Intent
 import android.net.Uri
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.TIRAMISU
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationManagerCompat
+import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
@@ -46,7 +46,7 @@ class AppEventDelegate(
         when (intent.action) {
             Intent.ACTION_SEND -> {
                 val uri = when {
-                    SDK_INT >= TIRAMISU -> intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
+                    Android.T -> intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
                     else -> intent.getParcelableExtra(Intent.EXTRA_STREAM) as Uri?
                 }
                 // todo alerts

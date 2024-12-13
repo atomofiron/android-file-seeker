@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.screens.root
 
 import android.Manifest
-import android.os.Build
 import android.os.Environment
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseRouter
@@ -31,7 +30,7 @@ class RootRouter(
         get() = if (granted) field else HomeScreen.Search
 
     val granted: Boolean get() = when {
-        Build.VERSION.SDK_INT >= Android.R -> Environment.isExternalStorageManager()
+        Android.R -> Environment.isExternalStorageManager()
         else -> context?.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE) == true
     }
 

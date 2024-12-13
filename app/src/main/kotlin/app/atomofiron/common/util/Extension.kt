@@ -90,7 +90,7 @@ fun ViewGroup.moveChildrenFrom(layoutId: Int) {
 fun Context.isDarkTheme(): Boolean = findBooleanByAttr(R.attr.isDarkTheme)
 
 fun Context.isGranted(permission: String): Boolean {
-    return SDK_INT < VERSION_CODES.M || checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+    return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 }
 
 fun Int.Companion.random(range: Int = 1000): Int = (Math.random() * range).toInt()

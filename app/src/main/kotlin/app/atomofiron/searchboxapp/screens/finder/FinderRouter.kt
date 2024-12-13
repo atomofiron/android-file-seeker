@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.screens.finder
 
-import android.os.Build
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.common.util.Android
@@ -30,7 +29,7 @@ class FinderRouter(fragment: WeakProperty<out Fragment>) : BaseRouter(fragment) 
     fun showSystemPermissionsAppSettings() {
         activity {
             when {
-                Build.VERSION.SDK_INT >= Android.R -> startActivity(Intents.storagePermissionIntent)
+                Android.R -> startActivity(Intents.storagePermissionIntent)
                 else -> startActivity(Intents.settingsIntent)
             }
         }

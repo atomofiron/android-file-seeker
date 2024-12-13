@@ -293,6 +293,6 @@ fun Context.canForegroundService(): Boolean {
 }
 
 fun Context.getDisplayCompat(): Display? = when {
-    SDK_INT >= Android.R -> display
+    Android.R -> display
     else -> (getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
 }
