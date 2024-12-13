@@ -52,6 +52,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
             deepBlack.isVisible = it
         }
         val uppUpdate = findPreference<AppUpdatePreference>(PreferenceKeys.KeyAppUpdate.name)!!
+        uppUpdate.listener = presenter
         viewState.appUpdate.collect(lifecycleScope) {
             uppUpdate.bind(it)
         }

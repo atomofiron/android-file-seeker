@@ -144,6 +144,9 @@
     <string name="is_up_to_date">App is up to date</string>
     <string name="update_downloaded">Update downloaded</string>
     <string name="install_update">Install update</string>
+    <string name="update_choice">Would you like to download the update in the background or right now?</string>
+    <string name="update_in_background">In background</string>
+    <string name="update_now">Now</string>
     <string name="check">Check</string>
     <string name="download">Download</string>
     <string name="install">Install</string>

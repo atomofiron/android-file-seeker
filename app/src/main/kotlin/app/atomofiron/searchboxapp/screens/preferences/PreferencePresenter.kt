@@ -3,11 +3,13 @@ package app.atomofiron.searchboxapp.screens.preferences
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.custom.preference.UpdateActionListener
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExportImportDelegate
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
+import app.atomofiron.searchboxapp.screens.preferences.presenter.UpdatePresenterDelegate
 import app.atomofiron.searchboxapp.utils.Shell
 import kotlinx.coroutines.CoroutineScope
 
@@ -19,9 +21,11 @@ class PreferencePresenter(
     preferenceClickOutput: PreferenceClickOutput,
     private val preferenceStore: PreferenceStore,
     appStore: AppStore,
+    updateDelegate: UpdateActionListener,
 ) : BasePresenter<PreferenceViewModel, PreferenceRouter>(scope, router),
     ExportImportDelegate.ExportImportOutput by exportImportDelegate,
-    PreferenceClickOutput by preferenceClickOutput
+    PreferenceClickOutput by preferenceClickOutput,
+    UpdateActionListener by updateDelegate
 {
 
     val resources by appStore.resourcesProperty

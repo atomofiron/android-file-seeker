@@ -4,13 +4,16 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.ButtonStyle
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
+import app.atomofiron.searchboxapp.model.other.AppUpdateAction
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
+import app.atomofiron.searchboxapp.model.other.UpdateType
 import app.atomofiron.searchboxapp.utils.getAttr
 import com.google.android.material.progressindicator.CircularProgressIndicator
 
@@ -28,11 +31,11 @@ class AppUpdatePreference @JvmOverloads constructor(
     private val buttonStyle = ButtonStyle(context)
     private lateinit var button: Button
     private lateinit var progress: CircularProgressIndicator
+    var listener: UpdateActionListener = UpdateActionListener { }
 
     init {
         widgetLayoutResource = R.layout.widget_button_with_progress
         isSelectable = false
-        state = AppUpdateState.Completable
         state.bindIcon()
         state.bindTitle()
     }
@@ -115,10 +118,34 @@ class AppUpdatePreference @JvmOverloads constructor(
         progress.isVisible = true
         progress.isIndeterminate = value == null
         value?.let { progress.setProgress((MAX * value).toInt()) }
-        buttonStyle
     }
 
     override fun onClick(v: View) {
-        onPreferenceClickListener?.onPreferenceClick(this)
+        when (val state = state) {
+            is AppUpdateState.Unknown -> AppUpdateAction.Check
+            is AppUpdateState.Available -> when (val type = state.type) {
+                is UpdateType.Variant -> AppUpdateAction.Download(type)
+                else -> return showChoice()
+            }
+            is AppUpdateState.Completable -> AppUpdateAction.Install
+            is AppUpdateState.Downloading,
+            is AppUpdateState.Installing,
+            is AppUpdateState.UpToDate -> null
+        }?.let { listener(it) }
     }
+
+    private fun showChoice() {
+        AlertDialog.Builder(context)
+            .setCancelable(false)
+            .setTitle(R.string.update_choice)
+            .setPositiveButton(R.string.update_now) { _, _ ->
+                listener(AppUpdateAction.Download(UpdateType.Immediate))
+            }.setNegativeButton(R.string.update_in_background) { _, _ ->
+                listener(AppUpdateAction.Download(UpdateType.Flexible))
+            }.show()
+    }
+}
+
+fun interface UpdateActionListener {
+    operator fun invoke(action: AppUpdateAction)
 }

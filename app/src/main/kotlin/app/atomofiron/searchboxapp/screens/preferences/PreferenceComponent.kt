@@ -4,12 +4,14 @@ import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.searchboxapp.custom.preference.UpdateActionListener
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
+import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.service.PreferenceService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
@@ -18,6 +20,7 @@ import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreference
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
 import app.atomofiron.searchboxapp.screens.preferences.presenter.ExportImportPresenterDelegate
 import app.atomofiron.searchboxapp.screens.preferences.presenter.PreferenceClickPresenterDelegate
+import app.atomofiron.searchboxapp.screens.preferences.presenter.UpdatePresenterDelegate
 import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExportImportDelegate
 import app.atomofiron.searchboxapp.utils.AppWatcherProxy
 import kotlinx.coroutines.CoroutineScope
@@ -78,6 +81,12 @@ class PreferenceModule {
 
     @Provides
     @PreferenceScope
+    fun updatePresenterDelegate(service: AppUpdateService): UpdateActionListener {
+        return UpdatePresenterDelegate(service)
+    }
+
+    @Provides
+    @PreferenceScope
     fun presenter(
         scope: CoroutineScope,
         viewState: PreferenceViewState,
@@ -86,6 +95,7 @@ class PreferenceModule {
         preferenceClickOutput: PreferenceClickOutput,
         preferenceStore: PreferenceStore,
         appStore: AppStore,
+        updateDelegate: UpdateActionListener,
     ): PreferencePresenter {
         return PreferencePresenter(
             scope,
@@ -95,6 +105,7 @@ class PreferenceModule {
             preferenceClickOutput,
             preferenceStore,
             appStore,
+            updateDelegate,
         )
     }
 
@@ -135,4 +146,5 @@ interface PreferenceDependencies {
     fun appWatcherProxy(): AppWatcherProxy
     fun appStore(): AppStore
     fun updateStore(): AppUpdateStore
+    fun appUpdateService(): AppUpdateService
 }

@@ -75,7 +75,7 @@ open class ServiceModule {
     fun textAppUpdateService(
         context: Context,
         appStore: AppStore,
-        store: AppUpdateStore,
+        updateStore: AppUpdateStore,
         preferences: PreferenceStore,
-    ): AppUpdateService = AppUpdateService(context, appStore.activityProperty, appStore.resourcesProperty, store, preferences)
+    ): AppUpdateService = AppUpdateService(context, appStore.resourcesProperty, updateStore, preferences)
 }

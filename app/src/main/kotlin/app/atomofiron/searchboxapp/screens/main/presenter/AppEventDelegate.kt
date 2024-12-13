@@ -45,6 +45,7 @@ class AppEventDelegate(
     override fun onActivityCreate(activity: AppCompatActivity) {
         appStore.onActivityCreate(activity)
         appStore.onResourcesChange(activity.resources)
+        updateService.onActivityCreate(activity)
     }
 
     override fun onIntent(intent: Intent) {

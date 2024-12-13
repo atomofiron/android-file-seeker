@@ -8,13 +8,14 @@ import android.content.Context
 import android.content.res.Resources
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.materialColor
-import app.atomofiron.common.util.property.MultiLazy
 import app.atomofiron.common.util.property.RoProperty
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
@@ -37,7 +38,6 @@ import com.google.android.play.core.install.model.UpdateAvailability
 
 class AppUpdateService(
     private val context: Context,
-    activity: RoProperty<AppCompatActivity?>,
     resources: RoProperty<Resources>,
     private val store: AppUpdateStore,
     private val preferences: PreferenceStore,
@@ -46,12 +46,14 @@ class AppUpdateService(
     private val resources by resources
     private val appUpdateManager by lazy { AppUpdateManagerFactory.create(context) }
     private var appUpdateInfo: AppUpdateInfo? = null
-    private val launcher by MultiLazy {
-        activity.value?.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult(), this)
-    }
+    private lateinit var launcher: ActivityResultLauncher<IntentSenderRequest>
 
     init {
         appUpdateManager.registerListener(this)
+    }
+
+    fun onActivityCreate(activity: AppCompatActivity) {
+        launcher = activity.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult(), this)
     }
 
     override fun onStateUpdate(state: InstallState) {
@@ -86,7 +88,7 @@ class AppUpdateService(
                 UpdateAvailability.UNKNOWN -> AppUpdateState.Unknown
                 UpdateAvailability.UPDATE_NOT_AVAILABLE -> AppUpdateState.UpToDate
                 UpdateAvailability.UPDATE_AVAILABLE -> appUpdateInfo.type()?.let {
-                    showNotificationForUpdate()
+                    showNotificationForUpdate(appUpdateInfo.availableVersionCode())
                     AppUpdateState.Available(it)
                 } ?: AppUpdateState.Unknown
                 else -> return@addOnSuccessListener
@@ -96,10 +98,13 @@ class AppUpdateService(
         }
     }
 
-    fun startUpdate(immediate: Boolean) {
-        val launcher = launcher ?: return
+    fun startUpdate(variant: UpdateType.Variant) {
         val appUpdateInfo = appUpdateInfo ?: return
-        val options = AppUpdateOptions.newBuilder(if (immediate) AppUpdateType.IMMEDIATE else AppUpdateType.FLEXIBLE).build()
+        val type = when (variant) {
+            UpdateType.Flexible -> AppUpdateType.FLEXIBLE
+            UpdateType.Immediate -> AppUpdateType.IMMEDIATE
+        }
+        val options = AppUpdateOptions.newBuilder(type).build()
         appUpdateManager.startUpdateFlowForResult(appUpdateInfo, launcher, options)
     }
 
@@ -107,7 +112,7 @@ class AppUpdateService(
         appUpdateManager.completeUpdate()
     }
 
-    private fun showNotificationForUpdate() = context.tryShow {
+    private fun showNotificationForUpdate(versionCode: Int) = context.tryShow {
         val manager = NotificationManagerCompat.from(context)
         if (Android.O) {
             var channel = manager.getNotificationChannel(Const.NOTIFICATION_CHANNEL_UPDATE_ID)

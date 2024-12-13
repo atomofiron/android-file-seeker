@@ -1,7 +1,13 @@
 package app.atomofiron.searchboxapp.model.other
 
-enum class UpdateType {
-    Immediate, Flexible, All
+sealed interface UpdateTypeVariant
+
+sealed interface UpdateType {
+    sealed interface Variant : UpdateType
+
+    data object Immediate : Variant
+    data object Flexible : Variant
+    data object All : UpdateType
 }
 
 sealed interface AppUpdateState {
