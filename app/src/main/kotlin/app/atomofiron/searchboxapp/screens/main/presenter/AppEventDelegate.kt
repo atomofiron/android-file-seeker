@@ -9,10 +9,13 @@ import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
+import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.main.MainRouter
+import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.Intents
 import kotlinx.coroutines.*
 
 interface AppEventDelegateApi {
@@ -27,10 +30,12 @@ class AppEventDelegate(
     private val scope: CoroutineScope,
     private val router: MainRouter,
     private val appStore: AppStore,
-    private val preferenceStore: PreferenceStore,
+    preferenceStore: PreferenceStore,
     private val mainChannel: MainChannel,
+    private val updateService: AppUpdateService,
 ) : AppEventDelegateApi {
 
+    private val notificationManager = NotificationManagerCompat.from(appStore.context)
     private var currentTheme: AppTheme? = null
 
     init {
@@ -53,6 +58,10 @@ class AppEventDelegate(
                 uri ?: return
                 mainChannel.fileToReceive[scope] = uri
             }
+            Intents.ACTION_UPDATE -> {
+                notificationManager.cancel(Const.NOTIFICATION_ID_UPDATE)
+                router.showSettings()
+            }
         }
     }
 
@@ -60,7 +69,7 @@ class AppEventDelegate(
 
     override fun onActivityDestroy() = appStore.onActivityDestroy()
 
-    override fun onActivityFinish() = Unit// todo appUpdateService.tryCompleteUpdate(forced = false)
+    override fun onActivityFinish() = updateService.completeUpdate()
 
     private fun onThemeApplied(theme: AppTheme) {
         if (currentTheme != null && theme != currentTheme) {

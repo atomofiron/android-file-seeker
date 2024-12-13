@@ -6,6 +6,7 @@ import androidx.fragment.app.FragmentManager
 import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.common.util.navigation.CustomNavHostFragment
 import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.searchboxapp.R
 
 class MainRouter(activityProperty: WeakProperty<out FragmentActivity>) : BaseRouter(activityProperty) {
 
@@ -28,6 +29,8 @@ class MainRouter(activityProperty: WeakProperty<out FragmentActivity>) : BaseRou
             recreate()
         }
     }
+
+    fun showSettings() = navigate(R.id.preferenceFragment)
 
     fun onBack(): Boolean {
         val lastVisibleFragment = lastVisibleFragment

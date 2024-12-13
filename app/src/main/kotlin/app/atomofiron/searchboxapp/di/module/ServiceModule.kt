@@ -69,4 +69,13 @@ open class ServiceModule {
         textViewerStore: TextViewerStore,
         finderStore: FinderStore,
     ): TextViewerService = TextViewerService(scope, preferenceStore, textViewerStore, finderStore)
+
+    @Provides
+    @Singleton
+    fun textAppUpdateService(
+        context: Context,
+        appStore: AppStore,
+        store: AppUpdateStore,
+        preferences: PreferenceStore,
+    ): AppUpdateService = AppUpdateService(context, appStore.activityProperty, appStore.resourcesProperty, store, preferences)
 }

@@ -23,6 +23,7 @@ import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.PreferenceKeys
@@ -42,13 +43,17 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         initViewModel(this, PreferenceViewModel::class, savedInstanceState)
 
         preferenceManager.preferenceDataStore = viewState.preferenceDataStore
-        preferenceDelegate = PreferenceFragmentDelegate(this, viewState, presenter)
+        preferenceDelegate = PreferenceFragmentDelegate(resources, viewState, presenter)
         setPreferencesFromResource(R.xml.preferences, rootKey)
         preferenceDelegate.onCreatePreference(preferenceScreen)
 
         val deepBlack = findPreference<Preference>(PreferenceKeys.KeyDeepBlack.name)!!
         viewState.showDeepBlack.collect(lifecycleScope) {
             deepBlack.isVisible = it
+        }
+        val uppUpdate = findPreference<AppUpdatePreference>(PreferenceKeys.KeyAppUpdate.name)!!
+        viewState.appUpdate.collect(lifecycleScope) {
+            uppUpdate.bind(it)
         }
     }
 

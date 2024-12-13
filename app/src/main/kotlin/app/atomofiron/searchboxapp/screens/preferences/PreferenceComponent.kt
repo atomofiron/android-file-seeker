@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.service.PreferenceService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
 import app.atomofiron.searchboxapp.screens.preferences.presenter.ExportImportPresenterDelegate
@@ -112,7 +113,8 @@ class PreferenceModule {
     fun viewState(
         scope: CoroutineScope,
         preferenceDataStore: PreferenceDataStore,
-    ): PreferenceViewState = PreferenceViewState(scope, preferenceDataStore)
+        updateStore: AppUpdateStore,
+    ): PreferenceViewState = PreferenceViewState(scope, preferenceDataStore, updateStore)
 
     @Provides
     @PreferenceScope
@@ -132,4 +134,5 @@ interface PreferenceDependencies {
     fun curtainChannel(): CurtainChannel
     fun appWatcherProxy(): AppWatcherProxy
     fun appStore(): AppStore
+    fun updateStore(): AppUpdateStore
 }

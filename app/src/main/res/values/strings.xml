@@ -21,6 +21,7 @@
     <string name="results">Your search returned %d results</string>
     <string name="find">Find</string>
     <string name="search_in_the_content">Search in the files content</string>
+    <string name="pref_general">General</string>
     <string name="pref_search">@string/search</string>
     <string name="regex">Use regexp</string>
     <string name="multiline">\'Multiline\' flag</string>
@@ -137,10 +138,16 @@
     <string name="save">Save</string>
     <string name="update_available">Update is available</string>
     <string name="failed_check_updates">Failed to check for updates</string>
+    <string name="check_updates">Check updates</string>
     <string name="update_loading">Update is loading now</string>
+    <string name="update_installing">Update is installing now</string>
+    <string name="is_up_to_date">App is up to date</string>
     <string name="update_downloaded">Update downloaded</string>
-    <string name="get_update">Update</string>
+    <string name="install_update">Install update</string>
+    <string name="check">Check</string>
+    <string name="download">Download</string>
     <string name="install">Install</string>
+    <string name="update">Update</string>
     <string name="channel_name_updates">Updates</string>
     <string name="tip">In Explorer specify where to search</string>
     <string name="search_here">Search here:</string>

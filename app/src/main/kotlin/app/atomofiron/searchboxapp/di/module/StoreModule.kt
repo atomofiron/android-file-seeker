@@ -37,4 +37,8 @@ open class StoreModule {
     open fun provideAppStore(context: Context, scope: CoroutineScope): AppStore {
         return AppStore(context, scope, context.resources)
     }
+
+    @Provides
+    @Singleton
+    open fun provideUpdateStore() = AppUpdateStore()
 }

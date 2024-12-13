@@ -1,23 +1,21 @@
 package app.atomofiron.searchboxapp.screens.preferences.fragment
 
+import android.content.res.Resources
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.Q
 import androidx.preference.*
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.preference.TextFieldPreference
 import app.atomofiron.searchboxapp.model.preference.AppTheme
-import app.atomofiron.searchboxapp.screens.preferences.PreferenceFragment
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.PreferenceKeys
 
 class PreferenceFragmentDelegate(
-    private val fragment: PreferenceFragment,
+    private val resources: Resources,
     private val viewState: PreferenceViewState,
     private val clickOutput: PreferenceClickOutput,
 ) : Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
-
-    private val resources get() = fragment.resources
 
     override fun onPreferenceChange(preference: Preference, newValue: Any?): Boolean {
         return updatePreference(preference, newValue)

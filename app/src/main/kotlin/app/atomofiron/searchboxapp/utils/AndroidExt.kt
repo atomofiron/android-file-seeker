@@ -278,7 +278,7 @@ inline fun Context.ifCanNotice(action: () -> Unit): Boolean {
 
 typealias IdNotification = Pair<Int, Notification>
 
-inline fun Context.showIfAllowed(action: NotificationManagerCompat.() -> IdNotification): Boolean {
+inline fun Context.tryShow(action: NotificationManagerCompat.() -> IdNotification): Boolean {
     if (SDK_INT < TIRAMISU || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
         val manager = NotificationManagerCompat.from(this)
         val (id, notification) = manager.action()

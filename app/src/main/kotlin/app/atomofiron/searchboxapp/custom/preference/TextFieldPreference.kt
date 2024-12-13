@@ -14,12 +14,9 @@ import androidx.core.view.isVisible
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import app.atomofiron.searchboxapp.custom.view.TextField
+import app.atomofiron.searchboxapp.utils.Alpha
 
 class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(context, attrs) {
-    companion object {
-        private const val VISIBLE = 1f
-        private const val INVISIBLE = 0f
-    }
     private lateinit var editText: TextField
     private lateinit var summary: View
     private var value = ""
@@ -54,7 +51,7 @@ class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(co
     }
 
     public override fun onClick() {
-        summary.alpha = INVISIBLE
+        summary.alpha = Alpha.Invisible
         editText.isVisible = true
         editText.performClick()
     }
@@ -65,7 +62,7 @@ class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(co
         editText.setOnSubmitListener(::onSubmit)
         editText.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
-                summary.alpha = VISIBLE
+                summary.alpha = Alpha.Visible
                 editText.isGone = true
             }
         }

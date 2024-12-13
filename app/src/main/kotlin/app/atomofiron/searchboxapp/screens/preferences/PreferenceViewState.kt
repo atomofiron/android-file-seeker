@@ -1,24 +1,25 @@
 package app.atomofiron.searchboxapp.screens.preferences
 
-import android.annotation.SuppressLint
 import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.set
+import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
+import app.atomofiron.searchboxapp.model.other.AppUpdateState
 import app.atomofiron.searchboxapp.utils.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 class PreferenceViewState(
     private val scope: CoroutineScope,
     val preferenceDataStore: PreferenceDataStore,
+    updateStore: AppUpdateStore,
 ) {
-
-    @SuppressLint("StaticFieldLeak")
-
     val alert = ChannelFlow<String>()
     val alertOutputSuccess = ChannelFlow<Int>()
     val alertOutputError = ChannelFlow<Shell.Output>()
     val showDeepBlack = MutableStateFlow(false)
+    val appUpdate: StateFlow<AppUpdateState> = updateStore.state
     // todo zip and share the backup
     val isExportImportAvailable: Boolean = true
 

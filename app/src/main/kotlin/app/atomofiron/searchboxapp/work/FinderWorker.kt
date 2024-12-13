@@ -304,7 +304,7 @@ class FinderWorker(
         } ?: (null to null)
         val error = task.error?.let { context.getString(R.string.search_error, it) }
         text = arrayOf(text, error).filterNotNull().joinToString(separator = ".\n")
-        context.showIfAllowed {
+        context.tryShow {
             val notification = NotificationCompat.Builder(context, Const.RESULT_NOTIFICATION_CHANNEL_ID)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setContentTitle(context.getString(titleId))

@@ -4,6 +4,7 @@ import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.service.WindowService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import dagger.BindsInstance
@@ -49,8 +50,9 @@ class MainModule {
         preferenceStore: PreferenceStore,
         mainChannel: MainChannel,
         initialDelegate: InitialDelegate,
+        updateService: AppUpdateService,
     ): MainPresenter {
-        return MainPresenter(scope, viewState, router, windowService, appStore, preferenceStore, initialDelegate, mainChannel)
+        return MainPresenter(scope, viewState, router, windowService, appStore, preferenceStore, initialDelegate, mainChannel, updateService)
     }
 
     @Provides
@@ -72,4 +74,5 @@ interface MainDependencies {
     fun preferenceStore(): PreferenceStore
     fun mainChannel(): MainChannel
     fun initialDelegate(): InitialDelegate
+    fun appUpdateService(): AppUpdateService
 }

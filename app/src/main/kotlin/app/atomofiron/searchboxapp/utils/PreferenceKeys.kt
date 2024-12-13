@@ -4,8 +4,10 @@ import androidx.datastore.preferences.core.*
 
 object PreferenceKeys {
 
+    val KeyAppUpdate = intPreferencesKey("pref_app_update")
     val KeyOpenedDirPath = stringPreferencesKey("pref_opened_dir_path")
     val KeyDockGravity = intPreferencesKey("pref_drawer_gravity")
+    val KeyLastUpdateNotificationCode = intPreferencesKey("pref_last_upd_notification_code")
     val KeySpecialCharacters = stringPreferencesKey("pref_special_characters")
     val KeyAppOrientation = stringPreferencesKey("pref_app_orientation")
     val KeyHomeScreen = stringPreferencesKey("pref_home_screen")

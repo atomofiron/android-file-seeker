@@ -3,20 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
-        app:title="@string/pref_home_screen"
-        app:key="pref_home_screen"
-        app:entries="@array/home_var"
-        app:entryValues="@array/home_val"
-        app:icon="@drawable/ic_home"
+    <app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
+        app:key="pref_app_update"
         />
-    <SwitchPreferenceCompat
-        app:title="@string/pref_use_su"
-        app:key="pref_use_su"
-        app:defaultValue="false"
-        app:icon="@drawable/ic_hash"
-        app:widgetLayout="@layout/widget_switch"
-        />
+    <PreferenceCategory
+        app:title="@string/pref_general"
+        >
+        <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
+            app:title="@string/pref_home_screen"
+            app:key="pref_home_screen"
+            app:entries="@array/home_var"
+            app:entryValues="@array/home_val"
+            app:icon="@drawable/ic_home"
+            />
+        <SwitchPreferenceCompat
+            app:title="@string/pref_use_su"
+            app:key="pref_use_su"
+            app:defaultValue="false"
+            app:icon="@drawable/ic_hash"
+            app:widgetLayout="@layout/widget_switch"
+            />
+    </PreferenceCategory>
     <PreferenceCategory
         app:title="@string/pref_search">
         <app.atomofiron.searchboxapp.custom.preference.TextFieldPreference

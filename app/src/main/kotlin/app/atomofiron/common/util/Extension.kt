@@ -3,8 +3,6 @@ package app.atomofiron.common.util
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +11,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import app.atomofiron.searchboxapp.R
+import com.google.android.material.color.MaterialColors
 
 
 fun View.showKeyboard(): Boolean {
@@ -76,6 +75,9 @@ fun Context.findDimensByAttr(@AttrRes vararg attrs: Int): IntArray {
 
 @ColorInt
 fun Context.findColorByAttr(@AttrRes attr: Int) = ContextCompat.getColor(this, findResIdByAttr(attr))
+
+@ColorInt
+fun Context.materialColor(@AttrRes attr: Int) = MaterialColors.getColor(this, attr, -1)
 
 fun ViewGroup.moveChildrenFrom(layoutId: Int) {
     val inflater = LayoutInflater.from(context)

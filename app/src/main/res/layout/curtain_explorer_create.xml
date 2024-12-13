@@ -43,7 +43,7 @@
         android:layout_marginEnd="@dimen/common_margin"
         android:layout_marginVertical="@dimen/common_margin"
         android:text="@string/a_file"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        style="@style/Widget.Material3.Button.OutlinedButton"
         app:cornerRadius="@dimen/infinity"
         app:layout_constraintTop_toBottomOf="@+id/explorer_create_til"
         app:layout_constraintEnd_toStartOf="@+id/explorer_create_dir_btn"

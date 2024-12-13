@@ -20,8 +20,7 @@ flexbox = "3.0.0"
 coroutines = "1.9.0-RC.2"
 dagger = "2.47"
 leakcanary = "2.9.1"
-playCore = "1.10.3"
-playCoreKtx = "1.8.1"
+appUpdate = "2.1.0"
 insets = "2.0.0-rc1"
 datastore = "1.1.1"
 exif = "1.3.7"
@@ -55,8 +54,8 @@ dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" 
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
 dagger-processor = { group = "com.google.dagger", name = "dagger-android-processor", version.ref = "dagger" }
 leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
-play-core = { group = "com.google.android.play", name = "core", version.ref = "playCore" }
-play-core-ktx = { group = "com.google.android.play", name = "core-ktx", version.ref = "playCoreKtx" }
+play-core = { group = "com.google.android.play", name = "app-update", version.ref = "appUpdate" }
+play-core-ktx = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "appUpdate" }
 insets = { group = "io.github.atomofiron", name = "extended-insets", version.ref = "insets" }
 
 [plugins]

@@ -53,7 +53,7 @@ object Const {
     const val RESULT_NOTIFICATION_CHANNEL_ID = "result_channel_id"
     const val FOREGROUND_NOTIFICATION_ID = 101
     const val FOREGROUND_INTENT_REQUEST_CODE = 102
-    const val REQUEST_CODE_MARKET_UPDATE = 7453
+    const val REQUEST_CODE_UPDATE = 7453
     const val NOTIFICATION_ID_UPDATE = 9485
     const val REQUEST_CODE_INSTALL = 5673
 

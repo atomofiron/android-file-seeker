@@ -21,6 +21,7 @@
     <string name="find">Найти</string>
     <string name="search_in_the_content">Искать по содержимому файлов</string>
     <string name="pref_search">@string/search</string>
+    <string name="pref_general">Общие</string>
     <string name="regex">Поиск по шаблону</string>
     <string name="multiline">Флаг \'multiline\'</string>
     <string name="bad_ex">Неверное регулярное выражение</string>
@@ -128,11 +129,17 @@
     <string name="edit">Редактировать</string>
     <string name="save">Сохранить</string>
     <string name="update_available">Доступно обновление</string>
+    <string name="check_updates">Проверить обновления</string>
     <string name="failed_check_updates">Не удалость проверить обновления</string>
     <string name="update_loading">Обновление скачивается</string>
+    <string name="update_installing">Обновление устанавливается</string>
+    <string name="is_up_to_date">У вас последняя версия приложения</string>
     <string name="update_downloaded">Обновление загружено</string>
-    <string name="get_update">Обновить</string>
+    <string name="install_update">Установить обнолвение</string>
+    <string name="check">Проверить</string>
+    <string name="download">Скачать</string>
     <string name="install">Установить</string>
+    <string name="update">Обновить</string>
     <string name="channel_name_updates">Обновления</string>
     <string name="tip">В Проводнике укажите где искать</string>
     <string name="search_here">Ищем здесь:</string>

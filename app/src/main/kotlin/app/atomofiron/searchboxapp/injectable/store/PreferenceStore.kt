@@ -6,12 +6,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
-import app.atomofiron.common.util.flow.SharedFlowProperty
+import app.atomofiron.common.util.flow.StateFlowProperty
 import app.atomofiron.common.util.flow.asProperty
 import app.atomofiron.searchboxapp.model.preference.*
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyAppOrientation
 import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyAppTheme
+import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyAppUpdate
 import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyDeepBlack
 import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyDockGravity
 import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyExcludeDirs
@@ -24,6 +25,7 @@ import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyOpenedDirPath
 import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeySpecialCharacters
 import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyToybox
 import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyUseSu
+import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyLastUpdateNotificationCode
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -99,6 +101,12 @@ class PreferenceStore(
         edit { it[KeyMaxSize] = value }
     }
 
+    val lastUpdateNotificationCode = getFlow(KeyLastUpdateNotificationCode)
+
+    suspend fun setLastUpdateNotificationCode(value: Int) {
+        edit { it[KeyLastUpdateNotificationCode] = value }
+    }
+
     val maxDepthForSearch = getFlow(KeyMaxDepth)
 
     suspend fun setMaxDepthForSearch(value: Int) {
@@ -124,7 +132,7 @@ class PreferenceStore(
     }
 
     val appOrientation = getFlow(KeyAppOrientation) {
-        AppOrientation.values()[it.toInt()]
+        AppOrientation.entries[it.toInt()]
     }
 
     suspend fun setAppOrientation(value: AppOrientation) {
@@ -132,7 +140,7 @@ class PreferenceStore(
     }
 
     val homeScreen = getFlow(KeyHomeScreen) {
-        HomeScreen.values()[it.toInt()]
+        HomeScreen.entries[it.toInt()]
     }
 
     suspend fun setHomeScreen(value: HomeScreen) {
@@ -163,12 +171,16 @@ class PreferenceStore(
         edit { it[KeyToybox] = value }
     }
 
-    private fun <V> getFlow(key: Preferences.Key<V>): SharedFlowProperty<V> {
-        return data.map { it[key] ?: key.default() }.shareInOne(scope).asProperty()
+    private fun <V> getFlow(key: Preferences.Key<V>): StateFlowProperty<V> {
+        return data.mapNotNull { it[key] }
+            .stateIn(scope, SharingStarted.Lazily, key.default())
+            .asProperty()
     }
 
-    private fun <V,E> getFlow(key: Preferences.Key<V>, transformation: (V) -> E): SharedFlowProperty<E> {
-        return data.map { (it[key] ?: key.default()).let(transformation) }.shareInOne(scope).asProperty()
+    private fun <V,E> getFlow(key: Preferences.Key<V>, transformation: (V) -> E): StateFlowProperty<E> {
+        return data.map { (it[key] ?: key.default()).let(transformation) }
+            .stateIn(scope, SharingStarted.Lazily, key.default().let(transformation))
+            .asProperty()
     }
 
     private fun <T> Flow<T>.shareInOne(scope: CoroutineScope): SharedFlow<T> {
@@ -180,6 +192,7 @@ class PreferenceStore(
     @Suppress("UNCHECKED_CAST")
     fun <T> Preferences.Key<T>.default(): T {
         return when (this) {
+            KeyAppUpdate -> 0 as T
             KeyOpenedDirPath -> "" as T
             KeyDockGravity -> Gravity.START as T
             KeySpecialCharacters -> Const.DEFAULT_SPECIAL_CHARACTERS as T
@@ -194,6 +207,7 @@ class PreferenceStore(
             KeyJoystick -> Const.DEFAULT_JOYSTICK as T
             KeyToybox -> setOf(Const.VALUE_TOYBOX_CUSTOM, Const.DEFAULT_TOYBOX_PATH) as T
             KeyHomeScreen -> HomeScreen.Search.ordinal.toString() as T
+            KeyLastUpdateNotificationCode -> 0 as T
             else -> null as T
         }
     }
