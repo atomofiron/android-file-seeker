@@ -16,7 +16,6 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.materialColor
 import app.atomofiron.common.util.property.MultiLazy
 import app.atomofiron.common.util.property.RoProperty
-import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
@@ -53,7 +52,6 @@ class AppUpdateService(
 
     init {
         appUpdateManager.registerListener(this)
-        showNotificationForUpdate()
     }
 
     override fun onStateUpdate(state: InstallState) {
@@ -121,7 +119,8 @@ class AppUpdateService(
                 )
             }
             val lastCode = preferences.lastUpdateNotificationCode.value
-            channel.importance = if (lastCode < BuildConfig.VERSION_CODE) NotificationManager.IMPORTANCE_HIGH else NotificationManager.IMPORTANCE_MIN
+            preferences { setLastUpdateNotificationCode(versionCode) }
+            channel.importance = if (lastCode < versionCode) NotificationManager.IMPORTANCE_HIGH else NotificationManager.IMPORTANCE_MIN
             manager.createNotificationChannel(channel)
         }
         val flag = PendingIntent.FLAG_UPDATE_CURRENT.immutable()
