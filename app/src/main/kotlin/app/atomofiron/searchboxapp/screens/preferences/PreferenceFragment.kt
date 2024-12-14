@@ -65,6 +65,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         val listContainer = view.findViewById<FrameLayout>(android.R.id.list_container)
         listContainer.removeView(recyclerView)
+        recyclerView.isVerticalScrollBarEnabled = false
         recyclerView.layoutParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
             behavior = AppBarLayout.ScrollingViewBehavior()
         }

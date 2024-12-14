@@ -65,19 +65,19 @@ class AppUpdateService(
                 AppUpdateState.Downloading(bytes.toFloat() / total)
             }
             InstallStatus.FAILED,
-            InstallStatus.CANCELED -> return store.fallback()
+            InstallStatus.CANCELED -> return onFailure()
             InstallStatus.UNKNOWN -> AppUpdateState.Unknown
-            InstallStatus.INSTALLED /*?*/ -> AppUpdateState.UpToDate
             InstallStatus.DOWNLOADED -> AppUpdateState.Completable
-            InstallStatus.INSTALLING /*?*/ -> AppUpdateState.Installing
-            InstallStatus.PENDING /*?*/ ->  AppUpdateState.Completable
+            InstallStatus.INSTALLING -> AppUpdateState.Installing
+            InstallStatus.INSTALLED -> AppUpdateState.UpToDate
+            InstallStatus.PENDING -> return // idk, doesn't matter
             else -> return
         }.let { store.set(it) }
     }
 
     override fun onActivityResult(result: ActivityResult) {
         if (result.resultCode != Activity.RESULT_OK) {
-            store.fallback()
+            onFailure() // needed in case when cancel without staring update
         }
     }
 
@@ -85,7 +85,6 @@ class AppUpdateService(
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
             this.appUpdateInfo = appUpdateInfo
             when (appUpdateInfo.updateAvailability()) {
-                UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> return@addOnSuccessListener
                 UpdateAvailability.UNKNOWN -> AppUpdateState.Unknown
                 UpdateAvailability.UPDATE_NOT_AVAILABLE -> AppUpdateState.UpToDate
                 UpdateAvailability.UPDATE_AVAILABLE -> appUpdateInfo.type()?.let {
@@ -111,6 +110,11 @@ class AppUpdateService(
 
     fun completeUpdate() {
         appUpdateManager.completeUpdate()
+    }
+
+    private fun onFailure() {
+        store.fallback()
+        check() // to get the new instance of AppUpdateInfo, otherwise startUpdateFlowForResult() stops working
     }
 
     private fun showNotificationForUpdate(versionCode: Int) = context.tryShow {

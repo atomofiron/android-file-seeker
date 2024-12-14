@@ -76,7 +76,7 @@ class AppUpdatePreference @JvmOverloads constructor(
 
     private fun AppUpdateState.bindTitle() {
         when (this) {
-            is AppUpdateState.Unknown -> R.string.check_updates
+            is AppUpdateState.Unknown -> R.string.failed_check_updates
             is AppUpdateState.Available -> R.string.update_available
             is AppUpdateState.Downloading -> R.string.update_loading
             is AppUpdateState.Installing -> R.string.update_installing
@@ -87,18 +87,20 @@ class AppUpdatePreference @JvmOverloads constructor(
 
     private fun AppUpdateState.bindButton() {
         val stringId = when (this) {
+            is AppUpdateState.UpToDate,
             is AppUpdateState.Unknown -> R.string.check
             is AppUpdateState.Available -> R.string.download
             is AppUpdateState.Completable -> R.string.install
             is AppUpdateState.Downloading,
-            is AppUpdateState.Installing,
-            is AppUpdateState.UpToDate -> null
+            is AppUpdateState.Installing -> null
         }
         button.isVisible = stringId != null
         when {
             !button.isVisible -> return
             this is AppUpdateState.Unknown -> buttonStyle.outlined(button)
-            else -> buttonStyle.filled(button)
+            this is AppUpdateState.Available -> buttonStyle.filled(button)
+            this is AppUpdateState.Completable -> buttonStyle.filled(button)
+            this is AppUpdateState.UpToDate -> buttonStyle.outlined(button)
         }
         stringId?.let { button.setText(it) }
     }
@@ -122,15 +124,15 @@ class AppUpdatePreference @JvmOverloads constructor(
 
     override fun onClick(v: View) {
         when (val state = state) {
-            is AppUpdateState.Unknown -> AppUpdateAction.Check
+            is AppUpdateState.Unknown,
+            is AppUpdateState.UpToDate -> AppUpdateAction.Check
             is AppUpdateState.Available -> when (val type = state.type) {
                 is UpdateType.Variant -> AppUpdateAction.Download(type)
                 else -> return showChoice()
             }
             is AppUpdateState.Completable -> AppUpdateAction.Install
             is AppUpdateState.Downloading,
-            is AppUpdateState.Installing,
-            is AppUpdateState.UpToDate -> null
+            is AppUpdateState.Installing -> null
         }?.let { listener(it) }
     }
 
