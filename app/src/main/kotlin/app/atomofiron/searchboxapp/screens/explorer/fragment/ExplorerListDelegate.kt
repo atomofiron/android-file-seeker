@@ -42,10 +42,7 @@ class ExplorerListDelegate(
 
     private fun getLastChild(): View? = recyclerView.getChildAt(recyclerView.childCount.dec())
 
-    fun isCurrentDirVisible(): Boolean? {
-        val current = currentDir ?: return null
-        return isVisible(current)
-    }
+    fun isCurrentDirVisible(): Boolean? = currentDir?.let { isVisible(it) }
 
     fun isVisible(item: Node): Boolean {
         val path = item.withoutDot()
