@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.screens.finder.history.dao
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import app.atomofiron.searchboxapp.poop
 
 object Migrations {
     val MIGRATION_1_2 get() = object : Migration(1, 2) {
