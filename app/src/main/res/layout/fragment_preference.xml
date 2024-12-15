@@ -38,4 +38,10 @@
         app:statusBar="false"
         app:navigationBar="bottom"
         />
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:id="@+id/snackbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

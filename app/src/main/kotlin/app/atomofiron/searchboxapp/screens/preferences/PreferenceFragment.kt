@@ -5,9 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.widget.FrameLayout
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
@@ -24,13 +22,13 @@ import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
+import app.atomofiron.searchboxapp.databinding.FragmentPreferenceBinding
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.anchorView
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.insetsPadding
 
@@ -38,6 +36,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
     BaseFragment<PreferenceFragment, PreferenceViewState, PreferencePresenter> by BaseFragmentImpl()
 {
     private lateinit var preferenceDelegate: PreferenceFragmentDelegate
+    private lateinit var binding: FragmentPreferenceBinding
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         initViewModel(this, PreferenceViewModel::class, savedInstanceState)
@@ -65,8 +64,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         root as ViewGroup
         val view = super.onCreateView(inflater, container, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-        val listContainer = view.findViewById<FrameLayout>(android.R.id.list_container)
-        listContainer.removeView(recyclerView)
+        (recyclerView.parent as ViewGroup).removeView(recyclerView)
         recyclerView.isVerticalScrollBarEnabled = false
         recyclerView.layoutParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
             behavior = AppBarLayout.ScrollingViewBehavior()
@@ -77,24 +75,23 @@ class PreferenceFragment : PreferenceFragmentCompat(),
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val toolbarLayout = view.findViewById<CollapsingToolbarLayout>(R.id.collapsing_layout)
-        val appBarLayout = view.findViewById<AppBarLayout>(R.id.appbar_layout)
-        val toolbar = view.findViewById<Toolbar>(R.id.toolbar)
+        binding = FragmentPreferenceBinding.bind(view)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         view.setBackgroundColor(view.context.findColorByAttr(R.attr.colorBackground))
         preferenceScreen.fixIcons()
         recyclerView.clipToPadding = false
         recyclerView.updatePadding(top = resources.getDimensionPixelSize(R.dimen.content_margin_half))
-        toolbar.setNavigationOnClickListener { presenter.onNavigationClick() }
-        toolbar.setOnMenuItemClickListener { item ->
+        binding.toolbar.setNavigationOnClickListener { presenter.onNavigationClick() }
+        binding.toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.pref_about -> presenter.onAboutClick()
             }
             true
         }
         recyclerView?.insetsPadding(ExtType { barsWithCutout + joystickBottom + joystickFlank }, start = true, end = true, bottom = true)
-        appBarLayout?.insetsPadding(ExtType { barsWithCutout + joystickFlank }, top = true)
-        toolbarLayout?.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, end = true)
+        binding.appbarLayout.insetsPadding(ExtType { barsWithCutout + joystickFlank }, top = true)
+        binding.toolbar.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, end = true)
+        binding.snackbarContainer.insetsPadding(ExtType { barsWithCutout + joystickBottom })
         viewState.onViewCollect()
     }
 
@@ -114,10 +111,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
     }
 
     private fun onAlert(message: String) {
-        val view = view ?: return
-        Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
-            .setAnchorView(anchorView)
-            .show()
+        Snackbar.make(binding.snackbarContainer, message, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun showOutputSuccess(message: Int) {
