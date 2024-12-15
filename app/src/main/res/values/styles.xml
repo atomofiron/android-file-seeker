@@ -22,6 +22,8 @@
 
 		<item name="android:statusBarColor">@color/status_bar</item>
 		<item name="android:navigationBarColor">@color/navigation_bar</item>
+		<item name="android:navigationBarDividerColor" tools:targetApi="o_mr1">@color/transparent</item>
+		<item name="android:enforceNavigationBarContrast" tools:targetApi="q">false</item>
 		<item name="android:windowLightStatusBar" tools:targetApi="23">@bool/isDayTheme</item>
 		<item name="android:windowLightNavigationBar" tools:targetApi="27">@bool/isDayTheme</item>
 
