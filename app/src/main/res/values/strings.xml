@@ -152,7 +152,7 @@
     <string name="install">Install</string>
     <string name="update">Update</string>
     <string name="channel_name_updates">Updates</string>
-    <string name="tip">In Explorer specify where to search</string>
+    <string name="tip">In Files specify where to search</string>
     <string name="search_here">Search here:</string>
     <string name="by_default">Reset to default</string>
     <string name="dash" translatable="false">—</string>
