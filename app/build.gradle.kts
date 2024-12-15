@@ -16,7 +16,7 @@ android {
     defaultConfig {
         applicationId = packageName
         minSdk = 24
-        targetSdk = 33 // todo 35
+        targetSdk = 33
         versionCode = 13
         versionName = "1.3.0"
 
