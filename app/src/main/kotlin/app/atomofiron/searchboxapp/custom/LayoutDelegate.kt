@@ -24,6 +24,7 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.navigationrail.NavigationRailView
+import lib.atomofiron.insets.InsetsCombining
 import lib.atomofiron.insets.InsetsSource
 import lib.atomofiron.insets.ViewInsetsDelegate
 import lib.atomofiron.insets.findInsetsProvider
@@ -60,9 +61,10 @@ object LayoutDelegate {
             railView?.applyLayout(railDelegate, layout)
             insetsProvider.requestInsets()
         }
-        snackbarContainer?.insetsPadding(ExtType.invoke { barsWithCutout + navigation + rail + ime })
+        snackbarContainer?.insetsPadding(ExtType.invoke { barsWithCutout + ime + navigation + rail })
         appBarLayout?.insetsPadding(ExtType.invoke { barsWithCutout + rail + joystickFlank }, start = true, top = true, end = true)
-        recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + navigation + rail })
+        recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + navigation + rail }, start = true, top = appBarLayout == null, end = true, bottom = true)
+            ?.combining(InsetsCombining(ExtType.invoke { displayCutout + rail }))
         headerView?.insetsPadding(ExtType.invoke { barsWithCutout + navigation + rail }, start = true, top = true, end = true)
         bottomView?.insetsPadding(start = true, end = true, bottom = true)
         bottomView?.insetsSource { view ->

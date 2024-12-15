@@ -93,10 +93,9 @@ class PreferenceFragment : PreferenceFragmentCompat(),
             }
             true
         }
-        recyclerView?.insetsPadding(ExtType { barsWithCutout + joystickBottom + joystickFlank }, start = true, end = true, bottom = true)
+        recyclerView?.insetsPadding(ExtType { barsWithCutout + ime + joystickBottom + joystickFlank }, start = true, end = true, bottom = true)
         binding.appbarLayout.insetsPadding(ExtType { barsWithCutout + joystickFlank }, top = true)
         binding.toolbar.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, end = true)
-        binding.snackbarContainer.insetsPadding(ExtType { barsWithCutout + joystickBottom })
         viewState.onViewCollect()
     }
 
