@@ -89,7 +89,6 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
                 if (BuildConfig.DEBUG) showTestSnackbar()
                 true
             }
-            root.isHapticFeedbackEnabled = false
             root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateSnackbarTranslation() }
             curtainParent.addOnLayoutChangeListener { parent, left, _, right, _, _, _, _, _ ->
                 onCurtainParentChange(parent, rootWidth = right - left)

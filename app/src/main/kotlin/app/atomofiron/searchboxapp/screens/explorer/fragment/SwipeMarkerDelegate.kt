@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment
 
 import android.content.res.Resources
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
@@ -44,6 +45,7 @@ class SwipeMarkerDelegate(resources: Resources) : RecyclerView.OnItemTouchListen
             checkbox ?: return@let
             makeChecked = !checkbox.isChecked
             checkbox.isChecked = !checkbox.isChecked
+            checkbox.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
         }
         val child = recyclerView.findChildViewUnder(e.x, e.y)
         child ?: return
@@ -59,6 +61,7 @@ class SwipeMarkerDelegate(resources: Resources) : RecyclerView.OnItemTouchListen
         }
         if (makeChecked != checkbox.isChecked) {
             checkbox.isChecked = !checkbox.isChecked
+            checkbox.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
         }
     }
 

@@ -17,7 +17,6 @@ import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.Alpha
-import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.getString
 
 class ExplorerItemBinderImpl(
@@ -61,6 +60,7 @@ class ExplorerItemBinderImpl(
         if (cbBox.buttonTintList == null) {
             cbBox.isUseMaterialThemeColors = true
         }
+        cbBox.isHapticFeedbackEnabled = true
 
         val stateEnabledChecked = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked)
         val stateDisabledChecked = intArrayOf(-android.R.attr.state_enabled, android.R.attr.state_checked)
