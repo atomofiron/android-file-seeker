@@ -12,9 +12,5 @@ class RootPresenter(
 
     fun onBack() = router.onBack()
 
-    fun onChildrenCreated() {
-        if (!router.granted) {
-            router.showFinder()
-        }
-    }
+    fun onChildrenCreated() = router.checkCurrentScreen()
 }

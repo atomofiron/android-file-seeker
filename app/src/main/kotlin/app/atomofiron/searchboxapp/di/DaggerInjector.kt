@@ -13,7 +13,7 @@ object DaggerInjector {
         appComponent = DaggerAppComponent
             .builder()
             .appContext(application.applicationContext)
-            .initialStore(InitialDelegate(application.applicationContext))
+            .initialDelegate(InitialDelegate(application.applicationContext))
             .appWatcher(BuildConfig.leakWatcher ?: LeakWatcher())
             .assetManager(application.assets)
             .packageManager(application.packageManager)

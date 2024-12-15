@@ -1,7 +1,5 @@
 package app.atomofiron.searchboxapp.model.other
 
-sealed interface UpdateTypeVariant
-
 sealed interface UpdateType {
     sealed interface Variant : UpdateType
 

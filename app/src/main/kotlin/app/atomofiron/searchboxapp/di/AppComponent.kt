@@ -57,7 +57,7 @@ interface AppComponent :
         fun appWatcher(proxy: LeakWatcher): Builder
 
         @BindsInstance
-        fun initialStore(initialDelegate: InitialDelegate): Builder
+        fun initialDelegate(initialDelegate: InitialDelegate): Builder
 
         @BindsInstance
         fun assetManager(assetManager: AssetManager): Builder

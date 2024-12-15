@@ -2,11 +2,11 @@ package app.atomofiron.searchboxapp.screens.root
 
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
@@ -47,9 +47,8 @@ class RootModule {
     @RootScope
     fun router(
         fragment: WeakProperty<out Fragment>,
-        scope: CoroutineScope,
-        preferenceStore: PreferenceStore,
-    ): RootRouter = RootRouter(fragment, scope, preferenceStore)
+        initialDelegate: InitialDelegate,
+    ): RootRouter = RootRouter(fragment, initialDelegate)
 
     @Provides
     @RootScope
@@ -57,5 +56,5 @@ class RootModule {
 }
 
 interface RootDependencies {
-    fun preferenceStore(): PreferenceStore
+    fun initialDelegate(): InitialDelegate
 }

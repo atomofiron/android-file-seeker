@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.utils.prederences
 import android.view.Gravity
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
-import app.atomofiron.searchboxapp.model.preference.HomeScreen
 import app.atomofiron.searchboxapp.utils.Const
 
 object PreferenceKeys {
@@ -13,7 +12,6 @@ object PreferenceKeys {
     val KeyLastUpdateNotificationCode = PreferenceKey("pref_last_upd_notification_code", 0)
     val KeySpecialCharacters = PreferenceKey("pref_special_characters", Const.DEFAULT_SPECIAL_CHARACTERS)
     val KeyAppOrientation = PreferenceKey("pref_app_orientation", AppOrientation.UNDEFINED.ordinal.toString())
-    val KeyHomeScreen = PreferenceKey("pref_home_screen", HomeScreen.Search.ordinal.toString())
     val KeyAppTheme = PreferenceKey("pref_app_theme", AppTheme.defaultName())
     val KeyDeepBlack = PreferenceKey("pref_deep_black", false)
     // it was long but DataStore made it int
@@ -32,7 +30,7 @@ object PreferenceKeys {
     const val PREF_CATEGORY_DEBUG = "pref_category_debug"
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
-        arrayOf(KeyOpenedDirPath, KeyDockGravity, KeyLastUpdateNotificationCode, KeySpecialCharacters, KeyAppOrientation, KeyHomeScreen, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyExcludeDirs, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyToybox)
+        arrayOf(KeyOpenedDirPath, KeyDockGravity, KeyLastUpdateNotificationCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyExcludeDirs, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyToybox)
     }
 
     fun <T> default(key: String): T = keys.find { it.key.name == key }?.default as T

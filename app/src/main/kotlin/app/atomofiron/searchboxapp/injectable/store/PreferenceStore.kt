@@ -16,7 +16,6 @@ import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDeepBlack
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDockGravity
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyExcludeDirs
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyExplorerItem
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyHomeScreen
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyJoystick
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyMaxDepth
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyMaxSize
@@ -139,14 +138,6 @@ class PreferenceStore(
 
     suspend fun setAppOrientation(value: AppOrientation) {
         edit { it[KeyAppOrientation] = value.ordinal.toString() }
-    }
-
-    val homeScreen = getFlow(KeyHomeScreen) {
-        HomeScreen.entries[it.toInt()]
-    }
-
-    suspend fun setHomeScreen(value: HomeScreen) {
-        edit { it[KeyHomeScreen] = value.ordinal.toString() }
     }
 
     val explorerItemComposition = getFlow(KeyExplorerItem) {

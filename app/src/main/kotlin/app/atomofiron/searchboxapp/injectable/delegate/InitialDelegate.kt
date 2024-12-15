@@ -1,13 +1,18 @@
 package app.atomofiron.searchboxapp.injectable.delegate
 
+import android.Manifest
 import android.app.Application
 import android.content.Context
+import android.os.Environment
 import androidx.appcompat.app.AppCompatDelegate
+import app.atomofiron.common.util.Android
+import app.atomofiron.common.util.isGranted
+import app.atomofiron.searchboxapp.model.other.InitialScreen
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppTheme
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDeepBlack
 
-class InitialDelegate(context: Context) {
+class InitialDelegate(private val context: Context) {
     companion object {
         private const val PRIVATE_PREFERENCES_NAME = "initial_preferences"
     }
@@ -35,5 +40,13 @@ class InitialDelegate(context: Context) {
             is AppTheme.Dark -> AppCompatDelegate.MODE_NIGHT_YES
         }
         AppCompatDelegate.setDefaultNightMode(mode)
+    }
+
+    fun initialScreen() = when {
+        Android.Below.R && context.isGranted(Manifest.permission.WRITE_EXTERNAL_STORAGE) -> InitialScreen.Explorer
+        Android.Below.R -> InitialScreen.Search
+        Environment.isExternalStorageManager() -> InitialScreen.Explorer
+        context.isGranted(Manifest.permission.MANAGE_EXTERNAL_STORAGE) -> InitialScreen.Explorer
+        else -> InitialScreen.Search
     }
 }
