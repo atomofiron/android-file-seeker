@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.injectable.store
 
 import android.content.Context
-import android.view.Gravity
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.SharedPreferencesMigration
 import androidx.datastore.preferences.core.*
@@ -9,23 +8,26 @@ import androidx.datastore.preferences.preferencesDataStore
 import app.atomofiron.common.util.flow.StateFlowProperty
 import app.atomofiron.common.util.flow.asProperty
 import app.atomofiron.searchboxapp.model.preference.*
-import app.atomofiron.searchboxapp.utils.Const
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyAppOrientation
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyAppTheme
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyAppUpdate
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyDeepBlack
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyDockGravity
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyExcludeDirs
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyExplorerItem
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyHomeScreen
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyJoystick
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyMaxDepth
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyMaxSize
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyOpenedDirPath
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeySpecialCharacters
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyToybox
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyUseSu
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyLastUpdateNotificationCode
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKey
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppOrientation
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppTheme
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDeepBlack
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDockGravity
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyExcludeDirs
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyExplorerItem
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyHomeScreen
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyJoystick
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyMaxDepth
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyMaxSize
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyOpenedDirPath
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeySpecialCharacters
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyToybox
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyUseSu
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyLastUpdateNotificationCode
+import app.atomofiron.searchboxapp.utils.prederences.get
+import app.atomofiron.searchboxapp.utils.prederences.remove
+import app.atomofiron.searchboxapp.utils.prederences.set
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
@@ -171,15 +173,15 @@ class PreferenceStore(
         edit { it[KeyToybox] = value }
     }
 
-    private fun <V> getFlow(key: Preferences.Key<V>): StateFlowProperty<V> {
+    private fun <V> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {
         return data.mapNotNull { it[key] }
-            .stateIn(scope, SharingStarted.Lazily, key.default())
+            .stateIn(scope, SharingStarted.Lazily, key.default)
             .asProperty()
     }
 
-    private fun <V,E> getFlow(key: Preferences.Key<V>, transformation: (V) -> E): StateFlowProperty<E> {
-        return data.map { (it[key] ?: key.default()).let(transformation) }
-            .stateIn(scope, SharingStarted.Lazily, key.default().let(transformation))
+    private fun <V,E> getFlow(key: PreferenceKey<V>, transformation: (V) -> E): StateFlowProperty<E> {
+        return data.map { (it[key] ?: key.default).let(transformation) }
+            .stateIn(scope, SharingStarted.Lazily, key.default.let(transformation))
             .asProperty()
     }
 
@@ -187,28 +189,5 @@ class PreferenceStore(
         return distinctUntilChanged().shareIn(scope, SharingStarted.Eagerly, replay = 1)
     }
 
-    fun <T> getOrDefault(key: Preferences.Key<T>): T = preferences[key] ?: key.default()
-
-    @Suppress("UNCHECKED_CAST")
-    fun <T> Preferences.Key<T>.default(): T {
-        return when (this) {
-            KeyAppUpdate -> 0 as T
-            KeyOpenedDirPath -> "" as T
-            KeyDockGravity -> Gravity.START as T
-            KeySpecialCharacters -> Const.DEFAULT_SPECIAL_CHARACTERS as T
-            KeyAppOrientation -> AppOrientation.UNDEFINED.ordinal.toString() as T
-            KeyAppTheme -> AppTheme.defaultName() as T
-            KeyDeepBlack -> false as T
-            KeyMaxSize -> Const.DEFAULT_MAX_SIZE as T
-            KeyMaxDepth -> Const.DEFAULT_MAX_DEPTH as T
-            KeyExcludeDirs -> false as T
-            KeyUseSu -> false as T
-            KeyExplorerItem -> Const.DEFAULT_EXPLORER_ITEM as T
-            KeyJoystick -> Const.DEFAULT_JOYSTICK as T
-            KeyToybox -> setOf(Const.VALUE_TOYBOX_CUSTOM, Const.DEFAULT_TOYBOX_PATH) as T
-            KeyHomeScreen -> HomeScreen.Search.ordinal.toString() as T
-            KeyLastUpdateNotificationCode -> 0 as T
-            else -> null as T
-        }
-    }
+    fun <T> getOrDefault(key: Preferences.Key<T>): T = preferences[key] ?: PreferenceKeys.default(key.name)
 }

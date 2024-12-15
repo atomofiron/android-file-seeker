@@ -4,8 +4,8 @@ import android.app.Application
 import android.content.Context
 import androidx.appcompat.app.AppCompatDelegate
 import app.atomofiron.searchboxapp.model.preference.AppTheme
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyAppTheme
-import app.atomofiron.searchboxapp.utils.PreferenceKeys.KeyDeepBlack
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppTheme
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDeepBlack
 
 class InitialDelegate(context: Context) {
     companion object {

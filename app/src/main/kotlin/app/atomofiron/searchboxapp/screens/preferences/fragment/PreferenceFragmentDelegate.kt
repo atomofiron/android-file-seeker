@@ -9,7 +9,7 @@ import app.atomofiron.searchboxapp.custom.preference.TextFieldPreference
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState
 import app.atomofiron.searchboxapp.utils.Const
-import app.atomofiron.searchboxapp.utils.PreferenceKeys
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
 
 class PreferenceFragmentDelegate(
     private val resources: Resources,

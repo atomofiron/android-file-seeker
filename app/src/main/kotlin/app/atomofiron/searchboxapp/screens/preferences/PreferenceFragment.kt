@@ -26,7 +26,7 @@ import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.databinding.FragmentPreferenceBinding
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
-import app.atomofiron.searchboxapp.utils.PreferenceKeys
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.anchorView
 import com.google.android.material.appbar.AppBarLayout
@@ -51,7 +51,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         viewState.showDeepBlack.collect(lifecycleScope) {
             deepBlack.isVisible = it
         }
-        val uppUpdate = findPreference<AppUpdatePreference>(PreferenceKeys.KeyAppUpdate.name)!!
+        val uppUpdate = findPreference<AppUpdatePreference>(PreferenceKeys.PREF_APP_UPDATE)!!
         uppUpdate.listener = presenter
         viewState.appUpdate.collect(lifecycleScope) {
             uppUpdate.bind(it)
