@@ -14,13 +14,13 @@ import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.flow.viewCollect
 import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.utils.anchorView
 import app.atomofiron.searchboxapp.databinding.FragmentFinderBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderSpanSizeLookup
 import app.atomofiron.searchboxapp.screens.finder.history.adapter.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.utils.makeSnackbar
 
 class FinderFragment : Fragment(R.layout.fragment_finder),
     BaseFragment<FinderFragment, FinderViewState, FinderPresenter> by BaseFragmentImpl()
@@ -138,10 +138,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     }
 
     private fun onShowSnackbar(value: String) {
-        val view = view ?: return
-        Snackbar.make(view, value, Snackbar.LENGTH_SHORT)
-                .setAnchorView(anchorView)
-                .show()
+        binding.snackbarContainer.makeSnackbar(value, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun onInsertInQuery(value: String) {
@@ -153,9 +150,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     }
 
     private fun showPermissionRequiredWarning(unit: Unit) {
-        val view = view ?: return
-        Snackbar.make(view, R.string.access_to_storage_forbidden, Snackbar.LENGTH_LONG)
-            .setAnchorView(view)
+        binding.snackbarContainer.makeSnackbar(R.string.access_to_storage_forbidden, Snackbar.LENGTH_LONG)
             .setAction(R.string.allow) { presenter.onAllowStorageClick() }
             .show()
     }

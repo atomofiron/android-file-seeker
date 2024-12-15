@@ -40,9 +40,9 @@
         app:labelVisibilityMode="unlabeled"
         app:elevation="0dp"
         />
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <app.atomofiron.searchboxapp.custom.view.SnackbarContainerLayout
         android:id="@+id/snackbar_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         />
 </lib.atomofiron.insets.InsetsProviderFrameLayout>

@@ -21,6 +21,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapte
 import app.atomofiron.searchboxapp.screens.main.util.KeyCodeConsumer
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getString
+import app.atomofiron.searchboxapp.utils.makeSnackbar
 import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.insetsPadding
 
@@ -128,7 +129,9 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     override fun onKeyDown(keyCode: Int): Boolean = when {
         !isVisible -> false
-        keyCode != KeyEvent.KEYCODE_VOLUME_UP -> false
+        keyCode != KeyEvent.KEYCODE_VOLUME_UP -> true.apply {
+            showAlert(NodeError.Unknown)
+        }
         else -> getCurrentTabView().isCurrentDirVisible()?.also {
             presenter.onVolumeUp(it)
         } != null
@@ -137,9 +140,6 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     private fun getCurrentTabView(): ExplorerView = explorerViews[binding.pager.currentItem]
 
     private fun showAlert(error: NodeError) {
-        val view = view ?: return
-        Snackbar.make(view, resources.getString(error), Snackbar.LENGTH_LONG)
-            .setAnchorView(view)
-            .show()
+        binding.snackbarContainer.makeSnackbar(resources.getString(error), Snackbar.LENGTH_LONG).show()
     }
 }

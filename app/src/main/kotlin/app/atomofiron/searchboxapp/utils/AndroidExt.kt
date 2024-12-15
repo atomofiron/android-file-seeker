@@ -29,14 +29,15 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
+import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.annotation.StyleableRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
 import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -48,6 +49,7 @@ import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable.Companion.setBa
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import com.google.android.material.navigation.NavigationBarView
+import com.google.android.material.snackbar.Snackbar
 import java.io.Serializable
 import java.util.Locale
 import kotlin.math.max
@@ -187,13 +189,26 @@ fun Drawable.setState(enabled: Boolean? = null, checked: Boolean? = null, activa
     state = getStateMut(enabled, checked, activated).toIntArray()
 }
 
-val Fragment.anchorView: View? get() = requireActivity()
-    .findViewById<View?>(R.id.joystick)
-    .takeIf { it.isVisible }
-    ?.takeIf {
-        val params = it.layoutParams as FrameLayout.LayoutParams
-        (params.gravity and Gravity.BOTTOM) == Gravity.BOTTOM
+fun CoordinatorLayout.makeSnackbar(@StringRes message: Int, duration: Int) = makeSnackbar(resources.getText(message), duration)
+
+fun CoordinatorLayout.makeSnackbar(message: CharSequence, duration: Int): Snackbar {
+    val joystick = findJoystick()
+    return Snackbar
+        .make(this, message, duration)
+        .setAnchorView(joystick)
+}
+
+private fun View.findJoystick(): View? {
+    return when (id) {
+        R.id.activity_root -> findViewById<View>(R.id.joystick)
+            .takeIf { it.isVisible }
+            ?.takeIf {
+                val params = it.layoutParams as FrameLayout.LayoutParams
+                (params.gravity and Gravity.BOTTOM) == Gravity.BOTTOM
+            }
+        else -> (parent as View).findJoystick()
     }
+}
 
 fun View.setContentMaxWidthRes(resId: Int) = setContentMaxWidth(resources.getDimensionPixelSize(resId))
 

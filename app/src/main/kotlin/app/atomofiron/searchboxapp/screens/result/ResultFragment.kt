@@ -13,13 +13,13 @@ import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.flow.viewCollect
 import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.utils.anchorView
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.databinding.FragmentResultBinding
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.model.textviewer.SearchTask
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
+import app.atomofiron.searchboxapp.utils.makeSnackbar
 import com.google.android.material.navigation.NavigationBarView
 
 class ResultFragment : Fragment(R.layout.fragment_result),
@@ -31,8 +31,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
 
     private val resultAdapter = ResultAdapter()
     private val errorSnackbar by lazy(LazyThreadSafetyMode.NONE) {
-        Snackbar.make(requireView(), "", Snackbar.LENGTH_INDEFINITE)
-            .setAnchorView(anchorView)
+        binding.snackbarContainer.makeSnackbar("", Snackbar.LENGTH_INDEFINITE)
             .setAction(R.string.got_it) { }
     }
     private var snackbarError: String? = null
@@ -129,8 +128,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
     }
 
     private fun showSnackbar(message: String) {
-        Snackbar.make(binding.snackbarContainer, message, Snackbar.LENGTH_INDEFINITE)
-            .setAnchorView(anchorView)
+        binding.snackbarContainer.makeSnackbar(message, Snackbar.LENGTH_INDEFINITE)
             .setAction(R.string.got_it) { }
             .show()
     }

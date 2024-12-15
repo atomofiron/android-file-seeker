@@ -28,7 +28,7 @@ import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragme
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.Shell
-import app.atomofiron.searchboxapp.utils.anchorView
+import app.atomofiron.searchboxapp.utils.makeSnackbar
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.insetsPadding
@@ -115,30 +115,26 @@ class PreferenceFragment : PreferenceFragmentCompat(),
     }
 
     private fun onAlert(message: String) {
-        Snackbar.make(binding.snackbarContainer, message, Snackbar.LENGTH_SHORT).show()
+        binding.snackbarContainer.makeSnackbar(message, Snackbar.LENGTH_SHORT).show()
     }
 
     private fun showOutputSuccess(message: Int) {
-        val view = view ?: return
         val duration = when (message) {
             R.string.successful_with_restart -> Snackbar.LENGTH_LONG
             else -> Snackbar.LENGTH_SHORT
         }
-        Snackbar.make(view, message, duration).setAnchorView(anchorView).show()
+        binding.snackbarContainer.makeSnackbar(message, duration).show()
     }
 
     private fun showOutputError(output: Shell.Output) {
-        val view = view ?: return
-        val anchorView = anchorView
-        Snackbar.make(view, R.string.error, Snackbar.LENGTH_SHORT).apply {
+        binding.snackbarContainer.makeSnackbar(R.string.error, Snackbar.LENGTH_SHORT).apply {
             if (output.error.isNotEmpty()) {
                 setAction(R.string.more) {
                     AlertDialog.Builder(context)
-                            .setMessage(output.error)
-                            .show()
+                        .setMessage(output.error)
+                        .show()
                 }
             }
-            this.anchorView = anchorView
             show()
         }
     }
