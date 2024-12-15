@@ -1,8 +1,9 @@
 package app.atomofiron.searchboxapp.di
 
 import android.app.Application
+import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
-import app.atomofiron.searchboxapp.utils.AppWatcherProxy
+import debug.AppWatcherProxy
 
 object DaggerInjector {
 
@@ -13,7 +14,7 @@ object DaggerInjector {
             .builder()
             .appContext(application.applicationContext)
             .initialStore(InitialDelegate(application.applicationContext))
-            .appWatcher(AppWatcherProxy())
+            .appWatcher(BuildConfig.appWatcher ?: AppWatcherProxy())
             .assetManager(application.assets)
             .packageManager(application.packageManager)
             .packageInstaller(application.packageManager.packageInstaller)

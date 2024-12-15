@@ -56,6 +56,8 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         viewState.appUpdate.collect(lifecycleScope) {
             uppUpdate.bind(it)
         }
+        val debugGroup = findPreference<PreferenceGroup>(PreferenceKeys.PREF_CATEGORY_DEBUG)!!
+        debugGroup.isVisible = viewState.withDebugGroup
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

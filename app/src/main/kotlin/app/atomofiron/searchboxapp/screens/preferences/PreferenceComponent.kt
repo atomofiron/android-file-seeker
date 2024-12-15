@@ -6,24 +6,24 @@ import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.custom.preference.UpdateActionListener
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
-import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
-import dagger.Provides
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.service.PreferenceService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
+import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
 import app.atomofiron.searchboxapp.screens.preferences.presenter.ExportImportPresenterDelegate
 import app.atomofiron.searchboxapp.screens.preferences.presenter.PreferenceClickPresenterDelegate
 import app.atomofiron.searchboxapp.screens.preferences.presenter.UpdatePresenterDelegate
 import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExportImportDelegate
-import app.atomofiron.searchboxapp.utils.AppWatcherProxy
+import dagger.BindsInstance
+import dagger.Component
+import dagger.Module
+import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
+import debug.AppWatcherProxy
 import javax.inject.Scope
 
 @Scope
@@ -125,7 +125,8 @@ class PreferenceModule {
         scope: CoroutineScope,
         preferenceDataStore: PreferenceDataStore,
         updateStore: AppUpdateStore,
-    ): PreferenceViewState = PreferenceViewState(scope, preferenceDataStore, updateStore)
+        appWatcher: AppWatcherProxy,
+    ): PreferenceViewState = PreferenceViewState(scope, preferenceDataStore, updateStore, appWatcher)
 
     @Provides
     @PreferenceScope

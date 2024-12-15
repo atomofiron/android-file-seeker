@@ -9,16 +9,19 @@ import app.atomofiron.searchboxapp.utils.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import debug.AppWatcherProxy
 
 class PreferenceViewState(
     private val scope: CoroutineScope,
     val preferenceDataStore: PreferenceDataStore,
     updateStore: AppUpdateStore,
+    appWatcher: AppWatcherProxy,
 ) {
     val alert = ChannelFlow<String>()
     val alertOutputSuccess = ChannelFlow<Int>()
     val alertOutputError = ChannelFlow<Shell.Output>()
     val showDeepBlack = MutableStateFlow(false)
+    val withDebugGroup = appWatcher.isAvailable
     val appUpdate: StateFlow<AppUpdateState> = updateStore.state
     // todo zip and share the backup
     val isExportImportAvailable: Boolean = true

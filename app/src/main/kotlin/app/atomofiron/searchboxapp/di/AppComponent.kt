@@ -5,22 +5,26 @@ import android.content.Context
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
-import dagger.BindsInstance
-import dagger.Component
 import app.atomofiron.searchboxapp.android.App
-import app.atomofiron.searchboxapp.di.module.*
+import app.atomofiron.searchboxapp.di.module.ChannelModule
+import app.atomofiron.searchboxapp.di.module.CommonModule
+import app.atomofiron.searchboxapp.di.module.InteractorModule
+import app.atomofiron.searchboxapp.di.module.ServiceModule
+import app.atomofiron.searchboxapp.di.module.StoreModule
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.screens.curtain.CurtainDependencies
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerDependencies
 import app.atomofiron.searchboxapp.screens.finder.FinderDependencies
+import app.atomofiron.searchboxapp.screens.main.MainDependencies
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceDependencies
 import app.atomofiron.searchboxapp.screens.result.ResultDependencies
-import app.atomofiron.searchboxapp.screens.main.MainDependencies
 import app.atomofiron.searchboxapp.screens.root.RootDependencies
 import app.atomofiron.searchboxapp.screens.template.TemplateDependencies
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerDependencies
-import app.atomofiron.searchboxapp.utils.AppWatcherProxy
 import app.atomofiron.searchboxapp.work.FinderWorker
+import dagger.BindsInstance
+import dagger.Component
+import debug.AppWatcherProxy
 import javax.inject.Singleton
 
 @Component(modules = [

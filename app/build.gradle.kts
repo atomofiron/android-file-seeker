@@ -43,6 +43,7 @@ android {
             applicationIdSuffix = ".debug"
             buildConfigField("boolean", "DEBUG_BUILD", "true")
             buildConfigField("String", "AUTHORITY", "\"${packageName + applicationIdSuffix + fileProviderName}\"")
+            buildConfigField("debug.AppWatcherProxy", "appWatcher", "new debug.AppWatcherProxyImpl()")
             manifestPlaceholders["PACKAGE_NAME"] = packageName + applicationIdSuffix
             manifestPlaceholders["PROVIDER"] = packageName + applicationIdSuffix + fileProviderName
         }
@@ -52,6 +53,7 @@ android {
             applicationIdSuffix = ""
             signingConfig = signingConfigs.getByName("debug")
             buildConfigField("String", "AUTHORITY", "\"${packageName + applicationIdSuffix + fileProviderName}\"")
+            buildConfigField("debug.AppWatcherProxy", "appWatcher", "null")
             manifestPlaceholders["PACKAGE_NAME"] = packageName + applicationIdSuffix
             manifestPlaceholders["PROVIDER"] = packageName + applicationIdSuffix + fileProviderName
         }
@@ -61,6 +63,7 @@ android {
             applicationIdSuffix = ""
             signingConfig = signingConfigs.getByName("debug")
             buildConfigField("String", "AUTHORITY", "\"${packageName + applicationIdSuffix + fileProviderName}\"")
+            buildConfigField("debug.AppWatcherProxy", "appWatcher", "null")
             manifestPlaceholders["PACKAGE_NAME"] = packageName + applicationIdSuffix
             manifestPlaceholders["PROVIDER"] = packageName + applicationIdSuffix + fileProviderName
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
@@ -68,6 +71,7 @@ android {
         getByName("release") {
             isMinifyEnabled = true
             buildConfigField("String", "AUTHORITY", "\"${packageName + fileProviderName}\"")
+            buildConfigField("debug.AppWatcherProxy", "appWatcher", "null")
             manifestPlaceholders["PACKAGE_NAME"] = packageName
             manifestPlaceholders["PROVIDER"] = packageName + fileProviderName
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
