@@ -10,7 +10,7 @@ object Shell {
     private const val SH = "sh"
 
     private const val TOYBOX = "{toybox}"
-    lateinit var toyboxPath: String
+    var toyboxPath = Const.DEFAULT_TOYBOX_PATH
 
     const val TOUCH = "{toybox} touch \"%s\""
     const val VERSION = "{toybox} --version"
