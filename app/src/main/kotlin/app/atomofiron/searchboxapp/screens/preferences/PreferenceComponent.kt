@@ -125,8 +125,9 @@ class PreferenceModule {
         scope: CoroutineScope,
         preferenceDataStore: PreferenceDataStore,
         updateStore: AppUpdateStore,
+        preferenceStore: PreferenceStore,
         appWatcher: LeakWatcher,
-    ): PreferenceViewState = PreferenceViewState(scope, preferenceDataStore, updateStore, appWatcher)
+    ): PreferenceViewState = PreferenceViewState(scope, preferenceDataStore, preferenceStore, updateStore, appWatcher)
 
     @Provides
     @PreferenceScope

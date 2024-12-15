@@ -4,6 +4,7 @@ import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
+import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
 import app.atomofiron.searchboxapp.utils.Shell
 import kotlinx.coroutines.CoroutineScope
@@ -14,6 +15,7 @@ import debug.LeakWatcher
 class PreferenceViewState(
     private val scope: CoroutineScope,
     val preferenceDataStore: PreferenceDataStore,
+    preferenceStore: PreferenceStore,
     updateStore: AppUpdateStore,
     appWatcher: LeakWatcher,
 ) {
@@ -21,6 +23,7 @@ class PreferenceViewState(
     val alertOutputSuccess = ChannelFlow<Int>()
     val alertOutputError = ChannelFlow<Shell.Output>()
     val showDeepBlack = MutableStateFlow(false)
+    val useSu: StateFlow<Boolean> = preferenceStore.useSu
     val withDebugGroup = appWatcher.isAvailable
     val appUpdate: StateFlow<AppUpdateState> = updateStore.state
     // todo zip and share the backup

@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceGroup
+import androidx.preference.SwitchPreferenceCompat
 import androidx.preference.forEach
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.arch.BaseFragment
@@ -54,6 +55,10 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         uppUpdate.listener = presenter
         viewState.appUpdate.collect(lifecycleScope) {
             uppUpdate.bind(it)
+        }
+        val useSu = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyUseSu.name)!!
+        viewState.useSu.collect(lifecycleScope) {
+            useSu.isChecked = it
         }
         val debugGroup = findPreference<PreferenceGroup>(PreferenceKeys.PREF_CATEGORY_DEBUG)!!
         debugGroup.isVisible = viewState.withDebugGroup

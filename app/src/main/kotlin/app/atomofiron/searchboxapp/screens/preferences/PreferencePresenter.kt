@@ -9,7 +9,6 @@ import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExportImportDelegate
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
-import app.atomofiron.searchboxapp.screens.preferences.presenter.UpdatePresenterDelegate
 import app.atomofiron.searchboxapp.utils.Shell
 import kotlinx.coroutines.CoroutineScope
 
@@ -46,11 +45,11 @@ class PreferencePresenter(
     private suspend fun onUseSuEnabled() {
         val output = Shell.checkSu()
         if (!output.success) {
+            val error = output.error.trim()
             preferenceStore.setUseSu(false)
-            val message = when {
-                output.error.isNotBlank() -> output.error
-                else -> resources.getString(R.string.not_allowed)
-            }
+            val message = error
+                .takeIf { it.isNotBlank() }
+                ?: resources.getString(R.string.not_allowed)
             viewState.showAlert(message)
         }
     }
