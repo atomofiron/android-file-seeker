@@ -8,8 +8,8 @@
     <string name="search_empty">Поиск не дал результатов</string>
     <string name="search_succeed">Поиск завершён успешно</string>
     <string name="search_failed">Поиск завершён с ошибкой</string>
-    <string name="search_for_content_result">"Подстрок: %d, файлов: %d, файлов всего: %d"</string>
-    <string name="search_for_names_result">"файлов: %d, файлов всего: %d"</string>
+    <string name="search_for_content_result">"Подстрок: %1$d, файлов: %2$d, файлов всего: %3$d"</string>
+    <string name="search_for_names_result">"файлов: %1$d, файлов всего: %2$d"</string>
     <string name="search_error">Ошибка: %s</string>
     <string name="error">Ошибка</string>
     <string name="nothing">Ничего не найдено</string>
