@@ -16,12 +16,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import debug.AppWatcherProxy
+import debug.LeakWatcher
 
 class LegacyPreferenceDataStore(
     private val preferenceStore: PreferenceStore,
     private val scope: CoroutineScope,
-    private val watcher: AppWatcherProxy,
+    private val watcher: LeakWatcher,
 ) : PreferenceDataStore(), DataStore<Preferences> by preferenceStore {
 
     override fun getBoolean(key: String, defValue: Boolean): Boolean {

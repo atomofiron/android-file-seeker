@@ -2,7 +2,7 @@ package debug
 
 import leakcanary.LeakCanary
 
-class AppWatcherProxyImpl : AppWatcherProxy() {
+class LeakWatcherImpl : LeakWatcher() {
 
     override val isAvailable = true
 

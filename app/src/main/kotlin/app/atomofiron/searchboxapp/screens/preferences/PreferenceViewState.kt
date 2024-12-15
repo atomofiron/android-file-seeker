@@ -9,13 +9,13 @@ import app.atomofiron.searchboxapp.utils.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import debug.AppWatcherProxy
+import debug.LeakWatcher
 
 class PreferenceViewState(
     private val scope: CoroutineScope,
     val preferenceDataStore: PreferenceDataStore,
     updateStore: AppUpdateStore,
-    appWatcher: AppWatcherProxy,
+    appWatcher: LeakWatcher,
 ) {
     val alert = ChannelFlow<String>()
     val alertOutputSuccess = ChannelFlow<Int>()

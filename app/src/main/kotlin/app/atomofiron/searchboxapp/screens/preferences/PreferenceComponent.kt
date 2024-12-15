@@ -23,7 +23,7 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
-import debug.AppWatcherProxy
+import debug.LeakWatcher
 import javax.inject.Scope
 
 @Scope
@@ -125,7 +125,7 @@ class PreferenceModule {
         scope: CoroutineScope,
         preferenceDataStore: PreferenceDataStore,
         updateStore: AppUpdateStore,
-        appWatcher: AppWatcherProxy,
+        appWatcher: LeakWatcher,
     ): PreferenceViewState = PreferenceViewState(scope, preferenceDataStore, updateStore, appWatcher)
 
     @Provides
@@ -133,7 +133,7 @@ class PreferenceModule {
     fun preferenceDataStore(
         preferences: PreferenceStore,
         appStore: AppStore,
-        watcher: AppWatcherProxy,
+        watcher: LeakWatcher,
     ): PreferenceDataStore {
         return LegacyPreferenceDataStore(preferences, appStore.scope, watcher)
     }
@@ -144,7 +144,7 @@ interface PreferenceDependencies {
     fun preferenceStore(): PreferenceStore
     fun context(): Context
     fun curtainChannel(): CurtainChannel
-    fun appWatcherProxy(): AppWatcherProxy
+    fun appWatcherProxy(): LeakWatcher
     fun appStore(): AppStore
     fun updateStore(): AppUpdateStore
     fun appUpdateService(): AppUpdateService

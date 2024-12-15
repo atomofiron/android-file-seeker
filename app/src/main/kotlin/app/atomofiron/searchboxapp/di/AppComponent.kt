@@ -24,7 +24,7 @@ import app.atomofiron.searchboxapp.screens.viewer.TextViewerDependencies
 import app.atomofiron.searchboxapp.work.FinderWorker
 import dagger.BindsInstance
 import dagger.Component
-import debug.AppWatcherProxy
+import debug.LeakWatcher
 import javax.inject.Singleton
 
 @Component(modules = [
@@ -54,7 +54,7 @@ interface AppComponent :
         fun appContext(context: Context): Builder
 
         @BindsInstance
-        fun appWatcher(proxy: AppWatcherProxy): Builder
+        fun appWatcher(proxy: LeakWatcher): Builder
 
         @BindsInstance
         fun initialStore(initialDelegate: InitialDelegate): Builder
