@@ -175,13 +175,13 @@ class PreferenceStore(
 
     private fun <V> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {
         return data.mapNotNull { it[key] }
-            .stateIn(scope, SharingStarted.Lazily, key.default)
+            .shareInOne(scope)
             .asProperty()
     }
 
     private fun <V,E> getFlow(key: PreferenceKey<V>, transformation: (V) -> E): StateFlowProperty<E> {
         return data.map { (it[key] ?: key.default).let(transformation) }
-            .stateIn(scope, SharingStarted.Lazily, key.default.let(transformation))
+            .shareInOne(scope)
             .asProperty()
     }
 
