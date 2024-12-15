@@ -11,6 +11,7 @@ android {
     namespace = packageName
 
     compileSdk = 35
+    buildToolsVersion = "35.0.0"
 
     defaultConfig {
         applicationId = packageName
@@ -36,14 +37,6 @@ android {
         viewBinding = true
         buildConfig = true
     }
-    signingConfigs {
-        create("alpha") {
-            storeFile = file("../debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
-        }
-    }
     buildTypes {
         getByName("debug") {
             isMinifyEnabled = false
@@ -57,7 +50,7 @@ android {
             isDebuggable = true
             isMinifyEnabled = false
             applicationIdSuffix = ""
-            signingConfig = signingConfigs.getByName("alpha")
+            signingConfig = signingConfigs.getByName("debug")
             buildConfigField("String", "AUTHORITY", "\"${packageName + applicationIdSuffix + fileProviderName}\"")
             manifestPlaceholders["PACKAGE_NAME"] = packageName + applicationIdSuffix
             manifestPlaceholders["PROVIDER"] = packageName + applicationIdSuffix + fileProviderName
@@ -66,7 +59,7 @@ android {
             isDebuggable = false
             isMinifyEnabled = true
             applicationIdSuffix = ""
-            signingConfig = signingConfigs.getByName("alpha")
+            signingConfig = signingConfigs.getByName("debug")
             buildConfigField("String", "AUTHORITY", "\"${packageName + applicationIdSuffix + fileProviderName}\"")
             manifestPlaceholders["PACKAGE_NAME"] = packageName + applicationIdSuffix
             manifestPlaceholders["PROVIDER"] = packageName + applicationIdSuffix + fileProviderName
