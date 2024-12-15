@@ -26,11 +26,9 @@
         <attr name="statusBar" format="boolean" />
         <attr name="navigationBar">
             <flag name="none" value="0x0" />
-            <flag name="all" value="0x13" />
-            <flag name="start" value="0x1" />
-            <flag name="end" value="0x4" />
-            <flag name="horizontal" value="0x5" />
-            <flag name="bottom" value="0x8" />
+            <flag name="bottom" value="0x1" />
+            <flag name="horizontal" value="0x2" />
+            <flag name="all" value="0x3" />
         </attr>
     </declare-styleable>
 </resources>

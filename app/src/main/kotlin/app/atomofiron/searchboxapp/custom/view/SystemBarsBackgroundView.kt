@@ -23,21 +23,17 @@ class SystemBarsBackgroundView : View, InsetsListener {
             val color = getColorByAttr(R.attr.colorBackground)
             return ColorUtils.setAlphaComponent(color, Alpha.Level67)
         }
-        private const val START =  0b00001
-        private const val TOP =    0b00010
-        private const val END =    0b00100
-        private const val BOTTOM = 0b01000
-        private const val ALL =    0b01111
-        private const val RTL =    0b10000
+        private const val BOTTOM =     0b001
+        private const val HORIZONTAL = 0b010
+        private const val ALL =        0b011
+        private const val RTL =        0b100
     }
 
     @JvmInline
     value class Sides(val value: Int) {
-        val left: Boolean get() = if (value and RTL == 0) (value and START != 0) else (value and END != 0)
-        val top: Boolean get() = (value and TOP != 0)
-        val right: Boolean get() = if (value and RTL == 0) (value and START != 0) else (value and END != 0)
+        val horizontal: Boolean get() = (value and HORIZONTAL != 0)
         val bottom: Boolean get() = (value and BOTTOM != 0)
-        val empty: Boolean get() = (value == 0)
+        val empty: Boolean get() = (value and ALL == 0)
 
         constructor(value: Int, rtl: Boolean) : this(value + if(rtl) RTL else 0)
     }
@@ -96,8 +92,10 @@ class SystemBarsBackgroundView : View, InsetsListener {
 
         navigationBar.takeIf { !it.empty }?.run {
             val navigationTop = if (statusBar) topInset else 0f
-            if (left) canvas.drawRect(0f, navigationTop, leftInset, height - bottomInset, paint)
-            if (right) canvas.drawRect(width - rightInset, navigationTop, width, height - bottomInset, paint)
+            if (horizontal) {
+                canvas.drawRect(0f, navigationTop, leftInset, height - bottomInset, paint)
+                canvas.drawRect(width - rightInset, navigationTop, width, height - bottomInset, paint)
+            }
             if (bottom) canvas.drawRect(0f, height - bottomInset, width, height, paint)
         }
     }
