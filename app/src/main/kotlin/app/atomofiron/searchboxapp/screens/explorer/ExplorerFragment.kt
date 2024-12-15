@@ -129,9 +129,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     override fun onKeyDown(keyCode: Int): Boolean = when {
         !isVisible -> false
-        keyCode != KeyEvent.KEYCODE_VOLUME_UP -> true.apply {
-            showAlert(NodeError.Unknown)
-        }
+        keyCode != KeyEvent.KEYCODE_VOLUME_UP -> false
         else -> getCurrentTabView().isCurrentDirVisible()?.also {
             presenter.onVolumeUp(it)
         } != null
