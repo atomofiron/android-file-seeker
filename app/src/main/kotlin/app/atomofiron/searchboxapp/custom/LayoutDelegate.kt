@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.custom
 
 import android.view.Display
 import android.view.Gravity
+import android.view.MenuItem
 import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
@@ -41,14 +42,14 @@ object LayoutDelegate {
         appBarLayout: AppBarLayout? = null,
         headerView: ExplorerHeaderView? = null,
         snackbarContainer: CoordinatorLayout? = null,
-        joystickVisibilityCallback: ((Boolean) -> Unit)? = null,
+        joystickPlaceholder: MenuItem? = null,
     ) {
         val insetsProvider = (root as View).findInsetsProvider()!!
         var layout = Layout(Layout.Ground.Bottom, withJoystick = true, root.isRtl())
         val railDelegate = railView?.insetsPadding(ExtType { barsWithCutout + joystickTop })
         root.setLayoutListener { new ->
             layout = new
-            joystickVisibilityCallback?.invoke(layout.withJoystick)
+            joystickPlaceholder?.isVisible = layout.withJoystick
             bottomView?.isVisible = !layout.isWide
             railView?.isVisible = layout.isWide
             tabLayout?.isVisible = !layout.isWide

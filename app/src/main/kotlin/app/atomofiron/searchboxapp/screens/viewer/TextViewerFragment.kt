@@ -86,16 +86,14 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
 
     override fun onApplyInsets(root: View) {
         binding.run {
-            //recyclerView.insetsPadding(start = true, end = true, bottom = true)
             LayoutDelegate(
                 root as ViewGroup,
                 recyclerView = recyclerView,
                 bottomView = bottomBar,
                 railView = navigationRail,
                 appBarLayout = appbarLayout,
-            ) {
-                bottomBar.menu.findItem(R.id.stub).isVisible = it
-            }
+                joystickPlaceholder = bottomBar.menu.findItem(R.id.stub),
+            )
         }
     }
 

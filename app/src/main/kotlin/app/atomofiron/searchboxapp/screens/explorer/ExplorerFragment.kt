@@ -120,10 +120,9 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
                 this.root,
                 bottomView = bottomBar,
                 railView = navigationRail,
-                tabLayout = null/*explorerTabs*/,
-            ) {
-                bottomBar.menu.findItem(R.id.stub).isVisible = it
-            }
+                //tabLayout = explorerTabs,
+                joystickPlaceholder = bottomBar.menu.findItem(R.id.stub),
+            )
         }
     }
 

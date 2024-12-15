@@ -21,7 +21,6 @@ import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.model.textviewer.SearchTask
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
 import com.google.android.material.navigation.NavigationBarView
-import lib.atomofiron.insets.insetsPadding
 
 class ResultFragment : Fragment(R.layout.fragment_result),
     BaseFragment<ResultFragment, ResultViewState, ResultPresenter> by BaseFragmentImpl()
@@ -88,9 +87,8 @@ class ResultFragment : Fragment(R.layout.fragment_result),
                 bottomView = bottomBar,
                 railView = navigationRail,
                 snackbarContainer = binding.snackbarContainer,
-            ) {
-                bottomBar.menu.findItem(R.id.stub).isVisible = it
-            }
+                joystickPlaceholder = bottomBar.menu.findItem(R.id.stub),
+            )
         }
     }
 

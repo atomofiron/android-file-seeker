@@ -120,9 +120,8 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
                 recyclerView = recyclerView,
                 bottomView = bottomBar,
                 railView = navigationRail,
-            ) {
-                bottomBar.menu.findItem(R.id.stub).isVisible = it
-            }
+                joystickPlaceholder = bottomBar.menu.findItem(R.id.stub),
+            )
         }
     }
 
