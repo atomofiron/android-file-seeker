@@ -5,7 +5,7 @@
 	<style name="CompatTheme.Amoled" parent="@style/AppTheme.Amoled.Legacy" />
 
 	<style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
-		<item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="28">shortEdges</item>
+		<item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="28">always</item>
 		<item name="android:clipToPadding">false</item>
 		<item name="android:windowEnableSplitTouch">false</item>
 		<item name="android:splitMotionEvents">false</item>
