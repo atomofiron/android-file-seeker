@@ -56,7 +56,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             layoutManager = LinearLayoutManager(requireContext())
             adapter = resultAdapter
         }
-        binding.navigationRail.menu.removeItem(R.id.stub)
+        binding.navigationRail.menu.removeItem(R.id.placeholder)
         binding.navigationRail.isItemActiveIndicatorEnabled = false
         binding.navigationRail.setOnItemSelectedListener(::onBottomMenuItemClick)
         binding.bottomBar.isItemActiveIndicatorEnabled = false
@@ -87,7 +87,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
                 bottomView = bottomBar,
                 railView = navigationRail,
                 snackbarContainer = binding.snackbarContainer,
-                joystickPlaceholder = bottomBar.menu.findItem(R.id.stub),
+                joystickPlaceholder = bottomBar.menu.findItem(R.id.placeholder),
             )
         }
     }

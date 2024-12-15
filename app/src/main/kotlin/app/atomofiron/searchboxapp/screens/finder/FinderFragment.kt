@@ -62,7 +62,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
         binding.bottomBar.isItemActiveIndicatorEnabled = false
         binding.bottomBar.setOnItemSelectedListener(::onNavigationItemSelected)
-        binding.navigationRail.menu.removeItem(R.id.stub)
+        binding.navigationRail.menu.removeItem(R.id.placeholder)
         binding.navigationRail.setOnItemSelectedListener(::onNavigationItemSelected)
         binding.navigationRail.isItemActiveIndicatorEnabled = false
 
@@ -120,7 +120,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
                 recyclerView = recyclerView,
                 bottomView = bottomBar,
                 railView = navigationRail,
-                joystickPlaceholder = bottomBar.menu.findItem(R.id.stub),
+                joystickPlaceholder = bottomBar.menu.findItem(R.id.placeholder),
             )
         }
     }

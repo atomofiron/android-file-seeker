@@ -52,7 +52,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
         pager.adapter = pagerAdapter
         bottomBar.isItemActiveIndicatorEnabled = false
         bottomBar.setOnItemSelectedListener(::onNavigationItemSelected)
-        binding.navigationRail.menu.removeItem(R.id.stub)
+        binding.navigationRail.menu.removeItem(R.id.placeholder)
         navigationRail.setOnItemSelectedListener(::onNavigationItemSelected)
         navigationRail.isItemActiveIndicatorEnabled = false
         pager.recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
@@ -121,7 +121,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
                 bottomView = bottomBar,
                 railView = navigationRail,
                 //tabLayout = explorerTabs,
-                joystickPlaceholder = bottomBar.menu.findItem(R.id.stub),
+                joystickPlaceholder = bottomBar.menu.findItem(R.id.placeholder),
             )
         }
     }

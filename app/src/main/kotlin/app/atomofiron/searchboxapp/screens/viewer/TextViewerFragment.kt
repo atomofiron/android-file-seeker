@@ -56,7 +56,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
             (recyclerView.layoutParams as CoordinatorLayout.LayoutParams).run {
                 behavior = AppBarLayout.ScrollingViewBehavior()
             }
-            navigationRail.menu.removeItem(R.id.stub)
+            navigationRail.menu.removeItem(R.id.placeholder)
             navigationRail.isItemActiveIndicatorEnabled = false
             navigationRail.setOnItemSelectedListener(::onBottomMenuItemClick)
             bottomBar.isItemActiveIndicatorEnabled = false
@@ -92,7 +92,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
                 bottomView = bottomBar,
                 railView = navigationRail,
                 appBarLayout = appbarLayout,
-                joystickPlaceholder = bottomBar.menu.findItem(R.id.stub),
+                joystickPlaceholder = bottomBar.menu.findItem(R.id.placeholder),
             )
         }
     }

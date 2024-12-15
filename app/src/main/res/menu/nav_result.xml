@@ -7,7 +7,7 @@
         android:icon="@drawable/ic_circle_stop"
         />
     <item
-        android:id="@+id/stub"
+        android:id="@+id/placeholder"
         android:title=""
         android:enabled="false"
         />
