@@ -47,7 +47,7 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
 
     override fun onBind(item: TextLine, position: Int) = Unit
 
-    fun onBind(item: TextLine, matches: List<TextLineMatch>?, indexFocus: Int?) {
+    fun onBind(item: TextLine, matches: List<TextLineMatch>?, indexFocus: Int) {
         when {
             matches.isNullOrEmpty() -> textView.text = item.text
             else -> {

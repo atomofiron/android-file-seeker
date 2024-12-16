@@ -10,6 +10,7 @@ import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState.MatchCursor
+import app.atomofiron.searchboxapp.utils.Const
 
 class TextViewerAdapter : GeneralAdapter<TextViewerHolder, TextLine>() {
     var textViewerListener: TextViewerListener? = null
@@ -30,12 +31,12 @@ class TextViewerAdapter : GeneralAdapter<TextViewerHolder, TextLine>() {
     }
 
     fun setCursor(cursor: MatchCursor) {
-        if (this.cursor.lineIndex > 0) {
-            notifyItemChanged(this.cursor.lineIndex)
-        }
+        val was = this.cursor.lineIndex
         this.cursor = cursor
-
-        if (cursor.lineIndex > 0) {
+        if (was >= 0) {
+            notifyItemChanged(was)
+        }
+        if (cursor.lineIndex >= 0 && cursor.lineIndex != was) {
             notifyItemChanged(cursor.lineIndex)
             recyclerView?.post {
                 recyclerView?.scrollToPosition(cursor.lineIndex)
@@ -62,7 +63,7 @@ class TextViewerAdapter : GeneralAdapter<TextViewerHolder, TextLine>() {
     override fun onBindViewHolder(holder: TextViewerHolder, position: Int) {
         val indexFocus = when (position) {
             cursor.lineIndex -> cursor.lineMatchIndex
-            else -> null
+            else -> Const.UNDEFINED
         }
         holder.onBind(items[position], matches[position], indexFocus)
         textViewerListener?.onLineVisible(position)
