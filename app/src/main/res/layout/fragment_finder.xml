@@ -16,7 +16,7 @@
 			android:layout_height="match_parent"
 			android:paddingTop="@dimen/common_margin_half"
 			android:paddingHorizontal="@dimen/common_margin_half"
-			android:paddingBottom="@dimen/common_margin_large"
+			android:paddingBottom="@dimen/common_margin"
 			android:maxWidth="@dimen/card_max_width"
 			/>
 		<app.atomofiron.searchboxapp.custom.view.SystemBarsBackgroundView

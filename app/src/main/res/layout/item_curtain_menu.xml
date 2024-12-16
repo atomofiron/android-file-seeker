@@ -12,10 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingStart="12dp"
-        android:paddingTop="@dimen/common_margin"
-        android:paddingEnd="@dimen/common_margin"
-        android:paddingBottom="@dimen/common_margin"
+        android:padding="@dimen/common_margin"
         android:gravity="center_vertical"
         >
         <androidx.appcompat.widget.AppCompatImageView
@@ -29,8 +26,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="@dimen/common_margin"
-            android:layout_marginEnd="@dimen/common_margin"
+            android:layout_marginHorizontal="@dimen/common_margin"
             android:textColor="?attr/colorContent"
             android:textSize="18sp"
             />
