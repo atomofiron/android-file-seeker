@@ -9,6 +9,7 @@ object PreferenceKeys {
 
     val KeyOpenedDirPath = PreferenceKey("pref_opened_dir_path", "")
     val KeyDockGravity = PreferenceKey("pref_drawer_gravity", Gravity.START)
+    val KeyAppUpdateCode = PreferenceKey("pref_app_update_code", 0)
     val KeyLastUpdateNotificationCode = PreferenceKey("pref_last_upd_notification_code", 0)
     val KeySpecialCharacters = PreferenceKey("pref_special_characters", Const.DEFAULT_SPECIAL_CHARACTERS)
     val KeyAppOrientation = PreferenceKey("pref_app_orientation", AppOrientation.UNDEFINED.ordinal.toString())
