@@ -53,9 +53,13 @@ class HistoryAdapter(
         if (index == UNDEFINED) {
             index = itemCount
         }
-        var item = ItemHistory(title = string)
-        item = item.copy(id = dao.insert(item))
         currentList.mutate {
+            find { it.title == string }?.let {
+                dao.delete(it)
+                remove(it)
+            }
+            var item = ItemHistory(title = string)
+            item = item.copy(id = dao.insert(item))
             add(index, item)
             submitList(this)
         }
