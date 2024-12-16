@@ -51,7 +51,7 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
         bView.isInvisible = !task.inProgress
 
         val idLabel = when {
-            task.inProgress -> R.string.look
+            task.inProgress -> R.string.open
             task.isStopped -> R.string.stopped
             task.isError -> R.string.error
             else -> R.string.done
