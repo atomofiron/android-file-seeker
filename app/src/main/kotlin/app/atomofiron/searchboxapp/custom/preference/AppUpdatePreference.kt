@@ -81,27 +81,20 @@ class AppUpdatePreference @JvmOverloads constructor(
             is AppUpdateState.Downloading -> R.string.update_loading
             is AppUpdateState.Installing -> R.string.update_installing
             is AppUpdateState.UpToDate -> R.string.is_up_to_date
-            is AppUpdateState.Completable -> R.string.install_update
+            is AppUpdateState.Completable -> R.string.update_ready
         }.let { setTitle(it) }
     }
 
     private fun AppUpdateState.bindButton() {
         val stringId = when (this) {
             is AppUpdateState.UpToDate,
-            is AppUpdateState.Unknown -> R.string.check
-            is AppUpdateState.Available -> R.string.download
-            is AppUpdateState.Completable -> R.string.install
+            is AppUpdateState.Unknown -> R.string.check.also { buttonStyle.outlined(button) }
+            is AppUpdateState.Available -> R.string.download.also { buttonStyle.filled(button) }
+            is AppUpdateState.Completable -> R.string.install.also { buttonStyle.filled(button) }
             is AppUpdateState.Downloading,
             is AppUpdateState.Installing -> null
         }
         button.isVisible = stringId != null
-        when {
-            !button.isVisible -> return
-            this is AppUpdateState.Unknown -> buttonStyle.outlined(button)
-            this is AppUpdateState.Available -> buttonStyle.filled(button)
-            this is AppUpdateState.Completable -> buttonStyle.filled(button)
-            this is AppUpdateState.UpToDate -> buttonStyle.outlined(button)
-        }
         stringId?.let { button.setText(it) }
     }
 

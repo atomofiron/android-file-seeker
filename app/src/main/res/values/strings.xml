@@ -142,7 +142,7 @@
     <string name="update_installing">Update is installing now</string>
     <string name="is_up_to_date">App is up to date</string>
     <string name="update_downloaded">Update downloaded</string>
-    <string name="install_update">Install update</string>
+    <string name="update_ready">The update is ready to install</string>
     <string name="update_choice">Would you like to download the update in the background or right now?</string>
     <string name="update_in_background">In background</string>
     <string name="update_now">Now</string>

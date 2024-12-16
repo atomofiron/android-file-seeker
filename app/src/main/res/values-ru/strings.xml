@@ -137,7 +137,7 @@
     <string name="update_installing">Обновление устанавливается</string>
     <string name="is_up_to_date">У вас последняя версия приложения</string>
     <string name="update_downloaded">Обновление загружено</string>
-    <string name="install_update">Установить обнолвение</string>
+    <string name="update_ready">Обновление готово к установке</string>
     <string name="check">Проверить</string>
     <string name="download">Скачать</string>
     <string name="install">Установить</string>

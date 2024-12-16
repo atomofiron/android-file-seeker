@@ -12,6 +12,7 @@ import app.atomofiron.searchboxapp.utils.prederences.PreferenceKey
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppOrientation
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppTheme
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppUpdateCode
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDeepBlack
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDockGravity
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyExcludeDirs
@@ -100,6 +101,12 @@ class PreferenceStore(
 
     suspend fun setMaxFileSizeForSearch(value: Int) {
         edit { it[KeyMaxSize] = value }
+    }
+
+    val appUpdateCode = getFlow(KeyAppUpdateCode)
+
+    suspend fun setAppUpdateCode(value: Int) {
+        edit { it[KeyAppUpdateCode] = value }
     }
 
     val lastUpdateNotificationCode = getFlow(KeyLastUpdateNotificationCode)

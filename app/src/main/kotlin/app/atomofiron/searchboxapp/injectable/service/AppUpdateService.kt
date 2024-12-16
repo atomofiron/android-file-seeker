@@ -17,6 +17,7 @@ import androidx.core.app.NotificationManagerCompat
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.materialColor
 import app.atomofiron.common.util.property.RoProperty
+import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
@@ -58,19 +59,24 @@ class AppUpdateService(
     }
 
     override fun onStateUpdate(state: InstallState) {
-        when (state.installStatus()) {
-            InstallStatus.DOWNLOADING -> {
-                val bytes = state.bytesDownloaded()
-                val total = state.totalBytesToDownload()
-                AppUpdateState.Downloading(bytes.toFloat() / total)
-            }
+        val downloadingProgress = state.totalBytesToDownload()
+            .takeIf { it > 0 }
+            ?.toFloat()
+            ?.let { state.bytesDownloaded() / it }
+        onStateUpdate(state.installStatus(), downloadingProgress)
+    }
+
+    private fun onStateUpdate(status: Int, downloadingProgress: Float?) {
+        when (status) {
+            InstallStatus.UNKNOWN -> AppUpdateState.Unknown
+            // PENDING before DOWNLOADING
+            InstallStatus.PENDING -> AppUpdateState.Downloading(null)
+            InstallStatus.DOWNLOADING -> AppUpdateState.Downloading(downloadingProgress)
             InstallStatus.FAILED,
             InstallStatus.CANCELED -> return onFailure()
-            InstallStatus.UNKNOWN -> AppUpdateState.Unknown
-            InstallStatus.DOWNLOADED -> AppUpdateState.Completable
+            InstallStatus.DOWNLOADED -> AppUpdateState.Completable // todo show notification if in foreground
             InstallStatus.INSTALLING -> AppUpdateState.Installing
             InstallStatus.INSTALLED -> AppUpdateState.UpToDate
-            InstallStatus.PENDING -> return // idk, doesn't matter
             else -> return
         }.let { store.set(it) }
     }
@@ -86,13 +92,21 @@ class AppUpdateService(
             this.appUpdateInfo = appUpdateInfo
             when (appUpdateInfo.updateAvailability()) {
                 UpdateAvailability.UNKNOWN -> AppUpdateState.Unknown
-                UpdateAvailability.UPDATE_NOT_AVAILABLE -> AppUpdateState.UpToDate
+                UpdateAvailability.UPDATE_NOT_AVAILABLE -> when {
+                    preferences.appUpdateCode.value > BuildConfig.VERSION_CODE -> AppUpdateState.Unknown
+                    else -> AppUpdateState.UpToDate
+                }
                 UpdateAvailability.UPDATE_AVAILABLE -> appUpdateInfo.type()?.let {
-                    showNotificationForUpdate(appUpdateInfo.availableVersionCode())
+                    val versionCode = appUpdateInfo.availableVersionCode()
+                    preferences { setAppUpdateCode(versionCode) }
+                    showNotificationForUpdate(versionCode)
                     AppUpdateState.Available(it)
-                } ?: AppUpdateState.Unknown
+                }
+                UpdateAvailability.DEVELOPER_TRIGGERED_UPDATE_IN_PROGRESS -> {
+                    return@addOnSuccessListener onStateUpdate(appUpdateInfo.installStatus(), downloadingProgress = null)
+                }
                 else -> return@addOnSuccessListener
-            }.let { store.set(it) }
+            }.let { store.set(it ?: AppUpdateState.Unknown) }
         }.addOnFailureListener {
             store.set(AppUpdateState.Unknown)
         }
@@ -100,6 +114,7 @@ class AppUpdateService(
 
     fun startUpdate(variant: UpdateType.Variant) {
         val appUpdateInfo = appUpdateInfo ?: return
+        this.appUpdateInfo = null // spent out
         val type = when (variant) {
             UpdateType.Flexible -> AppUpdateType.FLEXIBLE
             UpdateType.Immediate -> AppUpdateType.IMMEDIATE
