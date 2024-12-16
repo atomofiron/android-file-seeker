@@ -36,7 +36,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="look">Наблюдать</string>
+    <string name="open">Открыть</string>
     <string name="done">Завершено</string>
     <string name="stopped">Остановлено</string>
     <string name="options">Опции</string>
@@ -59,7 +59,7 @@
     <string name="pref_use_su">Использовать root</string>
     <string name="preferences">Настройки</string>
     <string name="pref_about">О Приложении</string>
-    <string name="look_github">Перейти к репозиторию</string>
+    <string name="look_github">GitHub репозиторий</string>
     <string name="faq_4pda">FAQ / Обсудить</string>
     <string name="test_field">Тестовое поле</string>
     <string name="try_find_this_text">Попробуйте найти этот текст</string>

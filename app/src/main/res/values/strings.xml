@@ -37,7 +37,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
-    <string name="look">Look</string>
+    <string name="open">Open</string>
     <string name="done">Done</string>
     <string name="stopped">Stopped</string>
     <string name="options">Options</string>
@@ -60,7 +60,7 @@
     <string name="pref_use_su">Use super user</string>
     <string name="preferences">Preferences</string>
     <string name="pref_about">About the App</string>
-    <string name="look_github">Look the Github repository</string>
+    <string name="look_github">GitHub repository</string>
     <string name="faq_4pda">FAQ / Discuss</string>
     <string name="test_field">Test text field</string>
     <string name="try_find_this_text">Try to find this text</string>
