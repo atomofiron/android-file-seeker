@@ -14,7 +14,6 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
 import app.atomofiron.searchboxapp.utils.Alpha
-import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.convert
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 

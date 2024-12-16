@@ -23,7 +23,11 @@ class RootAdapter(private val listener: RootClickListener) : ListAdapter<NodeRoo
         setHasStableIds(true)
     }
 
-    override fun getItemId(position: Int): Long = currentList[position].stableId.toLong()
+    private fun stableId(position: Int): Int = currentList[position].stableId
+
+    override fun getItemId(position: Int): Long = stableId(position).toLong()
+
+    override fun getItemViewType(position: Int): Int = stableId(position)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RootViewHolder {
         val inflater = LayoutInflater.from(parent.context)
