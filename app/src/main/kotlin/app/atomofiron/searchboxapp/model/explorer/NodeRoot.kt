@@ -27,19 +27,19 @@ data class NodeRoot(
     }
 
     sealed class NodeRootType {
-        open val stableId: Int = Objects.hash(this::class)
+        val stableId: Int = Objects.hash(this::class)
 
-        object Photos : NodeRootType()
-        object Videos : NodeRootType()
-        object Camera : NodeRootType()
-        object Screenshots : NodeRootType()
-        object Downloads : NodeRootType()
-        object Bluetooth : NodeRootType()
-        data class InternalStorage constructor(
+        data object Photos : NodeRootType()
+        data object Videos : NodeRootType()
+        data object Camera : NodeRootType()
+        data object Screenshots : NodeRootType()
+        data object Downloads : NodeRootType()
+        data object Bluetooth : NodeRootType()
+        data class InternalStorage(
             val used: Long = 0,
             val free: Long = 0,
         ) : NodeRootType()
-        object Favorite : NodeRootType()
+        data object Favorite : NodeRootType()
     }
 
     override fun equals(other: Any?): Boolean = when {

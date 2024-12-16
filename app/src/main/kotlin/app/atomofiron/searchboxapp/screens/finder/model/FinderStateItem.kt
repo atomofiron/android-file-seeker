@@ -44,7 +44,7 @@ sealed class FinderStateItem(val stableId: Int, val layoutId: Int) {
       val isLocal: Boolean = false,
     ) : FinderStateItem(CONFIG_ID, R.layout.item_search_options)
 
-    object ButtonsItem : FinderStateItem(BUTTONS_ID, R.layout.item_finder_buttons)
+    data object ButtonsItem : FinderStateItem(BUTTONS_ID, R.layout.item_finder_buttons)
 
     data class TestItem(
         val searchQuery: String = "",
@@ -64,5 +64,5 @@ sealed class FinderStateItem(val stableId: Int, val layoutId: Int) {
         @StringRes val titleId: Int,
     ) : FinderStateItem(titleId.hashCode(), R.layout.item_finder_tip)
 
-    object DisclaimerItem : FinderStateItem(DISCLAIMER_ID, R.layout.item_finder_disclaimer)
+    data object DisclaimerItem : FinderStateItem(DISCLAIMER_ID, R.layout.item_finder_disclaimer)
 }

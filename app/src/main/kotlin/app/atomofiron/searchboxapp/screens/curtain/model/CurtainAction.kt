@@ -4,7 +4,7 @@ import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 
 sealed class CurtainAction {
     class ShowNext(val layoutId: Int) : CurtainAction()
-    object ShowPrev : CurtainAction()
-    object Hide : CurtainAction()
+    data object ShowPrev : CurtainAction()
+    data object Hide : CurtainAction()
     class ShowSnackbar(val provider: CurtainApi.SnackbarProvider) : CurtainAction()
 }

@@ -10,8 +10,8 @@ sealed class NodeContent(
 ) {
     open val rootType: NodeRoot.NodeRootType? = null
 
-    object Unknown : NodeContent()
-    object Link : NodeContent()
+    data object Unknown : NodeContent()
+    data object Link : NodeContent()
 
     data class Directory(
         val type: Type = Type.Ordinary,
@@ -62,15 +62,15 @@ sealed class NodeContent(
             data class Rar(override val children: List<Node>? = null) : Archive("application/vnd.rar")
         }
         sealed class Text : File("text/plain") {
-            object Plain : Text()
-            object Script : Text()
+            data object Plain : Text()
+            data object Script : Text()
         }
-        object Pdf : File("application/pdf")
-        object DB : File()
-        object DataImage : File()
-        object Elf : File()
-        object Other : File()
-        object Unknown : File()
+        data object Pdf : File("application/pdf")
+        data object DB : File()
+        data object DataImage : File()
+        data object Elf : File()
+        data object Other : File()
+        data object Unknown : File()
     }
 }
 

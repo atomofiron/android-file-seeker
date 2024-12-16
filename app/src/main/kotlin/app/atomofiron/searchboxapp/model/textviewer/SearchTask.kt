@@ -6,7 +6,7 @@ import java.util.*
 
 
 sealed interface SearchState {
-    object Progress : SearchState
+    data object Progress : SearchState
     data class Ended(val isRemovable: Boolean, val isStopped: Boolean) : SearchState
 }
 

@@ -18,13 +18,13 @@ data class NodeState(
 }
 
 sealed class Operation {
-    object None : Operation()
-    object Deleting : Operation()
+    data object None : Operation()
+    data object Deleting : Operation()
     data class Copying(
         val isSource: Boolean,
         val asMoving: Boolean,
     ) : Operation()
-    object Installing : Operation()
+    data object Installing : Operation()
 }
 
 interface INodeState {
