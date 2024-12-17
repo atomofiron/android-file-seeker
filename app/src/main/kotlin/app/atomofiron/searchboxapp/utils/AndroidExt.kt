@@ -21,11 +21,9 @@ import android.util.AttributeSet
 import android.util.LayoutDirection
 import android.util.TypedValue
 import android.view.Display
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
@@ -36,7 +34,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.forEachIndexed
-import androidx.core.view.isVisible
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -204,22 +201,7 @@ private fun getStateMut(
 fun CoordinatorLayout.makeSnackbar(@StringRes message: Int, duration: Int) = makeSnackbar(resources.getText(message), duration)
 
 fun CoordinatorLayout.makeSnackbar(message: CharSequence, duration: Int): Snackbar {
-    val joystick = findJoystick()
-    return Snackbar
-        .make(this, message, duration)
-        .setAnchorView(joystick)
-}
-
-private fun View.findJoystick(): View? {
-    return when (id) {
-        R.id.activity_root -> findViewById<View>(R.id.joystick)
-            .takeIf { it.isVisible }
-            ?.takeIf {
-                val params = it.layoutParams as FrameLayout.LayoutParams
-                (params.gravity and Gravity.BOTTOM) == Gravity.BOTTOM
-            }
-        else -> (parent as View).findJoystick()
-    }
+    return Snackbar.make(this, message, duration)
 }
 
 fun View.setContentMaxWidthRes(resId: Int) = setContentMaxWidth(resources.getDimensionPixelSize(resId))
