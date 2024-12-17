@@ -85,7 +85,8 @@ class FinderModule {
 
     @Provides
     @FinderScope
-    fun viewState(scope: CoroutineScope): FinderViewState = FinderViewState(scope)
+    fun viewState(scope: CoroutineScope,
+        preferenceChannel: PreferenceChannel,): FinderViewState = FinderViewState(scope, preferenceChannel)
 }
 
 interface FinderDependencies {

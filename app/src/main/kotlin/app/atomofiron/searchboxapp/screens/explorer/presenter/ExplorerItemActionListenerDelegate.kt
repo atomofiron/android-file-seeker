@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.screens.explorer.presenter
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.File.Apk
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
@@ -15,7 +14,6 @@ class ExplorerItemActionListenerDelegate(
     private val viewState: ExplorerViewState,
     private val menuListenerDelegate: ExplorerCurtainMenuDelegate,
     private val explorerStore: ExplorerStore,
-    private val preferenceStore: PreferenceStore,
     private val router: ExplorerRouter,
     private val explorerInteractor: ExplorerInteractor,
     private val apkInteractor: ApkInteractor,

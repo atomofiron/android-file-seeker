@@ -189,6 +189,18 @@ fun Drawable.setState(enabled: Boolean? = null, checked: Boolean? = null, activa
     state = getStateMut(enabled, checked, activated).toIntArray()
 }
 
+private fun getStateMut(
+    enabled: Boolean? = null,
+    checked: Boolean? = null,
+    activated: Boolean? = null,
+): MutableList<Int> {
+    val flags = mutableListOf<Int>()
+    enabled?.let { flags.add(android.R.attr.state_enabled * it.toInt()) }
+    checked?.let { flags.add(android.R.attr.state_checked * it.toInt()) }
+    activated?.let { flags.add(android.R.attr.state_activated * it.toInt()) }
+    return flags
+}
+
 fun CoordinatorLayout.makeSnackbar(@StringRes message: Int, duration: Int) = makeSnackbar(resources.getText(message), duration)
 
 fun CoordinatorLayout.makeSnackbar(message: CharSequence, duration: Int): Snackbar {

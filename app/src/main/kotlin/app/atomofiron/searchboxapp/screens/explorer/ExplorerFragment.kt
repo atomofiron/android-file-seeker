@@ -13,15 +13,17 @@ import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.ExplorerView
+import app.atomofiron.searchboxapp.custom.LayoutDelegate
+import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.databinding.FragmentExplorerBinding
 import app.atomofiron.searchboxapp.model.explorer.NodeError
-import app.atomofiron.searchboxapp.custom.LayoutDelegate
-import app.atomofiron.searchboxapp.utils.recyclerView
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapter
 import app.atomofiron.searchboxapp.screens.main.util.KeyCodeConsumer
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.makeSnackbar
+import app.atomofiron.searchboxapp.utils.recyclerView
+import app.atomofiron.searchboxapp.utils.set
 import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.insetsPadding
 
@@ -53,6 +55,8 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
         pager.adapter = pagerAdapter
         bottomBar.isItemActiveIndicatorEnabled = false
         bottomBar.setOnItemSelectedListener(::onNavigationItemSelected)
+        bottomBar.menu.findItem(R.id.menu_settings).icon = NoticeableDrawable(requireContext(), R.drawable.ic_settings)
+        navigationRail.menu.findItem(R.id.menu_settings).icon = NoticeableDrawable(requireContext(), R.drawable.ic_settings)
         binding.navigationRail.menu.removeItem(R.id.placeholder)
         navigationRail.setOnItemSelectedListener(::onNavigationItemSelected)
         navigationRail.isItemActiveIndicatorEnabled = false
@@ -109,6 +113,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
             getCurrentTabView().scrollTo(item)
         }
         viewCollect(alerts, collector = ::showAlert)
+        viewCollect(settingsNotification, collector = ::setSettingsNotification)
         viewCollect(currentTab) {
             binding.pager.currentItem = it.index
         }
@@ -139,5 +144,10 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     private fun showAlert(error: NodeError) {
         binding.snackbarContainer.makeSnackbar(resources.getString(error), Snackbar.LENGTH_LONG).show()
+    }
+
+    private fun setSettingsNotification(value: Boolean) {
+        binding.bottomBar.menu[R.id.menu_settings] = value
+        binding.navigationRail.menu[R.id.menu_settings] = value
     }
 }

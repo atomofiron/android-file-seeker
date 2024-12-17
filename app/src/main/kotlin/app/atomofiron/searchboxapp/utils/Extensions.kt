@@ -1,9 +1,12 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.app.PendingIntent
+import android.view.Menu
+import androidx.annotation.IdRes
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 import java.io.InputStream
 import java.io.OutputStream
@@ -88,16 +91,8 @@ inline fun <E> Iterable<E>.findIndexed(predicate: (E) -> Boolean): Pair<Int, E?>
     return -1 to null
 }
 
-fun getStateMut(
-    enabled: Boolean? = null,
-    checked: Boolean? = null,
-    activated: Boolean? = null,
-): MutableList<Int> {
-    val flags = mutableListOf<Int>()
-    enabled?.let { flags.add(android.R.attr.state_enabled * it.toInt()) }
-    checked?.let { flags.add(android.R.attr.state_checked * it.toInt()) }
-    activated?.let { flags.add(android.R.attr.state_activated * it.toInt()) }
-    return flags
+operator fun Menu.set(@IdRes id: Int, value: Boolean) {
+    (findItem(id).icon as? NoticeableDrawable)?.forceShowDot(value)
 }
 
 fun Boolean.toInt(): Int = if (this) 1 else -1

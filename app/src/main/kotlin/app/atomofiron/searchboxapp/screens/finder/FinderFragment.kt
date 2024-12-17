@@ -16,11 +16,13 @@ import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.databinding.FragmentFinderBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
+import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderSpanSizeLookup
 import app.atomofiron.searchboxapp.screens.finder.history.adapter.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
 import app.atomofiron.searchboxapp.utils.makeSnackbar
+import app.atomofiron.searchboxapp.utils.set
 
 class FinderFragment : Fragment(R.layout.fragment_finder),
     BaseFragment<FinderFragment, FinderViewState, FinderPresenter> by BaseFragmentImpl()
@@ -65,6 +67,8 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         binding.navigationRail.menu.removeItem(R.id.placeholder)
         binding.navigationRail.setOnItemSelectedListener(::onNavigationItemSelected)
         binding.navigationRail.isItemActiveIndicatorEnabled = false
+        binding.bottomBar.menu.findItem(R.id.menu_settings).icon = NoticeableDrawable(requireContext(), R.drawable.ic_settings)
+        binding.navigationRail.menu.findItem(R.id.menu_settings).icon = NoticeableDrawable(requireContext(), R.drawable.ic_settings)
 
         binding.verticalDock.run {
             onGravityChangeListener = presenter::onDockGravityChange
@@ -111,6 +115,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         viewCollect(snackbar, collector = ::onShowSnackbar)
         viewCollect(showHistory) { binding.verticalDock.open() }
         viewCollect(permissionRequiredWarning, collector = ::showPermissionRequiredWarning)
+        viewCollect(settingsNotification, collector = ::setSettingsNotification)
     }
 
     override fun onApplyInsets(root: View) {
@@ -153,5 +158,10 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         binding.snackbarContainer.makeSnackbar(R.string.access_to_storage_forbidden, Snackbar.LENGTH_LONG)
             .setAction(R.string.allow) { presenter.onAllowStorageClick() }
             .show()
+    }
+
+    private fun setSettingsNotification(value: Boolean) {
+        binding.bottomBar.menu[R.id.menu_settings] = value
+        binding.navigationRail.menu[R.id.menu_settings] = value
     }
 }

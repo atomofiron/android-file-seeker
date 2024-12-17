@@ -44,7 +44,7 @@ class PreferenceStore(
     private val scope: CoroutineScope,
 ) : DataStore<Preferences> by context.dataStore {
 
-    lateinit var preferences: Preferences
+    private lateinit var preferences: Preferences
 
     init {
         scope.launch {

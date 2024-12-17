@@ -23,7 +23,6 @@ class ExplorerPresenter(
     private val preferenceStore: PreferenceStore,
     private val explorerInteractor: ExplorerInteractor,
     itemListener: ExplorerItemActionListenerDelegate,
-    private val curtainMenuDelegate: ExplorerCurtainMenuDelegate,
     mainChannel: MainChannel,
 ) : BasePresenter<ExplorerViewModel, ExplorerRouter>(scope, router),
     ExplorerView.ExplorerViewOutput,

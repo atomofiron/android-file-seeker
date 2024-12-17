@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
+import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import dagger.BindsInstance
 import dagger.Component
@@ -49,7 +50,6 @@ class ExplorerModule {
         viewState: ExplorerViewState,
         menuListenerDelegate: ExplorerCurtainMenuDelegate,
         explorerStore: ExplorerStore,
-        preferenceStore: PreferenceStore,
         router: ExplorerRouter,
         explorerInteractor: ExplorerInteractor,
         apkInteractor: ApkInteractor,
@@ -58,7 +58,6 @@ class ExplorerModule {
             viewState,
             menuListenerDelegate,
             explorerStore,
-            preferenceStore,
             router,
             explorerInteractor,
             apkInteractor,
@@ -99,7 +98,6 @@ class ExplorerModule {
             preferenceStore,
             explorerInteractor,
             itemListener,
-            curtainMenuDelegate,
             mainChannel,
         )
     }
@@ -118,8 +116,13 @@ class ExplorerModule {
 
     @Provides
     @ExplorerScope
-    fun viewState(scope: CoroutineScope, explorerStore: ExplorerStore, interactor: ExplorerInteractor): ExplorerViewState {
-        return ExplorerViewState(scope, explorerStore, interactor)
+    fun viewState(
+        scope: CoroutineScope,
+        explorerStore: ExplorerStore,
+        interactor: ExplorerInteractor,
+        preferenceChannel: PreferenceChannel,
+    ): ExplorerViewState {
+        return ExplorerViewState(scope, explorerStore, interactor, preferenceChannel)
     }
 }
 
@@ -132,4 +135,5 @@ interface ExplorerDependencies {
     fun curtainChannel(): CurtainChannel
     fun apkInteractor(): ApkInteractor
     fun mainChannel(): MainChannel
+    fun preferenceChannel(): PreferenceChannel
 }

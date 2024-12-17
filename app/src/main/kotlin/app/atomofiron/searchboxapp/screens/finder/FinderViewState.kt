@@ -5,6 +5,7 @@ import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
+import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem.ConfigItem
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class FinderViewState(
     private val scope: CoroutineScope,
+    preferenceChannel: PreferenceChannel,
 ) : FinderItemsState by FinderItemsStateDelegate(isLocal = false) {
 
     val historyDrawerGravity = MutableStateFlow(Gravity.START)
@@ -25,6 +27,7 @@ class FinderViewState(
     val history = ChannelFlow<String>()
     val showHistory = EventFlow<Unit>()
     val permissionRequiredWarning = ChannelFlow<Unit>()
+    val settingsNotification = preferenceChannel.notification
 
     fun showPermissionRequiredWarning() {
         permissionRequiredWarning(scope)

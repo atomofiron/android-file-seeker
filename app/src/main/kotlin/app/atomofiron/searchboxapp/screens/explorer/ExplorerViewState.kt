@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer
 
 import app.atomofiron.common.util.flow.*
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.*
@@ -15,6 +16,7 @@ class ExplorerViewState(
     private val scope: CoroutineScope,
     explorerStore: ExplorerStore,
     explorerInteractor: ExplorerInteractor,
+    preferenceChannel: PreferenceChannel,
 ) {
     companion object{
         private const val FIRST_TAB = "FIRST_TAB"
@@ -26,6 +28,7 @@ class ExplorerViewState(
     val manyFilesOptions = listOf(R.id.menu_remove)
 
     val scrollTo = ChannelFlow<Node>()
+    val settingsNotification = preferenceChannel.notification
     val itemComposition = DeferredStateFlow<ExplorerItemComposition>()
     val current: StateFlow<Node?> = explorerStore.current
     val alerts: Flow<NodeError> = explorerStore.alerts
