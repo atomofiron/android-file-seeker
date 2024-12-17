@@ -17,14 +17,12 @@ class MainPresenter(
     scope: CoroutineScope,
     private val viewState: MainViewState,
     router: MainRouter,
+    appEventDelegate: AppEventDelegate,
     private val windowService: WindowService,
-    appStore: AppStore,
-    private val preferenceStore: PreferenceStore,
+    preferenceStore: PreferenceStore,
     private val initialDelegate: InitialDelegate,
-    mainChannel: MainChannel,
-    updateService: AppUpdateService,
 ) : BasePresenter<MainViewModel, MainRouter>(scope, router),
-    AppEventDelegateApi by AppEventDelegate(scope, router, appStore, preferenceStore, mainChannel, updateService)
+    AppEventDelegateApi by appEventDelegate
 {
     init {
         viewState.tasks.value = Array(16) { XTask() }.toList()

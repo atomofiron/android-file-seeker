@@ -10,7 +10,7 @@ object PreferenceKeys {
     val KeyOpenedDirPath = PreferenceKey("pref_opened_dir_path", "")
     val KeyDockGravity = PreferenceKey("pref_drawer_gravity", Gravity.START)
     val KeyAppUpdateCode = PreferenceKey("pref_app_update_code", 0)
-    val KeyLastUpdateNotificationCode = PreferenceKey("pref_last_upd_notification_code", 0)
+    val KeyShownNotificationUpdateCode = PreferenceKey("pref_shown_notification_update_code", 0)
     val KeySpecialCharacters = PreferenceKey("pref_special_characters", Const.DEFAULT_SPECIAL_CHARACTERS)
     val KeyAppOrientation = PreferenceKey("pref_app_orientation", AppOrientation.UNDEFINED.ordinal.toString())
     val KeyAppTheme = PreferenceKey("pref_app_theme", AppTheme.defaultName())
@@ -31,7 +31,7 @@ object PreferenceKeys {
     const val PREF_CATEGORY_DEBUG = "pref_category_debug"
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
-        arrayOf(KeyOpenedDirPath, KeyDockGravity, KeyLastUpdateNotificationCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyExcludeDirs, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyToybox)
+        arrayOf(KeyOpenedDirPath, KeyDockGravity, KeyShownNotificationUpdateCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyExcludeDirs, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyToybox)
     }
 
     fun <T> default(key: String): T = keys.find { it.key.name == key }?.default as T

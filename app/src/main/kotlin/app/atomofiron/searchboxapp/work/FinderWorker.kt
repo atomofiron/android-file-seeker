@@ -11,6 +11,9 @@ import androidx.core.content.ContextCompat
 import androidx.work.*
 import app.atomofiron.searchboxapp.*
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.android.Notifications
+import app.atomofiron.searchboxapp.android.tryShow
+import app.atomofiron.searchboxapp.android.updateNotificationChannel
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.injectable.service.TextViewerService
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
@@ -231,7 +234,7 @@ class FinderWorker(
         }
         if (context.canForegroundService()) {
             context.updateNotificationChannel(
-                Const.FOREGROUND_NOTIFICATION_CHANNEL_ID,
+                Notifications.CHANNEL_ID_FOREGROUND,
                 context.getString(R.string.foreground_notification_name),
             )
             setForeground(getForegroundInfo())
@@ -274,7 +277,7 @@ class FinderWorker(
         return Result.success(dataBuilder.build())
     }
 
-    override suspend fun getForegroundInfo() = ForegroundInfo(Const.FOREGROUND_NOTIFICATION_ID, foregroundNotification())
+    override suspend fun getForegroundInfo() = ForegroundInfo(Notifications.ID_FOREGROUND, foregroundNotification())
 
     private fun showNotification() {
         val task = task
@@ -305,7 +308,7 @@ class FinderWorker(
         val error = task.error?.let { context.getString(R.string.search_error, it) }
         text = arrayOf(text, error).filterNotNull().joinToString(separator = ".\n")
         context.tryShow {
-            val notification = NotificationCompat.Builder(context, Const.RESULT_NOTIFICATION_CHANNEL_ID)
+            val notification = NotificationCompat.Builder(context, Notifications.CHANNEL_ID_RESULT)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setContentTitle(context.getString(titleId))
                 .setSubText(subText)
@@ -319,18 +322,18 @@ class FinderWorker(
             notification.flags = notification.flags or NotificationCompat.FLAG_AUTO_CANCEL
 
             context.updateNotificationChannel(
-                Const.RESULT_NOTIFICATION_CHANNEL_ID,
+                Notifications.CHANNEL_ID_RESULT,
                 context.getString(R.string.result_notification_name),
                 NotificationManagerCompat.IMPORTANCE_DEFAULT,
             )
-            id to notification
+            notification to id
         }
     }
 
     private fun foregroundNotification(): Notification {
         val intent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(context, Codes.Foreground, intent, UPDATING_FLAG)
-        return NotificationCompat.Builder(context, Const.FOREGROUND_NOTIFICATION_CHANNEL_ID)
+        return NotificationCompat.Builder(context, Notifications.CHANNEL_ID_FOREGROUND)
             .setDefaults(Notification.DEFAULT_ALL)
             .setContentTitle(context.getString(R.string.searching))
             .setSmallIcon(R.drawable.ic_notification)

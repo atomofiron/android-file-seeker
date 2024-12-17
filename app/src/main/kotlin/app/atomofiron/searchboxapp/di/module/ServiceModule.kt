@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
+import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import dagger.Module
 import dagger.Provides
 import app.atomofiron.searchboxapp.injectable.service.*
@@ -74,8 +75,8 @@ open class ServiceModule {
     @Singleton
     fun textAppUpdateService(
         context: Context,
-        appStore: AppStore,
         updateStore: AppUpdateStore,
         preferences: PreferenceStore,
-    ): AppUpdateService = AppUpdateService(context, appStore.resourcesProperty, updateStore, preferences)
+        preferenceChannel: PreferenceChannel,
+    ): AppUpdateService = AppUpdateService(context, updateStore, preferences, preferenceChannel)
 }

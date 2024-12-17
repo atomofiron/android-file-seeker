@@ -264,22 +264,6 @@ fun RecyclerView.scrollToTop() {
     }
 }
 
-@SuppressLint("WrongConstant")
-fun Context.updateNotificationChannel(
-    id: String,
-    name: String,
-    importance: Int = NotificationManagerCompat.IMPORTANCE_DEFAULT,
-) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val manager = NotificationManagerCompat.from(this)
-        var channel = manager.getNotificationChannel(id)
-        if (channel == null || channel.name != name) {
-            channel = NotificationChannel(id, name, importance)
-            manager.createNotificationChannel(channel)
-        }
-    }
-}
-
 val ViewPager2.recyclerView: RecyclerView get() = getChildAt(0) as RecyclerView
 
 inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String, clazz: Class<T>): T? = when {
@@ -301,16 +285,6 @@ inline fun Context.ifCanNotice(action: () -> Unit): Boolean {
 }
 
 typealias IdNotification = Pair<Int, Notification>
-
-inline fun Context.tryShow(action: NotificationManagerCompat.() -> IdNotification): Boolean {
-    if (SDK_INT < TIRAMISU || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
-        val manager = NotificationManagerCompat.from(this)
-        val (id, notification) = manager.action()
-        manager.notify(id, notification)
-        return true
-    }
-    return false
-}
 
 fun Context.canForegroundService(): Boolean {
     return SDK_INT < P || checkSelfPermission(android.Manifest.permission.FOREGROUND_SERVICE) == PERMISSION_GRANTED

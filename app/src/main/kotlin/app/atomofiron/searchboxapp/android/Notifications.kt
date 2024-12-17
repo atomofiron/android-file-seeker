@@ -1,50 +1,81 @@
 package app.atomofiron.searchboxapp.android
 
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.app.Notification
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.content.Context
+import android.content.pm.PackageManager.PERMISSION_GRANTED
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.app.NotificationManagerCompat.IMPORTANCE_HIGH
-import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.common.util.Android
+import app.atomofiron.common.util.materialColor
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.model.other.UpdateNotification
+import app.atomofiron.searchboxapp.utils.Codes
+import app.atomofiron.searchboxapp.utils.immutable
+import app.atomofiron.searchboxapp.utils.updateIntent
 
 object Notifications {
-    const val NOTIFICATION_CHANNEL_ID_UPDATE = "channel_update"
-    const val NOTIFICATION_ID_UPDATE = 9485
+    const val CHANNEL_ID_UPDATE = "update_channel_id"
+    const val CHANNEL_ID_FOREGROUND = "foreground_channel_id"
+    const val CHANNEL_ID_RESULT = "result_channel_id"
 
-    fun cancel(context: Context, id: Int) = NotificationManagerCompat.from(context).cancel(id)
+    const val ID_FOREGROUND = 101
+    const val ID_UPDATE = 102
+}
 
+fun Context.dismiss(notificationId: Int) = NotificationManagerCompat.from(this).cancel(notificationId)
 
-    fun createUpdateChannel(context: Context) = createChannel(context, NOTIFICATION_CHANNEL_ID_UPDATE, R.string.channel_name_updates)
+fun Context.dismissUpdateNotification() = dismiss(Notifications.ID_UPDATE)
 
-    fun update(context: Context, action: String, titleId: Int, actionId: Int) {
-        createUpdateChannel(context)
-        val notificationManager = NotificationManagerCompat.from(context)
-        val intent = Intents.mainActivity(context, action)
-        val notificationIntent = PendingIntent.getActivity(context, Intents.REQUEST_UPDATE, intent, FLAG_UPDATE_CURRENT)
-        val actionIntent = PendingIntent.getActivity(context, Intents.REQUEST_UPDATE, intent, FLAG_UPDATE_CURRENT)
-        val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID_UPDATE)
-            .setTicker(context.getString(titleId))
-            .setContentTitle(context.getString(titleId))
-            .setSmallIcon(R.drawable.ic_explorer_folder)
-            .setContentIntent(notificationIntent)
-            .addAction(0, context.getString(actionId), actionIntent)
-            .setColor(context.findColorByAttr(MaterialAttr.colorPrimary))
-            .build()
-        notificationManager.notify(NOTIFICATION_ID_UPDATE, notification)
+fun Context.showUpdateNotification(type: UpdateNotification) = tryShow { context ->
+    if (Android.O) {
+        updateNotificationChannel(
+            Notifications.CHANNEL_ID_UPDATE,
+            resources.getString(R.string.channel_name_updates),
+            NotificationManager.IMPORTANCE_HIGH,
+        )
     }
+    val title = when (type) {
+        is UpdateNotification.Available -> R.string.update_available
+        is UpdateNotification.Install -> R.string.update_ready
+    }.let { resources.getString(it) }
+    NotificationCompat.Builder(context, Notifications.CHANNEL_ID_UPDATE)
+        .setTicker(title)
+        .setContentTitle(title)
+        .setSmallIcon(R.drawable.ic_notification_update)
+        .setContentIntent(PendingIntent.getActivity(context, Codes.UpdateApp, updateIntent(), FLAG_UPDATE_CURRENT.immutable()))
+        .setColor(materialColor(MaterialAttr.colorPrimary))
+        .build() to Notifications.ID_UPDATE
+}
 
-    private fun createChannel(context: Context, id: String, nameId: Int) {
-        val notificationManager = NotificationManagerCompat.from(context)
-        var channel = notificationManager.getNotificationChannelCompat(id)
-        if (channel == null) {
-            channel = NotificationChannelCompat.Builder(id, IMPORTANCE_HIGH)
-                .setName(context.getString(nameId))
-                .build()
-            notificationManager.createNotificationChannel(channel)
+fun Context.updateNotificationChannel(
+    id: String,
+    name: String,
+    importance: Int = NotificationManagerCompat.IMPORTANCE_DEFAULT,
+) {
+    if (Android.O) {
+        val manager = NotificationManagerCompat.from(this)
+        var channel = manager.getNotificationChannelCompat(id)
+        if (channel == null || channel.name != name) {
+            channel = NotificationChannelCompat.Builder(id, importance).setName(name).build()
+            manager.createNotificationChannel(channel)
         }
     }
+}
+
+private typealias NotificationId = Pair<Notification, Int>
+
+inline fun Context.tryShow(action: NotificationManagerCompat.(Context) -> NotificationId): Boolean {
+    if (Android.Below.R || checkSelfPermission(POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
+        val manager = NotificationManagerCompat.from(this)
+        val (notification, id) = manager.action(this)
+        manager.notify(id, notification)
+        return true
+    }
+    return false
 }

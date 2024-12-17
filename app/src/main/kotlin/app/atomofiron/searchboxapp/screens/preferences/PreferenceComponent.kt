@@ -127,7 +127,8 @@ class PreferenceModule {
         updateStore: AppUpdateStore,
         preferenceStore: PreferenceStore,
         appWatcher: LeakWatcher,
-    ): PreferenceViewState = PreferenceViewState(scope, preferenceDataStore, preferenceStore, updateStore, appWatcher)
+        preferenceChannel: PreferenceChannel,
+    ): PreferenceViewState = PreferenceViewState(scope, preferenceDataStore, preferenceStore, preferenceChannel, updateStore, appWatcher)
 
     @Provides
     @PreferenceScope

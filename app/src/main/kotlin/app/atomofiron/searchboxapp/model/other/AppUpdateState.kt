@@ -11,7 +11,7 @@ sealed interface UpdateType {
 sealed interface AppUpdateState {
     data object Unknown : AppUpdateState
     data object UpToDate : AppUpdateState
-    data class Available(val type: UpdateType) : AppUpdateState
+    data class Available(val type: UpdateType, val code: Int) : AppUpdateState
     data class Downloading(val progress: Float?) : AppUpdateState
     data object Installing : AppUpdateState
     data object Completable : AppUpdateState

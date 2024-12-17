@@ -33,12 +33,6 @@ object Const {
     const val VALUE_TOYBOX_CUSTOM = "toybox_custom"
     const val VALUE_TOYBOX_IMPORTED = "toybox_imported"
 
-    const val NOTIFICATION_CHANNEL_UPDATE_ID = "channel_update"
-    const val FOREGROUND_NOTIFICATION_CHANNEL_ID = "foreground_channel_id"
-    const val RESULT_NOTIFICATION_CHANNEL_ID = "result_channel_id"
-    const val FOREGROUND_NOTIFICATION_ID = 101
-    const val NOTIFICATION_ID_UPDATE = 9485
-
     const val DATE_PATTERN = "yyyy-MM-DD_HH-mm-ss"
     const val MIME_TYPE_TEXT = "text/plain"
     const val GITHUB_URL = "https://github.com/Atomofiron/android-search-box-app"

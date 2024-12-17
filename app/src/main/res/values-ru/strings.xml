@@ -128,7 +128,6 @@
     <string name="edit">Редактировать</string>
     <string name="save">Сохранить</string>
     <string name="update_available">Доступно обновление</string>
-    <string name="check_updates">Проверить обновления</string>
     <string name="update_choice">Желаете загрезить обновление в фоне или прямо сейчас?</string>
     <string name="update_in_background">В фоне</string>
     <string name="update_now">Сейчас</string>

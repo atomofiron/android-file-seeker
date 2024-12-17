@@ -3,20 +3,23 @@ package app.atomofiron.searchboxapp.screens.main.presenter
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.NotificationManagerCompat
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
+import app.atomofiron.searchboxapp.android.dismissUpdateNotification
+import app.atomofiron.searchboxapp.android.showUpdateNotification
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.other.AppUpdateState
+import app.atomofiron.searchboxapp.model.other.UpdateNotification
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.main.MainRouter
-import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.Intents
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
 
 interface AppEventDelegateApi {
     fun onActivityCreate(activity: AppCompatActivity)
@@ -30,16 +33,18 @@ class AppEventDelegate(
     private val scope: CoroutineScope,
     private val router: MainRouter,
     private val appStore: AppStore,
-    preferenceStore: PreferenceStore,
+    private val preferences: PreferenceStore,
+    updateStore: AppUpdateStore,
     private val mainChannel: MainChannel,
     private val updateService: AppUpdateService,
 ) : AppEventDelegateApi {
 
-    private val notificationManager = NotificationManagerCompat.from(appStore.context)
+    private val context = appStore.context
     private var currentTheme: AppTheme? = null
 
     init {
-        preferenceStore.appTheme.collect(scope, ::onThemeApplied)
+        preferences.appTheme.collect(scope, ::onThemeApplied)
+        updateStore.state.collect(scope, ::onUpdateState)
     }
 
     override fun onActivityCreate(activity: AppCompatActivity) {
@@ -60,7 +65,7 @@ class AppEventDelegate(
                 mainChannel.fileToReceive[scope] = uri
             }
             Intents.ACTION_UPDATE -> {
-                notificationManager.cancel(Const.NOTIFICATION_ID_UPDATE)
+                context.dismissUpdateNotification()
                 router.showSettings()
             }
         }
@@ -77,5 +82,18 @@ class AppEventDelegate(
             router.recreateActivity()
         }
         currentTheme = theme
+    }
+
+    private fun onUpdateState(state: AppUpdateState) {
+        when (state) {
+            is AppUpdateState.Available -> {
+                val shownCode = preferences.shownNotificationUpdateCode.value
+                if (state.code <= shownCode) return
+                val shown = context.showUpdateNotification(UpdateNotification.Available)
+                if (shown) preferences { setShownNotificationUpdateCode(state.code) }
+            }
+            is AppUpdateState.Completable -> context.showUpdateNotification(UpdateNotification.Install)
+            else -> context.dismissUpdateNotification()
+        }
     }
 }

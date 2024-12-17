@@ -100,7 +100,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
     }
 
     override fun PreferenceViewState.onViewCollect() {
-        viewCollect(alert, collector = ::onAlert)
+        viewCollect(alerts, collector = ::onAlert)
         viewCollect(alertOutputSuccess, collector = ::showOutputSuccess)
         viewCollect(alertOutputError, collector = ::showOutputError)
     }

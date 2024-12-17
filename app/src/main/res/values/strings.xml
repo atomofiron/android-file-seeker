@@ -137,7 +137,6 @@
     <string name="save">Save</string>
     <string name="update_available">Update is available</string>
     <string name="failed_check_updates">Failed to check for updates</string>
-    <string name="check_updates">Check updates</string>
     <string name="update_loading">Update is loading now</string>
     <string name="update_installing">Update is installing now</string>
     <string name="is_up_to_date">App is up to date</string>

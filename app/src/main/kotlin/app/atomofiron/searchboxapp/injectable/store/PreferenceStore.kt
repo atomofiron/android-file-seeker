@@ -24,7 +24,7 @@ import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyOpenedDir
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeySpecialCharacters
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyToybox
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyUseSu
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyLastUpdateNotificationCode
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyShownNotificationUpdateCode
 import app.atomofiron.searchboxapp.utils.prederences.get
 import app.atomofiron.searchboxapp.utils.prederences.remove
 import app.atomofiron.searchboxapp.utils.prederences.set
@@ -109,10 +109,10 @@ class PreferenceStore(
         edit { it[KeyAppUpdateCode] = value }
     }
 
-    val lastUpdateNotificationCode = getFlow(KeyLastUpdateNotificationCode)
+    val shownNotificationUpdateCode = getFlow(KeyShownNotificationUpdateCode)
 
-    suspend fun setLastUpdateNotificationCode(value: Int) {
-        edit { it[KeyLastUpdateNotificationCode] = value }
+    suspend fun setShownNotificationUpdateCode(value: Int) {
+        edit { it[KeyShownNotificationUpdateCode] = value }
     }
 
     val maxDepthForSearch = getFlow(KeyMaxDepth)

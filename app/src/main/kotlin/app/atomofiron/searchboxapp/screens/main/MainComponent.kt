@@ -7,11 +7,13 @@ import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.service.WindowService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegate
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
@@ -45,14 +47,26 @@ class MainModule {
         scope: CoroutineScope,
         viewState: MainViewState,
         router: MainRouter,
+        appEventDelegate: AppEventDelegate,
         windowService: WindowService,
+        preferenceStore: PreferenceStore,
+        initialDelegate: InitialDelegate,
+    ): MainPresenter {
+        return MainPresenter(scope, viewState, router, appEventDelegate, windowService, preferenceStore, initialDelegate)
+    }
+
+    @Provides
+    @MainScope
+    fun appEventDelegate(
+        scope: CoroutineScope,
+        router: MainRouter,
         appStore: AppStore,
         preferenceStore: PreferenceStore,
+        updateStore: AppUpdateStore,
         mainChannel: MainChannel,
-        initialDelegate: InitialDelegate,
         updateService: AppUpdateService,
-    ): MainPresenter {
-        return MainPresenter(scope, viewState, router, windowService, appStore, preferenceStore, initialDelegate, mainChannel, updateService)
+    ): AppEventDelegate {
+        return AppEventDelegate(scope, router, appStore, preferenceStore, updateStore, mainChannel, updateService)
     }
 
     @Provides
@@ -75,4 +89,5 @@ interface MainDependencies {
     fun mainChannel(): MainChannel
     fun initialDelegate(): InitialDelegate
     fun appUpdateService(): AppUpdateService
+    fun appUpdateStore(): AppUpdateStore
 }
