@@ -87,7 +87,6 @@ class ExplorerModule {
         preferenceStore: PreferenceStore,
         explorerInteractor: ExplorerInteractor,
         itemListener: ExplorerItemActionListenerDelegate,
-        curtainMenuDelegate: ExplorerCurtainMenuDelegate,
         mainChannel: MainChannel,
     ): ExplorerPresenter {
         return ExplorerPresenter(

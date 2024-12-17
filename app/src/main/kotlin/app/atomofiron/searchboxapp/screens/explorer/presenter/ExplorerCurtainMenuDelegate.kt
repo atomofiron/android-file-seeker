@@ -20,7 +20,7 @@ import app.atomofiron.searchboxapp.utils.showCurtain
 import kotlinx.coroutines.CoroutineScope
 
 class ExplorerCurtainMenuDelegate(
-    private val scope: CoroutineScope,
+    scope: CoroutineScope,
     private val viewState: ExplorerViewState,
     private val router: ExplorerRouter,
     private val explorerStore: ExplorerStore,
