@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
-import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
@@ -15,6 +14,7 @@ import app.atomofiron.searchboxapp.model.other.AppUpdateAction
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
 import app.atomofiron.searchboxapp.model.other.UpdateType
 import app.atomofiron.searchboxapp.utils.getAttr
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.CircularProgressIndicator
 
 private const val MAX = 100
@@ -130,7 +130,7 @@ class AppUpdatePreference @JvmOverloads constructor(
     }
 
     private fun showChoice() {
-        AlertDialog.Builder(context)
+        MaterialAlertDialogBuilder(context)
             .setCancelable(false)
             .setTitle(R.string.update_choice)
             .setPositiveButton(R.string.update_now) { _, _ ->

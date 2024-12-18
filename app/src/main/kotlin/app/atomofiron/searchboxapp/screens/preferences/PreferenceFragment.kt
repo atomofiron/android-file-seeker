@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import androidx.appcompat.app.AlertDialog
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
@@ -26,10 +25,11 @@ import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.databinding.FragmentPreferenceBinding
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.makeSnackbar
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.insetsPadding
 
@@ -130,8 +130,10 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         binding.snackbarContainer.makeSnackbar(R.string.error, Snackbar.LENGTH_SHORT).apply {
             if (output.error.isNotEmpty()) {
                 setAction(R.string.more) {
-                    AlertDialog.Builder(context)
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle(R.string.error)
                         .setMessage(output.error)
+                        .setPositiveButton(R.string.ok) { _, _ -> }
                         .show()
                 }
             }

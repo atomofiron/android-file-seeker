@@ -15,6 +15,7 @@
     <string name="error">Error</string>
     <string name="nothing">Nothing found</string>
     <string name="warning">You have not selected any directory. The search will be made around the root section</string>
+    <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="stop">Stop</string>
     <string name="no_activity">You have no application able to open a file of this type</string>

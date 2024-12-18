@@ -14,6 +14,7 @@
     <string name="error">Ошибка</string>
     <string name="nothing">Ничего не найдено</string>
     <string name="warning">Вы не выбрали ни одной директории. Поиск будет произведён по всему корневому разделу</string>
+    <string name="ok">ОК</string>
     <string name="cancel">Отмена</string>
     <string name="stop">Остановить</string>
     <string name="no_activity">У вас нет приложения, способного открыть файл этого типа</string>
