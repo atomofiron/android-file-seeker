@@ -6,6 +6,7 @@ import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
+import app.atomofiron.searchboxapp.utils.Const
 
 class ExplorerHolder(itemView: View) : GeneralHolder<Node>(itemView),
     ExplorerItemBinder by ExplorerItemBinderImpl(itemView) {
@@ -22,6 +23,6 @@ class ExplorerHolder(itemView: View) : GeneralHolder<Node>(itemView),
         background.state = pressedState
         itemView.postDelayed({
             background.state = normalState
-        }, 250)
+        }, Const.COMMON_DELAY)
     }
 }

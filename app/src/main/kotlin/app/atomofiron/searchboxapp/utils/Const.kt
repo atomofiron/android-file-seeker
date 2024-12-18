@@ -25,7 +25,6 @@ object Const {
     const val UNDEFINEDL = -1L
     const val COMMON_DURATION = 512L
     const val COMMON_DELAY = 256L
-    const val CONFIRM_DELAY = 2000L
 
     const val VALUE_TOYBOX_ARM_32 = "toybox_arm_32"
     const val VALUE_TOYBOX_ARM_64 = "toybox_arm_64"
@@ -46,6 +45,5 @@ object Const {
     const val TEXT_FILE_PAGINATION_STEP = 128
     const val TEXT_FILE_PAGINATION_STEP_OFFSET = 16
 
-    const val ERROR_UPDATE_AVAILABILITY = "Update is unavailable."
-    const val ERROR_CHECK_UPDATE = "Failed to check updates."
+    const val PLACEHOLDER = "{}"
 }
