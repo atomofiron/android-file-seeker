@@ -6,7 +6,7 @@ import android.graphics.RadialGradient
 import android.graphics.Shader
 import androidx.core.graphics.ColorUtils
 
-class Circles(private val colorr: Int) {
+class DangerousCircles(private val colorr: Int) {
     private val paint = Paint().apply {
         isAntiAlias = true
         style = Paint.Style.FILL

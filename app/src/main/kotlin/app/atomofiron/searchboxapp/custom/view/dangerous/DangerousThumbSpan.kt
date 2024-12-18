@@ -9,7 +9,7 @@ import android.text.style.UpdateAppearance
 import android.widget.TextView
 import app.atomofiron.searchboxapp.utils.isRtl
 
-class ThumbSpan(
+class DangerousThumbSpan(
     private val view: TextView,
     colorStart: Int,
     colorEnd: Int,

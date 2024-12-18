@@ -9,7 +9,7 @@ import android.text.style.UpdateAppearance
 import android.widget.TextView
 import app.atomofiron.searchboxapp.utils.isRtl
 
-class TipSpan(private val view: TextView) : CharacterStyle(), UpdateAppearance {
+class DangerousTipSpan(private val view: TextView) : CharacterStyle(), UpdateAppearance {
 
     private val isRtl = view.isRtl()
     private val colors = IntArray(3)

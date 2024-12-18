@@ -49,9 +49,9 @@ class DangerousSliderView @JvmOverloads constructor(
     private val thumb = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, thumbColor.let { intArrayOf(it, it) })
     private val button = MaterialTextView(context)
     private val tip = MaterialTextView(context)
-    private val thumbSpan = ThumbSpan(button, thumbColor, textColor)
-    private val tipSpan = TipSpan(tip)
-    private val arrows = Arrows(thumbColor, strokeWidth.toFloat())
+    private val thumbSpan = DangerousThumbSpan(button, thumbColor, textColor)
+    private val tipSpan = DangerousTipSpan(tip)
+    private val arrows = DangerousArrows(thumbColor, strokeWidth.toFloat())
     private var border = GradientDrawable()
 
     private val isRtl = isRtl()

@@ -10,7 +10,7 @@ import kotlin.math.sqrt
 
 private const val Quarter = (Math.PI / 2).toFloat()
 
-class Arrows(private val color: Int, arrowThickness: Float) {
+class DangerousArrows(private val color: Int, arrowThickness: Float) {
 
     private val pts = FloatArray(8)
     private val paint = Paint().apply {
