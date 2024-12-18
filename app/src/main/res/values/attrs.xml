@@ -10,7 +10,7 @@
     <attr name="colorOverlay" format="color" />
     <attr name="topRadioGroupBackground" format="color" />
 
-    <declare-styleable name="VerticalDockView">
+    <declare-styleable name="DrawerView">
         <attr name="title" format="string" />
     </declare-styleable>
 

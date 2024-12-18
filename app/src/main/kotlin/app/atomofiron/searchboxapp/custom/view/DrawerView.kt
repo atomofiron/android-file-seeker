@@ -45,8 +45,8 @@ class DrawerView @JvmOverloads constructor(
             onGravityChangeListener?.invoke(gravity)
         }
         val tvTitle = findViewById<TextView>(R.id.drawer_title)
-        val styled = context.obtainStyledAttributes(attrs, R.styleable.VerticalDockView, defStyleAttr, 0)
-        tvTitle.text = styled.getString(R.styleable.VerticalDockView_title)
+        val styled = context.obtainStyledAttributes(attrs, R.styleable.DrawerView, defStyleAttr, 0)
+        tvTitle.text = styled.getString(R.styleable.DrawerView_title)
         styled.recycle()
 
         binding.drawerTitleContainer.run {
