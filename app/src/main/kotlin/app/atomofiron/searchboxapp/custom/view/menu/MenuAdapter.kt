@@ -2,14 +2,11 @@ package app.atomofiron.searchboxapp.custom.view.menu
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.graphics.BlendModeColorFilterCompat
-import androidx.core.graphics.BlendModeCompat
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.util.findColorByAttr
-import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.R
+
+private const val TYPE_NORMAL = 1
+private const val TYPE_DANGEROUS = 2
 
 @SuppressLint("RestrictedApi")
 class MenuAdapter(context: Context) : RecyclerView.Adapter<MenuHolder>() {
@@ -19,45 +16,38 @@ class MenuAdapter(context: Context) : RecyclerView.Adapter<MenuHolder>() {
     private var dangerousItemId = 0
 
     init {
-        menu.setMenuChangedListener(::onMenuChanged)
+        setHasStableIds(true)
+        menu.setMenuChangedListener(::notifyDataSetChanged)
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        recyclerView.requestDisallowInterceptTouchEvent(true)
+    }
+
+    override fun getItemId(position: Int): Long = menu.getItem(position).itemId.toLong()
+
+    override fun getItemViewType(position: Int): Int = when (dangerousItemId) {
+        menu.getItem(position).itemId -> TYPE_DANGEROUS
+        else -> TYPE_NORMAL
     }
 
     fun markAsDangerous(itemId: Int) {
         dangerousItemId = itemId
-    }
-
-    private fun onMenuChanged() {
-        notifyDataSetChanged()
+        val index = menu.findItemIndex(itemId)
+        notifyItemChanged(index)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuHolder {
-        val inflater = LayoutInflater.from(parent.context)
-        val view = inflater.inflate(R.layout.item_curtain_menu, parent, false)
-        view.background.mutate()
-        return MenuHolder(view, menuListener)
+        return when (viewType) {
+            TYPE_DANGEROUS -> DangerousMenuItemHolder(parent, menuListener)
+            else -> MenuItemHolder(parent, menuListener)
+        }
     }
 
     override fun getItemCount(): Int = menu.size()
 
     override fun onBindViewHolder(holder: MenuHolder, position: Int) {
-        val item = menu.getItem(position)
-        holder.bind(item)
-        val backgroundId = when (item.itemId) {
-            dangerousItemId -> R.drawable.item_menu_dangerous
-            else -> R.drawable.item_menu
-        }
-        holder.itemView.setBackgroundResource(backgroundId)
-        val context = holder.itemView.context
-        when (item.itemId) {
-            dangerousItemId -> {
-                val color = context.findColorByAttr(MaterialAttr.colorError)
-                holder.icon.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(color, BlendModeCompat.SRC_IN)
-                holder.title.setTextColor(color)
-            }
-            else -> {
-                holder.icon.colorFilter = null
-                holder.title.setTextColor(context.findColorByAttr(R.attr.colorContent))
-            }
-        }
+        holder.bind(menu.getItem(position))
     }
 }

@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.annotation.SuppressLint
-import android.app.Notification
 import android.app.NotificationChannel
 import android.content.Context
 import android.content.Intent
@@ -23,6 +22,7 @@ import android.util.TypedValue
 import android.view.Display
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewParent
 import android.view.WindowManager
 import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
@@ -33,6 +33,7 @@ import androidx.annotation.StyleableRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.ScrollingView
 import androidx.core.view.forEachIndexed
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.GridLayoutManager
@@ -278,8 +279,6 @@ inline fun Context.ifCanNotice(action: () -> Unit): Boolean {
     return canNotice().also { if (it) action() }
 }
 
-typealias IdNotification = Pair<Int, Notification>
-
 fun Context.canForegroundService(): Boolean {
     return SDK_INT < P || checkSelfPermission(android.Manifest.permission.FOREGROUND_SERVICE) == PERMISSION_GRANTED
 }
@@ -287,4 +286,16 @@ fun Context.canForegroundService(): Boolean {
 fun Context.getDisplayCompat(): Display? = when {
     Android.R -> display
     else -> (getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
+}
+
+// it was sweaty...
+fun ViewParent.disallowInterceptTouches() {
+    when (this) {
+        // NestedScrollView, RecyclerView...
+        is ScrollingView -> requestDisallowInterceptTouchEvent(true)
+        else -> parent?.disallowInterceptTouches()
+    }
+    // предотвращает перехват вертикального скроллинга при горизонтальном слайдинге,
+    // но из-за этого временно ломается или скроллинг в MenuView или в NestedScrollView,
+    // или в BottomSheetBehavior выше, но только при касании layout/item_explorer.xml
 }

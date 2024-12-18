@@ -6,6 +6,8 @@ object Alpha {
     const val Half = 0.5f
     const val Visible = 1f
 
+    const val Level5 = 12
+    const val Level10 = 25
     const val Level12 = 31
     const val Level30 = 80
     const val Level50 = 128
@@ -13,11 +15,11 @@ object Alpha {
     const val Level80 = 200
     const val Level90 = 225
 
-    const val RippleInt = 128
-
     const val InvisibleInt = 0
-    const val HalfInt = 128
-    const val VisibleInt = 255
+    const val HalfInt = 0x80
+    const val VisibleInt = 0xff
+
+    const val RippleInt = HalfInt
 
     fun visible(value: Boolean) = if (value) Visible else Invisible
     fun enabled(value: Boolean) = if (value) Visible else Half
