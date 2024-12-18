@@ -5,6 +5,7 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -277,7 +278,9 @@ class FinderWorker(
         return Result.success(dataBuilder.build())
     }
 
-    override suspend fun getForegroundInfo() = ForegroundInfo(Notifications.ID_FOREGROUND, foregroundNotification())
+    override suspend fun getForegroundInfo(): ForegroundInfo {
+        return ForegroundInfo(Notifications.ID_FOREGROUND, foregroundNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+    }
 
     private fun showNotification() {
         val task = task
