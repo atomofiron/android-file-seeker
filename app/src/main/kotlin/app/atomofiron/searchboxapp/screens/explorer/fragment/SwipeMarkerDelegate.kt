@@ -7,11 +7,13 @@ import android.view.View
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.utils.isRtl
 import kotlin.math.abs
 import kotlin.math.sign
 
 class SwipeMarkerDelegate(resources: Resources) : RecyclerView.OnItemTouchListener {
 
+    private val isRtl = resources.isRtl()
     private val allowedAria = resources.getDimensionPixelSize(R.dimen.edge_size)
     private var prevIndex = -1
     private var downChild: View? = null
@@ -31,8 +33,11 @@ class SwipeMarkerDelegate(resources: Resources) : RecyclerView.OnItemTouchListen
             }
             downChild = child
             prevIndex = downChild?.let { rv.getChildViewHolder(it).layoutPosition } ?: -1
-            val end = rv.width - rv.paddingEnd
-            allowed = e.x.toInt() in (end - allowedAria)..end
+            val area = when {
+                isRtl -> rv.paddingLeft.let { it..(it + allowedAria) }
+                else -> (rv.width - rv.paddingRight).let { (it - allowedAria)..it }
+            }
+            allowed = e.x.toInt() in area
             makeChecked = null
         }
         return allowed
