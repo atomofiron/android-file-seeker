@@ -33,7 +33,7 @@ class RootItemMarginDecorator(resources: Resources) : RecyclerView.ItemDecoratio
         var position = parent.getChildLayoutPosition(view)
         position %= spanCount
         if (parent.isRtl()) {
-            position = spanCount - position
+            position = spanCount.dec() - position
         }
         val index = position * 2
         outRect.left = margins[index]
