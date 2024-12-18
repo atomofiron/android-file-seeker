@@ -24,7 +24,6 @@ import androidx.core.graphics.ColorUtils
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.MaterialDimen
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
 import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.toIntAlpha
@@ -63,7 +62,7 @@ class DangerousSliderView @JvmOverloads constructor(
         get() = button.translationX * direction
         set(value) { button.translationX = value * direction }
     private val maxOffset get() = (width - button.width).toFloat()
-    private val progress get() = offset / maxOffset
+    private val progress get() = if (maxOffset == 0f) 0f else offset / maxOffset
     private var hapticAllowed = false
     var listener: (() -> Boolean)? = null
 
@@ -199,7 +198,6 @@ class DangerousSliderView @JvmOverloads constructor(
         thumbSpan.progress = progress
         tip.translationX = tipOffset
         val alpha = progress.toIntAlpha()
-        button.setTextColor(if (alpha > Alpha.HalfInt) textColor else thumbColor)
         var thumbColor = ColorUtils.setAlphaComponent(thumbColor, alpha)
         thumbColor = ColorUtils.compositeColors(thumbColor, trackColor)
         thumb.setColor(thumbColor)

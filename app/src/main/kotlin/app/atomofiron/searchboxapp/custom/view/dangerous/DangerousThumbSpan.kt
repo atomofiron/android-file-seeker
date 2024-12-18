@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.custom.view.dangerous
 
 import android.graphics.LinearGradient
-import android.graphics.Paint
 import android.graphics.Shader
 import android.text.TextPaint
 import android.text.style.CharacterStyle
@@ -21,7 +20,7 @@ class DangerousThumbSpan(
     var progress = 0f
         set(value) {
             field = value
-            view.invalidate()
+            //view.invalidate()
         }
 
     private var loop = false
@@ -37,7 +36,6 @@ class DangerousThumbSpan(
         val end = -start
         val offset = start + (end - start) * progress
 
-        paint.style = Paint.Style.FILL
         paint.shader = LinearGradient(offset, 0f, offset + width, 0f, colors, stops, Shader.TileMode.CLAMP)
     }
 }

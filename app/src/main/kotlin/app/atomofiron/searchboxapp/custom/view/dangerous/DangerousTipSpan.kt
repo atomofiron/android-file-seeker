@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.custom.view.dangerous
 
 import android.graphics.LinearGradient
-import android.graphics.Paint
 import android.graphics.Shader
 import android.text.TextPaint
 import android.text.style.CharacterStyle
@@ -33,7 +32,6 @@ class DangerousTipSpan(private val view: TextView) : CharacterStyle(), UpdateApp
         right += offset
         colors[1] = paint.color
 
-        paint.style = Paint.Style.FILL
         paint.shader = LinearGradient(left, 0f, right, 0f, colors, stops, Shader.TileMode.CLAMP)
     }
 }
