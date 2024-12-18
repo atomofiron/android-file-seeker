@@ -23,9 +23,9 @@ class ExplorerViewState(
         private const val SECOND_TAB = "SECOND_TAB"
     }
     val rootOptions = listOf(R.id.menu_create)
-    val directoryOptions = listOf(R.id.menu_remove, R.id.menu_rename, R.id.menu_create)
-    val oneFileOptions = listOf(R.id.menu_remove, R.id.menu_rename, R.id.menu_share, R.id.menu_open_with)
-    val manyFilesOptions = listOf(R.id.menu_remove)
+    val directoryOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_create)
+    val oneFileOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_share, R.id.menu_open_with)
+    val manyFilesOptions = listOf(R.id.menu_delete)
 
     val scrollTo = ChannelFlow<Node>()
     val settingsNotification = preferenceChannel.notification

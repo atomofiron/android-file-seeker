@@ -74,6 +74,7 @@
     <string name="exit">Выйти</string>
     <string name="click_back_to_exit">Нажмите Назад, чтобы закрыть приложение</string>
     <string name="remove">Удалить</string>
+    <string name="delete">Удалить</string>
     <string name="rename">Переименовать</string>
     <string name="open_with">Открыть в другом приложении</string>
     <string name="no_such_file">Файла не существует</string>

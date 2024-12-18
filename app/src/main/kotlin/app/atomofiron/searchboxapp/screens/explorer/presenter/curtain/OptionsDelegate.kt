@@ -24,7 +24,7 @@ class OptionsDelegate(
             val menu = inflateMenu(menuId)
             menu.hideExtra(options.ids)
             setMenuListener(output)
-            markAsDangerous(R.id.menu_remove)
+            markAsDangerous(R.id.menu_delete)
         }
         binding.init(options)
         binding.root.insetsPadding(ExtType.curtain, top = true)

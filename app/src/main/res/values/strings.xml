@@ -75,6 +75,7 @@
     <string name="exit">Exit</string>
     <string name="click_back_to_exit">Click Back to close the App</string>
     <string name="remove">Remove</string>
+    <string name="delete">Delete</string>
     <string name="rename">Rename</string>
     <string name="open_with">Open with</string>
     <string name="no_such_file">No such file</string>
