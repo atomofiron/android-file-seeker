@@ -1,6 +1,8 @@
 package app.atomofiron.searchboxapp
 
+import android.annotation.SuppressLint
 import android.util.Log
+import android.view.View
 
 private var timestamp: Long = 0
 private var nanotimestamp: Long = 0
@@ -20,6 +22,9 @@ fun Any.logE(s: String) {
 fun Any.poop(s: String) = poop(this.javaClass.simpleName, s)
 
 fun Any.poop(context: Any, s: String) = poop(context.javaClass.simpleName, s)
+
+@SuppressLint("ResourceType")
+fun View.info() = "${this::class.java.simpleName}(${if (id <= 0) id.toString() else resources.getResourceEntryName(id)})"
 
 fun Any.poop(label: String, s: String) {
     Log.e("searchboxapp", "[$label] $s")
