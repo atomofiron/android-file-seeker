@@ -68,6 +68,16 @@ class NoticeableDrawable(
         return this
     }
 
+    override fun getIntrinsicWidth(): Int = drawable.intrinsicWidth
+
+    override fun getIntrinsicHeight(): Int = drawable.intrinsicHeight
+
+    override fun getMinimumWidth(): Int = drawable.minimumWidth
+
+    override fun getMinimumHeight(): Int = drawable.minimumHeight
+
+    override fun getAlpha(): Int = drawable.alpha
+
     override fun onStateChange(state: IntArray): Boolean {
         drawDot = state.contains(state_activated).also {
             if (it != drawDot) invalidateSelf()
