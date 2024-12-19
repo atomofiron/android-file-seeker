@@ -9,7 +9,6 @@ import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemGravityDecorator
 
 class ResultAdapter : GeneralAdapter<ResultsHolder, ResultItem>() {
     companion object {

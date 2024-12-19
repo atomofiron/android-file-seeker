@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator
+package app.atomofiron.searchboxapp.screens.result.adapter
 
 import android.graphics.Rect
 import android.view.View
