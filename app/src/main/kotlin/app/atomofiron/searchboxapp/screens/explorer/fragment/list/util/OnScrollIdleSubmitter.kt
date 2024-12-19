@@ -2,13 +2,15 @@ package app.atomofiron.searchboxapp.screens.explorer.fragment.list.util
 
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.searchboxapp.model.explorer.Node
 
-class OnScrollIdleSubmitter<T>(
+class OnScrollIdleSubmitter(
     recyclerView: RecyclerView,
-    private val adapter: ListAdapter<T, *>,
+    private val adapter: ListAdapter<Node, *>,
+    private val visibleItems: Set<Int>,
 ) : RecyclerView.OnScrollListener() {
 
-    private var items: List<T>? = null
+    private var items: List<Node>? = null
     private var marker: String? = null
     private var allowed = true
 
@@ -16,10 +18,11 @@ class OnScrollIdleSubmitter<T>(
         recyclerView.addOnScrollListener(this)
     }
 
-    fun trySubmitList(items: List<T>, marker: String? = null) {
+    fun trySubmitList(items: List<Node>, marker: String? = null) {
         if (allowed || marker != this.marker) {
             this.marker = marker
             adapter.submitList(items)
+            items.triggerLastFiles()
         } else {
             this.items = items
         }
@@ -31,6 +34,18 @@ class OnScrollIdleSubmitter<T>(
             items?.let {
                 items = null
                 adapter.submitList(it)
+            }
+        }
+    }
+
+    // to update decoration offsets
+    private fun List<Node>.triggerLastFiles() {
+        val lastIndex = lastIndex
+        visibleItems.forEach { i ->
+            when {
+                i >= lastIndex -> Unit
+                get(i).parentPath.length <= get(i.inc()).parentPath.length -> Unit
+                else -> adapter.notifyItemChanged(i)
             }
         }
     }

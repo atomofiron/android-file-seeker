@@ -33,6 +33,8 @@ class ItemBorderDecorator(
     private val space = cornerRadius
     // под последним айтемом глубочайшей директории
     private val doubleSpace = cornerRadius * 2
+    // под открытой пустой директорией
+    private val tripleSpace = cornerRadius * 2.5f
     // расстояние между низом последнего айтема глубочайшей директории и нижним краем рамки,
     // а так же минимальное расстояние между низом открытой директории и нижним краем рамки
     private val frameBottomOffset = doubleSpace / 2 + borderWidth / 2
@@ -62,8 +64,7 @@ class ItemBorderDecorator(
         val item = items[holder.bindingAdapterPosition]
         val next = items.getOrNull(holder.bindingAdapterPosition.inc())
         outRect.bottom = when {
-            item.isOpened && item.isEmpty && item.parentPath != next?.parentPath -> doubleSpace + space
-            item.isOpened && item.isEmpty -> doubleSpace
+            item.isOpened && item.isEmpty -> tripleSpace
             item.isOpened -> space
             item.parentPath != next?.parentPath && item.parentPath == currentDir?.path -> doubleSpace
             item.parentPath != next?.parentPath -> space

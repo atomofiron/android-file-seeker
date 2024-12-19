@@ -37,7 +37,7 @@ class ExplorerView(
     private val explorerAdapter = ExplorerAdapter(output, ::onSeparatorClick)
     private val layoutManager = GridLayoutManager(context, 1)
     private val spanSizeLookup = ExplorerSpanSizeLookup(resources, layoutManager, rootAdapter)
-    private val submitter = OnScrollIdleSubmitter(binding.recyclerView, explorerAdapter)
+    private val submitter = OnScrollIdleSubmitter(binding.recyclerView, explorerAdapter, explorerAdapter.visibleItems)
 
     private val listDelegate: ExplorerListDelegate = ExplorerListDelegate(
         binding.recyclerView,

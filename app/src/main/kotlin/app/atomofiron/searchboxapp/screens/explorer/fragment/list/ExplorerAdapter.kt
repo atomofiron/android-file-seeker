@@ -26,6 +26,9 @@ class ExplorerAdapter(
 
     private lateinit var viewFactory: RecycleItemViewFactory
 
+    private val _visibleItems = mutableSetOf<Int>()
+    val visibleItems: Set<Int> = _visibleItems
+
     init {
         setHasStableIds(true)
     }
@@ -79,9 +82,15 @@ class ExplorerAdapter(
     }
 
     override fun onViewAttachedToWindow(holder: GeneralHolder<Node>) {
-        super.onViewAttachedToWindow(holder)
-        if (holder.bindingAdapterPosition > 0) {
+        if (holder.bindingAdapterPosition >= 0) {
+            _visibleItems.add(holder.bindingAdapterPosition)
             itemActionListener.onItemVisible(getItem(holder.bindingAdapterPosition))
+        }
+    }
+
+    override fun onViewDetachedFromWindow(holder: GeneralHolder<Node>) {
+        if (holder.bindingAdapterPosition >= 0) {
+            _visibleItems.remove(holder.bindingAdapterPosition)
         }
     }
 }
