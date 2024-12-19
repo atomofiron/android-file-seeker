@@ -185,7 +185,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         when (action) {
             is CurtainAction.ShowNext -> contentDelegate.showNext(action.layoutId)
             is CurtainAction.ShowPrev -> contentDelegate.showPrev()
-            is CurtainAction.Hide -> hide()
+            is CurtainAction.Hide -> hide(action.irrevocably)
             is CurtainAction.ShowSnackbar -> showSnackbar(action.provider)
         }
     }
@@ -235,7 +235,8 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         }
     }
 
-    private fun hide() {
+    private fun hide(irrevocably: Boolean = false) {
+        if (irrevocably) behavior.isDraggable = false
         behavior.isHideable = true
         behavior.state = BottomSheetBehavior.STATE_HIDDEN
     }

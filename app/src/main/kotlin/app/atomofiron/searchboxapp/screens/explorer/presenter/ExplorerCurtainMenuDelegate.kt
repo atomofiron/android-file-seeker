@@ -90,7 +90,7 @@ class ExplorerCurtainMenuDelegate(
     }
 
     private fun onRemoveConfirm(items: List<Node>) {
-        controller?.close()
+        controller?.close(irrevocably = true)
         explorerInteractor.deleteItems(currentTab, items)
     }
 

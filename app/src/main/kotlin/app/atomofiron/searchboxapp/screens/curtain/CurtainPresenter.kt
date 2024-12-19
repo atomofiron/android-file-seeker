@@ -46,9 +46,9 @@ class CurtainPresenter(
         viewState.action[scope] = CurtainAction.ShowPrev
     }
 
-    override fun close(immediately: Boolean) = when {
+    override fun close(immediately: Boolean, irrevocably: Boolean) = when {
         immediately -> router.navigateBack()
-        else -> viewState.action[scope] = CurtainAction.Hide
+        else -> viewState.action[scope] = CurtainAction.Hide(irrevocably)
     }
 
     override fun showSnackbar(string: String, duration: Int) = showSnackbar {

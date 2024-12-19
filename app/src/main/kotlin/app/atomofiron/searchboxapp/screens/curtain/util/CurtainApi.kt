@@ -24,7 +24,7 @@ object CurtainApi {
         fun setAdapter(adapter: Adapter<*>)
         fun showNext(layoutId: Int)
         fun showPrev()
-        fun close(immediately: Boolean = false)
+        fun close(immediately: Boolean = false, irrevocably: Boolean = false)
         fun showSnackbar(string: String, duration: Int)
         fun showSnackbar(stringId: Int, duration: Int)
         fun showSnackbar(provider: SnackbarProvider)
