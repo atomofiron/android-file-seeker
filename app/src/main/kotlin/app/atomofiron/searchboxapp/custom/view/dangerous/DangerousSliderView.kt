@@ -158,11 +158,9 @@ class DangerousSliderView @JvmOverloads constructor(
                 event.x
             }
             MotionEvent.ACTION_UP,
-            MotionEvent.ACTION_CANCEL -> when (true) {
-                (progress == START) -> Unit
-                (progress != END) -> animateBack()
-                listener?.invoke() -> onDone()
-                else -> animateBack()
+            MotionEvent.ACTION_CANCEL -> when {
+                progress == END && listener?.invoke() == true -> onDone()
+                else -> onRelease()
             }.let { null }
             else -> downX
         }
@@ -192,7 +190,7 @@ class DangerousSliderView @JvmOverloads constructor(
         tip.setTextSize(unit, size)
     }
 
-    private fun animateBack() {
+    private fun onRelease() {
         offsetAnimator.setFloatValues(offset, 0f)
         offsetAnimator.duration = (progress * OFFSET_DURATION).toLong()
         offsetAnimator.start()
