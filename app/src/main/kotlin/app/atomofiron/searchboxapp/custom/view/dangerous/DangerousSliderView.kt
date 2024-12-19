@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.custom.view.dangerous
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Outline
 import android.graphics.drawable.GradientDrawable
 import android.text.Spannable
@@ -20,6 +21,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
 import androidx.annotation.StringRes
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.MaterialDimen
@@ -32,6 +34,9 @@ import com.google.android.material.textview.MaterialTextView
 
 private const val OFFSET_DURATION = 512L
 private const val TIP_DURATION = 3072L
+private const val START = 0f
+private const val END = 1f
+private val HapticRange = 0.1f..0.9f
 
 class DangerousSliderView @JvmOverloads constructor(
     context: Context,
@@ -44,6 +49,7 @@ class DangerousSliderView @JvmOverloads constructor(
     private val trackColor = MaterialColors.getColor(context, android.R.attr.colorBackground, 0)
     private val thumbColor = MaterialColors.getColor(context, MaterialAttr.colorError, 0)
     private val tipColor = MaterialColors.getColor(context, MaterialAttr.colorOnErrorContainer, 0)
+    private val done = ContextCompat.getDrawable(context, R.drawable.ic_done)!!
 
     private val thumb = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, thumbColor.let { intArrayOf(it, it) })
     private val button = MaterialTextView(context)
@@ -59,18 +65,19 @@ class DangerousSliderView @JvmOverloads constructor(
     private val tipMinOffset get() = (button.width - button.height / 3) / 2f
     private val tipOffset get() = (tipMinOffset + tipMinOffset * progress) * direction
     private var offset
-        get() = button.translationX * direction
-        set(value) { button.translationX = value * direction }
-    private val maxOffset get() = (width - button.width).toFloat()
+        get() = button.translationX
+        set(value) { button.translationX = value }
+    private val maxOffset get() = (width - button.width).toFloat() * direction
     private val progress get() = if (maxOffset == 0f) 0f else offset / maxOffset
     private var hapticAllowed = false
+    private val isDone get() = !done.bounds.isEmpty
     var listener: (() -> Boolean)? = null
 
     private val offsetAnimator = ValueAnimator.ofFloat(0f)
-    private val tipAnimator = ValueAnimator.ofFloat(0f, 1f)
+    private val tipAnimator = ValueAnimator.ofFloat(START, END)
     private val clipping = object : ViewOutlineProvider() {
         override fun getOutline(view: View, outline: Outline) = when {
-            isRtl -> outline.setRoundRect(0, 0, view.right - view.left - offset.toInt(), view.bottom - view.top, view.height / 2f)
+            isRtl -> outline.setRoundRect(0, 0, view.right - view.left + offset.toInt(), view.bottom - view.top, view.height / 2f)
             else -> outline.setRoundRect(offset.toInt(), 0, view.right - view.left, view.bottom - view.top, view.height / 2f)
         }
     }
@@ -84,6 +91,7 @@ class DangerousSliderView @JvmOverloads constructor(
         thumb.setStroke(strokeWidth, thumbColor)
         border.cornerRadius = Float.MAX_VALUE
         border.setStroke(strokeWidth, thumbColor)
+        done.setTint(textColor)
 
         val styled = context.obtainStyledAttributes(attrs, R.styleable.DangerousSliderView, defStyleAttr, 0)
         tip.text = styled.getString(R.styleable.DangerousSliderView_tip)?.withSpan(tipSpan)
@@ -122,44 +130,41 @@ class DangerousSliderView @JvmOverloads constructor(
         super.onLayout(changed, left, top, right, bottom)
         arrows.setBounds(0, 0, width, height)
         border.setBounds(0, 0, width, height)
-        updateTranslation(0f)
+        updateOffset(0f)
     }
 
     override fun draw(canvas: Canvas) {
-        canvas.drawColor(trackColor)
         val arrowsAlpha = tipAnimator.animatedValue as Float * 2 - 1
         arrows.draw(canvas, flip = isRtl, progress = progress, alpha = arrowsAlpha, offset = tipOffset, arrowSize = tip.textSize / 2)
         border.draw(canvas)
         super.draw(canvas)
+        if (isDone) done.draw(canvas)
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        when (event.action) {
-            MotionEvent.ACTION_DOWN -> downX = when {
-                event.x < button.run { left + translationX } -> null
-                event.x > button.run { right + translationX } -> null
-                else -> event.x.also {
+        downX = when (event.action) {
+            MotionEvent.ACTION_DOWN -> when {
+                isDone -> null
+                event.x < button.run { left + offset } -> null
+                event.x > button.run { right + offset } -> null
+                else -> {
                     offsetAnimator.cancel()
                     parent.disallowInterceptTouches()
+                    event.x
                 }
             }
             MotionEvent.ACTION_MOVE -> downX?.let {
-                val dx = (event.x - it) * direction
-                updateTranslation(offset + dx)
-                downX = event.x
+                updateOffset(offset + (event.x - it))
+                event.x
             }
             MotionEvent.ACTION_UP,
-            MotionEvent.ACTION_CANCEL -> {
-                downX = null
-                when {
-                    progress == 0f -> Unit
-                    progress != 1f -> animateBack()
-                    listener?.invoke() != true -> animateBack()
-                }
-                if (progress < 1f && !tipAnimator.isRunning) {
-                    tipAnimator.start()
-                }
-            }
+            MotionEvent.ACTION_CANCEL -> when (true) {
+                (progress == START) -> Unit
+                (progress != END) -> animateBack()
+                listener?.invoke() -> onDone()
+                else -> animateBack()
+            }.let { null }
+            else -> downX
         }
         return downX != null
     }
@@ -167,7 +172,7 @@ class DangerousSliderView @JvmOverloads constructor(
     override fun onAnimationUpdate(animation: ValueAnimator) {
         val value = animation.animatedValue as Float
         if (animation === offsetAnimator) {
-            updateTranslation(value)
+            updateOffset(value)
         } else if (animation === tipAnimator) {
             tipSpan.progress = value
             invalidate()
@@ -191,10 +196,23 @@ class DangerousSliderView @JvmOverloads constructor(
         offsetAnimator.setFloatValues(offset, 0f)
         offsetAnimator.duration = (progress * OFFSET_DURATION).toLong()
         offsetAnimator.start()
+        when {
+            progress == END -> Unit
+            tipAnimator.isRunning -> Unit
+            else -> tipAnimator.start()
+        }
     }
 
-    private fun updateTranslation(translation: Float) {
-        offset = translation.coerceIn(0f..maxOffset)
+    private fun onDone() {
+        val left = button.left + button.width / 2 - done.intrinsicWidth / 2 + offset.toInt()
+        val top = button.top + button.height / 2 - done.intrinsicHeight / 2
+        done.setBounds(left, top, left + done.intrinsicWidth, top + done.intrinsicHeight)
+        button.setTextColor(Color.TRANSPARENT)
+        invalidate()
+    }
+
+    private fun updateOffset(translation: Float) {
+        offset = translation.inRange(0f, maxOffset)
         thumbSpan.progress = progress
         tip.translationX = tipOffset
         val alpha = progress.toIntAlpha()
@@ -202,11 +220,11 @@ class DangerousSliderView @JvmOverloads constructor(
         thumbColor = ColorUtils.compositeColors(thumbColor, trackColor)
         thumb.setColor(thumbColor)
         border.alpha = alpha
-        if (hapticAllowed && (progress == 1f || progress == 0f)) {
+        if (hapticAllowed && (progress == END || progress == START)) {
             button.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
             hapticAllowed = false
         }
-        hapticAllowed = hapticAllowed || progress in 0.1f..0.9f
+        hapticAllowed = hapticAllowed || progress in HapticRange
         invalidate()
         invalidateOutline()
     }
@@ -215,5 +233,19 @@ class DangerousSliderView @JvmOverloads constructor(
         val string = SpannableString(this)
         string.setSpan(span, 0, string.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         return string
+    }
+
+    private fun Float.inRange(first: Float, second: Float): Float = when {
+        first < second -> when {
+            this < first -> first
+            this > second -> second
+            else -> this
+        }
+        first > second -> when {
+            this < second -> second
+            this > first -> first
+            else -> this
+        }
+        else -> first
     }
 }
