@@ -18,7 +18,7 @@ class OnScrollIdleSubmitter(
         recyclerView.addOnScrollListener(this)
     }
 
-    fun trySubmitList(items: List<Node>, marker: String? = null) {
+    fun submitListOnIdle(items: List<Node>, marker: String? = null) {
         if (allowed || marker != this.marker) {
             this.marker = marker
             adapter.submitList(items)

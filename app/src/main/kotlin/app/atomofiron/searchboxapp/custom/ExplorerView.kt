@@ -81,7 +81,7 @@ class ExplorerView(
 
     fun submitList(items: NodeTabItems) {
         rootAdapter.submitList(items.roots)
-        submitter.trySubmitList(items.items, items.current?.path)
+        submitter.submitListOnIdle(items.items, items.current?.path)
         listDelegate.setCurrentDir(items.current)
         title = items.current?.getTitle(resources)
     }
