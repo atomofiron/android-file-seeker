@@ -44,7 +44,8 @@ class InsetsBackgroundView : View, InsetsListener {
 
     private val paint = Paint()
 
-    private var common = Type.systemBars
+    private var common = Type.statusBars
+        set(value) { field = value + Type.statusBars }
     private var statusBar = true
     private var sides = Sides(ALL)
 
@@ -63,7 +64,7 @@ class InsetsBackgroundView : View, InsetsListener {
     }
 
     fun setAdditional(types: TypeSet) {
-        common = Type.systemBars + types
+        common = types
     }
 
     override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
