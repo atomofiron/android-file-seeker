@@ -25,6 +25,8 @@ class ItemBorderDecorator(
     private val headerView: ExplorerHeaderView,
     private val requestUpdateHeaderPosition: () -> Unit,
 ) : ItemDecoration() {
+    // примерный размер жестового навбара, чтобы игнорировать равный ему паддинг снизу
+    private val gestureBar = headerView.resources.displayMetrics.density * 32 // 24
 
     private val items get() = adapter.currentList
     private val cornerRadius = headerView.resources.getDimension(R.dimen.explorer_border_corner_radius)
@@ -84,7 +86,8 @@ class ItemBorderDecorator(
 
         var frameRect: RectF? = null
         val headerBottom = headerView.height.toFloat()
-        val parentBottom = (parent.height - parent.paddingBottom).toFloat()
+        val paddingBottom = parent.paddingBottom.let { if (it < gestureBar) 0 else it }
+        val parentBottom = (parent.height - paddingBottom).toFloat()
 
         val firstIndex = firstItemViewHolder.bindingAdapterPosition
         val lastIndex = firstIndex + itemChildCount.dec()
