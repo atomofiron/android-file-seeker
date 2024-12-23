@@ -52,10 +52,6 @@ class ExplorerPresenter(
         }
         explorerInteractor.updateRoots(currentTab)
         explorerStore.current.value = viewState.getCurrentDir()
-        /* todo searchTargets
-            val checked = items.filter { it.isChecked }
-            explorerStore.searchTargets.set(checked)
-        */
     }
 
     fun onSettingsOptionSelected() = router.showSettings()
