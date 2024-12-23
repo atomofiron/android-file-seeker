@@ -16,6 +16,7 @@ import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewOutlineProvider
+import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
 import android.widget.FrameLayout
@@ -31,12 +32,16 @@ import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.toIntAlpha
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.textview.MaterialTextView
+import kotlin.math.PI
+import kotlin.math.sin
 
 private const val OFFSET_DURATION = 512L
 private const val TIP_DURATION = 3072L
+private const val BOUNCE_DURATION = 1024L
 private const val START = 0f
 private const val END = 1f
 private val HapticRange = 0.1f..0.9f
+private const val Pi = PI.toFloat()
 
 class DangerousSliderView @JvmOverloads constructor(
     context: Context,
@@ -68,13 +73,16 @@ class DangerousSliderView @JvmOverloads constructor(
         get() = button.translationX
         set(value) { button.translationX = value }
     private val maxOffset get() = (width - button.width).toFloat() * direction
-    private val progress get() = if (maxOffset == 0f) 0f else offset / maxOffset
+    private val maxBounceOffset get() = button.width / 2f
+    private val progress get() = if (maxOffset == 0f) START else offset / maxOffset
     private var hapticAllowed = false
     private val isDone get() = !done.bounds.isEmpty
     var listener: (() -> Boolean)? = null
 
     private val offsetAnimator = ValueAnimator.ofFloat(0f)
     private val tipAnimator = ValueAnimator.ofFloat(START, END)
+    private val bounceAnimator = ValueAnimator.ofFloat(0f)
+    private val bounceInterpolator = BounceInterpolator()
     private val clipping = object : ViewOutlineProvider() {
         override fun getOutline(view: View, outline: Outline) = when {
             isRtl -> outline.setRoundRect(0, 0, view.right - view.left + offset.toInt(), view.bottom - view.top, view.height / 2f)
@@ -112,6 +120,9 @@ class DangerousSliderView @JvmOverloads constructor(
         tipAnimator.addUpdateListener(this)
         tipAnimator.interpolator = LinearInterpolator()
         tipAnimator.duration = TIP_DURATION
+        bounceAnimator.addUpdateListener(this)
+        bounceAnimator.interpolator = LinearInterpolator()
+        bounceAnimator.duration = BOUNCE_DURATION
         outlineProvider = clipping
         clipToOutline = true
     }
@@ -149,6 +160,7 @@ class DangerousSliderView @JvmOverloads constructor(
                 event.x > button.run { right + offset } -> null
                 else -> {
                     offsetAnimator.cancel()
+                    bounceAnimator.cancel()
                     parent.disallowInterceptTouches()
                     event.x
                 }
@@ -174,6 +186,12 @@ class DangerousSliderView @JvmOverloads constructor(
         } else if (animation === tipAnimator) {
             tipSpan.progress = value
             invalidate()
+        } else if (animation === bounceAnimator) {
+            val scale = when {
+                value < END -> sin(value * Pi / 2)
+                else -> 1 - bounceInterpolator.getInterpolation((value - END) / END)
+            }
+            updateOffset(maxBounceOffset * scale)
         }
     }
 
@@ -191,9 +209,14 @@ class DangerousSliderView @JvmOverloads constructor(
     }
 
     private fun onRelease() {
-        offsetAnimator.setFloatValues(offset, 0f)
-        offsetAnimator.duration = (progress * OFFSET_DURATION).toLong()
-        offsetAnimator.start()
+        if (offset == 0f) {
+            bounceAnimator.setFloatValues(START, END * 2)
+            bounceAnimator.start()
+        } else {
+            offsetAnimator.setFloatValues(offset, 0f)
+            offsetAnimator.duration = (progress * OFFSET_DURATION).toLong()
+            offsetAnimator.start()
+        }
         when {
             progress == END -> Unit
             tipAnimator.isRunning -> Unit
