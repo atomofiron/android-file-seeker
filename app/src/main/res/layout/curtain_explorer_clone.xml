@@ -15,7 +15,7 @@
         android:textSize="@dimen/curtain_title_size"
         android:textColor="?attr/colorContent"
         android:textStyle="bold"
-        android:text="@string/create_a_new"
+        android:text="@string/make_a_clone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
