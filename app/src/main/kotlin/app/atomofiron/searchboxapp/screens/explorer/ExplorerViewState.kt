@@ -10,7 +10,6 @@ import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 class ExplorerViewState(
     private val scope: CoroutineScope,
@@ -23,14 +22,13 @@ class ExplorerViewState(
         private const val SECOND_TAB = "SECOND_TAB"
     }
     val rootOptions = listOf(R.id.menu_create)
-    val directoryOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_create)
-    val oneFileOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_share, R.id.menu_open_with)
+    val directoryOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_create, R.id.menu_clone)
+    val oneFileOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_share, R.id.menu_open_with, R.id.menu_clone)
     val manyFilesOptions = listOf(R.id.menu_delete)
 
     val scrollTo = ChannelFlow<Node>()
     val settingsNotification = preferenceChannel.notification
     val itemComposition = DeferredStateFlow<ExplorerItemComposition>()
-    val current: StateFlow<Node?> = explorerStore.current
     val alerts: Flow<NodeError> = explorerStore.alerts
 
     val firstTab = NodeTabKey(FIRST_TAB, index = 0)

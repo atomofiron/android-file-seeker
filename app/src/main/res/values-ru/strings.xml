@@ -39,6 +39,7 @@
 
     <string name="open">Открыть</string>
     <string name="done">Завершено</string>
+    <string name="submit">Подтвердить</string>
     <string name="stopped">Остановлено</string>
     <string name="options">Опции</string>
     <string name="options_title">Опции:</string>
@@ -111,7 +112,9 @@
     <string name="group">Группа</string>
     <string name="empty_check_box">Пустой чек бокс</string>
     <string name="item_explorer_background">Чередующийся фон</string>
-    <string name="create_a_new">Создать</string>
+    <string name="create_a_new">Создать новый(ую)</string>
+    <string name="make_a_clone">Создать копию</string>
+    <string name="clone">Клонировать</string>
     <string name="create_file_or_dir">Создать файл или директорию</string>
     <string name="a_name">Имя</string>
     <string name="a_file">Файл</string>

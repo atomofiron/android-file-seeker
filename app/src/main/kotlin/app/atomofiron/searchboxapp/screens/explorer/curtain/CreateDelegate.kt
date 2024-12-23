@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.explorer.presenter.curtain
+package app.atomofiron.searchboxapp.screens.explorer.curtain
 
 import android.text.Editable
 import android.text.TextWatcher
@@ -30,7 +30,6 @@ class CreateDelegate(
         explorerCreateEt.text?.clear()
         explorerCreateEt.inputType = EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         val textListener = ButtonState(dirFiles, arrayOf(explorerCreateDirBtn, explorerCreateFileBtn))
-        explorerCreateEt.addTextChangedListener(textListener)
         explorerCreateEt.addTextChangedListener(textListener)
         val clickListener = ButtonClick(dir, explorerCreateEt)
         explorerCreateDirBtn.setOnClickListener(clickListener)

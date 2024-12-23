@@ -13,6 +13,7 @@ object Shell {
     var toyboxPath = Const.DEFAULT_TOYBOX_PATH
 
     const val TOUCH = "{toybox} touch \"%s\""
+    const val COPY = "{toybox} cp -r \"%s\" \"%s\""
     const val VERSION = "{toybox} --version"
     const val MKDIR = "{toybox} mkdir \"%s\""
     const val RM_RF = "{toybox} rm -rf \"%s\""

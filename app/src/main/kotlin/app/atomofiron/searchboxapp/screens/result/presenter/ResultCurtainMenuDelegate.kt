@@ -10,14 +10,14 @@ import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
-import app.atomofiron.searchboxapp.screens.explorer.presenter.curtain.OptionsDelegate
+import app.atomofiron.searchboxapp.screens.explorer.curtain.OptionsDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
 import app.atomofiron.searchboxapp.screens.result.ResultViewState
 import app.atomofiron.searchboxapp.utils.showCurtain
 import kotlinx.coroutines.CoroutineScope
 
 class ResultCurtainMenuDelegate(
-    private val scope: CoroutineScope,
+    scope: CoroutineScope,
     private val viewState: ResultViewState,
     private val router: ResultRouter,
     private val interactor: ResultInteractor,

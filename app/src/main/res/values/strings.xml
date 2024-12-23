@@ -40,6 +40,7 @@
 
     <string name="open">Open</string>
     <string name="done">Done</string>
+    <string name="submit">Submit</string>
     <string name="stopped">Stopped</string>
     <string name="options">Options</string>
     <string name="options_title">Options:</string>
@@ -109,12 +110,14 @@
     <string name="pref_explorer_item">File / Directory</string>
     <string name="pref_joystick">ESC button\'s color</string>
     <string name="create">Create</string>
+    <string name="clone">Clone</string>
     <string name="create_file_or_dir">Create a file or directory</string>
     <string name="owner">Owner</string>
     <string name="group">Group</string>
     <string name="empty_check_box">Empty check box</string>
     <string name="item_explorer_background">Striped background</string>
     <string name="create_a_new">Create a new</string>
+    <string name="make_a_clone">Make a clone</string>
     <string name="a_name">Name</string>
     <string name="a_file">File</string>
     <string name="a_directory">Directory</string>

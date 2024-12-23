@@ -12,9 +12,10 @@ import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerViewState
-import app.atomofiron.searchboxapp.screens.explorer.presenter.curtain.CreateDelegate
-import app.atomofiron.searchboxapp.screens.explorer.presenter.curtain.OptionsDelegate
-import app.atomofiron.searchboxapp.screens.explorer.presenter.curtain.RenameDelegate
+import app.atomofiron.searchboxapp.screens.explorer.curtain.CloneDelegate
+import app.atomofiron.searchboxapp.screens.explorer.curtain.CreateDelegate
+import app.atomofiron.searchboxapp.screens.explorer.curtain.OptionsDelegate
+import app.atomofiron.searchboxapp.screens.explorer.curtain.RenameDelegate
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.isParentOf
 import app.atomofiron.searchboxapp.utils.showCurtain
 import kotlinx.coroutines.CoroutineScope
@@ -31,10 +32,12 @@ class ExplorerCurtainMenuDelegate(
         const val OPTIONS = 111
         const val CREATE = 222
         const val RENAME = 333
+        const val CLONE = 444
     }
 
     private val optionsDelegate = OptionsDelegate(R.menu.item_options_explorer, output = this)
     private val createDelegate = CreateDelegate(output = this)
+    private val cloneDelegate = CloneDelegate(output = this)
     private val renameDelegate = RenameDelegate(output = this)
 
     private val currentTab get() = viewState.currentTab.value
@@ -58,6 +61,13 @@ class ExplorerCurtainMenuDelegate(
             CREATE -> data?.items?.firstOrNull()?.let {
                 createDelegate.getView(it, inflater)
             }
+            CLONE -> {
+                val target = data?.items?.firstOrNull() ?: return null
+                val parent = explorerStore.currentItems
+                    .find { it.path == target.parentPath }
+                    ?: return null
+                cloneDelegate.getView(parent, target, inflater)
+            }
             RENAME -> getRenameData()?.let {
                 renameDelegate.getView(it, inflater)
             }
@@ -71,12 +81,18 @@ class ExplorerCurtainMenuDelegate(
         val options = data ?: return
         val items = options.items
         when (id) {
+            R.id.menu_clone -> controller?.showNext(CLONE)
             R.id.menu_create -> controller?.showNext(CREATE)
             R.id.menu_rename -> controller?.showNext(RENAME)
             R.id.menu_delete -> onRemoveConfirm(items)
             R.id.menu_share -> router.shareWith(items.first())
             R.id.menu_open_with -> router.openWith(items.first())
         }
+    }
+
+    fun onCloneConfirm(target: Node, name: String) {
+        controller?.close()
+        explorerInteractor.clone(currentTab, target, name)
     }
 
     fun onCreateConfirm(dir: Node, name: String, directory: Boolean) {

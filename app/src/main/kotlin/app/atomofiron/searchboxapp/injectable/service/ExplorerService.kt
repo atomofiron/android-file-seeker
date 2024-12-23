@@ -385,6 +385,37 @@ class ExplorerService(
         }
     }
 
+    suspend fun tryCopy(key: NodeTabKey, from: Node, to: Node, asMoving: Boolean) {
+        renderTab(key) {
+            states.updateState(from.uniqueId) {
+                nextState(from.uniqueId, copying = Operation.Copying(isSource = true, asMoving = asMoving))
+            }.let { if (it?.isCopying != true) return }
+            states.updateState(to.uniqueId) {
+                nextState(to.uniqueId, copying = Operation.Copying(isSource = false))
+            }
+            tree.find(to.parentPath)?.children?.run {
+                var index = indexOfFirst { it.isFile }
+                if (index < 0) index = size
+                items.add(index, to)
+            }
+        }
+        val new = ExplorerDelegate.copy(from, to, config.useSu)
+        renderTab(key) {
+            states.updateState(from.uniqueId) {
+                nextState(from.uniqueId, copying = null)
+            }
+            states.updateState(to.uniqueId) {
+                nextState(to.uniqueId, copying = null)
+            }
+            tree.find(new.parentPath)?.children?.run {
+                val index = indexOfFirst { it.uniqueId == new.uniqueId }
+                if (index < 0) return@run
+                items[index] = new
+            }
+        }
+        tryCacheAsync(key, to)
+    }
+
     suspend fun tryCheckItem(key: NodeTabKey, item: Node, isChecked: Boolean) {
         renderTab(key) {
             val (_, state) = states.findState(item.uniqueId)
@@ -776,7 +807,11 @@ class ExplorerService(
         return null
     }
 
+    private fun List<Node>.find(uniqueId: Int): Node? = find { it.uniqueId == uniqueId }
+
     private fun List<Node>.findIndexed(uniqueId: Int): Pair<Int, Node?> = findIndexed { it.uniqueId == uniqueId }
+
+    private fun List<Node>.find(path: String): Node? = find { it.path == path }
 
     private fun List<Node>.findIndexed(path: String): Pair<Int, Node?> = findIndexed { it.path == path }
 

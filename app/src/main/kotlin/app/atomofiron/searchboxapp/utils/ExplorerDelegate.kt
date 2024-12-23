@@ -4,6 +4,7 @@ import android.util.Log
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
+import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.utils.MediaDelegate.getThumbnail
 import kotlinx.coroutines.Job
 
@@ -98,6 +99,15 @@ object ExplorerDelegate {
         )
     }
 
+    fun copy(from: Node, to: Node, useSu: Boolean): Node {
+        val output = Shell.exec(Shell[Shell.COPY].format(from.path, to.path), useSu)
+        val new = to.updateProperties(CacheConfig(useSu))
+        return when {
+            output.success -> new
+            else -> from.copy(error = output.error.toNodeError(from.path))
+        }
+    }
+
     fun create(parent: Node, name: String, directory: Boolean, useSu: Boolean): Node {
         var targetPath = parent.path + name
         if (directory) {
@@ -171,6 +181,16 @@ object ExplorerDelegate {
             "Music" -> Type.Music
             "Pictures" -> Type.Pictures
             else -> Type.Ordinary
+        }
+    }
+
+    fun Node.updateProperties(config: CacheConfig): Node {
+        val output = Shell.exec(Shell[Shell.LS_LAHLD].format(path), config.useSu)
+        val lines = output.output.split("\n").filter { it.isNotEmpty() }
+        return when {
+            output.success && lines.size == 1 -> parseNode(lines.first())
+            output.success -> copy(children = null, error = NodeError.Unknown)
+            else -> copy(error = output.error.toNodeError(path))
         }
     }
 

@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.explorer.presenter.curtain
+package app.atomofiron.searchboxapp.screens.explorer.curtain
 
 import android.view.LayoutInflater
 import android.view.View

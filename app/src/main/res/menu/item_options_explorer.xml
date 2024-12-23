@@ -2,6 +2,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="app.atomofiron.searchboxapp.MainActivity">
     <item
+        android:id="@+id/menu_clone"
+        android:title="@string/clone"
+        android:icon="@drawable/ic_clone"
+        />
+    <item
         android:id="@+id/menu_create"
         android:title="@string/create_file_or_dir"
         android:icon="@drawable/ic_create"

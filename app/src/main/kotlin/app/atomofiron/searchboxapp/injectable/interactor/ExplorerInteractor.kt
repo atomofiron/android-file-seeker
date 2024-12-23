@@ -5,7 +5,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
+import app.atomofiron.searchboxapp.model.explorer.NodeState
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 
 class ExplorerInteractor(
@@ -61,6 +63,14 @@ class ExplorerInteractor(
     fun create(tab: NodeTabKey, dir: Node, name: String, directory: Boolean) {
         scope.launch(context) {
             service.tryCreate(tab, dir, name, directory)
+        }
+    }
+
+    fun clone(tab: NodeTabKey, target: Node, name: String) {
+        scope.launch(context) {
+            var to = target.rename(name)
+            if (to.isDirectory) to = to.copy(children = null)
+            service.tryCopy(tab, target, to, asMoving = false)
         }
     }
 }
