@@ -564,12 +564,12 @@ class ExplorerService(
         val items = renderNodes()
         val tabItems = NodeTabItems(roots.toMutableList(), items, currentDir)
         flow.emit(tabItems)
-        explorerStore.current.value = currentDir
 
         updateStates(items)
         updateChecked(items)
         val checked = items.filter { it.isChecked }
         explorerStore.searchTargets.set(checked)
+        explorerStore.current.value = currentDir
         explorerStore.setCurrentItems(items)
     }
 
