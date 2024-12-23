@@ -560,7 +560,9 @@ class ExplorerService(
         }
         tree.dropClosedLevels()
         updateDirectoryTypes()
-        val currentDir = tree.lastOrNull()?.takeIf { it.isOpened }
+        val currentDir = tree.lastOrNull()
+            ?.takeIf { it.isOpened }
+            ?.run { if (checked.contains(uniqueId)) copy(isChecked = true) else this }
         val items = renderNodes()
         val tabItems = NodeTabItems(roots.toMutableList(), items, currentDir)
         flow.emit(tabItems)
