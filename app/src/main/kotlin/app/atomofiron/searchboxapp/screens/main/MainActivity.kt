@@ -31,6 +31,7 @@ import app.atomofiron.searchboxapp.screens.main.util.offerKeyCodeToChildren
 import app.atomofiron.searchboxapp.utils.ExtType
 import com.google.android.material.color.DynamicColors
 import lib.atomofiron.insets.InsetsSource
+import lib.atomofiron.insets.builder
 import lib.atomofiron.insets.insetsMargin
 import lib.atomofiron.insets.insetsSource
 
@@ -63,15 +64,56 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        applyInsets()
-
         presenter.onActivityCreate(this)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
         binding.joystick.setOnClickListener { onEscClick() }
         binding.joystick.syncWithLayout(binding.root)
-        binding.joystick.insetsMargin()
-        binding.joystick.insetsSource { view ->
+
+        if (savedInstanceState == null) onIntent(intent)
+
+        val manager = getSystemService(Service.INPUT_METHOD_SERVICE) as InputMethodManager
+        val onBackStackChangedListener: () -> Unit = {
+            presenter.updateLightStatusBar(isDarkTheme())
+            manager.hideSoftInputFromWindow(binding.root.windowToken, 0)
+        }
+        val childFragmentManager = supportFragmentManager.fragments.first().childFragmentManager
+        childFragmentManager.addOnBackStackChangedListener(onBackStackChangedListener)
+        supportFragmentManager.addOnBackStackChangedListener(onBackStackChangedListener)
+
+        presenter.updateLightNavigationBar(isDarkTheme())
+        presenter.updateLightStatusBar(isDarkTheme())
+        onCollect()
+        applyInsets()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        when {
+            isFirstStart -> isFirstStart = false
+            else -> presenter.onMaximize()
+        }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onActivityDestroy()
+    }
+
+    private fun applyInsets() = binding.run {
+        root.setInsetsModifier { _, windowInsets ->
+            val navigation = windowInsets[ExtType.navigationBars]
+            val tappable = windowInsets[ExtType.tappableElement]
+            when (navigation.bottom) {
+                0, tappable.bottom -> windowInsets
+                else -> windowInsets.builder()
+                    .set(ExtType.navigationBars, navigation.run { Insets.of(left, top, right, bottom / 2) })
+                    .set(ExtType.tappableElement, tappable.run { Insets.of(left, top, right, bottom / 2) })
+                    .build()
+            }
+        }
+        joystick.insetsMargin()
+        joystick.insetsSource { view ->
             if (!view.isVisible) {
                 return@insetsSource InsetsSource.submit(ExtType.joystickBottom, Insets.NONE)
             }
@@ -88,38 +130,6 @@ class MainActivity : AppCompatActivity() {
                     .submit(ExtType.joystickFlank, Insets.of(0, 0, parent.width - view.left, 0))
             }
         }
-
-        if (savedInstanceState == null) onIntent(intent)
-
-        val manager = getSystemService(Service.INPUT_METHOD_SERVICE) as InputMethodManager
-        val onBackStackChangedListener: () -> Unit = {
-            presenter.updateLightStatusBar(isDarkTheme())
-            manager.hideSoftInputFromWindow(binding.root.windowToken, 0)
-        }
-        val childFragmentManager = supportFragmentManager.fragments.first().childFragmentManager
-        childFragmentManager.addOnBackStackChangedListener(onBackStackChangedListener)
-        supportFragmentManager.addOnBackStackChangedListener(onBackStackChangedListener)
-
-        presenter.updateLightNavigationBar(isDarkTheme())
-        presenter.updateLightStatusBar(isDarkTheme())
-        onCollect()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        when {
-            isFirstStart -> isFirstStart = false
-            else -> presenter.onMaximize()
-        }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.onActivityDestroy()
-    }
-
-    private fun applyInsets() {
-        binding.joystick.insetsMargin()
     }
 
     override fun onNewIntent(intent: Intent) {
