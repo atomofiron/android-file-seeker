@@ -73,6 +73,7 @@
 	<dimen name="stroke_width">1dp</dimen>
 	<dimen name="selected_stroke_width">3dp</dimen>
 	<dimen name="arc_stroke_width">6dp</dimen>
+	<dimen name="scroll_thumb">4dp</dimen>
 	<dimen name="explorer_border_width">6dp</dimen>
 	<dimen name="explorer_border_corner_radius">16dp</dimen>
 	<dimen name="curtain_elevation">16dp</dimen>

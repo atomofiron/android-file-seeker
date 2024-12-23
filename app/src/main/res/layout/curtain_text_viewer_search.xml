@@ -19,6 +19,7 @@
         android:clipToPadding="false"
         android:overScrollMode="never"
         android:paddingHorizontal="@dimen/content_margin_half"
+        android:nestedScrollingEnabled="false"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:reverseLayout="true"
         />

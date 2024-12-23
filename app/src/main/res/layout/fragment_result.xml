@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:maxWidth="@dimen/card_max_width"
+        android:scrollbarThumbVertical="@drawable/scroll_thumb"
         />
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottom_bar"

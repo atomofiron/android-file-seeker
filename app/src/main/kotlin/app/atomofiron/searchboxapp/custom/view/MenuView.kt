@@ -21,6 +21,7 @@ class MenuView : RecyclerView {
         overScrollMode = View.OVER_SCROLL_NEVER
         layoutManager = LinearLayoutManager(context)
         adapter = menuAdapter
+        isVerticalScrollBarEnabled = false
     }
 
     fun inflateMenu(menuResId: Int): MenuImpl {
