@@ -245,7 +245,7 @@ class DangerousSliderView @JvmOverloads constructor(
             button.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
             hapticAllowed = false
         }
-        hapticAllowed = hapticAllowed || progress in HapticRange
+        hapticAllowed = hapticAllowed || (progress in HapticRange && !bounceAnimator.isRunning)
         invalidate()
         invalidateOutline()
     }
