@@ -12,7 +12,7 @@
 
 		<item name="colorContent">@color/day_night_content</item>
 
-		<item name="colorBackground">?colorSurface</item>
+		<item name="colorBackground">?android:attr/colorBackground</item>
 		<item name="colorFieldBackground">@color/day_night_background</item>
 		<item name="colorFieldDivider">@color/day_night_field_divider</item>
 		<item name="colorBone">@color/day_night_bone</item>
