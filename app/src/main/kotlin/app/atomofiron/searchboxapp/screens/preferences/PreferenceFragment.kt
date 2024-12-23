@@ -26,11 +26,16 @@ import app.atomofiron.searchboxapp.databinding.FragmentPreferenceBinding
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.Shell
+import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
 import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
+import lib.atomofiron.insets.ExtendedWindowInsets
+import lib.atomofiron.insets.InsetsListener
+import lib.atomofiron.insets.attachInsetsListener
 import lib.atomofiron.insets.insetsPadding
 
 class PreferenceFragment : PreferenceFragmentCompat(),
@@ -96,6 +101,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         recyclerView?.insetsPadding(ExtType { barsWithCutout + ime + joystickBottom + joystickFlank }, start = true, end = true, bottom = true)
         binding.appbarLayout.insetsPadding(ExtType { barsWithCutout + joystickFlank }, top = true)
         binding.toolbar.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, end = true)
+        binding.collapsingLayout.fixInsets()
         viewState.onViewCollect()
     }
 
@@ -140,4 +146,16 @@ class PreferenceFragment : PreferenceFragmentCompat(),
             show()
         }
     }
+
+    private fun CollapsingToolbarLayout.fixInsets() = object : InsetsListener {
+        private val isRtl = isRtl()
+        private val defaultStart = expandedTitleMarginStart
+        private val defaultEnd = expandedTitleMarginEnd
+        override val types = ExtType { barsWithCutout + joystickFlank }
+        override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
+            val insets = windowInsets[types]
+            expandedTitleMarginStart = defaultStart + if (isRtl) insets.right else insets.left
+            expandedTitleMarginEnd = defaultEnd + if (isRtl) insets.left else insets.right
+        }
+    }.let { binding.root.attachInsetsListener(it) }
 }
