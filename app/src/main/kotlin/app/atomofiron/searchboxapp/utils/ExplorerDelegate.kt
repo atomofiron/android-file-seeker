@@ -4,7 +4,6 @@ import android.util.Log
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.utils.MediaDelegate.getThumbnail
 import kotlinx.coroutines.Job
 

@@ -67,7 +67,22 @@ data class Node constructor(
     fun rename(name: String): Node {
         val path = "$parentPath$name${if (isDirectory) "/" else ""}"
         val properties = properties.copy(name = name)
-        return copy(path = path, uniqueId = path.toUniqueId(), properties = properties, state = stateStub)
+        var new = copy(path = path, uniqueId = path.toUniqueId(), properties = properties, state = stateStub)
+        children?.withNewParentPath(path)?.let {
+            new = new.copy(children = it)
+        }
+        return new
+    }
+
+    private fun NodeChildren.withNewParentPath(parent: String): NodeChildren {
+        val items = items.map { node ->
+            val path = "$parent${node.name}${if (isDirectory) "/" else ""}"
+            var new = node.copy(parentPath = parent, path = path)
+            new.children?.withNewParentPath(path)?.let {
+                new = new.copy(children = it)
+            }
+            new
+        }.toMutableList()
+        return copy(items = items)
     }
 }
-
