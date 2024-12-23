@@ -13,7 +13,7 @@
         android:layout_height="match_parent"
         android:paddingTop="@dimen/common_margin_half"
         />
-    <app.atomofiron.searchboxapp.custom.view.SystemBarsBackgroundView
+    <app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
         android:id="@+id/system_ui_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

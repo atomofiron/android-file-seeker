@@ -19,11 +19,11 @@
 			android:paddingBottom="@dimen/common_margin"
 			android:maxWidth="@dimen/card_max_width"
 			/>
-		<app.atomofiron.searchboxapp.custom.view.SystemBarsBackgroundView
-			android:id="@+id/system_ui_background"
+		<app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
+			android:id="@+id/insets_background"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
-			app:navigationBar="none"
+			app:navigationBar="horizontal"
 			/>
 		<app.atomofiron.searchboxapp.custom.view.SnackbarContainerLayout
 			android:id="@+id/snackbar_container"

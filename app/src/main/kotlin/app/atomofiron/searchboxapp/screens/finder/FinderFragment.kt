@@ -21,6 +21,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderSpanSizeLookup
 import app.atomofiron.searchboxapp.screens.finder.history.adapter.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.set
 
@@ -118,16 +119,15 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         viewCollect(settingsNotification, collector = ::setSettingsNotification)
     }
 
-    override fun onApplyInsets(root: View) {
-        binding.run {
-            LayoutDelegate(
-                this.root,
-                recyclerView = recyclerView,
-                bottomView = bottomBar,
-                railView = navigationRail,
-                joystickPlaceholder = bottomBar.menu.findItem(R.id.placeholder),
-            )
-        }
+    override fun onApplyInsets(root: View) = binding.run {
+        LayoutDelegate(
+            this.root,
+            recyclerView = recyclerView,
+            bottomView = bottomBar,
+            railView = navigationRail,
+            joystickPlaceholder = bottomBar.menu.findItem(R.id.placeholder),
+        )
+        insetsBackground.setAdditional(ExtType.rail)
     }
 
     override fun onBack(): Boolean {

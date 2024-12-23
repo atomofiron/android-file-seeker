@@ -44,7 +44,7 @@
             android:alpha="0.5"
             />
     </LinearLayout>
-    <app.atomofiron.searchboxapp.custom.view.SystemBarsBackgroundView
+    <app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:statusBar="false"
