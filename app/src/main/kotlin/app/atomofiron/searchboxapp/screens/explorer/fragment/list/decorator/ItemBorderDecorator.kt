@@ -68,8 +68,9 @@ class ItemBorderDecorator(
         outRect.bottom = when {
             item.isOpened && item.isEmpty -> tripleSpace
             item.isOpened -> space
-            item.parentPath != next?.parentPath && item.parentPath == currentDir?.path -> doubleSpace
-            item.parentPath != next?.parentPath -> space
+            next == null -> space
+            item.parentPath != next.parentPath && item.parentPath == currentDir?.path -> doubleSpace
+            item.parentPath != next.parentPath -> space
             else -> return
         }.toInt()
     }
