@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.DrawerStateListenerImpl
@@ -16,6 +17,7 @@ import app.atomofiron.searchboxapp.databinding.LayoutDrawerNavigationBinding
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExtType
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.shape.MaterialShapeDrawable
 import lib.atomofiron.insets.insetsPadding
 
 class DrawerView @JvmOverloads constructor(
@@ -26,7 +28,7 @@ class DrawerView @JvmOverloads constructor(
 
     private val binding = LayoutDrawerNavigationBinding.inflate(LayoutInflater.from(context), this)
     private val titleInsetsDelegate = binding.drawerTitleContainer.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
-    private val rvInsetsDelegate = binding.drawerRv.insetsPadding(ExtType { barsWithCutout + joystickFlank })
+    private val rvInsetsDelegate = binding.drawerRv.insetsPadding(ExtType { barsWithCutout + joystickFlank + joystickBottom })
 
     private val ibDockSide: ImageButton = findViewById(R.id.drawer_ib_dock_side)
     val recyclerView: RecyclerView = findViewById(R.id.drawer_rv)
@@ -50,7 +52,8 @@ class DrawerView @JvmOverloads constructor(
         styled.recycle()
 
         binding.drawerTitleContainer.run {
-            background = background.mutate()
+            val color = (this@DrawerView.background as MaterialShapeDrawable).resolvedTintColor
+            setBackgroundColor(color)
             background.alpha = Alpha.Level80
         }
     }
@@ -61,6 +64,7 @@ class DrawerView @JvmOverloads constructor(
         val gravity = (params as? DrawerLayout.LayoutParams)?.gravity ?: Gravity.START
         val icDock = if (gravity == Gravity.START) R.drawable.ic_dock_end else R.drawable.ic_dock_start
         ibDockSide.setImageResource(icDock)
+        updateInsets()
     }
 
     fun open() = (parent as DrawerLayout).openDrawer(gravity)
@@ -80,11 +84,14 @@ class DrawerView @JvmOverloads constructor(
     }
 
     private fun updateGravity(gravity: Int) {
-        (layoutParams as DrawerLayout.LayoutParams).run {
+        updateLayoutParams<DrawerLayout.LayoutParams> {
             if (this.gravity == gravity) return
             this.gravity = gravity
         }
-        layoutParams = layoutParams
+        onSizeChanged(width, height, width, height) // trigger maybeClearCornerSizeAnimationForDrawerLayout()
+    }
+
+    private fun updateInsets() {
         titleInsetsDelegate.changeInsets {
             when (gravity) {
                 Gravity.START -> padding(start, top)
@@ -97,6 +104,5 @@ class DrawerView @JvmOverloads constructor(
                 Gravity.END -> padding(top, end, bottom)
             }
         }
-        onSizeChanged(width, height, width, height) // trigger maybeClearCornerSizeAnimationForDrawerLayout()
     }
 }

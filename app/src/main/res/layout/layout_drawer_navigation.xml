@@ -21,7 +21,6 @@
         android:id="@+id/drawer_title_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?attr/colorSurfaceVariant"
         >
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/drawer_title"

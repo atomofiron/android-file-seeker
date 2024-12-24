@@ -36,7 +36,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     private val historyAdapter: HistoryAdapter by lazy {
         HistoryAdapter(requireContext(), object : HistoryAdapter.OnItemClickListener {
             override fun onItemClick(node: String) {
-                binding.verticalDock.close()
+                binding.drawer.close()
                 presenter.onHistoryItemClick(node)
             }
         })
@@ -71,7 +71,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         binding.bottomBar.menu.findItem(R.id.menu_settings).icon = NoticeableDrawable(requireContext(), R.drawable.ic_settings)
         binding.navigationRail.menu.findItem(R.id.menu_settings).icon = NoticeableDrawable(requireContext(), R.drawable.ic_settings)
 
-        binding.verticalDock.run {
+        binding.drawer.run {
             onGravityChangeListener = presenter::onDockGravityChange
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = historyAdapter
@@ -107,14 +107,14 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     }
 
     override fun FinderViewState.onViewCollect() {
-        viewCollect(historyDrawerGravity) { binding.verticalDock.gravity = it }
+        viewCollect(historyDrawerGravity) { binding.drawer.gravity = it }
         viewCollect(reloadHistory, collector = historyAdapter::reload)
         viewCollect(history, collector = historyAdapter::add)
         viewCollect(insertInQuery, collector = ::onInsertInQuery)
         viewCollect(searchItems, collector = ::onStateChange)
         viewCollect(replaceQuery, collector = ::onReplaceQuery)
         viewCollect(snackbar, collector = ::onShowSnackbar)
-        viewCollect(showHistory) { binding.verticalDock.open() }
+        viewCollect(showHistory) { binding.drawer.open() }
         viewCollect(permissionRequiredWarning, collector = ::showPermissionRequiredWarning)
         viewCollect(settingsNotification, collector = ::setSettingsNotification)
     }
@@ -131,8 +131,8 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     }
 
     override fun onBack(): Boolean {
-        val consumed = binding.verticalDock.isOpened
-        binding.verticalDock.close()
+        val consumed = binding.drawer.isOpened
+        binding.drawer.close()
         return consumed || super.onBack()
     }
 

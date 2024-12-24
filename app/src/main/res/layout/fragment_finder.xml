@@ -55,7 +55,7 @@
 			/>
 	</FrameLayout>
 	<app.atomofiron.searchboxapp.custom.view.DrawerView
-		android:id="@+id/vertical_dock"
+		android:id="@+id/drawer"
 		android:layout_width="wrap_content"
 		android:layout_height="match_parent"
 		android:layout_gravity="start"
