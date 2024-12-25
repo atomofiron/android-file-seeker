@@ -1,91 +1,81 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment
 
 import android.content.res.Resources
+import android.graphics.PointF
 import android.view.HapticFeedbackConstants
-import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.utils.isRtl
 import kotlin.math.abs
-import kotlin.math.sign
+import app.atomofiron.common.util.progressionTo
 
-class SwipeMarkerDelegate(resources: Resources) : RecyclerView.OnItemTouchListener {
+private data class State(
+    val toChecked: Boolean,
+    val prevIndex: Int,
+)
+
+class SwipeMarkerDelegate(resources: Resources) {
 
     private val isRtl = resources.isRtl()
     private val allowedAria = resources.getDimensionPixelSize(R.dimen.edge_size)
-    private var prevIndex = -1
-    private var downChild: View? = null
-    private var allowed = false
-    private var makeChecked: Boolean? = null
+    private var state: State? = null
+    private var downPoint: PointF? = null
 
-    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {
-        if (disallowIntercept) allowed = false
+    fun onDown(rv: RecyclerView, x: Float, y: Float): Boolean {
+        val itemView = rv.findChildViewUnder(x, y)
+        if (itemView?.id != R.id.item_explorer) {
+            return false
+        }
+        val area = when {
+            isRtl -> rv.paddingLeft.let { it..(it + allowedAria) }
+            else -> (rv.width - rv.paddingRight).let { (it - allowedAria)..it }
+        }
+        if (x.toInt() in area) {
+            val prevIndex = rv.getChildLayoutPosition(itemView)
+            val check = itemView.getCheckBox() ?: return false
+            state = State(!check.isChecked, prevIndex)
+            downPoint = PointF(x, y)
+        }
+        return state != null
     }
 
-    override fun onInterceptTouchEvent(rv: RecyclerView, e: MotionEvent): Boolean {
-        if (e.action == MotionEvent.ACTION_DOWN) {
-            val child = rv.findChildViewUnder(e.x, e.y)
-            if (child?.id != R.id.item_explorer) {
-                allowed = false
-                return false
+    fun onMove(rv: RecyclerView, x: Float, y: Float): Boolean {
+        downPoint?.let {
+            if (abs(it.x - x) > abs(it.y - y)) {
+                state = null
             }
-            downChild = child
-            prevIndex = downChild?.let { rv.getChildViewHolder(it).layoutPosition } ?: -1
-            val area = when {
-                isRtl -> rv.paddingLeft.let { it..(it + allowedAria) }
-                else -> (rv.width - rv.paddingRight).let { (it - allowedAria)..it }
-            }
-            allowed = e.x.toInt() in area
-            makeChecked = null
         }
-        return allowed
+        downPoint = null
+        return rv.check(x, y)
     }
 
-    override fun onTouchEvent(recyclerView: RecyclerView, e: MotionEvent) {
-        downChild?.let { child ->
-            downChild = null
-            val checkbox = child.getCheckBox()
-            checkbox ?: return@let
-            makeChecked = !checkbox.isChecked
-            checkbox.isChecked = !checkbox.isChecked
-            checkbox.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
-        }
-        val child = recyclerView.findChildViewUnder(e.x, e.y)
-        child ?: return
-        child.tryCheck()
-        recyclerView.checkMissed(child)
+    fun onUp(rv: RecyclerView, x: Float, y: Float) {
+        rv.check(x, y)
+        state = null
     }
 
-    private fun View.tryCheck() {
-        val checkbox = getCheckBox()
-        checkbox ?: return
-        if (makeChecked == null) {
-            makeChecked = !checkbox.isChecked
+    private fun RecyclerView.check(x: Float, y: Float): Boolean {
+        val state = state ?: return false
+        val itemView = findChildViewUnder(x, y)
+        if (itemView?.id != R.id.item_explorer) {
+            return true
         }
-        if (makeChecked != checkbox.isChecked) {
-            checkbox.isChecked = !checkbox.isChecked
-            checkbox.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        val index = getChildLayoutPosition(itemView)
+        var toggled = false
+        for (i in index.progressionTo(state.prevIndex)) {
+            val checkBox = findViewHolderForLayoutPosition(i)
+                ?.itemView
+                ?.getCheckBox()
+                ?: continue
+            toggled = toggled || checkBox.isChecked != state.toChecked
+            checkBox.isChecked = state.toChecked
         }
+        this@SwipeMarkerDelegate.state = state.copy(prevIndex = index)
+        if (toggled) performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        return true
     }
-
-    private fun RecyclerView.checkMissed(child: View) {
-        val prevIndex = prevIndex
-        if (prevIndex < 0) return
-        var index = getChildViewHolder(child).layoutPosition
-        this@SwipeMarkerDelegate.prevIndex = index
-        index = getChildViewHolder(child).layoutPosition.stepTo(prevIndex)
-        if (prevIndex == index) return
-        for (i in 0 until abs(prevIndex - index)) {
-            val position = index
-            index = index.stepTo(prevIndex)
-            val missed = findViewHolderForLayoutPosition(position)?.itemView
-            missed?.tryCheck()
-        }
-    }
-
-    private fun Int.stepTo(target: Int): Int = this + (target - this).sign
 
     private fun View.getCheckBox(): CheckBox? = findViewById(R.id.item_explorer_cb)
 }
