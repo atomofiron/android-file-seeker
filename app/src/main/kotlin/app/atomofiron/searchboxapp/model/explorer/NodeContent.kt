@@ -61,14 +61,30 @@ sealed class NodeContent(
             data class Tar(override val children: List<Node>? = null) : Archive("application/x-tar")
             data class Rar(override val children: List<Node>? = null) : Archive("application/vnd.rar")
         }
-        sealed class Text : File("text/plain") {
+        sealed class Osu(
+            mimeType: String,
+        ) : File(mimeType) {
+            abstract val children: List<Node>?
+
+            data class Map(override val children: List<Node>? = null) : Osu("application/x-osu-beatmap-archive")
+            data class Skin(override val children: List<Node>? = null) : Osu("application/x-osu-skin-archive")
+            data class LazerMap(override val children: List<Node>? = null) : Osu("application/x-osu-beatmap-archive")
+            data class Storyboard(override val children: List<Node>? = null) : Osu("application/x-osu-storyboard")
+            data class Replay(override val children: List<Node>? = null) : Osu("application/x-osu-replay")
+        }
+        sealed class Text(mimeType: String = "text/plain") : File(mimeType) {
             data object Plain : Text()
             data object Script : Text()
+            data object Osu : Text("application/x-osu-beatmap")
         }
         data object Pdf : File("application/pdf")
         data object DB : File()
         data object DataImage : File()
+        data object Pem : File()
         data object Elf : File()
+        data object ElfSo : File()
+        data object ExeMs : File()
+        data object ExeApl : File()
         data object Other : File()
         data object Unknown : File()
     }

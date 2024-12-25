@@ -20,12 +20,22 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.File.Movie -> R.drawable.ic_explorer_movie
     is NodeContent.File.Apk -> R.drawable.ic_explorer_apk
     is NodeContent.File.Archive -> R.drawable.ic_explorer_archive_file
+    is NodeContent.File.Text.Osu -> R.drawable.ic_file_osu
     is NodeContent.File.Text.Script -> R.drawable.ic_explorer_script
     is NodeContent.File.Text -> R.drawable.ic_explorer_text
     is NodeContent.File.Pdf -> R.drawable.ic_explorer_pdf
     is NodeContent.File.DataImage -> R.drawable.ic_explorer_dt
     is NodeContent.File.DB -> R.drawable.ic_explorer_db
+    is NodeContent.File.Osu.Map,
+    is NodeContent.File.Osu.Skin,
+    is NodeContent.File.Osu.LazerMap,
+    is NodeContent.File.Osu.Storyboard,
+    is NodeContent.File.Osu.Replay -> R.drawable.ic_explorer_osu_map
     is NodeContent.File.Elf,
+    is NodeContent.File.ElfSo,
+    is NodeContent.File.ExeApl,
+    is NodeContent.File.ExeMs,
+    is NodeContent.File.Pem,
     is NodeContent.File.Other,
     is NodeContent.File.Unknown -> R.drawable.ic_file_circle
 }
