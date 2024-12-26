@@ -64,7 +64,7 @@ class SwipeMarkerDelegate(resources: Resources) {
         }
         val index = getChildLayoutPosition(itemView)
         var toggled = false
-        for (i in index.progressionTo(state.prevIndex)) {
+        for (i in index progressionTo state.prevIndex) {
             val checkBox = findViewHolderForLayoutPosition(i)
                 ?.itemView
                 ?.getCheckBox()

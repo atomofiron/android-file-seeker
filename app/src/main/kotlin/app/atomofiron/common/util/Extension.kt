@@ -100,7 +100,7 @@ fun Int.Companion.random(range: Int = 1000): Int = (Math.random() * range).toInt
 fun Boolean.Companion.random(probability: Double = 0.5): Boolean = Math.random() < probability
 
 @Suppress("EXTENSION_SHADOWED_BY_MEMBER") // стандартное дерьмо ебаное
-fun Int.progressionTo(other: Int) = when {
+infix fun Int.progressionTo(other: Int) = when {
     this <= other -> this..other
     else -> this downTo other
 }
