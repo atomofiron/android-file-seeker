@@ -14,7 +14,7 @@
         android:paddingTop="36dp"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        android:nestedScrollingEnabled="false"
+        android:scrollbars="none"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         />
     <LinearLayout
