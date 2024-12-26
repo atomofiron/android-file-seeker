@@ -43,11 +43,11 @@ class FastScroller(
     @Retention(AnnotationRetention.SOURCE)
     private annotation class AnimationState
 
-    private val mVerticalThumbWidth: Int = max(defaultWidth.toDouble(), mVerticalThumbDrawable.intrinsicWidth.toDouble()).toInt()
-    private val mVerticalTrackWidth: Int = max(defaultWidth.toDouble(), verticalTrackDrawable.intrinsicWidth.toDouble()).toInt()
+    private val mVerticalThumbWidth: Int = max(defaultWidth, mVerticalThumbDrawable.intrinsicWidth)
+    private val mVerticalTrackWidth: Int = max(defaultWidth, verticalTrackDrawable.intrinsicWidth)
 
-    private val mHorizontalThumbHeight: Int = max(defaultWidth.toDouble(), mHorizontalThumbDrawable.intrinsicWidth.toDouble()).toInt()
-    private val mHorizontalTrackHeight: Int = max(defaultWidth.toDouble(), horizontalTrackDrawable.intrinsicWidth.toDouble()).toInt()
+    private val mHorizontalThumbHeight: Int = max(defaultWidth, mHorizontalThumbDrawable.intrinsicWidth)
+    private val mHorizontalTrackHeight: Int = max(defaultWidth, horizontalTrackDrawable.intrinsicWidth)
 
     // Dynamic values for the vertical scroll bar
     private var mVerticalThumbHeight = 0
@@ -232,39 +232,39 @@ class FastScroller(
         val viewWidth = mRecyclerViewWidth
 
         val left = viewWidth - mVerticalThumbWidth
-        val top = mVerticalThumbCenterY - mVerticalThumbHeight / 2
+        val top = mVerticalThumbCenterY - mVerticalThumbHeight / 2f
         mVerticalThumbDrawable.setBounds(0, 0, mVerticalThumbWidth, mVerticalThumbHeight)
         verticalTrackDrawable.setBounds(0, paddingTop, mVerticalTrackWidth, paddingTop + verticalArea) // edit
 
         if (isLayoutRTL) {
             verticalTrackDrawable.draw(canvas)
-            canvas.translate(mVerticalThumbWidth.toFloat(), top.toFloat())
+            canvas.translate(mVerticalThumbWidth.toFloat(), top)
             canvas.scale(-1f, 1f)
             mVerticalThumbDrawable.draw(canvas)
             canvas.scale(-1f, 1f)
-            canvas.translate(-mVerticalThumbWidth.toFloat(), -top.toFloat())
+            canvas.translate(-mVerticalThumbWidth.toFloat(), -top)
         } else {
             canvas.translate(left.toFloat(), 0f)
             verticalTrackDrawable.draw(canvas)
-            canvas.translate(0f, top.toFloat())
+            canvas.translate(0f, top)
             mVerticalThumbDrawable.draw(canvas)
-            canvas.translate(-left.toFloat(), -top.toFloat())
+            canvas.translate(-left.toFloat(), -top)
         }
     }
 
     private fun drawHorizontalScrollbar(canvas: Canvas) {
         val viewHeight = mRecyclerViewHeight
 
-        val top = viewHeight - mHorizontalThumbHeight
-        val left = mHorizontalThumbCenterX - mHorizontalThumbWidth / 2
+        val top = viewHeight - mHorizontalThumbHeight.toFloat()
+        val left = mHorizontalThumbCenterX - mHorizontalThumbWidth / 2f
         mHorizontalThumbDrawable.setBounds(0, 0, mHorizontalThumbWidth, mHorizontalThumbHeight)
         horizontalTrackDrawable.setBounds(paddingLeft, 0, paddingLeft + horizontalArea, mHorizontalTrackHeight) // edit
 
-        canvas.translate(0f, top.toFloat())
+        canvas.translate(0f, top)
         horizontalTrackDrawable.draw(canvas)
-        canvas.translate(left.toFloat(), 0f)
+        canvas.translate(left, 0f)
         mHorizontalThumbDrawable.draw(canvas)
-        canvas.translate(-left.toFloat(), -top.toFloat())
+        canvas.translate(-left, -top)
     }
 
     /**
@@ -316,10 +316,10 @@ class FastScroller(
                 if (ev.action == MotionEvent.ACTION_DOWN && (insideVerticalThumb || insideHorizontalThumb)) {
                     if (insideHorizontalThumb) {
                         mDragState = DRAG_X
-                        mHorizontalDragX = ev.x.toInt().toFloat()
+                        mHorizontalDragX = ev.x
                     } else if (insideVerticalThumb) {
                         mDragState = DRAG_Y
-                        mVerticalDragY = ev.y.toInt().toFloat()
+                        mVerticalDragY = ev.y
                     }
                     setState(STATE_DRAGGING)
                     true
@@ -343,10 +343,10 @@ class FastScroller(
             if (insideVerticalThumb || insideHorizontalThumb) {
                 if (insideHorizontalThumb) {
                     mDragState = DRAG_X
-                    mHorizontalDragX = me.x.toInt().toFloat()
+                    mHorizontalDragX = me.x
                 } else if (insideVerticalThumb) {
                     mDragState = DRAG_Y
-                    mVerticalDragY = me.y.toInt().toFloat()
+                    mVerticalDragY = me.y
                 }
                 setState(STATE_DRAGGING)
             }
@@ -371,8 +371,8 @@ class FastScroller(
 
     private fun verticalScrollTo(y: Float) {
         val scrollbarRange = verticalRange
-        // edit var y = max(scrollbarRange[0].toDouble(), min(scrollbarRange[1].toDouble(), y.toDouble())).toFloat()
-        if (abs((mVerticalThumbCenterY - y).toDouble()) < 2) {
+        // edit var y = max(scrollbarRange[0], min(scrollbarRange[1], y))
+        if (abs(mVerticalThumbCenterY - y) < 2) {
             return
         }
         val scrollingBy = scrollTo(
@@ -389,8 +389,8 @@ class FastScroller(
 
     private fun horizontalScrollTo(x: Float) {
         val scrollbarRange = horizontalRange
-        // edit var x = max(scrollbarRange[0].toDouble(), min(scrollbarRange[1].toDouble(), x.toDouble())).toFloat()
-        if (abs((mHorizontalThumbCenterX - x).toDouble()) < 2) {
+        // edit var x = max(scrollbarRange[0], min(scrollbarRange[1], x))
+        if (abs((mHorizontalThumbCenterX - x)) < 2) {
             return
         }
         val scrollingBy = scrollTo(
