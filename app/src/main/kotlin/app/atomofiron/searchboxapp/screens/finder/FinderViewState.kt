@@ -19,6 +19,7 @@ class FinderViewState(
     preferenceChannel: PreferenceChannel,
 ) : FinderItemsState by FinderItemsStateDelegate(isLocal = false) {
 
+    val inactiveTargets = MutableStateFlow(emptyList<Int>())
     val historyDrawerGravity = MutableStateFlow(Gravity.START)
     val reloadHistory = ChannelFlow<Unit>()
     val insertInQuery = ChannelFlow<String>()
@@ -33,17 +34,9 @@ class FinderViewState(
         permissionRequiredWarning(scope)
     }
 
-    fun updateTargets(currentDir: Node?, checked: List<Node>) {
-        targets.clear()
-        when {
-            checked.isNotEmpty() -> {
-                val filtered = checked.filter { target ->
-                    !checked.any { target.parentPath.startsWith(it.path) }
-                }
-                targets.addAll(filtered)
-            }
-            currentDir != null -> targets.add(currentDir)
-        }
+    fun updateTargets(targets: List<Node>) {
+        this.targets.clear()
+        this.targets.addAll(targets)
         updateState()
     }
 

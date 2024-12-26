@@ -27,7 +27,7 @@ class FinderAdapter : ListAdapter<FinderStateItem, GeneralHolder<FinderStateItem
             FinderItemType.TEST.id -> TestHolder(parent, viewType)
             FinderItemType.BUTTONS.id -> ButtonsHolder(parent, viewType, output)
             FinderItemType.PROGRESS.id -> ProgressHolder(parent, viewType, output)
-            FinderItemType.TARGETS.id -> TargetsHolder(parent, viewType)
+            FinderItemType.TARGETS.id -> TargetsHolder(parent, viewType, output)
             FinderItemType.TIP.id -> TipHolder(parent, viewType)
             FinderItemType.DISCLAIMER.id -> DisclaimerHolder(parent, viewType)
             else -> throw IllegalArgumentException("viewType = $viewType")

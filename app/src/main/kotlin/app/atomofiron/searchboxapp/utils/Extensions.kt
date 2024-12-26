@@ -10,7 +10,7 @@ import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.*
+import java.util.Locale
 import kotlin.math.min
 
 fun String.escapeQuotes(): String = this.replace(Const.QUOTE, "\\" + Const.QUOTE)
@@ -110,7 +110,7 @@ fun <E> MutableList<E>.removeOneIf(predicate: (E) -> Boolean): E? {
 }
 
 inline fun <T> List<T>.mutate(action: MutableList<T>.() -> Unit): MutableList<T> {
-    val list = if (this is ArrayList<T>) this else toMutableList()
+    val list = toMutableList()
     list.action()
     return list
 }

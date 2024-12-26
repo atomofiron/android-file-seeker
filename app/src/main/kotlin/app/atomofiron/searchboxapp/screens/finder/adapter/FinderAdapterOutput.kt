@@ -7,4 +7,5 @@ interface FinderAdapterOutput :
         CharactersHolder.OnActionListener,
         ConfigHolder.FinderConfigListener,
         ButtonsHolder.FinderButtonsListener,
+        TargetsHolder.FinderTargetsOutput,
         ProgressHolder.OnActionListener

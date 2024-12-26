@@ -10,8 +10,6 @@
     android:textColor="?attr/colorContent"
     android:textStyle="bold"
     android:gravity="bottom"
-    android:checked="true"
-    android:ellipsize="middle"
     android:textSize="18sp"
     app:chipIconSize="24dp"
     app:chipIcon="@drawable/ic_file"

@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.injectable.service.FinderService
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderAdapterPresenterDelegate
+import app.atomofiron.searchboxapp.screens.finder.presenter.FinderTargetsPresenterDelegate
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
@@ -47,7 +48,7 @@ class FinderModule {
         router: FinderRouter,
         finderAdapterDelegate: FinderAdapterPresenterDelegate,
         finderStore: FinderStore,
-        explorerStore: ExplorerStore,
+        targetsDelegate: FinderTargetsPresenterDelegate,
         preferenceStore: PreferenceStore,
         preferenceChannel: PreferenceChannel
     ): FinderPresenter {
@@ -56,7 +57,7 @@ class FinderModule {
             viewState,
             router,
             finderAdapterDelegate,
-            explorerStore,
+            targetsDelegate,
             preferenceStore,
             finderStore,
             preferenceChannel,
@@ -71,6 +72,16 @@ class FinderModule {
         interactor: FinderInteractor,
     ): FinderAdapterPresenterDelegate {
         return FinderAdapterPresenterDelegate(viewState, router, interactor)
+    }
+
+    @Provides
+    @FinderScope
+    fun finderTargetsDelegate(
+        scope: CoroutineScope,
+        viewState: FinderViewState,
+        explorerStore: ExplorerStore,
+    ): FinderTargetsPresenterDelegate {
+        return FinderTargetsPresenterDelegate(scope, viewState, explorerStore)
     }
 
     @Provides
