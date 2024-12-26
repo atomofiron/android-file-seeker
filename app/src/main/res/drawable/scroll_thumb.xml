@@ -3,13 +3,13 @@
     <item android:state_pressed="true">
         <shape>
             <corners android:radius="@dimen/fastscroll_thickness" />
-            <solid android:color="?colorTertiaryContainer" />
+            <solid android:color="?colorPrimaryInverse" />
         </shape>
     </item>
     <item>
         <shape>
             <corners android:radius="@dimen/fastscroll_thickness" />
-            <solid android:color="?colorOutlineVariant" />
+            <solid android:color="?colorOutline" />
         </shape>
     </item>
 </selector>

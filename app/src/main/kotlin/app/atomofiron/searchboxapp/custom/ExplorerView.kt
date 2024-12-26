@@ -124,6 +124,7 @@ class ExplorerView(
 }
 
 fun RecyclerView.addFastScroll() {
+    val container = parent as View
     val scroller = FastScroller(
         this,
         ContextCompat.getDrawable(context, R.drawable.scroll_thumb) as StateListDrawable,
@@ -134,6 +135,7 @@ fun RecyclerView.addFastScroll() {
         resources.getDimensionPixelSize(R.dimen.fastscroll_minimum_range),
         resources.getDimensionPixelSize(R.dimen.fastscroll_area),
         inTheEnd = false,
+        requestRedraw = { container.foreground?.invalidateSelf() },
     )
     // вся эта поебота нужна для того,
     // чтобы скролл рисовался поверх пинящегося заголовка,
@@ -146,7 +148,7 @@ fun RecyclerView.addFastScroll() {
         override fun setColorFilter(colorFilter: ColorFilter?) = Unit
         override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
     }
-    (parent as View).foreground = foreground
+    container.foreground = foreground
     addOnScrollListener(object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) = foreground.invalidateSelf()
     })

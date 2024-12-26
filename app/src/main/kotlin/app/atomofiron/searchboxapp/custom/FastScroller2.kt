@@ -28,6 +28,7 @@ class FastScroller(
     private val mScrollbarMinimumRange: Int,
     private val areaSize: Int, // edit
     private val inTheEnd: Boolean = true, // add
+    private val requestRedraw: () -> Unit = { }, // add
 ) : ItemDecoration(), OnItemTouchListener {
     @IntDef(STATE_HIDDEN, STATE_VISIBLE, STATE_DRAGGING)
     @Retention(AnnotationRetention.SOURCE)
@@ -134,6 +135,7 @@ class FastScroller(
 
     fun requestRedraw() {
         mRecyclerView.invalidate()
+        requestRedraw.invoke()
     }
 
     fun setState(@State state: Int) {
@@ -348,6 +350,7 @@ class FastScroller(
             mHorizontalDragX = 0f
             setState(STATE_VISIBLE)
             mDragState = DRAG_NONE
+            requestRedraw() // add
         } else if (me.action == MotionEvent.ACTION_MOVE && mState == STATE_DRAGGING) {
             show()
             if (mDragState == DRAG_X) {
