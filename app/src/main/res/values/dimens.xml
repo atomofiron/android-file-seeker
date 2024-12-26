@@ -81,4 +81,5 @@
 	<dimen name="fastscroll_area">16dp</dimen>
 	<dimen name="fastscroll_thickness">6dp</dimen>
     <dimen name="fastscroll_minimum_range">50dp</dimen>
+    <dimen name="fastscroll_minimum_size">56dp</dimen>
 </resources>

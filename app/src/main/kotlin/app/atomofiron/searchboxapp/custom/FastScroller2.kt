@@ -27,6 +27,7 @@ class FastScroller(
     defaultWidth: Int,
     private val mScrollbarMinimumRange: Int,
     private val areaSize: Int, // edit
+    private val minThumbLength: Int = 0, // add
     private val inTheEnd: Boolean = true, // add
     private val requestRedraw: () -> Unit = { }, // add
 ) : ItemDecoration(), OnItemTouchListener {
@@ -289,14 +290,18 @@ class FastScroller(
             return
         }
         if (mNeedVerticalScrollbar) {
-            val middleScreenPos = offsetY + verticalVisibleLength / 2.0f
-            mVerticalThumbCenterY = paddingTop + ((verticalVisibleLength * middleScreenPos) / verticalContentLength).toInt() // edit
-            mVerticalThumbHeight = min(verticalVisibleLength.toDouble(), ((verticalVisibleLength * verticalVisibleLength) / verticalContentLength).toDouble()).toInt()
+            // edit val middleScreenPos = offsetY + verticalVisibleLength / 2.0f
+            mVerticalThumbHeight = min(verticalVisibleLength, ((verticalVisibleLength * verticalVisibleLength) / verticalContentLength))
+                .coerceAtLeast(minThumbLength) // add
+            mVerticalThumbCenterY = paddingTop + mVerticalThumbHeight / 2 + // edit
+                    ((verticalVisibleLength - mVerticalThumbHeight) * offsetY / (verticalContentLength - verticalArea)) // edit
         }
         if (mNeedHorizontalScrollbar) {
-            val middleScreenPos = offsetX + horizontalVisibleLength / 2.0f
-            mHorizontalThumbCenterX = paddingLeft + ((horizontalVisibleLength * middleScreenPos) / horizontalContentLength).toInt() // edit
-            mHorizontalThumbWidth = min(horizontalVisibleLength.toDouble(), ((horizontalVisibleLength * horizontalVisibleLength) / horizontalContentLength).toDouble()).toInt()
+            // edit val middleScreenPos = offsetX + horizontalVisibleLength / 2.0f
+            mHorizontalThumbWidth = min(horizontalVisibleLength, ((horizontalVisibleLength * horizontalVisibleLength) / horizontalContentLength))
+                .coerceAtLeast(minThumbLength) // add
+            mHorizontalThumbCenterX = paddingLeft + mHorizontalThumbWidth / 2 + // edit
+                    ((horizontalVisibleLength * mHorizontalThumbWidth) * offsetX / (horizontalContentLength - horizontalArea)) // edit
         }
         if (mState == STATE_HIDDEN || mState == STATE_VISIBLE) {
             setState(STATE_VISIBLE)
