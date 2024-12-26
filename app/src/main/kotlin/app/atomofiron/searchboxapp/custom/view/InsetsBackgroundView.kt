@@ -63,6 +63,10 @@ class InsetsBackgroundView : View, InsetsListener {
         attachInsetsListener(this)
     }
 
+    fun setColor(color: Int, alpha: Int = Alpha.Level67) {
+        paint.color = ColorUtils.setAlphaComponent(color, alpha)
+    }
+
     fun setAdditional(types: TypeSet) {
         common = types
     }
