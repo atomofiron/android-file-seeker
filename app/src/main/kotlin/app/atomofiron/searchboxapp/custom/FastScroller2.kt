@@ -36,7 +36,7 @@ class FastScroller2(
     minAreaSize: Int = defaultWidth,
     private val minThumbLength: Int = 0,
     private val inTheEnd: Boolean = true,
-    private val requestRedraw: () -> Unit = { },
+    private val callback: ((Action) -> Unit)? = null,
 ) : ItemDecoration(), OnItemTouchListener {
     companion object {
         // Scroll thumb not showing
@@ -63,6 +63,10 @@ class FastScroller2(
 
         private val PRESSED_STATE_SET = intArrayOf(android.R.attr.state_pressed)
         private val EMPTY_STATE_SET = intArrayOf()
+    }
+
+    enum class Action {
+        Redraw, DragStart
     }
 
     @IntDef(STATE_HIDDEN, STATE_VISIBLE, STATE_DRAGGING)
@@ -132,11 +136,13 @@ class FastScroller2(
     private val mShowHideAnimator = ValueAnimator.ofFloat(0f, 1f)
 
     @AnimationState
-    private var mAnimationState: Int = ANIMATION_STATE_OUT
-    private val mHideRunnable: Runnable = Runnable { hide(HIDE_DURATION_MS) }
-    private val mOnScrollListener: RecyclerView.OnScrollListener = object : RecyclerView.OnScrollListener() {
+    private var mAnimationState = ANIMATION_STATE_OUT
+    private val mHideRunnable = Runnable { hide(HIDE_DURATION_MS) }
+    private val mOnScrollListener = object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-            updateScrollPosition(recyclerView.computeHorizontalScrollOffset(), recyclerView.computeVerticalScrollOffset())
+            if (dx != 0 || dy != 0) {
+                updateScrollPosition(recyclerView.computeHorizontalScrollOffset(), recyclerView.computeVerticalScrollOffset())
+            }
         }
     }
 
@@ -184,20 +190,21 @@ class FastScroller2(
 
     fun requestRedraw() {
         mRecyclerView.invalidate()
-        requestRedraw.invoke()
+        callback?.invoke(Action.Redraw)
     }
 
     fun setState(@State state: Int) {
         if (state == STATE_DRAGGING && mState != STATE_DRAGGING) {
             mVerticalThumbDrawable.setState(PRESSED_STATE_SET)
             cancelHide()
+            callback?.invoke(Action.DragStart)
         }
-
-        when (state) {
-            STATE_HIDDEN -> requestRedraw()
-            else -> show()
+        if (state != mState) {
+            requestRedraw()
         }
-
+        if (state != STATE_HIDDEN) {
+            show()
+        }
         if (mState == STATE_DRAGGING && state != STATE_DRAGGING) {
             mVerticalThumbDrawable.setState(EMPTY_STATE_SET)
             resetHideDelay(HIDE_DELAY_AFTER_DRAGGING_MS)
@@ -381,7 +388,7 @@ class FastScroller2(
                         mDragState = DRAG_X
                         mHorizontalDownX = ev.x
                         mHorizontalDownOffset = mRecyclerView.computeHorizontalScrollOffset()
-                    } else if (insideVerticalThumb) {
+                    } else {
                         mDragState = DRAG_Y
                         mVerticalDownY = ev.y
                         mVerticalDownOffset = mRecyclerView.computeVerticalScrollOffset()
@@ -409,7 +416,7 @@ class FastScroller2(
                     mDragState = DRAG_X
                     mHorizontalDownX = me.x
                     mHorizontalDownOffset = mRecyclerView.computeHorizontalScrollOffset()
-                } else if (insideVerticalThumb) {
+                } else {
                     mDragState = DRAG_Y
                     mVerticalDownY = me.y
                     mVerticalDownOffset = mRecyclerView.computeVerticalScrollOffset()
@@ -419,14 +426,11 @@ class FastScroller2(
         } else if (me.action == MotionEvent.ACTION_UP && mState == STATE_DRAGGING) {
             setState(STATE_VISIBLE)
             mDragState = DRAG_NONE
-            requestRedraw()
         } else if (me.action == MotionEvent.ACTION_MOVE && mState == STATE_DRAGGING) {
             show()
-            if (mDragState == DRAG_X) {
-                horizontalScrollTo(me.x)
-            }
-            if (mDragState == DRAG_Y) {
-                verticalScrollTo(me.y)
+            when (mDragState) {
+                DRAG_X -> horizontalScrollTo(me.x)
+                DRAG_Y -> verticalScrollTo(me.y)
             }
         }
     }

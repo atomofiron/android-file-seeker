@@ -136,7 +136,12 @@ fun RecyclerView.addFastScroll() {
         resources.getDimensionPixelSize(R.dimen.fastscroll_area),
         resources.getDimensionPixelSize(R.dimen.fastscroll_minimum_size),
         inTheEnd = false,
-        requestRedraw = { container.foreground?.invalidateSelf() },
+        callback = {
+            when (it) {
+                FastScroller2.Action.Redraw -> container.foreground?.invalidateSelf()
+                FastScroller2.Action.DragStart -> parent.disallowInterceptTouches()
+            }
+        },
     )
     // вся эта поебота нужна для того,
     // чтобы скролл рисовался поверх пинящегося заголовка,
