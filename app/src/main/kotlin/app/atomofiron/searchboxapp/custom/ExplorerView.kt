@@ -125,7 +125,7 @@ class ExplorerView(
 
 fun RecyclerView.addFastScroll() {
     val container = parent as View
-    val scroller = FastScroller(
+    val scroller = FastScroller2(
         this,
         ContextCompat.getDrawable(context, R.drawable.scroll_thumb) as StateListDrawable,
         ContextCompat.getDrawable(context, R.drawable.scroll_track) as Drawable,
