@@ -342,11 +342,11 @@ class FastScroller2(
     fun updateScrollPosition(offsetX: Int, offsetY: Int) {
         val verticalContentLength = mRecyclerView.computeVerticalScrollRange()
         val verticalVisibleLength = getVerticalTrackArea()
-        mNeedVerticalScrollbar = (verticalContentLength - verticalVisibleLength > 0) && (verticalVisibleLength >= mScrollbarMinimumRange)
+        mNeedVerticalScrollbar = verticalContentLength - verticalVisibleLength >= mScrollbarMinimumRange
 
         val horizontalContentLength = mRecyclerView.computeHorizontalScrollRange()
         val horizontalVisibleLength = getHorizontalTrackArea()
-        mNeedHorizontalScrollbar = (horizontalContentLength - horizontalVisibleLength > 0) && (horizontalVisibleLength >= mScrollbarMinimumRange)
+        mNeedHorizontalScrollbar = horizontalContentLength - horizontalVisibleLength >= mScrollbarMinimumRange
 
         if (!mNeedVerticalScrollbar && !mNeedHorizontalScrollbar) {
             if (mState != STATE_HIDDEN) {
