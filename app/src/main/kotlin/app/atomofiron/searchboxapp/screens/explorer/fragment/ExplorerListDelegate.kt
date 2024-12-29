@@ -11,6 +11,8 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.Item
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBorderDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.RootItemMarginDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.withoutDot
 import lib.atomofiron.insets.attachInsetsListener
@@ -108,8 +110,7 @@ class ExplorerListDelegate(
         holder.highlight()
     }
 
-    private inner class HeaderListener : ExplorerItemActionListener {
-        override fun onItemVisible(item: Node) = Unit // unreachable
+    private inner class HeaderListener : ExplorerItemBinderActionListener {
 
         override fun onItemLongClick(item: Node) = output.onItemLongClick(item)
 

@@ -13,9 +13,9 @@ import app.atomofiron.searchboxapp.*
 import app.atomofiron.searchboxapp.databinding.ItemExplorerBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeOpenedCurrent
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.utils.Alpha
 
 class ExplorerHeaderView @JvmOverloads constructor(
@@ -43,7 +43,7 @@ class ExplorerHeaderView @JvmOverloads constructor(
         insetColor = ColorUtils.setAlphaComponent(backgroundColor, Alpha.Level67)
     }
 
-    fun setOnItemActionListener(listener: ExplorerItemActionListener) {
+    fun setOnItemActionListener(listener: ExplorerItemBinderActionListener) {
         binder.onItemActionListener = listener
     }
 

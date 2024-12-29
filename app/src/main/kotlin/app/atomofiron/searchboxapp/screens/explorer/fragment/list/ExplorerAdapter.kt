@@ -12,6 +12,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.Explore
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerItemViewFactory
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerItemViewFactory.*
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerSeparatorHolder
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ItemVisibilityDelegate
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.NodeCallback
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.RecycleItemViewFactory
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.isDot
@@ -26,8 +27,8 @@ class ExplorerAdapter(
 
     private lateinit var viewFactory: RecycleItemViewFactory
 
-    private val _visibleItems = mutableSetOf<Int>()
-    val visibleItems: Set<Int> = _visibleItems
+    private val itemVisibilityDelegate = ItemVisibilityDelegate(this, itemActionListener)
+    val visibleItems = itemVisibilityDelegate.visibleItems
 
     init {
         setHasStableIds(true)
@@ -81,16 +82,7 @@ class ExplorerAdapter(
         }
     }
 
-    override fun onViewAttachedToWindow(holder: GeneralHolder<Node>) {
-        if (holder.bindingAdapterPosition >= 0) {
-            _visibleItems.add(holder.bindingAdapterPosition)
-            itemActionListener.onItemVisible(getItem(holder.bindingAdapterPosition))
-        }
-    }
+    override fun onViewAttachedToWindow(holder: GeneralHolder<Node>) = itemVisibilityDelegate.onItemAttached(holder)
 
-    override fun onViewDetachedFromWindow(holder: GeneralHolder<Node>) {
-        if (holder.bindingAdapterPosition >= 0) {
-            _visibleItems.remove(holder.bindingAdapterPosition)
-        }
-    }
+    override fun onViewDetachedFromWindow(holder: GeneralHolder<Node>) = itemVisibilityDelegate.onItemDetached(holder)
 }
