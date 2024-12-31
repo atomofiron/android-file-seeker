@@ -9,7 +9,7 @@ class NodeGarden {
 
     val states = LinkedList<NodeState>()
     val mutex = Mutex()
-    val trees = HashMap<NodeTabKey, NodeTabTree>()
+    val trees = HashMap<NodeTabKey, NodeTab>()
 
     suspend inline fun <R> withGarden(action: NodeGarden.() -> R): R {
         return mutex.withLock {
@@ -17,5 +17,5 @@ class NodeGarden {
         }
     }
 
-    operator fun get(key: NodeTabKey): NodeTabTree? = trees[key]
+    operator fun get(key: NodeTabKey): NodeTab? = trees[key]
 }

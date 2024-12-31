@@ -5,9 +5,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
-import app.atomofiron.searchboxapp.model.explorer.NodeState
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 
 class ExplorerInteractor(

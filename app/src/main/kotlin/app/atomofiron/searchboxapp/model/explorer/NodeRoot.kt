@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.model.explorer
 
-import android.graphics.drawable.Drawable
+import android.graphics.Bitmap
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.asRoot
 import java.util.Objects
 
@@ -8,7 +8,7 @@ import java.util.Objects
 data class NodeRoot(
     val type: NodeRootType,
     val item: Node,
-    val thumbnail: Drawable? = null,
+    val thumbnail: Bitmap? = null,
     val thumbnailPath: String = "",
     val isSelected: Boolean = false,
     val pathVariants: Array<out String>? = null,

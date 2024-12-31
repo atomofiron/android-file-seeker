@@ -57,7 +57,12 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
         binding.cardTitle.text = item.type.getTitle(itemView.resources)
         binding.cardThumbnail.imageTintList = if (item.withPreview) null else colors
         binding.cardThumbnail.background = item.getThumbnailBackground()
-        binding.cardThumbnail.setImageDrawable((item.thumbnail ?: item.getIcon()))
+        binding.cardThumbnail.run {
+            when (val thumbnail = item.thumbnail) {
+                null -> setImageDrawable(item.getIcon())
+                else -> setImageBitmap(thumbnail)
+            }
+        }
         item.bindType()
     }
 

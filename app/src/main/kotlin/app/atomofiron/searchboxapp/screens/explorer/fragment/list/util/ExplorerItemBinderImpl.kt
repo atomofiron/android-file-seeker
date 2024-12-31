@@ -84,7 +84,11 @@ class ExplorerItemBinderImpl(
         ivIcon.setImageResource(item.getIcon())
         ivIcon.alpha = Alpha.enabled(!item.isDirectory || item.isCached)
         val thumbnail = (item.content as? NodeContent.File)?.thumbnail
-        ivThumbnail.setImageDrawable(thumbnail)
+        when (thumbnail) {
+            is Thumbnail.Bitmap -> ivThumbnail.setImageBitmap(thumbnail.value)
+            is Thumbnail.Drawable -> ivThumbnail.setImageDrawable(thumbnail.value)
+            null -> ivThumbnail.setImageDrawable(null)
+        }
 
         tvName.text = when {
             item.isRoot -> item.getTitle(itemView.resources)

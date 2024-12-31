@@ -1,7 +1,5 @@
 package app.atomofiron.searchboxapp.model.explorer
 
-import android.graphics.drawable.Drawable
-
 sealed class NodeContent(
     // '*/*' - значит тип неизвестен,
     // null - пока неизвестно, известен тип или нет,
@@ -9,6 +7,7 @@ sealed class NodeContent(
     val mimeType: String? = null,
 ) {
     open val rootType: NodeRoot.NodeRootType? = null
+    open val isCached: Boolean = false
 
     data object Unknown : NodeContent()
     data object Link : NodeContent()
@@ -24,27 +23,28 @@ sealed class NodeContent(
 
     sealed class File(
         mimeType: String? = null,
-        open val thumbnail: Drawable? = null,
+        open val thumbnail: Thumbnail? = null,
     ) : NodeContent(mimeType) {
         // прямая связь
         val isEmpty: Boolean get() = thumbnail == null
+        override val isCached: Boolean get() = thumbnail != null
 
         data class Movie(
             val duration: Int = 0,
-            override val thumbnail: Drawable? = null,
+            override val thumbnail: Thumbnail? = null,
         ) : File()
         data class Music(
             val duration: Int = 0,
-            override val thumbnail: Drawable? = null,
+            override val thumbnail: Thumbnail? = null,
         ) : File()
         sealed class Picture(mimeType: String) : File(mimeType) {
-            data class Png(override val thumbnail: Drawable? = null) : Picture("image/png")
-            data class Jpeg(override val thumbnail: Drawable? = null) : Picture("image/jpeg")
-            data class Gif(override val thumbnail: Drawable? = null) : Picture("image/gif")
-            data class Webp(override val thumbnail: Drawable? = null) : Picture("image/webp")
+            data class Png(override val thumbnail: Thumbnail? = null) : Picture("image/png")
+            data class Jpeg(override val thumbnail: Thumbnail? = null) : Picture("image/jpeg")
+            data class Gif(override val thumbnail: Thumbnail? = null) : Picture("image/gif")
+            data class Webp(override val thumbnail: Thumbnail? = null) : Picture("image/webp")
         }
         data class Apk(
-            override val thumbnail: Drawable? = null,
+            override val thumbnail: Thumbnail? = null,
             val appName: String = "",
             val versionName: String = "",
             val versionCode: Int = 0,

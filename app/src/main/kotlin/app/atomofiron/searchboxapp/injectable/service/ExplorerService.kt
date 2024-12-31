@@ -25,8 +25,10 @@ import app.atomofiron.searchboxapp.utils.ExplorerDelegate.asRoot
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.close
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.completePath
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.delete
+import app.atomofiron.searchboxapp.utils.ExplorerDelegate.ensureCached
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.open
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.rename
+import app.atomofiron.searchboxapp.utils.ExplorerDelegate.resolveDirChildren
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.sortByDate
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.sortByName
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.theSame
@@ -61,6 +63,7 @@ class ExplorerService(
 
     private val scope = appStore.scope
     private val previewSize = context.resources.getDimensionPixelSize(R.dimen.preview_size)
+    private var delayedRender: Job? = null
 
     private var config = CacheConfig(useSu = false)
     private val internalStoragePath = Environment
@@ -72,7 +75,7 @@ class ExplorerService(
 
     init {
         scope.launch(Dispatchers.IO) {
-            garden.withGarden {
+            withGarden {
                 preferenceStore.useSu.first()
                 copyToybox(context)
             }
@@ -91,7 +94,7 @@ class ExplorerService(
     }
 
     suspend fun getOrCreateFlow(key: NodeTabKey): MutableSharedFlow<NodeTabItems> {
-        return garden.withGarden {
+        return withGarden {
             getOrCreateFlowSync(key)
         }
     }
@@ -99,7 +102,7 @@ class ExplorerService(
     fun getOrCreateFlowSync(key: NodeTabKey): MutableSharedFlow<NodeTabItems> {
         return garden.run {
             trees[key]?.run { return flow }
-            val tree = NodeTabTree(key, states)
+            val tree = NodeTab(key, states)
             tree.initRoots()
             trees[key] = tree
             scope.launch {
@@ -112,12 +115,12 @@ class ExplorerService(
     }
 
     suspend fun dropTab(key: NodeTabKey) {
-        garden.withGarden {
+        withGarden {
             trees.remove(key)
         }
     }
 
-    private fun NodeTabTree.initRoots() {
+    private fun NodeTab.initRoots() {
         val storagePath = internalStoragePath
         val roots = listOf(
             NodeRoot(NodeRootType.Photos, "${storagePath}$SUB_PATH_CAMERA"),
@@ -155,9 +158,16 @@ class ExplorerService(
     }
 
     suspend fun tryToggle(key: NodeTabKey, it: Node) {
+        if (it.isRoot && it.isCurrent) {
+            return
+        }
         renderTab(key) {
             var item = tree.findNode(it.uniqueId)
-            if (item?.isCached != true) return
+            when {
+                item?.isCached != true -> return
+                it.isOpened != item.isOpened -> return
+            }
+            item!!
             item = item.getOpened() ?: item
 
             val (levelIndex, parent) = tree.findIndexed(item.parentPath)
@@ -188,7 +198,7 @@ class ExplorerService(
         }
     }
 
-    private fun NodeTabTree.updateRootsAsync() {
+    private fun NodeTab.updateRootsAsync() {
         roots.forEach { root ->
             updateRootAsync(key, root)
         }
@@ -199,6 +209,7 @@ class ExplorerService(
             withGarden {
                 withCachingState(root.stableId) {
                     var updated = root.item.update(config)
+                    updated.children?.items
                     updated = when (updated.error) {
                         !is NodeError.NoSuchFile -> updated
                         else -> tryAlternative(root, updated)
@@ -233,7 +244,7 @@ class ExplorerService(
         }
     }
 
-    private fun NodeGarden.updateInternalStorageStats(targetTab: NodeTabTree) {
+    private fun NodeGarden.updateInternalStorageStats(targetTab: NodeTab) {
         var root = targetTab.roots.find { it.type is NodeRootType.InternalStorage }!!
         val statFs = StatFs(root.item.path)
         val freeBytes = statFs.freeBytes
@@ -273,7 +284,7 @@ class ExplorerService(
                 val config = config.copy(thumbnailSize = previewSize)
                 val updatedChild = newestChild.copy(content = NodeContent.Unknown).update(config)
                 val content = updatedChild.content as? NodeContent.File
-                targetRoot.copy(item = updated, thumbnail = content?.thumbnail, thumbnailPath = newestChild.path)
+                targetRoot.copy(item = updated, thumbnail = content?.thumbnail?.bitmap, thumbnailPath = newestChild.path)
             }
         }
     }
@@ -335,22 +346,34 @@ class ExplorerService(
         }
     }
 
-    suspend fun tryCacheAsync(key: NodeTabKey, it: Node) {
+    suspend fun tryCacheAsync(key: NodeTabKey, item: Node) {
         withGarden(key) { tab ->
-            if (it.isRoot) {
-                val root = tab.roots.find { r -> r.item.uniqueId == it.uniqueId }
-                if (root != null) {
-                    updateRootAsync(key, root)
-                    return
-                }
-            }
-            val item = tab.tree.findNode(it.uniqueId)
-            item ?: return
+            tab.roots
+                .takeIf { item.isRoot }
+                ?.find { it.item.uniqueId == item.uniqueId }
+                ?.let { return updateRootAsync(key, it) }
+
+            val item = tab.tree
+                .findNode(item.uniqueId)
+                ?: return
+
             withCachingState(item.uniqueId) {
-                cacheSync(key, item) {
+                cacheSync(key, item) { new ->
                     // todo replace everywhere
-                    tree.replaceItem(it)
+                    tree.replaceItem(new).also {
+                        if (it && new.isDirectory) new.resolveDirChildrenAsync(key)
+                    }
                 }
+
+            }
+        }
+    }
+
+    private fun Node.resolveDirChildrenAsync(key: NodeTabKey) {
+        scope.launch {
+            val resolved = resolveDirChildren(config.useSu)
+            renderTab(key) {
+                tree.replaceItem(resolved)
             }
         }
     }
@@ -526,34 +549,45 @@ class ExplorerService(
 
     private suspend inline fun <R> withGarden(block: NodeGarden.() -> R): R = garden.withGarden(block)
 
-    private suspend inline fun withGarden(key: NodeTabKey, block: NodeGarden.(NodeTabTree) -> Unit) {
-        garden.withGarden {
+    private suspend inline fun withGarden(key: NodeTabKey, block: NodeGarden.(NodeTab) -> Unit) {
+        withGarden {
             get(key)?.let { block(it) }
         }
     }
 
-    private suspend inline fun <R> withTab(key: NodeTabKey, block: NodeTabTree.() -> R): R? {
-        return garden.withGarden {
+    private suspend inline fun <R> withTab(key: NodeTabKey, block: NodeTab.() -> R): R? {
+        return withGarden {
             get(key)?.block()
         }
     }
 
     private suspend inline fun renderTab(key: NodeTabKey) {
-        garden.withGarden {
+        withGarden {
             val tab = get(key) ?: return
             tab.render()
         }
     }
 
-    private suspend inline fun renderTab(key: NodeTabKey, block: NodeTabTree.() -> Unit) {
-        garden.withGarden {
+    private suspend inline fun renderTab(key: NodeTabKey, lazy: Boolean = false, block: NodeTab.() -> Unit) {
+        withGarden {
             val tab = get(key) ?: return
             tab.block()
-            tab.render()
+            when {
+                !lazy -> tab.render()
+                delayedRender == null -> delayedRender = scope.launch {
+                    delay(128)
+                    delayedRender = null
+                    withGarden {
+                        tab.render()
+                    }
+                }
+            }
         }
     }
 
-    private suspend inline fun NodeTabTree.render() {
+    private suspend inline fun NodeTab.render() {
+        delayedRender?.cancel()
+        delayedRender = null
         states.replace {
             // todo NullPointerException
             if (it.withoutState) null else it
@@ -583,7 +617,7 @@ class ExplorerService(
         }
     }
 
-    private fun NodeTabTree.updateStates(items: List<Node>) {
+    private fun NodeTab.updateStates(items: List<Node>) {
         if (states.isNotEmpty()) {
             val iterator = states.listIterator()
             while (iterator.hasNext()) {
@@ -600,7 +634,7 @@ class ExplorerService(
         }
     }
 
-    private fun NodeTabTree.updateChecked(items: List<Node>) {
+    private fun NodeTab.updateChecked(items: List<Node>) {
         if (checked.isNotEmpty()) {
             val iterator = checked.listIterator()
             while (iterator.hasNext()) {
@@ -611,24 +645,18 @@ class ExplorerService(
         }
     }
 
-    private fun NodeTabTree.renderNodes(): List<Node> {
+    private fun NodeTab.renderNodes(): List<Node> {
         var isEmpty = false
         var count = min(1, tree.size)
         count += tree.sumOf {
             if (it.isOpened) it.childCount else 0
         }
         val items = ArrayList<Node>(count)
-        val root = tree.firstOrNull()?.let {
-            when {
-                !it.isOpened -> it
-                else -> it.copy(isCurrent = !it.hasOpened())
-            }
-        }?.also {
-            items.add(updateStateFor(it))
-        }
-        if (root?.isOpened != true) {
-            return items
-        }
+        tree.firstOrNull()
+            ?.let { if (it.isOpened) it.copy(isCurrent = !it.hasOpened()) else it }
+            ?.also { items.add(updateStateFor(it)) }
+            .let { if (it?.isOpened != true) return items }
+
         for (i in tree.indices) {
             val level = tree[i]
             for (j in 0..level.getOpenedIndex()) {
@@ -663,7 +691,7 @@ class ExplorerService(
         return items
     }
 
-    private fun NodeTabTree.updateStateFor(item: Node): Node {
+    private fun NodeTab.updateStateFor(item: Node): Node {
         val state = states.find { it.uniqueId == item.uniqueId }
         val isChecked = checked.find { it == item.uniqueId } != null
         return when {
@@ -673,7 +701,7 @@ class ExplorerService(
         }
     }
 
-    private fun NodeTabTree.updateDirectoryTypes() {
+    private fun NodeTab.updateDirectoryTypes() {
         val defaultStoragePath = internalStoragePath
         val (_, level) = tree.findIndexed { it.parentPath == defaultStoragePath }
         level?.children ?: return
@@ -704,11 +732,12 @@ class ExplorerService(
     private suspend fun cacheSync(
         key: NodeTabKey,
         item: Node,
-        predicate: NodeTabTree.(Node) -> Boolean,
+        predicate: NodeTab.(Node) -> Boolean,
     ): Node {
-        var updated = item.update(config).sortByName()
-        updated = updated.updateContent()
-        renderTab(key) {
+        var updated = item.ensureCached(config)
+            .sortByName()
+            .updateContent()
+        renderTab(key, lazy = true) {
             states.updateState(item.uniqueId) {
                 nextState(item.uniqueId, cachingJob = null)
             }
@@ -831,7 +860,7 @@ class ExplorerService(
                 info.publicSourceDir = path
 
                 val new = NodeContent.File.Apk(
-                    thumbnail = info.loadIcon(packageManager),
+                    thumbnail = info.loadIcon(packageManager).forNode,
                     appName = info.loadLabel(packageManager).toString(),
                     versionName = packageInfo.versionName.toString(),
                     versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt(),

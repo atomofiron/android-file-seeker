@@ -8,6 +8,7 @@ import java.io.OutputStream
 object Shell {
     private const val SU = "su"
     private const val SH = "sh"
+    private const val DOT_SLASH = "./"
 
     private const val TOYBOX = "{toybox}"
     var toyboxPath = Const.DEFAULT_TOYBOX_PATH
@@ -20,7 +21,10 @@ object Shell {
     const val MV = "{toybox} mv \"%s\" \"%s\""
     const val LS_LAHL = "{toybox} ls -lAhL \"%s\""
     const val LS_LAHLD = "{toybox} ls -lAhLd \"%s\""
-    const val FILE_B = "{toybox} file -b \"%s\""
+    // DOT_SLASH is needed because of this shit:
+    // $ cd /some/dir && file *
+    // file: Unknown option '-file-name-starting-with-dash.png' (see "file --help")
+    const val CD_FILE_CHILDREN = "cd \"%s\" && {toybox} file $DOT_SLASH*"
 
     // grep: No 'E' with 'F'
     const val FIND_GREP_HCS = "{toybox} find \"%s\" -type f -maxdepth %d | xargs {toybox} grep -Hcs -e \"%s\""
