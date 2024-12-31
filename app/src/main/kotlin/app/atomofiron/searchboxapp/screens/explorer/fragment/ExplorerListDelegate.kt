@@ -11,7 +11,6 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.Item
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBorderDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.RootItemMarginDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.withoutDot
@@ -24,7 +23,8 @@ class ExplorerListDelegate(
     private val nodeAdapter: ExplorerAdapter,
     headerView: ExplorerHeaderView,
     private val output: ExplorerItemActionListener,
-) {
+) : RecyclerView.AdapterDataObserver() {
+
     private var currentDir: Node? = null
 
     private val headerDelegate = ExplorerHeaderDelegate(recyclerView, headerView, nodeAdapter)
@@ -38,6 +38,21 @@ class ExplorerListDelegate(
         recyclerView.addItemDecoration(backgroundDecorator)
         recyclerView.addItemDecoration(borderDecorator)
         headerView.setOnItemActionListener(HeaderListener())
+        nodeAdapter.registerAdapterDataObserver(this)
+    }
+
+    // areItemsTheSame() = by uniqueId and by isCurrent
+    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+        for (i in positionStart..<(positionStart + itemCount)) {
+            nodeAdapter.currentList[i]
+                .takeIf { it.isCurrent }
+                ?.let { return setCurrentDir(it) }
+        }
+        for (i in positionStart..<(positionStart + itemCount)) {
+            nodeAdapter.currentList[i]
+                .takeIf { it.uniqueId == currentDir?.uniqueId }
+                ?.let { return setCurrentDir(null) }
+        }
     }
 
     private fun getFirstChild(): View? = recyclerView.getChildAt(0)
@@ -61,7 +76,7 @@ class ExplorerListDelegate(
         return position in topItemPosition..bottomItemPosition
     }
 
-    fun setCurrentDir(item: Node?) {
+    private fun setCurrentDir(item: Node?) {
         currentDir = item
         borderDecorator.setCurrentDir(item)
         headerDelegate.setCurrentDir(item)

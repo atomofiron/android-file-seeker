@@ -85,6 +85,7 @@ sealed class NodeContent(
         data object ElfSo : File()
         data object ExeMs : File()
         data object ExeApl : File()
+        data object ExeApls : File()
         data object Other : File()
         data object Unknown : File()
     }
