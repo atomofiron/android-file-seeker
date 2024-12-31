@@ -43,6 +43,7 @@ object ExplorerDelegate {
     private const val FILE_ELF_SO = "ELF shared object" //, 64-bit LSB x86-64, dynamic (/lib64/ld-linux-x86-64.so.2), not stripped
     private const val FILE_MS_EXE = "MS PE32+ executable" // (console) x86-64, (GUI) x86-64
     private const val FILE_APL_EXE = "Mach-O 64-bit x86-64 executable"
+    private const val FILE_APLS_EXE = "Mach-O 64-bit arm64 executable"
 
     private const val EXT_PNG = ".png"
     private const val EXT_JPG = ".jpg"
@@ -286,6 +287,7 @@ object ExplorerDelegate {
             type.startsWith(FILE_PEM) -> content.ifNotCached { NodeContent.File.Pem }
             type.startsWith(FILE_ELF_SO) -> content.ifNotCached { NodeContent.File.ElfSo }
             type.startsWith(FILE_MS_EXE) -> content.ifNotCached { NodeContent.File.ExeMs }
+            type.startsWith(FILE_APLS_EXE) -> content.ifNotCached { NodeContent.File.ExeApls }
             type.startsWith(FILE_APL_EXE) -> content.ifNotCached { NodeContent.File.ExeApl }
             type.startsWith(FILE_DATA) -> name.resolveFileType(content)
             else -> {

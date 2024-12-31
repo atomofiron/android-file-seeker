@@ -34,6 +34,7 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.File.Elf,
     is NodeContent.File.ElfSo,
     is NodeContent.File.ExeApl,
+    is NodeContent.File.ExeApls,
     is NodeContent.File.ExeMs,
     is NodeContent.File.Pem,
     is NodeContent.File.Other,
