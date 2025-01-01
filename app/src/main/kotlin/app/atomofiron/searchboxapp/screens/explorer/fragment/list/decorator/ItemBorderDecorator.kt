@@ -32,7 +32,7 @@ class ItemBorderDecorator(
     private val cornerRadius = headerView.resources.getDimension(R.dimen.explorer_border_corner_radius)
     private val borderWidth = headerView.resources.getDimension(R.dimen.explorer_border_width)
     // под открытой не пустой директорией
-    private val space = cornerRadius
+    private val space = headerView.resources.getDimension(R.dimen.explorer_item_space)
     // под последним айтемом глубочайшей директории
     private val doubleSpace = cornerRadius * 2
     // под открытой пустой директорией
