@@ -353,27 +353,38 @@ class ExplorerService(
                 ?.find { it.item.uniqueId == item.uniqueId }
                 ?.let { return updateRootAsync(key, it) }
 
-            val item = tab.tree
+            val current = tab.tree
                 .findNode(item.uniqueId)
                 ?: return
 
-            withCachingState(item.uniqueId) {
-                cacheSync(key, item) { new ->
+            withCachingState(current.uniqueId) {
+                cacheSync(key, current) { new ->
                     // todo replace everywhere
                     tree.replaceItem(new).also {
-                        if (it && new.isDirectory) new.resolveDirChildrenAsync(key)
+                        if (it && new.isDirectory) resolveDirChildrenAsync(key, new)
                     }
                 }
-
             }
         }
     }
 
-    private fun Node.resolveDirChildrenAsync(key: NodeTabKey) {
-        scope.launch {
-            val resolved = resolveDirChildren(config.useSu)
+    private fun NodeGarden.resolveDirChildrenAsync(key: NodeTabKey, it: Node) {
+        withCachingState(it.uniqueId) {
+            val resolved = it.resolveDirChildren(config.useSu)
             renderTab(key) {
-                tree.replaceItem(resolved)
+                states.updateState(it.uniqueId) {
+                    nextState(it.uniqueId, cachingJob = null)
+                }
+                resolved.children ?: return@renderTab
+                val item = tree.findNode(it.uniqueId) ?: return@renderTab
+                val children = item.children ?: return@renderTab
+                val items = children.map { current ->
+                    resolved.children
+                        .find { it.uniqueId == current.uniqueId }
+                        ?.let { current.updateWith(it.content) }
+                        ?: current
+                }
+                tree.replaceItem(item.copy(children = children.copy(items = items.toMutableList())))
             }
         }
     }
@@ -732,7 +743,7 @@ class ExplorerService(
     private suspend fun cacheSync(
         key: NodeTabKey,
         item: Node,
-        predicate: NodeTab.(Node) -> Boolean,
+        predicate: suspend NodeTab.(Node) -> Boolean,
     ): Node {
         var updated = item.ensureCached(config)
             .sortByName()
