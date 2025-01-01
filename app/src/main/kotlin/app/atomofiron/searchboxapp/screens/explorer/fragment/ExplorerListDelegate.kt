@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer.fragment
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.Node.Companion.toUniqueId
@@ -55,11 +56,11 @@ class ExplorerListDelegate(
         }
     }
 
-    private fun getFirstChild(): View? = recyclerView.getChildAt(0)
+    private fun getFirstChild(offset: Int = 0): View? = recyclerView.getChildAt(offset)
 
-    private fun getLastChild(): View? = recyclerView.getChildAt(recyclerView.childCount.dec())
+    private fun getLastChild(offset: Int = 0): View? = recyclerView.getChildAt(recyclerView.childCount.dec() + offset)
 
-    fun isCurrentDirVisible(): Boolean? = currentDir?.let { isVisible(it) }
+    fun isCurrentDirVisible(): Boolean? = currentDir?.let { isVisible(it) }?.takeIf { !it || currentDir?.isRoot == false }
 
     fun isVisible(item: Node): Boolean {
         val path = item.withoutDot()
@@ -68,8 +69,16 @@ class ExplorerListDelegate(
     }
 
     fun isVisible(position: Int): Boolean {
-        val firstChild = getFirstChild() ?: return false
-        val lastChild = getLastChild() ?: return false
+        var firstChild = getFirstChild() ?: return false
+        var lastChild = getLastChild() ?: return false
+        var offset = 0
+        while (firstChild.bottom < recyclerView.paddingTop) {
+            firstChild = getFirstChild(++offset) ?: break
+        }
+        offset = 0
+        while (lastChild.top > recyclerView.run { height - paddingBottom }) {
+            lastChild = getLastChild(--offset) ?: break
+        }
         var topItemPosition = recyclerView.getChildLayoutPosition(firstChild)
         val bottomItemPosition = recyclerView.getChildLayoutPosition(lastChild)
         if (firstChild.top < 0) topItemPosition = min(bottomItemPosition, topItemPosition.inc())
@@ -88,25 +97,31 @@ class ExplorerListDelegate(
     }
 
     fun scrollTo(item: Node) {
-        val path = item.withoutDot()
-        var lastChild = getLastChild() ?: return
-        var position = nodeAdapter.currentList.indexOfFirst { it.path == path }
-        position += rootAdapter.itemCount
-        val lastItemPosition = recyclerView.getChildLayoutPosition(lastChild)
+        val middleChild = getFirstChild(recyclerView.childCount / 2) ?: return
+        val middlePosition = recyclerView.getChildAdapterPosition(middleChild)
+        val space = recyclerView.resources.getDimensionPixelSize(R.dimen.explorer_item_space)
+        val nodePosition = nodeAdapter.currentList.indexOfFirst { it.uniqueId == item.uniqueId }
+        val position = nodePosition + rootAdapter.itemCount
         recyclerView.stopScroll()
         when {
-            position > lastItemPosition -> {
+            position > middlePosition -> {
                 recyclerView.scrollToPosition(position.dec())
                 recyclerView.post {
-                    lastChild = getLastChild() ?: return@post
-                    recyclerView.smoothScrollBy(0, lastChild.height * 2)
+                    val holder = recyclerView.findViewHolderForAdapterPosition(position.dec())
+                    holder ?: return@post
+                    val area = recyclerView.run { height - paddingTop - paddingBottom}
+                    val childCount = item.children?.size ?: 0
+                    val dy = (holder.itemView.height * (childCount.inc()) + space * 2).coerceAtMost(area)
+                    recyclerView.smoothScrollBy(0, dy)
                 }
             }
             else -> {
                 recyclerView.scrollToPosition(position.inc())
                 recyclerView.post {
-                    val firstChild = getFirstChild() ?: return@post
-                    recyclerView.smoothScrollBy(0, -firstChild.height * 3 / 2)
+                    val holder = recyclerView.findViewHolderForLayoutPosition(position.inc())
+                    holder ?: return@post
+                    val dy = (recyclerView.paddingTop + holder.itemView.height) - holder.itemView.top
+                    if (dy > 0) recyclerView.smoothScrollBy(0, -dy)
                 }
             }
         }
