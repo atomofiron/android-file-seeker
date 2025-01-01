@@ -64,11 +64,16 @@ object ExplorerDelegate {
     private const val EXT_SH = ".sh"
     private const val EXT_IMG = ".img"
     private const val EXT_MP4 = ".mp4"
+    private const val EXT_MKV = ".mkv"
+    private const val EXT_MOV = ".mov"
+    private const val EXT_WEBM = ".webm"
     private const val EXT_3GP = ".3gp"
     private const val EXT_AVI = ".avi"
     private const val EXT_MP3 = ".mp3"
+    private const val EXT_M4A = ".m4a"
     private const val EXT_OGG = ".ogg"
     private const val EXT_WAV = ".wav"
+    private const val EXT_SWF = ".swf"
     private const val EXT_FLAC = ".flac"
     private const val EXT_AAC = ".aac"
     private const val EXT_OGA = ".oga"
@@ -259,9 +264,10 @@ object ExplorerDelegate {
 
     private fun Node.resolveType(type: String): Node {
         val content = when (true) {
-            type.isBlank() -> name.resolveFileType()
-            type.startsWith(DIRECTORY) -> NodeContent.Directory()
+            type.isBlank(),
+            type.startsWith(FILE_DATA),
             type.startsWith(FILE_EMPTY) -> name.resolveFileType()
+            type.startsWith(DIRECTORY) -> NodeContent.Directory()
             type.startsWith(FILE_PNG) -> content.ifNotCached { NodeContent.File.Picture.Png() }
             type.startsWith(FILE_JPEG) -> content.ifNotCached { NodeContent.File.Picture.Jpeg() }
             type.startsWith(FILE_GIF) -> content.ifNotCached { NodeContent.File.Picture.Gif() }
@@ -299,7 +305,6 @@ object ExplorerDelegate {
             type.startsWith(FILE_MS_EXE) -> content.ifNotCached { NodeContent.File.ExeMs }
             type.startsWith(FILE_APLS_EXE) -> content.ifNotCached { NodeContent.File.ExeApls }
             type.startsWith(FILE_APL_EXE) -> content.ifNotCached { NodeContent.File.ExeApl }
-            type.startsWith(FILE_DATA) -> name.resolveFileType(content)
             else -> {
                 Log.e("searchboxapp", "$path unknown type: $type")
                 name.resolveFileType()
@@ -500,9 +505,13 @@ object ExplorerDelegate {
         endsWith(EXT_TXT, ignoreCase = true) -> NodeContent.File.Text.Plain
         endsWith(EXT_IMG, ignoreCase = true) -> NodeContent.File.DataImage
         endsWith(EXT_MP4, ignoreCase = true),
+        endsWith(EXT_MKV, ignoreCase = true),
+        endsWith(EXT_MOV, ignoreCase = true),
+        endsWith(EXT_WEBM, ignoreCase = true),
         endsWith(EXT_3GP, ignoreCase = true),
         endsWith(EXT_AVI, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Movie() }
         endsWith(EXT_MP3, ignoreCase = true),
+        endsWith(EXT_M4A, ignoreCase = true),
         endsWith(EXT_OGG, ignoreCase = true),
         endsWith(EXT_WAV, ignoreCase = true),
         endsWith(EXT_FLAC, ignoreCase = true),
@@ -511,6 +520,7 @@ object ExplorerDelegate {
         endsWith(EXT_PDF, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Pdf }
         endsWith(EXT_FAP, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Fap }
         endsWith(EXT_EXE, ignoreCase = true) -> content.ifNotCached { NodeContent.File.ExeMs }
+        endsWith(EXT_SWF, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Flash }
         else -> NodeContent.File.Other
     }
 
