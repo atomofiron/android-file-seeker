@@ -42,17 +42,24 @@ class ExplorerListDelegate(
         nodeAdapter.registerAdapterDataObserver(this)
     }
 
-    // areItemsTheSame() = by uniqueId and by isCurrent
-    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-        for (i in positionStart..<(positionStart + itemCount)) {
-            nodeAdapter.currentList[i]
-                .takeIf { it.isCurrent }
-                ?.let { return setCurrentDir(it) }
+    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = checkCurrentIn(positionStart..<(positionStart + itemCount))
+
+    override fun onItemRangeChanged(positionStart: Int, itemCount: Int) = checkCurrentIn(positionStart..<(positionStart + itemCount))
+
+    override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) = checkCurrentIn(positionStart..<(positionStart + itemCount))
+
+    private fun checkCurrentIn(range: IntRange) {
+        var findTheNewCurrent = false
+        for (i in range) {
+            val item = nodeAdapter.currentList.getOrNull(i)
+            when {
+                item == null -> continue
+                item.isCurrent -> return setCurrentDir(item)
+                item.uniqueId == currentDir?.uniqueId -> findTheNewCurrent = true
+            }
         }
-        for (i in positionStart..<(positionStart + itemCount)) {
-            nodeAdapter.currentList[i]
-                .takeIf { it.uniqueId == currentDir?.uniqueId }
-                ?.let { return setCurrentDir(null) }
+        if (findTheNewCurrent) {
+            setCurrentDir(nodeAdapter.currentList.find { it.isCurrent })
         }
     }
 
