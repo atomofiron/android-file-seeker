@@ -31,12 +31,14 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.File.Osu.LazerMap,
     is NodeContent.File.Osu.Storyboard,
     is NodeContent.File.Osu.Replay -> R.drawable.ic_explorer_osu_map
+    is NodeContent.File.Fap -> R.drawable.ic_dolphin
     is NodeContent.File.Elf,
     is NodeContent.File.ElfSo,
     is NodeContent.File.ExeApl,
     is NodeContent.File.ExeApls,
     is NodeContent.File.ExeMs,
     is NodeContent.File.Pem,
+    is NodeContent.File.Xz,
     is NodeContent.File.Other,
     is NodeContent.File.Unknown -> R.drawable.ic_file_circle
 }

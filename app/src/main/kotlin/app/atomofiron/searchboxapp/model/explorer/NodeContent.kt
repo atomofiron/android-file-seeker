@@ -78,10 +78,12 @@ sealed class NodeContent(
             data object Osu : Text("application/x-osu-beatmap")
         }
         data object Pdf : File("application/pdf")
+        data object Xz : File()
         data object DB : File()
         data object DataImage : File()
         data object Pem : File()
         data object Elf : File()
+        data object Fap : File()
         data object ElfSo : File()
         data object ExeMs : File()
         data object ExeApl : File()

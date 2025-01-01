@@ -27,6 +27,7 @@ object ExplorerDelegate {
     private const val FILE_GIF = "GIF image data"
     private const val FILE_ZIP = "Zip archive data"
     private const val FILE_GZIP = "gzip compressed data"
+    private const val FILE_XZ = "xz compressed data"
     private const val FILE_BZIP2 = "bzip2 compressed data"
     private const val FILE_TAR = "POSIX tar archive" // (GNU)
     private const val FILE_UTF8_TEXT = "UTF-8 text"
@@ -39,9 +40,11 @@ object ExplorerDelegate {
     private const val FILE_SH_SCRIPT = "/bin/sh script" // sh
     private const val FILE_OGG = "Ogg data, opus audio" // oga
     private const val FILE_PEM = "PEM certificate" // pem
-    private const val FILE_ELF = "ELF executable"
+    private const val FILE_ELF_EXE = "ELF executable"
+    private const val FILE_ELF_RE = "ELF relocatable"
     private const val FILE_ELF_SO = "ELF shared object" //, 64-bit LSB x86-64, dynamic (/lib64/ld-linux-x86-64.so.2), not stripped
-    private const val FILE_MS_EXE = "MS PE32+ executable" // (console) x86-64, (GUI) x86-64
+    private const val FILE_MSP_EXE = "MS PE32+ executable" // (console) x86-64, (GUI) x86-64
+    private const val FILE_MS_EXE = "MS PE32 executable" //  (GUI) x86
     private const val FILE_APL_EXE = "Mach-O 64-bit x86-64 executable"
     private const val FILE_APLS_EXE = "Mach-O 64-bit arm64 executable"
 
@@ -69,6 +72,7 @@ object ExplorerDelegate {
     private const val EXT_FLAC = ".flac"
     private const val EXT_AAC = ".aac"
     private const val EXT_OGA = ".oga"
+    private const val EXT_FAP = ".fap"
     private const val EXT_PDF = ".pdf"
     private const val EXT_EXE = ".exe"
     private const val EXT_XPI = ".xpi" // Mozilla extension
@@ -273,6 +277,7 @@ object ExplorerDelegate {
             type.startsWith(FILE_BZIP2) -> content.ifNotCached { NodeContent.File.Archive.Bzip2() }
             type.startsWith(FILE_GZIP) -> content.ifNotCached { NodeContent.File.Archive.Gz() }
             type.startsWith(FILE_TAR) -> content.ifNotCached { NodeContent.File.Archive.Tar() }
+            type.startsWith(FILE_XZ) -> content.ifNotCached { NodeContent.File.Xz }
             type.startsWith(FILE_SH_SCRIPT) -> NodeContent.File.Text.Script
             type.startsWith(FILE_UTF8_TEXT),
             type.startsWith(FILE_ASCII_TEXT) -> when {
@@ -283,9 +288,14 @@ object ExplorerDelegate {
             type.startsWith(FILE_BOOT_IMAGE) -> NodeContent.File.DataImage
             type.startsWith(FILE_OGG) -> content.ifNotCached { NodeContent.File.Music() }
             type.startsWith(FILE_PDF) -> content.ifNotCached { NodeContent.File.Pdf }
-            type.startsWith(FILE_ELF) -> content.ifNotCached { NodeContent.File.Elf }
+            type.startsWith(FILE_ELF_EXE) -> content.ifNotCached { NodeContent.File.Elf }
+            type.startsWith(FILE_ELF_RE) -> when {
+                name.endsWith(EXT_FAP) -> content.ifNotCached { NodeContent.File.Fap }
+                else -> content.ifNotCached { NodeContent.File.Elf }
+            }
             type.startsWith(FILE_PEM) -> content.ifNotCached { NodeContent.File.Pem }
             type.startsWith(FILE_ELF_SO) -> content.ifNotCached { NodeContent.File.ElfSo }
+            type.startsWith(FILE_MSP_EXE),
             type.startsWith(FILE_MS_EXE) -> content.ifNotCached { NodeContent.File.ExeMs }
             type.startsWith(FILE_APLS_EXE) -> content.ifNotCached { NodeContent.File.ExeApls }
             type.startsWith(FILE_APL_EXE) -> content.ifNotCached { NodeContent.File.ExeApl }
@@ -499,6 +509,8 @@ object ExplorerDelegate {
         endsWith(EXT_OGA, ignoreCase = true),
         endsWith(EXT_AAC, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Music() }
         endsWith(EXT_PDF, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Pdf }
+        endsWith(EXT_FAP, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Fap }
+        endsWith(EXT_EXE, ignoreCase = true) -> content.ifNotCached { NodeContent.File.ExeMs }
         else -> NodeContent.File.Other
     }
 
@@ -513,5 +525,14 @@ object ExplorerDelegate {
         }?.toMutableList() ?: mutableListOf()
         val wasOpened = oldChildren?.isOpened ?: false
         return item.copy(children = newChildren?.copy(items = items, isOpened = wasOpened))
+    }
+
+    fun Node.updateWith(new: NodeContent): Node {
+        val content = when (true) {
+            (new::class != content::class),
+            !isCached -> new
+            else -> return this
+        }
+        return copy(content = content)
     }
 }
