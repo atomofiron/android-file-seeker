@@ -28,3 +28,10 @@ fun String.createVideoThumbnail(config: CacheConfig): Bitmap? = try {
     error(e.toString())
     null
 }
+
+fun String.createAudioThumbnail(config: CacheConfig): Bitmap? = try {
+    ThumbnailUtils.createAudioThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
+} catch (e: Exception) {
+    error(e.toString())
+    null
+}

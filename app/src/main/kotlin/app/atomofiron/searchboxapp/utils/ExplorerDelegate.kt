@@ -326,6 +326,7 @@ object ExplorerDelegate {
             is NodeContent.File.Picture.Webp -> NodeContent.File.Picture.Webp(path.createImageThumbnail(config)?.forNode)
             is NodeContent.File.Picture.Avif -> NodeContent.File.Picture.Avif(path.createImageThumbnail(config)?.forNode)
             is NodeContent.File.Movie -> NodeContent.File.Movie(0, path.createVideoThumbnail(config)?.forNode)
+            is NodeContent.File.Music -> NodeContent.File.Music(0, path.createAudioThumbnail(config)?.forNode)
             else -> return this
         }
         return copy(content = content)
