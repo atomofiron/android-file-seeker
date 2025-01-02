@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.utils
 import android.graphics.Bitmap
 import android.media.ThumbnailUtils
 import android.util.Size
+import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.searchboxapp.model.CacheConfig
 import java.io.File
 
@@ -18,20 +19,28 @@ fun String.createImageThumbnail(config: CacheConfig): Bitmap? = try {
     }*/
     ThumbnailUtils.createImageThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
 } catch (e: Exception) {
-    error(e.toString())
+    e.print(this)
     null
 }
 
 fun String.createVideoThumbnail(config: CacheConfig): Bitmap? = try {
     ThumbnailUtils.createVideoThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
 } catch (e: Exception) {
-    error(e.toString())
+    e.print(this)
     null
 }
 
 fun String.createAudioThumbnail(config: CacheConfig): Bitmap? = try {
     ThumbnailUtils.createAudioThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
 } catch (e: Exception) {
-    error(e.toString())
+    e.print(this)
     null
+}
+
+private fun Exception.print(path: String) {
+    val message = when {
+        BuildConfig.DEBUG -> "$path $this"
+        else -> toString()
+    }
+    error(message)
 }

@@ -319,6 +319,9 @@ object ExplorerDelegate {
     }
 
     private fun Node.cacheFile(config: CacheConfig): Node {
+        if (length == 0L) {
+            return this
+        }
         val content = when (content) {
             is NodeContent.File.Picture.Png -> NodeContent.File.Picture.Png(path.createImageThumbnail(config)?.forNode)
             is NodeContent.File.Picture.Jpeg -> NodeContent.File.Picture.Jpeg(path.createImageThumbnail(config)?.forNode)
