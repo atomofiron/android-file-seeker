@@ -1,14 +1,15 @@
 package app.atomofiron.searchboxapp.custom.view.menu
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.searchboxapp.custom.view.menu.holder.DangerousMenuItemHolder
+import app.atomofiron.searchboxapp.custom.view.menu.holder.MenuHolder
+import app.atomofiron.searchboxapp.custom.view.menu.holder.MenuItemHolder
 
 private const val TYPE_NORMAL = 1
 private const val TYPE_DANGEROUS = 2
 
-@SuppressLint("RestrictedApi")
 class MenuAdapter(context: Context) : RecyclerView.Adapter<MenuHolder>() {
     val menu = MenuImpl(context)
 
