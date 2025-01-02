@@ -79,6 +79,7 @@ object ExplorerDelegate {
     private const val EXT_OGA = ".oga"
     private const val EXT_FAP = ".fap"
     private const val EXT_PDF = ".pdf"
+    private const val EXT_TORRENT = ".torrent"
     private const val EXT_EXE = ".exe"
     private const val EXT_XPI = ".xpi" // Mozilla extension
     private const val EXT_OSZ = ".osz" // osu map
@@ -518,6 +519,7 @@ object ExplorerDelegate {
         endsWith(EXT_OGA, ignoreCase = true),
         endsWith(EXT_AAC, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Music() }
         endsWith(EXT_PDF, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Pdf }
+        endsWith(EXT_TORRENT, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Torrent }
         endsWith(EXT_FAP, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Fap }
         endsWith(EXT_EXE, ignoreCase = true) -> content.ifNotCached { NodeContent.File.ExeMs }
         endsWith(EXT_SWF, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Flash }
