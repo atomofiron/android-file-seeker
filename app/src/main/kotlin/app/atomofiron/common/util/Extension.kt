@@ -10,6 +10,7 @@ import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import app.atomofiron.searchboxapp.R
 import com.google.android.material.color.MaterialColors
 
@@ -99,8 +100,11 @@ fun Int.Companion.random(range: Int = 1000): Int = (Math.random() * range).toInt
 
 fun Boolean.Companion.random(probability: Double = 0.5): Boolean = Math.random() < probability
 
-@Suppress("EXTENSION_SHADOWED_BY_MEMBER") // стандартное дерьмо ебаное
 infix fun Int.progressionTo(other: Int) = when {
     this <= other -> this..other
     else -> this downTo other
+}
+
+fun <T : View> T.ifVisible(action: T.() -> Unit) {
+    if (isVisible) action()
 }

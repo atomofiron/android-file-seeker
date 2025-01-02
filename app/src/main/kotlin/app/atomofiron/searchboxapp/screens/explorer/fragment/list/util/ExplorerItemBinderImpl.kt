@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import app.atomofiron.common.util.ifVisible
 import com.google.android.material.checkbox.MaterialCheckBox
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.view.BallsView
@@ -81,8 +82,6 @@ class ExplorerItemBinderImpl(
         itemView.setOnLongClickListener(onLongClickListener)
         cbBox.setOnCheckedChangeListener(onCheckListener)
 
-        ivIcon.setImageResource(item.getIcon())
-        ivIcon.alpha = Alpha.enabled(!item.isDirectory || item.isCached)
         val thumbnail = (item.content as? NodeContent.File)?.thumbnail
         when (thumbnail) {
             is Thumbnail.Bitmap -> ivThumbnail.setImageBitmap(thumbnail.value)
@@ -107,6 +106,12 @@ class ExplorerItemBinderImpl(
         tvError.isVisible = error != null
         psProgress.isVisible = item.withOperation
         cbBox.isInvisible = item.withOperation
+
+        ivIcon.ifVisible {
+            ivIcon.setImageResource(item.getIcon())
+            ivIcon.alpha = Alpha.enabled(!item.isDirectory || item.isCached)
+        }
+        tvName.setCompoundDrawablesRelativeWithIntrinsicBounds(if (withThumbnail) item.getIcon() else 0, 0, 0, 0)
     }
 
     override fun setOnItemActionListener(listener: ExplorerItemActionListener?) {
