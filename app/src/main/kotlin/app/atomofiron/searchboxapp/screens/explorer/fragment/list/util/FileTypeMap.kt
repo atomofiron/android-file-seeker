@@ -32,7 +32,7 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.File.Osu.Storyboard,
     is NodeContent.File.Osu.Replay -> R.drawable.ic_explorer_osu_map
     is NodeContent.File.Fap -> R.drawable.ic_dolphin
-    is NodeContent.File.Torrent -> R.drawable.ic_download
+    is NodeContent.File.Torrent -> R.drawable.ic_explorer_download
     is NodeContent.File.Elf,
     is NodeContent.File.ElfSo,
     is NodeContent.File.ExeApl,
