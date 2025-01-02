@@ -308,7 +308,10 @@ object ExplorerDelegate {
             type.startsWith(FILE_APLS_EXE) -> content.ifNotCached { NodeContent.File.ExeApls }
             type.startsWith(FILE_APL_EXE) -> content.ifNotCached { NodeContent.File.ExeApl }
             else -> {
-                Log.e("searchboxapp", "$path unknown type: $type")
+                val ext = name.lastIndexOf(Const.DOT).inc()
+                    .let { if (it == 0) name.length else it }
+                    .let { name.substring(it) }
+                error("'$ext' unknown type: $type")
                 name.resolveFileType()
             }
         }

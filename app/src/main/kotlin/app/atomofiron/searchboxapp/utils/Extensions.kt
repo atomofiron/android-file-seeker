@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.app.PendingIntent
+import android.util.Log
 import android.view.Menu
 import androidx.annotation.IdRes
 import androidx.core.graphics.ColorUtils
@@ -12,6 +13,10 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.util.Locale
 import kotlin.math.min
+
+fun error(message: String) {
+    Log.e("searchboxapp", message)
+}
 
 fun String.escapeQuotes(): String = this.replace(Const.QUOTE, "\\" + Const.QUOTE)
 

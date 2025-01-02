@@ -18,11 +18,13 @@ fun String.createImageThumbnail(config: CacheConfig): Bitmap? = try {
     }*/
     ThumbnailUtils.createImageThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
 } catch (e: Exception) {
+    error(e.toString())
     null
 }
 
 fun String.createVideoThumbnail(config: CacheConfig): Bitmap? = try {
     ThumbnailUtils.createVideoThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
 } catch (e: Exception) {
+    error(e.toString())
     null
 }
