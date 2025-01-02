@@ -49,7 +49,7 @@
         android:layout_width="0dp"
         android:layout_height="26sp"
         android:layout_marginEnd="@dimen/edge_size"
-        android:ellipsize="end"
+        android:ellipsize="middle"
         android:maxLines="1"
         android:textSize="18sp"
         android:gravity="bottom"
