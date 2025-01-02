@@ -42,6 +42,7 @@ sealed class NodeContent(
             data class Jpeg(override val thumbnail: Thumbnail? = null) : Picture("image/jpeg")
             data class Gif(override val thumbnail: Thumbnail? = null) : Picture("image/gif")
             data class Webp(override val thumbnail: Thumbnail? = null) : Picture("image/webp")
+            data class Avif(override val thumbnail: Thumbnail? = null) : Picture("image/avif")
         }
         data class Apk(
             override val thumbnail: Thumbnail? = null,

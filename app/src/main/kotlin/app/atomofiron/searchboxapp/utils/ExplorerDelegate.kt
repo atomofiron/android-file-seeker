@@ -69,6 +69,7 @@ object ExplorerDelegate {
     private const val EXT_WEBM = ".webm"
     private const val EXT_3GP = ".3gp"
     private const val EXT_AVI = ".avi"
+    private const val EXT_AVIF = ".avif"
     private const val EXT_MP3 = ".mp3"
     private const val EXT_M4A = ".m4a"
     private const val EXT_OGG = ".ogg"
@@ -320,6 +321,7 @@ object ExplorerDelegate {
             is NodeContent.File.Picture.Jpeg -> NodeContent.File.Picture.Jpeg(path.createImageThumbnail(config)?.forNode)
             is NodeContent.File.Picture.Gif -> NodeContent.File.Picture.Gif(path.createImageThumbnail(config)?.forNode)
             is NodeContent.File.Picture.Webp -> NodeContent.File.Picture.Webp(path.createImageThumbnail(config)?.forNode)
+            is NodeContent.File.Picture.Avif -> NodeContent.File.Picture.Avif(path.createImageThumbnail(config)?.forNode)
             is NodeContent.File.Movie -> NodeContent.File.Movie(0, path.createVideoThumbnail(config)?.forNode)
             else -> return this
         }
@@ -495,6 +497,7 @@ object ExplorerDelegate {
         endsWith(EXT_JPEG, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Picture.Jpeg() }
         endsWith(EXT_GIF, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Picture.Gif() }
         endsWith(EXT_WEBP, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Picture.Webp() }
+        endsWith(EXT_AVIF, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Picture.Avif() }
         endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Apk() }
         endsWith(EXT_ZIP, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Archive.Zip() }
         endsWith(EXT_TAR, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Archive.Tar() }
