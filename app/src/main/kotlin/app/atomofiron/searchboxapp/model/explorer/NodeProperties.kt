@@ -19,4 +19,6 @@ interface INodeProperties {
     val date: String
     val time: String
     val name: String
+    // todo complete
+    val length: Long get() = if (size == "0B") 0 else 1
 }

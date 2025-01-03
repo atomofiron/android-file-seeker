@@ -1,5 +1,7 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
+
 sealed class NodeContent(
     // '*/*' - значит тип неизвестен,
     // null - пока неизвестно, известен тип или нет,
@@ -46,10 +48,7 @@ sealed class NodeContent(
         }
         data class Apk(
             override val thumbnail: Thumbnail? = null,
-            val appName: String = "",
-            val versionName: String = "",
-            val versionCode: Int = 0,
-            val children: List<Node>? = null,
+            val info: ApkInfo? = null,
         ) : File("application/vnd.android.package-archive", thumbnail)
         sealed class Archive(
             mimeType: String,

@@ -5,6 +5,7 @@ import app.atomofiron.common.arch.Recipient
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
+import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -26,6 +27,7 @@ class ExplorerCurtainMenuDelegate(
     private val router: ExplorerRouter,
     private val explorerStore: ExplorerStore,
     private val explorerInteractor: ExplorerInteractor,
+    private val apkInteractor: ApkInteractor,
     curtainChannel: CurtainChannel,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>(), Recipient, MenuListener {
     private companion object {
@@ -87,6 +89,8 @@ class ExplorerCurtainMenuDelegate(
             R.id.menu_delete -> onRemoveConfirm(items)
             R.id.menu_share -> router.shareWith(items.first())
             R.id.menu_open_with -> router.openWith(items.first())
+            R.id.menu_install -> apkInteractor.install(viewState.currentTab.value, items.first())
+            R.id.menu_launch -> apkInteractor.launch(items.first())
         }
     }
 

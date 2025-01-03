@@ -6,6 +6,7 @@ import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.Operation
 import kotlinx.coroutines.CoroutineScope
@@ -19,7 +20,7 @@ class ApkInteractor(
     private val apkService: ApkService,
     private val explorerService: ExplorerService,
 ) {
-    fun installApk(tab: NodeTabKey, item: Node) {
+    fun install(tab: NodeTabKey, item: Node) {
         scope.launch(Dispatchers.IO) {
             val allowed = explorerService.tryMarkInstalling(tab, item, Operation.Installing)
             if (allowed != true) return@launch
@@ -28,5 +29,11 @@ class ApkInteractor(
             apkService.installApk(uri)
             explorerService.tryMarkInstalling(tab, item, installing = null)
         }
+    }
+
+    fun launch(item: Node) {
+        val info = (item.content as? NodeContent.File.Apk)?.info
+        info ?: return
+        apkService.launchApk(info.packageName)
     }
 }

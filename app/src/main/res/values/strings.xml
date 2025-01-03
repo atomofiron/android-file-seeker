@@ -154,6 +154,7 @@
     <string name="check">Check</string>
     <string name="download">Download</string>
     <string name="install">Install</string>
+    <string name="launch">Launch</string>
     <string name="update">Update</string>
     <string name="channel_name_updates">Updates</string>
     <string name="tip">In Files specify where to search</string>

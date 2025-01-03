@@ -41,4 +41,9 @@ class ApkService(
             session.close()
         }
     }
+
+    fun launchApk(packageName: String) {
+        val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
+        context.startActivity(launchIntent)
+    }
 }

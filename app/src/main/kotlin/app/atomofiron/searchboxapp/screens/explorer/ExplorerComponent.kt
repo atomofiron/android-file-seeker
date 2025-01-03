@@ -72,9 +72,10 @@ class ExplorerModule {
         router: ExplorerRouter,
         explorerStore: ExplorerStore,
         explorerInteractor: ExplorerInteractor,
+        apkInteractor: ApkInteractor,
         curtainChannel: CurtainChannel,
     ): ExplorerCurtainMenuDelegate {
-        return ExplorerCurtainMenuDelegate(scope, viewState, router, explorerStore, explorerInteractor, curtainChannel)
+        return ExplorerCurtainMenuDelegate(scope, viewState, router, explorerStore, explorerInteractor, apkInteractor, curtainChannel)
     }
 
     @Provides

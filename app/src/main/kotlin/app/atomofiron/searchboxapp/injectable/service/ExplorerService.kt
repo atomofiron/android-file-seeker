@@ -19,6 +19,7 @@ import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
+import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.asRoot
@@ -427,10 +428,12 @@ class ExplorerService(
             states.updateState(to.uniqueId) {
                 nextState(to.uniqueId, copying = Operation.Copying(isSource = false))
             }
-            tree.find(to.parentPath)?.children?.run {
+            val parent = tree.find(to.parentPath)
+            parent?.children?.run {
                 var index = indexOfFirst { it.isFile }
                 if (index < 0) index = size
                 items.add(index, to)
+                parent.sortByName()
             }
         }
         val new = ExplorerDelegate.copy(from, to, config.useSu)
@@ -872,9 +875,12 @@ class ExplorerService(
 
                 val new = NodeContent.File.Apk(
                     thumbnail = info.loadIcon(packageManager).forNode,
-                    appName = info.loadLabel(packageManager).toString(),
-                    versionName = packageInfo.versionName.toString(),
-                    versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt(),
+                    ApkInfo(
+                        appName = info.loadLabel(packageManager).toString(),
+                        versionName = packageInfo.versionName.toString(),
+                        versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt(),
+                        packageName = packageInfo.packageName,
+                    )
                 )
                 copy(content = new)
             }
