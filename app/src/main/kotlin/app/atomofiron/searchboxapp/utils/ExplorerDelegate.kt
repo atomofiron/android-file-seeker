@@ -243,13 +243,13 @@ object ExplorerDelegate {
     }
 
     /** resolve content types */
-    fun Node.resolveDirChildren(useSu: Boolean) {
-        val children = children ?: return
+    fun Node.resolveDirChildren(useSu: Boolean): Boolean {
+        val children = children ?: return false
         val output = Shell.exec(Shell[Shell.CD_FILE_CHILDREN].format(path), useSu)
         val lines = output.output.split(LF).filter { it.isNotEmpty() }
         when {
-            output.success && lines.isEmpty() -> return
-            !output.success -> return
+            !output.success -> return false
+            lines.isEmpty() -> return false
         }
         lines.map { it.split(fileType) }.forEach { (path, type) ->
             val name = path.substring(2) // remove Shell.DOT_SLASH = "./"
@@ -260,6 +260,7 @@ object ExplorerDelegate {
                 items[index] = items[index].resolveType(type)
             }
         }
+        return true
     }
 
     private fun Node.resolveType(type: String): Node {

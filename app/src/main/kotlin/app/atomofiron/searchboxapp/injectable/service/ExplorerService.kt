@@ -370,22 +370,24 @@ class ExplorerService(
     }
 
     private fun NodeGarden.resolveDirChildrenAsync(key: NodeTabKey, it: Node) {
+        val children = it.children?.copy() ?: return
+        val copy = it.copy(children = children)
         withCachingState(it.uniqueId) {
-            val resolved = it.resolveDirChildren(config.useSu)
+            val done = copy.resolveDirChildren(config.useSu)
             renderTab(key) {
                 states.updateState(it.uniqueId) {
                     nextState(it.uniqueId, cachingJob = null)
                 }
-                resolved.children ?: return@renderTab
-                val item = tree.findNode(it.uniqueId) ?: return@renderTab
-                val children = item.children ?: return@renderTab
-                val items = children.map { current ->
-                    resolved.children
-                        .find { it.uniqueId == current.uniqueId }
-                        ?.let { current.updateWith(it.content) }
-                        ?: current
+                if (!done) {
+                    return@withCachingState
                 }
-                tree.replaceItem(item.copy(children = children.copy(items = items.toMutableList())))
+                val item = tree.findNode(it.uniqueId) ?: return@renderTab
+                val items = item.children?.items ?: return@withCachingState
+                items.forEachIndexed { index, current ->
+                    val resolved = children.find { child -> child.uniqueId == current.uniqueId }
+                    resolved ?: return@forEachIndexed
+                    items[index] = current.updateWith(resolved.content)
+                }
             }
         }
     }
