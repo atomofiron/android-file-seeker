@@ -108,3 +108,12 @@ infix fun Int.progressionTo(other: Int) = when {
 fun <T : View> T.ifVisible(action: T.() -> Unit) {
     if (isVisible) action()
 }
+
+inline fun <T> T.applyIf(predicate: Boolean, action: T.() -> Unit) = when {
+    predicate -> apply(action)
+    else -> this
+}
+
+inline fun <T,Q : Any> T.with(it: Q?, action: T.(Q) -> Unit) = apply {
+    it?.let { action(this, it) }
+}
