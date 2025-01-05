@@ -577,7 +577,7 @@ class ExplorerService(
         }
     }
 
-    private suspend inline fun renderTab(key: NodeTabKey) {
+    private suspend fun renderTab(key: NodeTabKey) {
         withGarden {
             val tab = get(key) ?: return
             tab.render()
@@ -588,15 +588,16 @@ class ExplorerService(
         withGarden {
             val tab = get(key) ?: return
             tab.block()
-            when {
-                !lazy -> tab.render()
-                delayedRender == null -> delayedRender = scope.launch {
-                    delay(128)
-                    delayedRender = null
-                    withGarden {
-                        tab.render()
-                    }
-                }
+            if (lazy) renderTabLazily(key) else tab.render()
+        }
+    }
+
+    private fun renderTabLazily(key: NodeTabKey) {
+        if (delayedRender == null) {
+            delayedRender = scope.launch {
+                delay(128)
+                delayedRender = null
+                renderTab(key)
             }
         }
     }
@@ -749,7 +750,7 @@ class ExplorerService(
         key: NodeTabKey,
         item: Node,
         predicate: suspend NodeTab.(Node) -> Boolean,
-    ): Node {
+    ) {
         var updated = item.ensureCached(config)
             .sortByName()
             .updateContent()
@@ -758,13 +759,13 @@ class ExplorerService(
                 nextState(item.uniqueId, cachingJob = null)
             }
             val current = tree.findNode(item.uniqueId)
-            current ?: return updated
+            current ?: return
+            updated = current.updateWith(updated)
             if (updated.isOpened != current.isOpened) {
                 updated = updated.copy(children = updated.children?.copy(isOpened = current.isOpened))
             }
-            if (!predicate(updated)) return updated
+            if (!predicate(updated)) return
         }
-        return updated
     }
 
     private fun NodeState?.nextState(
@@ -832,6 +833,7 @@ class ExplorerService(
         val (currentIndex, current) = findIndexed(uniqueId)
         when {
             current == null -> fails++
+            currentIndex < 0 -> fails++ // unreachable, always (-1, null)
             item == null -> removeAt(currentIndex)
             current.isOpened == item.isOpened -> set(currentIndex, item)
             else -> set(currentIndex, item.open(!item.isOpened))

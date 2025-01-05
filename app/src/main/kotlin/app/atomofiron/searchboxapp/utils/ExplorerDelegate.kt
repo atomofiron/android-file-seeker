@@ -536,16 +536,41 @@ object ExplorerDelegate {
     }
 
     fun Node.updateWith(item: Node): Node {
-        val oldChildren = children
-        val newChildren = item.children
-        val items = newChildren?.map { new ->
-            when (val old = oldChildren?.find { it.uniqueId == new.uniqueId }) {
-                null -> new
-                else -> new.copy(children = old.children)
+        var children = when {
+            children == null && item.children == null -> null
+            children == null || item.children == null -> item.children
+            else -> {
+                val iterator = children.items.listIterator()
+                val new = item.children.items
+                while (new.isNotEmpty()) {
+                    val node = iterator.takeIf { it.hasNext() }?.next()
+                    val newNode = when (node) {
+                        null -> new.removeLast()
+                        else -> new.removeOneIf { it.uniqueId == node.uniqueId }
+                    }
+                    when {
+                        node != null && newNode != null -> iterator.set(node.copy(properties = newNode.properties))
+                        node != null -> continue
+                        newNode != null -> iterator.add(newNode)
+                    }
+                }
+                children
             }
-        }?.toMutableList() ?: mutableListOf()
-        val wasOpened = oldChildren?.isOpened ?: false
-        return item.copy(children = newChildren?.copy(items = items, isOpened = wasOpened))
+        }
+        if (children != null && children.isOpened != isOpened) {
+            children = children.copy(isOpened = isOpened)
+        }
+        val content = when (true) {
+            (item.content::class != content::class),
+            !content.isCached -> item.content
+            else -> content
+        }
+        return copy(
+            properties = item.properties,
+            content = content,
+            children = children,
+            error = item.error,
+        )
     }
 
     fun Node.updateWith(new: NodeContent): Node {
