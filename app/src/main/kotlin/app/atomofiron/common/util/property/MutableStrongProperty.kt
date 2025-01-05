@@ -2,7 +2,7 @@ package app.atomofiron.common.util.property
 
 import kotlin.reflect.KProperty
 
-class MutableStrongProperty<T : Any?> : StrongProperty<T> {
+open class MutableStrongProperty<T : Any?> : StrongProperty<T> {
     override var value: T
         get() = super.value
         public set(value) {

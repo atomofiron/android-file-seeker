@@ -12,12 +12,11 @@ import kotlinx.coroutines.CoroutineScope
 class AppStore constructor(
     val context: Context,
     val scope: CoroutineScope,
-    resources: Resources,
+    val resourcesProperty: AppResources,
 ) {
     val activityProperty = MutableWeakProperty<AppCompatActivity>(null)
     val windowProperty = MutableWeakProperty<Window>(null)
     val insetsControllerProperty = MutableStrongProperty<WindowInsetsControllerCompat?>()
-    val resourcesProperty = MutableStrongProperty(resources)
 
     fun onActivityCreate(activity: AppCompatActivity) {
         activityProperty.value = activity

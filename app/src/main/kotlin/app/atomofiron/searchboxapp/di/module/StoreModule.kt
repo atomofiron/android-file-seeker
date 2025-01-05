@@ -12,6 +12,10 @@ open class StoreModule {
 
     @Provides
     @Singleton
+    open fun appResources(context: Context) = AppResources(context.resources)
+
+    @Provides
+    @Singleton
     open fun provideFinderStore(scope: CoroutineScope): FinderStore = FinderStore(scope)
 
     @Provides
@@ -34,8 +38,8 @@ open class StoreModule {
 
     @Provides
     @Singleton
-    open fun provideAppStore(context: Context, scope: CoroutineScope): AppStore {
-        return AppStore(context, scope, context.resources)
+    open fun provideAppStore(context: Context, resources: AppResources, scope: CoroutineScope): AppStore {
+        return AppStore(context, scope, resources)
     }
 
     @Provides
