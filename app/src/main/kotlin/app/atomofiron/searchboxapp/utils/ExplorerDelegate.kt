@@ -84,7 +84,7 @@ object ExplorerDelegate {
     private const val EXT_XPI = ".xpi" // Mozilla extension
     private const val EXT_OSZ = ".osz" // osu map
     private const val EXT_OSK = ".osk" // osu skin
-    private const val EXT_OSU = ".osk" // osu beatmap level
+    private const val EXT_OSU = ".osu" // osu beatmap level
     private const val EXT_OLZ = ".olz" // osu lazer map
     private const val EXT_OSR = ".osr" // osu replay
     private const val EXT_OSB = ".osb" // osu storyboard
@@ -243,16 +243,16 @@ object ExplorerDelegate {
     }
 
     /** resolve content types */
-    fun Node.resolveDirChildren(useSu: Boolean): Node {
-        val children = children ?: return this
+    fun Node.resolveDirChildren(useSu: Boolean) {
+        val children = children ?: return
         val output = Shell.exec(Shell[Shell.CD_FILE_CHILDREN].format(path), useSu)
         val lines = output.output.split(LF).filter { it.isNotEmpty() }
         when {
-            output.success && lines.isEmpty() -> return this
-            !output.success -> return copy(error = output.error.toNodeError(path))
+            output.success && lines.isEmpty() -> return
+            !output.success -> return
         }
-        lines.map { it.split(fileType) }.forEach { (name, type) ->
-            val name = name.substring(2) // remove Shell.DOT_SLASH = "./"
+        lines.map { it.split(fileType) }.forEach { (path, type) ->
+            val name = path.substring(2) // remove Shell.DOT_SLASH = "./"
             val index = children.items
                 .indexOfFirst { it.name == name }
                 .also { if (it < 0) return@forEach }
@@ -260,7 +260,6 @@ object ExplorerDelegate {
                 items[index] = items[index].resolveType(type)
             }
         }
-        return this
     }
 
     private fun Node.resolveType(type: String): Node {
