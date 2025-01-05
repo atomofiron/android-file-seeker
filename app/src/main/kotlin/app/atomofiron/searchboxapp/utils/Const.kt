@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.utils
 object Const {
     const val ROOT = "/"
     const val SLASH = '/'
+    const val LF = '\n'
     const val DOT = '.'
     const val SPACE = " "
     const val EMPTY = ""

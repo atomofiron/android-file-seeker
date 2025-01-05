@@ -1,9 +1,9 @@
 package app.atomofiron.searchboxapp.utils
 
-import android.util.Log
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
+import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
 
 object ExplorerDelegate {
@@ -11,7 +11,6 @@ object ExplorerDelegate {
 
     private const val TOTAL = "total"
     private const val SLASH = "/"
-    private const val NEW_LINE = "\n"
     private const val ROOT = SLASH
     private const val ROOT_NAME = "Root"
     private const val DIR_CHAR = 'd'
@@ -209,7 +208,7 @@ object ExplorerDelegate {
 
     fun Node.updateProperties(config: CacheConfig): Node {
         val output = Shell.exec(Shell[Shell.LS_LAHLD].format(path), config.useSu)
-        val lines = output.output.split("\n").filter { it.isNotEmpty() }
+        val lines = output.output.split(LF).filter { it.isNotEmpty() }
         return when {
             output.success && lines.size == 1 -> parseNode(lines.first())
             output.success -> copy(children = null, error = NodeError.Unknown)
@@ -219,7 +218,7 @@ object ExplorerDelegate {
 
     fun Node.update(config: CacheConfig): Node {
         val output = Shell.exec(Shell[Shell.LS_LAHLD].format(path), config.useSu)
-        val lines = output.output.split("\n").filter { it.isNotEmpty() }
+        val lines = output.output.split(LF).filter { it.isNotEmpty() }
         return when {
             output.success && lines.size == 1 -> parseNode(lines.first()).ensureCached(config)
             output.success -> copy(children = null, error = null)
@@ -235,7 +234,7 @@ object ExplorerDelegate {
 
     private fun Node.cacheDir(useSu: Boolean): Node {
         val output = Shell.exec(Shell[Shell.LS_LAHL].format(path), useSu)
-        val lines = output.output.split("\n").filter { it.isNotEmpty() }
+        val lines = output.output.split(LF).filter { it.isNotEmpty() }
         return when {
             output.success && lines.isEmpty() -> copy(children = null, error = null)
             output.success -> parseDir(lines)
@@ -247,7 +246,7 @@ object ExplorerDelegate {
     fun Node.resolveDirChildren(useSu: Boolean): Node {
         val children = children ?: return this
         val output = Shell.exec(Shell[Shell.CD_FILE_CHILDREN].format(path), useSu)
-        val lines = output.output.split("\n").filter { it.isNotEmpty() }
+        val lines = output.output.split(LF).filter { it.isNotEmpty() }
         when {
             output.success && lines.isEmpty() -> return this
             !output.success -> return copy(error = output.error.toNodeError(path))
@@ -477,7 +476,7 @@ object ExplorerDelegate {
     }
 
     private fun String.toNodeError(path: String): NodeError {
-        val lines = trim().split(NEW_LINE)
+        val lines = trim().split(LF)
         val first = lines.find { it.isNotBlank() }
         return when {
             lines.size > 1 -> NodeError.Multiply(lines)
