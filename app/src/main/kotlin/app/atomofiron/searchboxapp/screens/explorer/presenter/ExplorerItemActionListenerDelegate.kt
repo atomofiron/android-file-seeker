@@ -5,9 +5,11 @@ import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.DialogInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
+import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.File
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
+import app.atomofiron.searchboxapp.model.preference.ActionApk
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerViewState
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
@@ -21,6 +23,7 @@ class ExplorerItemActionListenerDelegate(
     private val explorerInteractor: ExplorerInteractor,
     private val apks: ApkInteractor,
     private val dialogs: DialogInteractor,
+    private val preferences: PreferenceStore,
 ) : ExplorerItemActionListener {
 
     private val currentTab get() = viewState.currentTab.value
@@ -47,7 +50,7 @@ class ExplorerItemActionListenerDelegate(
     private fun openItem(item: Node) {
         when {
             item.isDirectory -> explorerInteractor.toggleDir(currentTab, item)
-            item.content is File.Apk -> askAboutApk(item)
+            item.content is File.Apk -> processApk(item)
             item.isFile -> router.showFile(item)
         }
     }
@@ -56,14 +59,25 @@ class ExplorerItemActionListenerDelegate(
 
     override fun onItemBecomeVisible(item: Node) = explorerInteractor.updateItem(currentTab, item)
 
+    private fun processApk(item: Node) {
+        when (preferences.actionApk.value) {
+            ActionApk.Ask -> askAboutApk(item)
+            ActionApk.Install -> apks.install(currentTab, item)
+            ActionApk.Launch -> apks.launch(item)
+        }
+    }
+
     private fun askAboutApk(item: Node) {
         dialogs.builder()
             .setTitle(item.name)
             .setMessageWithOfferDontAskAnymore(true)
-            .setPositiveButton(R.string.launch) {
+            .setPositiveButton(R.string.launch) { dontAskAnymore ->
+                if (dontAskAnymore) preferences { setActionApk(ActionApk.Launch) }
                 apks.launch(item)
-            }.setNegativeButton(R.string.install) {
+            }.setNegativeButton(R.string.install) { dontAskAnymore ->
+                if (dontAskAnymore) preferences { setActionApk(ActionApk.Install) }
                 apks.install(currentTab, item)
-            }.show()
+            }.setNeutralButton(R.string.cancel)
+            .show()
     }
 }

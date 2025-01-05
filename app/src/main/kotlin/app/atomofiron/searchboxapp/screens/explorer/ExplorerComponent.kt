@@ -55,6 +55,7 @@ class ExplorerModule {
         explorerInteractor: ExplorerInteractor,
         apks: ApkInteractor,
         dialogs: DialogInteractor,
+        preferences: PreferenceStore,
     ): ExplorerItemActionListenerDelegate {
         return ExplorerItemActionListenerDelegate(
             viewState,
@@ -64,6 +65,7 @@ class ExplorerModule {
             explorerInteractor,
             apks,
             dialogs,
+            preferences,
         )
     }
 
