@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer.presenter
 
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
+import app.atomofiron.searchboxapp.injectable.interactor.DialogInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -18,7 +19,8 @@ class ExplorerItemActionListenerDelegate(
     private val explorerStore: ExplorerStore,
     private val router: ExplorerRouter,
     private val explorerInteractor: ExplorerInteractor,
-    private val apkInteractor: ApkInteractor,
+    private val apks: ApkInteractor,
+    private val dialogs: DialogInteractor,
 ) : ExplorerItemActionListener {
 
     private val currentTab get() = viewState.currentTab.value
@@ -45,8 +47,7 @@ class ExplorerItemActionListenerDelegate(
     private fun openItem(item: Node) {
         when {
             item.isDirectory -> explorerInteractor.toggleDir(currentTab, item)
-            // todo ask install/launch
-            item.content is File.Apk -> apkInteractor.install(viewState.currentTab.value, item)
+            item.content is File.Apk -> askAboutApk(item)
             item.isFile -> router.showFile(item)
         }
     }
@@ -54,4 +55,15 @@ class ExplorerItemActionListenerDelegate(
     override fun onItemCheck(item: Node, isChecked: Boolean) = explorerInteractor.checkItem(currentTab, item, isChecked)
 
     override fun onItemBecomeVisible(item: Node) = explorerInteractor.updateItem(currentTab, item)
+
+    private fun askAboutApk(item: Node) {
+        dialogs.builder()
+            .setTitle(item.name)
+            .setMessageWithOfferDontAskAnymore(true)
+            .setPositiveButton(R.string.launch) {
+                apks.launch(item)
+            }.setNegativeButton(R.string.install) {
+                apks.install(currentTab, item)
+            }.show()
+    }
 }

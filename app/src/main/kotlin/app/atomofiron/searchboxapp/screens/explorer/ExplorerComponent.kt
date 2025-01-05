@@ -8,6 +8,7 @@ import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
+import app.atomofiron.searchboxapp.injectable.interactor.DialogInteractor
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -52,7 +53,8 @@ class ExplorerModule {
         explorerStore: ExplorerStore,
         router: ExplorerRouter,
         explorerInteractor: ExplorerInteractor,
-        apkInteractor: ApkInteractor,
+        apks: ApkInteractor,
+        dialogs: DialogInteractor,
     ): ExplorerItemActionListenerDelegate {
         return ExplorerItemActionListenerDelegate(
             viewState,
@@ -60,7 +62,8 @@ class ExplorerModule {
             explorerStore,
             router,
             explorerInteractor,
-            apkInteractor,
+            apks,
+            dialogs,
         )
     }
 
@@ -134,6 +137,7 @@ interface ExplorerDependencies {
     fun preferenceStore(): PreferenceStore
     fun curtainChannel(): CurtainChannel
     fun apkInteractor(): ApkInteractor
+    fun dialogInteractor(): DialogInteractor
     fun mainChannel(): MainChannel
     fun preferenceChannel(): PreferenceChannel
 }
