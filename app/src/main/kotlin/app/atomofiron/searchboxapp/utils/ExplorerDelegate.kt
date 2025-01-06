@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.utils
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
+import app.atomofiron.searchboxapp.removeLastOne
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
 
@@ -106,20 +107,6 @@ object ExplorerDelegate {
     fun String.parent(): String = replace(lastPart, "")
 
     fun String.name(): String = split(slashes).findLast { it.isNotEmpty() } ?: ROOT_NAME
-
-    fun create(parent: Node, name: String, isDirectory: Boolean): Node {
-        val content = when {
-            isDirectory -> NodeContent.Directory(Type.Ordinary)
-            else -> NodeContent.File.Unknown
-        }
-        return Node(
-            rootId = parent.rootId,
-            path = parent.path + name,
-            parentPath = parent.path,
-            properties = NodeProperties(name = name),
-            content = content,
-        )
-    }
 
     fun copy(from: Node, to: Node, useSu: Boolean): Node {
         val output = Shell.exec(Shell[Shell.COPY].format(from.path, to.path), useSu)
@@ -454,9 +441,13 @@ object ExplorerDelegate {
 
     fun NodeProperties.isLink(): Boolean = access.firstOrNull() == LINK_CHAR
 
+    // means this node the fake, may be is a visual separating item, isn't a dir
     fun Node.isDot(): Boolean = path.endsWith("/.")
 
-    fun Node.withoutDot(): String = path.replace(Regex("(?<=\\/)\\.$"), "")
+    fun Node.withoutDot(): String = when {
+        isDot() -> path.substring(0, path.length.dec())
+        else -> path
+    }
 
     fun Node.delete(useSu: Boolean): Node? {
         val output = Shell.exec(Shell[Shell.RM_RF].format(path), useSu)
@@ -545,7 +536,7 @@ object ExplorerDelegate {
                 while (new.isNotEmpty()) {
                     val node = iterator.takeIf { it.hasNext() }?.next()
                     val newNode = when (node) {
-                        null -> new.removeLast()
+                        null -> new.removeLastOne()
                         else -> new.removeOneIf { it.uniqueId == node.uniqueId }
                     }
                     when {
