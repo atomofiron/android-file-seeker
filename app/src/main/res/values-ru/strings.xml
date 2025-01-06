@@ -5,6 +5,7 @@
     <string name="storage_err">Ошибка доступа к памяти</string>
     <string name="searching">Поиск…</string>
     <string name="search_stopped">Поиск был остановлен</string>
+    <string name="search_stopping">Прерывание поиска</string>
     <string name="search_empty">Поиск не дал результатов</string>
     <string name="search_succeed">Поиск завершён успешно</string>
     <string name="search_failed">Поиск завершён с ошибкой</string>
@@ -40,6 +41,8 @@
     <string name="open">Открыть</string>
     <string name="done">Завершено</string>
     <string name="submit">Подтвердить</string>
+    <string name="started">Запущен</string>
+    <string name="stopping">Остановка</string>
     <string name="stopped">Остановлено</string>
     <string name="options">Опции</string>
     <string name="options_title">Опции:</string>

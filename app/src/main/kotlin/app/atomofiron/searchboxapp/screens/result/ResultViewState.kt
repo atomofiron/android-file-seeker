@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.result
 import app.atomofiron.common.util.flow.*
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.model.textviewer.SearchTask
+import app.atomofiron.searchboxapp.model.finder.SearchTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 

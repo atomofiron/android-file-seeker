@@ -26,8 +26,8 @@ import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult.FinderResult
 import app.atomofiron.searchboxapp.model.finder.toItemMatchMultiply
-import app.atomofiron.searchboxapp.model.textviewer.SearchState
-import app.atomofiron.searchboxapp.model.textviewer.SearchTask
+import app.atomofiron.searchboxapp.model.finder.SearchState
+import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.Const.UNDEFINEDL
@@ -260,16 +260,16 @@ class FinderWorker(
                 toEnded()
             }
         } catch (e: CancellationException) {
-            updateTask {
-                toEnded(isStopped = true)
+            finderStore {
+                update(task.uuid, SearchState.Stopped())
             }
             process?.destroy()
             dataBuilder.putBoolean(KEY_CANCELLED, true)
         } catch (e: Exception) {
-            logE("$e")
+            logE(e.toString())
             waitForJobs()
-            updateTask {
-                toEnded(error = e.toString())
+            finderStore {
+                update(task.uuid, SearchState.Ended(), error = e.toString())
             }
             dataBuilder.putString(KEY_EXCEPTION, e.toString())
         } finally {
@@ -295,7 +295,8 @@ class FinderWorker(
         }
         val titleId = when {
             task.error != null -> R.string.search_failed
-            task.state.isStopped -> R.string.search_stopped
+            task.state is SearchState.Stopping -> R.string.search_stopping
+            task.state is SearchState.Stopped -> R.string.search_stopped
             task.result.isEmpty -> R.string.search_empty
             else -> R.string.search_succeed
         }

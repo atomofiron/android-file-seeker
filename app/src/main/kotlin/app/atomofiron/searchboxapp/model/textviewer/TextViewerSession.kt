@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.model.textviewer
 
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.finder.SearchTask
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import java.io.File

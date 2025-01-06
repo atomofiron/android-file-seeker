@@ -4,7 +4,7 @@ import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.textviewer.SearchTask
+import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState

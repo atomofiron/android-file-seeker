@@ -6,12 +6,10 @@ import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.finder.SearchParams
-import app.atomofiron.searchboxapp.model.textviewer.SearchTask
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerRouter
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState
-import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState.MatchCursor
 import app.atomofiron.searchboxapp.screens.viewer.presenter.curtain.CurtainSearchDelegate
 import app.atomofiron.searchboxapp.utils.showCurtain
 import kotlinx.coroutines.CoroutineScope

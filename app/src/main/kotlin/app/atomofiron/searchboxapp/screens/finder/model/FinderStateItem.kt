@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.finder.model
 import androidx.annotation.StringRes
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.textviewer.SearchTask
+import app.atomofiron.searchboxapp.model.finder.SearchTask
 import java.util.Objects
 
 // all children mast be 'data classes'

@@ -1,14 +1,6 @@
-package app.atomofiron.searchboxapp.model.textviewer
+package app.atomofiron.searchboxapp.model.finder
 
-import app.atomofiron.searchboxapp.model.finder.SearchParams
-import app.atomofiron.searchboxapp.model.finder.SearchResult
 import java.util.*
-
-
-sealed interface SearchState {
-    data object Progress : SearchState
-    data class Ended(val isRemovable: Boolean, val isStopped: Boolean) : SearchState
-}
 
 data class SearchTask(
     val uuid: UUID,
@@ -22,7 +14,7 @@ data class SearchTask(
 
     val inProgress: Boolean get() = state == SearchState.Progress
     val isEnded: Boolean get() = state is SearchState.Ended
-    val isStopped: Boolean get() = state is SearchState.Ended && state.isStopped
+    val isStopped: Boolean get() = state is SearchState.Stopped
     val isError: Boolean get() = state is SearchState.Ended && error != null
 
     fun copyWith(result: SearchResult): SearchTask = copy(result = result)
@@ -34,10 +26,11 @@ data class SearchTask(
         error: String? = this.error,
     ): SearchTask {
         return copy(
-            state = SearchState.Ended(isRemovable, isStopped),
+            state = if (isStopped) SearchState.Stopped(isRemovable) else SearchState.Ended(
+                isRemovable
+            ),
             result = result,
             error = error,
         )
     }
-
 }

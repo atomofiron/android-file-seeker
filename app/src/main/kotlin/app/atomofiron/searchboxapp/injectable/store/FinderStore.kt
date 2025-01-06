@@ -3,11 +3,14 @@ package app.atomofiron.searchboxapp.injectable.store
 import app.atomofiron.common.util.flow.throttleLatest
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.textviewer.SearchTask
+import app.atomofiron.searchboxapp.model.finder.SearchState
+import app.atomofiron.searchboxapp.model.finder.SearchTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import java.util.UUID
 
 class FinderStore(
     private val scope: CoroutineScope,
@@ -17,9 +20,25 @@ class FinderStore(
     val tasksFlow = mutableTasks.throttleLatest(duration = 100L)
     val tasks: List<SearchTask> get() = mutableTasks.value
 
+    operator fun invoke(block: suspend FinderStore.() -> Unit) {
+        scope.launch { block() }
+    }
+
     suspend fun add(item: SearchTask) {
         mutableTasks.updateList {
             add(item)
+        }
+    }
+
+    suspend fun update(uuid: UUID, state: SearchState, error: String? = null) {
+        mutableTasks.updateList {
+            val index = indexOfFirst { it.uuid == uuid }
+            val current = getOrNull(index)
+            when {
+                current == null -> Unit
+                current.state.order >= state.order -> Unit
+                else -> set(index, current.copy(state = state, error = error ?: current.error))
+            }
         }
     }
 
@@ -51,11 +70,9 @@ class FinderStore(
         }
     }
 
-    private suspend fun <T> MutableStateFlow<List<T>>.updateList(action: MutableList<T>.(current: List<T>) -> Unit) {
+    private suspend inline fun <T> MutableStateFlow<List<T>>.updateList(action: MutableList<T>.() -> Unit) {
         mutex.withLock {
-            value = value.toMutableList().apply {
-                action(value)
-            }
+            value = value.toMutableList().apply(action)
         }
     }
 }

@@ -9,3 +9,5 @@ fun <T> MutableList<T>.removeLastOne() = kotlinRemoveLast()
 typealias MaterialId = com.google.android.material.R.id
 typealias MaterialAttr = com.google.android.material.R.attr
 typealias MaterialDimen = com.google.android.material.R.dimen
+
+typealias Unreachable = Unit

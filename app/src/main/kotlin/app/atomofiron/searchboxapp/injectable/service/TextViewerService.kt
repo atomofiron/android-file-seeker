@@ -9,6 +9,8 @@ import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchResult.TextSearchResult
+import app.atomofiron.searchboxapp.model.finder.SearchState
+import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.textviewer.*
 import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.update
@@ -93,7 +95,7 @@ class TextViewerService(
             finderTask.uuid,
             finderTask.params,
             TextSearchResult(itemMatch.count, itemMatch.matchesMap, itemMatch.indexes),
-            SearchState.Ended(isRemovable = false, isStopped = false),
+            SearchState.Ended(removable = false),
         )
         session.addProgressTask(task)
         return task

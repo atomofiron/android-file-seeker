@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.model.finder
 import android.os.Parcel
 import android.os.Parcelable
 
-class SearchParams(
+data class SearchParams(
     val query: String,
     val useRegex: Boolean,
     val ignoreCase: Boolean,

@@ -6,6 +6,7 @@
     <string name="storage_err">Error accessing memory</string>
     <string name="searching">Search…</string>
     <string name="search_stopped">Search was stopped</string>
+    <string name="search_stopping">Search is stopping</string>
     <string name="search_empty">Search returned no results</string>
     <string name="search_succeed">Search completed successfully</string>
     <string name="search_failed">Search ended with an error</string>
@@ -41,6 +42,8 @@
     <string name="open">Open</string>
     <string name="done">Done</string>
     <string name="submit">Submit</string>
+    <string name="started">Started</string>
+    <string name="stopping">Stopping</string>
     <string name="stopped">Stopped</string>
     <string name="options">Options</string>
     <string name="options_title">Options:</string>

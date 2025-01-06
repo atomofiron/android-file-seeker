@@ -11,13 +11,13 @@ import androidx.core.view.isInvisible
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.Unreachable
 import app.atomofiron.searchboxapp.custom.view.BallsView
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.textviewer.SearchState
+import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
 import app.atomofiron.searchboxapp.utils.Alpha
-import app.atomofiron.searchboxapp.utils.Const
 
 class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListener) : CardViewHolder(parent, layoutId) {
     private val tvLabel = itemView.findViewById<TextView>(R.id.progress_tv_label)
@@ -33,9 +33,11 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
         btnAction.setOnClickListener { view ->
             view.isEnabled = false
             val item = item as FinderStateItem.ProgressItem
-            when {
-                item.task.inProgress -> listener.onProgressStopClick(item)
-                else -> listener.onProgressRemoveClick(item)
+            when (item.task.state) {
+                is SearchState.Progress -> listener.onProgressStopClick(item)
+                is SearchState.Stopping -> Unreachable
+                is SearchState.Stopped,
+                is SearchState.Ended -> listener.onProgressRemoveClick(item)
             }
         }
         tvParams.setSingleLine()
@@ -47,14 +49,13 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
         tvParams.setParams(task.params)
         tvStatus.setStatus(task.result)
         btnAction.isActivated = !task.inProgress
-        btnAction.isEnabled = true
-        bView.isInvisible = !task.inProgress
+        bView.isInvisible = !task.state.running
 
-        val idLabel = when {
-            task.inProgress -> R.string.open
-            task.isStopped -> R.string.stopped
-            task.isError -> R.string.error
-            else -> R.string.done
+        val idLabel = if (task.isError) R.string.error else when (task.state) {
+            is SearchState.Progress -> R.string.started
+            is SearchState.Stopping -> R.string.stopping
+            is SearchState.Stopped -> R.string.stopped
+            is SearchState.Ended -> R.string.done
         }
         val colorLabel = when {
             task.isError -> context.findColorByAttr(MaterialAttr.colorError)
@@ -64,14 +65,11 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
         tvLabel.setTextColor(colorLabel)
 
         val idAction = when {
-            task.inProgress -> R.string.stop
+            task.state.running -> R.string.stop
             else -> R.string.remove
         }
         btnAction.setText(idAction)
-        btnAction.isEnabled = when (task.state) {
-            !is SearchState.Ended -> true
-            else -> task.state.isRemovable
-        }
+        btnAction.isEnabled = task.inProgress || task.state.removable
     }
 
     private fun TextView.setParams(params: SearchParams) {

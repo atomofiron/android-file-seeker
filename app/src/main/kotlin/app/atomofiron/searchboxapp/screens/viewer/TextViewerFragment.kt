@@ -19,7 +19,7 @@ import app.atomofiron.searchboxapp.custom.LayoutDelegate.setScreenSizeListener
 import app.atomofiron.searchboxapp.databinding.FragmentTextViewerBinding
 import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.textviewer.SearchTask
+import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.viewer.recycler.TextViewerAdapter
 import app.atomofiron.searchboxapp.utils.updateItem
 import com.google.android.material.appbar.AppBarLayout

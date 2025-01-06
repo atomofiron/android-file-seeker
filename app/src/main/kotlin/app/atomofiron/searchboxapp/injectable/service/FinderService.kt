@@ -9,14 +9,14 @@ import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.textviewer.SearchTask
+import app.atomofiron.searchboxapp.model.finder.SearchState
+import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.work.FinderWorker
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import java.util.*
 
 class FinderService(
-    private val scope: CoroutineScope,
+    scope: CoroutineScope,
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
     private val finderStore: FinderStore,
@@ -47,11 +47,16 @@ class FinderService(
         workManager.beginWith(request).enqueue()
     }
 
-    fun stop(uuid: UUID) = workManager.cancelWorkById(uuid)
+    fun stop(uuid: UUID) {
+        finderStore {
+            update(uuid, SearchState.Stopping)
+        }
+        workManager.cancelWorkById(uuid)
+    }
 
     fun drop(task: SearchTask) {
-        scope.launch {
-            finderStore.drop(task)
+        finderStore {
+            drop(task)
         }
         notificationManager.cancel(task.uniqueId)
     }
