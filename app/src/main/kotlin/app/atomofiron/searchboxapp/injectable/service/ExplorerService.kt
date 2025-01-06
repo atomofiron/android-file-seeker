@@ -399,7 +399,7 @@ class ExplorerService(
         item ?: return
         val renamed = item.rename(name, config.useSu)
         renderTab(key) {
-            val (_, level) = tree.findIndexed(item.parentPath)
+            val level = tree.find(item.parentPath)
             val index = level?.children?.indexOfFirst { it.uniqueId == item.uniqueId }
             if (index == null || index < 0) return
             level.children.items[index] = renamed
@@ -824,7 +824,7 @@ class ExplorerService(
     private fun MutableList<Node>.replaceItem(item: Node) = replaceItem(item.uniqueId, item.parentPath, item)
 
     private fun MutableList<Node>.replaceItem(uniqueId: Int, parentPath: String, item: Node?): Boolean {
-        val (_, parent) = findIndexed(parentPath)
+        val parent = find(parentPath)
         val parentChildren = parent?.children?.items
         val index = parentChildren?.indexOfFirst { it.uniqueId == uniqueId } ?: -1
         var fails = 0
