@@ -409,14 +409,19 @@ class ExplorerService(
     suspend fun tryCreate(key: NodeTabKey, dir: Node, name: String, directory: Boolean) {
         val item = ExplorerDelegate.create(dir, name, directory, config.useSu)
         renderTab(key) {
-            val (_, level) = tree.findIndexed(dir.path)
-            level?.children ?: return
+            val children = tree.find(dir.uniqueId)
+                ?.children
+                ?: tree.find(dir.parentPath)
+                    ?.children
+                    ?.find { it.uniqueId == dir.uniqueId }
+                    ?.children
+                ?: return
             when {
-                item.isDirectory -> level.children.items.add(0, item)
+                item.isDirectory -> children.items.add(0, item)
                 else -> {
-                    var index = level.children.indexOfFirst { it.isFile }
-                    if (index < 0) index = level.children.size
-                    level.children.items.add(index, item)
+                    var index = children.indexOfFirst { it.isFile }
+                    if (index < 0) index = children.size
+                    children.items.add(index, item)
                 }
             }
         }
