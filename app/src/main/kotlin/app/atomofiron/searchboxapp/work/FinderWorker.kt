@@ -260,6 +260,7 @@ class FinderWorker(
                 toEnded()
             }
         } catch (e: CancellationException) {
+            task = task.copy(state = SearchState.Stopped())
             finderStore {
                 update(task.uuid, SearchState.Stopped())
             }
@@ -268,6 +269,7 @@ class FinderWorker(
         } catch (e: Exception) {
             logE(e.toString())
             waitForJobs()
+            task = task.copy(state = SearchState.Ended(), error = e.toString())
             finderStore {
                 update(task.uuid, SearchState.Ended(), error = e.toString())
             }
@@ -284,7 +286,6 @@ class FinderWorker(
 
     private fun showNotification() {
         val task = task
-        task.state as SearchState.Ended
         val id = task.uniqueId
         val intent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(context, id, intent, UPDATING_FLAG)
@@ -295,7 +296,6 @@ class FinderWorker(
         }
         val titleId = when {
             task.error != null -> R.string.search_failed
-            task.state is SearchState.Stopping -> R.string.search_stopping
             task.state is SearchState.Stopped -> R.string.search_stopped
             task.result.isEmpty -> R.string.search_empty
             else -> R.string.search_succeed
