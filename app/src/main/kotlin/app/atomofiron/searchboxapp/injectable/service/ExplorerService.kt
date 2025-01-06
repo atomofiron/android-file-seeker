@@ -210,7 +210,6 @@ class ExplorerService(
             withGarden {
                 withCachingState(root.stableId) {
                     var updated = root.item.update(config)
-                    updated.children?.items
                     updated = when (updated.error) {
                         !is NodeError.NoSuchFile -> updated
                         else -> tryAlternative(root, updated)
@@ -292,27 +291,28 @@ class ExplorerService(
 
     private suspend fun updateRootSync(updated: Node, key: NodeTabKey, targetRoot: NodeRoot) {
         filterMediaRootChildren(updated, targetRoot.type)
-        val root = updateRootThumbnail(updated, targetRoot)
+        val updatedRoot = updateRootThumbnail(updated, targetRoot)
         withGarden(key) { currentTab ->
-            states.updateState(root.stableId) {
-                nextState(root.stableId, cachingJob = null)
+            states.updateState(updatedRoot.stableId) {
+                nextState(updatedRoot.stableId, cachingJob = null)
             }
             trees.values.forEach { tab ->
-                tab.roots.replace {
-                    when (it.stableId) {
+                tab.roots.replace { root ->
+                    when (root.stableId) {
                         targetRoot.stableId -> {
-                            if (it.isSelected && !root.item.isCached) {
+                            if (root.isSelected && !updatedRoot.item.isCached) {
                                 tab.tree.clear()
                             }
-                            val isSelected = it.isSelected && root.item.isCached
-                            if (tab.key == key) root else it.copy(
-                                thumbnail = root.thumbnail,
-                                thumbnailPath = root.thumbnailPath,
+                            val isSelected = root.isSelected && updatedRoot.item.isCached
+                            val updatedItem = root.item.updateWith(updatedRoot.item)
+                            if (tab.key == key) updatedRoot.copy(item = updatedItem) else root.copy(
+                                thumbnail = updatedRoot.thumbnail,
+                                thumbnailPath = updatedRoot.thumbnailPath,
                                 isSelected = isSelected,
-                                item = it.item.updateWith(updated),
+                                item = updatedItem,
                             )
                         }
-                        else -> it
+                        else -> root
                     }.also { updated ->
                         if (!updated.isSelected) return@also
                         val treeRoot = tab.tree.firstOrNull()
@@ -371,10 +371,10 @@ class ExplorerService(
 
     private fun NodeGarden.resolveDirChildrenAsync(key: NodeTabKey, it: Node) {
         val children = it.children?.copy() ?: return
-        val copy = it.copy(children = children)
         withCachingState(it.uniqueId) {
-            val done = copy.resolveDirChildren(config.useSu)
-            renderTab(key) {
+            val done = it.copy(children = children)
+                .resolveDirChildren(config.useSu)
+            renderTab(key, lazy = true) {
                 states.updateState(it.uniqueId) {
                     nextState(it.uniqueId, cachingJob = null)
                 }

@@ -530,7 +530,8 @@ object ExplorerDelegate {
         var children = when {
             children == null && item.children == null -> null
             children == null || item.children == null -> item.children
-            else -> {
+            children === item.children -> children
+            else -> children.also {
                 val iterator = children.items.listIterator()
                 val new = item.children.items
                 while (new.isNotEmpty()) {
@@ -545,7 +546,6 @@ object ExplorerDelegate {
                         newNode != null -> iterator.add(newNode)
                     }
                 }
-                children
             }
         }
         if (children != null && children.isOpened != isOpened) {
@@ -565,11 +565,10 @@ object ExplorerDelegate {
     }
 
     fun Node.updateWith(new: NodeContent): Node {
-        val content = when (true) {
+        return when (true) {
             (new::class != content::class),
-            !isCached -> new
-            else -> return this
+            !isCached -> copy(content = new)
+            else -> this
         }
-        return copy(content = content)
     }
 }

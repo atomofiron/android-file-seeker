@@ -34,7 +34,7 @@ data class NodeChildren(
         items.forEach { names.add(it.name) }
     }
 
-    fun copy(items: MutableList<Node> = this.items.toMutableList()): NodeChildren {
+    fun copy(items: MutableList<Node> = this.items): NodeChildren {
         return copy(isOpened = isOpened, items = items.toMutableList())
     }
 }
