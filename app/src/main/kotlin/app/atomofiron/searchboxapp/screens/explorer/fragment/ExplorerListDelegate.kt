@@ -105,9 +105,10 @@ class ExplorerListDelegate(
 
     fun scrollTo(item: Node) {
         val middleChild = getFirstChild(recyclerView.childCount / 2) ?: return
+        val targetPath = item.withoutDot()
         val middlePosition = recyclerView.getChildAdapterPosition(middleChild)
         val space = recyclerView.resources.getDimensionPixelSize(R.dimen.explorer_item_space)
-        val nodePosition = nodeAdapter.currentList.indexOfFirst { it.uniqueId == item.uniqueId }
+        val nodePosition = nodeAdapter.currentList.indexOfFirst { it.path == targetPath }
         val position = nodePosition + rootAdapter.itemCount
         recyclerView.stopScroll()
         when {
@@ -127,7 +128,7 @@ class ExplorerListDelegate(
                 recyclerView.post {
                     val holder = recyclerView.findViewHolderForLayoutPosition(position.inc())
                     holder ?: return@post
-                    val dy = (recyclerView.paddingTop + holder.itemView.height) - holder.itemView.top
+                    val dy = (recyclerView.paddingTop + holder.itemView.height) - holder.itemView.top + space
                     if (dy > 0) recyclerView.smoothScrollBy(0, -dy)
                 }
             }
