@@ -23,6 +23,7 @@
         app:itemTextColor="?android:textColorPrimary"
         app:itemIconTint="?android:textColorPrimary"
         app:labelVisibilityMode="labeled"
+        app:itemTextAppearanceActiveBoldEnabled="false"
         />
     <app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
         android:id="@+id/system_ui_background"

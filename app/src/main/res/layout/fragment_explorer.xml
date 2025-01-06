@@ -61,6 +61,7 @@
         app:itemTextColor="?android:textColorPrimary"
         app:itemIconTint="?android:textColorPrimary"
         app:labelVisibilityMode="labeled"
+        app:itemTextAppearanceActiveBoldEnabled="false"
         app:layout_constraintBottom_toBottomOf="parent"
         />
     <com.google.android.material.navigationrail.NavigationRailView

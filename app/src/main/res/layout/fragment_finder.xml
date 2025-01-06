@@ -40,6 +40,7 @@
 			app:itemTextColor="?android:textColorPrimary"
 			app:itemIconTint="?android:textColorPrimary"
 			app:labelVisibilityMode="labeled"
+			app:itemTextAppearanceActiveBoldEnabled="false"
 			/>
 		<com.google.android.material.navigationrail.NavigationRailView
 			android:id="@+id/navigation_rail"
