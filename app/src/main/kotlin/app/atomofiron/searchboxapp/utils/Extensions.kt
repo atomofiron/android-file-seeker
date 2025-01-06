@@ -14,10 +14,6 @@ import java.io.OutputStream
 import java.util.Locale
 import kotlin.math.min
 
-fun error(message: String) {
-    Log.e("searchboxapp", message)
-}
-
 fun String.escapeQuotes(): String = this.replace(Const.QUOTE, "\\" + Const.QUOTE)
 
 private fun String.getExt(): String {

@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.utils
 
+import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
@@ -297,7 +298,7 @@ object ExplorerDelegate {
                 val ext = name.lastIndexOf(Const.DOT).inc()
                     .let { if (it == 0) name.length else it }
                     .let { name.substring(it) }
-                error("'$ext' unknown type: $type")
+                logE("'$ext' unknown type: $type")
                 name.resolveFileType()
             }
         }

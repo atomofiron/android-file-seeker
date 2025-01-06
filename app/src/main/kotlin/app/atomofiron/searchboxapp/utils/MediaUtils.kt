@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.media.ThumbnailUtils
 import android.util.Size
 import app.atomofiron.searchboxapp.BuildConfig
+import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import java.io.File
 
@@ -42,5 +43,5 @@ private fun Exception.print(path: String) {
         BuildConfig.DEBUG -> "$path $this"
         else -> toString()
     }
-    error(message)
+    logE(message)
 }
