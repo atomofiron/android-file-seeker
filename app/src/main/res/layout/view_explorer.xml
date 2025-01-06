@@ -14,16 +14,17 @@
         android:paddingTop="@dimen/common_margin_half"
         android:scrollbars="none"
         />
-    <app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
-        android:id="@+id/system_ui_background"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:navigationBar="none"
-        />
     <app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
         android:id="@+id/explorer_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:visibility="invisible"
+        android:background="?colorBackground"
+        />
+    <app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
+        android:id="@+id/system_ui_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:navigationBar="none"
         />
 </merge>
