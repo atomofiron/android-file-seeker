@@ -9,7 +9,6 @@ import android.os.StatFs
 import androidx.core.content.pm.PackageInfoCompat
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.set
-import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.dropLast
 import app.atomofiron.searchboxapp.injectable.store.AppStore
@@ -541,7 +540,6 @@ class ExplorerService(
         }
         val jobs = items.map { item ->
             scope.launch {
-                if (BuildConfig.DEBUG) delay(1000)
                 val result = item.delete(config.useSu)
                 withGarden(key) { tab ->
                     tab.tree.replaceItem(item.uniqueId, item.parentPath, result)
