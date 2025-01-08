@@ -204,12 +204,7 @@ class FinderWorker(
 
     /** @return true if needed restart */
     private suspend fun Shell.Output.handleErrors(checkPoint: FinderResult, item: Node): Boolean {
-        if (!success && error.isNotBlank()) {
-            logE(error)
-            updateTask {
-                copy(error = error)
-            }
-        } else if (killed && !isStopped) {
+        if (killed && !isStopped) {
             if (BuildConfig.DEBUG) {
                 logE("killed on ${item.path}")
             }
@@ -217,6 +212,11 @@ class FinderWorker(
                 copy(result = checkPoint.copy(retries = checkPoint.retries.inc()))
             }
             return true
+        } else if (!success && error.isNotBlank()) {
+            logE(error)
+            updateTask {
+                copy(error = error)
+            }
         }
         return false
     }

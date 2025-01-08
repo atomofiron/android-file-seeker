@@ -164,7 +164,7 @@
     <string name="search_here">Search here:</string>
     <string name="by_default">Reset to default</string>
     <string name="dash" translatable="false">—</string>
-    <string name="fix_android_12">Starting from Android 12, the search may be interrupted by the system.\nThis issue will be fixed in the next updates.</string>
+    <string name="fix_android_12">Starting from Android 12, the search may be interrupted by the system, which will cause it to partially or fully restart</string>
     <plurals name="x_dirs">
         <item quantity="zero">%d directories</item>
         <item quantity="one">%d directory</item>

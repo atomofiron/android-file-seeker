@@ -27,8 +27,10 @@ class FinderItemsStateDelegate(override val isLocal: Boolean) : FinderItemsState
                 items.add(FinderStateItem.TipItem(R.string.search_here))
             }
         }
+        if (SDK_INT >= S && !isLocal && progressItems.any { it.task.withRetries }) {
+            items.add(FinderStateItem.DisclaimerItem)
+        }
         items.addAll(progressItems)
-        if (SDK_INT >= S && !isLocal) items.add(FinderStateItem.DisclaimerItem)
         searchItems.value = items
     }
 

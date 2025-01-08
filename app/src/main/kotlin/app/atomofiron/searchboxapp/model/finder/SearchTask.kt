@@ -2,15 +2,16 @@ package app.atomofiron.searchboxapp.model.finder
 
 import java.util.*
 
-data class SearchTask(
+data class SearchTask/*<Result : SearchResult>*/(
     val uuid: UUID,
     val params: SearchParams,
-    val result: SearchResult,
+    val result: SearchResult/*Result*/,
     val state: SearchState = SearchState.Progress,
     val error: String? = null,
 ) {
     val uniqueId: Int get() = uuid.hashCode()
     val count: Int = result.count
+    val withRetries: Boolean get() = (result as? SearchResult.FinderResult)?.retries?.let { it > 0 } == true
 
     val inProgress: Boolean get() = state == SearchState.Progress
     val isEnded: Boolean get() = state is SearchState.Ended
