@@ -129,6 +129,7 @@ class FinderWorker(
             if (isStopped) {
                 return
             }
+            val checkPoint = task.result as FinderResult
             val template = when {
                 item.isDirectory && useRegex && ignoreCase -> Shell[Shell.FIND_GREP_HCS_IE]
                 item.isDirectory && useRegex && !ignoreCase -> Shell[Shell.FIND_GREP_HCS_E]
@@ -145,11 +146,8 @@ class FinderWorker(
                 else -> continue@forLoop
             }
             val output = Shell.exec(command, useSu, processObserver, forContentLineListener)
-            if (!output.success && output.error.isNotBlank()) {
-                logE(output.error)
-                updateTask {
-                    copy(error = output.error)
-                }
+            if (output.handleErrors(checkPoint, item)) {
+                searchForContent(listOf(item))
             }
         }
     }
@@ -186,43 +184,61 @@ class FinderWorker(
         }.let { progressJobs.add(it) }
     }
 
-    private suspend fun searchForName(where: List<Node>) {
+    private suspend fun searchByName(where: List<Node>) {
         for (item in where) {
             if (isStopped) {
                 return
             }
+            val checkPoint = task.result as FinderResult
             val template = when {
                 excludeDirs -> Shell[Shell.FIND_F]
                 else -> Shell[Shell.FIND_FD]
             }
             val command = template.format(item.path, maxDepth)
             val output = Shell.exec(command, useSu, processObserver, forNameLineListener)
-            if (!output.success && output.error.isNotBlank()) {
-                logE(output.error)
-                updateTask {
-                    copy(error = output.error)
-                }
+            if (output.handleErrors(checkPoint, item)) {
+                searchByName(listOf(item))
             }
         }
     }
 
-    private val forNameLineListener: (String) -> Unit = { line ->
-        appScope.launch {
-            val item = Node(line, content = NodeContent.File.Unknown).update(resultCacheConfig)
-            when {
-                useRegex && !pattern.matcher(line).find() -> Unit
-                !useRegex && !line.contains(query, ignoreCase) -> Unit
-                else -> addToResult(ItemMatch.Single(item))
+    /** @return true if needed restart */
+    private suspend fun Shell.Output.handleErrors(checkPoint: FinderResult, item: Node): Boolean {
+        if (!success && error.isNotBlank()) {
+            logE(error)
+            updateTask {
+                copy(error = error)
             }
-        }.let { progressJobs.add(it) }
+        } else if (killed && !isStopped) {
+            if (BuildConfig.DEBUG) {
+                logE("killed on ${item.path}")
+            }
+            updateTask {
+                copy(result = checkPoint.copy(retries = checkPoint.retries.inc()))
+            }
+            return true
+        }
+        return false
+    }
+
+    private val forNameLineListener: (String) -> Unit = { line ->
+        when {
+            useRegex && !pattern.matcher(line).find() -> Unit
+            !useRegex && !line.contains(query, ignoreCase) -> Unit
+            else -> appScope.launch {
+                val item = Node(line, content = NodeContent.File.Unknown).update(resultCacheConfig)
+                addToResult(ItemMatch.Single(item))
+            }.let { progressJobs.add(it) }
+        }
     }
 
     private suspend fun addToResult(itemMatch: ItemMatch?) {
         updateTask {
             var result = task.result as FinderResult
-            result = when (itemMatch) {
-                null -> result.copy(countTotal = result.countTotal.inc())
-                else -> result.add(itemMatch)
+            result = when {
+                itemMatch == null -> result.copy(countTotal = result.countTotal.inc())
+                !result.contains(itemMatch) -> result.add(itemMatch)
+                else -> return
             }
             copyWith(result)
         }
@@ -240,7 +256,20 @@ class FinderWorker(
             )
             setForeground(getForegroundInfo())
         }
-        return work()
+        return handleCancellation(::work)
+    }
+
+    private suspend fun <R> handleCancellation(action: suspend () -> R): R {
+        return coroutineScope {
+            launch {
+                try {
+                    while (true) delay(1000)
+                } catch (e: CancellationException) {
+                    process?.destroy()
+                }
+            }
+            action()
+        }
     }
 
     private suspend fun work(): Result {
@@ -253,7 +282,7 @@ class FinderWorker(
             }
             when {
                 forContent -> searchForContent(where)
-                else -> searchForName(where)
+                else -> searchByName(where)
             }
             waitForJobs()
             updateTask {

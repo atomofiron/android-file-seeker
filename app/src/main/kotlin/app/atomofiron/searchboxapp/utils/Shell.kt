@@ -1,7 +1,9 @@
 package app.atomofiron.searchboxapp.utils
 
 import app.atomofiron.searchboxapp.logE
+import app.atomofiron.searchboxapp.poop
 import java.io.InputStream
+import java.io.InterruptedIOException
 import java.io.OutputStream
 
 
@@ -118,7 +120,8 @@ object Shell {
             errorStream = process.errorStream!!
             val osw = outputStream.writer()
 
-            osw.write(String.format("%s\n", command))
+            osw.write(command)
+            osw.write("\n")
             osw.flush()
             osw.close()
 
@@ -129,6 +132,9 @@ object Shell {
             }
             error = errorStream.reader().readText()
             code = process.waitFor()
+        } catch (e: InterruptedIOException) {
+            // process was destroyed, stopped by user
+            error = ""
         } catch (e: Exception) {
             logE(e.toString())
             e.printStackTrace()
@@ -152,5 +158,14 @@ object Shell {
         val error: String,
     ) {
         val success: Boolean = code == 0
+        val killed: Boolean = code == 137 // 1-byte -9?
     }
 }
+
+/*
+/system/bin/device_config get activity_manager max_phantom_processes
+settings get global settings_enable_monitor_phantom_procs
+
+/system/bin/device_config put activity_manager max_phantom_processes 2147483647
+settings put global settings_enable_monitor_phantom_procs false
+*/

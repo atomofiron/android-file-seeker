@@ -34,6 +34,7 @@ sealed class SearchResult {
         override val count: Int = 0,
         val matches: List<ItemMatch> = listOf(),
         override val countTotal: Int = 0,
+        val retries: Int = 0,
     ) : SearchResult() {
 
         override fun getCounters(): IntArray = when {
@@ -59,6 +60,8 @@ sealed class SearchResult {
             val count = left.sumOf { it.count }
             return FinderResult(forContent, count, items, countTotal.dec())
         }
+
+        fun contains(itemCounter: ItemMatch) = matches.contains(itemCounter)
 
         fun add(itemCounter: ItemMatch): FinderResult {
             val items = matches.toMutableList()
