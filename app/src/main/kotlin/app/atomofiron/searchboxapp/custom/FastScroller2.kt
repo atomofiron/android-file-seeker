@@ -97,20 +97,30 @@ class FastScroller2(
     var mVerticalThumbHeight = 0
     @VisibleForTesting
     var mVerticalThumbCenterY = 0
+        set(value) {
+            mVerticalThumbSpeed = abs(value - field) / 3
+            field = value
+        }
     @VisibleForTesting
     var mVerticalDownY = 0f
     @VisibleForTesting
     var mVerticalDownOffset = 0
+    private var mVerticalThumbSpeed = 0
 
     // Dynamic values for the horizontal scroll bar
     @VisibleForTesting
     var mHorizontalThumbWidth = 0
     @VisibleForTesting
     var mHorizontalThumbCenterX = 0
+        set(value) {
+            mHorizontalThumbSpeed = abs(value - field) / 3
+            field = value
+        }
     @VisibleForTesting
     var mHorizontalDownX = 0f
     @VisibleForTesting
     var mHorizontalDownOffset = 0
+    private var mHorizontalThumbSpeed = 0
 
     private var mRecyclerViewWidth = 0
     private var mRecyclerViewHeight = 0
@@ -210,6 +220,7 @@ class FastScroller2(
         if (mState == STATE_DRAGGING && state != STATE_DRAGGING) {
             mVerticalThumbDrawable.setState(EMPTY_STATE_SET)
             resetHideDelay(HIDE_DELAY_AFTER_DRAGGING_MS)
+            resetSpeed()
         } else if (state == STATE_VISIBLE) {
             resetHideDelay(HIDE_DELAY_AFTER_VISIBLE_MS)
         }
@@ -292,42 +303,31 @@ class FastScroller2(
     }
 
     private fun drawVerticalScrollbar(canvas: Canvas) {
-        val viewWidth = mRecyclerViewWidth
-
-        val left = viewWidth - mVerticalThumbWidth.toFloat()
-        val top = mVerticalThumbCenterY - mVerticalThumbHeight / 2f
-        mVerticalThumbDrawable.setBounds(0, 0, mVerticalThumbWidth, mVerticalThumbHeight)
+        val speed = if (mDragState == STATE_DRAGGING) 0 else mVerticalThumbSpeed
+        mVerticalThumbDrawable.setBounds(0, 0, max(1, mVerticalThumbWidth - speed), mVerticalThumbHeight)
         mVerticalTrackDrawable.setBounds(0, paddingTop, mVerticalTrackWidth, paddingTop + getVerticalTrackArea())
 
+        val saved = canvas.save()
         if (onTheLeft) {
-            mVerticalTrackDrawable.draw(canvas)
-            canvas.translate(mVerticalThumbWidth.toFloat(), top)
-            canvas.scale(-1f, 1f)
-            mVerticalThumbDrawable.draw(canvas)
-            canvas.scale(-1f, 1f)
-            canvas.translate(-mVerticalThumbWidth.toFloat(), -top)
+            canvas.translate(paddingLeft.toFloat(), 0f)
         } else {
-            canvas.translate(left, 0f)
-            mVerticalTrackDrawable.draw(canvas)
-            canvas.translate(0f, top)
-            mVerticalThumbDrawable.draw(canvas)
-            canvas.translate(-left, -top)
+            canvas.translate((mRecyclerViewWidth - paddingRight).toFloat(), 0f)
+            canvas.scale(-1f, 1f)
         }
+        mVerticalTrackDrawable.draw(canvas)
+        canvas.translate(0f, mVerticalThumbCenterY - mVerticalThumbHeight / 2f)
+        mVerticalThumbDrawable.draw(canvas)
         if (isShowingLayoutBounds) {
-            when {
-                onTheLeft -> canvas.translate(0f, top)
-                else -> canvas.translate(viewWidth - verticalThumbArea.toFloat(), top)
-            }
             canvas.drawRect(PIXEL_HALF, 0f, verticalThumbArea - PIXEL_HALF, mVerticalThumbHeight.toFloat(), debugPaint)
         }
+        canvas.restoreToCount(saved)
     }
 
     private fun drawHorizontalScrollbar(canvas: Canvas) {
-        val viewHeight = mRecyclerViewHeight
-
-        val top = viewHeight - mHorizontalThumbHeight.toFloat()
+        val top = mRecyclerViewHeight - mHorizontalThumbHeight.toFloat()
         val left = mHorizontalThumbCenterX - mHorizontalThumbWidth / 2f
-        mHorizontalThumbDrawable.setBounds(0, 0, mHorizontalThumbWidth, mHorizontalThumbHeight)
+        val speed = if (mDragState == STATE_DRAGGING) 0 else mHorizontalThumbSpeed
+        mHorizontalThumbDrawable.setBounds(0, min(speed, mHorizontalThumbWidth.dec()), mHorizontalThumbWidth, mHorizontalThumbHeight)
         mHorizontalTrackDrawable.setBounds(paddingLeft, 0, paddingLeft + getHorizontalTrackArea(), mHorizontalTrackHeight)
 
         canvas.translate(0f, top)
@@ -520,6 +520,12 @@ class FastScroller2(
      * Gets the horizontal area of the horizontal scroll bar.
      */
     private fun getHorizontalTrackArea() = mRecyclerViewWidth - paddingLeft - paddingRight
+
+    private fun resetSpeed() {
+        mVerticalThumbSpeed = 0
+        mHorizontalThumbSpeed = 0
+        requestRedraw()
+    }
 
     private inner class AnimatorListener : AnimatorListenerAdapter() {
         private var mCanceled = false
