@@ -61,6 +61,8 @@ class FastScroller2(
         private const val HIDE_DURATION_MS = 500
         private const val SCROLLBAR_FULL_OPAQUE = 255
 
+        private const val PIXEL_HALF = 0.5f
+
         private val PRESSED_STATE_SET = intArrayOf(android.R.attr.state_pressed)
         private val EMPTY_STATE_SET = intArrayOf()
     }
@@ -316,7 +318,7 @@ class FastScroller2(
                 onTheLeft -> canvas.translate(0f, top)
                 else -> canvas.translate(viewWidth - verticalThumbArea.toFloat(), top)
             }
-            canvas.drawRect(0f, 0f, verticalThumbArea.toFloat(), mVerticalThumbHeight.toFloat(), debugPaint)
+            canvas.drawRect(PIXEL_HALF, 0f, verticalThumbArea - PIXEL_HALF, mVerticalThumbHeight.toFloat(), debugPaint)
         }
     }
 
@@ -333,8 +335,8 @@ class FastScroller2(
         canvas.translate(left, 0f)
         mHorizontalThumbDrawable.draw(canvas)
         if (isShowingLayoutBounds) {
-            val height = mHorizontalThumbHeight.toFloat()
-            canvas.drawRect(0f, height - horizontalThumbArea, height, mHorizontalThumbWidth.toFloat(), debugPaint)
+            val height = mHorizontalThumbHeight
+            canvas.drawRect(0f, height - horizontalThumbArea + PIXEL_HALF, height - PIXEL_HALF, mHorizontalThumbWidth.toFloat(), debugPaint)
         }
         canvas.translate(-left, -top)
     }
