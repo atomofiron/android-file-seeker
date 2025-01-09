@@ -54,10 +54,12 @@ object ExplorerDelegate {
     private const val EXT_JPEG = ".jpeg"
     private const val EXT_GIF = ".gif"
     private const val EXT_WEBP = ".webp"
+    private const val EXT_SVG = ".svg"
     private const val EXT_APK = ".apk"
     private const val EXT_ZIP = ".zip"
     private const val EXT_TAR = ".tar"
     private const val EXT_BZ2 = ".bz2"
+    private const val EXT_DMG = ".dmg"
     private const val EXT_GZ = ".gz"
     private const val EXT_RAR = ".rar"
     private const val EXT_TXT = ".txt"
@@ -269,13 +271,17 @@ object ExplorerDelegate {
                 path.endsWith(EXT_OSB, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.Storyboard() }
                 else -> content.ifNotCached { NodeContent.File.Archive.Zip() }
             }
-            type.startsWith(FILE_BZIP2) -> content.ifNotCached { NodeContent.File.Archive.Bzip2() }
+            type.startsWith(FILE_BZIP2) -> when {
+                name.endsWith(EXT_DMG) -> content.ifNotCached { NodeContent.File.Dmg }
+                else -> content.ifNotCached { NodeContent.File.Archive.Bzip2() }
+            }
             type.startsWith(FILE_GZIP) -> content.ifNotCached { NodeContent.File.Archive.Gz() }
             type.startsWith(FILE_TAR) -> content.ifNotCached { NodeContent.File.Archive.Tar() }
             type.startsWith(FILE_XZ) -> content.ifNotCached { NodeContent.File.Xz }
             type.startsWith(FILE_SH_SCRIPT) -> NodeContent.File.Text.Script
             type.startsWith(FILE_UTF8_TEXT),
             type.startsWith(FILE_ASCII_TEXT) -> when {
+                path.endsWith(EXT_SVG, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Svg }
                 path.endsWith(EXT_OSU, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Osu }
                 else -> NodeContent.File.Text.Plain
             }
@@ -334,7 +340,7 @@ object ExplorerDelegate {
 
     fun Node.sortByName(reversed: Boolean = false): Node {
         children?.update(updateNames = false) {
-            sortBy { it.name }
+            sortBy { it.name.lowercase() }
             if (reversed) reverse()
             sortBy { if (it.isDirectory) 0 else 1 }
         }
@@ -512,6 +518,7 @@ object ExplorerDelegate {
         endsWith(EXT_SH, ignoreCase = true) -> NodeContent.File.Text.Script
         endsWith(EXT_HTML, ignoreCase = true),
         endsWith(EXT_TXT, ignoreCase = true) -> NodeContent.File.Text.Plain
+        endsWith(EXT_SVG, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Svg }
         endsWith(EXT_IMG, ignoreCase = true) -> NodeContent.File.DataImage
         endsWith(EXT_MP4, ignoreCase = true),
         endsWith(EXT_MKV, ignoreCase = true),
