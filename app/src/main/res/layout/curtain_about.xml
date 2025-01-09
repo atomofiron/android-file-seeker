@@ -47,6 +47,7 @@
             android:textSize="20sp"
             android:textColor="?colorSecondary"
             android:drawableStart="@drawable/ic_github"
+            android:drawableEnd="@drawable/ic_open_with"
             android:text="@string/look_github"
             android:paddingEnd="@dimen/padding_large"
             />
@@ -66,6 +67,7 @@
             android:textSize="20sp"
             android:textColor="?colorSecondary"
             android:drawableStart="@drawable/ic_forpda"
+            android:drawableEnd="@drawable/ic_open_with"
             android:text="@string/faq_4pda"
             android:paddingEnd="@dimen/padding_large"
             />
