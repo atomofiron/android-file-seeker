@@ -326,15 +326,22 @@ object ExplorerDelegate {
         return if (this !is T || !isCached) action() else this
     }
 
-    fun Node.sortByName(): Node {
+    fun Node.sortBy(how: NodeSort): Node = when (how) {
+        is NodeSort.Size,
+        is NodeSort.Name -> sortByName(reversed = how.reversed)
+        is NodeSort.Date -> sortByDate(newFirst = how.reversed)
+    }
+
+    fun Node.sortByName(reversed: Boolean = false): Node {
         children?.update(updateNames = false) {
-            sortBy { it.name.lowercase() }
+            sortBy { it.name }
+            if (reversed) reverse()
             sortBy { if (it.isDirectory) 0 else 1 }
         }
         return this
     }
 
-    fun Node.sortByDate(newFirst: Boolean = true): Node {
+    private fun Node.sortByDate(newFirst: Boolean = true): Node {
         children?.update(updateNames = false) {
             sortBy { it.time }
             sortBy { it.date }
@@ -527,7 +534,7 @@ object ExplorerDelegate {
         else -> NodeContent.File.Other
     }
 
-    fun Node.updateWith(item: Node): Node {
+    fun Node.updateWith(item: Node, sort: NodeSort? = null): Node {
         var children = when {
             children == null && item.children == null -> null
             children == null || item.children == null -> item.children
@@ -562,7 +569,9 @@ object ExplorerDelegate {
             content = content,
             children = children,
             error = item.error,
-        )
+        ).run {
+            sortBy(sort ?: return@run this)
+        }
     }
 
     fun Node.updateWith(new: NodeContent): Node {

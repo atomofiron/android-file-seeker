@@ -8,14 +8,15 @@ import java.util.Objects
 data class NodeRoot(
     val type: NodeRootType,
     val item: Node,
+    val sort: NodeSort,
     val thumbnail: Bitmap? = null,
     val thumbnailPath: String = "",
     val isSelected: Boolean = false,
     val pathVariants: Array<out String>? = null,
 ) {
 
-    constructor(type: NodeRootType, vararg pathVariants: String)
-            : this(type, Node.asRoot(pathVariants.first(), type), pathVariants = pathVariants.takeIf { it.size > 1 })
+    constructor(type: NodeRootType, sort: NodeSort, vararg pathVariants: String)
+            : this(type, Node.asRoot(pathVariants.first(), type), sort, pathVariants = pathVariants.takeIf { it.size > 1 })
 
     val stableId: Int = type.stableId
     val withPreview: Boolean = when (type) {

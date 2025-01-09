@@ -29,7 +29,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerDelegate.ensureCached
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.open
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.rename
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.resolveDirChildren
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.sortByDate
+import app.atomofiron.searchboxapp.utils.ExplorerDelegate.sortBy
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.sortByName
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.theSame
 import app.atomofiron.searchboxapp.utils.ExplorerDelegate.update
@@ -123,12 +123,12 @@ class ExplorerService(
     private fun NodeTab.initRoots() {
         val storagePath = internalStoragePath
         val roots = listOf(
-            NodeRoot(NodeRootType.Photos, "${storagePath}$SUB_PATH_CAMERA"),
-            NodeRoot(NodeRootType.Videos, "${storagePath}$SUB_PATH_CAMERA"),
-            NodeRoot(NodeRootType.Screenshots, "${storagePath}$SUB_PATH_PIC_SCREENSHOTS", "${storagePath}$SUB_PATH_DCIM_SCREENSHOTS"),
-            NodeRoot(NodeRootType.Bluetooth, "${storagePath}$SUB_PATH_BLUETOOTH", "${storagePath}$SUB_PATH_DOWNLOAD_BLUETOOTH"),
-            NodeRoot(NodeRootType.Downloads, "${storagePath}$SUB_PATH_BLUETOOTH", "${storagePath}$SUB_PATH_DOWNLOAD"),
-            NodeRoot(NodeRootType.InternalStorage(), storagePath),
+            NodeRoot(NodeRootType.Photos, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_CAMERA"),
+            NodeRoot(NodeRootType.Videos, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_CAMERA"),
+            NodeRoot(NodeRootType.Screenshots, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_PIC_SCREENSHOTS", "${storagePath}$SUB_PATH_DCIM_SCREENSHOTS"),
+            NodeRoot(NodeRootType.Bluetooth, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_BLUETOOTH", "${storagePath}$SUB_PATH_DOWNLOAD_BLUETOOTH"),
+            NodeRoot(NodeRootType.Downloads, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_BLUETOOTH", "${storagePath}$SUB_PATH_DOWNLOAD"),
+            NodeRoot(NodeRootType.InternalStorage(), NodeSort.Name, storagePath),
         )
         this.roots.clear()
         this.roots.addAll(roots)
@@ -213,14 +213,6 @@ class ExplorerService(
                         !is NodeError.NoSuchFile -> updated
                         else -> tryAlternative(root, updated)
                     }
-                    updated.run {
-                        when (true) {
-                            root.withPreview,
-                            (root.type is NodeRootType.Bluetooth),
-                            (root.type is NodeRootType.Downloads) -> sortByDate()
-                            else -> sortByName()
-                        }
-                    }
                     updateRootSync(updated, key, root)
                 }
             }
@@ -275,7 +267,10 @@ class ExplorerService(
     }
 
     private fun updateRootThumbnail(updated: Node, targetRoot: NodeRoot): NodeRoot {
-        val newestChild = updated.takeIf { targetRoot.withPreview }?.children?.firstOrNull()
+        val newestChild = updated.takeIf { targetRoot.withPreview }
+            ?.sortBy(targetRoot.sort)
+            ?.children
+            ?.firstOrNull()
         return when {
             newestChild == null -> targetRoot.copy(item = updated, thumbnail = null, thumbnailPath = "")
             targetRoot.thumbnailPath == newestChild.path -> targetRoot
@@ -303,7 +298,7 @@ class ExplorerService(
                                 tab.tree.clear()
                             }
                             val isSelected = root.isSelected && updatedRoot.item.isCached
-                            val updatedItem = root.item.updateWith(updatedRoot.item)
+                            val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sort)
                             if (tab.key == key) updatedRoot.copy(item = updatedItem) else root.copy(
                                 thumbnail = updatedRoot.thumbnail,
                                 thumbnailPath = updatedRoot.thumbnailPath,
