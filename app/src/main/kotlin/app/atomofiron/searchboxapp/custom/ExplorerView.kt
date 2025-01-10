@@ -130,10 +130,10 @@ fun RecyclerView.addFastScroll() {
         ContextCompat.getDrawable(context, R.drawable.scroll_track) as Drawable,
         ContextCompat.getDrawable(context, R.drawable.scroll_thumb) as StateListDrawable,
         ContextCompat.getDrawable(context, R.drawable.scroll_track) as Drawable,
-        resources.getDimensionPixelSize(R.dimen.fastscroll_thickness),
-        resources.getDimensionPixelSize(R.dimen.fastscroll_minimum_range),
-        resources.getDimensionPixelSize(R.dimen.fastscroll_area),
-        resources.getDimensionPixelSize(R.dimen.fastscroll_minimum_size),
+        thickness = resources.getDimensionPixelSize(R.dimen.fastscroll_thickness),
+        mScrollbarMinimumRange = resources.getDimensionPixelSize(R.dimen.fastscroll_minimum_range),
+        minDragAreaSize = resources.getDimensionPixelSize(R.dimen.fastscroll_area),
+        minThumbLength = resources.getDimensionPixelSize(R.dimen.fastscroll_minimum_size),
         inTheEnd = false,
         callback = {
             when (it) {
