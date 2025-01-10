@@ -11,6 +11,7 @@ data class NodeRoot(
     val sort: NodeSort,
     val thumbnail: Bitmap? = null,
     val thumbnailPath: String = "",
+    // todo make true due rendering only
     val isSelected: Boolean = false,
     val pathVariants: Array<out String>? = null,
 ) {
