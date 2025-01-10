@@ -36,7 +36,7 @@ sealed class FinderStateItem(val stableId: Int, val layoutId: Int) {
     }
 
     data class ConfigItem(
-      val ignoreCase: Boolean = false,
+      val ignoreCase: Boolean = true,
       val useRegex: Boolean = false,
       val searchInContent: Boolean = false,
       val excludeDirs: Boolean = false,

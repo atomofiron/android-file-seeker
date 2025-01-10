@@ -28,7 +28,6 @@
         android:text="@string/case_sens"
         android:ellipsize="none"
         android:singleLine="true"
-        android:checked="true"
         />
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/config_cb_use_regexp"

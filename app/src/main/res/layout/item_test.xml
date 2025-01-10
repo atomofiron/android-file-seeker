@@ -5,6 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/common_margin_half"
     android:hint="@string/test_field"
+    android:clipToPadding="false"
+    android:clipChildren="false"
     style="?textInputOutlinedDenseStyle"
     >
     <com.google.android.material.textfield.TextInputEditText
@@ -14,6 +16,7 @@
         android:inputType="textMultiLine|textNoSuggestions"
         android:imeOptions="flagNoFullscreen|flagNoExtractUi"
         android:text="@string/try_find_this_text"
+        android:clipToOutline="false"
         style="@style/Widget.Material3.TextInputEditText.OutlinedBox.Dense"
         />
 </com.google.android.material.textfield.TextInputLayout>
