@@ -93,15 +93,13 @@ class ExplorerListDelegate(
     }
 
     private fun setCurrentDir(item: Node?) {
-        if (currentDir?.path == item?.path) {
-            return
-        }
+        item?.takeIf { !it.isRoot }
+            ?.takeIf { it.path != currentDir?.path }
+            ?.takeIf { currentDir?.parentPath?.startsWith(it.path) == false }
+            ?.let { recyclerView.post { scrollTo(it) } }
         currentDir = item
         borderDecorator.setCurrentDir(item)
         headerDelegate.setCurrentDir(item)
-        item?.takeIf { !it.isRoot }?.let {
-            recyclerView.post { scrollTo(it) }
-        }
     }
 
     fun setComposition(composition: ExplorerItemComposition) {
