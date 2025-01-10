@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.model.explorer
 
 import android.graphics.Bitmap
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.asRoot
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import java.util.Objects
 
 

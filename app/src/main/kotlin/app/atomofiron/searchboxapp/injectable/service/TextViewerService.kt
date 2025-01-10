@@ -13,7 +13,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.textviewer.*
 import app.atomofiron.searchboxapp.utils.*
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.update
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

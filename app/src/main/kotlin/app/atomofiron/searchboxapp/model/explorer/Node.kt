@@ -1,8 +1,8 @@
 package app.atomofiron.searchboxapp.model.explorer
 
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.areChildrenContentsTheSame
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.name
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.parent
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.areChildrenContentsTheSame
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.name
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.parent
 
 
 data class Node constructor(

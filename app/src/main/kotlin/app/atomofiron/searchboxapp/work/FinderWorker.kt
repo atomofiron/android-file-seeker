@@ -31,7 +31,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.Const.UNDEFINEDL
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.update
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock

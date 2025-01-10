@@ -14,7 +14,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.Root
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.withoutDot
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.withoutDot
 import lib.atomofiron.insets.attachInsetsListener
 import kotlin.math.min
 

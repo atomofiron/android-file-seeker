@@ -8,7 +8,7 @@ import app.atomofiron.searchboxapp.removeLastOne
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
 
-object ExplorerDelegate {
+object ExplorerUtils {
     private const val ROOT_PARENT_PATH = "root_parent_path"
 
     private const val TOTAL = "total"

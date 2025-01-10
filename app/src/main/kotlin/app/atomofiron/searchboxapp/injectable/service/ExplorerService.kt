@@ -21,19 +21,19 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.*
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.asRoot
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.close
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.completePath
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.delete
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.ensureCached
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.open
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.rename
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.resolveDirChildren
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.sortBy
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.sortByName
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.theSame
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.update
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.updateWith
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.close
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.completePath
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.ensureCached
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.open
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortBy
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortByName
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateWith
 import app.atomofiron.searchboxapp.utils.endingDot
 import app.atomofiron.searchboxapp.utils.writeTo
 import kotlinx.coroutines.*
@@ -403,7 +403,7 @@ class ExplorerService(
     }
 
     suspend fun tryCreate(key: NodeTabKey, dir: Node, name: String, directory: Boolean) {
-        val item = ExplorerDelegate.create(dir, name, directory, config.useSu)
+        val item = ExplorerUtils.create(dir, name, directory, config.useSu)
         renderTab(key) {
             val children = tree.find(dir.uniqueId)
                 ?.children
@@ -439,7 +439,7 @@ class ExplorerService(
                 parent.sortByName()
             }
         }
-        val new = ExplorerDelegate.copy(from, to, config.useSu)
+        val new = ExplorerUtils.copy(from, to, config.useSu)
         renderTab(key) {
             states.updateState(from.uniqueId) {
                 nextState(from.uniqueId, copying = null)
@@ -727,7 +727,7 @@ class ExplorerService(
             val content = item.content as? NodeContent.Directory
             content ?: continue
             if (content.type != Type.Ordinary) continue
-            val type = ExplorerDelegate.getDirectoryType(item.name)
+            val type = ExplorerUtils.getDirectoryType(item.name)
             if (type == Type.Ordinary) continue
             level.children.items[i] = item.copy(content = content.copy(type = type))
         }

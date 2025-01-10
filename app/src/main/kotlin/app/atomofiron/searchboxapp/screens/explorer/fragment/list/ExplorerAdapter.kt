@@ -15,7 +15,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.Explore
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ItemVisibilityDelegate
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.NodeCallback
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.RecycleItemViewFactory
-import app.atomofiron.searchboxapp.utils.ExplorerDelegate.isDot
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.isDot
 
 class ExplorerAdapter(
     private val itemActionListener: ExplorerItemActionListener,
