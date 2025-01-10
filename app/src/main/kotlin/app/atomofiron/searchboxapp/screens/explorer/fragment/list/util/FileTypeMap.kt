@@ -39,7 +39,7 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.File.ExeApl,
     is NodeContent.File.ExeApls,
     is NodeContent.File.ExeMs,
-    is NodeContent.File.Pem,
+    is NodeContent.File.Cert,
     is NodeContent.File.Xz,
     is NodeContent.File.Other,
     is NodeContent.File.Flash,

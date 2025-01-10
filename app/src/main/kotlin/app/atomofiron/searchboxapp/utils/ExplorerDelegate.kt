@@ -83,6 +83,9 @@ object ExplorerDelegate {
     private const val EXT_OGA = ".oga"
     private const val EXT_FAP = ".fap"
     private const val EXT_PDF = ".pdf"
+    private const val EXT_PEM = ".pem"
+    private const val EXT_P12 = ".p12"
+    private const val EXT_CRT = ".crt"
     private const val EXT_TORRENT = ".torrent"
     private const val EXT_EXE = ".exe"
     private const val EXT_XPI = ".xpi" // Mozilla extension
@@ -294,7 +297,7 @@ object ExplorerDelegate {
                 name.endsWith(EXT_FAP) -> content.ifNotCached { NodeContent.File.Fap }
                 else -> content.ifNotCached { NodeContent.File.Elf }
             }
-            type.startsWith(FILE_PEM) -> content.ifNotCached { NodeContent.File.Pem }
+            type.startsWith(FILE_PEM) -> content.ifNotCached { NodeContent.File.Cert }
             type.startsWith(FILE_ELF_SO) -> content.ifNotCached { NodeContent.File.ElfSo }
             type.startsWith(FILE_MSP_EXE),
             type.startsWith(FILE_MS_EXE) -> content.ifNotCached { NodeContent.File.ExeMs }
@@ -538,6 +541,9 @@ object ExplorerDelegate {
         endsWith(EXT_FAP, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Fap }
         endsWith(EXT_EXE, ignoreCase = true) -> content.ifNotCached { NodeContent.File.ExeMs }
         endsWith(EXT_SWF, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Flash }
+        endsWith(EXT_PEM, ignoreCase = true),
+        endsWith(EXT_P12, ignoreCase = true),
+        endsWith(EXT_CRT, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Cert }
         else -> NodeContent.File.Other
     }
 
