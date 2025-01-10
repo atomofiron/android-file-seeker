@@ -127,7 +127,7 @@ class ExplorerService(
             NodeRoot(NodeRootType.Videos, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_CAMERA"),
             NodeRoot(NodeRootType.Screenshots, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_PIC_SCREENSHOTS", "${storagePath}$SUB_PATH_DCIM_SCREENSHOTS"),
             NodeRoot(NodeRootType.Bluetooth, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_BLUETOOTH", "${storagePath}$SUB_PATH_DOWNLOAD_BLUETOOTH"),
-            NodeRoot(NodeRootType.Downloads, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_BLUETOOTH", "${storagePath}$SUB_PATH_DOWNLOAD"),
+            NodeRoot(NodeRootType.Downloads, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_DOWNLOAD"),
             NodeRoot(NodeRootType.InternalStorage(), NodeSort.Name, storagePath),
         )
         this.roots.clear()

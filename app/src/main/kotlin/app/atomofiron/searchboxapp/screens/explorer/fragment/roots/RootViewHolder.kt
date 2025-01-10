@@ -83,23 +83,17 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
             is NodeRootType.InternalStorage -> R.drawable.ic_thumbnail_memory
             is NodeRootType.Favorite -> R.drawable.ic_thumbnail_favorite
         }
-        return ContextCompat.getDrawable(context, resId)!!
+        return ContextCompat.getDrawable(context, resId) as Drawable
     }
 
-    private fun NodeRoot.getThumbnailBackground(): Drawable? {
-        val resId = when (type) {
-            is NodeRootType.Photos,
-            is NodeRootType.Videos,
-            is NodeRootType.Camera,
-            is NodeRootType.Screenshots -> R.drawable.item_root_thumbnail
-            is NodeRootType.Downloads,
-            is NodeRootType.Bluetooth,
-            is NodeRootType.InternalStorage,
-            is NodeRootType.Favorite -> 0
-        }
-        return when (resId) {
-            0 -> null
-            else -> ContextCompat.getDrawable(context, resId)
-        }
+    private fun NodeRoot.getThumbnailBackground(): Drawable? = when (type) {
+        is NodeRootType.Photos,
+        is NodeRootType.Videos,
+        is NodeRootType.Camera,
+        is NodeRootType.Screenshots -> ContextCompat.getDrawable(context, R.drawable.item_root_thumbnail)
+        is NodeRootType.Downloads,
+        is NodeRootType.Bluetooth,
+        is NodeRootType.InternalStorage,
+        is NodeRootType.Favorite -> null
     }
 }
