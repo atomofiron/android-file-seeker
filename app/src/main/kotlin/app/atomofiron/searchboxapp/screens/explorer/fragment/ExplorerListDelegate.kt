@@ -93,9 +93,15 @@ class ExplorerListDelegate(
     }
 
     private fun setCurrentDir(item: Node?) {
+        if (currentDir?.path == item?.path) {
+            return
+        }
         currentDir = item
         borderDecorator.setCurrentDir(item)
         headerDelegate.setCurrentDir(item)
+        item?.takeIf { !it.isRoot }?.let {
+            recyclerView.post { scrollTo(it) }
+        }
     }
 
     fun setComposition(composition: ExplorerItemComposition) {
@@ -104,12 +110,15 @@ class ExplorerListDelegate(
     }
 
     fun scrollTo(item: Node) {
-        val middleChild = getFirstChild(recyclerView.childCount / 2) ?: return
         val targetPath = item.withoutDot()
-        val middlePosition = recyclerView.getChildAdapterPosition(middleChild)
-        val space = recyclerView.resources.getDimensionPixelSize(R.dimen.explorer_item_space)
         val nodePosition = nodeAdapter.currentList.indexOfFirst { it.path == targetPath }
         val position = nodePosition + rootAdapter.itemCount
+        recyclerView.findViewHolderForAdapterPosition(position)
+            ?.takeIf { recyclerView.run { it.itemView.top > paddingTop && it.itemView.bottom < height - paddingBottom } }
+            ?.let { return }
+        val middleChild = getFirstChild(recyclerView.childCount / 2) ?: return
+        val space = recyclerView.resources.getDimensionPixelSize(R.dimen.explorer_item_space)
+        val middlePosition = recyclerView.getChildAdapterPosition(middleChild)
         recyclerView.stopScroll()
         when {
             position > middlePosition -> {
@@ -120,7 +129,7 @@ class ExplorerListDelegate(
                     val area = recyclerView.run { height - paddingTop - paddingBottom}
                     val childCount = item.children?.size ?: 0
                     val dy = (holder.itemView.height * (childCount.inc()) + space * 2).coerceAtMost(area)
-                    recyclerView.smoothScrollBy(0, dy)
+                    if (dy < 0) recyclerView.smoothScrollBy(0, dy)
                 }
             }
             else -> {
