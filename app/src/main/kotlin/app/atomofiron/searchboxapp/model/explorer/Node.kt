@@ -33,6 +33,7 @@ data class Node constructor(
 
     val isCached: Boolean get() = children != null || content.isCached
     val isEmpty: Boolean get() = children?.isEmpty() == true
+    val hasChildren: Boolean get() = children?.isNotEmpty() == true
     val isOpened: Boolean get() = children?.isOpened == true
     val childCount: Int get() = children?.size ?: 0
 

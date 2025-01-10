@@ -128,7 +128,7 @@ class ExplorerItemBinderImpl(
         tvDescription.text = string.toString()
         tvSize.text = when {
             !composition.visibleSize -> EMPTY
-            !item.isFile && !preview -> EMPTY
+            !preview && item.isDirectory && !item.hasChildren -> EMPTY
             item.size.isBlank() -> EMPTY
             else -> item.size + BYTE_LETTER
         }

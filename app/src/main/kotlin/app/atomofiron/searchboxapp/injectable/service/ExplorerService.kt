@@ -300,7 +300,8 @@ class ExplorerService(
                             }
                             val isSelected = root.isSelected && updatedRoot.item.isCached
                             val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sort)
-                            if (tab.key == key) updatedRoot.copy(item = updatedItem) else root.copy(
+                            if (tab.key == key) updatedRoot.copy(item = updatedItem, type = root.type) else root.copy(
+                                type = root.type,
                                 thumbnail = updatedRoot.thumbnail,
                                 thumbnailPath = updatedRoot.thumbnailPath,
                                 isSelected = isSelected,
@@ -381,7 +382,7 @@ class ExplorerService(
                 items.forEachIndexed { index, current ->
                     val resolved = children.find { child -> child.uniqueId == current.uniqueId }
                     resolved ?: return@forEachIndexed
-                    items[index] = current.updateWith(resolved.content)
+                    items[index] = current.updateWith(resolved.content, resolved.properties)
                 }
             }
         }

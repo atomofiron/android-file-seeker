@@ -22,6 +22,7 @@ object Shell {
     const val MV = "{toybox} mv \"%s\" \"%s\""
     const val LS_LAHL = "{toybox} ls -lAhL \"%s\""
     const val LS_LAHLD = "{toybox} ls -lAhLd \"%s\""
+    const val DU_HD1 = "{toybox} du -hd 1 \"%s\""
     // DOT_SLASH is needed because of this shit:
     // $ cd /some/dir && file *
     // file: Unknown option '-file-name-starting-with-dash.png' (see "file --help")
@@ -151,7 +152,7 @@ object Shell {
         return Output(code, output, error)
     }
 
-    class Output(
+    data class Output(
         val code: Int,
         val output: String,
         val error: String,

@@ -163,7 +163,7 @@ object ExplorerDelegate {
             access = parts[0],
             owner = parts[2],
             group = parts[3],
-            size = parts[4],
+            size = if (parts[0].firstOrNull() == FILE_CHAR) parts[4] else "",
             date = parts[5],
             time = time,
             name = nodeName,
@@ -253,7 +253,28 @@ object ExplorerDelegate {
                 items[index] = items[index].resolveType(type)
             }
         }
+        resolveDirChildrenSize(useSu)
         return true
+    }
+
+    private fun Node.resolveDirChildrenSize(useSu: Boolean) {
+        val children = children ?: return
+        val output = Shell.exec(Shell[Shell.DU_HD1].format(path), useSu)
+        val lines = output.output.split(LF).filter { it.isNotEmpty() }
+        lines.takeIf {
+            it.isNotEmpty()
+        }?.mapNotNull { line ->
+            line.split(Const.TAB).takeIf { it.size == 2 }
+        }?.forEach { (size, p) ->
+            val path = "$p/"
+            val index = children.items
+                .indexOfFirst { it.path == path }
+                .also { if (it < 0) return@forEach }
+            children.run {
+                val item = items[index]
+                items[index] = item.copy(properties = item.properties.copy(size = size))
+            }
+        }
     }
 
     private fun Node.resolveType(type: String): Node {
@@ -387,8 +408,11 @@ object ExplorerDelegate {
         for (i in start until lines.size) {
             val line = lines[i]
             if (line.isNotEmpty()) {
-                val properties = parse(line)
+                var properties = parse(line)
                 val child = children?.find { it.name == properties.name }
+                if (child?.isDirectory == true) {
+                    properties = properties.copy(size = child.properties.size)
+                }
                 val item = when {
                     child == null -> parse(path, line, rootId)
                     child.properties == properties -> child
@@ -587,10 +611,19 @@ object ExplorerDelegate {
         }
     }
 
-    fun Node.updateWith(new: NodeContent): Node {
-        return when (true) {
+    fun Node.updateWith(new: NodeContent, properties: NodeProperties): Node {
+        val content = when (true) {
             (new::class != content::class),
-            !isCached -> copy(content = new)
+            !isCached -> new
+            else -> null
+        }
+        val properties = when (properties) {
+            this.properties -> null
+            else -> properties
+        }
+        return when (true) {
+            (properties != null),
+            (content != null) -> copy(content = content ?: this.content, properties = properties ?: this.properties)
             else -> this
         }
     }
