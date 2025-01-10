@@ -25,7 +25,6 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.close
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.completePath
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.ensureCached
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.open
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
@@ -299,7 +298,7 @@ class ExplorerService(
                                 tab.tree.clear()
                             }
                             val isSelected = root.isSelected && updatedRoot.item.isCached
-                            val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sort)
+                            val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sort) // todo children ConcurrentModificationException
                             if (tab.key == key) updatedRoot.copy(item = updatedItem, type = root.type) else root.copy(
                                 type = root.type,
                                 thumbnail = updatedRoot.thumbnail,
@@ -355,12 +354,7 @@ class ExplorerService(
                 ?: return
 
             withCachingState(current.uniqueId) {
-                cacheSync(key, current) { new ->
-                    // todo replace everywhere
-                    tree.replaceItem(new).also {
-                        if (it && new.isDirectory) resolveDirChildrenAsync(key, new)
-                    }
-                }
+                cacheSync(key, current)
             }
         }
     }
@@ -746,12 +740,8 @@ class ExplorerService(
         return null
     }
 
-    private suspend fun cacheSync(
-        key: NodeTabKey,
-        item: Node,
-        predicate: suspend NodeTab.(Node) -> Boolean,
-    ) {
-        var updated = item.ensureCached(config)
+    private suspend fun cacheSync(key: NodeTabKey, item: Node) {
+        var updated = item.update(config)
             .sortByName()
             .updateContent()
         renderTab(key, lazy = true) {
@@ -760,11 +750,20 @@ class ExplorerService(
             }
             val current = tree.findNode(item.uniqueId)
             current ?: return
+            if (updated.error is NodeError.NoSuchFile) {
+                tree.replaceItem(item.uniqueId, item.parentPath, null)
+                return@renderTab
+            }
             updated = current.updateWith(updated)
             if (updated.isOpened != current.isOpened) {
                 updated = updated.copy(children = updated.children?.copy(isOpened = current.isOpened))
             }
-            if (!predicate(updated)) return
+            // todo replace everywhere
+            val replaced = tree.replaceItem(updated)
+            when {
+                !replaced -> return
+                updated.isDirectory -> garden.resolveDirChildrenAsync(key, updated)
+            }
         }
     }
 
