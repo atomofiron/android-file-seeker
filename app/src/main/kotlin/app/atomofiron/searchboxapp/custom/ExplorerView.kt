@@ -37,7 +37,7 @@ import lib.atomofiron.insets.insetsPadding
 @SuppressLint("ViewConstructor")
 class ExplorerView(
     context: Context,
-    output: ExplorerViewOutput,
+    private val output: ExplorerViewOutput,
 ) : FrameLayout(context) {
 
     private val binding = ViewExplorerBinding.inflate(LayoutInflater.from(context), this)
@@ -112,6 +112,11 @@ class ExplorerView(
     fun setComposition(composition: ExplorerItemComposition) {
         listDelegate.setComposition(composition)
         explorerAdapter.setComposition(composition)
+    }
+
+    fun onItemsVisible() {
+        val items = explorerAdapter.visibleItems.mapNotNull { explorerAdapter.currentList.getOrNull(it) }
+        output.onItemsBecomeVisible(items)
     }
 
     private fun onSeparatorClick(item: Node) = when {

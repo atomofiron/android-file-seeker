@@ -15,7 +15,8 @@ class ItemVisibilityDelegate(
     fun onItemAttached(holder: RecyclerView.ViewHolder) {
         if (holder.bindingAdapterPosition < 0) return
         _visibleItems.add(holder.bindingAdapterPosition)
-        listener.onItemBecomeVisible(adapter.currentList[holder.bindingAdapterPosition])
+        val item = adapter.currentList[holder.bindingAdapterPosition]
+        listener.onItemsBecomeVisible(listOf(item))
     }
 
     fun onItemDetached(holder: RecyclerView.ViewHolder) {
@@ -24,6 +25,6 @@ class ItemVisibilityDelegate(
     }
 
     interface ExplorerItemVisibilityListener {
-        fun onItemBecomeVisible(item: Node)
+        fun onItemsBecomeVisible(items: List<Node>)
     }
 }

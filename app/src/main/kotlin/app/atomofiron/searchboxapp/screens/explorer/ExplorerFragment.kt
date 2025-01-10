@@ -132,6 +132,11 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        explorerViews.forEach { it.onItemsVisible() }
+    }
+
     override fun onKeyDown(keyCode: Int): Boolean = when {
         !isVisible -> false
         keyCode != KeyEvent.KEYCODE_VOLUME_UP -> false

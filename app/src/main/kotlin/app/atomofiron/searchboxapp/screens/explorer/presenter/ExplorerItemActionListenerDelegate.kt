@@ -57,7 +57,11 @@ class ExplorerItemActionListenerDelegate(
 
     override fun onItemCheck(item: Node, isChecked: Boolean) = explorerInteractor.checkItem(currentTab, item, isChecked)
 
-    override fun onItemBecomeVisible(item: Node) = explorerInteractor.updateItem(currentTab, item)
+    override fun onItemsBecomeVisible(items: List<Node>) {
+        items.forEach {
+            explorerInteractor.updateItem(currentTab, it)
+        }
+    }
 
     private fun processApk(item: Node) {
         when (preferences.actionApk.value) {
