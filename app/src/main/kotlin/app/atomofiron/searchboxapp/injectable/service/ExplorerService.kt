@@ -213,6 +213,7 @@ class ExplorerService(
                         !is NodeError.NoSuchFile -> updated
                         else -> tryAlternative(root, updated)
                     }
+                    updated.resolveDirChildren(config.useSu)
                     updateRootSync(updated, key, root)
                 }
             }

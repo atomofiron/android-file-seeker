@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.utils
 
 import app.atomofiron.searchboxapp.logE
-import app.atomofiron.searchboxapp.poop
 import java.io.InputStream
 import java.io.InterruptedIOException
 import java.io.OutputStream
@@ -26,7 +25,7 @@ object Shell {
     // DOT_SLASH is needed because of this shit:
     // $ cd /some/dir && file *
     // file: Unknown option '-file-name-starting-with-dash.png' (see "file --help")
-    const val CD_FILE_CHILDREN = "cd \"%s\" && {toybox} file $DOT_SLASH*"
+    const val CD_FILE_CHILDREN = "cd \"%s\" && {toybox} file $DOT_SLASH* && {toybox} file $DOT_SLASH.*"
 
     // grep: No 'E' with 'F'
     const val FIND_GREP_HCS = "{toybox} find \"%s\" -type f -maxdepth %d | xargs {toybox} grep -Hcs -e \"%s\""
