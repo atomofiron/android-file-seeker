@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.custom.view
 
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BlurMaskFilter
@@ -11,6 +10,7 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.util.AttributeSet
+import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -61,7 +61,6 @@ class JoystickView @JvmOverloads constructor(
         }
     }
 
-    @SuppressLint("DrawAllocation")
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         val size = min(right - left, bottom - top)
@@ -103,7 +102,6 @@ class JoystickView @JvmOverloads constructor(
         invalidate()
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
@@ -111,6 +109,7 @@ class JoystickView @JvmOverloads constructor(
                 trackTouchEvent = true
                 brightness = 1f
                 invalidate()
+                performHapticFeedback(HapticFeedbackConstants.KEYBOARD_PRESS)
             }
             MotionEvent.ACTION_MOVE -> {
                 if (trackTouchEvent) {
@@ -120,6 +119,7 @@ class JoystickView @JvmOverloads constructor(
                     if (!contains) {
                         trackTouchEvent = false
                         glowAnimator.start()
+                        performHapticFeedback(HapticFeedbackConstants.KEYBOARD_RELEASE)
                     }
                 }
             }
@@ -127,6 +127,7 @@ class JoystickView @JvmOverloads constructor(
             MotionEvent.ACTION_CANCEL -> {
                 if (trackTouchEvent) {
                     glowAnimator.start()
+                    performHapticFeedback(HapticFeedbackConstants.KEYBOARD_RELEASE)
                 }
             }
         }
