@@ -42,8 +42,13 @@ class ApkService(
         }
     }
 
+    fun launchable(packageName: String): Boolean {
+        return context.packageManager.getLaunchIntentForPackage(packageName) != null
+    }
+
     fun launchApk(packageName: String) {
         val launchIntent = context.packageManager.getLaunchIntentForPackage(packageName)
+        launchIntent ?: return
         context.startActivity(launchIntent)
     }
 }

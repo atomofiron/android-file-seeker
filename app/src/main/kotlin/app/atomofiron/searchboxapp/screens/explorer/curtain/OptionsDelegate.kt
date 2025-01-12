@@ -1,10 +1,11 @@
 package app.atomofiron.searchboxapp.screens.explorer.curtain
 
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.core.view.*
 import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.custom.view.menu.MenuImpl
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.databinding.CurtainExplorerOptionsBinding
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
@@ -22,8 +23,7 @@ class OptionsDelegate(
         val binding = CurtainExplorerOptionsBinding.inflate(inflater, null, false)
         binding.menuView.run {
             val menu = inflateMenu(menuId)
-            menu.hideExtra(options.ids)
-            menu.check(options.checked)
+            options.bind(menu)
             setMenuListener(output)
             markAsDangerous(R.id.menu_delete)
         }
@@ -71,30 +71,21 @@ class OptionsDelegate(
         }
     }
 
-    private fun MenuImpl.hideExtra(ids: List<Int>) {
-        val iter = iterator()
+    private fun ExplorerItemOptions.bind(menu: Menu) {
+        val iter = menu.iterator()
         while (iter.hasNext()) {
-            if (!ids.contains(iter.next().itemId)) {
-                iter.remove()
-            }
+            bind(iter)
         }
     }
 
-    private fun MenuImpl.check(checked: List<Int>) {
-        val iter = iterator()
-        while (iter.hasNext()) {
-            var next = iter.next()
-            if (checked.contains(next.itemId)) {
-                next.isChecked = true
-            }
-            next.subMenu?.iterator()?.let {
-                while (it.hasNext()) {
-                    next = it.next()
-                    if (checked.contains(next.itemId)) {
-                        next.isChecked = true
-                    }
-                }
-            }
+    private fun ExplorerItemOptions.bind(iterator: MutableIterator<MenuItem>) {
+        val item = iterator.next()
+        if (!ids.contains(item.itemId)) {
+            iterator.remove()
+            return
         }
+        item.isChecked = checked.contains(item.itemId)
+        item.isEnabled = !disabled.contains(item.itemId)
+        item.subMenu?.let { bind(it) }
     }
 }

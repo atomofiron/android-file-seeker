@@ -8,4 +8,5 @@ data class ExplorerItemOptions constructor(
     val items: List<Node>,
     val composition: ExplorerItemComposition,
     val checked: List<Int> = emptyList(),
+    val disabled: List<Int> = emptyList(),
 )

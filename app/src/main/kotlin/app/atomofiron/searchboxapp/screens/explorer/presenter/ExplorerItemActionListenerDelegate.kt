@@ -34,6 +34,7 @@ class ExplorerItemActionListenerDelegate(
             else -> listOf(item)
         }
         val checked = mutableListOf<Int>()
+        val disabled = mutableListOf<Int>()
         val ids = when {
             files.size > 1 -> viewState.manyFilesOptions
             files.first().isRoot -> viewState.rootOptions
@@ -46,10 +47,15 @@ class ExplorerItemActionListenerDelegate(
                         ActionApk.Install -> checked.add(R.id.menu_install)
                     }
                     add(R.id.menu_apk)
+                    add(R.id.menu_launch)
+                    add(R.id.menu_install)
+                    if (!apks.launchable(item)) {
+                        disabled.add(R.id.menu_launch)
+                    }
                 }
             }
         }
-        val options = ExplorerItemOptions(ids, files, viewState.itemComposition.value, checked)
+        val options = ExplorerItemOptions(ids, files, viewState.itemComposition.value, checked = checked, disabled = disabled)
         menuListenerDelegate.showOptions(options)
     }
 

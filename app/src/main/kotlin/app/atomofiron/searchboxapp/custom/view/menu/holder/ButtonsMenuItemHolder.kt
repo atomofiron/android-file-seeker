@@ -47,15 +47,18 @@ class ButtonsMenuItemHolder private constructor(
     }
 
     private fun ButtonWithCrossBinding.bind(item: MenuItem) {
-        common.isVisible = item.isChecked
-        tonal.isVisible = !item.isChecked
-        if (item.isChecked) common.bind(item) else tonal.bind(item)
-        if (item.isChecked) cross.setOnClickListener {
+        val isChecked = item.isChecked && item.isEnabled
+        common.isVisible = isChecked
+        tonal.isVisible = !isChecked
+        tonal.isEnabled = item.isEnabled
+        if (isChecked) common.bind(item) else tonal.bind(item)
+        cross.clipToOutline = true
+        cross.isVisible = isChecked
+        if (isChecked) cross.setOnClickListener {
             listener.onMenuItemSelected(-itemView.id)
             item.isChecked = false
             bind(item)
         }
-        cross.clipToOutline = true
     }
 
     private fun Button.bind(item: MenuItem) {
