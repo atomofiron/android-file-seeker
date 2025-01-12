@@ -54,7 +54,12 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
                 val spannable = SpannableString(item.text)
                 matches.forEachIndexed { index, match ->
                     val byteOffset = match.byteOffset - item.byteOffset
-                    val start = item.text.toByteArray().slice(0 until byteOffset.toInt()).toByteArray().toString(charset = Charsets.UTF_8).length
+                    val bytes = item.text.toByteArray()
+                    val range = 0 until byteOffset.toInt().coerceAtMost(bytes.size)
+                    val start = bytes.slice(range)
+                        .toByteArray()
+                        .toString(charset = Charsets.UTF_8)
+                        .length
                     val end = start + match.length
                     val forTheEntireLine = start == 0 && end == item.text.length
                     val span: Any = when {
