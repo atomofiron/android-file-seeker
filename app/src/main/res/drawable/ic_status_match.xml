@@ -1,8 +1,8 @@
 <vector
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="@dimen/item_progress_status_counter_size"
+    android:width="@dimen/item_progress_status_counter_width"
     android:height="@dimen/item_progress_status_counter_size"
-    android:viewportWidth="20"
+    android:viewportWidth="24"
     android:viewportHeight="20"
     android:tint="?colorContent"
     >

@@ -90,21 +90,16 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
     }
 
     private fun TextView.setStatus(result: SearchResult) {
-        val counters = result.getCounters()
         val status = SpannableStringBuilder()
-        counters.reverse()
-        counters.forEachIndexed { index, it ->
-            status.insert(0, "*$it  ")
-            val resId = when {
-                counters.size == 1 -> R.drawable.ic_status_match
-                index == 0 -> R.drawable.ic_status_file_all
-                index == 1 -> R.drawable.ic_status_file_match
-                else -> R.drawable.ic_status_match
+        result.getCounters().forEachIndexed { index, it ->
+            status.append("*$it  ")
+            val resId = when (index) {
+                0 -> R.drawable.ic_status_match
+                1 -> R.drawable.ic_status_file_match
+                else -> R.drawable.ic_status_file_all
             }
-            if (resId == R.drawable.ic_status_match) {
-                status.insert(1, " ")
-            }
-            status.setIcon(resId, 0, 1)
+            val star = status.lastIndexOf('*')
+            status.setIcon(resId, star, star.inc())
         }
         text = status
     }

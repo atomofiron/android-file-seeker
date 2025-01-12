@@ -39,7 +39,7 @@ sealed class SearchResult {
 
         override fun getCounters(): IntArray = when {
             forContent -> intArrayOf(count, matches.size, countTotal)
-            else -> intArrayOf(matches.size, countTotal)
+            else -> intArrayOf(matches.size, matches.size)
         }
 
         fun toMarkdown(): String {

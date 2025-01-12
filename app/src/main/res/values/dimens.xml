@@ -78,6 +78,7 @@
 	<dimen name="explorer_item_space">@dimen/explorer_border_corner_radius</dimen>
 	<dimen name="curtain_elevation">16dp</dimen>
 	<dimen name="item_root_title">20sp</dimen>
+    <dimen name="item_progress_status_counter_width">16.8sp</dimen>
     <dimen name="item_progress_status_counter_size">14sp</dimen>
 	<dimen name="fastscroll_area">16dp</dimen>
 	<dimen name="fastscroll_thickness">6dp</dimen>
