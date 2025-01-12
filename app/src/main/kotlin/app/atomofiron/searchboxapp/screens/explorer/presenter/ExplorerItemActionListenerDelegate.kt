@@ -81,7 +81,7 @@ class ExplorerItemActionListenerDelegate(
         when (preferences.actionApk.value) {
             ActionApk.Ask -> if (apks.launchable(item)) askAboutApk(item) else apks.install(currentTab, item)
             ActionApk.Install -> apks.install(currentTab, item)
-            ActionApk.Launch -> apks.launch(item)
+            ActionApk.Launch -> if (apks.launchable(item)) apks.launch(item) else apks.install(currentTab, item)
         }
     }
 
