@@ -20,7 +20,6 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.close
@@ -205,7 +204,6 @@ class ExplorerService(
     }
 
     private fun updateRootAsync(key: NodeTabKey, root: NodeRoot) {
-        poop("updateRootAsync ${root.type}")
         scope.launch {
             withGarden {
                 withCachingState(root.stableId) {
@@ -286,7 +284,6 @@ class ExplorerService(
     }
 
     private suspend fun updateRootSync(updated: Node, key: NodeTabKey, targetRoot: NodeRoot) {
-        poop("updateRootSync ${targetRoot.type} ...")
         filterMediaRootChildren(updated, targetRoot.type)
         val updatedRoot = updateRootThumbnail(updated, targetRoot)
         withGarden(key) { currentTab ->
@@ -319,7 +316,6 @@ class ExplorerService(
                     }
                 }
             }
-            poop("updateRootSync ${targetRoot.type} render")
             currentTab.render()
             trees.values.forEach { otherTab ->
                 if (otherTab.key != key) otherTab.render()
