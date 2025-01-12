@@ -142,13 +142,9 @@ class TextViewerService(
         session.finishTask(taskDone)
     }
 
-    private fun findSession(item: Node): TextViewerSession? {
-        return textViewerStore.sessions[item.uniqueId].also { task ->
-            task ?: logE("Session not found for ${item.path}")
-        }
-    }
+    private fun findSession(item: Node): TextViewerSession? = textViewerStore.sessions[item.uniqueId]
 
-    private suspend fun TextViewerSession.readNextLines() {
+    private fun TextViewerSession.readNextLines() {
         val reader = reader ?: return
         textLoading.value = true
         val lines = ArrayList<TextLine>(Const.TEXT_FILE_PAGINATION_STEP)
