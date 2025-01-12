@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:layout_marginHorizontal="@dimen/common_margin_half"
+    >
+    <ImageView
+        android:id="@+id/cross"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="end|center_vertical"
+        android:layout_marginVertical="4dp"
+        android:paddingStart="48dp"
+        android:paddingEnd="6dp"
+        android:paddingVertical="4dp"
+        android:src="@drawable/ic_cross"
+        android:scaleType="center"
+        android:background="@drawable/outline"
+        android:foreground="?selectableItemBackground"
+        />
+    <Button
+        android:id="@+id/common"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="32dp"
+        style="@style/Widget.Material3.Button"
+        />
+    <Button
+        android:id="@+id/tonal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.Material3.Button.TonalButton"
+        />
+</FrameLayout>

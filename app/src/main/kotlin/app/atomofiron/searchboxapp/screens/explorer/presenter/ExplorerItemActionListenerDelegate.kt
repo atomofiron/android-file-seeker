@@ -33,15 +33,23 @@ class ExplorerItemActionListenerDelegate(
             item.isChecked -> explorerStore.searchTargets.value
             else -> listOf(item)
         }
+        val checked = mutableListOf<Int>()
         val ids = when {
             files.size > 1 -> viewState.manyFilesOptions
             files.first().isRoot -> viewState.rootOptions
             files.first().isDirectory -> viewState.directoryOptions
             else -> viewState.oneFileOptions.mutate {
-                if (item.content is File.Apk) add(R.id.menu_apk)
+                if (item.content is File.Apk) {
+                    when (preferences.actionApk.value) {
+                        ActionApk.Ask -> Unit
+                        ActionApk.Launch -> checked.add(R.id.menu_launch)
+                        ActionApk.Install -> checked.add(R.id.menu_install)
+                    }
+                    add(R.id.menu_apk)
+                }
             }
         }
-        val options = ExplorerItemOptions(ids, files, viewState.itemComposition.value)
+        val options = ExplorerItemOptions(ids, files, viewState.itemComposition.value, checked)
         menuListenerDelegate.showOptions(options)
     }
 

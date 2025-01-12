@@ -23,6 +23,7 @@ class OptionsDelegate(
         binding.menuView.run {
             val menu = inflateMenu(menuId)
             menu.hideExtra(options.ids)
+            menu.check(options.checked)
             setMenuListener(output)
             markAsDangerous(R.id.menu_delete)
         }
@@ -75,6 +76,24 @@ class OptionsDelegate(
         while (iter.hasNext()) {
             if (!ids.contains(iter.next().itemId)) {
                 iter.remove()
+            }
+        }
+    }
+
+    private fun MenuImpl.check(checked: List<Int>) {
+        val iter = iterator()
+        while (iter.hasNext()) {
+            var next = iter.next()
+            if (checked.contains(next.itemId)) {
+                next.isChecked = true
+            }
+            next.subMenu?.iterator()?.let {
+                while (it.hasNext()) {
+                    next = it.next()
+                    if (checked.contains(next.itemId)) {
+                        next.isChecked = true
+                    }
+                }
             }
         }
     }

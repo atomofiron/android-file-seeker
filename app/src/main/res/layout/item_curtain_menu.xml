@@ -14,6 +14,7 @@
         android:id="@+id/item_menu_iv_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/common_margin"
         android:tint="?attr/colorContent"
         />
     <com.google.android.material.textview.MaterialTextView
@@ -21,7 +22,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginHorizontal="@dimen/common_margin"
         android:textColor="?attr/colorContent"
         android:textSize="18sp"
         />

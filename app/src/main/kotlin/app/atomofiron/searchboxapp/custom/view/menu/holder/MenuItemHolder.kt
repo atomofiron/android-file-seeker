@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.view.isVisible
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 
@@ -33,6 +34,7 @@ class MenuItemHolder private constructor(
         itemId = item.itemId
         itemView.id = item.itemId
         icon.setImageDrawable(item.icon)
+        icon.isVisible = item.icon != null
         title.text = item.title
     }
 }
