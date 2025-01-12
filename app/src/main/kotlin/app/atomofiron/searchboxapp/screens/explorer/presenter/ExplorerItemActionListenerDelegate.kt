@@ -79,7 +79,7 @@ class ExplorerItemActionListenerDelegate(
 
     private fun processApk(item: Node) {
         when (preferences.actionApk.value) {
-            ActionApk.Ask -> askAboutApk(item)
+            ActionApk.Ask -> if (apks.launchable(item)) askAboutApk(item) else apks.install(currentTab, item)
             ActionApk.Install -> apks.install(currentTab, item)
             ActionApk.Launch -> apks.launch(item)
         }
