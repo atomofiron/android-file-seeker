@@ -199,21 +199,24 @@ object ExplorerUtils {
         }
     }
 
-    fun Node.updateProperties(config: CacheConfig): Node {
-        val output = Shell.exec(Shell[Shell.LS_LAHLD].format(path), config.useSu)
-        val lines = output.output.split(LF).filter { it.isNotEmpty() }
+    private fun Node.updateProperties(config: CacheConfig): Node {
+        val output = Shell.exec(Shell[Shell.LS_LAHLD_FILE_B].format(path, path), config.useSu)
+        val lines = output.output.trim().split(LF)
         return when {
-            output.success && lines.size == 1 -> parseNode(lines.first())
+            output.success && lines.size == 2 -> parseNode(lines.first())
+                .resolveType(lines.last())
             output.success -> copy(children = null, error = NodeError.Unknown)
             else -> copy(error = output.error.toNodeError(path))
         }
     }
 
     fun Node.update(config: CacheConfig): Node {
-        val output = Shell.exec(Shell[Shell.LS_LAHLD].format(path), config.useSu)
-        val lines = output.output.split(LF).filter { it.isNotEmpty() }
+        val output = Shell.exec(Shell[Shell.LS_LAHLD_FILE_B].format(path, path), config.useSu)
+        val lines = output.output.trim().split(LF)
         return when {
-            output.success && lines.size == 1 -> parseNode(lines.first()).ensureCached(config)
+            output.success && lines.size == 2 -> parseNode(lines.first())
+                .resolveType(lines.last())
+                .ensureCached(config)
             output.success -> copy(children = null, error = null)
             else -> copy(error = output.error.toNodeError(path))
         }

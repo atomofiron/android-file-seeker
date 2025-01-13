@@ -21,7 +21,7 @@ object Shell {
     const val RM_RF = "{toybox} rm -rf \"%s\""
     const val MV = "{toybox} mv \"%s\" \"%s\""
     const val LS_LAHL = "{toybox} ls -lAhL \"%s\""
-    const val LS_LAHLD = "{toybox} ls -lAhLd \"%s\""
+    const val LS_LAHLD_FILE_B = "{toybox} ls -lAhLd \"%s\" && {toybox} file -b \"%s\""
     const val DU_HD1 = "{toybox} du -hd 1 \"%s\""
     // DOT_SLASH is needed because of this shit:
     // $ cd /some/dir && file *
@@ -29,10 +29,10 @@ object Shell {
     const val CD_FILE_CHILDREN = "cd \"%s\" && {toybox} file $DOT_SLASH* && {toybox} file $DOT_SLASH.*"
 
     // grep: No 'E' with 'F'
-    const val FIND_GREP_HCS = "{toybox} find \"%s\" -type f -maxdepth %d | xargs {toybox} grep -Hcs -e \"%s\""
-    const val FIND_GREP_HCS_I = "{toybox} find \"%s\" -type f -maxdepth %d | xargs {toybox} grep -Hcs -ie \"%s\""
-    const val FIND_GREP_HCS_E = "{toybox} find \"%s\" -type f -maxdepth %d | xargs {toybox} grep -Hcs -E \"%s\""
-    const val FIND_GREP_HCS_IE = "{toybox} find \"%s\" -type f -maxdepth %d | xargs {toybox} grep -Hcs -iE \"%s\""
+    const val FIND_GREP_HCS = "{toybox} find \"%s\" -type f -maxdepth %d | xargs {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: '{print \$1}' | xargs {toybox} grep -Hcs -e \"%s\""
+    const val FIND_GREP_HCS_I = "{toybox} find \"%s\" -type f -maxdepth %d | xargs {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: '{print \$1}' | xargs {toybox} grep -Hcs -ie \"%s\""
+    const val FIND_GREP_HCS_E = "{toybox} find \"%s\" -type f -maxdepth %d | xargs {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: '{print \$1}' | xargs {toybox} grep -Hcs -E \"%s\""
+    const val FIND_GREP_HCS_IE = "{toybox} find \"%s\" -type f -maxdepth %d | xargs {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: '{print \$1}' | xargs {toybox} grep -Hcs -iE \"%s\""
     // /storage/emulated/0/fadb/sba.txt:15
 
     // -H is necessary

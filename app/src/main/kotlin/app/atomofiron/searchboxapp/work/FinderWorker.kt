@@ -172,10 +172,6 @@ class FinderWorker(
             }
             val path = line.substring(0, index)
             val item = Node(path, content = NodeContent.File.Unknown).update(cacheConfig)
-            if (item.content !is NodeContent.File.Text) {
-                addToResult(null)
-                return@launch
-            }
             val itemMatch = when (val result = TextViewerService.searchInside(params, path, useSu)) {
                 is Rslt.Ok -> result.data.toItemMatchMultiply(item)
                 is Rslt.Err -> ItemMatch.MultiplyError(item, count, result.error)
