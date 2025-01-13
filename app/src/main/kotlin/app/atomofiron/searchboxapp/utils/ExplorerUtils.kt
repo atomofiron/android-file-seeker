@@ -285,7 +285,7 @@ object ExplorerUtils {
             type.isBlank(),
             type.startsWith(FILE_DATA),
             type.startsWith(FILE_EMPTY) -> name.resolveFileType()
-            type.startsWith(DIRECTORY) -> NodeContent.Directory()
+            type.startsWith(DIRECTORY) -> content.ifNotCached { NodeContent.Directory() }
             type.startsWith(FILE_PNG) -> content.ifNotCached { NodeContent.File.Picture.Png() }
             type.startsWith(FILE_JPEG) -> content.ifNotCached { NodeContent.File.Picture.Jpeg() }
             type.startsWith(FILE_GIF) -> content.ifNotCached { NodeContent.File.Picture.Gif() }
@@ -355,7 +355,7 @@ object ExplorerUtils {
         return copy(content = content)
     }
 
-    private inline fun <reified T : NodeContent.File> NodeContent?.ifNotCached(action: () -> T): T {
+    private inline fun <reified T : NodeContent> NodeContent?.ifNotCached(action: () -> T): T {
         return if (this !is T || !isCached) action() else this
     }
 

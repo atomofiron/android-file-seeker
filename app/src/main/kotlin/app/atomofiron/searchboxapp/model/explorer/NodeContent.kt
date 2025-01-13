@@ -21,6 +21,7 @@ sealed class NodeContent(
         enum class Type {
             Ordinary, Android, Camera, Download, Movies, Music, Pictures,
         }
+        override val isCached: Boolean get() = rootType != null
     }
 
     sealed class File(
