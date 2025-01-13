@@ -31,7 +31,7 @@ data class Node constructor(
     val isDirectory: Boolean = content is NodeContent.Directory
     val isFile: Boolean = content is NodeContent.File
 
-    val isCached: Boolean get() = children != null || content.isCached
+    val isCached: Boolean get() = children != null || !isDirectory && content.isCached
     val isEmpty: Boolean get() = children?.isEmpty() == true
     val hasChildren: Boolean get() = children?.isNotEmpty() == true
     val isOpened: Boolean get() = children?.isOpened == true
