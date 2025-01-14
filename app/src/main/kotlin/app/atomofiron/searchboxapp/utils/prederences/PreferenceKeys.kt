@@ -16,10 +16,10 @@ object PreferenceKeys {
     val KeyAppOrientation = PreferenceKey("pref_app_orientation", AppOrientation.UNDEFINED.ordinal.toString())
     val KeyAppTheme = PreferenceKey("pref_app_theme", AppTheme.defaultName())
     val KeyDeepBlack = PreferenceKey("pref_deep_black", false)
+    // todo pack KeyMaxSize and KeyMaxDepth with other in one
     // it was long but DataStore made it int
     val KeyMaxSize = PreferenceKey("pref_max_size", Const.DEFAULT_MAX_SIZE)
     val KeyMaxDepth = PreferenceKey("pref_max_depth", Const.DEFAULT_MAX_DEPTH)
-    val KeyExcludeDirs = PreferenceKey("pref_exclude_dirs", false)
     val KeyUseSu = PreferenceKey("pref_use_su", false)
     val KeyActionApk = PreferenceKey("pref_actionApk", ActionApk.Ask.ordinal)
     val KeyExplorerItem = PreferenceKey("pref_explorer_item", Const.DEFAULT_EXPLORER_ITEM)
@@ -33,7 +33,7 @@ object PreferenceKeys {
     const val PREF_CATEGORY_DEBUG = "pref_category_debug"
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
-        arrayOf(KeyOpenedDirPath, KeyDockGravity, KeyShownNotificationUpdateCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyExcludeDirs, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyToybox)
+        arrayOf(KeyOpenedDirPath, KeyDockGravity, KeyShownNotificationUpdateCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyToybox)
     }
 
     fun <T> default(key: String): T = keys.find { it.key.name == key }?.default as T

@@ -62,7 +62,7 @@ class FinderAdapterPresenterDelegate(
 
     private fun startSearch(query: String, targets: List<Node>) {
         viewState.addToHistory(query)
-        val config = viewState.configItem
-        interactor.search(query, targets, config.ignoreCase, config.useRegex, config.excludeDirs, config.searchInContent)
+        val config = viewState.configItem.config
+        interactor.search(query, targets, config)
     }
 }

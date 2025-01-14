@@ -16,7 +16,6 @@ import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppTheme
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppUpdateCode
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDeepBlack
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDockGravity
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyExcludeDirs
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyExplorerItem
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyJoystick
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyMaxDepth
@@ -98,12 +97,6 @@ class PreferenceStore(
 
     suspend fun setSpecialCharacters(value: Array<String>) {
         edit { it[KeySpecialCharacters] = value.joinToString(separator = " ") }
-    }
-
-    val excludeDirs = getFlow(KeyExcludeDirs)
-
-    suspend fun setExcludeDirs(value: Boolean) {
-        edit { it[KeyExcludeDirs] = value }
     }
 
     val maxFileSizeForSearch = getFlow(KeyMaxSize)

@@ -40,6 +40,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
+import androidx.work.Data
 import app.atomofiron.common.util.Android
 import app.atomofiron.searchboxapp.MaterialId
 import app.atomofiron.searchboxapp.R
@@ -298,4 +299,8 @@ fun ViewParent.disallowInterceptTouches() {
     // предотвращает перехват вертикального скроллинга при горизонтальном слайдинге,
     // но из-за этого временно ломается или скроллинг в MenuView или в NestedScrollView,
     // или в BottomSheetBehavior выше, но только при касании layout/item_explorer.xml
+}
+
+fun Data.Builder.putStringArray(key: String, value: Array<out String?>): Data.Builder {
+    return putStringArray(key, value as Array<String?>)
 }

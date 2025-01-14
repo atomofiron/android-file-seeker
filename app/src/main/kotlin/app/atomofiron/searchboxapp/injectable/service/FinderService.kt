@@ -9,6 +9,7 @@ import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.finder.SearchConfig
 import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.work.FinderWorker
@@ -30,16 +31,13 @@ class FinderService(
         }
     }
 
-    fun search(query: String, where: List<Node>, ignoreCase: Boolean, useRegex: Boolean, isMultiline: Boolean, forContent: Boolean) {
+    fun search(query: String, where: List<Node>, config: SearchConfig) {
         val maxSize = preferenceStore.maxFileSizeForSearch.value
         val maxDepth = preferenceStore.maxDepthForSearch.value
         val useSu = preferenceStore.useSu.value
-        val excludeDirs = preferenceStore.excludeDirs.value
 
-        val inputData = FinderWorker.inputData(
-            query, useSu, useRegex, maxSize, ignoreCase, excludeDirs, isMultiline, forContent,
-            maxDepth, where.map { it.path }.toTypedArray(),
-        )
+        val targets = where.map { it.path }.toTypedArray()
+        val inputData = FinderWorker.inputData(query, useSu, config, maxSize, maxDepth, targets)
         val request = OneTimeWorkRequest.Builder(FinderWorker::class.java)
             .setInputData(inputData)
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)

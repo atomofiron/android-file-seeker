@@ -27,13 +27,6 @@
             app:defaultValue="1024"
             app:icon="@drawable/ic_tornado"
             />
-        <CheckBoxPreference
-            app:title="@string/pref_exclude_dirs"
-            android:key="pref_exclude_dirs"
-            android:summary="@string/exclude_dirs_summary"
-            app:widgetLayout="@layout/widget_checkbox"
-            app:icon="@drawable/ic_folder_eye"
-            />
         <app.atomofiron.searchboxapp.custom.preference.ByteSizePreference
             app:title="@string/pref_max_size"
             app:key="pref_max_size"

@@ -28,11 +28,11 @@ class ConfigHolder(
 
         cbCaseSense.setOnClickListener { view ->
             view as CompoundButton
-            update { it.copy(ignoreCase = !view.isChecked) }
+            update { it.copy(config = it.config.copy(ignoreCase = !view.isChecked)) }
         }
         cbUseRegexp.setOnClickListener { view ->
             view as CompoundButton
-            update { it.copy(useRegex = view.isChecked) }
+            update { it.copy(config = it.config.copy(useRegex = view.isChecked)) }
         }
         cpSearchInContent.setOnClickListener { view ->
             view as CompoundButton
@@ -46,16 +46,16 @@ class ConfigHolder(
                 view.isChecked -> cbExcludeDirs.isChecked
                 else -> checkExcludeDirsWhenEnabled
             }
-            update { it.copy(searchInContent = view.isChecked, excludeDirs = excludeDirs) }
+            update { it.copy(config = it.config.copy(searchInContent = view.isChecked, excludeDirs = excludeDirs)) }
             cbExcludeDirs.isEnabled = !view.isChecked
         }
         cbExcludeDirs.setOnClickListener { view ->
             view as CompoundButton
-            update { it.copy(excludeDirs = view.isChecked) }
+            update { it.copy(config = it.config.copy(excludeDirs = view.isChecked)) }
         }
         cbReplace.setOnClickListener { view ->
             view as CompoundButton
-            update { it.copy(replaceEnabled = view.isChecked) }
+            update { it.copy(config = it.config.copy(replaceEnabled = view.isChecked)) }
         }
     }
 

@@ -3,6 +3,8 @@ package app.atomofiron.searchboxapp.screens.finder.model
 import androidx.annotation.StringRes
 import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.finder.ISearchConfig
+import app.atomofiron.searchboxapp.model.finder.SearchConfig
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import java.util.Objects
 
@@ -36,13 +38,9 @@ sealed class FinderStateItem(val stableId: Int, val layoutId: Int) {
     }
 
     data class ConfigItem(
-      val ignoreCase: Boolean = true,
-      val useRegex: Boolean = false,
-      val searchInContent: Boolean = false,
-      val excludeDirs: Boolean = false,
-      val replaceEnabled: Boolean = false,
-      val isLocal: Boolean = false,
-    ) : FinderStateItem(CONFIG_ID, R.layout.item_search_options)
+        val config: SearchConfig = SearchConfig(),
+        val isLocal: Boolean = false,
+    ) : FinderStateItem(CONFIG_ID, R.layout.item_search_options), ISearchConfig by config
 
     data object ButtonsItem : FinderStateItem(BUTTONS_ID, R.layout.item_finder_buttons)
 

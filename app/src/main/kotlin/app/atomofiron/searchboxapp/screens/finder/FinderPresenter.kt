@@ -51,10 +51,6 @@ class FinderPresenter(
     }
 
     override fun onSubscribeData() {
-        preferenceStore.excludeDirs.collect(scope) { excludeDirs ->
-            viewState.setExcludeDirsValue(excludeDirs)
-            viewState.updateState()
-        }
         preferenceStore.dockGravity.collect(scope) { gravity ->
             viewState.historyDrawerGravity.value = gravity
         }

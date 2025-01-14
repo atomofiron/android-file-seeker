@@ -40,12 +40,6 @@ class FinderViewState(
         updateState()
     }
 
-    fun setExcludeDirsValue(excludeDirs: Boolean) {
-        updateConfig {
-            copy(excludeDirs = excludeDirs)
-        }
-    }
-
     fun switchConfigItemVisibility() {
         var index = uniqueItems.indexOfFirst { it is ConfigItem }
         if (index < 0) {

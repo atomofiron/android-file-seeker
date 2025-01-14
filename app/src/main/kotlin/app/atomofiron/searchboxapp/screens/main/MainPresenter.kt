@@ -2,11 +2,8 @@ package app.atomofiron.searchboxapp.screens.main
 
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
-import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.service.WindowService
-import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegate
 import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegateApi
