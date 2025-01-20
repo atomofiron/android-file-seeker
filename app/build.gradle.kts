@@ -122,5 +122,4 @@ dependencies {
     debugImplementation(libs.leakcanary)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
-    //implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 }
