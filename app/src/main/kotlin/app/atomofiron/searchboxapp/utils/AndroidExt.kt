@@ -36,6 +36,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ScrollingView
 import androidx.core.view.forEachIndexed
 import androidx.core.view.updatePadding
+import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -304,3 +305,5 @@ fun ViewParent.disallowInterceptTouches() {
 fun Data.Builder.putStringArray(key: String, value: Array<out String?>): Data.Builder {
     return putStringArray(key, value as Array<String?>)
 }
+
+fun Context.document(uri: Uri) = DocumentFile.fromSingleUri(this, uri)!!

@@ -10,6 +10,7 @@ class UpdatePresenterDelegate(
     override fun invoke(action: AppUpdateAction) {
         when (action) {
             is AppUpdateAction.Check -> service.check(userAction = true)
+            is AppUpdateAction.Retry -> service.retry()
             is AppUpdateAction.Download -> service.startUpdate(action.choice)
             is AppUpdateAction.Install -> service.completeUpdate()
         }

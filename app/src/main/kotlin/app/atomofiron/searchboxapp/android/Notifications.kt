@@ -17,7 +17,6 @@ import app.atomofiron.searchboxapp.R
 import app.atomofiron.searchboxapp.model.other.UpdateNotification
 import app.atomofiron.searchboxapp.utils.Codes
 import app.atomofiron.searchboxapp.utils.immutable
-import app.atomofiron.searchboxapp.utils.updateIntent
 
 object Notifications {
     const val CHANNEL_ID_UPDATE = "update_channel_id"
@@ -48,7 +47,25 @@ fun Context.showUpdateNotification(type: UpdateNotification) = tryShow { context
         .setTicker(title)
         .setContentTitle(title)
         .setSmallIcon(R.drawable.ic_notification_update)
-        .setContentIntent(PendingIntent.getActivity(context, Codes.UpdateApp, updateIntent(), FLAG_UPDATE_CURRENT.immutable()))
+        .setContentIntent(PendingIntent.getActivity(context, Codes.UpdateApp, Intents.updating(context), FLAG_UPDATE_CURRENT.immutable()))
+        .setColor(materialColor(MaterialAttr.colorPrimary))
+        .build() to Notifications.ID_UPDATE
+}
+
+fun Context.showAppUpdatedNotification() = tryShow { context ->
+    if (Android.O) {
+        updateNotificationChannel(
+            Notifications.CHANNEL_ID_UPDATE,
+            resources.getString(R.string.channel_name_updates),
+            NotificationManager.IMPORTANCE_HIGH,
+        )
+    }
+    val title = resources.getString(R.string.update_installed)
+    NotificationCompat.Builder(context, Notifications.CHANNEL_ID_UPDATE)
+        .setTicker(title)
+        .setContentTitle(title)
+        .setSmallIcon(R.drawable.ic_notification_update)
+        .setContentIntent(PendingIntent.getActivity(context, Codes.LaunchApp, Intents.mainActivity(context), FLAG_UPDATE_CURRENT.immutable()))
         .setColor(materialColor(MaterialAttr.colorPrimary))
         .build() to Notifications.ID_UPDATE
 }
@@ -71,7 +88,7 @@ fun Context.updateNotificationChannel(
 private typealias NotificationId = Pair<Notification, Int>
 
 inline fun Context.tryShow(action: NotificationManagerCompat.(Context) -> NotificationId): Boolean {
-    if (Android.Below.R || checkSelfPermission(POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
+    if (Android.Below.T || checkSelfPermission(POST_NOTIFICATIONS) == PERMISSION_GRANTED) {
         val manager = NotificationManagerCompat.from(this)
         val (notification, id) = manager.action(this)
         manager.notify(id, notification)

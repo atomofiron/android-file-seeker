@@ -1,6 +1,10 @@
+import java.text.SimpleDateFormat
+import java.util.Date
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    kotlin("plugin.serialization") version "2.1.0"
     id("com.google.devtools.ksp")
     id("kotlin-kapt")
 }
@@ -25,6 +29,10 @@ android {
         resValue("string", "version_name", "v$versionName ($versionCode)")
         buildConfigField("String", "YANDEX_API_KEY", "null")
         buildConfigField("boolean", "DEBUG_BUILD", "true")
+
+        val threshold = Date().apply { time += 1000 * 60 * 60 * 8 }
+        val date = SimpleDateFormat ("yyyy-MM-dd'T'hh:mm:ss'Z'").format(threshold)
+        buildConfigField("String", "UPDATE_THRESHOLD", "\"$date\"")
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -106,8 +114,13 @@ dependencies {
     implementation(libs.material)
     implementation(libs.play.core)
     implementation(libs.play.core.ktx)
+    implementation(libs.ktor.negotiation)
+    implementation(libs.ktor.core)
+    implementation(libs.ktor.json)
+    implementation(libs.ktor.cio)
     implementation(libs.insets)
     debugImplementation(libs.leakcanary)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    //implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 }

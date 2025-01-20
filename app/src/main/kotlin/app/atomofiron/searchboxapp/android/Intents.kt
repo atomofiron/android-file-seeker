@@ -14,20 +14,12 @@ object Intents {
     const val ACTION_UPDATE = "ACTION_UPDATE"
     const val ACTION_INSTALL_UPDATE = "ACTION_INSTALL_UPDATE"
 
-    const val REQUEST_UPDATE = 7453
-    const val REQUEST_REMINDER = 7454
-    const val REQUEST_REMIND_IN_10_MIN = 7455
-    const val REQUEST_REMIND_IN_AN_HOUR = 7456
-    const val REQUEST_RESTORE_BACKUP = 34576
-    const val REQUEST_CODE_UPDATE_APP = 12345
-
-    const val KEY_REMIND_IN_MINUTES = "KEY_REMIND_IN_MINUTES"
-    const val KEY_WITH_SOUND = "KEY_WITH_SOUND"
-
     private const val PACKAGE_SCHEME = "package:"
     private const val MAX_REQUEST_CODE = 65536
 
     //val telegramLink get() = Intent(Intent.ACTION_VIEW, Uri.parse(Const.TELEGRAM_LINK))
+    val github = Intent(Intent.ACTION_VIEW, Uri.parse(Const.GITHUB_URL))
+    val forPda = Intent(Intent.ACTION_VIEW, Uri.parse(Const.FORPDA_URL))
 
     fun mainActivity(context: Context, action: String? = null) = Intent(context, MainActivity::class.java).setAction(action)
 
@@ -56,4 +48,8 @@ object Intents {
             Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
             Uri.parse(PACKAGE_SCHEME + BuildConfig.APPLICATION_ID)
         )
+
+    fun updating(context: Context) = mainActivity(context, ACTION_UPDATE)
+
+    fun installing(context: Context) = Intent(context, InstallReceiver::class.java)
 }

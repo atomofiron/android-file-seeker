@@ -143,10 +143,12 @@
     <string name="failed_check_updates">Не удалость проверить обновления</string>
     <string name="update_loading">Обновление скачивается</string>
     <string name="update_installing">Обновление устанавливается</string>
+    <string name="update_installed">Обновление было успешно установлено</string>
     <string name="is_up_to_date">У вас последняя версия приложения</string>
     <string name="update_downloaded">Обновление загружено</string>
     <string name="update_ready">Обновление готово к установке</string>
     <string name="check">Проверить</string>
+    <string name="retry">Повторить</string>
     <string name="download">Скачать</string>
     <string name="install">Установить</string>
     <string name="launch">Запустить</string>

@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.di.module
 
 import android.content.ClipboardManager
-import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
@@ -9,6 +8,7 @@ import android.content.res.AssetManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
+import app.atomofiron.searchboxapp.injectable.network.UpdateApi
 import dagger.Module
 import dagger.Provides
 import app.atomofiron.searchboxapp.injectable.service.*
@@ -59,8 +59,7 @@ open class ServiceModule {
     fun apkService(
         appStore: AppStore,
         packageInstaller: PackageInstaller,
-        contentResolver: ContentResolver,
-    ): ApkService = ApkService(appStore.context, packageInstaller, contentResolver)
+    ): ApkService = ApkService(appStore.context, packageInstaller)
 
     @Provides
     @Singleton
@@ -73,10 +72,16 @@ open class ServiceModule {
 
     @Provides
     @Singleton
-    fun textAppUpdateService(
+    fun appUpdateService(
         context: Context,
+        scope: CoroutineScope,
+        api: UpdateApi,
         updateStore: AppUpdateStore,
         preferences: PreferenceStore,
         preferenceChannel: PreferenceChannel,
-    ): AppUpdateService = AppUpdateService(context, updateStore, preferences, preferenceChannel)
+        apkService: ApkService,
+    ): AppUpdateService = when {
+        true -> AppUpdateServiceGithubImpl(context, scope, api, updateStore, apkService)
+        else -> AppUpdateServiceImpl(context, updateStore, preferences, preferenceChannel)
+    }
 }

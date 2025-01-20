@@ -70,13 +70,15 @@ class AppUpdatePreference @JvmOverloads constructor(
             is AppUpdateState.Downloading,
             is AppUpdateState.Installing -> R.drawable.ic_progress_download
             is AppUpdateState.UpToDate -> R.drawable.ic_smile
-            is AppUpdateState.Unknown -> R.drawable.ic_error
+            is AppUpdateState.Unknown,
+            is AppUpdateState.Error -> R.drawable.ic_error
         }.let { setIcon(it) }
     }
 
     private fun AppUpdateState.bindTitle() {
         when (this) {
             is AppUpdateState.Unknown -> R.string.failed_check_updates
+            is AppUpdateState.Error -> return setTitle(message)
             is AppUpdateState.Available -> R.string.update_available
             is AppUpdateState.Downloading -> R.string.update_loading
             is AppUpdateState.Installing -> R.string.update_installing
@@ -89,6 +91,7 @@ class AppUpdatePreference @JvmOverloads constructor(
         val stringId = when (this) {
             is AppUpdateState.UpToDate,
             is AppUpdateState.Unknown -> R.string.check.also { buttonStyle.outlined(button) }
+            is AppUpdateState.Error -> R.string.retry.also { buttonStyle.filled(button) }
             is AppUpdateState.Available -> R.string.download.also { buttonStyle.filled(button) }
             is AppUpdateState.Completable -> R.string.install.also { buttonStyle.filled(button) }
             is AppUpdateState.Downloading,
@@ -103,6 +106,7 @@ class AppUpdatePreference @JvmOverloads constructor(
             is AppUpdateState.Installing -> null
             is AppUpdateState.Downloading -> progress
             is AppUpdateState.Unknown,
+            is AppUpdateState.Error,
             is AppUpdateState.Available,
             is AppUpdateState.Completable,
             is AppUpdateState.UpToDate -> {
@@ -119,6 +123,7 @@ class AppUpdatePreference @JvmOverloads constructor(
         when (val state = state) {
             is AppUpdateState.Unknown,
             is AppUpdateState.UpToDate -> AppUpdateAction.Check
+            is AppUpdateState.Error -> AppUpdateAction.Retry
             is AppUpdateState.Available -> when (val type = state.type) {
                 is UpdateType.Variant -> AppUpdateAction.Download(type)
                 else -> return showChoice()

@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.utils
 
-sealed class Rslt<T> {
-    class Ok<T>(val data: T) : Rslt<T>()
-    class Err<T>(val error: String) : Rslt<T>()
+
+sealed interface Rslt<T> {
+    data class Ok<T>(val data: T) : Rslt<T>
+    data class Err<T>(val error: String) : Rslt<T>
 }

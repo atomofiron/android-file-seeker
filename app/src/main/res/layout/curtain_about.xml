@@ -29,6 +29,9 @@
             android:text="@string/version_name"
             android:textColor="?colorSecondary"
             android:layout_marginBottom="@dimen/common_margin"
+            android:drawableStart="@drawable/ic_githb"
+            android:gravity="center_vertical"
+            android:drawablePadding="4dp"
             />
 
         <com.google.android.material.textview.MaterialTextView
@@ -46,7 +49,7 @@
             android:gravity="center_vertical"
             android:textSize="20sp"
             android:textColor="?colorSecondary"
-            android:drawableStart="@drawable/ic_github"
+            android:drawableStart="@drawable/logo_github"
             android:drawableEnd="@drawable/ic_open_with"
             android:text="@string/look_github"
             android:paddingEnd="@dimen/padding_large"
@@ -66,7 +69,7 @@
             android:gravity="center_vertical"
             android:textSize="20sp"
             android:textColor="?colorSecondary"
-            android:drawableStart="@drawable/ic_forpda"
+            android:drawableStart="@drawable/logo_forpda"
             android:drawableEnd="@drawable/ic_open_with"
             android:text="@string/faq_4pda"
             android:paddingEnd="@dimen/padding_large"

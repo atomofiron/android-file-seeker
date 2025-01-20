@@ -7,6 +7,7 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
+import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.android.dismissUpdateNotification
 import app.atomofiron.searchboxapp.android.showUpdateNotification
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
@@ -18,7 +19,6 @@ import app.atomofiron.searchboxapp.model.other.AppUpdateState
 import app.atomofiron.searchboxapp.model.other.UpdateNotification
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.main.MainRouter
-import app.atomofiron.searchboxapp.utils.Intents
 import kotlinx.coroutines.CoroutineScope
 
 interface AppEventDelegateApi {

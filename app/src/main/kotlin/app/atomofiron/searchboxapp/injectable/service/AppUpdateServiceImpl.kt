@@ -10,6 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.searchboxapp.R
+import app.atomofiron.searchboxapp.Unreachable
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
@@ -24,12 +25,20 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 
-class AppUpdateService(
+interface AppUpdateService {
+    fun onActivityCreate(activity: AppCompatActivity)
+    fun check(userAction: Boolean = false)
+    fun retry()
+    fun startUpdate(variant: UpdateType.Variant)
+    fun completeUpdate()
+}
+
+class AppUpdateServiceImpl(
     private val context: Context,
     private val store: AppUpdateStore,
     private val preferences: PreferenceStore,
     private val preferenceChannel: PreferenceChannel,
-) : InstallStateUpdatedListener, ActivityResultCallback<ActivityResult> {
+) : AppUpdateService, InstallStateUpdatedListener, ActivityResultCallback<ActivityResult> {
 
     private val appUpdateManager by lazy { AppUpdateManagerFactory.create(context) }
     private var appUpdateInfo: AppUpdateInfo? = null
@@ -42,7 +51,7 @@ class AppUpdateService(
         appUpdateManager.registerListener(this)
     }
 
-    fun onActivityCreate(activity: AppCompatActivity) {
+    override fun onActivityCreate(activity: AppCompatActivity) {
         launcher = activity.registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult(), this)
     }
 
@@ -75,7 +84,7 @@ class AppUpdateService(
         }
     }
 
-    fun check(userAction: Boolean = false) {
+    override fun check(userAction: Boolean) {
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
             this.appUpdateInfo = appUpdateInfo
             when (appUpdateInfo.updateAvailability()) {
@@ -102,7 +111,9 @@ class AppUpdateService(
         }
     }
 
-    fun startUpdate(variant: UpdateType.Variant) {
+    override fun retry() = Unreachable // no AppUpdateState.Error sent
+
+    override fun startUpdate(variant: UpdateType.Variant) {
         val appUpdateInfo = appUpdateInfo ?: return
         this.appUpdateInfo = null // spent out
         val type = when (variant) {
@@ -113,7 +124,7 @@ class AppUpdateService(
         appUpdateManager.startUpdateFlowForResult(appUpdateInfo, launcher, options)
     }
 
-    fun completeUpdate() {
+    override fun completeUpdate() {
         appUpdateManager.completeUpdate()
     }
 
@@ -133,3 +144,4 @@ private fun AppUpdateInfo.type(): UpdateType? {
         else -> null
     }
 }
+

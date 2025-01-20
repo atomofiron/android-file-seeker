@@ -10,6 +10,7 @@ sealed interface UpdateType {
 
 sealed class AppUpdateState(val waiting: Boolean = false) {
     data object Unknown : AppUpdateState()
+    data class Error(val message: String?) : AppUpdateState()
     data object UpToDate : AppUpdateState()
     data class Available(val type: UpdateType, val code: Int) : AppUpdateState(waiting = true)
     data class Downloading(val progress: Float?) : AppUpdateState()

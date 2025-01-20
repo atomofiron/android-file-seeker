@@ -9,6 +9,7 @@ import app.atomofiron.searchboxapp.android.App
 import app.atomofiron.searchboxapp.di.module.ChannelModule
 import app.atomofiron.searchboxapp.di.module.CommonModule
 import app.atomofiron.searchboxapp.di.module.InteractorModule
+import app.atomofiron.searchboxapp.di.module.NetworkModule
 import app.atomofiron.searchboxapp.di.module.ServiceModule
 import app.atomofiron.searchboxapp.di.module.StoreModule
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
@@ -33,6 +34,7 @@ import javax.inject.Singleton
     ServiceModule::class,
     StoreModule::class,
     InteractorModule::class,
+    NetworkModule::class,
 ])
 @Singleton
 interface AppComponent :
@@ -69,7 +71,7 @@ interface AppComponent :
         fun packageInstaller(packageInstaller: PackageInstaller): Builder
 
         @BindsInstance
-        fun contentResolver(contentResolver: ContentResolver): Builder
+        fun contentResolver(contentResolver: ContentResolver): Builder // unused?
 
         fun build(): AppComponent
     }

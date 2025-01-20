@@ -152,7 +152,7 @@ object ExplorerUtils {
         )
     }
 
-    private fun parse(line: String, name: String? = null): NodeProperties {
+    private fun parse(line: String, name: String? = null, size: String = ""): NodeProperties {
         val parts = line.split(spaces, 7)
         val last = parts.last()
         val time = last.substring(0, 5)
@@ -163,7 +163,7 @@ object ExplorerUtils {
             access = parts[0],
             owner = parts[2],
             group = parts[3],
-            size = if (parts[0].firstOrNull() == FILE_CHAR) parts[4] else "",
+            size = if (parts[0].firstOrNull() == FILE_CHAR) parts[4] else size,
             date = parts[5],
             time = time,
             name = nodeName,
@@ -385,7 +385,7 @@ object ExplorerUtils {
     }
 
     private fun Node.parseNode(line: String): Node {
-        val properties = parse(line, name)
+        val properties = parse(line, name, size)
         val (children, content) = when {
             properties.isDirectory() -> when (content) {
                 is NodeContent.Directory -> children to content
@@ -620,9 +620,12 @@ object ExplorerUtils {
             !isCached -> new
             else -> null
         }
-        val properties = when (properties) {
-            this.properties -> null
-            else -> properties
+        val properties = when {
+            properties == this.properties -> null
+            !properties.isDirectory() -> properties
+            properties.size.isNotEmpty() -> properties
+            this.properties.size.isEmpty() -> properties
+            else -> properties.copy(size = this.properties.size)
         }
         return when (true) {
             (properties != null),

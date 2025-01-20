@@ -25,6 +25,7 @@ insets = "2.0.0-rc1"
 datastore = "1.1.1"
 exif = "1.3.7"
 asyncInflater = "1.0.0"
+ktor = "3.0.3"
 
 [libraries]
 kotlinx-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -57,6 +58,10 @@ leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", v
 play-core = { group = "com.google.android.play", name = "app-update", version.ref = "appUpdate" }
 play-core-ktx = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "appUpdate" }
 insets = { group = "io.github.atomofiron", name = "extended-insets", version.ref = "insets" }
+ktor-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

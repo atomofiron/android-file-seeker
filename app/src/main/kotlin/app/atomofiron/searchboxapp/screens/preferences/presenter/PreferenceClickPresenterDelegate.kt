@@ -23,7 +23,7 @@ class PreferenceClickPresenterDelegate(
         curtainChannel.flow.collectForMe(scope) { controller ->
             controller ?: return@collectForMe
             val adapter: CurtainApi.Adapter<*> = when (controller.requestId) {
-                R.layout.curtain_about -> AboutDelegate()
+                R.layout.curtain_about -> AboutDelegate(router)
                 R.layout.curtain_preference_export_import -> ExportImportDelegate(exportImportDelegate)
                 R.layout.curtain_preference_explorer_item -> ExplorerItemDelegate(preferenceStore)
                 R.layout.curtain_preference_joystick -> JoystickDelegate(preferenceStore)

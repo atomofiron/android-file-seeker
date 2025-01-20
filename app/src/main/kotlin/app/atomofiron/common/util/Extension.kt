@@ -117,3 +117,5 @@ inline fun <T> T.applyIf(predicate: Boolean, action: T.() -> Unit) = when {
 inline fun <T,Q : Any> T.with(it: Q?, action: T.(Q) -> Unit) = apply {
     it?.let { action(this, it) }
 }
+
+fun Throwable.human() = "${this::class.simpleName}: $message"

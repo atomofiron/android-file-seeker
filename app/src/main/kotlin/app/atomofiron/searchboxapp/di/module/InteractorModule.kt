@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.di.module
 
-import android.content.Context
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.DialogInteractor
 import app.atomofiron.searchboxapp.injectable.service.ApkService
@@ -16,11 +15,10 @@ class InteractorModule {
     @Provides
     @Singleton
     fun apks(
-        context: Context,
         appStore: AppStore,
         apkService: ApkService,
         explorerService: ExplorerService,
-    ): ApkInteractor = ApkInteractor(context, appStore.scope, apkService, explorerService)
+    ): ApkInteractor = ApkInteractor(appStore.scope, apkService, explorerService)
 
     @Provides
     @Singleton

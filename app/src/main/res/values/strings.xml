@@ -148,6 +148,7 @@
     <string name="failed_check_updates">Failed to check for updates</string>
     <string name="update_loading">Update is loading now</string>
     <string name="update_installing">Update is installing now</string>
+    <string name="update_installed">The update was successfully installed</string>
     <string name="is_up_to_date">App is up to date</string>
     <string name="update_downloaded">Update downloaded</string>
     <string name="update_ready">The update is ready to install</string>
@@ -155,6 +156,7 @@
     <string name="update_in_background">In background</string>
     <string name="update_now">Now</string>
     <string name="check">Check</string>
+    <string name="retry">Retry</string>
     <string name="download">Download</string>
     <string name="install">Install</string>
     <string name="launch">Launch</string>
