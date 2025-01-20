@@ -25,14 +25,7 @@ import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
 
-interface AppUpdateService {
-    fun onActivityCreate(activity: AppCompatActivity)
-    fun check(userAction: Boolean = false)
-    fun retry()
-    fun startUpdate(variant: UpdateType.Variant)
-    fun completeUpdate()
-}
-
+class AppUpdateServiceGoogleImpl(
     private val context: Context,
     private val store: AppUpdateStore,
     private val preferences: PreferenceStore,
