@@ -33,7 +33,6 @@ interface AppUpdateService {
     fun completeUpdate()
 }
 
-class AppUpdateServiceImpl(
     private val context: Context,
     private val store: AppUpdateStore,
     private val preferences: PreferenceStore,

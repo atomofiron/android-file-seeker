@@ -82,6 +82,6 @@ open class ServiceModule {
         apkService: ApkService,
     ): AppUpdateService = when {
         true -> AppUpdateServiceGithubImpl(context, scope, api, updateStore, apkService)
-        else -> AppUpdateServiceImpl(context, updateStore, preferences, preferenceChannel)
+        else -> AppUpdateServiceGoogleImpl(context, updateStore, preferences, preferenceChannel)
     }
 }
