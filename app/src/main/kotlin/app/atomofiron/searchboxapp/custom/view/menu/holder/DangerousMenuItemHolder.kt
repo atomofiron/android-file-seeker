@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.custom.view.menu.holder
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.ViewGroup
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dangerous.DangerousSliderView
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.utils.Const

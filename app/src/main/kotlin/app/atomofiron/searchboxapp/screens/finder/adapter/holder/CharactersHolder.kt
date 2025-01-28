@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
 

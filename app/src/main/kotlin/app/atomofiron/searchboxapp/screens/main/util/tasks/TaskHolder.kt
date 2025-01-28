@@ -8,7 +8,7 @@ import androidx.transition.TransitionManager
 import app.atomofiron.common.recycler.GeneralHolder
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textview.MaterialTextView
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 class TaskHolder(itemView: View) : GeneralHolder<XTask>(itemView) {
     companion object {
@@ -24,9 +24,9 @@ class TaskHolder(itemView: View) : GeneralHolder<XTask>(itemView) {
 
         ibCancel.setOnClickListener { view ->
             toggle(confirm = true)
-            val position = adapterPosition
+            val position = absoluteAdapterPosition
             view.postDelayed(block@{
-                if (adapterPosition != position) return@block
+                if (absoluteAdapterPosition != position) return@block
                 toggle(confirm = false)
             }, CONFIRM_DELAY)
         }

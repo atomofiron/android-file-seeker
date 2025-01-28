@@ -7,7 +7,7 @@ import android.view.View
 import android.widget.LinearLayout
 import app.atomofiron.common.util.moveChildrenFrom
 import com.google.android.material.textview.MaterialTextView
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 class DetailProgressView @JvmOverloads constructor(
         context: Context,

@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 class TemplateFragment : Fragment(R.layout.fragment_template),
     BaseFragment<TemplateFragment, TemplateViewState, TemplatePresenter> by BaseFragmentImpl()

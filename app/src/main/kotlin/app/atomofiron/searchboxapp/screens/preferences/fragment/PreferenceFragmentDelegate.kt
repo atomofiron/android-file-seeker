@@ -4,7 +4,7 @@ import android.content.res.Resources
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.Q
 import androidx.preference.*
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.preference.TextFieldPreference
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState

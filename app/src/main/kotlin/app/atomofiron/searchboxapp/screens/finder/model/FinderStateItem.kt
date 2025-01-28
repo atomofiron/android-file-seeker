@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.finder.model
 
 import androidx.annotation.StringRes
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.finder.ISearchConfig
 import app.atomofiron.searchboxapp.model.finder.SearchConfig

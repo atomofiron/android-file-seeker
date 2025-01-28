@@ -11,7 +11,7 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import com.google.android.material.color.MaterialColors
 
 

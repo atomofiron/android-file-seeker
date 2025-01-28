@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 
 private object ItemCallbackImpl : DiffUtil.ItemCallback<NodeRoot>() {

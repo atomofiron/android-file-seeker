@@ -5,9 +5,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.core.view.*
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
-import app.atomofiron.searchboxapp.databinding.CurtainExplorerOptionsBinding
+import app.atomofiron.fileseeker.databinding.CurtainExplorerOptionsBinding
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl

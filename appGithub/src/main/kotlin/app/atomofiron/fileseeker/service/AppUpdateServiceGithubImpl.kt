@@ -1,15 +1,17 @@
-package app.atomofiron.searchboxapp.injectable.service
+package app.atomofiron.fileseeker.service
 
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.common.util.isGranted
 import app.atomofiron.searchboxapp.BuildConfig
-import app.atomofiron.searchboxapp.BuildConfig.VERSION_CODE
 import app.atomofiron.searchboxapp.Unreachable
 import app.atomofiron.searchboxapp.android.Intents
-import app.atomofiron.searchboxapp.injectable.network.UpdateApi
+import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
+import app.atomofiron.searchboxapp.injectable.service.ApkService
+import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
+import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.network.GithubAsset
 import app.atomofiron.searchboxapp.model.network.GithubRelease
 import app.atomofiron.searchboxapp.model.network.Loading
@@ -28,11 +30,28 @@ private const val SUBDIR = "updates" // src/res/xml/provider_paths.xml
 class AppUpdateServiceGithubImpl(
     private val context: Context,
     private val scope: CoroutineScope,
+    private val apks: ApkService,
     private val api: UpdateApi,
     private val store: AppUpdateStore,
-    private val apks: ApkService,
 ) : AppUpdateService {
+    companion object : AppUpdateService.Factory {
+        override fun new(
+            context: Context,
+            scope: CoroutineScope,
+            apkService: ApkService,
+            updateStore: AppUpdateStore,
+            preferences: PreferenceStore,
+            preferenceChannel: PreferenceChannel
+        ): AppUpdateService = AppUpdateServiceGithubImpl(
+            context,
+            scope,
+            apkService,
+            UpdateApi(),
+            updateStore,
+        )
+    }
 
+    // todo save asset into preferences
     private var asset: GithubAsset? = null
     private var file: File? = null
 
@@ -51,7 +70,10 @@ class AppUpdateServiceGithubImpl(
         }
     }
 
-    override fun retry() = store.set(asset?.checkFile() ?: AppUpdateState.Unknown)
+    override fun retry() = when (val state = asset?.checkFile()) {
+        null -> check()
+        else -> store.set(state)
+    }
 
     override fun startUpdate(variant: UpdateType.Variant) {
         val asset = asset ?: return Unreachable
@@ -116,7 +138,7 @@ class AppUpdateServiceGithubImpl(
         !exists() -> false
         length() != asset.size -> false
         BuildConfig.DEBUG -> true
-        else -> context.apkInfo(path)?.let { it.versionCode > VERSION_CODE } == true
+        else -> context.apkInfo(path)?.let { it.versionCode > BuildConfig.VERSION_CODE } == true
     }.let { verified ->
         if (!verified) delete()
         takeIf { verified }

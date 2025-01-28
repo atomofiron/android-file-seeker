@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.custom.view
 import android.content.Context
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable.Companion.setBallsDrawable
 
 class BallsView @JvmOverloads constructor(

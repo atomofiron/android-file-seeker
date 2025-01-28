@@ -13,8 +13,8 @@ import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.flow.viewCollect
 import com.google.android.material.snackbar.Snackbar
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.FragmentFinderBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter

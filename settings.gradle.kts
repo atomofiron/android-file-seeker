@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -10,6 +11,7 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
         jcenter()
+        gradlePluginPortal()
     }
 }
 dependencyResolutionManagement {
@@ -22,4 +24,6 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "File Seeker"
+include(":appGoogle")
+include(":appGithub")
 include(":app")

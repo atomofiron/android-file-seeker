@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.finder.history.dao.HistoryDao
 import app.atomofiron.searchboxapp.screens.finder.history.dao.HistoryDatabase
 import app.atomofiron.searchboxapp.screens.finder.history.dao.ItemHistory

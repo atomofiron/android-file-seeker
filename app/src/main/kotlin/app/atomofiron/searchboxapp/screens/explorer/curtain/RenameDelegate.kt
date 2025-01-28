@@ -6,7 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
-import app.atomofiron.searchboxapp.databinding.CurtainExplorerRenameBinding
+import app.atomofiron.fileseeker.databinding.CurtainExplorerRenameBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder

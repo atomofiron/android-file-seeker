@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.preferences
 
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.preference.UpdateActionListener
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore

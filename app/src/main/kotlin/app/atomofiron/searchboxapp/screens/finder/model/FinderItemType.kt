@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.screens.finder.model
 
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 enum class FinderItemType(val id: Int) {
     FIND(R.layout.item_field_search),

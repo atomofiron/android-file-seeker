@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.explorer
 
 import app.atomofiron.common.util.flow.*
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore

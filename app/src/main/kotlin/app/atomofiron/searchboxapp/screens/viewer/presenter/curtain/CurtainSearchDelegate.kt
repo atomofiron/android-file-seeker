@@ -3,8 +3,8 @@ package app.atomofiron.searchboxapp.screens.viewer.presenter.curtain
 import android.view.LayoutInflater
 import android.widget.EditText
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.CurtainTextViewerSearchBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.CurtainTextViewerSearchBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder

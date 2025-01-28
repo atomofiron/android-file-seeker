@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralHolder
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
 

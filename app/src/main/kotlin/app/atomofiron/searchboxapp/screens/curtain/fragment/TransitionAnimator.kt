@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.curtain.fragment
 import android.animation.ValueAnimator
 import android.view.View
 import android.view.animation.DecelerateInterpolator
-import app.atomofiron.searchboxapp.databinding.FragmentCurtainBinding
+import app.atomofiron.fileseeker.databinding.FragmentCurtainBinding
 import app.atomofiron.searchboxapp.utils.Const
 import kotlin.math.abs
 

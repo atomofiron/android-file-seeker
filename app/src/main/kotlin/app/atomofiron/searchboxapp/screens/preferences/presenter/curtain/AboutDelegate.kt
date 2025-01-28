@@ -4,9 +4,9 @@ import android.view.LayoutInflater
 import android.view.View
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
-import app.atomofiron.searchboxapp.databinding.CurtainAboutBinding
+import app.atomofiron.fileseeker.databinding.CurtainAboutBinding
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceRouter
 import app.atomofiron.searchboxapp.utils.Alpha

@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.root
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.model.other.InitialScreen
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerFragment

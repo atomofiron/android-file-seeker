@@ -5,7 +5,7 @@ import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.widget.Button
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 class ButtonStyle(
     private val filled: Pair<Drawable, ColorStateList>,

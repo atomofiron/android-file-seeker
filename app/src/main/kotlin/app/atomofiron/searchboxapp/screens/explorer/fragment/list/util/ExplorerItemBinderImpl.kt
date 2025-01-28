@@ -11,7 +11,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import app.atomofiron.common.util.ifVisible
 import com.google.android.material.checkbox.MaterialCheckBox
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.BallsView
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition

@@ -7,8 +7,8 @@ import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.EditText
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.CurtainExplorerCreateBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.CurtainExplorerCreateBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMenuDelegate
 import app.atomofiron.searchboxapp.utils.ExtType

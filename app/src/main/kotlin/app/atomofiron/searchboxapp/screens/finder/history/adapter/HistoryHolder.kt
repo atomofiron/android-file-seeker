@@ -5,7 +5,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 class HistoryHolder(itemView: View, onItemActionListener: OnItemActionListener) : RecyclerView.ViewHolder(itemView) {
     companion object {
@@ -17,16 +17,16 @@ class HistoryHolder(itemView: View, onItemActionListener: OnItemActionListener) 
 
     init {
         itemView.setOnClickListener {
-            if (adapterPosition == UNDEFINED) return@setOnClickListener
-            onItemActionListener.onItemClick(adapterPosition)
+            if (absoluteAdapterPosition == UNDEFINED) return@setOnClickListener
+            onItemActionListener.onItemClick(absoluteAdapterPosition)
         }
         btnPinned.setOnClickListener {
-            if (adapterPosition == UNDEFINED) return@setOnClickListener
-            onItemActionListener.onItemPin(adapterPosition)
+            if (absoluteAdapterPosition == UNDEFINED) return@setOnClickListener
+            onItemActionListener.onItemPin(absoluteAdapterPosition)
         }
         btnRemove.setOnClickListener {
-            if (adapterPosition == UNDEFINED) return@setOnClickListener
-            onItemActionListener.onItemRemove(adapterPosition)
+            if (absoluteAdapterPosition == UNDEFINED) return@setOnClickListener
+            onItemActionListener.onItemRemove(absoluteAdapterPosition)
         }
     }
 

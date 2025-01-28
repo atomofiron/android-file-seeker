@@ -1,12 +1,11 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.app.PendingIntent
-import android.util.Log
 import android.view.Menu
 import androidx.annotation.IdRes
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.arch.BaseRouter
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 import java.io.InputStream

@@ -5,7 +5,7 @@ import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.permission.PermissionDelegate
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerFragment
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams

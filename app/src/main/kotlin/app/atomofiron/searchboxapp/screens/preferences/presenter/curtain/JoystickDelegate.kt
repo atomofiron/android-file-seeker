@@ -8,8 +8,8 @@ import android.widget.CompoundButton
 import android.widget.SeekBar
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.CurtainPreferenceJoystickBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.CurtainPreferenceJoystickBinding
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi

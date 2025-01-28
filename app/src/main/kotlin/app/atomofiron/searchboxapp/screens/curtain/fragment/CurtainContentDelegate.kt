@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.screens.curtain.fragment
 
-import app.atomofiron.searchboxapp.databinding.FragmentCurtainBinding
+import app.atomofiron.fileseeker.databinding.FragmentCurtainBinding
 import app.atomofiron.searchboxapp.dropLast
 import app.atomofiron.searchboxapp.screens.curtain.CurtainPresenter
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi

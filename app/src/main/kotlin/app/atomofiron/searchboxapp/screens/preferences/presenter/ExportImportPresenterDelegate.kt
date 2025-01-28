@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.preferences.presenter
 
 import app.atomofiron.common.util.flow.invoke
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.service.PreferenceService
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState

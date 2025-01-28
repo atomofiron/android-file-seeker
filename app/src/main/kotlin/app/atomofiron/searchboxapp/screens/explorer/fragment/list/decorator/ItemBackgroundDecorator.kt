@@ -6,7 +6,7 @@ import android.graphics.Rect
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.TAG_EXPLORER_OPENED_ITEM
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.getSortedChildren
 

@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer.presenter
 
 import android.view.LayoutInflater
 import app.atomofiron.common.arch.Recipient
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor

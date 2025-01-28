@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.screens.explorer.presenter
 
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.DialogInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor

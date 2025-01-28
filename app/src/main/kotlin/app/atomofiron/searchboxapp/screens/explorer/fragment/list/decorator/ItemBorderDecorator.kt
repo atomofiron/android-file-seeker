@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter

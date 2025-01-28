@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.result.adapter
 
 import android.view.View
 import android.widget.TextView
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 class ResultsHeaderHolder(itemView: View) : ResultsHolder(itemView) {
     private val tvTitle = itemView.findViewById<TextView>(R.id.item_tv_title)

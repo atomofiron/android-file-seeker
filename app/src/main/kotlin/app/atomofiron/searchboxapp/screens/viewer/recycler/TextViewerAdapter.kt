@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState.MatchCursor

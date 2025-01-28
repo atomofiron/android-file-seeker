@@ -5,7 +5,7 @@ import android.widget.CheckBox
 import android.widget.CompoundButton
 import androidx.core.view.isGone
 import app.atomofiron.common.recycler.GeneralHolder
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
 
 class ConfigHolder(

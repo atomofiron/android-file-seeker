@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.injectable.service
+package app.atomofiron.fileseeker.service
 
 import android.app.Activity
 import android.content.Context
@@ -9,9 +9,11 @@ import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.searchboxapp.BuildConfig
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.Unreachable
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
+import app.atomofiron.searchboxapp.injectable.service.ApkService
+import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
@@ -24,6 +26,7 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
+import kotlinx.coroutines.CoroutineScope
 
 class AppUpdateServiceGoogleImpl(
     private val context: Context,
@@ -31,8 +34,25 @@ class AppUpdateServiceGoogleImpl(
     private val preferences: PreferenceStore,
     private val preferenceChannel: PreferenceChannel,
 ) : AppUpdateService, InstallStateUpdatedListener, ActivityResultCallback<ActivityResult> {
+    companion object : AppUpdateService.Factory {
+        override fun new(
+            context: Context,
+            scope: CoroutineScope,
+            apkService: ApkService,
+            updateStore: AppUpdateStore,
+            preferences: PreferenceStore,
+            preferenceChannel: PreferenceChannel
+        ): AppUpdateService = AppUpdateServiceGoogleImpl(
+            context,
+            updateStore,
+            preferences,
+            preferenceChannel,
+        )
+    }
 
-    private val appUpdateManager by lazy { AppUpdateManagerFactory.create(context) }
+    private val appUpdateManager by lazy {
+        AppUpdateManagerFactory.create(context)
+    }
     private var appUpdateInfo: AppUpdateInfo? = null
     private lateinit var launcher: ActivityResultLauncher<IntentSenderRequest>
     private var knownActualCode: Int
@@ -59,8 +79,12 @@ class AppUpdateServiceGoogleImpl(
         when (status) {
             InstallStatus.UNKNOWN -> AppUpdateState.Unknown
             // PENDING before DOWNLOADING
-            InstallStatus.PENDING -> AppUpdateState.Downloading(null)
-            InstallStatus.DOWNLOADING -> AppUpdateState.Downloading(downloadingProgress)
+            InstallStatus.PENDING -> AppUpdateState.Downloading(
+                null
+            )
+            InstallStatus.DOWNLOADING -> AppUpdateState.Downloading(
+                downloadingProgress
+            )
             InstallStatus.FAILED,
             InstallStatus.CANCELED -> return onFailure()
             InstallStatus.DOWNLOADED -> AppUpdateState.Completable
@@ -136,4 +160,3 @@ private fun AppUpdateInfo.type(): UpdateType? {
         else -> null
     }
 }
-

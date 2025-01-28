@@ -4,7 +4,7 @@ import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.common.util.permission.PermissionDelegate
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.screens.finder.FinderFragment

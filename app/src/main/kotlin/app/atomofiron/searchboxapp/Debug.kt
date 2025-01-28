@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp
 import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
+import app.atomofiron.fileseeker.BuildConfig
 
 private var timestamp: Long = 0
 private var nanotimestamp: Long = 0

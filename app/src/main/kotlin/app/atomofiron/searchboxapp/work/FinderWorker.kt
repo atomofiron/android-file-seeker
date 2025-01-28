@@ -10,8 +10,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.work.*
+import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.*
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Notifications
 import app.atomofiron.searchboxapp.android.tryShow
 import app.atomofiron.searchboxapp.android.updateNotificationChannel

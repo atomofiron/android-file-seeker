@@ -2,9 +2,9 @@ package app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder
 
 import android.view.View
 import app.atomofiron.common.recycler.GeneralHolder
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.ItemExplorerBinding
-import app.atomofiron.searchboxapp.databinding.ItemExplorerSeparatorBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
+import app.atomofiron.fileseeker.databinding.ItemExplorerSeparatorBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 
 enum class ExplorerItemViewFactory(val layoutId: Int) {

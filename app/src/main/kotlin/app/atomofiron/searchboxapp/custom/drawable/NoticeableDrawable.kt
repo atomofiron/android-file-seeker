@@ -16,7 +16,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.toIntAlpha
 
@@ -136,9 +136,11 @@ class NoticeableDrawable(
     @RequiresApi(Q)
     override fun setTintBlendMode(blendMode: BlendMode?) = drawable.setTintBlendMode(blendMode)
 
+    @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override fun setColorFilter(color: Int, mode: PorterDuff.Mode) = drawable.setColorFilter(color, mode)
 
-    override fun getOpacity(): Int = drawable.getOpacity()
+    @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+    override fun getOpacity(): Int = drawable.opacity
 
     override fun invalidateDrawable(who: Drawable) {
         callback?.invalidateDrawable(this)

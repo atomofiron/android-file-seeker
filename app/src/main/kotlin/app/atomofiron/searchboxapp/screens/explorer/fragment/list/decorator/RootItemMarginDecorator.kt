@@ -5,7 +5,7 @@ import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.isRtl
 import lib.atomofiron.insets.ExtendedWindowInsets

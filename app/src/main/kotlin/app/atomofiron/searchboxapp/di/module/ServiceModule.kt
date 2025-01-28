@@ -8,7 +8,6 @@ import android.content.res.AssetManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
-import app.atomofiron.searchboxapp.injectable.network.UpdateApi
 import dagger.Module
 import dagger.Provides
 import app.atomofiron.searchboxapp.injectable.service.*
@@ -72,16 +71,20 @@ open class ServiceModule {
 
     @Provides
     @Singleton
-    fun appUpdateService(
+    fun updateService(
+        factory: AppUpdateService.Factory,
         context: Context,
         scope: CoroutineScope,
-        api: UpdateApi,
+        apkService: ApkService,
         updateStore: AppUpdateStore,
         preferences: PreferenceStore,
         preferenceChannel: PreferenceChannel,
-        apkService: ApkService,
-    ): AppUpdateService = when {
-        true -> AppUpdateServiceGithubImpl(context, scope, api, updateStore, apkService)
-        else -> AppUpdateServiceGoogleImpl(context, updateStore, preferences, preferenceChannel)
-    }
+    ): AppUpdateService = factory.new(
+        context,
+        scope,
+        apkService,
+        updateStore,
+        preferences,
+        preferenceChannel,
+    )
 }

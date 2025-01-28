@@ -5,7 +5,7 @@ import android.content.res.TypedArray
 import android.util.AttributeSet
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ByteSizeTextField
 
 class ByteSizePreference(context: Context, attrs: AttributeSet) : Preference(context, attrs) {

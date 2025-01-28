@@ -5,7 +5,7 @@ import androidx.annotation.StringRes
 import app.atomofiron.common.util.applyIf
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.common.util.with
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.get
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

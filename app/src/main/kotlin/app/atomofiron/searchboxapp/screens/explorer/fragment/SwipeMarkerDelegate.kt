@@ -6,7 +6,7 @@ import android.view.HapticFeedbackConstants
 import android.view.View
 import android.widget.CheckBox
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.isRtl
 import kotlin.math.abs
 import app.atomofiron.common.util.progressionTo

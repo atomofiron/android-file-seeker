@@ -12,11 +12,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.flow.viewCollect
-import app.atomofiron.searchboxapp.BuildConfig
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.BuildConfig
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.setScreenSizeListener
-import app.atomofiron.searchboxapp.databinding.FragmentTextViewerBinding
+import app.atomofiron.fileseeker.databinding.FragmentTextViewerBinding
 import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask

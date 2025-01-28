@@ -9,11 +9,10 @@ import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.ItemExplorerBinding
-import app.atomofiron.searchboxapp.databinding.ItemExplorerSeparatorBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
+import app.atomofiron.fileseeker.databinding.ItemExplorerSeparatorBinding
 import app.atomofiron.searchboxapp.utils.Alpha
-import app.atomofiron.searchboxapp.utils.Const
 
 const val TAG_EXPLORER_OPENED_ITEM = "TAG_EXPLORER_OPENED_ITEM"
 

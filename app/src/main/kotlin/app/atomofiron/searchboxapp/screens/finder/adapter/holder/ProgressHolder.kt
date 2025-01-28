@@ -10,7 +10,7 @@ import android.widget.TextView
 import androidx.core.view.isInvisible
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.Unreachable
 import app.atomofiron.searchboxapp.custom.view.BallsView
 import app.atomofiron.searchboxapp.model.finder.SearchParams

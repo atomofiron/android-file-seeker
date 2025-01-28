@@ -20,9 +20,9 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
-import app.atomofiron.searchboxapp.databinding.FragmentPreferenceBinding
+import app.atomofiron.fileseeker.databinding.FragmentPreferenceBinding
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.Shell

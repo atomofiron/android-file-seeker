@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.inputmethod.EditorInfo
 import app.atomofiron.common.util.RadioGroupImpl
 import com.google.android.material.snackbar.Snackbar
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.CurtainPreferenceToyboxBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.CurtainPreferenceToyboxBinding
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi

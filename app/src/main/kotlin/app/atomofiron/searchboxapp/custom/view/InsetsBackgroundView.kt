@@ -6,7 +6,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.graphics.ColorUtils
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 import app.atomofiron.searchboxapp.utils.obtainStyledAttributes

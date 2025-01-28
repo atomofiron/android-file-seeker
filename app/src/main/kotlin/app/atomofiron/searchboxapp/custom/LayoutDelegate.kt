@@ -12,7 +12,7 @@ import androidx.core.graphics.Insets
 import androidx.core.view.*
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.custom.view.JoystickView
 import app.atomofiron.searchboxapp.model.Layout

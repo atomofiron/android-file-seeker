@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.main.util
 import android.content.Context
 import app.atomofiron.common.util.findBooleanByAttr
 import com.google.android.material.snackbar.Snackbar
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 class SnackbarWrapper(
     private val context: Context,

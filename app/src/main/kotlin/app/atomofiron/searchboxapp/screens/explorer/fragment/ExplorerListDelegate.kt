@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer.fragment
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.Node.Companion.toUniqueId

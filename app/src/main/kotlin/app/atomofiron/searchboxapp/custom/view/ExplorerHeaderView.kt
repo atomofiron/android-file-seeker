@@ -5,8 +5,8 @@ import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.widget.FrameLayout
 import androidx.core.view.isVisible
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.ItemExplorerBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeOpenedCurrent

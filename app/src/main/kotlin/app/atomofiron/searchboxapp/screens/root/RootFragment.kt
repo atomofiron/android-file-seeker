@@ -5,8 +5,8 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.FragmentRootBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.FragmentRootBinding
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 

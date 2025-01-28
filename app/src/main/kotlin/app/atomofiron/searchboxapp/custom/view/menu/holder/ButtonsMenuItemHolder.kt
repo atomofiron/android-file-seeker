@@ -8,9 +8,9 @@ import android.widget.Button
 import android.widget.LinearLayout
 import androidx.core.view.isVisible
 import androidx.core.view.size
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
-import app.atomofiron.searchboxapp.databinding.ButtonWithCrossBinding
+import app.atomofiron.fileseeker.databinding.ButtonWithCrossBinding
 
 class ButtonsMenuItemHolder private constructor(
     private val layout: LinearLayout,

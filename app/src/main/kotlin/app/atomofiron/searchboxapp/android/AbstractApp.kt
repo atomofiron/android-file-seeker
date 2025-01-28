@@ -1,16 +1,13 @@
 package app.atomofiron.searchboxapp.android
 
 import android.app.Application
-import androidx.work.Configuration
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import com.google.android.material.color.DynamicColors
 import javax.inject.Inject
 
-class App : Application(), Configuration.Provider {
-
-    override val workManagerConfiguration = Configuration.Builder().build()
+abstract class AbstractApp : Application() {
 
     @Inject
     lateinit var initialDelegate: InitialDelegate
@@ -18,12 +15,14 @@ class App : Application(), Configuration.Provider {
     @Inject
     lateinit var updateService: AppUpdateService
 
+    protected abstract val updateServiceFactory: AppUpdateService.Factory
+
     override fun onCreate() {
         super.onCreate()
 
         DynamicColors.applyToActivitiesIfAvailable(this)
 
-        DaggerInjector.init(this)
+        DaggerInjector.init(this, updateServiceFactory)
         DaggerInjector.appComponent.inject(this)
 
         initialDelegate.applyTheme()

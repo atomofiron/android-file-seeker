@@ -17,11 +17,11 @@ import app.atomofiron.common.arch.TranslucentFragment
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.isDarkTheme
-import app.atomofiron.searchboxapp.BuildConfig
+import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.MaterialDimen
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.FragmentCurtainBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.FragmentCurtainBinding
 import app.atomofiron.searchboxapp.screens.curtain.fragment.CurtainContentDelegate
 import app.atomofiron.searchboxapp.screens.curtain.fragment.CurtainNode
 import app.atomofiron.searchboxapp.screens.curtain.fragment.TransitionAnimator

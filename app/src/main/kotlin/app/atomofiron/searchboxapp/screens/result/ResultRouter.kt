@@ -4,7 +4,7 @@ import android.content.Intent
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 import app.atomofiron.searchboxapp.utils.Const
 import java.util.*

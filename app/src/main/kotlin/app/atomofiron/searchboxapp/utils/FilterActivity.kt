@@ -7,7 +7,7 @@ import android.view.Gravity
 import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 class FilterActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {

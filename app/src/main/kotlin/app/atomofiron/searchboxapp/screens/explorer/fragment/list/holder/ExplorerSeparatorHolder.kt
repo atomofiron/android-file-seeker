@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder
 
 import android.view.View
 import app.atomofiron.common.recycler.GeneralHolder
-import app.atomofiron.searchboxapp.databinding.ItemExplorerSeparatorBinding
+import app.atomofiron.fileseeker.databinding.ItemExplorerSeparatorBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 

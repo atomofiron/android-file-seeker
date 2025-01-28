@@ -1,9 +1,5 @@
 package app.atomofiron.searchboxapp.injectable.interactor
 
-import android.content.Context
-import androidx.core.content.FileProvider
-import app.atomofiron.searchboxapp.BuildConfig
-import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.model.explorer.Node

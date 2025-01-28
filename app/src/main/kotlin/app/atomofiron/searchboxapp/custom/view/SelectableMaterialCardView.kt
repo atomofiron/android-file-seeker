@@ -8,7 +8,7 @@ import android.graphics.RectF
 import android.util.AttributeSet
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import com.google.android.material.card.MaterialCardView
 
 class SelectableMaterialCardView : MaterialCardView {

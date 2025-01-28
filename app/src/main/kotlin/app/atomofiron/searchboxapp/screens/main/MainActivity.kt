@@ -20,10 +20,10 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.common.util.isDarkTheme
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.getLayout
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.syncWithLayout
-import app.atomofiron.searchboxapp.databinding.ActivityMainBinding
+import app.atomofiron.fileseeker.databinding.ActivityMainBinding
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme

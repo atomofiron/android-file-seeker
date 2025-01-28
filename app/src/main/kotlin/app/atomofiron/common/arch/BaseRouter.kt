@@ -11,7 +11,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.injectable.router.FileSharingDelegateImpl
 

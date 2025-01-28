@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.explorer.fragment
 import android.content.res.Resources
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import kotlin.math.max
 

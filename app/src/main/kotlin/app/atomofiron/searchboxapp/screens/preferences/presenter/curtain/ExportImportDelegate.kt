@@ -1,8 +1,8 @@
 package app.atomofiron.searchboxapp.screens.preferences.presenter.curtain
 
 import android.view.LayoutInflater
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.CurtainPreferenceExportImportBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.CurtainPreferenceExportImportBinding
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding

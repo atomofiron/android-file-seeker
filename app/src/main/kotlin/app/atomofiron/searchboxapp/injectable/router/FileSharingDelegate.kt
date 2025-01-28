@@ -6,7 +6,7 @@ import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.BuildConfig
+import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import java.io.File
 

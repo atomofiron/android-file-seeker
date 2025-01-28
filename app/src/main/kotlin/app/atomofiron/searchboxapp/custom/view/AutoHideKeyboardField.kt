@@ -8,7 +8,7 @@ import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.AppCompatEditText
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 open class AutoHideKeyboardField : AppCompatEditText {
     private val inputMethodManager: InputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

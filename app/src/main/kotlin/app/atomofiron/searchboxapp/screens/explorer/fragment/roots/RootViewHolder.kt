@@ -8,8 +8,8 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.ItemExplorerCardBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemExplorerCardBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType

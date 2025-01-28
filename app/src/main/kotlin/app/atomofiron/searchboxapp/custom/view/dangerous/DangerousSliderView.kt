@@ -26,7 +26,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.searchboxapp.MaterialAttr
 import app.atomofiron.searchboxapp.MaterialDimen
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
 import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.toIntAlpha

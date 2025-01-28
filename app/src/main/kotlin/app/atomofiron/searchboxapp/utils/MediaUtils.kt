@@ -3,11 +3,12 @@ package app.atomofiron.searchboxapp.utils
 import android.graphics.Bitmap
 import android.media.ThumbnailUtils
 import android.util.Size
-import app.atomofiron.searchboxapp.BuildConfig
+import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import java.io.File
 
+// todo api 29 required????????
 fun String.createImageThumbnail(config: CacheConfig): Bitmap? = try {
     /* ThumbnailUtils.createImageThumbnail already do that
     val exif = ExifInterface(this)

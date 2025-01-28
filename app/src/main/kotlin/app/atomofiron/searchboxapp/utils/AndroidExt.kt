@@ -44,7 +44,7 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Data
 import app.atomofiron.common.util.Android
 import app.atomofiron.searchboxapp.MaterialId
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable.Companion.setBallsDrawable
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
@@ -137,6 +137,7 @@ fun Resources.getString(error: NodeError, content: NodeContent? = null): String 
 
 const val DEFAULT_FREQUENCY = 60
 
+@Suppress("DEPRECATION")
 fun Context.getFrequency(): Int {
     val refreshRate = when {
         SDK_INT >= Build.VERSION_CODES.R -> display.refreshRate
@@ -263,11 +264,13 @@ fun RecyclerView.scrollToTop() {
 
 val ViewPager2.recyclerView: RecyclerView get() = getChildAt(0) as RecyclerView
 
+@Suppress("DEPRECATION")
 inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String, clazz: Class<T>): T? = when {
     SDK_INT >= TIRAMISU -> getParcelable(key, clazz)
     else -> getParcelable(key)
 }
 
+@Suppress("DEPRECATION")
 inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String, clazz: Class<T>): T? = when {
     SDK_INT >= TIRAMISU -> getSerializable(key, clazz)
     else -> getSerializable(key) as T?
@@ -285,6 +288,7 @@ fun Context.canForegroundService(): Boolean {
     return SDK_INT < P || checkSelfPermission(android.Manifest.permission.FOREGROUND_SERVICE) == PERMISSION_GRANTED
 }
 
+@Suppress("DEPRECATION")
 fun Context.getDisplayCompat(): Display? = when {
     Android.R -> display
     else -> (getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay

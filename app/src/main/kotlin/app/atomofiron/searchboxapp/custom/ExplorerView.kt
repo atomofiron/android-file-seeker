@@ -15,8 +15,8 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.ViewExplorerBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ViewExplorerBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition

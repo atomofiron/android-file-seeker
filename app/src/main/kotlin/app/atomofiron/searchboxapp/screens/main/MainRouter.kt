@@ -6,7 +6,7 @@ import androidx.fragment.app.FragmentManager
 import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.common.util.navigation.CustomNavHostFragment
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 class MainRouter(activityProperty: WeakProperty<out FragmentActivity>) : BaseRouter(activityProperty) {
 

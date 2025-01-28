@@ -4,7 +4,7 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.R
 import android.view.Window
 import android.view.WindowManager.LayoutParams.FLAG_SECURE
-import app.atomofiron.searchboxapp.BuildConfig
+import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 
 class WindowService(

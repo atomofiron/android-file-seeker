@@ -3,8 +3,8 @@ package app.atomofiron.searchboxapp.screens.preferences.presenter.curtain
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
-import app.atomofiron.searchboxapp.R
-import app.atomofiron.searchboxapp.databinding.CurtainPreferenceExplorerItemBinding
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.CurtainPreferenceExplorerItemBinding
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -12,7 +12,6 @@ import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.utils.Alpha
-import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 

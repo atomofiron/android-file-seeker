@@ -5,14 +5,14 @@ import android.content.Context
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
-import app.atomofiron.searchboxapp.android.App
+import app.atomofiron.searchboxapp.android.AbstractApp
 import app.atomofiron.searchboxapp.di.module.ChannelModule
 import app.atomofiron.searchboxapp.di.module.CommonModule
 import app.atomofiron.searchboxapp.di.module.InteractorModule
-import app.atomofiron.searchboxapp.di.module.NetworkModule
 import app.atomofiron.searchboxapp.di.module.ServiceModule
 import app.atomofiron.searchboxapp.di.module.StoreModule
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.screens.curtain.CurtainDependencies
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerDependencies
 import app.atomofiron.searchboxapp.screens.finder.FinderDependencies
@@ -34,7 +34,7 @@ import javax.inject.Singleton
     ServiceModule::class,
     StoreModule::class,
     InteractorModule::class,
-    NetworkModule::class,
+    //NetworkModule::class, I'll be back...
 ])
 @Singleton
 interface AppComponent :
@@ -62,6 +62,9 @@ interface AppComponent :
         fun initialDelegate(initialDelegate: InitialDelegate): Builder
 
         @BindsInstance
+        fun updateServiceFactory(updateServiceFactory: AppUpdateService.Factory): Builder
+
+        @BindsInstance
         fun assetManager(assetManager: AssetManager): Builder
 
         @BindsInstance
@@ -76,6 +79,6 @@ interface AppComponent :
         fun build(): AppComponent
     }
 
-    fun inject(target: App)
+    fun inject(target: AbstractApp)
     fun inject(target: FinderWorker)
 }

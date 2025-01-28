@@ -13,7 +13,7 @@ import androidx.core.app.NotificationManagerCompat
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.materialColor
 import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.other.UpdateNotification
 import app.atomofiron.searchboxapp.utils.Codes
 import app.atomofiron.searchboxapp.utils.immutable

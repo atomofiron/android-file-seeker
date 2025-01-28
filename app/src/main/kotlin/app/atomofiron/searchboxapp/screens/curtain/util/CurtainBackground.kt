@@ -13,7 +13,7 @@ import android.graphics.drawable.Drawable
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.asOverlayOn
 import app.atomofiron.searchboxapp.utils.getColorByAttr

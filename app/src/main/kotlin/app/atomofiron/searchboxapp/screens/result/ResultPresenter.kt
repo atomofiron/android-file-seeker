@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.result
 import androidx.core.os.ConfigurationCompat
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.injectable.store.*
 import app.atomofiron.searchboxapp.logE

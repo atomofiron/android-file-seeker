@@ -5,7 +5,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.ArrayAdapter
 import androidx.preference.DropDownPreference
-import app.atomofiron.searchboxapp.R
+import app.atomofiron.fileseeker.R
 
 @SuppressLint("PrivateResource")
 class DropDownPreference(
