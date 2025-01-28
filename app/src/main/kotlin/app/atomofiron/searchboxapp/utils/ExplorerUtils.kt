@@ -4,7 +4,7 @@ import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
-import app.atomofiron.searchboxapp.removeLastOne
+import app.atomofiron.common.util.removeLastOne
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
 

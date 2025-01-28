@@ -10,7 +10,7 @@ import androidx.core.content.pm.PackageInfoCompat
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.dropLast
+import app.atomofiron.common.util.dropLast
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
