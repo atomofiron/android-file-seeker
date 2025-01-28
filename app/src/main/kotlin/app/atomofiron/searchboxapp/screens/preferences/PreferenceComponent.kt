@@ -12,6 +12,7 @@ import app.atomofiron.searchboxapp.injectable.service.PreferenceService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
 import app.atomofiron.searchboxapp.screens.preferences.presenter.ExportImportPresenterDelegate
@@ -69,6 +70,7 @@ class PreferenceModule {
         exportImportDelegate: ExportImportDelegate.ExportImportOutput,
         preferenceStore: PreferenceStore,
         curtainChannel: CurtainChannel,
+        appSource: AppSource,
     ): PreferenceClickOutput {
         return PreferenceClickPresenterDelegate(
             scope,
@@ -76,6 +78,7 @@ class PreferenceModule {
             exportImportDelegate,
             preferenceStore,
             curtainChannel,
+            appSource,
         )
     }
 
@@ -142,6 +145,7 @@ class PreferenceModule {
 }
 
 interface PreferenceDependencies {
+    fun appSource(): AppSource
     fun preferenceChannel(): PreferenceChannel
     fun preferenceStore(): PreferenceStore
     fun context(): Context

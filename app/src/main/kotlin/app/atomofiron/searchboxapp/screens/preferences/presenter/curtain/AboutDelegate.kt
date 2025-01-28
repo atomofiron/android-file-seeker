@@ -7,6 +7,7 @@ import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.fileseeker.databinding.CurtainAboutBinding
+import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceRouter
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -16,6 +17,7 @@ import lib.atomofiron.insets.insetsPadding
 
 class AboutDelegate(
     private val router: PreferenceRouter,
+    private val appSource: AppSource,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
 
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
@@ -26,6 +28,11 @@ class AboutDelegate(
     }
 
     private fun CurtainAboutBinding.init() {
+        val versionIcon = when (appSource) {
+            AppSource.GitHub -> R.drawable.ic_github
+            AppSource.GooglePlay -> R.drawable.ic_google_play
+        }
+        version.setCompoundDrawablesRelativeWithIntrinsicBounds(versionIcon, 0, 0, 0)
         val context = root.context
         var available = context.resolve(Intents.github)
         aboutTvGithub.isEnabled = available

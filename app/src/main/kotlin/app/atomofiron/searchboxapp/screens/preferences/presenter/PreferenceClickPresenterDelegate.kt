@@ -4,6 +4,7 @@ import app.atomofiron.common.arch.Recipient
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceRouter
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
@@ -17,13 +18,14 @@ class PreferenceClickPresenterDelegate(
     private val exportImportDelegate: ExportImportDelegate.ExportImportOutput,
     private val preferenceStore: PreferenceStore,
     curtainChannel: CurtainChannel,
+    appSource: AppSource,
 ) : Recipient, PreferenceClickOutput {
 
     init {
         curtainChannel.flow.collectForMe(scope) { controller ->
             controller ?: return@collectForMe
             val adapter: CurtainApi.Adapter<*> = when (controller.requestId) {
-                R.layout.curtain_about -> AboutDelegate(router)
+                R.layout.curtain_about -> AboutDelegate(router, appSource)
                 R.layout.curtain_preference_export_import -> ExportImportDelegate(exportImportDelegate)
                 R.layout.curtain_preference_explorer_item -> ExplorerItemDelegate(preferenceStore)
                 R.layout.curtain_preference_joystick -> JoystickDelegate(preferenceStore)

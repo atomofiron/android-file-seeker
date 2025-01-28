@@ -24,12 +24,13 @@
             android:textColor="?colorSecondary"
             />
         <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/version"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/version_name"
             android:textColor="?colorSecondary"
             android:layout_marginBottom="@dimen/common_margin"
-            android:drawableStart="@drawable/ic_githb"
+            android:drawableStart="@drawable/ic_info"
             android:gravity="center_vertical"
             android:drawablePadding="4dp"
             />

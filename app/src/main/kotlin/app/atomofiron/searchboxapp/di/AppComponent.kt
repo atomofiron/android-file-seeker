@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.di.module.ServiceModule
 import app.atomofiron.searchboxapp.di.module.StoreModule
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
+import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.curtain.CurtainDependencies
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerDependencies
 import app.atomofiron.searchboxapp.screens.finder.FinderDependencies
@@ -51,6 +52,9 @@ interface AppComponent :
 
     @Component.Builder
     interface Builder {
+
+        @BindsInstance
+        fun appSource(appSource: AppSource): Builder
 
         @BindsInstance
         fun appContext(context: Context): Builder
