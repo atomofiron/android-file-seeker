@@ -12,7 +12,7 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findBooleanByAttr
-import app.atomofiron.searchboxapp.MaterialAttr
+import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.asOverlayOn

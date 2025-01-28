@@ -43,7 +43,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Data
 import app.atomofiron.common.util.Android
-import app.atomofiron.searchboxapp.MaterialId
+import app.atomofiron.common.util.MaterialId
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable.Companion.setBallsDrawable
 import app.atomofiron.searchboxapp.model.explorer.NodeContent

@@ -15,7 +15,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import app.atomofiron.common.util.WeakDrawableCallback
 import app.atomofiron.common.util.findColorByAttr
-import app.atomofiron.searchboxapp.MaterialAttr
+import app.atomofiron.common.util.MaterialAttr
 import kotlin.math.min
 
 class BallsDrawable private constructor(context: Context) : Drawable(), ValueAnimator.AnimatorUpdateListener, View.OnAttachStateChangeListener {

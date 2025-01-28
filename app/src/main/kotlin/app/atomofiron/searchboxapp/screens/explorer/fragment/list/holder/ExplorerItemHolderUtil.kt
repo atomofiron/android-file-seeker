@@ -8,7 +8,7 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findColorByAttr
-import app.atomofiron.searchboxapp.MaterialAttr
+import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
 import app.atomofiron.fileseeker.databinding.ItemExplorerSeparatorBinding

@@ -5,7 +5,7 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.common.util.isGranted
 import app.atomofiron.searchboxapp.BuildConfig
-import app.atomofiron.searchboxapp.Unreachable
+import app.atomofiron.common.util.Unreachable
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.service.ApkService

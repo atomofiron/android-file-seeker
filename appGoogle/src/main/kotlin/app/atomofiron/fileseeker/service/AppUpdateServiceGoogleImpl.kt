@@ -10,7 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.Unreachable
+import app.atomofiron.common.util.Unreachable
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService

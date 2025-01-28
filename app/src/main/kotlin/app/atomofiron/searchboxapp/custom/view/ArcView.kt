@@ -9,7 +9,7 @@ import android.util.AttributeSet
 import android.view.Gravity
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findColorByAttr
-import app.atomofiron.searchboxapp.MaterialAttr
+import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import com.google.android.material.textview.MaterialTextView

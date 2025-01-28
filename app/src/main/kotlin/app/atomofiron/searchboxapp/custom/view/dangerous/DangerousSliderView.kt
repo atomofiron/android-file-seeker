@@ -24,8 +24,8 @@ import android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.MaterialDimen
+import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
 import app.atomofiron.searchboxapp.utils.isRtl

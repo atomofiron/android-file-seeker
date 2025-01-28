@@ -17,7 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.common.util.findColorByAttr
-import app.atomofiron.searchboxapp.MaterialAttr
+import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import kotlin.math.min

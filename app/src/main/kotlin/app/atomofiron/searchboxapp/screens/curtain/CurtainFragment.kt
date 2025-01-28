@@ -18,8 +18,8 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.fileseeker.BuildConfig
-import app.atomofiron.searchboxapp.MaterialAttr
-import app.atomofiron.searchboxapp.MaterialDimen
+import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentCurtainBinding
 import app.atomofiron.searchboxapp.screens.curtain.fragment.CurtainContentDelegate

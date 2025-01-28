@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.common.util.findColorByAttr
-import app.atomofiron.searchboxapp.MaterialAttr
+import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem

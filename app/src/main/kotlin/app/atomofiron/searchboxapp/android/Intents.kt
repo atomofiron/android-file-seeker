@@ -43,7 +43,7 @@ object Intents {
         }
 
     val storagePermissionIntent: Intent
-        @RequiresApi(AndroidSdk.O)
+        @RequiresApi(AndroidSdk.R)
         get() {
             return Intent(
                 Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
