@@ -104,7 +104,7 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
         text = status
     }
 
-    private fun Spannable.setIcon(resId: Int, start: Int, end: Int, alpha: Int = Alpha.VisibleInt) {
+    private fun Spannable.setIcon(resId: Int, start: Int, end: Int, alpha: Int = Alpha.VISIBLE_INT) {
         val span = ImageSpan(context, resId, ImageSpan.ALIGN_BASELINE)
         span.drawable.alpha = alpha
         setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)

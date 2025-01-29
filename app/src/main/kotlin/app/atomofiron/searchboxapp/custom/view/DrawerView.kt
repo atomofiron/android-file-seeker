@@ -54,7 +54,7 @@ class DrawerView @JvmOverloads constructor(
         binding.drawerTitleContainer.run {
             val color = (this@DrawerView.background as MaterialShapeDrawable).resolvedTintColor
             setBackgroundColor(color)
-            background.alpha = Alpha.Level80
+            background.alpha = Alpha.LEVEL_80
             binding.insetsBackground.setColor(color)
         }
     }

@@ -32,7 +32,7 @@ open class CurtainBackground(context: Context) : Drawable() {
     private val strokeColor = when {
         isBlackDeep -> context
             .getColorByAttr(MaterialAttr.strokeColor)
-            .setColorAlpha(Alpha.Level50)
+            .setColorAlpha(Alpha.LEVEL_50)
             .asOverlayOn(curtainColor)
         else -> Color.TRANSPARENT
     }

@@ -1,28 +1,27 @@
 package app.atomofiron.searchboxapp.utils
 
-@Suppress("ConstPropertyName")
 object Alpha {
-    const val Invisible = 0f
-    const val Half = 0.5f
-    const val Visible = 1f
+    const val INVISIBLE = 0f
+    const val HALF = 0.5f
+    const val VISIBLE = 1f
 
-    const val Level5 = 12
-    const val Level10 = 25
-    const val Level12 = 31
-    const val Level30 = 80
-    const val Level50 = 128
-    const val Level67 = 170
-    const val Level80 = 200
-    const val Level90 = 225
+    const val LEVEL_5 = 12
+    const val LEVEL_10 = 25
+    const val LEVEL_12 = 31
+    const val LEVEL_30 = 80
+    const val LEVEL_50 = 128
+    const val LEVEL_67 = 170
+    const val LEVEL_80 = 200
+    const val LEVEL_90 = 225
 
-    const val InvisibleInt = 0
-    const val HalfInt = 0x80
-    const val VisibleInt = 0xff
+    const val INVISIBLE_INT = 0
+    const val HALF_INT = 0x80
+    const val VISIBLE_INT = 0xff
 
-    const val RippleInt = HalfInt
+    const val RIPPLE_INT = HALF_INT
 
-    fun visible(value: Boolean) = if (value) Visible else Invisible
-    fun enabled(value: Boolean) = if (value) Visible else Half
+    fun visible(value: Boolean) = if (value) VISIBLE else INVISIBLE
+    fun enabled(value: Boolean) = if (value) VISIBLE else HALF
 }
 
-fun Float.toIntAlpha(): Int = (this * Alpha.VisibleInt).toInt().coerceIn(Alpha.InvisibleInt, Alpha.VisibleInt)
+fun Float.toIntAlpha(): Int = (this * Alpha.VISIBLE_INT).toInt().coerceIn(Alpha.INVISIBLE_INT, Alpha.VISIBLE_INT)

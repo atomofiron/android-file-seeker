@@ -51,7 +51,7 @@ class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(co
     }
 
     public override fun onClick() {
-        summary.alpha = Alpha.Invisible
+        summary.alpha = Alpha.INVISIBLE
         editText.isVisible = true
         editText.performClick()
     }
@@ -62,7 +62,7 @@ class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(co
         editText.setOnSubmitListener(::onSubmit)
         editText.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) {
-                summary.alpha = Alpha.Visible
+                summary.alpha = Alpha.VISIBLE
                 editText.isGone = true
             }
         }

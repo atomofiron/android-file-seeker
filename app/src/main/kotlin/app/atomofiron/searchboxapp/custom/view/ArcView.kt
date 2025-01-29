@@ -32,7 +32,7 @@ class ArcView : MaterialTextView {
     private val paint = Paint()
 
     private val colorProgress = context.findColorByAttr(MaterialAttr.colorPrimary)
-    private val colorTrack = ColorUtils.setAlphaComponent(colorProgress, Alpha.Level30)
+    private val colorTrack = ColorUtils.setAlphaComponent(colorProgress, Alpha.LEVEL_30)
     private val strokeWidth = resources.getDimension(R.dimen.arc_stroke_width)
     private val strokeMargin = strokeWidth * 2
 

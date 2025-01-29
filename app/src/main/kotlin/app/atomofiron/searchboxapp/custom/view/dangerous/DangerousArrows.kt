@@ -48,9 +48,9 @@ class DangerousArrows(private val color: Int, arrowThickness: Float) {
         val interpolatedAlpha = (abs(alpha * 3) - 2).coerceAtLeast(0f)
         val fastAlpha = interpolatedAlpha * interpolatedAlpha
         val slowAlpha = sqrt(interpolatedAlpha)
-        val firstAlpha = (Alpha.VisibleInt * if (appearing) fastAlpha else slowAlpha).toInt()
-        val secondAlpha = (Alpha.VisibleInt * interpolatedAlpha).toInt()
-        val thirdAlpha = (Alpha.VisibleInt * if (appearing) slowAlpha else fastAlpha).toInt()
+        val firstAlpha = (Alpha.VISIBLE_INT * if (appearing) fastAlpha else slowAlpha).toInt()
+        val secondAlpha = (Alpha.VISIBLE_INT * interpolatedAlpha).toInt()
+        val thirdAlpha = (Alpha.VISIBLE_INT * if (appearing) slowAlpha else fastAlpha).toInt()
         val fullProgress = progress * 1.5f
         val firstOffset = maxOffset * fullProgress.interpolate(0f)
         val firstScale = firstOffset / maxOffset

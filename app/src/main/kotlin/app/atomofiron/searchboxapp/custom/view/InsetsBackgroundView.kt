@@ -21,7 +21,7 @@ class InsetsBackgroundView : View, InsetsListener {
     companion object {
         fun Context.getSystemBarsColor(): Int {
             val color = getColorByAttr(R.attr.colorBackground)
-            return ColorUtils.setAlphaComponent(color, Alpha.Level67)
+            return ColorUtils.setAlphaComponent(color, Alpha.LEVEL_67)
         }
         private const val BOTTOM =     0b001
         private const val HORIZONTAL = 0b010
@@ -63,7 +63,7 @@ class InsetsBackgroundView : View, InsetsListener {
         attachInsetsListener(this)
     }
 
-    fun setColor(color: Int, alpha: Int = Alpha.Level67) {
+    fun setColor(color: Int, alpha: Int = Alpha.LEVEL_67) {
         paint.color = ColorUtils.setAlphaComponent(color, alpha)
     }
 

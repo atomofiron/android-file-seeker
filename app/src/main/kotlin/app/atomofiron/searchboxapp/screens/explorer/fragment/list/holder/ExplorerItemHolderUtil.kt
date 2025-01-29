@@ -60,7 +60,7 @@ private fun ItemExplorerBinding.makeOpposite(
     }
     val rippleMask = GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, intArrayOf(Color.BLACK, Color.BLACK))
     rippleMask.cornerRadius = cornerRadius
-    val rippleColor = ColorUtils.setAlphaComponent(content, Alpha.RippleInt)
+    val rippleColor = ColorUtils.setAlphaComponent(content, Alpha.RIPPLE_INT)
     val rippleColorList = ColorStateList.valueOf(rippleColor)
     root.background = RippleDrawable(rippleColorList, drawable, rippleMask)
     val filter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(content, BlendModeCompat.SRC_IN)

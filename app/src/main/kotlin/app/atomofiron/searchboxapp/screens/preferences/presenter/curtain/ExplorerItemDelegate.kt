@@ -60,7 +60,7 @@ class ExplorerItemDelegate(
         holder.disableClicks()
         holder.setGreyBackgroundColor(composition.visibleBg)
 
-        preferenceExplorerItem.itemExplorerIvIcon.alpha = Alpha.Visible
+        preferenceExplorerItem.itemExplorerIvIcon.alpha = Alpha.VISIBLE
         preferenceExplorerItem.itemExplorerTvSize.text = dir.size
     }
 

@@ -34,7 +34,7 @@ class NoticeableDrawable(
 
     private val dotRadius: Float get() = bounds.width().toFloat() / 6
     private val holeRadius: Float get() = bounds.width().toFloat() / 4
-    private var dotAlpha = Alpha.VisibleInt
+    private var dotAlpha = Alpha.VISIBLE_INT
     private val holeX: Float get() = bounds.right - dotRadius
     private val holeY: Float get() = dotRadius
 
