@@ -1,8 +1,7 @@
 package app.atomofiron.searchboxapp.utils
 
 object Codes {
-    const val Foreground = 111
-    const val UpdateApp = 222
-    const val InstallApk = 333
-    const val LaunchApp = 333
+    const val FOREGROUND = 111
+    const val UPDATE_APP = 222
+    const val LAUNCH_APP = 333
 }

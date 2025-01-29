@@ -355,7 +355,7 @@ class FinderWorker(
 
     private fun foregroundNotification(): Notification {
         val intent = Intent(context, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(context, Codes.Foreground, intent, UPDATING_FLAG)
+        val pendingIntent = PendingIntent.getActivity(context, Codes.FOREGROUND, intent, UPDATING_FLAG)
         return NotificationCompat.Builder(context, Notifications.CHANNEL_ID_FOREGROUND)
             .setDefaults(Notification.DEFAULT_ALL)
             .setContentTitle(context.getString(R.string.searching))

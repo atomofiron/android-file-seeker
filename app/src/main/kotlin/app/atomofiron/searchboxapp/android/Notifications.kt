@@ -47,7 +47,7 @@ fun Context.showUpdateNotification(type: UpdateNotification) = tryShow { context
         .setTicker(title)
         .setContentTitle(title)
         .setSmallIcon(R.drawable.ic_notification_update)
-        .setContentIntent(PendingIntent.getActivity(context, Codes.UpdateApp, Intents.updating(context), FLAG_UPDATE_CURRENT.immutable()))
+        .setContentIntent(PendingIntent.getActivity(context, Codes.UPDATE_APP, Intents.updating(context), FLAG_UPDATE_CURRENT.immutable()))
         .setColor(materialColor(MaterialAttr.colorPrimary))
         .build() to Notifications.ID_UPDATE
 }
@@ -65,7 +65,7 @@ fun Context.showAppUpdatedNotification() = tryShow { context ->
         .setTicker(title)
         .setContentTitle(title)
         .setSmallIcon(R.drawable.ic_notification_update)
-        .setContentIntent(PendingIntent.getActivity(context, Codes.LaunchApp, Intents.mainActivity(context), FLAG_UPDATE_CURRENT.immutable()))
+        .setContentIntent(PendingIntent.getActivity(context, Codes.LAUNCH_APP, Intents.mainActivity(context), FLAG_UPDATE_CURRENT.immutable()))
         .setColor(materialColor(MaterialAttr.colorPrimary))
         .build() to Notifications.ID_UPDATE
 }
