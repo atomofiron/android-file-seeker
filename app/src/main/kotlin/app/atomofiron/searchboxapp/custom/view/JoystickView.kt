@@ -24,6 +24,9 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
+private const val PRESS = HapticFeedbackConstants.KEYBOARD_TAP
+private const val RELEASE = HapticFeedbackConstants.CLOCK_TICK
+
 class JoystickView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -109,7 +112,7 @@ class JoystickView @JvmOverloads constructor(
                 trackTouchEvent = true
                 brightness = 1f
                 invalidate()
-                performHapticFeedback(HapticFeedbackConstants.KEYBOARD_PRESS)
+                performHapticFeedback(PRESS)
             }
             MotionEvent.ACTION_MOVE -> {
                 if (trackTouchEvent) {
@@ -119,7 +122,7 @@ class JoystickView @JvmOverloads constructor(
                     if (!contains) {
                         trackTouchEvent = false
                         glowAnimator.start()
-                        performHapticFeedback(HapticFeedbackConstants.KEYBOARD_RELEASE)
+                        performHapticFeedback(RELEASE)
                     }
                 }
             }
@@ -127,7 +130,7 @@ class JoystickView @JvmOverloads constructor(
             MotionEvent.ACTION_CANCEL -> {
                 if (trackTouchEvent) {
                     glowAnimator.start()
-                    performHapticFeedback(HapticFeedbackConstants.KEYBOARD_RELEASE)
+                    performHapticFeedback(RELEASE)
                 }
             }
         }
