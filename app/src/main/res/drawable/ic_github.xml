@@ -4,6 +4,7 @@
     android:height="24dp"
     android:viewportWidth="20"
     android:viewportHeight="20"
+    android:tint="?attr/colorContent"
     >
     <group
         android:translateX="2"
