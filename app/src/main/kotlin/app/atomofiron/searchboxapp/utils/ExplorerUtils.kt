@@ -222,7 +222,7 @@ object ExplorerUtils {
         }
     }
 
-    fun Node.ensureCached(config: CacheConfig): Node = when {
+    private fun Node.ensureCached(config: CacheConfig): Node = when {
         isDirectory -> cacheDir(config.useSu)
         isCached -> this
         else -> cacheFile(config)
@@ -436,6 +436,7 @@ object ExplorerUtils {
         return copy(
             children = NodeChildren(items, isOpened = children?.isOpened == true),
             content = NodeContent.Directory(directoryType, content.rootType),
+            error = null,
         )
     }
 
