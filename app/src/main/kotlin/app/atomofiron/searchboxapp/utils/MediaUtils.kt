@@ -2,13 +2,17 @@ package app.atomofiron.searchboxapp.utils
 
 import android.graphics.Bitmap
 import android.media.ThumbnailUtils
+import android.provider.MediaStore.Images.Thumbnails.MICRO_KIND
+import android.provider.MediaStore.Images.Thumbnails.MINI_KIND
 import android.util.Size
+import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import java.io.File
 
-// todo api 29 required????????
+private fun CacheConfig.kind() = if (legacySizeBig) MINI_KIND else MICRO_KIND
+
 fun String.createImageThumbnail(config: CacheConfig): Bitmap? = try {
     /* ThumbnailUtils.createImageThumbnail already do that
     val exif = ExifInterface(this)
@@ -19,21 +23,30 @@ fun String.createImageThumbnail(config: CacheConfig): Bitmap? = try {
         thumbnail = Bitmap.createBitmap(thumbnail, 0, 0, thumbnail.width, thumbnail.height, matrix, false)
         recycle.recycle()
     }*/
-    ThumbnailUtils.createImageThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
+    when {
+        Android.Q -> ThumbnailUtils.createImageThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
+        else -> ThumbnailUtils.createImageThumbnail(this, config.kind())
+    }
 } catch (e: Exception) {
     e.print(this)
     null
 }
 
 fun String.createVideoThumbnail(config: CacheConfig): Bitmap? = try {
-    ThumbnailUtils.createVideoThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
+    when {
+        Android.Q -> ThumbnailUtils.createVideoThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
+        else -> ThumbnailUtils.createVideoThumbnail(this, config.kind())
+    }
 } catch (e: Exception) {
     e.print(this)
     null
 }
 
 fun String.createAudioThumbnail(config: CacheConfig): Bitmap? = try {
-    ThumbnailUtils.createAudioThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
+    when {
+        Android.Q -> ThumbnailUtils.createAudioThumbnail(File(this), config.thumbnailSize.let { Size(it, it) }, null)
+        else -> ThumbnailUtils.createAudioThumbnail(this, config.kind())
+    }
 } catch (e: Exception) {
     e.print(this)
     null
