@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.preference.PreferenceDataStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -27,6 +28,8 @@ class LegacyPreferenceDataStore(
     override fun getBoolean(key: String, defValue: Boolean): Boolean {
         return when (key) {
             PreferenceKeys.PREF_LEAK_CANARY -> watcher.isEnabled
+            PreferenceKeys.KeyToybox.name -> preferenceStore.getOrDefault(PreferenceKeys.KeyToybox.key)
+                .let { ToyboxVariant(it) is ToyboxVariant.Embedded }
             else -> preferenceStore.getOrDefault(booleanPreferencesKey(key))
         }
     }
@@ -54,6 +57,7 @@ class LegacyPreferenceDataStore(
     override fun putBoolean(key: String, value: Boolean) {
         when (key) {
             PreferenceKeys.PREF_LEAK_CANARY -> watcher.isEnabled = value
+            PreferenceKeys.KeyToybox.name -> putString(PreferenceKeys.KeyToybox.name, ToyboxVariant(value).path)
             else -> launchImmediately {
                 edit {
                     it[booleanPreferencesKey(key)] = value

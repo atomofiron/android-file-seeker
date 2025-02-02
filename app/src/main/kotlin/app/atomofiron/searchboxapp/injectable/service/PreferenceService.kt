@@ -9,7 +9,7 @@ class PreferenceService(
     val preferenceStore: PreferenceStore,
 ) {
     private val packageName = context.packageName
-    private val toybox: String get() = preferenceStore.toyboxVariant.value.toyboxPath
+    private val toybox: String get() = Shell.toyboxPath
     private val internalPath = context.applicationInfo.dataDir
     private val externalPath: String get() = context.getExternalFilesDir(null)!!.absolutePath
 

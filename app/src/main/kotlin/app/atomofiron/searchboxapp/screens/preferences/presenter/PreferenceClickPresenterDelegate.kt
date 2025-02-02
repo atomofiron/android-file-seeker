@@ -29,7 +29,6 @@ class PreferenceClickPresenterDelegate(
                 R.layout.curtain_preference_export_import -> ExportImportDelegate(exportImportDelegate)
                 R.layout.curtain_preference_explorer_item -> ExplorerItemDelegate(preferenceStore)
                 R.layout.curtain_preference_joystick -> JoystickDelegate(preferenceStore)
-                R.layout.curtain_preference_toybox -> ToyboxDelegate(preferenceStore)
                 else -> return@collectForMe
             }
             adapter.setController(controller)
@@ -43,6 +42,4 @@ class PreferenceClickPresenterDelegate(
     override fun onExplorerItemClick() = router.showCurtain(recipient, R.layout.curtain_preference_explorer_item)
 
     override fun onJoystickClick() = router.showCurtain(recipient, R.layout.curtain_preference_joystick)
-
-    override fun onToyboxClick() = router.showCurtain(recipient, R.layout.curtain_preference_toybox)
 }

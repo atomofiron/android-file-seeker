@@ -165,12 +165,10 @@ class PreferenceStore(
         edit { it[KeyJoystick] = value.data }
     }
 
-    val toyboxVariant = getFlow(KeyToybox) {
-        ToyboxVariant.fromSet(context, it)
-    }
+    val toyboxVariant = getFlow(KeyToybox, ToyboxVariant.Companion::invoke)
 
-    suspend fun setToyboxVariant(value: Set<String>) {
-        edit { it[KeyToybox] = value }
+    suspend fun setEmbeddedToybox(value: ToyboxVariant) {
+        edit { it[KeyToybox] = value.path }
     }
 
     private fun <V> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {

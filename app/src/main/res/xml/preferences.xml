@@ -76,9 +76,9 @@
             app:key="pref_export_import"
             app:icon="@drawable/ic_export_import"
             />
-        <Preference
-            app:title="@string/pref_toybox"
-            app:key="pref_toybox"
+        <SwitchPreference
+            app:title="@string/pref_embedded_toybox"
+            app:key="pref_toybox_path"
             app:icon="@drawable/ic_shell"
             />
     </PreferenceCategory>

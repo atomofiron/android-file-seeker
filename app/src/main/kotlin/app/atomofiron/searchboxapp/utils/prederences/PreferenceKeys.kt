@@ -4,9 +4,16 @@ import android.view.Gravity
 import app.atomofiron.searchboxapp.model.preference.ActionApk
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
+import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.Const
 
 object PreferenceKeys {
+    const val PREF_APP_UPDATE = "pref_app_update"
+    const val PREF_EXPORT_IMPORT = "pref_export_import"
+    const val PREF_LEAK_CANARY = "pref_leak_canary"
+    const val PREF_CATEGORY_SYSTEM = "pref_category_system"
+    const val PREF_CATEGORY_DEBUG = "pref_category_debug"
+    const val PREF_TOYBOX = "pref_toybox_path"
 
     val KeyOpenedDirPath = PreferenceKey("pref_opened_dir_path", "")
     val KeyDockGravity = PreferenceKey("pref_drawer_gravity", Gravity.START)
@@ -24,13 +31,7 @@ object PreferenceKeys {
     val KeyActionApk = PreferenceKey("pref_actionApk", ActionApk.Ask.ordinal)
     val KeyExplorerItem = PreferenceKey("pref_explorer_item", Const.DEFAULT_EXPLORER_ITEM)
     val KeyJoystick = PreferenceKey("pref_joystick", Const.DEFAULT_JOYSTICK)
-    val KeyToybox = PreferenceKey("pref_toybox", setOf(Const.VALUE_TOYBOX_CUSTOM, Const.DEFAULT_TOYBOX_PATH))
-
-    const val PREF_APP_UPDATE = "pref_app_update"
-    const val PREF_EXPORT_IMPORT = "pref_export_import"
-    const val PREF_LEAK_CANARY = "pref_leak_canary"
-    const val PREF_CATEGORY_SYSTEM = "pref_category_system"
-    const val PREF_CATEGORY_DEBUG = "pref_category_debug"
+    val KeyToybox = PreferenceKey(PREF_TOYBOX, ToyboxVariant.Undefined.EMPTY)
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
         arrayOf(KeyOpenedDirPath, KeyDockGravity, KeyShownNotificationUpdateCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyToybox)

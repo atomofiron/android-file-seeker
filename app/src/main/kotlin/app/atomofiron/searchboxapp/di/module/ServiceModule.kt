@@ -4,7 +4,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
-import android.content.res.AssetManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
@@ -22,12 +21,11 @@ open class ServiceModule {
     @Singleton
     fun explorerService(
         context: Context,
-        assets: AssetManager,
         appStore: AppStore,
         explorerStore: ExplorerStore,
         preferenceStore: PreferenceStore,
         packageManager: PackageManager,
-    ): ExplorerService = ExplorerService(context, packageManager, assets, appStore, explorerStore, preferenceStore)
+    ): ExplorerService = ExplorerService(context, packageManager, appStore, explorerStore, preferenceStore)
 
     @Provides
     @Singleton

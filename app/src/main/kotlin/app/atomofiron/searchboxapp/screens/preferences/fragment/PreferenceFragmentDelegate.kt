@@ -59,7 +59,6 @@ class PreferenceFragmentDelegate(
                 preference.summary = resources.getStringArray(R.array.orientation_var)[i]
             }
             PreferenceKeys.PREF_EXPORT_IMPORT -> preference.isEnabled = viewState.isExportImportAvailable
-            PreferenceKeys.KeyToybox.name -> preference.isVisible = SDK_INT < Q
             PreferenceKeys.PREF_CATEGORY_SYSTEM -> preference.isVisible = SDK_INT < Q
         }
         return true
@@ -74,7 +73,6 @@ class PreferenceFragmentDelegate(
             PreferenceKeys.PREF_EXPORT_IMPORT -> clickOutput.onExportImportClick()
             PreferenceKeys.KeyExplorerItem.name -> clickOutput.onExplorerItemClick()
             PreferenceKeys.KeyJoystick.name -> clickOutput.onJoystickClick()
-            PreferenceKeys.KeyToybox.name -> clickOutput.onToyboxClick()
         }
         return true
     }

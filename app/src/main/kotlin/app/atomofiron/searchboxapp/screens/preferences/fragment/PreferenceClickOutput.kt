@@ -5,5 +5,4 @@ interface PreferenceClickOutput {
     fun onExportImportClick()
     fun onExplorerItemClick()
     fun onJoystickClick()
-    fun onToyboxClick()
 }

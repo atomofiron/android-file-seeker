@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.injectable.service
 
 import android.content.Context
 import android.content.pm.PackageManager
-import android.content.res.AssetManager
 import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
@@ -37,7 +36,6 @@ import app.atomofiron.searchboxapp.utils.endingDot
 import app.atomofiron.searchboxapp.utils.writeTo
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.first
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -46,7 +44,6 @@ import kotlin.math.min
 class ExplorerService(
     context: Context,
     private val packageManager: PackageManager,
-    private val assets: AssetManager,
     private val appStore: AppStore,
     private val explorerStore: ExplorerStore,
     private val preferenceStore: PreferenceStore,
@@ -73,23 +70,34 @@ class ExplorerService(
     private val garden = NodeGarden()
 
     init {
+        val useSuDefined = Job()
+        val toyboxDefined = Job()
         scope.launch(Dispatchers.IO) {
             withGarden {
-                preferenceStore.useSu.first()
-                copyToybox(context)
+                useSuDefined.join()
+                toyboxDefined.join()
+                context.resolveToybox(preferenceStore.toyboxVariant.value)
             }
         }
         // todo try move out
         val thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size)
         preferenceStore.useSu.collect(scope) {
+            useSuDefined.complete()
             config = CacheConfig(it, thumbnailSize)
+        }
+        preferenceStore.toyboxVariant.collect(scope) {
+            toyboxDefined.complete()
+            context.resolveToybox(it)
         }
         explorerStore.current.collect(scope) {
             preferenceStore.setOpenedDirPath(it?.path)
         }
-        preferenceStore.toyboxVariant.collect(scope) {
-            Shell.toyboxPath = it.toyboxPath
-        }
+    }
+
+    private fun Context.resolveToybox(embedded: ToyboxVariant) {
+        val variant = verify(embedded)
+        Shell.toyboxPath = variant.path
+        preferenceStore { setEmbeddedToybox(variant) }
     }
 
     suspend fun getOrCreateFlow(key: NodeTabKey): MutableSharedFlow<NodeTabItems> {
@@ -888,30 +896,6 @@ class ExplorerService(
                 copy(content = new)
             }
             else -> this
-        }
-    }
-
-    private fun copyToybox(context: Context) {
-        val variants = arrayOf(
-            Const.VALUE_TOYBOX_ARM_32,
-            Const.VALUE_TOYBOX_ARM_64,
-            Const.VALUE_TOYBOX_X86_64,
-        )
-        context.filesDir.mkdirs()
-
-        for (variant in variants) {
-            val path = ToyboxVariant.getToyboxPath(context, variant)
-            val file = File(path)
-            if (file.exists() && file.canExecute()) {
-                continue
-            }
-            val input = assets.open("toybox/" + file.name)
-            val bytes = input.readBytes()
-            input.close()
-            val output = FileOutputStream(file)
-            output.write(bytes)
-            output.close()
-            file.setExecutable(true, true)
         }
     }
 

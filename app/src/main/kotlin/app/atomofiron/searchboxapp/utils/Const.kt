@@ -29,21 +29,10 @@ object Const {
     const val COMMON_DURATION = 512L
     const val COMMON_DELAY = 256L
 
-    const val VALUE_TOYBOX_ARM_32 = "toybox_arm_32"
-    const val VALUE_TOYBOX_ARM_64 = "toybox_arm_64"
-    const val VALUE_TOYBOX_X86_64 = "toybox_x86_64"
-    const val VALUE_TOYBOX_CUSTOM = "toybox_custom"
-    const val VALUE_TOYBOX_IMPORTED = "toybox_imported"
-
     const val DATE_PATTERN = "yyyy-MM-DD_HH-mm-ss"
     const val MIME_TYPE_TEXT = "text/plain"
     const val GITHUB_URL = "https://github.com/Atomofiron/android-search-box-app"
     const val FORPDA_URL = "https://4pda.ru/forum/index.php?showtopic=1000070&view=findpost&p=98557921"
-
-    const val TOYBOX_32 = "/toybox32"
-    const val TOYBOX_64 = "/toybox64"
-    const val TOYBOX_86_64 = "/toybox86_64"
-    const val TOYBOX_IMPORTED = "/toybox_imported"
 
     const val TEXT_FILE_PAGINATION_STEP = 128
     const val TEXT_FILE_PAGINATION_STEP_OFFSET = 16

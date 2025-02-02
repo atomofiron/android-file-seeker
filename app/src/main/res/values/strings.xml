@@ -133,11 +133,7 @@
     <string name="result_notification_name" translatable="false">Result Notification</string>
     <string name="copy_path">Copy the absolute path</string>
     <string name="pref_category_system">System</string>
-    <string name="pref_toybox">Toybox version</string>
-    <string name="path_to_toybox">Path to toybox tool</string>
-    <string name="toybox_64" translatable="false">toybox arm64</string>
-    <string name="toybox_32" translatable="false">toybox arm32</string>
-    <string name="toybox_x86_64" translatable="false">toybox x86_64</string>
+    <string name="pref_embedded_toybox">Use embedded toybox</string>
     <string name="dismiss">Dismiss</string>
     <string name="got_it">Got it</string>
     <string name="next">Next</string>
