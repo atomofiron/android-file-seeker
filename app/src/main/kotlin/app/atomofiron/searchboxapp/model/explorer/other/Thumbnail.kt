@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.model.explorer
+package app.atomofiron.searchboxapp.model.explorer.other
 
 import android.graphics.Bitmap as AndroidBitmap
 import android.graphics.drawable.Drawable as AndroidDrawable

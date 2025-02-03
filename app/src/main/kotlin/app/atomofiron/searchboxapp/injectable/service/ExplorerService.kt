@@ -18,6 +18,7 @@ import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
+import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot

@@ -14,6 +14,7 @@ import com.google.android.material.checkbox.MaterialCheckBox
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.BallsView
 import app.atomofiron.searchboxapp.model.explorer.*
+import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle

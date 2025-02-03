@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
+import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 
 sealed class NodeContent(
     // '*/*' - значит тип неизвестен,
