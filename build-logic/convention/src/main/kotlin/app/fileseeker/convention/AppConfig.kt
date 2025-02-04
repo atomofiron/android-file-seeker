@@ -14,6 +14,6 @@ object AppConfig {
     const val compileSdk = 35
     const val buildToolsVersion = "35.0.0"
 
-    const val versionCode = 17
+    const val versionCode = 18
     const val versionName = "1.4.1"
 }
