@@ -307,7 +307,7 @@ class ExplorerService(
                                 tab.tree.clear()
                             }
                             val isSelected = root.isSelected && updatedRoot.item.isCached
-                            val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sort) // todo children ConcurrentModificationException
+                            val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sort)
                             if (tab.key == key) updatedRoot.copy(item = updatedItem, type = root.type) else root.copy(
                                 type = root.type,
                                 thumbnail = updatedRoot.thumbnail,

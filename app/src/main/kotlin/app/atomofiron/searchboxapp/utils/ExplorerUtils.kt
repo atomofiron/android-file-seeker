@@ -581,6 +581,7 @@ object ExplorerUtils {
             children == null && item.children == null -> null
             children == null || item.children == null -> item.children
             children === item.children -> children
+            children.items === item.children.items -> children // fixes ConcurrentModificationException
             else -> children.also {
                 val iterator = children.items.listIterator()
                 val new = item.children.items
