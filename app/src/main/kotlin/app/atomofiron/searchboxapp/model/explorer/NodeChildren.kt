@@ -3,9 +3,9 @@ package app.atomofiron.searchboxapp.model.explorer
 import java.util.*
 
 data class NodeChildren(
-    // a copy is made during rendering by NodeChildren.copy()
+    // a copy is made during rendering by NodeChildren.fetch()
     val items: MutableList<Node>,
-    // todo make true due rendering only
+    // can be true in the tree and in the NodeRoot
     val isOpened: Boolean,
 ) : List<Node> by items {
 
@@ -35,7 +35,5 @@ data class NodeChildren(
         items.forEach { names.add(it.name) }
     }
 
-    fun copy(items: MutableList<Node> = this.items): NodeChildren {
-        return copy(isOpened = isOpened, items = items.toMutableList())
-    }
+    fun fetch(isOpened: Boolean = this.isOpened) = NodeChildren(isOpened = isOpened, items = items.toMutableList())
 }

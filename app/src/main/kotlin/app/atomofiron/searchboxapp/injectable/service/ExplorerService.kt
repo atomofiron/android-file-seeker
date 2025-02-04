@@ -369,7 +369,7 @@ class ExplorerService(
     }
 
     private fun NodeGarden.resolveDirChildrenAsync(key: NodeTabKey, it: Node) {
-        val children = it.children?.copy() ?: return
+        val children = it.children?.fetch() ?: return
         withCachingState(it.uniqueId) {
             val done = it.copy(children = children)
                 .resolveDirChildren(config.useSu)
@@ -683,7 +683,7 @@ class ExplorerService(
                 var item = updateStateFor(level.children!![j])
                 if (item.isOpened) {
                     val isDeepest = i == tree.lastIndex.dec()
-                    item = item.copy(isCurrent = isDeepest, children = item.children?.copy())
+                    item = item.copy(isCurrent = isDeepest, children = item.children?.fetch())
                     if (isDeepest) {
                         isEmpty = item.isEmpty
                     }
