@@ -14,6 +14,7 @@ import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.injectable.router.FileSharingDelegateImpl
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 
 abstract class BaseRouter(
     fragmentProperty: WeakProperty<out Fragment>,
@@ -108,6 +109,13 @@ abstract class BaseRouter(
             .show(target)
             .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
             .commit()
+    }
+
+    fun showCurtain(recipient: String, layoutId: Int) {
+        navigation {
+            val args = CurtainPresenterParams.args(recipient, layoutId)
+            navigate(R.id.curtainFragment, args, curtainOptions)
+        }
     }
 
     protected fun List<Fragment>?.findLastVisibleFragment() = this?.filter {

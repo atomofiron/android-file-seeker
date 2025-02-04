@@ -4,10 +4,7 @@ import android.app.PendingIntent
 import android.view.Menu
 import androidx.annotation.IdRes
 import androidx.core.graphics.ColorUtils
-import app.atomofiron.common.arch.BaseRouter
-import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
-import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Locale
@@ -73,13 +70,6 @@ fun String.convert(): Int {
         else -> 1
     }
     return value.toInt()
-}
-
-fun BaseRouter.showCurtain(recipient: String, layoutId: Int) {
-    navigation {
-        val args = CurtainPresenterParams.args(recipient, layoutId)
-        navigate(R.id.curtainFragment, args, BaseRouter.curtainOptions)
-    }
 }
 
 fun Int.immutable(): Int = this or PendingIntent.FLAG_IMMUTABLE
