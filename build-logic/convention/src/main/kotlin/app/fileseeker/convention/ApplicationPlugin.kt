@@ -28,9 +28,9 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         }
         defaultConfig {
             applicationId = AppConfig.packageId
-            targetSdk = 35
-            versionCode = 17
-            versionName = "1.4.2"
+            targetSdk = AppConfig.targetSdk
+            versionCode = AppConfig.versionCode
+            versionName = AppConfig.versionName
         }
         buildTypes {
             getByName("debug") {
