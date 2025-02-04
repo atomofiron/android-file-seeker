@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
 import androidx.core.content.pm.PackageInfoCompat
+import app.atomofiron.common.util.Unreachable
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
@@ -144,56 +145,45 @@ class ExplorerService(
 
     suspend fun trySelectRoot(key: NodeTabKey, rootItem: NodeRoot) {
         renderTab(key) {
-            var index = roots.indexOfFirst { it.isSelected }
-            tree.clear()
-            if (index >= 0) {
-                val selected = roots[index]
-                roots[index] = selected.copy(isSelected = false)
-                if (selected.stableId == rootItem.stableId) {
-                    return@renderTab
-                }
-            }
-            index = roots.indexOfFirst { it.stableId == rootItem.stableId }
-            val root = roots[index]
-            var item = root.item.copy(children = root.item.children?.copy(isOpened = true))
-            roots[index] = root.copy(item = item, isSelected = true)
-            while (true) {
-                tree.add(item)
-                item = item.getOpened() ?: break
+            selectedRootId = when (val typeId = rootItem.type.stableId) {
+                selectedRootId -> 0
+                else -> typeId
             }
         }
         tryCacheAsync(key, rootItem.item)
     }
 
     suspend fun tryToggle(key: NodeTabKey, it: Node) {
-        if (it.isRoot && it.isCurrent) {
-            return
-        }
         renderTab(key) {
-            var item = tree.findNode(it.uniqueId)
-            when {
-                item?.isCached != true -> return
-                it.isOpened != item.isOpened -> return
+            val (levelIndex, parent) = tree.findIndexed(it.parentPath)
+            val (index, item) = parent?.children
+                ?.findIndexed(it.uniqueId)
+                ?: (-1 to tree.find(it.uniqueId)) // click on the root item
+            item?.children ?: return
+            while (tree.size.dec() > levelIndex) {
+                tree.dropLast()
             }
-            item!!
-            item = item.getOpened() ?: item
-
-            val (levelIndex, parent) = tree.findIndexed(item.parentPath)
-
-            if (!item.isOpened && parent?.children != null) {
-                val anotherOpenedIndex = parent.getOpenedIndex()
-                if (anotherOpenedIndex >= 0) {
-                    val anotherOpened = parent.children[anotherOpenedIndex]
-                    parent.children.items[anotherOpenedIndex] = anotherOpened.close()
+            val other = parent?.getOpenedIndex()
+            if (parent?.children != null && other != null && other >= 0) {
+                val node = parent.children[other]
+                if (node.uniqueId != item.uniqueId) {
+                    parent.children.items[other] = node.close()
                 }
             }
-            // close() and open() make a copy of children list
-            val toggled = if (item.isOpened) item.close() else item.open()
-            val index = parent?.children?.indexOfFirst { it.uniqueId == item.uniqueId } ?: -1
-            if (index >= 0) {
-                parent?.children?.items?.set(index, toggled)
+            when {
+                !item.isOpened -> {
+                    val opened = item.open()
+                    parent?.children?.items?.set(index, opened)
+                    tree.add(opened)
+                }
+                item.hasOpened() -> { // just close a child
+                    val sub = item.getOpenedIndex()
+                    item.children.items[sub] = item.children[sub].close()
+                    tree.add(item)
+                }
+                // close clicked item
+                else -> parent?.children?.items?.set(index, item.close())
             }
-            tree.add(levelIndex.inc(), toggled)
         }
         tryCacheAsync(key, it)
     }
@@ -245,7 +235,9 @@ class ExplorerService(
     }
 
     private fun NodeGarden.updateInternalStorageStats(targetTab: NodeTab) {
-        var root = targetTab.roots.find { it.type is NodeRootType.InternalStorage }!!
+        var root = targetTab.roots
+            .find { it.type is NodeRootType.InternalStorage }
+            ?: return Unreachable
         val statFs = StatFs(root.item.path)
         val freeBytes = statFs.freeBytes
         val totalBytes = statFs.totalBytes
@@ -306,13 +298,11 @@ class ExplorerService(
                             if (root.isSelected && !updatedRoot.item.isCached) {
                                 tab.tree.clear()
                             }
-                            val isSelected = root.isSelected && updatedRoot.item.isCached
                             val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sort)
                             if (tab.key == key) updatedRoot.copy(item = updatedItem, type = root.type) else root.copy(
                                 type = root.type,
                                 thumbnail = updatedRoot.thumbnail,
                                 thumbnailPath = updatedRoot.thumbnailPath,
-                                isSelected = isSelected,
                                 item = updatedItem,
                             )
                         }
@@ -612,7 +602,7 @@ class ExplorerService(
             // todo NullPointerException
             if (it.withoutState) null else it
         }
-        tree.dropClosedLevels()
+        syncSelectedRoot()
         updateDirectoryTypes()
         val currentDir = tree.lastOrNull()
             ?.takeIf { it.isOpened }
@@ -629,11 +619,32 @@ class ExplorerService(
         explorerStore.setCurrentItems(items)
     }
 
-    private fun MutableList<Node>.dropClosedLevels() {
-        val index = indexOfFirst { !it.hasOpened() }
-        if (index < 0) return
-        while (index.inc() != size) {
-            dropLast()
+    private fun NodeTab.syncSelectedRoot() {
+        roots.forEachIndexed { index, root ->
+            if ((root.type.stableId == selectedRootId) != root.isSelected) {
+                roots[index] = root.copy(
+                    isSelected = root.type.stableId == selectedRootId,
+                    item = root.item.copy(children = root.item.children?.copy(isOpened = true)),
+                )
+            }
+        }
+        syncSelectedRootWithTree()
+    }
+
+    private fun NodeTab.syncSelectedRootWithTree() {
+        roots.find { it.isSelected }.let { selected ->
+            if (selected?.item?.rootId != tree.firstOrNull()?.rootId) {
+                tree.clear()
+                selected?.placeOpened(tree)
+            }
+        }
+    }
+
+    private fun NodeRoot.placeOpened(tree: MutableList<Node>) {
+        var opened: Node? = item
+        while (opened != null) {
+            tree.add(opened)
+            opened = opened.children?.find { it.isOpened }
         }
     }
 
@@ -855,11 +866,9 @@ class ExplorerService(
             return root
         }
         for (i in indices.reversed()) {
-            get(i).children?.find {
-                it.uniqueId == uniqueId
-            }?.let { item ->
-                return item
-            }
+            get(i).children
+                ?.find { it.uniqueId == uniqueId }
+                ?.let { return it }
         }
         return null
     }
