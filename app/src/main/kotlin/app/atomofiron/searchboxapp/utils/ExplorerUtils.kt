@@ -64,6 +64,11 @@ object ExplorerUtils {
     private const val EXT_GZ = ".gz"
     private const val EXT_RAR = ".rar"
     private const val EXT_TXT = ".txt"
+    private const val EXT_INI = ".ini"
+    private const val EXT_KT = ".kt"
+    private const val EXT_KTS = ".kts"
+    private const val EXT_SWIFT = ".swift"
+    private const val EXT_YAML = ".yaml"
     private const val EXT_HTML = ".html"
     private const val EXT_SH = ".sh"
     private const val EXT_IMG = ".img"
@@ -548,8 +553,13 @@ object ExplorerUtils {
         endsWith(EXT_GZ, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Archive.Gz() }
         endsWith(EXT_RAR, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Archive.Rar() }
         endsWith(EXT_SH, ignoreCase = true) -> NodeContent.File.Text.Script
-        endsWith(EXT_HTML, ignoreCase = true),
-        endsWith(EXT_TXT, ignoreCase = true) -> NodeContent.File.Text.Plain
+        endsWith(EXT_TXT, ignoreCase = true),
+        endsWith(EXT_INI, ignoreCase = true),
+        endsWith(EXT_KT, ignoreCase = true),
+        endsWith(EXT_KTS, ignoreCase = true),
+        endsWith(EXT_SWIFT, ignoreCase = true),
+        endsWith(EXT_YAML, ignoreCase = true),
+        endsWith(EXT_HTML, ignoreCase = true) -> NodeContent.File.Text.Plain
         endsWith(EXT_SVG, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Svg }
         endsWith(EXT_IMG, ignoreCase = true) -> NodeContent.File.DataImage
         endsWith(EXT_MP4, ignoreCase = true),
