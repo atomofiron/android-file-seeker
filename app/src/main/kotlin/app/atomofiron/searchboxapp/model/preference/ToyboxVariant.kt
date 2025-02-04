@@ -1,9 +1,9 @@
 package app.atomofiron.searchboxapp.model.preference
 
-import app.atomofiron.searchboxapp.utils.Const
+private const val SYSTEM_TOYBOX_PATH = "/system/bin/toybox"
 
 sealed class ToyboxVariant(open val path: String) {
-    data object Undefined : ToyboxVariant(Const.DEFAULT_TOYBOX_PATH) {
+    data object Undefined : ToyboxVariant(SYSTEM_TOYBOX_PATH) {
         const val EMPTY = ""
     }
     data class Embedded(override val path: String) : ToyboxVariant(path) {
@@ -11,7 +11,7 @@ sealed class ToyboxVariant(open val path: String) {
             val Stub = Embedded("placeholder")
         }
     }
-    data object System : ToyboxVariant(Const.DEFAULT_TOYBOX_PATH)
+    data object System : ToyboxVariant(SYSTEM_TOYBOX_PATH)
 
     companion object {
         operator fun invoke(path: String) = when (path) {

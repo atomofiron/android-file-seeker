@@ -23,6 +23,7 @@ import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.fileseeker.databinding.FragmentPreferenceBinding
+import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.Shell
@@ -64,6 +65,10 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         val useSu = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyUseSu.name)!!
         viewState.useSu.collect(lifecycleScope) {
             useSu.isChecked = it
+        }
+        val toybox = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyToybox.name)!!
+        viewState.toybox.collect(lifecycleScope) {
+            toybox.isChecked = it is ToyboxVariant.Embedded
         }
         val debugGroup = findPreference<PreferenceGroup>(PreferenceKeys.PREF_CATEGORY_DEBUG)!!
         debugGroup.isVisible = viewState.withDebugGroup

@@ -8,7 +8,7 @@ import kotlin.math.max
 import java.util.regex.Pattern
 
 private const val TOYBOX = "toybox"
-private val MinVersion = listOf("0", "8", "2")
+private val MinVersion = listOf("0", "7", "4") // may be lower
 
 private fun Context.embedded() = assets.list(TOYBOX) ?: arrayOf()
 
@@ -19,7 +19,7 @@ fun Context.verify(embedded: ToyboxVariant): ToyboxVariant = when (embedded) {
 }
 
 private fun Context.getCorrectVariant(): ToyboxVariant {
-    val version = getToyboxVersion(Const.DEFAULT_TOYBOX_PATH)
+    val version = getToyboxVersion(ToyboxVariant.System.path)
     return takeIf { version.lowerThan(MinVersion) }
         ?.selectEmbedded()
         ?: ToyboxVariant.System
@@ -71,5 +71,6 @@ private fun Context.selectEmbedded(): ToyboxVariant.Embedded? {
             return ToyboxVariant.Embedded(path)
         }
     }
+    file.delete()
     return null
 }

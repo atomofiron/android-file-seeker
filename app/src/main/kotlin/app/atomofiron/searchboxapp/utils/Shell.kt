@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.utils
 
 import app.atomofiron.searchboxapp.logE
+import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import java.io.InputStream
 import java.io.InterruptedIOException
 import java.io.OutputStream
@@ -12,7 +13,7 @@ object Shell {
     private const val DOT_SLASH = "./"
 
     private const val TOYBOX = "{toybox}"
-    var toyboxPath = Const.DEFAULT_TOYBOX_PATH
+    var toyboxPath = ToyboxVariant.System.path
 
     const val TOUCH = "{toybox} touch \"%s\""
     const val COPY = "{toybox} cp -r \"%s\" \"%s\""

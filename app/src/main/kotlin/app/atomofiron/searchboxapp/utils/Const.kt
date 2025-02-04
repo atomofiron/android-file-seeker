@@ -17,7 +17,6 @@ object Const {
     const val DEFAULT_MAX_DEPTH = 1024
     const val DEFAULT_EXPLORER_ITEM = 248
     const val DEFAULT_JOYSTICK = 16732754 // 0ff5252
-    const val DEFAULT_TOYBOX_PATH = "/system/bin/toybox"
 
     const val SCHEME_FILE = "file"
     const val SCHEME_PACKAGE = "package"

@@ -7,6 +7,7 @@ import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
+import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.Shell
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,6 +29,7 @@ class PreferenceViewState(
     val alertOutputError = ChannelFlow<Shell.Output>()
     val showDeepBlack = MutableStateFlow(false)
     val useSu: StateFlow<Boolean> = preferenceStore.useSu
+    val toybox: StateFlow<ToyboxVariant> = preferenceStore.toyboxVariant
     val withDebugGroup = appWatcher.isAvailable
     val appUpdate: StateFlow<AppUpdateState> = updateStore.state
     // todo zip and share the backup
