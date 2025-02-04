@@ -77,10 +77,11 @@
             app:icon="@drawable/ic_export_import"
             app:isPreferenceVisible="false"
             />
-        <SwitchPreference
+        <SwitchPreferenceCompat
             app:title="@string/pref_embedded_toybox"
             app:key="pref_toybox_path"
             app:icon="@drawable/ic_shell"
+            app:widgetLayout="@layout/widget_switch"
             />
     </PreferenceCategory>
     <PreferenceCategory
