@@ -206,22 +206,22 @@ object ExplorerUtils {
     }
 
     private fun Node.updateProperties(config: CacheConfig): Node {
-        val output = Shell.exec(Shell[Shell.LS_LAHLD_FILE_B].format(path, path), config.useSu)
+        val output = Shell.exec(Shell[Shell.LS_LAHLD_FILE].format(path, path), config.useSu)
         val lines = output.output.trim().split(LF)
         return when {
             output.success && lines.size == 2 -> parseNode(lines.first())
-                .resolveType(lines.last())
+                .resolveType(type = lines.last(), path = path)
             output.success -> copy(children = null, error = NodeError.Unknown)
             else -> copy(error = output.error.toNodeError(path))
         }
     }
 
     fun Node.update(config: CacheConfig): Node {
-        val output = Shell.exec(Shell[Shell.LS_LAHLD_FILE_B].format(path, path), config.useSu)
+        val output = Shell.exec(Shell[Shell.LS_LAHLD_FILE].format(path, path), config.useSu)
         val lines = output.output.trim().split(LF)
         return when {
             output.success && lines.size == 2 -> parseNode(lines.first())
-                .resolveType(lines.last())
+                .resolveType(type = lines.last(), path = path)
                 .ensureCached(config)
             output.success -> copy(children = null, error = null)
             else -> copy(error = output.error.toNodeError(path))
@@ -259,7 +259,7 @@ object ExplorerUtils {
                 .indexOfFirst { it.name == name }
                 .also { if (it < 0) return@forEach }
             children.run {
-                items[index] = items[index].resolveType(type)
+                items[index] = items[index].resolveType(type = type)
             }
         }
         resolveDirChildrenSize(useSu)
@@ -286,8 +286,13 @@ object ExplorerUtils {
         }
     }
 
+    private fun Node.resolveType(type: String, path: String): Node {
+        return resolveType(type.substring(path.length.inc()).trim())
+    }
+
     private fun Node.resolveType(type: String): Node {
         val content = when (true) {
+            (content is NodeContent.Directory) -> content
             type.isBlank(),
             type.startsWith(FILE_DATA),
             type.startsWith(FILE_EMPTY) -> name.resolveFileType()

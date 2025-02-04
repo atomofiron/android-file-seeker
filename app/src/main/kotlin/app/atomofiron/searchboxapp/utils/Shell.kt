@@ -22,7 +22,8 @@ object Shell {
     const val RM_RF = "{toybox} rm -rf \"%s\""
     const val MV = "{toybox} mv \"%s\" \"%s\""
     const val LS_LAHL = "{toybox} ls -lAhL \"%s\""
-    const val LS_LAHLD_FILE_B = "{toybox} ls -lAhLd \"%s\" && {toybox} file -b \"%s\""
+    // can't use 'file -b' because of Android 10 contains toybox-0.8.0
+    const val LS_LAHLD_FILE = "{toybox} ls -lAhLd \"%s\" && {toybox} file \"%s\""
     const val DU_HD1 = "{toybox} du -hd 1 \"%s\""
     // DOT_SLASH is needed because of this shit:
     // $ cd /some/dir && file *
