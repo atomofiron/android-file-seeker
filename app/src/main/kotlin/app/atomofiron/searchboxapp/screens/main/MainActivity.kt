@@ -47,6 +47,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // system bars color breaks at least on Android 15 after app theme has been changed
+        // enableEdgeToEdge() don't help you in that hell, it doesn't work too
+
         val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.setView(this)
         presenter = viewModel.presenter
