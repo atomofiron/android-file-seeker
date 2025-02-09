@@ -6,7 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.*
 
 interface Recipient {
-    val recipient: String get() = this::class.java.simpleName
+    val recipient: String get() = this::class.java.name // don't use simpleName because of minification
 
     fun <D> Flow<Response<D>>.filterForMe() = filter { it.recipient == recipient }.map { it.data }
 
