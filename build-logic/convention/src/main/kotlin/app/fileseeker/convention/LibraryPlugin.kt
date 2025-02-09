@@ -5,8 +5,6 @@ import com.android.build.api.dsl.VariantDimension
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.publish.PublishingExtension
-import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.configure
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
@@ -65,44 +63,3 @@ fun VariantDimension.buildConfig(debug: Boolean) {
 fun VariantDimension.leakWatcher(value: String? = null) {
     buildConfigField("debug.LeakWatcher", "leakWatcher", value.toString())
 }
-
-abstract class AndroidLibraryPublishMetaData {
-    var isPublishEnabled = true
-    var publicationList: List<PublicationDetail> = emptyList()
-}
-
-data class PublicationDetail(
-    val variantName: String,
-    val groupId: String,
-    val artifactId: String,
-    val version: String,
-    val name: String? = null,
-    val description: String? = null
-)
-
-internal fun Project.configureAndroidLibraryPublish(metaData: AndroidLibraryPublishMetaData) {
-    if (!metaData.isPublishEnabled) return
-
-    afterEvaluate {
-        val allVariants = (extensions.getByName("android") as LibraryExtension).libraryVariants.map { it.name }.toSet()
-        val eligiblePublication = metaData.publicationList.filter { allVariants.contains(it.variantName) }
-
-        val publishing = extensions.getByType(PublishingExtension::class.java) // from maven-publish plugin
-
-        eligiblePublication.forEach { publication ->
-            publishing.publications.create(publication.variantName, MavenPublication::class.java) {
-                groupId = publication.groupId
-                artifactId = publication.artifactId
-                version = publication.version
-
-                from(components.getAt(publication.variantName))
-
-                pom {
-                    name.set(publication.name)
-                    description.set(publication.description)
-                }
-            }
-        }
-    }
-}
-
