@@ -1,6 +1,7 @@
 package app.fileseeker.convention
 
 import app.fileseeker.convention.app.fileseeker.convention.configureKotlinAndroid
+import com.android.build.api.dsl.VariantDimension
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -29,30 +30,40 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         }
         defaultConfig {
             resValue("string", "version_name", "v${AppConfig.versionName} (${AppConfig.versionCode})")
-            buildConfigField("boolean", "DEBUG_BUILD", "false")
-            buildConfigField("String", "PACKAGE_NAME", "\"${AppConfig.packageId}\"")
-            buildConfigField("String", "AUTHORITY", "\"${AppConfig.fileProvider}\"")
-            buildConfigField("debug.LeakWatcher", "leakWatcher", "null")
-            manifestPlaceholders["PACKAGE_NAME"] = AppConfig.packageId
-            manifestPlaceholders["PROVIDER"] = AppConfig.fileProvider
         }
         buildTypes {
             getByName("debug") {
-                buildConfigField("boolean", "DEBUG_BUILD", "true")
-                buildConfigField("String", "PACKAGE_NAME", "\"${AppConfig.packageIdDebug}\"")
-                buildConfigField("String", "AUTHORITY", "\"${AppConfig.fileProviderDebug}\"")
-                buildConfigField("debug.LeakWatcher", "leakWatcher", "new debug.LeakWatcherImpl()")
-                manifestPlaceholders["PACKAGE_NAME"] = AppConfig.packageIdDebug
-                manifestPlaceholders["PROVIDER"] = AppConfig.fileProviderDebug
+                buildConfig(true)
+                leakWatcher("new debug.LeakWatcherImpl()")
             }
             create("alpha") {
+                buildConfig(true)
+                leakWatcher()
             }
             create("beta") {
+                buildConfig(false)
+                leakWatcher()
             }
             getByName("release") {
+                buildConfig(false)
+                leakWatcher()
             }
         }
     }
+}
+
+fun VariantDimension.buildConfig(debug: Boolean) {
+    val packageId = if (debug) AppConfig.packageIdDebug else AppConfig.packageId
+    val fileProvider = if (debug) AppConfig.fileProviderDebug else AppConfig.fileProvider
+    buildConfigField("boolean", "DEBUG_BUILD", debug.toString())
+    buildConfigField("String", "PACKAGE_NAME", "\"$packageId\"")
+    buildConfigField("String", "AUTHORITY", "\"$fileProvider\"")
+    manifestPlaceholders["PACKAGE_NAME"] = packageId
+    manifestPlaceholders["PROVIDER"] = fileProvider
+}
+
+fun VariantDimension.leakWatcher(value: String? = null) {
+    buildConfigField("debug.LeakWatcher", "leakWatcher", value.toString())
 }
 
 abstract class AndroidLibraryPublishMetaData {

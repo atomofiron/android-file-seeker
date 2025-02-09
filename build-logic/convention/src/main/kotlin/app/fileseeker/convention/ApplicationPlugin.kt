@@ -34,8 +34,14 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         }
         buildTypes {
             getByName("debug") {
-                isMinifyEnabled = false
                 applicationIdSuffix = ".debug"
+                isMinifyEnabled = false
+            }
+            create("alpha") {
+                applicationIdSuffix = ".debug"
+                isDebuggable = true
+                isMinifyEnabled = false
+                signingConfig = signingConfigs.getByName("debug")
             }
             create("alpha") {
                 isDebuggable = true
