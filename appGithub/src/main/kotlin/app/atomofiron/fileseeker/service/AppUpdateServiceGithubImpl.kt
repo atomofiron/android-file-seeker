@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.common.util.isGranted
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.common.util.Unreachable
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.service.ApkService
@@ -33,6 +34,7 @@ class AppUpdateServiceGithubImpl(
     private val apks: ApkService,
     private val api: UpdateApi,
     private val store: AppUpdateStore,
+    private val preferenceChannel: PreferenceChannel,
 ) : AppUpdateService {
     companion object : AppUpdateService.Factory {
         override fun new(
@@ -48,6 +50,7 @@ class AppUpdateServiceGithubImpl(
             apkService,
             UpdateApi(),
             updateStore,
+            preferenceChannel,
         )
     }
 
@@ -64,7 +67,9 @@ class AppUpdateServiceGithubImpl(
                     .findAsset(userAction)
                     .also { asset = it }
                     ?.checkFile()
-                    ?: AppUpdateState.UpToDate
+                    ?: AppUpdateState.UpToDate.also {
+                        if (userAction) preferenceChannel.notifyUpdateStatus(context.getString(R.string.is_up_to_date))
+                    }
                 is Err -> AppUpdateState.Unknown
             }.let { store.set(it) }
         }
