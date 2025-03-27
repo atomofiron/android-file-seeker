@@ -684,7 +684,7 @@ class ExplorerService(
         }
         val items = ArrayList<Node>(count)
         tree.firstOrNull()
-            ?.let { if (it.isOpened) it.copy(isCurrent = !it.hasOpened()) else it }
+            ?.let { if (it.isOpened && !it.hasOpened()) it.copy(isCurrent = true) else it }
             ?.also { items.add(updateStateFor(it)) }
             .let { if (it?.isOpened != true) return items }
 

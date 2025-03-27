@@ -49,18 +49,21 @@ class ExplorerListDelegate(
     override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) = checkCurrentIn(positionStart..<(positionStart + itemCount))
 
     private fun checkCurrentIn(range: IntRange) {
-        var findTheNewCurrent = false
+        var current: Node? = null
         for (i in range) {
-            val item = nodeAdapter.currentList.getOrNull(i)
-            when {
-                item == null -> continue
-                item.isCurrent -> return setCurrentDir(item)
-                item.uniqueId == currentDir?.uniqueId -> findTheNewCurrent = true
-            }
+            nodeAdapter.currentList.getOrNull(i)
+                ?.takeIf { it.isCurrent }
+                ?.let { current = it }
         }
-        if (findTheNewCurrent) {
-            setCurrentDir(nodeAdapter.currentList.find { it.isCurrent })
+        current = current ?: nodeAdapter.currentList.find { it.isCurrent }
+        val currentDir = currentDir
+        when {
+            currentDir == null && current == null -> return
+            currentDir == null && current != null -> Unit
+            currentDir != null && current == null -> Unit
+            currentDir?.areContentsTheSame(current) == true -> return
         }
+        setCurrentDir(current)
     }
 
     private fun getFirstChild(offset: Int = 0): View? = recyclerView.getChildAt(offset)
