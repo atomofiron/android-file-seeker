@@ -51,7 +51,7 @@ class JoystickView @JvmOverloads constructor(
     private var brightness = 0f
     private val glowAnimator = ValueAnimator.ofFloat(0f, (Math.PI / 2).toFloat())
 
-    private var composition: JoystickComposition? = null
+    private var composition = JoystickComposition.Default
     private var bitmap: Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ALPHA_8)
 
     init {
@@ -112,25 +112,25 @@ class JoystickView @JvmOverloads constructor(
                 trackTouchEvent = true
                 brightness = 1f
                 invalidate()
-                performHapticFeedback(PRESS)
+                if (composition.withHaptic) performHapticFeedback(PRESS)
             }
-            MotionEvent.ACTION_MOVE -> {
-                if (trackTouchEvent) {
-                    val contains = event.x > 0f && event.y > 0f &&
-                            event.x.toInt() < width && event.y.toInt() < height
-
-                    if (!contains) {
-                        trackTouchEvent = false
-                        glowAnimator.start()
-                        performHapticFeedback(RELEASE)
-                    }
+            MotionEvent.ACTION_MOVE -> when {
+                !trackTouchEvent -> Unit
+                event.x < 0f -> Unit
+                event.y < 0f -> Unit
+                event.x.toInt() > width -> Unit
+                event.y.toInt() > height -> Unit
+                else -> {
+                    trackTouchEvent = false
+                    glowAnimator.start()
+                    if (composition.withHaptic) performHapticFeedback(RELEASE)
                 }
             }
             MotionEvent.ACTION_UP,
             MotionEvent.ACTION_CANCEL -> {
                 if (trackTouchEvent) {
                     glowAnimator.start()
-                    performHapticFeedback(RELEASE)
+                    if (composition.withHaptic) performHapticFeedback(RELEASE)
                 }
             }
         }

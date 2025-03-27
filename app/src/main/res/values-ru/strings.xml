@@ -109,7 +109,7 @@
     <string name="oops_not_working">Упс, пока не работает</string>
     <string name="user_interface">Интерфейс</string>
     <string name="pref_explorer_item">Файл / Директория</string>
-    <string name="pref_joystick">Цвет кнопки ESC</string>
+    <string name="pref_joystick">Настройки кнопки ESC</string>
     <string name="create">Создать</string>
     <string name="owner">Владелец</string>
     <string name="group">Группа</string>
@@ -123,6 +123,7 @@
     <string name="a_file">Файл</string>
     <string name="a_directory">Директорию</string>
     <string name="inverse_glowing">Инвертировать свечение</string>
+    <string name="with_haptic">С эффектом стука</string>
     <string name="inverse_for_dark">Инвертировать при тёмной теме</string>
     <string name="pref_category_debug">Отладка</string>
     <string name="root">Корень</string>

@@ -40,45 +40,44 @@ class JoystickDelegate(
             // day/night themes has different primary colors
             entity = entity.withPrimary(root.context)
         }
-        preferenceJoystickTvTitle.text = entity.text()
+        preferenceJoystickTvTitle.text = entity.colorText()
 
         val listener = Listener(this)
-        preferenceSbRed.setOnSeekBarChangeListener(listener)
-        preferenceSbGreen.setOnSeekBarChangeListener(listener)
-        preferenceSbBlue.setOnSeekBarChangeListener(listener)
-        preferenceInvForTheme.setOnClickListener(listener)
-        preferenceInvHighlight.setOnClickListener(listener)
-        preferenceBtnDefault.setOnClickListener(listener)
+        sbRed.setOnSeekBarChangeListener(listener)
+        sbGreen.setOnSeekBarChangeListener(listener)
+        sbBlue.setOnSeekBarChangeListener(listener)
+        invForTheme.setOnCheckedChangeListener(listener)
+        invHighlight.setOnCheckedChangeListener(listener)
+        withHaptic.setOnCheckedChangeListener(listener)
+        btnDefault.setOnClickListener(listener)
 
-        preferenceSbRed.progress = entity.red
-        preferenceSbGreen.progress = entity.green
-        preferenceSbBlue.progress = entity.blue
-        preferenceInvForTheme.isChecked = entity.invForDark
-        preferenceInvHighlight.isChecked = entity.invGlowing
+        bind(entity)
     }
 
     private fun CurtainPreferenceJoystickBinding.bind(composition: JoystickComposition) {
-        preferenceSbRed.progress = composition.red
-        preferenceSbGreen.progress = composition.green
-        preferenceSbBlue.progress = composition.blue
-        preferenceInvForTheme.isChecked = composition.invForDark
-        preferenceInvHighlight.isChecked = composition.invGlowing
+        sbRed.progress = composition.red
+        sbGreen.progress = composition.green
+        sbBlue.progress = composition.blue
+        invForTheme.isChecked = composition.invForDark
+        invHighlight.isChecked = composition.invGlowing
+        withHaptic.isChecked = composition.withHaptic
     }
 
     private inner class Listener(
         private val binding: CurtainPreferenceJoystickBinding,
-    ) : SeekBar.OnSeekBarChangeListener, View.OnClickListener {
+    ) : SeekBar.OnSeekBarChangeListener, View.OnClickListener,
+        CompoundButton.OnCheckedChangeListener {
 
         override fun onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean) {
             val new = when (seekBar.id) {
-                R.id.preference_sb_red -> entity.copy(red = progress, overrideTheme = true)
-                R.id.preference_sb_green -> entity.copy(green = progress, overrideTheme = true)
-                R.id.preference_sb_blue -> entity.copy(blue = progress, overrideTheme = true)
+                R.id.sb_red -> entity.copy(red = progress, overrideTheme = true)
+                R.id.sb_green -> entity.copy(green = progress, overrideTheme = true)
+                R.id.sb_blue -> entity.copy(blue = progress, overrideTheme = true)
                 else -> throw Exception()
             }
             if (new.red == entity.red && new.green == entity.green && new.blue == entity.blue) return
             entity = new
-            binding.preferenceJoystickTvTitle.text = entity.text()
+            binding.preferenceJoystickTvTitle.text = entity.colorText()
             preferenceStore { setJoystickComposition(entity) }
         }
 
@@ -88,9 +87,18 @@ class JoystickDelegate(
 
         override fun onClick(view: View) {
             entity = when (view.id) {
-                R.id.preference_inv_for_theme -> entity.copy(invForDark = (view as CompoundButton).isChecked, overrideTheme = true)
-                R.id.preference_inv_highlight -> entity.copy(invGlowing = (view as CompoundButton).isChecked)
-                R.id.preference_btn_default -> entity.withPrimary(view.context).copy(overrideTheme = false, invForDark = false)
+                R.id.btn_default -> entity.withPrimary(view.context).copy(overrideTheme = false, invForDark = false)
+                else -> throw Exception()
+            }
+            binding.bind(entity)
+            preferenceStore { setJoystickComposition(entity) }
+        }
+
+        override fun onCheckedChanged(button: CompoundButton, isChecked: Boolean) {
+            entity = when (button.id) {
+                R.id.inv_for_theme -> entity.copy(invForDark = button.isChecked, overrideTheme = true)
+                R.id.inv_highlight -> entity.copy(invGlowing = button.isChecked)
+                R.id.with_haptic -> entity.copy(withHaptic = button.isChecked)
                 else -> throw Exception()
             }
             binding.bind(entity)

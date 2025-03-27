@@ -6,25 +6,31 @@ data class JoystickComposition(
     val invForDark: Boolean,
     val invGlowing: Boolean,
     val overrideTheme: Boolean,
+    val withHaptic: Boolean,
     val red: Int,
     val green: Int,
     val blue: Int,
 ) {
     companion object {
-        private const val INV_FOR_DARK_MASK  = 0x01000000
-        private const val INV_GLOWING_MASK = 0x02000000
-        private const val OVERRIDE_THEME_MASK = 0x04000000
+        private const val INV_FOR_DARK  =  0x01000000
+        private const val INV_GLOWING =    0x02000000
+        private const val OVERRIDE_THEME = 0x04000000
+        private const val WITH_HAPTIC =    0x08000000
         private const val BYTE = 256
         private const val FF = 255
+
+        const val DEFAULT = 16732754 + WITH_HAPTIC // #ff5252 + WITH_HAPTIC
+        val Default = JoystickComposition(DEFAULT)
     }
 
     constructor(flags: Int) : this(
-        (flags and INV_FOR_DARK_MASK) == INV_FOR_DARK_MASK,
-        (flags and INV_GLOWING_MASK) == INV_GLOWING_MASK,
-        (flags and OVERRIDE_THEME_MASK) == OVERRIDE_THEME_MASK,
-        flags / BYTE / BYTE % BYTE,
-        flags / BYTE % BYTE,
-        flags % BYTE,
+        invForDark = (flags and INV_FOR_DARK) == INV_FOR_DARK,
+        invGlowing = (flags and INV_GLOWING) == INV_GLOWING,
+        overrideTheme = (flags and OVERRIDE_THEME) == OVERRIDE_THEME,
+        withHaptic = (flags and WITH_HAPTIC) == WITH_HAPTIC,
+        red = flags / BYTE / BYTE % BYTE,
+        green = flags / BYTE % BYTE,
+        blue = flags % BYTE,
     )
 
     val data: Int
@@ -32,13 +38,16 @@ data class JoystickComposition(
     init {
         var data = red * BYTE * BYTE + green * BYTE + blue
         if (invForDark) {
-            data += INV_FOR_DARK_MASK
+            data += INV_FOR_DARK
         }
         if (invGlowing) {
-            data += INV_GLOWING_MASK
+            data += INV_GLOWING
         }
         if (overrideTheme) {
-            data += OVERRIDE_THEME_MASK
+            data += OVERRIDE_THEME
+        }
+        if (withHaptic) {
+            data += WITH_HAPTIC
         }
         this.data = data
     }
@@ -65,7 +74,7 @@ data class JoystickComposition(
         }
     }
 
-    fun text(): String {
+    fun colorText(): String {
         val builder = StringBuilder("#")
         val color = red * BYTE * BYTE + green * BYTE + blue
         val hex = Integer.toHexString(color)

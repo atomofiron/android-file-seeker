@@ -22,7 +22,7 @@
             />
 
         <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/preference_sb_red"
+            android:id="@+id/sb_red"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_large"
@@ -30,51 +30,50 @@
             android:background="@color/item_explorer_background"
             />
         <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/preference_sb_green"
+            android:id="@+id/sb_green"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_large"
             android:max="255"
             />
         <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/preference_sb_blue"
+            android:id="@+id/sb_blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:padding="@dimen/padding_large"
             android:max="255"
             android:background="@color/item_explorer_background"
             />
-        <LinearLayout
-            android:layout_width="match_parent"
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/inv_for_theme"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center_horizontal"
-            >
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/preference_inv_for_theme"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/inverse_for_dark"
-                android:paddingStart="@dimen/padding_xlarge"
-                android:paddingEnd="@dimen/padding_xlarge"
-                />
-            <com.google.android.material.checkbox.MaterialCheckBox
-                android:id="@+id/preference_inv_highlight"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/inverse_glowing"
-                android:paddingStart="@dimen/padding_xlarge"
-                android:paddingEnd="@dimen/padding_xlarge"
-                />
-        </LinearLayout>
+            android:layout_gravity="center_horizontal"
+            android:text="@string/inverse_for_dark"
+            />
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/inv_highlight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/inverse_glowing"
+            />
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/preference_btn_default"
+            android:id="@+id/btn_default"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/by_default"
             style="?materialButtonOutlinedStyle"
+            />
+
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/with_haptic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/with_haptic"
             />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
