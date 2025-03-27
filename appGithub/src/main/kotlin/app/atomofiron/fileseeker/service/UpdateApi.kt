@@ -28,7 +28,6 @@ private const val RELEASES = "https://api.github.com/repos/atomofiron/android-fi
 
 private fun HttpStatusCode.ok() = value in 200..299
 
-
 class UpdateApi {
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -43,16 +42,14 @@ class UpdateApi {
         }
     }
 
-    suspend fun releases(): Rslt<List<GithubRelease>> {
-        val response = try {
-            client.get(RELEASES)
-        } catch (t: Throwable) {
-            return Rslt.Err(t.human())
-        }
-        return when {
+    suspend fun releases(): Rslt<List<GithubRelease>> = try {
+        val response = client.get(RELEASES)
+        when {
             response.status.ok() -> Rslt.Ok(response.body<List<GithubRelease>>())
             else -> Rslt.Err(response.body<GithubError>().run { "[$status] $message" })
         }
+    } catch (t: Throwable) {
+        Rslt.Err(t.human())
     }
 
     fun download(url: String, dst: File): Flow<Loading> = flow {
@@ -79,8 +76,6 @@ class UpdateApi {
             }
         } catch (t: Throwable) {
             emit(Loading.Error(t.human()))
-        } catch (e: Exception) {
-            emit(Loading.Error(e.human()))
         }
     }
 }
