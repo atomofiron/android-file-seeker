@@ -1,15 +1,20 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment
 
+import android.content.Context
 import android.content.res.Resources
 import android.graphics.PointF
+import android.util.AttributeSet
 import android.view.HapticFeedbackConstants
+import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
+import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.isRtl
 import kotlin.math.abs
 import app.atomofiron.common.util.progressionTo
+import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
 
 private data class State(
     val toChecked: Boolean,
@@ -23,7 +28,7 @@ class SwipeMarkerDelegate(resources: Resources) {
     private var state: State? = null
     private var downPoint: PointF? = null
 
-    fun onDown(rv: RecyclerView, x: Float, y: Float): Boolean {
+    private fun onDown(rv: RecyclerView, x: Float, y: Float): Boolean {
         val itemView = rv.findChildViewUnder(x, y)
         if (itemView?.id != R.id.item_explorer) {
             return false
@@ -41,7 +46,7 @@ class SwipeMarkerDelegate(resources: Resources) {
         return state != null
     }
 
-    fun onMove(rv: RecyclerView, x: Float, y: Float): Boolean {
+    private fun onMove(rv: RecyclerView, x: Float, y: Float): Boolean {
         downPoint?.let {
             if (abs(it.x - x) > abs(it.y - y)) {
                 state = null
@@ -51,7 +56,7 @@ class SwipeMarkerDelegate(resources: Resources) {
         return rv.check(x, y)
     }
 
-    fun onUp(rv: RecyclerView, x: Float, y: Float) {
+    private fun onUp(rv: RecyclerView, x: Float, y: Float) {
         rv.check(x, y)
         state = null
     }
@@ -78,4 +83,30 @@ class SwipeMarkerDelegate(resources: Resources) {
     }
 
     private fun View.getCheckBox(): CheckBox? = findViewById(R.id.item_explorer_cb)
+
+    fun onTouch(view: RecyclerView, event: MotionEvent): Boolean = when (event.action) {
+        MotionEvent.ACTION_DOWN -> onDown(view, event.x, event.y)
+            .also { if (it) view.parent.disallowInterceptTouches() }
+        MotionEvent.ACTION_MOVE -> onMove(view, event.x, event.y)
+        MotionEvent.ACTION_CANCEL,
+        MotionEvent.ACTION_UP -> false.also { onUp(view, event.x, event.y) }
+        else -> false
+    }
+}
+
+class SwipeMarkerLayout @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null) : FrameLayout(context, attrs) {
+
+    private val delegate = SwipeMarkerDelegate(resources)
+
+    override fun addView(child: View?) {
+        super.addView(child)
+        if (child != null && child !is RecyclerView) {
+            throw IllegalArgumentException()
+        }
+    }
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        val child = getChildAt(0) as RecyclerView
+        return delegate.onTouch(child, event) || super.dispatchTouchEvent(event)
+    }
 }

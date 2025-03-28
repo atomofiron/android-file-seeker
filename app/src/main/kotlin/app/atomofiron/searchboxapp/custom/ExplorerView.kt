@@ -86,15 +86,7 @@ class ExplorerView(
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        val result = when (event.action) {
-            MotionEvent.ACTION_DOWN -> swipeMarker.onDown(binding.recyclerView, event.x, event.y)
-                .also { if (it) parent.disallowInterceptTouches() }
-            MotionEvent.ACTION_MOVE -> swipeMarker.onMove(binding.recyclerView, event.x, event.y)
-            MotionEvent.ACTION_CANCEL,
-            MotionEvent.ACTION_UP -> false.also { swipeMarker.onUp(binding.recyclerView, event.x, event.y) }
-            else -> false
-        }
-        return result || super.dispatchTouchEvent(event)
+        return swipeMarker.onTouch(binding.recyclerView, event) || super.dispatchTouchEvent(event)
     }
 
     fun scrollTo(item: Node) = listDelegate.scrollTo(item)
