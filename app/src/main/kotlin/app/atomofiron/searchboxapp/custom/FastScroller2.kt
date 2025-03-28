@@ -15,7 +15,6 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.IntDef
 import androidx.annotation.VisibleForTesting
-import androidx.collection.MutableIntList
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
@@ -100,10 +99,6 @@ class FastScroller2(
     var mVerticalThumbHeight = 0
     @VisibleForTesting
     var mVerticalThumbCenterY = 0
-        set(value) {
-            avgSpeedY.add(abs(value - field))
-            field = value
-        }
     @VisibleForTesting
     var mVerticalDownY = 0f
     @VisibleForTesting
@@ -114,17 +109,10 @@ class FastScroller2(
     var mHorizontalThumbWidth = 0
     @VisibleForTesting
     var mHorizontalThumbCenterX = 0
-        set(value) {
-            avgSpeedX.add(abs(value - field))
-            field = value
-        }
     @VisibleForTesting
     var mHorizontalDownX = 0f
     @VisibleForTesting
     var mHorizontalDownOffset = 0
-
-    private val avgSpeedX = AvgSpeed()
-    private val avgSpeedY = AvgSpeed()
 
     private var mRecyclerViewWidth = 0
     private var mRecyclerViewHeight = 0
@@ -162,7 +150,7 @@ class FastScroller2(
         }
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
             if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                resetSpeed()
+                requestRedraw()
             }
         }
     }
@@ -229,7 +217,7 @@ class FastScroller2(
         if (mState == STATE_DRAGGING && state != STATE_DRAGGING) {
             mVerticalThumbDrawable.setState(EMPTY_STATE_SET)
             resetHideDelay(HIDE_DELAY_AFTER_DRAGGING_MS)
-            resetSpeed()
+            requestRedraw()
         } else if (state == STATE_VISIBLE) {
             resetHideDelay(HIDE_DELAY_AFTER_VISIBLE_MS)
         }
@@ -312,15 +300,14 @@ class FastScroller2(
     }
 
     private fun drawVerticalScrollbar(canvas: Canvas) {
-        val speed = avgSpeedY.major(mDragState)
-        mVerticalThumbDrawable.setBounds(0, 0, max(minThumbThickness, mVerticalThumbWidth - speed), mVerticalThumbHeight)
+        mVerticalThumbDrawable.setBounds(0, 0, max(minThumbThickness, mVerticalThumbWidth), mVerticalThumbHeight)
         mVerticalTrackDrawable.setBounds(0, paddingTop, mVerticalTrackWidth, paddingTop + getVerticalTrackArea())
 
         val saved = canvas.save()
         if (onTheLeft) {
-            canvas.translate(paddingLeft - avgSpeedY.minor(mDragState), 0f)
+            canvas.translate(paddingLeft.toFloat(), 0f)
         } else {
-            canvas.translate(mRecyclerViewWidth - paddingRight + avgSpeedY.minor(mDragState), 0f)
+            canvas.translate(mRecyclerViewWidth - paddingRight.toFloat(), 0f)
             canvas.scale(-1f, 1f)
         }
         mVerticalTrackDrawable.draw(canvas)
@@ -334,12 +321,11 @@ class FastScroller2(
 
     private fun drawHorizontalScrollbar(canvas: Canvas) {
         val left = mHorizontalThumbCenterX - mHorizontalThumbWidth / 2f
-        val speed = if (mDragState == STATE_DRAGGING) 0 else avgSpeedX.major(mDragState)
-        mHorizontalThumbDrawable.setBounds(0, 0, mHorizontalThumbWidth, max(minThumbThickness, mHorizontalThumbHeight - speed))
+        mHorizontalThumbDrawable.setBounds(0, 0, mHorizontalThumbWidth, max(minThumbThickness, mHorizontalThumbHeight))
         mHorizontalTrackDrawable.setBounds(paddingLeft, 0, paddingLeft + getHorizontalTrackArea(), mHorizontalTrackHeight)
 
         val saved = canvas.save()
-        canvas.translate(0f, mRecyclerViewHeight - paddingBottom + avgSpeedX.minor(mDragState))
+        canvas.translate(0f, mRecyclerViewHeight - paddingBottom.toFloat())
         canvas.scale(1f, -1f)
         mHorizontalTrackDrawable.draw(canvas)
         canvas.translate(left, 0f)
@@ -530,12 +516,6 @@ class FastScroller2(
      */
     private fun getHorizontalTrackArea() = mRecyclerViewWidth - paddingLeft - paddingRight
 
-    private fun resetSpeed() {
-        avgSpeedX.clear()
-        avgSpeedY.clear()
-        requestRedraw()
-    }
-
     private inner class AnimatorListener : AnimatorListenerAdapter() {
         private var mCanceled = false
 
@@ -565,32 +545,6 @@ class FastScroller2(
             mVerticalThumbDrawable.alpha = alpha
             mVerticalTrackDrawable.alpha = alpha
             requestRedraw()
-        }
-    }
-
-    private class AvgSpeed {
-
-        private val list = MutableIntList(8)
-
-        fun add(speed: Int) {
-            if (list.size == 8) {
-                list.removeAt(0)
-            }
-            list.add(speed / 1)
-        }
-
-        private fun general() = if (list.isEmpty()) 0f else (list.sum() / list.size.toFloat())
-
-        fun major(@DragState state: Int) = if (state == STATE_DRAGGING) 0 else general().toInt()
-
-        fun minor(@DragState state: Int) = if (state == STATE_DRAGGING) 0f else (general() % 1f)
-
-        fun clear() = list.clear()
-
-        private fun MutableIntList.sum(): Int {
-            var sum = 0
-            for (i in indices) sum += get(i)
-            return sum
         }
     }
 }
