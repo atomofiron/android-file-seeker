@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.result
 
+import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.*
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
@@ -11,16 +12,16 @@ class ResultViewState(
     private val scope: CoroutineScope,
 ) {
 
-    val oneFileOptions = listOf(R.id.menu_remove, R.id.menu_share, R.id.menu_open_with)
-    val oneDirOptions = listOf(R.id.menu_remove)
-    val manyFilesOptions = listOf(R.id.menu_remove)
+    val oneFileOptions = listOf(R.id.menu_delete, R.id.menu_share, R.id.menu_open_with, R.id.menu_copy_path)
+    val oneDirOptions = listOf(R.id.menu_delete, R.id.menu_copy_path)
+    val manyFilesOptions = listOf(R.id.menu_delete)
 
     val task = DeferredStateFlow<SearchTask>()
     val composition = DeferredStateFlow<ExplorerItemComposition>()
-    val alerts = ChannelFlow<String>()
+    val alerts = ChannelFlow<AlertMessage.Res>()
     val checked = MutableStateFlow(listOf<Int>())
 
-    fun sendAlert(value: String) {
-        alerts[scope] = value
+    fun showAlert(message: AlertMessage.Res) {
+        alerts[scope] = message
     }
 }

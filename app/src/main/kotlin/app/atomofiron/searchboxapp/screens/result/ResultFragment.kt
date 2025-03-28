@@ -10,11 +10,14 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
+import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.viewCollect
+import app.atomofiron.common.util.unsafeLazy
 import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.fileseeker.databinding.FragmentResultBinding
+import app.atomofiron.searchboxapp.custom.addFastScroll
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.model.finder.SearchTask
@@ -30,7 +33,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
     private lateinit var statusDrawable: Drawable
 
     private val resultAdapter = ResultAdapter()
-    private val errorSnackbar by lazy(LazyThreadSafetyMode.NONE) {
+    private val errorSnackbar by unsafeLazy {
         binding.snackbarContainer.makeSnackbar("", Snackbar.LENGTH_INDEFINITE)
             .setAction(R.string.got_it) { }
     }
@@ -54,6 +57,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             itemAnimator = null
             layoutManager = LinearLayoutManager(requireContext())
             adapter = resultAdapter
+            addFastScroll()
         }
         binding.navigationRail.menu.removeItem(R.id.placeholder)
         binding.navigationRail.isItemActiveIndicatorEnabled = false
@@ -127,9 +131,10 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         resultAdapter.setComposition(composition)
     }
 
-    private fun showSnackbar(message: String) {
-        binding.snackbarContainer.makeSnackbar(message, Snackbar.LENGTH_INDEFINITE)
-            .setAction(R.string.got_it) { }
+    private fun showSnackbar(message: AlertMessage.Res) {
+        val length = if (message.important) Snackbar.LENGTH_INDEFINITE else Snackbar.LENGTH_LONG
+        binding.snackbarContainer.makeSnackbar(message.message, length)
+            .apply { if (message.important) setAction(R.string.got_it) { } }
             .show()
     }
 }

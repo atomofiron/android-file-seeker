@@ -2,7 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="app.atomofiron.searchboxapp.MainActivity">
-    <item android:id="@+id/menu_apk">
+    <item
+        android:id="@+id/menu_apk"
+        tools:ignore="MenuTitle">
         <menu>
             <item
                 android:id="@+id/menu_install"
@@ -40,6 +42,11 @@
         android:id="@+id/menu_share"
         android:title="@string/share"
         android:icon="@drawable/ic_share"
+        />
+    <item
+        android:id="@+id/menu_copy_path"
+        android:title="@string/copy_path"
+        android:icon="@drawable/ic_link"
         />
     <item
         android:id="@+id/menu_delete"

@@ -11,7 +11,8 @@ import kotlinx.coroutines.CoroutineScope
 import app.atomofiron.searchboxapp.injectable.channel.ResultChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
-import app.atomofiron.searchboxapp.injectable.service.ResultService
+import app.atomofiron.searchboxapp.injectable.service.FinderService
+import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
@@ -102,10 +103,11 @@ class ResultModule {
     @ResultScope
     fun interactor(
         scope: CoroutineScope,
-        resultService: ResultService,
+        utilService: UtilService,
         explorerService: ExplorerService,
+        finderService: FinderService,
     ): ResultInteractor {
-        return ResultInteractor(scope, resultService, explorerService)
+        return ResultInteractor(scope, utilService, explorerService, finderService)
     }
 
     @Provides
@@ -120,8 +122,9 @@ class ResultModule {
 interface ResultDependencies {
     fun finderStore(): FinderStore
     fun preferenceStore(): PreferenceStore
-    fun resultService(): ResultService
+    fun resultService(): UtilService
     fun explorerService(): ExplorerService
+    fun finderService(): FinderService
     fun resultStore(): ResultStore
     fun resultChannel(): ResultChannel
     fun appStore(): AppStore

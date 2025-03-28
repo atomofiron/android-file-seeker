@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.result.presenter
 
 import android.view.LayoutInflater
 import app.atomofiron.common.arch.Recipient
+import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
@@ -24,8 +25,7 @@ class ResultCurtainMenuDelegate(
     curtainChannel: CurtainChannel,
 ) : Recipient, CurtainApi.Adapter<CurtainApi.ViewHolder>(), MenuListener {
 
-    private val resources by appStore.resourcesProperty
-    private val optionsDelegate = OptionsDelegate(R.menu.item_options_result, this)
+    private val optionsDelegate = OptionsDelegate(R.menu.item_options, this)
     override var data: ExplorerItemOptions? = null
 
     init {
@@ -45,11 +45,11 @@ class ResultCurtainMenuDelegate(
         when (id) {
             R.id.menu_copy_path -> {
                 interactor.copyToClipboard(items.first())
-                viewState.sendAlert(resources.getString(R.string.copied))
+                viewState.showAlert(AlertMessage(R.string.copied))
             }
             R.id.menu_open_with -> router.openWith(items.first())
             R.id.menu_share -> router.shareWith(items.first())
-            R.id.menu_remove -> interactor.deleteItems(items)
+            R.id.menu_delete -> interactor.deleteItems(items)
         }
     }
 

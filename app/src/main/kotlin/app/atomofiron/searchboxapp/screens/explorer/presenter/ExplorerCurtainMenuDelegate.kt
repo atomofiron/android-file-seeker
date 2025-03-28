@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer.presenter
 
 import android.view.LayoutInflater
 import app.atomofiron.common.arch.Recipient
+import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
@@ -39,7 +40,7 @@ class ExplorerCurtainMenuDelegate(
         const val CLONE = 444
     }
 
-    private val optionsDelegate = OptionsDelegate(R.menu.item_options_explorer, output = this)
+    private val optionsDelegate = OptionsDelegate(R.menu.item_options, output = this)
     private val createDelegate = CreateDelegate(output = this)
     private val cloneDelegate = CloneDelegate(output = this)
     private val renameDelegate = RenameDelegate(output = this)
@@ -94,6 +95,11 @@ class ExplorerCurtainMenuDelegate(
             R.id.menu_install -> apkInteractor.install(viewState.currentTab.value, items.first())
             R.id.menu_launch -> apkInteractor.launch(items.first())
             -R.id.menu_apk -> preferences { setActionApk(ActionApk.Ask) }
+            R.id.menu_copy_path -> {
+                explorerInteractor.copyToClipboard(items.first())
+                viewState.showAlert(AlertMessage(R.string.copied))
+                controller?.close()
+            }
         }
     }
 

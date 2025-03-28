@@ -41,9 +41,8 @@ open class ServiceModule {
     @Provides
     @Singleton
     fun resultService(
-        workManager: WorkManager,
         clipboardManager: ClipboardManager,
-    ): ResultService = ResultService(workManager, clipboardManager)
+    ): UtilService = UtilService(clipboardManager)
 
     @Provides
     @Singleton

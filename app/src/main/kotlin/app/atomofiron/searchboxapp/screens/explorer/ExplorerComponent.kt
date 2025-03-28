@@ -16,6 +16,7 @@ import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
+import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMenuDelegate
@@ -110,8 +111,8 @@ class ExplorerModule {
 
     @Provides
     @ExplorerScope
-    fun interactor(scope: CoroutineScope, explorerService: ExplorerService): ExplorerInteractor {
-        return ExplorerInteractor(scope, explorerService)
+    fun interactor(scope: CoroutineScope, explorerService: ExplorerService, utils: UtilService): ExplorerInteractor {
+        return ExplorerInteractor(scope, explorerService, utils)
     }
 
     @Provides
@@ -136,6 +137,7 @@ interface ExplorerDependencies {
     fun context(): Context
     fun assetManager(): AssetManager
     fun explorerService(): ExplorerService
+    fun utilService(): UtilService
     fun explorerStore(): ExplorerStore
     fun preferenceStore(): PreferenceStore
     fun curtainChannel(): CurtainChannel

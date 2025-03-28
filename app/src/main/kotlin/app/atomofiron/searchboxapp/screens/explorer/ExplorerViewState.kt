@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.explorer
 
+import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.*
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
@@ -10,6 +11,8 @@ import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 
 class ExplorerViewState(
     private val scope: CoroutineScope,
@@ -22,14 +25,15 @@ class ExplorerViewState(
         private const val SECOND_TAB = "SECOND_TAB"
     }
     val rootOptions = listOf(R.id.menu_create)
-    val directoryOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_create, R.id.menu_clone)
-    val oneFileOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_share, R.id.menu_open_with, R.id.menu_clone)
+    val directoryOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_create, R.id.menu_clone, R.id.menu_copy_path)
+    val oneFileOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_share, R.id.menu_open_with, R.id.menu_clone, R.id.menu_copy_path)
     val manyFilesOptions = listOf(R.id.menu_delete)
 
     val scrollTo = ChannelFlow<Node>()
     val settingsNotification = preferenceChannel.notification
     val itemComposition = DeferredStateFlow<ExplorerItemComposition>()
-    val alerts: Flow<NodeError> = explorerStore.alerts
+    private val otherAlerts = ChannelFlow<AlertMessage>()
+    val alerts: Flow<AlertMessage> = merge(explorerStore.alerts.map { AlertMessage(it) }, otherAlerts)
 
     val firstTab = NodeTabKey(FIRST_TAB, index = 0)
     val secondTab = NodeTabKey(SECOND_TAB, index = 1)
@@ -47,5 +51,9 @@ class ExplorerViewState(
             firstTab -> firstTabItems.valueOrNull?.current
             else -> null//secondTabItems.valueOrNull?.current
         }
+    }
+
+    fun showAlert(message: AlertMessage) {
+        otherAlerts[scope] = message
     }
 }

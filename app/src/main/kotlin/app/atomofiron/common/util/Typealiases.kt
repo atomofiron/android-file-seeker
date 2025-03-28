@@ -14,3 +14,5 @@ typealias MaterialAttr = com.google.android.material.R.attr
 typealias MaterialDimen = com.google.android.material.R.dimen
 
 typealias Unreachable = Unit
+
+fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NONE, initializer)

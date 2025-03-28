@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
+import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.ExplorerView
@@ -112,7 +113,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
         viewCollect(scrollTo) { item ->
             getCurrentTabView().scrollTo(item)
         }
-        viewCollect(alerts, collector = ::showAlert)
+        viewCollect(alerts, collector = ::showSnackbar)
         viewCollect(settingsNotification, collector = ::setSettingsNotification)
         viewCollect(currentTab) {
             binding.pager.currentItem = it.index
@@ -147,8 +148,17 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     private fun getCurrentTabView(): ExplorerView = explorerViews[binding.pager.currentItem]
 
-    private fun showAlert(error: NodeError) {
-        binding.snackbarContainer.makeSnackbar(resources.getString(error), Snackbar.LENGTH_LONG).show()
+    private fun showSnackbar(message: AlertMessage) {
+        binding.snackbarContainer.run {
+            when (message) {
+                is AlertMessage.Str -> makeSnackbar(message.message, Snackbar.LENGTH_LONG)
+                is AlertMessage.Res -> makeSnackbar(message.message, Snackbar.LENGTH_LONG)
+                is AlertMessage.Other<*> -> when (message.message) {
+                    is NodeError -> makeSnackbar(resources.getString(message.message), Snackbar.LENGTH_LONG)
+                    else -> return
+                }
+            }
+        }.show()
     }
 
     private fun setSettingsNotification(value: Boolean) {

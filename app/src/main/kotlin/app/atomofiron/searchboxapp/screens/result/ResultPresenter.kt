@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.result
 
 import androidx.core.os.ConfigurationCompat
 import app.atomofiron.common.arch.BasePresenter
+import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
@@ -77,7 +78,7 @@ class ResultPresenter(
         val title = "search_$date.md.txt";
 
         if (!router.shareFile(title, data)) {
-            viewState.sendAlert(resources.getString(R.string.no_activity))
+            viewState.showAlert(AlertMessage(R.string.no_activity, important = true))
         }
     }
 }

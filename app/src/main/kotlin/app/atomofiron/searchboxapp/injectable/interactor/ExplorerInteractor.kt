@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.injectable.interactor
 
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
+import app.atomofiron.searchboxapp.injectable.service.UtilService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -11,10 +12,13 @@ import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 class ExplorerInteractor(
     private val scope: CoroutineScope,
     private val service: ExplorerService,
+    private val utils: UtilService,
 ) {
     private val context = Dispatchers.IO
 
     fun getFlow(tab: NodeTabKey) = service.getOrCreateFlowSync(tab)
+
+    fun copyToClipboard(item: Node) = utils.copyToClipboard(item)
 
     fun selectRoot(tab: NodeTabKey, item: NodeRoot) {
         scope.launch(context) {
