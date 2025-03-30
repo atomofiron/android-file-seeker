@@ -72,6 +72,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         when (item.itemId) {
             R.id.menu_stop -> presenter.onStopClick()
             R.id.menu_export -> presenter.onExportClick()
+            R.id.menu_share -> presenter.onShareClick()
         }
         return false
     }
@@ -108,6 +109,10 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         item = menu.findItem(R.id.menu_export)
         if (item.isEnabled != !task.result.isEmpty) {
             item.isEnabled = !task.result.isEmpty
+        }
+        item = menu.findItem(R.id.menu_share)
+        if (item.isEnabled != (!task.inProgress && task.count > 0)) {
+            item.isEnabled = true
         }
     }
 

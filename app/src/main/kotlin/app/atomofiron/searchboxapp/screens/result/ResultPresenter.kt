@@ -70,6 +70,13 @@ class ResultPresenter(
 
     fun onStopClick() = interactor.stop(viewState.task.value.uuid)
 
+    fun onShareClick() {
+        val task = viewState.task.value
+        val data = task.result as SearchResult.FinderResult
+        val items = data.matches.map { it.item }
+        router.shareWith(items)
+    }
+
     fun onExportClick() {
         val task = viewState.task.value
         val data = (task.result as SearchResult.FinderResult).toMarkdown()

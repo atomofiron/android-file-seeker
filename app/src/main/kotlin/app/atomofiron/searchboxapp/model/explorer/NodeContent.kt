@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+import app.atomofiron.common.util.unsafeLazy
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 
@@ -9,6 +10,10 @@ sealed class NodeContent(
     // поэтому тут null
     val mimeType: String? = null,
 ) {
+    companion object {
+        const val AnyType = "*/*"
+    }
+    val commonMimeType: String by unsafeLazy { mimeType?.run { substring(0, indexOf('/')) + "/*" } ?: AnyType }
     open val rootType: NodeRoot.NodeRootType? = null
     open val isCached: Boolean = false
 
@@ -40,7 +45,7 @@ sealed class NodeContent(
         data class Music(
             val duration: Int = 0,
             override val thumbnail: Thumbnail? = null,
-        ) : File()
+        ) : File(mimeType = "audio/*")
         sealed class Picture(mimeType: String) : File(mimeType) {
             data class Png(override val thumbnail: Thumbnail? = null) : Picture("image/png")
             data class Jpeg(override val thumbnail: Thumbnail? = null) : Picture("image/jpeg")
@@ -51,7 +56,7 @@ sealed class NodeContent(
         data class Apk(
             override val thumbnail: Thumbnail? = null,
             val info: ApkInfo? = null,
-        ) : File("application/vnd.android.package-archive", thumbnail)
+        ) : File("application/vnd.android.package-archive", thumbnail = thumbnail)
         sealed class Archive(
             mimeType: String,
         ) : File(mimeType) {

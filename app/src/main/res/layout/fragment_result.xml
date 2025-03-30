@@ -16,7 +16,6 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:scrollbarThumbVertical="@drawable/scroll_thumb"
             />
     </app.atomofiron.searchboxapp.screens.explorer.fragment.SwipeMarkerLayout>
     <com.google.android.material.bottomnavigation.BottomNavigationView
