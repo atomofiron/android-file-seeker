@@ -4,7 +4,6 @@ import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
-import app.atomofiron.common.util.removeLastOne
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
@@ -597,20 +596,27 @@ object ExplorerUtils {
             children == null || item.children == null -> item.children
             children === item.children -> children
             children.items === item.children.items -> children // fixes ConcurrentModificationException
-            else -> children.also {
-                val iterator = children.items.listIterator()
-                val new = item.children.items
-                while (new.isNotEmpty()) {
-                    val node = iterator.takeIf { it.hasNext() }?.next()
-                    val newNode = when (node) {
-                        null -> new.removeLastOne()
-                        else -> new.removeOneIf { it.uniqueId == node.uniqueId }
+            else -> item.children.also { newChildren ->
+                val iterator = newChildren.items.listIterator()
+                var oldIndex = 0
+                while (iterator.hasNext()) {
+                    val next = iterator.next()
+                    var old = children.getOrNull(oldIndex)
+                    if (old?.uniqueId != next.uniqueId) {
+                        val index = children.indexOfFirst { it.uniqueId == next.uniqueId }
+                        if (index >= 0) {
+                            old = children[index]
+                            oldIndex = index
+                        } else {
+                            continue
+                        }
                     }
-                    when {
-                        node != null && newNode != null -> iterator.set(node.copy(properties = newNode.properties))
-                        node != null -> continue
-                        newNode != null -> iterator.add(newNode)
+                    oldIndex++
+                    val actual = when (old.properties) {
+                        next.properties -> old
+                        else -> old.copy(properties = next.properties)
                     }
+                    iterator.set(actual)
                 }
             }
         }
