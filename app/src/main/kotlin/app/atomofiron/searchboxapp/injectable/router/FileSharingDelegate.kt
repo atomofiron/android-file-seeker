@@ -10,7 +10,6 @@ import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.poop
 import java.io.File
 
 
@@ -42,7 +41,6 @@ class FileSharingDelegateImpl(activityProperty: WeakProperty<out FragmentActivit
             }
         }
         intent.setType(mimeType ?: commonMimeType)
-        poop("mimeType ${mimeType ?: commonMimeType}")
         val files = ArrayList<Uri>()
         for (item in items) {
             val file = File(item.path)
@@ -61,7 +59,7 @@ class FileSharingDelegateImpl(activityProperty: WeakProperty<out FragmentActivit
         val type = item.content.mimeType ?: let {
             val ext = MimeTypeMap.getFileExtensionFromUrl(file.name)
             MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext)
-        } ?: "*/*"
+        } ?: NodeContent.AnyType
         val intent = Intent(action)
         intent.putExtra(Intent.EXTRA_STREAM, contentUri)
         intent.setDataAndType(contentUri, type)
