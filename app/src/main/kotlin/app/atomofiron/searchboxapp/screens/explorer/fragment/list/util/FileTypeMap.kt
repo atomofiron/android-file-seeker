@@ -23,6 +23,7 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.File.Dmg -> R.drawable.ic_explorer_archive_file
     is NodeContent.File.Text.Osu -> R.drawable.ic_file_osu
     is NodeContent.File.Text.Script -> R.drawable.ic_explorer_script
+    is NodeContent.File.Text.Ino -> R.drawable.ic_explorer_infinity
     is NodeContent.File.Text -> R.drawable.ic_explorer_text
     is NodeContent.File.Pdf -> R.drawable.ic_explorer_pdf
     is NodeContent.File.DataImage -> R.drawable.ic_explorer_dt

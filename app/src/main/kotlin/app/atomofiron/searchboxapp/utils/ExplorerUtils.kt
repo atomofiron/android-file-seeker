@@ -64,6 +64,7 @@ object ExplorerUtils {
     private const val EXT_RAR = ".rar"
     private const val EXT_TXT = ".txt"
     private const val EXT_INI = ".ini"
+    private const val EXT_INO = ".ino"
     private const val EXT_KT = ".kt"
     private const val EXT_KTS = ".kts"
     private const val EXT_SWIFT = ".swift"
@@ -320,6 +321,7 @@ object ExplorerUtils {
             type.startsWith(FILE_ASCII_TEXT) -> when {
                 path.endsWith(EXT_SVG, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Svg }
                 path.endsWith(EXT_OSU, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Osu }
+                path.endsWith(EXT_INO, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Ino }
                 else -> NodeContent.File.Text.Plain
             }
             type.startsWith(FILE_BOOTING),
@@ -379,7 +381,7 @@ object ExplorerUtils {
         children?.update(updateNames = false) {
             sortBy { it.name.lowercase() }
             if (reversed) reverse()
-            sortBy { if (it.isDirectory) 0 else 1 }
+            sortBy { !it.isDirectory }
         }
         return this
     }
@@ -389,7 +391,7 @@ object ExplorerUtils {
             sortBy { it.time }
             sortBy { it.date }
             if (newFirst) reverse()
-            sortBy { if (it.isDirectory) 0 else 1 }
+            sortBy { !it.isDirectory }
         }
         return this
     }
