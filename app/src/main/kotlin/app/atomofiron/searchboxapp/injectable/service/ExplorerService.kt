@@ -5,7 +5,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
-import androidx.core.content.pm.PackageInfoCompat
 import app.atomofiron.common.util.Unreachable
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.set
@@ -18,8 +17,6 @@ import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
-import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
-import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
@@ -761,9 +758,7 @@ class ExplorerService(
     }
 
     private suspend fun cacheSync(key: NodeTabKey, item: Node) {
-        var updated = item.update(config)
-            .sortByName()
-            .updateContent()
+        var updated = item.update(config).sortByName()
         renderTab(key, lazy = true) {
             states.updateState(item.uniqueId) {
                 nextState(item.uniqueId, cachingJob = null)
@@ -883,31 +878,6 @@ class ExplorerService(
 
     // todo WTF 'NodeState.getUniqueId()' on a null object reference
     private fun List<NodeState>.findState(uniqueId: Int): Pair<Int, NodeState?> = findIndexed { it.uniqueId == uniqueId }
-
-    private fun Node.updateContent(): Node {
-        val content = content
-        return when {
-            content is NodeContent.File.Apk && content.thumbnail == null -> {
-                val packageInfo = packageManager.getPackageArchiveInfo(path, 0)
-                val info = packageInfo?.applicationInfo
-                info ?: return this
-                info.sourceDir = path
-                info.publicSourceDir = path
-
-                val new = NodeContent.File.Apk(
-                    thumbnail = info.loadIcon(packageManager).forNode,
-                    ApkInfo(
-                        appName = info.loadLabel(packageManager).toString(),
-                        versionName = packageInfo.versionName.toString(),
-                        versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt(),
-                        packageName = packageInfo.packageName,
-                    )
-                )
-                copy(content = new)
-            }
-            else -> this
-        }
-    }
 
     private fun Node.getOpenedIndex(): Int = children?.indexOfFirst { it.isOpened } ?: -1
 

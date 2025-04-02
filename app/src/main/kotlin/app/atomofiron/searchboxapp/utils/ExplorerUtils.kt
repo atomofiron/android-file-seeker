@@ -1,14 +1,21 @@
 package app.atomofiron.searchboxapp.utils
 
+import android.content.pm.PackageManager
+import androidx.core.content.pm.PackageInfoCompat
+import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
+import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
 
 object ExplorerUtils {
+    // зато насколько всё становится проще
+    val packageManager =  MutableWeakProperty<PackageManager>()
+
     private const val ROOT_PARENT_PATH = "root_parent_path"
 
     private const val TOTAL = "total"
@@ -222,16 +229,16 @@ object ExplorerUtils {
         return when {
             output.success && lines.size == 2 -> parseNode(lines.first())
                 .resolveType(type = lines.last(), path = path)
-                .ensureCached(config)
+                .ensureCached(config, oldProps = properties)
             output.success -> copy(children = null, error = null)
             else -> copy(error = output.error.toNodeError(path))
         }
     }
 
-    private fun Node.ensureCached(config: CacheConfig): Node = when {
+    private fun Node.ensureCached(config: CacheConfig, oldProps: NodeProperties): Node = when {
         isDirectory -> cacheDir(config.useSu)
         isCached -> this
-        else -> cacheFile(config)
+        else -> cacheFile(config, oldProps)
     }
 
     private fun Node.cacheDir(useSu: Boolean): Node {
@@ -350,11 +357,15 @@ object ExplorerUtils {
         return copy(content = content)
     }
 
-    private fun Node.cacheFile(config: CacheConfig): Node {
-        if (length == 0L) {
-            return this
+    private fun Node.cacheFile(config: CacheConfig, oldProps: NodeProperties): Node {
+        var content = content
+        when {
+            length == 0L && oldProps.size != size -> return resolveFileType()
+            length == 0L -> return this
+            oldProps.size != size -> Unit // size changed -> cache again
+            content.isCached -> return this
         }
-        val content = when (content) {
+        content = when (content) {
             is NodeContent.File.Picture.Png -> NodeContent.File.Picture.Png(path.createImageThumbnail(config)?.forNode)
             is NodeContent.File.Picture.Jpeg -> NodeContent.File.Picture.Jpeg(path.createImageThumbnail(config)?.forNode)
             is NodeContent.File.Picture.Gif -> NodeContent.File.Picture.Gif(path.createImageThumbnail(config)?.forNode)
@@ -362,6 +373,23 @@ object ExplorerUtils {
             is NodeContent.File.Picture.Avif -> NodeContent.File.Picture.Avif(path.createImageThumbnail(config)?.forNode)
             is NodeContent.File.Movie -> NodeContent.File.Movie(0, path.createVideoThumbnail(config)?.forNode)
             is NodeContent.File.Music -> NodeContent.File.Music(0, path.createAudioThumbnail(config)?.forNode)
+            is NodeContent.File.Apk -> {
+                val packageManager = packageManager.value ?: return this
+                val packageInfo = packageManager.getPackageArchiveInfo(path, 0)
+                val info = packageInfo?.applicationInfo
+                info ?: return this
+                info.sourceDir = path
+                info.publicSourceDir = path
+                NodeContent.File.Apk(
+                    thumbnail = info.loadIcon(packageManager).forNode,
+                    ApkInfo(
+                        appName = info.loadLabel(packageManager).toString(),
+                        versionName = packageInfo.versionName.toString(),
+                        versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt(),
+                        packageName = packageInfo.packageName,
+                    )
+                )
+            }
             else -> return this
         }
         return copy(content = content)
@@ -543,6 +571,12 @@ object ExplorerUtils {
             currentOperation != operation -> false
             else -> true
         }
+    }
+
+    private fun Node.resolveFileType(): Node {
+        val currentOrNull = content.takeIf { !isCached || length > 0L }
+        val new = name.resolveFileType(currentOrNull)
+        return if (new == content) this else copy(content = new)
     }
 
     private fun String.resolveFileType(content: NodeContent? = null): NodeContent = when (true) {

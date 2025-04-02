@@ -63,9 +63,6 @@ interface AppComponent :
         fun appWatcher(proxy: LeakWatcher): Builder
 
         @BindsInstance
-        fun initialDelegate(initialDelegate: InitialDelegate): Builder
-
-        @BindsInstance
         fun updateServiceFactory(updateServiceFactory: AppUpdateService.Factory): Builder
 
         @BindsInstance

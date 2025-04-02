@@ -16,7 +16,6 @@ object DaggerInjector {
             .builder()
             .appSource(appSource)
             .appContext(application.applicationContext)
-            .initialDelegate(InitialDelegate(application.applicationContext))
             .updateServiceFactory(updateServiceFactory)
             .appWatcher(BuildConfig.leakWatcher ?: LeakWatcher())
             .assetManager(application.assets)

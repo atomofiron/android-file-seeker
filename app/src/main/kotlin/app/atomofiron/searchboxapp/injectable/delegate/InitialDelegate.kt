@@ -3,21 +3,30 @@ package app.atomofiron.searchboxapp.injectable.delegate
 import android.Manifest
 import android.app.Application
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Environment
 import androidx.appcompat.app.AppCompatDelegate
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.isGranted
 import app.atomofiron.searchboxapp.model.other.InitialScreen
 import app.atomofiron.searchboxapp.model.preference.AppTheme
+import app.atomofiron.searchboxapp.utils.ExplorerUtils
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppTheme
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDeepBlack
 
-class InitialDelegate(private val context: Context) {
+class InitialDelegate(
+    private val context: Context,
+    private val packageManager: PackageManager,
+) {
     companion object {
         private const val PRIVATE_PREFERENCES_NAME = "initial_preferences"
     }
 
     private val sp = context.getSharedPreferences(PRIVATE_PREFERENCES_NAME, Application.MODE_PRIVATE)
+
+    init {
+        ExplorerUtils.packageManager.value = packageManager
+    }
 
     fun getTheme(): AppTheme {
         val themeName = sp.getString(KeyAppTheme.name, AppTheme.defaultName())
