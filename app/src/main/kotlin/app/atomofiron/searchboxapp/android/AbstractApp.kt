@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.android
 
 import android.app.Application
+import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
@@ -28,6 +29,6 @@ abstract class AbstractApp : Application() {
         DaggerInjector.appComponent.inject(this)
 
         initialDelegate.applyTheme()
-        updateService.check()
+        if (!BuildConfig.DEBUG) updateService.check()
     }
 }
