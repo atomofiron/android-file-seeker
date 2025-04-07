@@ -148,7 +148,7 @@ class ExplorerService(
                 else -> typeId
             }
         }
-        tryCacheAsync(key, rootItem.item)
+        tryCache(key, rootItem.item)
     }
 
     suspend fun tryToggle(key: NodeTabKey, it: Node) {
@@ -183,7 +183,7 @@ class ExplorerService(
                 else -> parent?.children?.items?.set(index, item.close())
             }
         }
-        tryCacheAsync(key, it)
+        tryCache(key, it)
     }
 
     suspend fun updateRootsAsync(key: NodeTabKey) {
@@ -339,7 +339,7 @@ class ExplorerService(
         }
     }
 
-    suspend fun tryCacheAsync(key: NodeTabKey, item: Node) {
+    suspend fun tryCache(key: NodeTabKey, item: Node) {
         withGarden(key) { tab ->
             tab.roots
                 .takeIf { item.isRoot }
@@ -357,7 +357,7 @@ class ExplorerService(
         }
     }
 
-    private fun NodeGarden.resolveDirChildrenAsync(key: NodeTabKey, it: Node) {
+    private fun NodeGarden.resolveDirChildren(key: NodeTabKey, it: Node) {
         val children = it.children?.fetch() ?: return
         withCachingState(it.uniqueId) {
             val done = it.copy(children = children)
@@ -445,7 +445,7 @@ class ExplorerService(
                 items[index] = new
             }
         }
-        tryCacheAsync(key, to)
+        tryCache(key, to)
     }
 
     suspend fun tryCheckItem(key: NodeTabKey, item: Node, isChecked: Boolean) {
@@ -780,7 +780,7 @@ class ExplorerService(
             val replaced = tree.replaceItem(updated)
             when {
                 !replaced -> return
-                updated.isDirectory -> garden.resolveDirChildrenAsync(key, updated)
+                updated.isDirectory -> garden.resolveDirChildren(key, updated)
             }
         }
     }

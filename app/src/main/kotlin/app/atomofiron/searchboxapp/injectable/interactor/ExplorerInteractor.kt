@@ -42,7 +42,7 @@ class ExplorerInteractor(
         scope.launch(context) {
             items.forEach {
                 launch {
-                    service.tryCacheAsync(tab, it)
+                    service.tryCache(tab, it)
                 }
             }
         }
