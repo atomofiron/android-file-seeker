@@ -16,7 +16,11 @@ class ApkInteractor(
     private val apkService: ApkService,
     private val explorerService: ExplorerService,
 ) {
-    fun install(tab: NodeTabKey, item: Node) {
+    fun install(item: Node, tab: NodeTabKey? = null) {
+        if (tab == null) {
+            apkService.installApk(File(item.path))
+            return
+        }
         scope.launch(Dispatchers.IO) {
             val allowed = explorerService.tryMarkInstalling(tab, item, Operation.Installing)
             if (allowed != true) return@launch

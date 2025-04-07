@@ -8,10 +8,10 @@ import android.content.res.AssetManager
 import app.atomofiron.searchboxapp.android.AbstractApp
 import app.atomofiron.searchboxapp.di.module.ChannelModule
 import app.atomofiron.searchboxapp.di.module.CommonModule
+import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.di.module.InteractorModule
 import app.atomofiron.searchboxapp.di.module.ServiceModule
 import app.atomofiron.searchboxapp.di.module.StoreModule
-import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.curtain.CurtainDependencies
@@ -32,6 +32,7 @@ import javax.inject.Singleton
 @Component(modules = [
     ChannelModule::class,
     CommonModule::class,
+    DelegateModule::class,
     ServiceModule::class,
     StoreModule::class,
     InteractorModule::class,

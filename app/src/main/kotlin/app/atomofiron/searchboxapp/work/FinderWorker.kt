@@ -93,8 +93,7 @@ class FinderWorker(
         FinderResult(forContent),
     )
     private var process: Process? = null
-    private val cacheConfig = CacheConfig(useSu)
-    private val resultCacheConfig = CacheConfig(useSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.preview_size))
+    private val cacheConfig = CacheConfig(useSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size))
     private val progressJobs = mutableListOf<Job>()
 
     @Inject
@@ -165,7 +164,7 @@ class FinderWorker(
                 return@launch
             }
             val path = line.substring(0, index)
-            val item = Node(path, content = NodeContent.File.Unknown).update(cacheConfig)
+            val item = newNode(path)
             val itemMatch = when (val result = TextViewerService.searchInside(params, path, useSu)) {
                 is Rslt.Ok -> result.data.toItemMatchMultiply(item)
                 is Rslt.Err -> ItemMatch.MultiplyError(item, count, result.error)
@@ -216,12 +215,13 @@ class FinderWorker(
             useRegex && !pattern.matcher(line).find() -> Unit
             !useRegex && !line.contains(query, ignoreCase) -> Unit
             else -> appScope.launch {
-                val item = Node(line, content = NodeContent.File.Unknown).update(resultCacheConfig)
+                val item = newNode(line)
                 addToResult(ItemMatch.Single(item))
             }.let { progressJobs.add(it) }
         }
     }
 
+    // todo remove deleting files from results
     private suspend fun addToResult(itemMatch: ItemMatch?) {
         updateTask {
             var result = task.result as FinderResult
@@ -298,6 +298,8 @@ class FinderWorker(
         }
         return Result.success(dataBuilder.build())
     }
+
+    private fun newNode(path: String) = Node(path, rootId = task.uniqueId, content = NodeContent.File.Unknown).update(cacheConfig)
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return ForegroundInfo(Notifications.ID_FOREGROUND, foregroundNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)

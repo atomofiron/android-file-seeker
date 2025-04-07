@@ -14,7 +14,7 @@ import kotlinx.coroutines.Job
 
 object ExplorerUtils {
     // зато насколько всё становится проще
-    val packageManager =  MutableWeakProperty<PackageManager>()
+    val packageManager = MutableWeakProperty<PackageManager>()
 
     private const val ROOT_PARENT_PATH = "root_parent_path"
 
@@ -493,6 +493,8 @@ object ExplorerUtils {
 
     fun Node.isParentOf(other: Node): Boolean = other.parentPath == path
 
+    fun Node.isSomeParentOf(other: Node): Boolean = path.length <= other.path.length && other.path.startsWith(path)
+
     private fun NodeChildren.clearChildren() = update {
         val iter = listIterator()
         while (iter.hasNext()) {
@@ -546,7 +548,7 @@ object ExplorerUtils {
         val targetPath = parentPath + name
         val output = Shell.exec(Shell[Shell.MV].format(path, targetPath), useSu)
         return when {
-            output.success -> rename(name)
+            output.success -> rename(name).copy(error = null)
             else -> copy(error = output.error.toNodeError(path))
         }
     }
@@ -691,6 +693,21 @@ object ExplorerUtils {
             (properties != null),
             (content != null) -> copy(content = content ?: this.content, properties = properties ?: this.properties)
             else -> this
+        }
+    }
+
+    fun List<Node>.merge() = toMutableList().apply {
+        var i = 0
+        var j = 1
+        while (i < lastIndex) {
+            val first = get(i)
+            val second = get(j)
+            when {
+                first.isSomeParentOf(second) -> removeAt(j)
+                second.isSomeParentOf(first) -> removeAt(i)
+                j == lastIndex -> j = ++i + 1
+                else -> j++
+            }
         }
     }
 }

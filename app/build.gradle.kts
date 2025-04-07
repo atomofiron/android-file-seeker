@@ -52,5 +52,6 @@ dependencies {
     implementation(libs.insets)
     debugImplementation(libs.leakcanary)
     testImplementation(libs.junit)
+    testImplementation(kotlin("test"))
     androidTestImplementation(libs.androidx.junit)
 }

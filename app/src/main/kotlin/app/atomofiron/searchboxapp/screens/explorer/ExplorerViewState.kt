@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.explorer
 
 import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.*
-import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
@@ -24,10 +23,6 @@ class ExplorerViewState(
         private const val FIRST_TAB = "FIRST_TAB"
         private const val SECOND_TAB = "SECOND_TAB"
     }
-    val rootOptions = listOf(R.id.menu_create)
-    val directoryOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_create, R.id.menu_clone, R.id.menu_copy_path)
-    val oneFileOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_share, R.id.menu_open_with, R.id.menu_clone, R.id.menu_copy_path)
-    val manyFilesOptions = listOf(R.id.menu_delete)
 
     val scrollTo = ChannelFlow<Node>()
     val settingsNotification = preferenceChannel.notification

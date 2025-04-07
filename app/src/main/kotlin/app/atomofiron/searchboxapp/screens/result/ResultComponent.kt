@@ -9,6 +9,7 @@ import dagger.Module
 import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import app.atomofiron.searchboxapp.injectable.channel.ResultChannel
+import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.injectable.service.FinderService
@@ -17,6 +18,7 @@ import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.injectable.store.ResultStore
+import app.atomofiron.searchboxapp.screens.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultCurtainMenuDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultItemActionDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
@@ -78,12 +80,11 @@ class ResultModule {
     @ResultScope
     fun resultItemActionDelegate(
         viewModel: ResultViewState,
+        operations: FileOperationsDelegate,
         router: ResultRouter,
         menuListenerDelegate: ResultCurtainMenuDelegate,
-        interactor: ResultInteractor,
-        preferenceStore: PreferenceStore,
     ): ResultItemActionDelegate {
-        return ResultItemActionDelegate(viewModel, router, menuListenerDelegate, interactor, preferenceStore)
+        return ResultItemActionDelegate(viewModel, operations, router, menuListenerDelegate)
     }
 
     @Provides
@@ -93,10 +94,11 @@ class ResultModule {
         viewState: ResultViewState,
         router: ResultRouter,
         interactor: ResultInteractor,
-        appStore: AppStore,
+        apks: ApkInteractor,
         curtainChannel: CurtainChannel,
+        preferences: PreferenceStore,
     ): ResultCurtainMenuDelegate {
-        return ResultCurtainMenuDelegate(scope, viewState, router, interactor, appStore, curtainChannel)
+        return ResultCurtainMenuDelegate(scope, viewState, router, interactor, apks, preferences, curtainChannel)
     }
 
     @Provides
@@ -121,10 +123,12 @@ class ResultModule {
 
 interface ResultDependencies {
     fun finderStore(): FinderStore
+    fun fileOperationsDelegate(): FileOperationsDelegate
     fun preferenceStore(): PreferenceStore
     fun resultService(): UtilService
     fun explorerService(): ExplorerService
     fun finderService(): FinderService
+    fun apkInteractor(): ApkInteractor
     fun resultStore(): ResultStore
     fun resultChannel(): ResultChannel
     fun appStore(): AppStore

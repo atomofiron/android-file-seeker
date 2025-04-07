@@ -8,7 +8,6 @@ import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
-import app.atomofiron.searchboxapp.injectable.interactor.DialogInteractor
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -19,6 +18,7 @@ import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMenuDelegate
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerItemActionListenerDelegate
 import javax.inject.Scope
@@ -50,23 +50,19 @@ class ExplorerModule {
     @ExplorerScope
     fun itemListener(
         viewState: ExplorerViewState,
+        operations: FileOperationsDelegate,
         menuListenerDelegate: ExplorerCurtainMenuDelegate,
         explorerStore: ExplorerStore,
         router: ExplorerRouter,
         explorerInteractor: ExplorerInteractor,
-        apks: ApkInteractor,
-        dialogs: DialogInteractor,
-        preferences: PreferenceStore,
     ): ExplorerItemActionListenerDelegate {
         return ExplorerItemActionListenerDelegate(
             viewState,
+            operations,
             menuListenerDelegate,
             explorerStore,
             router,
             explorerInteractor,
-            apks,
-            dialogs,
-            preferences,
         )
     }
 
@@ -135,6 +131,7 @@ class ExplorerModule {
 
 interface ExplorerDependencies {
     fun context(): Context
+    fun fileOperationsDelegate(): FileOperationsDelegate
     fun assetManager(): AssetManager
     fun explorerService(): ExplorerService
     fun utilService(): UtilService
@@ -142,7 +139,6 @@ interface ExplorerDependencies {
     fun preferenceStore(): PreferenceStore
     fun curtainChannel(): CurtainChannel
     fun apkInteractor(): ApkInteractor
-    fun dialogInteractor(): DialogInteractor
     fun mainChannel(): MainChannel
     fun preferenceChannel(): PreferenceChannel
 }

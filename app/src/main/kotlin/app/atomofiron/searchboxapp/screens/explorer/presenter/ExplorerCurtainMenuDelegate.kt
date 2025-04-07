@@ -92,7 +92,7 @@ class ExplorerCurtainMenuDelegate(
             R.id.menu_delete -> onRemoveConfirm(items)
             R.id.menu_share -> router.shareWith(items.first())
             R.id.menu_open_with -> router.openWith(items.first())
-            R.id.menu_install -> apkInteractor.install(viewState.currentTab.value, items.first())
+            R.id.menu_install -> apkInteractor.install(items.first(), viewState.currentTab.value)
             R.id.menu_launch -> apkInteractor.launch(items.first())
             -R.id.menu_apk -> preferences { setActionApk(ActionApk.Ask) }
             R.id.menu_copy_path -> {
@@ -104,17 +104,17 @@ class ExplorerCurtainMenuDelegate(
     }
 
     fun onCloneConfirm(target: Node, name: String) {
-        controller?.close()
+        controller?.close(irrevocably = true)
         explorerInteractor.clone(currentTab, target, name)
     }
 
     fun onCreateConfirm(dir: Node, name: String, directory: Boolean) {
-        controller?.close()
+        controller?.close(irrevocably = true)
         explorerInteractor.create(currentTab, dir, name, directory)
     }
 
     fun onRenameConfirm(item: Node, name: String) {
-        controller?.close()
+        controller?.close(irrevocably = true)
         explorerInteractor.rename(currentTab, item, name)
     }
 
