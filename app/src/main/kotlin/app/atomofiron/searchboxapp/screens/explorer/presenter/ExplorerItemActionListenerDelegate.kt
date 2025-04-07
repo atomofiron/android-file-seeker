@@ -44,9 +44,5 @@ class ExplorerItemActionListenerDelegate(
 
     override fun onItemCheck(item: Node, isChecked: Boolean) = explorerInteractor.checkItem(currentTab, item, isChecked)
 
-    override fun onItemsBecomeVisible(items: List<Node>) {
-        items.forEach {
-            explorerInteractor.updateItem(currentTab, it)
-        }
-    }
+    override fun onItemsBecomeVisible(items: List<Node>) = explorerInteractor.updateItems(currentTab, items)
 }

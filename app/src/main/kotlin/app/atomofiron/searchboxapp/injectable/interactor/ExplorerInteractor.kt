@@ -38,9 +38,13 @@ class ExplorerInteractor(
         }
     }
 
-    fun updateItem(tab: NodeTabKey, file: Node) {
+    fun updateItems(tab: NodeTabKey, items: List<Node>) {
         scope.launch(context) {
-            service.tryCacheAsync(tab, file)
+            items.forEach {
+                launch {
+                    service.tryCacheAsync(tab, it)
+                }
+            }
         }
     }
 
