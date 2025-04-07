@@ -45,7 +45,7 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.File.Xz,
     is NodeContent.File.Other,
     is NodeContent.File.Flash,
-    is NodeContent.File.Unknown -> R.drawable.ic_file_circle
+    is NodeContent.File.Unknown -> R.drawable.ic_explorer_unknown
 }
 
 fun NodeContent.Directory.getIcon(isEmpty: Boolean): Int = when (type) {
