@@ -4,7 +4,6 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/common_margin"
-    android:layout_marginVertical="@dimen/common_margin_half"
+    android:layout_margin="@dimen/common_margin"
     app:textSize="18sp"
     />
