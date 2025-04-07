@@ -352,7 +352,7 @@ class ExplorerService(
 
             withCachingState(current.uniqueId) {
                 cacheSync(key, current)
-                resolveSizeAsync(key, item)
+                if (item.isDirectory) resolveSizeAsync(key, item)
             }
         }
     }
