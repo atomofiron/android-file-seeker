@@ -24,7 +24,8 @@ object Shell {
     const val LS_LAHL = "{toybox} ls -lAhL \"%s\""
     // can't use 'file -b' because of Android 10 contains toybox-0.8.0
     const val LS_LAHLD_FILE = "{toybox} ls -lAhLd \"%s\" && {toybox} file \"%s\""
-    const val DU_HD1 = "{toybox} du -hd 1 \"%s\""
+    // 'du -hd 1' is useless because of any error don't allow get info about items below dir with error (Permission denied)
+    const val DU_HD0 = "{toybox} du -hd 0 \"%s\""
     // DOT_SLASH is needed because of this shit:
     // $ cd /some/dir && file *
     // file: Unknown option '-file-name-starting-with-dash.png' (see "file --help")

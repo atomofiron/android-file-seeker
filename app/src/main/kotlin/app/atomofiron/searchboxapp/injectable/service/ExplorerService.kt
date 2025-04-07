@@ -26,6 +26,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.open
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveSize
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortBy
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortByName
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
@@ -351,6 +352,7 @@ class ExplorerService(
 
             withCachingState(current.uniqueId) {
                 cacheSync(key, current)
+                resolveSizeAsync(key, item)
             }
         }
     }
@@ -779,6 +781,22 @@ class ExplorerService(
             when {
                 !replaced -> return
                 updated.isDirectory -> garden.resolveDirChildrenAsync(key, updated)
+            }
+        }
+    }
+
+    private fun resolveSizeAsync(key: NodeTabKey, item: Node) {
+        scope.launch {
+            val size = item.resolveSize(config.useSu)
+            if (size == item.size) {
+                return@launch
+            }
+            renderTab(key, lazy = true) {
+                val current = tree.findNode(item.uniqueId)
+                current ?: return@launch
+                val updated = current.copy(properties = item.properties.copy(size = size))
+                val replaced = tree.replaceItem(updated)
+                if (!replaced) return@launch
             }
         }
     }

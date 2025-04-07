@@ -269,29 +269,16 @@ object ExplorerUtils {
                 items[index] = items[index].resolveType(type = type)
             }
         }
-        resolveDirChildrenSize(useSu)
         return true
     }
 
-    private fun Node.resolveDirChildrenSize(useSu: Boolean) {
-        val children = children ?: return
-        val output = Shell.exec(Shell[Shell.DU_HD1].format(path), useSu)
-        val lines = output.output.split(LF).filter { it.isNotEmpty() }
-        lines.takeIf {
-            it.isNotEmpty()
-        }?.mapNotNull { line ->
-            line.split(Const.TAB).takeIf { it.size == 2 }
-        }?.forEach { (size, p) ->
-            val path = "$p/"
-            val index = children.items
-                .indexOfFirst { it.path == path }
-                .also { if (it < 0) return@forEach }
-            children.run {
-                val item = items[index]
-                items[index] = item.copy(properties = item.properties.copy(size = size))
-            }
-        }
-    }
+    fun Node.resolveSize(useSu: Boolean): String = Shell.exec(Shell[Shell.DU_HD0].format(path), useSu)
+            .output
+            .trim()
+            .split(Const.TAB)
+            .takeIf { it.size == 2 }
+            ?.firstOrNull()
+            ?: ""
 
     private fun Node.resolveType(type: String, path: String): Node {
         return resolveType(type.substring(path.length.inc()).trim())
