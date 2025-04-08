@@ -8,7 +8,7 @@
     <group android:translateX="-2">
         <path
             android:fillColor="?attr/colorAccent"
-            android:pathData="M12,3 a9,9 0 0,0 0,18 a9,9 0 0,0 0,-18 M11,10V6h2v4h3l-4,4l-4,-4H11zM17,17H7v-2h10V17z"
+            android:pathData="M12,2 a10,10 0 0,0 0,20 a10,10 0 0,0 0,-20 M11,10V6h2v4h3l-4,4l-4,-4H11zM17,17H7v-2h10V17z"
             />
     </group>
 </vector>
