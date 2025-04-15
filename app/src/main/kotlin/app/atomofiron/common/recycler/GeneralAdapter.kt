@@ -57,7 +57,7 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>> : RecyclerView.Adap
     // inheritor's fields init after super
     protected open fun getItemCallback(): DiffUtil.ItemCallback<D>? = null
 
-    fun submitItems(items: List<D>) {
+    fun submit(items: List<D>) {
         val differ = differ
         if (differ == null) {
             mutableItems.clear()
@@ -70,7 +70,7 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>> : RecyclerView.Adap
         }
     }
 
-    fun submitItem(item: D, itemIndex: Int = UNDEFINED) {
+    fun submit(item: D, itemIndex: Int = UNDEFINED) {
         val index = when {
             itemIndex > UNDEFINED -> itemIndex
             itemCallback == null -> throw UnsupportedOperationException()

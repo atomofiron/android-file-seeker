@@ -43,7 +43,7 @@ class ExplorerListDelegate(
         nodeAdapter.registerAdapterDataObserver(this)
     }
 
-    fun submitList(items: List<Node>) {
+    fun set(items: List<Node>) {
         this.items = items
     }
 

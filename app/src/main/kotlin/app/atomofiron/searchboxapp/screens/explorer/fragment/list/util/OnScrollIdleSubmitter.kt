@@ -20,10 +20,10 @@ class OnScrollIdleSubmitter(
         adapter.addListListener(this)
     }
 
-    fun submitListOnIdle(items: List<Node>, marker: String? = null) {
+    fun submitOnIdle(items: List<Node>, marker: String? = null) {
         if (allowed || marker != this.marker) {
             this.marker = marker
-            adapter.submitItems(items)
+            adapter.submit(items)
             items.triggerLastFiles()
         } else {
             this.items = items.toMutableList()
@@ -45,13 +45,13 @@ class OnScrollIdleSubmitter(
             return
         }
         if (oldIndexDelayed >= 0) items?.set(oldIndexDelayed, new)
-        if (oldIndex >= 0) adapter.submitItem(new, oldIndex)
+        if (oldIndex >= 0) adapter.submit(new, oldIndex)
     }
 
     override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
         allowed = newState == RecyclerView.SCROLL_STATE_IDLE
         if (allowed) {
-            adapter.submitItems(items ?: return)
+            adapter.submit(items ?: return)
             items?.triggerLastFiles()
             items = null
         }

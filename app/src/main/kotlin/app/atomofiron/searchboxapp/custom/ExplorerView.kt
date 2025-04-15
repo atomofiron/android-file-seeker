@@ -95,14 +95,14 @@ class ExplorerView(
 
     fun isCurrentDirVisible(): Boolean? = listDelegate.isCurrentDirVisible()
 
-    fun submitList(items: NodeTabItems) {
+    fun submit(items: NodeTabItems) {
         rootAdapter.submitList(items.roots)
-        submitter.submitListOnIdle(items.items, items.current?.path)
-        listDelegate.submitList(items.items)
+        submitter.submitOnIdle(items.items, items.current?.path)
+        listDelegate.set(items.items)
         title = items.current?.getTitle(resources)
     }
 
-    fun update(item: Node) = submitter.submit(item)
+    fun submit(item: Node) = submitter.submit(item)
 
     fun setComposition(composition: ExplorerItemComposition) {
         listDelegate.setComposition(composition)

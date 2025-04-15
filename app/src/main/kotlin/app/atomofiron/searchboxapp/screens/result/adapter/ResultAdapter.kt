@@ -30,7 +30,7 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>() {
         results.matches.forEach {
             items.add(ResultItem.Item(it))
         }
-        super.submitItems(items)
+        super.submit(items)
     }
 
     fun setComposition(composition: ExplorerItemComposition) {

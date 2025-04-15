@@ -97,11 +97,11 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     override fun ExplorerViewState.onViewCollect() {
         viewCollect(updates) {
-            explorerViews.first().update(it)
+            explorerViews.first().submit(it)
         }
         viewCollect(firstTabItems) {
             val first = explorerViews.first()
-            first.submitList(it)
+            first.submit(it)
             binding.firstButton.text = first.title ?: getString(R.string.dash)
         }
         /*viewCollect(secondTabItems) {
