@@ -83,7 +83,7 @@ class ExplorerHeaderDelegate(
         if (topChildren.isEmpty()) return 0
         val topItems = topChildren.map {
             val holder = recyclerView.getChildViewHolder(it)
-            adapter.currentList[holder.bindingAdapterPosition]
+            adapter.items[holder.bindingAdapterPosition]
         }
         var bottom = 0
         topItems.forEachIndexed { i, it ->

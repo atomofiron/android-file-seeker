@@ -78,7 +78,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
 
     override fun TextViewerViewState.onViewCollect() {
         viewCollect(item) { binding.toolbar.title = it.name }
-        viewCollect(textLines, collector = viewerAdapter::setItems)
+        viewCollect(textLines, collector = viewerAdapter::submitItems)
         viewCollect(currentTask, collector = ::onTaskChanged)
         viewCollect(matchesCursor, collector = ::onMatchCursorChanged)
         viewCollect(status, collector = ::onStatusChanged)

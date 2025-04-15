@@ -35,6 +35,7 @@ class ExplorerViewState(
     val currentTab = MutableStateFlow(firstTab)
 
     val firstTabItems = explorerInteractor.getFlow(firstTab)
+    val updates = explorerStore.updated
     //val secondTabItems = explorerInteractor.getFlow(secondTab)
 
     fun scrollTo(item: Node) {

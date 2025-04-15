@@ -96,7 +96,9 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     }
 
     override fun ExplorerViewState.onViewCollect() {
-        //viewCollect(actions, collector = explorerAdapter::onAction)
+        viewCollect(updates) {
+            explorerViews.first().update(it)
+        }
         viewCollect(firstTabItems) {
             val first = explorerViews.first()
             first.submitList(it)

@@ -28,7 +28,7 @@ class ItemBorderDecorator(
     // примерный размер жестового навбара, чтобы игнорировать равный ему паддинг снизу
     private val gestureBar = headerView.resources.displayMetrics.density * 32 // 24
 
-    private val items get() = adapter.currentList
+    private val items get() = adapter.items
     private val cornerRadius = headerView.resources.getDimension(R.dimen.explorer_border_corner_radius)
     private val borderWidth = headerView.resources.getDimension(R.dimen.explorer_border_width)
     // под открытой не пустой директорией

@@ -15,7 +15,7 @@ class ItemVisibilityDelegate(
     fun onItemAttached(holder: RecyclerView.ViewHolder) {
         if (holder.bindingAdapterPosition < 0) return
         _visibleItems.add(holder.bindingAdapterPosition)
-        val item = adapter.currentList[holder.bindingAdapterPosition]
+        val item = adapter.items[holder.bindingAdapterPosition]
         listener.onItemsBecomeVisible(listOf(item))
     }
 

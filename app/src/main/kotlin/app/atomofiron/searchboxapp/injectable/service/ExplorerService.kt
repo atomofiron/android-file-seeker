@@ -43,9 +43,8 @@ import kotlin.math.min
 
 class ExplorerService(
     context: Context,
-    private val packageManager: PackageManager,
     private val appStore: AppStore,
-    private val explorerStore: ExplorerStore,
+    private val store: ExplorerStore,
     private val preferenceStore: PreferenceStore,
 ) {
     companion object {
@@ -89,7 +88,7 @@ class ExplorerService(
             toyboxDefined.complete()
             context.resolveToybox(it)
         }
-        explorerStore.current.collect(scope) {
+        store.current.collect(scope) {
             preferenceStore.setOpenedDirPath(it?.path)
         }
     }
@@ -501,7 +500,7 @@ class ExplorerService(
 
     private suspend fun Node.delete() {
         if (delete(config.useSu) == null) {
-            explorerStore.removed.emit(copy(children = null))
+            store.removed.emit(copy(children = null))
         }
     }
 
@@ -534,7 +533,7 @@ class ExplorerService(
                 withGarden(key) { tab ->
                     tab.tree.replaceItem(item.uniqueId, item.parentPath, result)
                     states.updateState(item.uniqueId) { null }
-                    explorerStore.removed.emit(item.copy(children = null))
+                    store.removed.emit(item.copy(children = null))
                     tab.render()
                 }
             }
@@ -614,9 +613,9 @@ class ExplorerService(
         updateStates(items)
         updateChecked(items)
         val checked = items.filter { it.isChecked }
-        explorerStore.searchTargets.set(checked)
-        explorerStore.current.value = currentDir
-        explorerStore.setCurrentItems(items)
+        store.searchTargets.set(checked)
+        store.current.value = currentDir
+        store.setCurrentItems(items)
     }
 
     private fun NodeTab.syncSelectedRoot() {
@@ -722,14 +721,16 @@ class ExplorerService(
         return items
     }
 
-    private fun NodeTab.updateStateFor(item: Node): Node {
+    private fun NodeTab.updateStateFor(item: Node, children: NodeChildren? = item.children): Node {
         val state = states.find { it.uniqueId == item.uniqueId }
         val isChecked = checked.find { it == item.uniqueId } != null
-        return when {
-            state != null -> item.copy(state = state, isChecked = isChecked)
-            isChecked -> item.copy(isChecked = true)
-            else -> item
+        when {
+            state != null -> Unit
+            isChecked != item.isChecked -> Unit
+            children !== item.children -> Unit
+            else -> return item
         }
+        return item.copy(isChecked = isChecked, state = state ?: item.state, children = children)
     }
 
     private fun NodeTab.updateDirectoryTypes() {
@@ -762,7 +763,7 @@ class ExplorerService(
 
     private suspend fun cacheSync(key: NodeTabKey, item: Node) {
         var updated = item.update(config).sortByName()
-        renderTab(key, lazy = true) {
+        withTab(key) {
             states.updateState(item.uniqueId) {
                 nextState(item.uniqueId, cachingJob = null)
             }
@@ -770,18 +771,18 @@ class ExplorerService(
             current ?: return
             if (updated.error is NodeError.NoSuchFile) {
                 tree.replaceItem(item.uniqueId, item.parentPath, null)
-                return@renderTab
+                return render()
             }
             updated = current.updateWith(updated)
-            if (updated.isOpened != current.isOpened) {
-                updated = updated.copy(children = updated.children?.copy(isOpened = current.isOpened))
-            }
+            val c = updated.content.isCached
             // todo replace everywhere
             val replaced = tree.replaceItem(updated)
             when {
                 !replaced -> return
                 updated.isDirectory -> garden.resolveDirChildren(key, updated)
             }
+            updated = updateStateFor(updated, children = updated.children?.fetch(isOpened = current.isOpened))
+            store.emitUpdate(updated)
         }
     }
 

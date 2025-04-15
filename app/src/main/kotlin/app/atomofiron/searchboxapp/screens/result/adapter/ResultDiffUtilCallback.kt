@@ -2,16 +2,9 @@ package app.atomofiron.searchboxapp.screens.result.adapter
 
 import androidx.recyclerview.widget.DiffUtil
 
-class ResultDiffUtilCallback(
-    private val old: List<ResultItem>,
-    private val new: List<ResultItem>
-) : DiffUtil.Callback() {
+object ResultDiffUtilCallback : DiffUtil.ItemCallback<ResultItem>() {
 
-    override fun getOldListSize(): Int = old.size
+    override fun areItemsTheSame(oldItem: ResultItem, newItem: ResultItem): Boolean = oldItem.uniqueId == newItem.uniqueId
 
-    override fun getNewListSize(): Int = new.size
-
-    override fun areItemsTheSame(i: Int, j: Int): Boolean = old[i].uniqueId == new[j].uniqueId
-
-    override fun areContentsTheSame(i: Int, j: Int): Boolean = old[i] == new[j]
+    override fun areContentsTheSame(oldItem: ResultItem, newItem: ResultItem): Boolean = oldItem == newItem
 }

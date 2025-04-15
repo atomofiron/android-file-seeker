@@ -26,6 +26,7 @@ class ExplorerListDelegate(
     private val output: ExplorerItemActionListener,
 ) : RecyclerView.AdapterDataObserver() {
 
+    private var items = emptyList<Node>()
     private var currentDir: Node? = null
 
     private val headerDelegate = ExplorerHeaderDelegate(recyclerView, headerView, nodeAdapter)
@@ -42,6 +43,10 @@ class ExplorerListDelegate(
         nodeAdapter.registerAdapterDataObserver(this)
     }
 
+    fun submitList(items: List<Node>) {
+        this.items = items
+    }
+
     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = checkCurrentIn(positionStart..<(positionStart + itemCount))
 
     override fun onItemRangeChanged(positionStart: Int, itemCount: Int) = checkCurrentIn(positionStart..<(positionStart + itemCount))
@@ -51,11 +56,11 @@ class ExplorerListDelegate(
     private fun checkCurrentIn(range: IntRange) {
         var current: Node? = null
         for (i in range) {
-            nodeAdapter.currentList.getOrNull(i)
+            items.getOrNull(i)
                 ?.takeIf { it.isCurrent }
                 ?.let { current = it }
         }
-        current = current ?: nodeAdapter.currentList.find { it.isCurrent }
+        current = current ?: items.find { it.isCurrent }
         val currentDir = currentDir
         when {
             currentDir == null && current == null -> return
@@ -74,7 +79,7 @@ class ExplorerListDelegate(
 
     fun isVisible(item: Node): Boolean {
         val path = item.withoutDot()
-        val index = nodeAdapter.currentList.indexOfFirst { it.path == path }
+        val index = nodeAdapter.items.indexOfFirst { it.path == path }
         return isVisible(index + rootAdapter.itemCount)
     }
 
@@ -96,6 +101,9 @@ class ExplorerListDelegate(
     }
 
     private fun setCurrentDir(item: Node?) {
+        if (currentDir?.areContentsTheSame(item) == true) {
+            return
+        }
         item?.takeIf { !it.isRoot }
             ?.takeIf { it.path != currentDir?.path }
             ?.takeIf { currentDir?.parentPath?.startsWith(it.path) == false }
@@ -112,7 +120,7 @@ class ExplorerListDelegate(
 
     fun scrollTo(item: Node) {
         val targetPath = item.withoutDot()
-        val nodePosition = nodeAdapter.currentList.indexOfFirst { it.path == targetPath }
+        val nodePosition = nodeAdapter.items.indexOfFirst { it.path == targetPath }
         val position = nodePosition + rootAdapter.itemCount
         recyclerView.findViewHolderForAdapterPosition(position)
             ?.takeIf { recyclerView.run { it.itemView.top > paddingTop && it.itemView.bottom < height - paddingBottom } }
@@ -147,7 +155,7 @@ class ExplorerListDelegate(
 
     fun highlight(item: Node) {
         val uniqueId = item.withoutDot().toUniqueId()
-        val dir = nodeAdapter.currentList.find { it.uniqueId == uniqueId }
+        val dir = nodeAdapter.items.find { it.uniqueId == uniqueId }
         dir ?: return
         val holder = recyclerView.findViewHolderForItemId(dir.uniqueId.toLong())
         if (holder !is ExplorerHolder) return

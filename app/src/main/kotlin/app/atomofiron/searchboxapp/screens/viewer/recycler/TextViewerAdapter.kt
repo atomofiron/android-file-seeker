@@ -14,7 +14,7 @@ import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState.MatchCursor
 import app.atomofiron.searchboxapp.utils.Const
 
-class TextViewerAdapter : GeneralAdapter<TextViewerHolder, TextLine>() {
+class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
     var textViewerListener: TextViewerListener? = null
     private var matches: Map<Int, List<TextLineMatch>> = mapOf()
 

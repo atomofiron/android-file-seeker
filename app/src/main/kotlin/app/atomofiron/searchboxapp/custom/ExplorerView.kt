@@ -98,8 +98,11 @@ class ExplorerView(
     fun submitList(items: NodeTabItems) {
         rootAdapter.submitList(items.roots)
         submitter.submitListOnIdle(items.items, items.current?.path)
+        listDelegate.submitList(items.items)
         title = items.current?.getTitle(resources)
     }
+
+    fun update(item: Node) = submitter.submit(item)
 
     fun setComposition(composition: ExplorerItemComposition) {
         listDelegate.setComposition(composition)
@@ -107,7 +110,7 @@ class ExplorerView(
     }
 
     fun onItemsVisible() {
-        val items = explorerAdapter.visibleItems.mapNotNull { explorerAdapter.currentList.getOrNull(it) }
+        val items = explorerAdapter.visibleItems.mapNotNull { explorerAdapter.items.getOrNull(it) }
         output.onItemsBecomeVisible(items)
     }
 

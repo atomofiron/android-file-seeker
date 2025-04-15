@@ -7,25 +7,29 @@ import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
 import app.atomofiron.fileseeker.databinding.ItemExplorerSeparatorBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 
-enum class ExplorerItemViewFactory(val layoutId: Int) {
-    NodeItem(R.layout.item_explorer) {
+enum class ExplorerItemViewFactory(
+    val viewType: Int,
+    val layoutId: Int,
+    val cache: Int = 4,
+) {
+    NodeItem(0, R.layout.item_explorer, cache = 32) {
         override fun createHolder(itemView: View): ExplorerHolder {
             return ExplorerHolder(itemView)
         }
     },
-    OpenedNodeItem(R.layout.item_explorer) {
+    OpenedNodeItem(1, R.layout.item_explorer) {
         override fun createHolder(itemView: View): ExplorerHolder {
             ItemExplorerBinding.bind(itemView).makeOpened()
             return ExplorerHolder(itemView)
         }
     },
-    CurrentOpenedNodeItem(R.layout.item_explorer) {
+    CurrentOpenedNodeItem(2, R.layout.item_explorer) {
         override fun createHolder(itemView: View): ExplorerHolder {
             ItemExplorerBinding.bind(itemView).makeOpenedCurrent()
             return ExplorerHolder(itemView)
         }
     },
-    SeparatorNodeItem(R.layout.item_explorer_separator) {
+    SeparatorNodeItem(3, R.layout.item_explorer_separator) {
         override fun createHolder(itemView: View): ExplorerSeparatorHolder {
             ItemExplorerSeparatorBinding.bind(itemView).makeSeparator()
             return ExplorerSeparatorHolder(itemView)

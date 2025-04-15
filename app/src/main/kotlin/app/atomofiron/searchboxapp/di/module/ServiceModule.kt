@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.di.module
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageInstaller
-import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
@@ -24,8 +23,7 @@ open class ServiceModule {
         appStore: AppStore,
         explorerStore: ExplorerStore,
         preferenceStore: PreferenceStore,
-        packageManager: PackageManager,
-    ): ExplorerService = ExplorerService(context, packageManager, appStore, explorerStore, preferenceStore)
+    ): ExplorerService = ExplorerService(context, appStore, explorerStore, preferenceStore)
 
     @Provides
     @Singleton

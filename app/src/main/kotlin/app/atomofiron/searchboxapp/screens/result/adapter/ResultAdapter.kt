@@ -10,12 +10,11 @@ import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
 
-class ResultAdapter : GeneralAdapter<ResultsHolder, ResultItem>() {
+class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>() {
     companion object {
         private const val POSITION_HEADER = 0
         private const val TYPE_HEADER = 2
     }
-    override val useDiffUtils = true
     lateinit var itemActionListener: ResultItemActionListener
 
     private lateinit var composition: ExplorerItemComposition
@@ -31,7 +30,7 @@ class ResultAdapter : GeneralAdapter<ResultsHolder, ResultItem>() {
         results.matches.forEach {
             items.add(ResultItem.Item(it))
         }
-        super.setItems(items)
+        super.submitItems(items)
     }
 
     fun setComposition(composition: ExplorerItemComposition) {
@@ -44,9 +43,7 @@ class ResultAdapter : GeneralAdapter<ResultsHolder, ResultItem>() {
         else -> super.getItemViewType(position)
     }
 
-    override fun getDiffUtilCallback(old: List<ResultItem>, new: List<ResultItem>): DiffUtil.Callback {
-        return ResultDiffUtilCallback(old, new)
-    }
+    override fun getItemCallback(): DiffUtil.ItemCallback<ResultItem> = ResultDiffUtilCallback
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)

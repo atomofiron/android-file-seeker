@@ -11,8 +11,11 @@ class ExplorerStore {
     val searchTargets = MutableStateFlow<List<Node>>(listOf())
     val alerts = EventFlow<NodeError>()
     val removed = EventFlow<Node>()
+    val updated = EventFlow<Node>()
 
     fun setCurrentItems(items: List<Node>) {
         currentItems = items
     }
+
+    suspend fun emitUpdate(item: Node) = updated.emit(item)
 }
