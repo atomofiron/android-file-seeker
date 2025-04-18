@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.utils
 
 import android.content.pm.PackageManager
 import androidx.core.content.pm.PackageInfoCompat
+import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
@@ -183,8 +184,7 @@ object ExplorerUtils {
         )
     }
 
-    private fun parse(parentPath: String, line: String, root: Int): Node {
-        val properties = parse(line)
+    private fun parse(parentPath: String, root: Int, properties: NodeProperties): Node {
         val content = when (properties.access[0]) {
             DIR_CHAR -> NodeContent.Directory(Type.Ordinary)
             LINK_CHAR -> NodeContent.Link
@@ -432,19 +432,20 @@ object ExplorerUtils {
     }
 
     private fun Node.parseDir(lines: List<String>): Node {
-        val items = ArrayList<Node>(lines.size)
-        val files = ArrayList<Node>(lines.size)
+        val items = MutableList<Node>(lines.size)
+        val files = MutableList<Node>(lines.size)
         val start = if (lines.first().startsWith(TOTAL)) 1 else 0
         for (i in start until lines.size) {
             val line = lines[i]
             if (line.isNotEmpty()) {
                 var properties = parse(line)
+                // todo ConcurrentModificationException because of deleting
                 val child = children?.find { it.name == properties.name }
                 if (child?.isDirectory == true) {
                     properties = properties.copy(size = child.properties.size)
                 }
                 val item = when {
-                    child == null -> parse(path, line, rootId)
+                    child == null -> parse(path, rootId, properties)
                     child.properties == properties -> child
                     else -> child.copy(properties = properties)
                 }
