@@ -439,8 +439,7 @@ object ExplorerUtils {
             val line = lines[i]
             if (line.isNotEmpty()) {
                 var properties = parse(line)
-                // todo ConcurrentModificationException because of deleting
-                val child = children?.find { it.name == properties.name }
+                val child = children?.findOnMut { it.name == properties.name }
                 if (child?.isDirectory == true) {
                     properties = properties.copy(size = child.properties.size)
                 }

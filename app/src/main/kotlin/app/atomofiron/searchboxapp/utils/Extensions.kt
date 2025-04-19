@@ -108,3 +108,21 @@ inline fun <T> List<T>.mutate(action: MutableList<T>.() -> Unit): MutableList<T>
 fun Int.setColorAlpha(alpha: Int): Int = ColorUtils.setAlphaComponent(this, alpha)
 
 fun Int.asOverlayOn(background: Int): Int = ColorUtils.compositeColors(this, background)
+
+// prevents ConcurrentModificationException
+inline fun <reified E> List<E>.findOnMut(predicate: (E) -> Boolean): E? {
+    var size = size
+    var index = 0
+    while (index < size) {
+        val item = getOrNull(index)
+        if (size != this.size) {
+            size = this.size
+            index = 0
+            continue
+        } else if (item is E && predicate(item)) {
+            return item
+        }
+        index++
+    }
+    return null
+}
