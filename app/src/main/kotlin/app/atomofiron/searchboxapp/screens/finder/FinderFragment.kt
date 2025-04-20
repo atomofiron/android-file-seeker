@@ -72,7 +72,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         binding.navigationRail.menu.findItem(R.id.menu_settings).icon = NoticeableDrawable(requireContext(), R.drawable.ic_settings)
 
         binding.drawer.run {
-            onGravityChangeListener = presenter::onDockGravityChange
+            onGravityChangeListener = presenter::onDrawerGravityChange
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = historyAdapter
         }

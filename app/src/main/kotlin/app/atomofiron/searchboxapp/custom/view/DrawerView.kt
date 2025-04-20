@@ -30,7 +30,7 @@ class DrawerView @JvmOverloads constructor(
     private val titleInsetsDelegate = binding.drawerTitleContainer.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
     private val rvInsetsDelegate = binding.drawerRv.insetsPadding(ExtType { barsWithCutout + joystickFlank + joystickBottom })
 
-    private val ibDockSide: ImageButton = findViewById(R.id.drawer_ib_dock_side)
+    private val ibDrawerSide: ImageButton = findViewById(R.id.drawer_ib_drawer_side)
     val recyclerView: RecyclerView = findViewById(R.id.drawer_rv)
     val isOpened: Boolean get() = drawerStateListener.isOpened
 
@@ -42,7 +42,7 @@ class DrawerView @JvmOverloads constructor(
     var onGravityChangeListener: ((gravity: Int) -> Unit)? = null
 
     init {
-        ibDockSide.setOnClickListener {
+        ibDrawerSide.setOnClickListener {
             val gravity = if (gravity == Gravity.START) Gravity.END else Gravity.START
             onGravityChangeListener?.invoke(gravity)
         }
@@ -63,8 +63,8 @@ class DrawerView @JvmOverloads constructor(
         super.setLayoutParams(params)
 
         val gravity = (params as? DrawerLayout.LayoutParams)?.gravity ?: Gravity.START
-        val icDock = if (gravity == Gravity.START) R.drawable.ic_dock_end else R.drawable.ic_dock_start
-        ibDockSide.setImageResource(icDock)
+        val icDrawer = if (gravity == Gravity.START) R.drawable.ic_drawer_end else R.drawable.ic_drawer_start
+        ibDrawerSide.setImageResource(icDrawer)
         updateInsets()
     }
 

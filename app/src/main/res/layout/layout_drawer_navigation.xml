@@ -34,10 +34,10 @@
             tools:text="Title"
             />
         <androidx.appcompat.widget.AppCompatImageButton
-            android:id="@+id/drawer_ib_dock_side"
+            android:id="@+id/drawer_ib_drawer_side"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:src="@drawable/ic_dock_end"
+            android:src="@drawable/ic_drawer_end"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:paddingHorizontal="12dp"
             android:tint="?attr/colorContent"

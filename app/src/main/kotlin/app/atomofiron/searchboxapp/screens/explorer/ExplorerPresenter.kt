@@ -56,8 +56,6 @@ class ExplorerPresenter(
 
     fun onSettingsOptionSelected() = router.showSettings()
 
-    fun onDockGravityChange(gravity: Int) = preferenceStore { setDockGravity(gravity) }
-
     fun onVolumeUp(isCurrentDirVisible: Boolean) {
         val currentDir = viewState.getCurrentDir()
         currentDir ?: return

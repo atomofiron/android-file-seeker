@@ -15,7 +15,7 @@ import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppOrient
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppTheme
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppUpdateCode
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDeepBlack
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDockGravity
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDrawerGravity
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyExplorerItem
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyJoystick
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyMaxDepth
@@ -85,10 +85,10 @@ class PreferenceStore(
         }
     }
 
-    val dockGravity = getFlow(KeyDockGravity)
+    val drawerGravity = getFlow(KeyDrawerGravity)
 
-    suspend fun setDockGravity(value: Int) {
-        edit { it[KeyDockGravity] = value }
+    suspend fun setDrawerGravity(value: Int) {
+        edit { it[KeyDrawerGravity] = value }
     }
 
     val specialCharacters = getFlow(KeySpecialCharacters) {

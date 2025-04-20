@@ -17,7 +17,7 @@ object PreferenceKeys {
     const val PREF_TOYBOX = "pref_toybox_path"
 
     val KeyOpenedDirPath = PreferenceKey("pref_opened_dir_path", "")
-    val KeyDockGravity = PreferenceKey("pref_drawer_gravity", Gravity.START)
+    val KeyDrawerGravity = PreferenceKey("pref_drawer_gravity", Gravity.START)
     val KeyAppUpdateCode = PreferenceKey("pref_app_update_code", 0)
     val KeyShownNotificationUpdateCode = PreferenceKey("pref_shown_notification_update_code", 0)
     val KeySpecialCharacters = PreferenceKey("pref_special_characters", Const.DEFAULT_SPECIAL_CHARACTERS)
@@ -35,7 +35,7 @@ object PreferenceKeys {
     val KeyToybox = PreferenceKey(PREF_TOYBOX, ToyboxVariant.Undefined.EMPTY)
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
-        arrayOf(KeyOpenedDirPath, KeyDockGravity, KeyShownNotificationUpdateCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyToybox)
+        arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyShownNotificationUpdateCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyToybox)
     }
 
     fun <T> default(key: String): T = keys.find { it.key.name == key }?.default as T

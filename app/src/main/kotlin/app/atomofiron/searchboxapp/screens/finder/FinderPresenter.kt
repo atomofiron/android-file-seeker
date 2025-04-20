@@ -51,7 +51,7 @@ class FinderPresenter(
     }
 
     override fun onSubscribeData() {
-        preferenceStore.dockGravity.collect(scope) { gravity ->
+        preferenceStore.drawerGravity.collect(scope) { gravity ->
             viewState.historyDrawerGravity.value = gravity
         }
         preferenceStore.specialCharacters.collect(scope) { chs ->
@@ -68,7 +68,7 @@ class FinderPresenter(
         }
     }
 
-    fun onDockGravityChange(gravity: Int) = preferenceStore { setDockGravity(gravity) }
+    fun onDrawerGravityChange(gravity: Int) = preferenceStore { setDrawerGravity(gravity) }
 
     fun onExplorerOptionSelected() {
         when {
