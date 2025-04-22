@@ -19,7 +19,7 @@ class DockOverlayView @JvmOverloads constructor(
     private var dock: DockBarView? = null
 
     init {
-        elevation = resources.getDimension(MaterialDimen.m3_comp_navigation_bar_container_elevation).inc()
+        translationZ = resources.getDimension(MaterialDimen.m3_comp_navigation_bar_container_elevation).inc()
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -40,7 +40,7 @@ class DockOverlayView @JvmOverloads constructor(
 
     fun setDockBarView(view: DockBarView) {
         dock = view
-        elevation = max(elevation, view.elevation.inc())
+        translationZ = max(translationZ, view.elevation.inc())
     }
 
     private fun MotionEvent.offset(dx: Float, dy: Float) = MotionEvent.obtain(downTime, eventTime, action, x + dx, y + dy, pressure, size, metaState, xPrecision, yPrecision, deviceId, edgeFlags)
