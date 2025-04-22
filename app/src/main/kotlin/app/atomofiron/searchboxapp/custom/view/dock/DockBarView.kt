@@ -13,7 +13,6 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
-import app.atomofiron.searchboxapp.model.Layout
 
 class DockBarView @JvmOverloads constructor(
     context: Context,
@@ -21,11 +20,12 @@ class DockBarView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
     private var mode: DockMode? = null,
     private var itemConfig: DockItemConfig = DockItemConfig.Stub,
+    items: List<DockItem> = emptyList(),
 ) : RecyclerView(context, attrs, defStyleAttr) {
 
     private var listener: ((DockItem) -> Unit)? = null
     private val adapter = DockAdapter { listener?.invoke(it) }
-    private val gridManager = GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false)
+    private val gridManager = GridLayoutManager(context, 322)
     private val padding = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
 
     init {
@@ -38,7 +38,9 @@ class DockBarView @JvmOverloads constructor(
         elevation = resources.getDimension(MaterialDimen.m3_comp_navigation_bar_container_elevation)
         setBackgroundColor(context.findColorByAttr(MaterialAttr.colorSurfaceContainer))
         setPaddingRelative(padding, padding, padding, padding)
+        adapter.submitList(items)
         super.setAdapter(adapter)
+        mode?.apply()
     }
 
     override fun onAttachedToWindow() {
@@ -60,7 +62,7 @@ class DockBarView @JvmOverloads constructor(
 
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
         when (mode) {
-            is DockMode.Children -> super.onMeasure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED)
+            is DockMode.Popup -> super.onMeasure(MeasureSpec.UNSPECIFIED, MeasureSpec.UNSPECIFIED) // todo
             else -> super.onMeasure(widthSpec, heightSpec)
         }
     }
@@ -74,27 +76,39 @@ class DockBarView @JvmOverloads constructor(
         mode?.apply()
     }
 
-    fun setMode(bottom: Layout) {
-        mode = if (bottom.isBottom) DockMode.Bottom else DockMode.Flank
-        mode?.apply()
+    fun setMode(mode: DockMode) {
+        this.mode = mode
+        itemConfig = itemConfig.copy(ground = mode.ground)
+        mode.apply()
     }
 
     private fun DockMode.apply() {
-        gridManager.spanCount = when (this) {
-            is DockMode.Bottom -> adapter.itemCount
-            is DockMode.Flank -> 1
-            is DockMode.Children -> columns
+        gridManager.orientation = when (this) {
+            is DockMode.Pinned -> VERTICAL
+            is DockMode.Popup -> when (true) {
+                !itemConfig.isBottom,
+                (columns > 1) -> VERTICAL
+                else -> HORIZONTAL
+            }
         }
+        gridManager.spanCount = when (this) {
+            is DockMode.Pinned -> if (isBottom) adapter.itemCount else 1
+            is DockMode.Popup -> columns
+        }.coerceAtLeast(1)
         adapter.itemConfig = when (this) {
-            is DockMode.Bottom -> itemConfig.copy(width = MATCH_PARENT)
-            is DockMode.Flank -> itemConfig.copy(height = WRAP_CONTENT)
-            is DockMode.Children -> itemConfig
+            is DockMode.Pinned -> when {
+                isBottom -> itemConfig.copy(width = MATCH_PARENT)
+                else -> itemConfig.copy(height = WRAP_CONTENT)
+            }
+            is DockMode.Popup -> itemConfig
         }
         layoutParams?.run {
             when (this@apply) {
-                is DockMode.Bottom -> MATCH_PARENT to WRAP_CONTENT
-                is DockMode.Flank -> WRAP_CONTENT to MATCH_PARENT
-                is DockMode.Children -> WRAP_CONTENT to WRAP_CONTENT
+                is DockMode.Pinned -> when {
+                    isBottom -> MATCH_PARENT to WRAP_CONTENT
+                    else -> WRAP_CONTENT to MATCH_PARENT
+                }
+                is DockMode.Popup -> WRAP_CONTENT to WRAP_CONTENT
             }.let { (width, height) ->
                 this.width = width
                 this.height = height

@@ -11,4 +11,5 @@ data class DockItemConfig(
         val Stub = DockItemConfig(0, 0, Layout.Ground.Bottom)
     }
     val isZero get() = width <= 0 || height <= 0
+    val isBottom get() = ground.isBottom
 }

@@ -65,11 +65,12 @@ class DockItemHolder(
         if (overlay.isNotEmpty()) {
             return
         }
-        val childrenView = DockItemChildrenView(root.context, item.children, config.copy(width = root.width, height = root.height), selectListener)
+        val childConfig = config.copy(width = root.width, height = root.height)
+        val childrenView = DockItemChildrenView(root.context, item.children, childConfig, selectListener)
         overlay.addView(childrenView)
         childrenView.updateLayoutParams {
-            width = root.width
-            height = root.height
+            width = childConfig.width
+            height = childConfig.height
         }
         childrenView.expand()
     }

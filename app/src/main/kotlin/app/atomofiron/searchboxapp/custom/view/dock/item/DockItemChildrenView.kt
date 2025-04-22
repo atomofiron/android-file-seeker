@@ -41,7 +41,7 @@ private const val EXPANDED = 1f
 @SuppressLint("ViewConstructor")
 class DockItemChildrenView(
     context: Context,
-    children: List<DockItem>,
+    children: DockItem.Children,
     private val config: DockItemConfig,
     private val selectListener: (DockItem) -> Unit,
 ) : FrameLayout(context), ValueAnimator.AnimatorUpdateListener {
@@ -49,7 +49,7 @@ class DockItemChildrenView(
     private val holder = LayoutInflater.from(context)
         .let { ItemDockBinding.inflate(it, this, true) }
         .let { DockItemHolder(it) { collapse() } }
-    private val childrenView = DockBarView(context, mode = DockMode.Children(2), itemConfig = config)
+    private val childrenView = DockBarView(context, items = children, itemConfig = config, mode = DockMode.Popup(config.ground, children.columns))
     private val backgroundPath = Path()
     private val corner = resources.getDimension(R.dimen.dock_overlay_corner)
     private val offset = resources.getDimension(R.dimen.dock_item_half_margin).roundToInt().toFloat()
@@ -72,7 +72,6 @@ class DockItemChildrenView(
         childrenView.elevation = resources.getDimension(R.dimen.overlay_elevation)
         childrenView.outlineProvider = OutlineProvider(corner)
         childrenView.clipToOutline = true
-        childrenView.submit(children)
         childrenView.setListener(::onSelect)
         addView(childrenView)
         childrenView.updateLayoutParams {
