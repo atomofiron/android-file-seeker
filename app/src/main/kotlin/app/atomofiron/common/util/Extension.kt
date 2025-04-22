@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewParent
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
@@ -119,3 +120,11 @@ inline fun <T,Q : Any> T.with(it: Q?, action: T.(Q) -> Unit) = apply {
 }
 
 fun Throwable.human() = "${this::class.simpleName}: $message"
+
+fun ViewParent.noClip() = (this as? ViewGroup)?.noClip()
+
+fun ViewGroup.noClip() {
+    clipToPadding = false
+    clipChildren = false
+    clipToOutline = false
+}

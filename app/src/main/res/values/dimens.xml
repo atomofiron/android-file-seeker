@@ -69,6 +69,10 @@
 	<dimen name="content_margin_quarter">4dp</dimen>
 	<dimen name="content_margin_three_quarter">12dp</dimen>
 
+	<dimen name="dock_item_half_margin">2dp</dimen>
+	<dimen name="dock_overlay_corner">16dp</dimen>
+	<dimen name="dock_item_corner">12dp</dimen>
+
 	<dimen name="item_card_corner_radius">16dp</dimen>
 	<dimen name="stroke_width">1dp</dimen>
 	<dimen name="selected_stroke_width">3dp</dimen>
