@@ -53,6 +53,7 @@ import com.google.android.material.snackbar.Snackbar
 import java.io.Serializable
 import java.util.Locale
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 fun Resources.getLocale(): Locale = configuration.locales.get(0)
 
@@ -311,3 +312,7 @@ fun Data.Builder.putStringArray(key: String, value: Array<out String?>): Data.Bu
 }
 
 fun Context.document(uri: Uri) = DocumentFile.fromSingleUri(this, uri)!!
+
+fun View.dpf(value: Int) = (resources.displayMetrics.density * value)
+
+fun View.dp(value: Int) = dpf(value).roundToInt()

@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp
 import android.annotation.SuppressLint
 import android.util.Log
 import android.view.View
+import android.view.View.MeasureSpec
 import app.atomofiron.fileseeker.BuildConfig
 
 private var timestamp: Long = 0
@@ -62,3 +63,12 @@ fun Any.natik(s: String) {
 val Any?.simpleName: String get() = this?.javaClass?.simpleName.toString()
 
 val Any?.className: String get() = this?.javaClass?.name.toString()
+
+fun Int.size(): Int = MeasureSpec.getSize(this)
+
+fun Int.mode(): String = when (MeasureSpec.getMode(this)) {
+    MeasureSpec.AT_MOST -> "AT_MOST"
+    MeasureSpec.EXACTLY -> "EXACTLY"
+    MeasureSpec.UNSPECIFIED -> "UNSPECIFIED"
+    else -> toString()
+}
