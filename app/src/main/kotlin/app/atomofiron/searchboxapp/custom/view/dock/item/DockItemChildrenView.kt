@@ -25,6 +25,7 @@ import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.DockItem
 import app.atomofiron.searchboxapp.custom.view.dock.DockItemHolder
 import app.atomofiron.searchboxapp.custom.view.dock.DockMode
+import app.atomofiron.searchboxapp.model.Layout.Ground
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -41,15 +42,14 @@ private const val EXPANDED = 1f
 class DockItemChildrenView(
     context: Context,
     children: List<DockItem>,
-    private val itemWidth: Int,
-    private val itemHeight: Int,
+    private val config: DockItemConfig,
     private val selectListener: (DockItem) -> Unit,
 ) : FrameLayout(context), ValueAnimator.AnimatorUpdateListener {
 
     private val holder = LayoutInflater.from(context)
         .let { ItemDockBinding.inflate(it, this, true) }
         .let { DockItemHolder(it) { collapse() } }
-    private val childrenView = DockBarView(context, mode = DockMode.Children(itemWidth, itemHeight, 2))
+    private val childrenView = DockBarView(context, mode = DockMode.Children(2), itemConfig = config)
     private val backgroundPath = Path()
     private val corner = resources.getDimension(R.dimen.dock_overlay_corner)
     private val offset = resources.getDimension(R.dimen.dock_item_half_margin).roundToInt().toFloat()
@@ -60,14 +60,14 @@ class DockItemChildrenView(
 
     init {
         setWillNotDraw(false)
-        holder.bind(DockItem(R.drawable.ic_cross, 0))
+        holder.bind(DockItem(R.drawable.ic_cross, 0), config)
         holder.itemView.setBackgroundColor(context.findColorByAttr(MaterialAttr.colorSurfaceContainer))
         holder.itemView.setOnClickListener { toggle() }
         holder.itemView.elevation = resources.getDimension(R.dimen.overlay_elevation)
         holder.itemView.background = PathDrawable(backgroundPath, context.findColorByAttr(MaterialAttr.colorSurfaceContainer))
         holder.itemView.updateLayoutParams {
-            width = itemWidth
-            height = itemHeight
+            width = config.width
+            height = config.height
         }
         childrenView.elevation = resources.getDimension(R.dimen.overlay_elevation)
         childrenView.outlineProvider = OutlineProvider(corner)
@@ -91,16 +91,8 @@ class DockItemChildrenView(
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        childrenView.translationY = -offset - childrenView.height
-        childrenView.translationX = (width - childrenView.width) / 2f
-        val width = width.toFloat()
-        val height = height.toFloat()
-        backgroundPath.reset()
-        backgroundPath.corner(-corner, 0f, left = false, top = true, clockWise = true, radius = corner, offsetX = -offset, offsetY = -offset)
-        backgroundPath.corner(0f, height - corner, left = true, top = false, clockWise = false, radius = corner, offsetX = -offset, offsetY = offset)
-        backgroundPath.corner(width - corner, height, left = false, top = false, clockWise = false, radius = corner, offsetX = offset, offsetY = offset)
-        backgroundPath.corner(width, corner, left = true, top = true, clockWise = true, radius = corner, offsetX = offset, offsetY = -offset)
-        backgroundPath.close()
+        placeChildren()
+        updateBackgroundPath()
     }
 
     override fun onAnimationUpdate(animation: ValueAnimator) {
@@ -108,8 +100,8 @@ class DockItemChildrenView(
         if (currentValue == COLLAPSED && targetValue == COLLAPSED) {
             remove()
         } else {
-            val width = childrenView.width + itemWidth.toFloat() * 0
-            val height = childrenView.height + itemHeight.toFloat()
+            val width = childrenView.width + config.width.toFloat() * 0 // todo
+            val height = childrenView.height + config.height.toFloat()
             val radius = currentValue * sqrt(width * width + height * height)
             clipPath.reset()
             clipPath.addCircle(this.width / 2f, this.height / 2f, radius, Path.Direction.CW)
@@ -156,6 +148,30 @@ class DockItemChildrenView(
     private fun onSelect(item: DockItem) {
         collapse(withDelay = true)
         selectListener(item)
+    }
+
+    private fun placeChildren() {
+        childrenView.translationX = when (config.ground) {
+            Ground.Bottom -> (width - childrenView.width) / 2f
+            Ground.Left -> childrenView.width + width + offset
+            Ground.Right -> -childrenView.width - offset
+        }
+        childrenView.translationY = when (config.ground) {
+            Ground.Bottom -> -offset - childrenView.height
+            Ground.Left,
+            Ground.Right -> childrenView.height / 2f + height / 2f
+        }
+    }
+
+    private fun updateBackgroundPath() {
+        val width = width.toFloat()
+        val height = height.toFloat()
+        backgroundPath.reset()
+        backgroundPath.corner(-corner, 0f, left = false, top = true, clockWise = true, radius = corner, offsetX = -offset, offsetY = -offset)
+        backgroundPath.corner(0f, height - corner, left = true, top = false, clockWise = false, radius = corner, offsetX = -offset, offsetY = offset)
+        backgroundPath.corner(width - corner, height, left = false, top = false, clockWise = false, radius = corner, offsetX = offset, offsetY = offset)
+        backgroundPath.corner(width, corner, left = true, top = true, clockWise = true, radius = corner, offsetX = offset, offsetY = -offset)
+        backgroundPath.close()
     }
 
     private class OutlineProvider(private val corner: Float) : ViewOutlineProvider() {

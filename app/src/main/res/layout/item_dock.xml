@@ -12,6 +12,7 @@
         android:gravity="center"
         android:background="@drawable/item_dock"
         android:duplicateParentState="true"
+        android:paddingVertical="8dp"
         >
         <ImageView
             android:id="@id/icon"

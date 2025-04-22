@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.custom.view.dock
 
 import android.content.Context
 import android.util.AttributeSet
-import android.util.Size
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -13,21 +12,20 @@ import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
 import app.atomofiron.searchboxapp.model.Layout
-
-private val Zero = Size(0, 0)
 
 class DockBarView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
     private var mode: DockMode? = null,
+    private var itemConfig: DockItemConfig = DockItemConfig.Stub,
 ) : RecyclerView(context, attrs, defStyleAttr) {
 
     private var listener: ((DockItem) -> Unit)? = null
     private val adapter = DockAdapter { listener?.invoke(it) }
     private val gridManager = GridLayoutManager(context, 1, GridLayoutManager.VERTICAL, false)
-    private var itemSize = Zero
     private val padding = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
 
     init {
@@ -50,10 +48,13 @@ class DockBarView @JvmOverloads constructor(
 
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
         super.setLayoutParams(params)
-        if (params != null && params.width > 0 && params.height > 0 && itemSize == Zero) {
+        if (params != null && params.width > 0 && params.height > 0 && itemConfig.isZero) {
             val padding = padding * 2
-            itemSize = Size(params.width - padding, params.height - padding)
-            mode?.apply()
+            val new = itemConfig.copy(width = params.width - padding, height = params.height - padding)
+            if (new != itemConfig) {
+                itemConfig = new
+                mode?.apply()
+            }
         }
     }
 
@@ -84,10 +85,10 @@ class DockBarView @JvmOverloads constructor(
             is DockMode.Flank -> 1
             is DockMode.Children -> columns
         }
-        adapter.itemSize = when (this) {
-            is DockMode.Bottom -> Size(MATCH_PARENT, itemSize.height)
-            is DockMode.Flank -> Size(itemSize.width, WRAP_CONTENT)
-            is DockMode.Children -> Size(width, height)
+        adapter.itemConfig = when (this) {
+            is DockMode.Bottom -> itemConfig.copy(width = MATCH_PARENT)
+            is DockMode.Flank -> itemConfig.copy(height = WRAP_CONTENT)
+            is DockMode.Children -> itemConfig
         }
         layoutParams?.run {
             when (this@apply) {

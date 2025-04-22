@@ -10,6 +10,7 @@ import app.atomofiron.common.util.MaterialColor
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildrenView
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
 
 class DockItemHolder(
     private val binding: ItemDockBinding,
@@ -17,6 +18,7 @@ class DockItemHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private lateinit var item: DockItem
+    private var config = DockItemConfig.Stub
 
     init {
         binding.run {
@@ -28,8 +30,16 @@ class DockItemHolder(
         }
     }
 
-    fun bind(item: DockItem) = binding.run {
-        this@DockItemHolder.item = item
+    fun bind(item: DockItem, config: DockItemConfig) {
+        if (config != this.config) {
+            binding.overlay.removeAllViews()
+        }
+        this.item = item
+        this.config = config
+        bind(item)
+    }
+
+    private fun bind(item: DockItem) = binding.run {
         when (item.icon) {
             0 -> icon.setImageDrawable(null)
             else -> icon.setImageResource(item.icon)
@@ -55,7 +65,7 @@ class DockItemHolder(
         if (overlay.isNotEmpty()) {
             return
         }
-        val childrenView = DockItemChildrenView(root.context, item.children, root.width, root.height, selectListener)
+        val childrenView = DockItemChildrenView(root.context, item.children, config.copy(width = root.width, height = root.height), selectListener)
         overlay.addView(childrenView)
         childrenView.updateLayoutParams {
             width = root.width

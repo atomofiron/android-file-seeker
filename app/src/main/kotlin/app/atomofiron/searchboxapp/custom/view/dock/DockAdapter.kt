@@ -1,17 +1,15 @@
 package app.atomofiron.searchboxapp.custom.view.dock
 
-import android.util.Size
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.ListAdapter
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
 
 class DockAdapter(private val selectListener: (DockItem) -> Unit) : ListAdapter<DockItem, DockItemHolder>(DockItemCallback()) {
 
-    var itemSize = Size(MATCH_PARENT, WRAP_CONTENT)
+    var itemConfig = DockItemConfig.Stub
         set(value) {
             if (value != field) {
                 field = value
@@ -35,9 +33,9 @@ class DockAdapter(private val selectListener: (DockItem) -> Unit) : ListAdapter<
 
     override fun onBindViewHolder(holder: DockItemHolder, position: Int) {
         holder.itemView.updateLayoutParams {
-            width = itemSize.width
-            height = itemSize.height
+            width = itemConfig.width
+            height = itemConfig.height
         }
-        holder.bind(currentList[position])
+        holder.bind(currentList[position], itemConfig)
     }
 }
