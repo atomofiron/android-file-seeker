@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:elevation="@dimen/curtain_elevation"
+            android:elevation="@dimen/overlay_elevation"
             app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
             app:behavior_skipCollapsed="true"
             app:behavior_hideable="true"
