@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.custom.view.dock.item
+package app.atomofiron.searchboxapp.custom.view.dock.popup
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
@@ -23,6 +23,7 @@ import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.drawable.PathDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.DockItem
+import app.atomofiron.searchboxapp.custom.view.dock.DockItemConfig
 import app.atomofiron.searchboxapp.custom.view.dock.DockItemHolder
 import app.atomofiron.searchboxapp.custom.view.dock.DockMode
 import app.atomofiron.searchboxapp.model.Layout.Ground

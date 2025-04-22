@@ -9,8 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.MaterialColor
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
-import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildrenView
-import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
+import app.atomofiron.searchboxapp.custom.view.dock.popup.DockItemChildrenView
 
 class DockItemHolder(
     private val binding: ItemDockBinding,
