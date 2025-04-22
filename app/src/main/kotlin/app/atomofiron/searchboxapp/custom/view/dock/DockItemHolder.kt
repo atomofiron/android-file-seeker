@@ -22,7 +22,7 @@ class DockItemHolder(
     init {
         binding.run {
             root.noClip()
-            overlay.noClip()
+            popup.noClip()
             root.setOnClickListener(::onClick)
             icon.imageTintList = ContextCompat.getColorStateList(root.context, MaterialColor.m3_navigation_item_icon_tint)
             label.setTextColor(ContextCompat.getColorStateList(root.context, MaterialColor.m3_navigation_item_text_color))
@@ -31,7 +31,7 @@ class DockItemHolder(
 
     fun bind(item: DockItem, config: DockItemConfig) {
         if (config != this.config) {
-            binding.overlay.removeAllViews()
+            binding.popup.removeAllViews()
         }
         this.item = item
         this.config = config
@@ -51,22 +51,22 @@ class DockItemHolder(
         root.isSelected = item.selected
         root.isEnabled = item.enabled
         if (item.children.isEmpty()) {
-            overlay.removeAllViews()
+            popup.removeAllViews()
         }
     }
 
     private fun onClick(view: View) = when {
         item.children.isEmpty() -> selectListener(item)
-        else -> binding.expand()
+        else -> binding.showPopup()
     }
 
-    private fun ItemDockBinding.expand() {
-        if (overlay.isNotEmpty()) {
+    private fun ItemDockBinding.showPopup() {
+        if (popup.isNotEmpty()) {
             return
         }
         val childConfig = config.copy(width = root.width, height = root.height)
         val childrenView = DockItemChildrenView(root.context, item.children, childConfig, selectListener)
-        overlay.addView(childrenView)
+        popup.addView(childrenView)
         childrenView.updateLayoutParams {
             width = childConfig.width
             height = childConfig.height

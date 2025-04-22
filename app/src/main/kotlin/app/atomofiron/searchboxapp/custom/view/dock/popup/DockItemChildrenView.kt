@@ -23,6 +23,7 @@ import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.drawable.PathDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.DockItem
+import app.atomofiron.searchboxapp.custom.view.dock.DockItemChildren
 import app.atomofiron.searchboxapp.custom.view.dock.DockItemConfig
 import app.atomofiron.searchboxapp.custom.view.dock.DockItemHolder
 import app.atomofiron.searchboxapp.custom.view.dock.DockMode
@@ -42,7 +43,7 @@ private const val EXPANDED = 1f
 @SuppressLint("ViewConstructor")
 class DockItemChildrenView(
     context: Context,
-    children: DockItem.Children,
+    children: DockItemChildren,
     private val config: DockItemConfig,
     private val selectListener: (DockItem) -> Unit,
 ) : FrameLayout(context), ValueAnimator.AnimatorUpdateListener {
@@ -50,7 +51,7 @@ class DockItemChildrenView(
     private val holder = LayoutInflater.from(context)
         .let { ItemDockBinding.inflate(it, this, true) }
         .let { DockItemHolder(it) { collapse() } }
-    private val childrenView = DockBarView(context, items = children, itemConfig = config, mode = DockMode.Popup(config.ground, children.columns))
+    private val childrenView = DockBarView(context, items = children, itemConfig = config, mode = DockMode.Popup(config.popup, children.columns))
     private val backgroundPath = Path()
     private val corner = resources.getDimension(R.dimen.dock_overlay_corner)
     private val offset = resources.getDimension(R.dimen.dock_item_half_margin).roundToInt().toFloat()

@@ -27,7 +27,7 @@ class DockOverlayView @JvmOverloads constructor(
             ?.takeIf { event.pointerCount == 1 }
             ?: return false
         for (child in dock.children) {
-            child.findViewById<ViewGroup>(R.id.overlay)
+            child.findViewById<ViewGroup>(R.id.popup)
                 .getChildAt(0)
                 ?.run {
                     val moved = event.offset(-(dock.x + child.x), -(dock.y + child.y))
