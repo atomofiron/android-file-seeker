@@ -71,6 +71,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
     private fun onBottomMenuItemClick(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menu_stop -> presenter.onStopClick()
+            R.id.menu_sorting -> Unit
             R.id.menu_export -> presenter.onExportClick()
             R.id.menu_share -> presenter.onShareClick()
         }

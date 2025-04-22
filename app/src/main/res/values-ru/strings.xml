@@ -17,7 +17,15 @@
     <string name="warning">Вы не выбрали ни одной директории. Поиск будет произведён по всему корневому разделу</string>
     <string name="ok">ОК</string>
     <string name="cancel">Отмена</string>
+    <string name="close">Закрыть</string>
     <string name="stop">Остановить</string>
+    <string name="sorting">Сортировка</string>
+    <string name="from_start">С начала</string>
+    <string name="from_end">С конца</string>
+    <string name="new_ones">Новые</string>
+    <string name="old_ones">Старые</string>
+    <string name="lite">Лёгкие</string>
+    <string name="heavy">Тяжёлые</string>
     <string name="no_activity">У вас нет приложения, способного открыть файл этого типа</string>
     <string name="results">Поиск дал %d результатов</string>
     <string name="find">Найти</string>

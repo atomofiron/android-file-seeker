@@ -18,7 +18,15 @@
     <string name="warning">You have not selected any directory. The search will be made around the root section</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
     <string name="stop">Stop</string>
+    <string name="sorting">Sorting</string>
+    <string name="from_start">Beginning</string>
+    <string name="from_end">Ending</string>
+    <string name="new_ones">New</string>
+    <string name="old_ones">Old</string>
+    <string name="lite">Lite</string>
+    <string name="heavy">Heavy</string>
     <string name="no_activity">You have no application able to open a file of this type</string>
     <string name="results">Your search returned %d results</string>
     <string name="find">Find</string>
