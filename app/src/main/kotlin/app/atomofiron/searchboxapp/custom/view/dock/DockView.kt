@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.custom.view.dock
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.AttributeSet
+import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.GridLayoutManager
@@ -10,33 +10,30 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.MATCH_PARENT
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.WRAP_CONTENT
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
 import app.atomofiron.searchboxapp.model.Layout
 
-class DockBarView(
+interface DockView {
+    fun setMode(mode: DockMode)
+    fun submit(items: List<DockItem>)
+    fun setListener(listener: (DockItem) -> Unit)
+}
+
+@SuppressLint("ViewConstructor")
+class DockViewImpl(
     context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0,
-    items: List<DockItem>,
-    private var mode: DockMode?,
-    private var itemConfig: DockItemConfig,
-) : RecyclerView(context, attrs, defStyleAttr) {
+    items: List<DockItem> = emptyList(),
+    private var mode: DockMode? = null,
+    private var itemConfig: DockItemConfig = DockItemConfig.Stub,
+) : RecyclerView(context), DockView, Forwarding {
 
     private var listener: ((DockItem) -> Unit)? = null
     private val adapter = DockAdapter { listener?.invoke(it) }
     private val gridManager = GridLayoutManager(context, 322)
     private val padding = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
-
-    @JvmOverloads
-    constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0,
-    ) : this(context, attrs, defStyleAttr, emptyList(), null, DockItemConfig.Stub)
 
     init {
         noClip()
@@ -45,9 +42,8 @@ class DockBarView(
         itemAnimator = null
         layoutManager = gridManager
         overScrollMode = OVER_SCROLL_NEVER
-        elevation = resources.getDimension(MaterialDimen.m3_comp_navigation_bar_container_elevation)
         setBackgroundColor(context.findColorByAttr(MaterialAttr.colorSurfaceContainer))
-        setPaddingRelative(padding, padding, padding, padding)
+        setPadding(padding, padding, padding, padding)
         adapter.submitList(items)
         super.setAdapter(adapter)
         if (isInEditMode) {
@@ -59,16 +55,13 @@ class DockBarView(
         mode?.apply()
     }
 
-    override fun onAttachedToWindow() {
-        super.onAttachedToWindow()
-        parent.noClip()
-    }
-
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
         super.setLayoutParams(params)
-        if (params != null && params.width > 0 && params.height > 0 && itemConfig.isZero && !isInEditMode) {
+        if (params != null && params.run { width > 0 || height > 0 } && itemConfig.isZero && !isInEditMode) {
             val padding = padding * 2
-            val new = itemConfig.copy(width = params.width - padding, height = params.height - padding)
+            val width = if (params.width > padding) params.width else params.height
+            val height = if (params.height > padding) params.height else params.height
+            val new = itemConfig.copy(width = width, height = height)
             submit(config = new)
         }
     }
@@ -94,16 +87,16 @@ class DockBarView(
         }
     }
 
-    fun setListener(listener: (DockItem) -> Unit) {
+    override fun setListener(listener: (DockItem) -> Unit) {
         this.listener = listener
     }
 
-    fun submit(items: List<DockItem>) {
+    override fun submit(items: List<DockItem>) {
         adapter.submitList(items)
         mode?.apply()
     }
 
-    fun setMode(mode: DockMode) = submit(mode)
+    override fun setMode(mode: DockMode) = submit(mode)
 
     private fun submit(
         mode: DockMode? = this.mode,
@@ -139,7 +132,13 @@ class DockBarView(
             }
             is DockMode.Popup -> itemConfig
         }
-        layoutParams?.run {
+        (layoutParams as FrameLayout.LayoutParams?)?.run {
+            gravity = when (ground.takeIf { this@apply is DockMode.Pinned }) {
+                Layout.Ground.Left -> Gravity.LEFT
+                Layout.Ground.Right -> Gravity.RIGHT
+                Layout.Ground.Bottom -> Gravity.BOTTOM
+                else -> gravity
+            }
             when (this@apply) {
                 is DockMode.Pinned -> when {
                     isBottom -> MATCH_PARENT to WRAP_CONTENT
