@@ -38,5 +38,6 @@ object PreferenceKeys {
         arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyShownNotificationUpdateCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyToybox)
     }
 
+    @Suppress("UNCHECKED_CAST") // omg it's an error in Kotlin 2.2
     fun <T> default(key: String): T = keys.find { it.key.name == key }?.default as T
 }
