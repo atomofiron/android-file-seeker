@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.custom.view.dock
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -82,7 +83,7 @@ class DockViewImpl(
                     mode.isBottom -> height -= measuredHeight
                     else -> width -= measuredWidth
                 }
-                submit(config = itemConfig.copy(popup = DockPopupConfig(width, height, mode.ground)))
+                submit(config = itemConfig.copy(popup = DockPopupConfig(mode.ground, width, height)))
             }
         }
     }

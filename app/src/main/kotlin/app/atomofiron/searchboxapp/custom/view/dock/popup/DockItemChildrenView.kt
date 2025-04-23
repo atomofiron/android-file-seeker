@@ -39,8 +39,6 @@ private const val DELAY = 256L
 private const val COLLAPSED = 0f
 private const val EXPANDED = 1f
 
-// todo on the first and last item
-
 @SuppressLint("ViewConstructor")
 class DockItemChildrenView(
     context: Context,
@@ -170,15 +168,24 @@ class DockItemChildrenView(
     }
 
     private fun DockViewImpl.place() {
-        translationX = when (config.popup.ground) {
-            Ground.Bottom -> 0f
+        val rect = config.popup.rect
+        val ground = config.popup.ground
+        translationX = when (ground) {
+            Ground.Bottom -> when {
+                left < rect.left -> rect.left - left
+                right > rect.right -> rect.right - right
+                else -> 0
+            }.toFloat()
             Ground.Left -> offset + config.width
-            Ground.Right -> -offset - config.width
+            Ground.Right -> -(offset + config.width)
         }
-        translationY = when (config.popup.ground) {
+        translationY = when (ground) {
             Ground.Bottom -> -offset - config.height
-            Ground.Left -> 0f
-            Ground.Right -> 0f
+            Ground.Left, Ground.Right -> when {
+                top < rect.top -> rect.top - top
+                top > rect.top -> rect.top - top
+                else -> 0
+            }.toFloat()
         }
     }
 

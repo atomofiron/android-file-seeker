@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.custom.view.dock
 
+import android.graphics.Rect
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.isNotEmpty
@@ -8,8 +9,11 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.MaterialColor
 import app.atomofiron.common.util.noClip
+import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockItemChildrenView
+import app.atomofiron.searchboxapp.model.Layout.Ground
+import kotlin.math.min
 
 class DockItemHolder(
     private val binding: ItemDockBinding,
@@ -64,9 +68,32 @@ class DockItemHolder(
         if (popup.isNotEmpty()) {
             return
         }
-        val childConfig = config.copy(width = root.width, height = root.height)
+        val container = popup
+        val offset = root.resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
+        val parent = root.parent as RecyclerView
+        val popup = config.popup
+        val ground = popup.ground
+        val minLeft = when (ground) {
+            Ground.Bottom -> min(parent.paddingLeft, root.left) - offset - root.left
+            Ground.Left -> root.width + offset
+            Ground.Right -> -popup.spaceWidth - offset
+        }
+        val maxRight = when (ground) {
+            Ground.Bottom -> parent.run { width - paddingRight + offset } - root.left
+            Ground.Left, Ground.Right -> minLeft + popup.spaceWidth
+        }
+        val minTop = when (ground) {
+            Ground.Bottom -> -popup.spaceHeight - offset
+            Ground.Left, Ground.Right -> min(parent.paddingTop, root.top) - offset - root.top
+        }
+        val maxBottom = when (ground) {
+            Ground.Bottom -> -offset
+            Ground.Left, Ground.Right -> parent.run { height - paddingBottom + offset } - root.top
+        }
+        val popupConfig = popup.copy(rect = Rect(minLeft, minTop, maxRight, maxBottom))
+        val childConfig = config.copy(width = root.width, height = root.height, popup = popupConfig)
         val childrenView = DockItemChildrenView(root.context, item.children, childConfig, selectListener)
-        popup.addView(childrenView)
+        container.addView(childrenView)
         childrenView.updateLayoutParams {
             width = childConfig.width
             height = childConfig.height
