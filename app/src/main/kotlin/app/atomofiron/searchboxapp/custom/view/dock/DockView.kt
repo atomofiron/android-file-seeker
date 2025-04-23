@@ -18,6 +18,7 @@ import app.atomofiron.searchboxapp.model.Layout
 
 interface DockView {
     fun setMode(mode: DockMode)
+    fun setTransparent(value: Boolean)
     fun submit(items: List<DockItem>)
     fun setListener(listener: (DockItem) -> Unit)
 }
@@ -34,6 +35,7 @@ class DockViewImpl(
     private val adapter = DockAdapter { listener?.invoke(it) }
     private val gridManager = GridLayoutManager(context, 322)
     private val padding = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
+    private val color = context.findColorByAttr(MaterialAttr.colorSurfaceContainer)
 
     init {
         noClip()
@@ -42,7 +44,7 @@ class DockViewImpl(
         itemAnimator = null
         layoutManager = gridManager
         overScrollMode = OVER_SCROLL_NEVER
-        setBackgroundColor(context.findColorByAttr(MaterialAttr.colorSurfaceContainer))
+        setBackgroundColor(color)
         setPadding(padding, padding, padding, padding)
         adapter.submitList(items)
         super.setAdapter(adapter)
@@ -97,6 +99,10 @@ class DockViewImpl(
     }
 
     override fun setMode(mode: DockMode) = submit(mode)
+
+    override fun setTransparent(value: Boolean) {
+        if (value) background = null else setBackgroundColor(color)
+    }
 
     private fun submit(
         mode: DockMode? = this.mode,
