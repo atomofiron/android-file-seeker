@@ -4,6 +4,7 @@ import android.graphics.Path
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
 import kotlin.math.sign
 
 fun Path.corner(x: Float, y: Float, left: Boolean, top: Boolean, clockWise: Boolean, radius: Float, offsetX: Float = 0f, offsetY: Float = 0f) {
@@ -49,3 +50,20 @@ private fun dY(dx: Float, dy: Float, clockWise: Boolean): Float = dy * dY(dx.sig
 private fun dX(magicalFlag: Boolean, clockWise: Boolean) = if (magicalFlag == clockWise) -1 else 1
 
 private fun dY(magicalFlag: Boolean, clockWise: Boolean) = if (magicalFlag == clockWise) 1 else -1
+
+fun nearby(distance: Float, x0: Float, y0: Float, x1: Float, y1: Float, x2: Float = x1, y2: Float = y1): Boolean {
+    if (x0 == x1 && y0 == y1 || x0 == x2 && y0 == y2) {
+        return true
+    }
+    return nearby(distance, x0, y0, x1, y1) || (x1 != x2 || y1 != y2) && nearby(distance, x0, y0, x2, y2)
+}
+
+private fun nearby(distance: Float, x0: Float, y0: Float, x1: Float, y1: Float): Boolean {
+    val dx = abs(x1 - x0)
+    val dy = abs(y1 - y0)
+    return when {
+        dx > distance && dy > distance -> false
+        (distance / 2).let { dx < it && dy < it } -> true
+        else -> dx.pow(2) + dy.pow(2) < distance.pow(2)
+    }
+}

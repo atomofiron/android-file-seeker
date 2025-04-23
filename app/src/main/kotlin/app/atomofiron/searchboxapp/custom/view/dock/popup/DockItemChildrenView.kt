@@ -19,6 +19,7 @@ import androidx.core.graphics.withClip
 import androidx.core.view.updateLayoutParams
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.corner
+import app.atomofiron.common.util.extension.nearby
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
@@ -190,41 +191,48 @@ class DockItemChildrenView(
     }
 
     private fun updateBackgroundPath() = backgroundPath.run {
-        var left = holder.itemView.x
-        var top = holder.itemView.y
-        var right = left + config.width
-        var bottom = top + config.height
+        val ground = config.popup.ground
+        val closeLeft = holder.itemView.x - offset
+        val closeTop = holder.itemView.y - offset
+        val closeRight = closeLeft + config.width + offset * 2
+        val closeBottom = closeTop + config.height + offset * 2
+        val popupLeft = childrenView.x
+        val popupTop = childrenView.y
+        val popupRight = popupLeft + childrenView.width
+        val popupBottom = popupTop + childrenView.height
+        val distance = corner * 2
+        val topLeft = !nearby(distance, popupLeft, popupTop, closeRight, closeTop)
+        val topRight = !nearby(distance, popupRight, popupTop, closeLeft, closeTop)
+        val bottomRight = !nearby(distance, popupRight, popupBottom, closeRight, closeTop, closeLeft, closeBottom)
+        val bottomLeft = !nearby(distance, popupLeft, popupBottom, closeLeft, closeTop, closeRight, closeBottom)
         reset()
-        when (config.popup.ground) {
+        moveTo(closeLeft, closeTop)
+        when (ground) {
             Ground.Bottom -> {
-                corner(left, top, left = false, top = true, clockWise = true, radius = corner, offsetX = -offset, offsetY = -offset)
-                corner(left, bottom, left = true, top = false, clockWise = false, radius = corner, offsetX = -offset, offsetY = offset)
-                corner(right, bottom, left = false, top = false, clockWise = false, radius = corner, offsetX = offset, offsetY = offset)
-                corner(right, top, left = true, top = true, clockWise = true, radius = corner, offsetX = offset, offsetY = -offset)
+                if (bottomLeft) corner(closeLeft, closeTop, left = false, top = true, clockWise = false, radius = corner) else lineTo(closeLeft, closeTop)
+                if (bottomRight) corner(closeRight, closeTop, left = true, top = true, clockWise = false, radius = corner) else lineTo(closeRight, closeTop)
+                corner(closeRight, closeBottom, left = false, top = false, clockWise = true, radius = corner)
+                corner(closeLeft, closeBottom, left = true, top = false, clockWise = true, radius = corner)
             }
             Ground.Right -> {
-                corner(left, bottom, left = true, top = true, clockWise = true, radius = corner, offsetX = -offset, offsetY = offset)
-                corner(right, bottom, left = false, top = false, clockWise = false, radius = corner, offsetX = offset, offsetY = offset)
-                corner(right, top, left = false, top = true, clockWise = false, radius = corner, offsetX = offset, offsetY = -offset)
-                corner(left, top, left = true, top = false, clockWise = true, radius = corner, offsetX = -offset, offsetY = -offset)
+                if (topRight) corner(closeLeft, closeTop, left = true, top = false, clockWise = false, radius = corner) else lineTo(closeLeft, closeTop)
+                corner(closeRight, closeTop, left = false, top = true, clockWise = true, radius = corner)
+                corner(closeRight, closeBottom, left = false, top = false, clockWise = true, radius = corner)
+                if (bottomRight) corner(closeLeft, closeBottom, left = true, top = true, clockWise = false, radius = corner) else lineTo(closeLeft, closeBottom)
             }
             Ground.Left -> {
-                corner(right, top, left = false, top = false, clockWise = true, radius = corner, offsetX = offset, offsetY = -offset)
-                corner(left, top, left = true, top = true, clockWise = false, radius = corner, offsetX = -offset, offsetY = -offset)
-                corner(left, bottom, left = true, top = false, clockWise = false, radius = corner, offsetX = -offset, offsetY = offset)
-                corner(right, bottom, left = false, top = true, clockWise = true, radius = corner, offsetX = offset, offsetY = offset)
+                corner(closeLeft, closeTop, left = true, top = true, clockWise = true, radius = corner)
+                if (topLeft) corner(closeRight, closeTop, left = false, top = false, clockWise = false, radius = corner) else lineTo(closeRight, closeTop)
+                if (bottomLeft) corner(closeRight, closeBottom, left = false, top = true, clockWise = false, radius = corner) else lineTo(closeRight, closeBottom)
+                corner(closeLeft, closeBottom, left = true, top = false, clockWise = true, radius = corner)
             }
         }
         close()
-        left = childrenView.x
-        top = childrenView.y
-        right = left + childrenView.width
-        bottom = top + childrenView.height
-        moveTo(right - corner, bottom)
-        corner(right, bottom, left = false, top = false, clockWise = false, radius = corner)
-        corner(right, top, left = false, top = true, clockWise = false, radius = corner)
-        corner(left, top, left = true, top = true, clockWise = false, radius = corner)
-        corner(left, bottom, left = true, top = false, clockWise = false, radius = corner)
+        moveTo(popupLeft, popupTop)
+        if (topLeft) corner(popupLeft, popupTop, left = true, top = true, clockWise = true, radius = corner) else lineTo(popupLeft, popupTop)
+        if (topRight) corner(popupRight, popupTop, left = false, top = true, clockWise = true, radius = corner) else lineTo(popupRight, popupTop)
+        if (bottomRight) corner(popupRight, popupBottom, left = false, top = false, clockWise = true, radius = corner) else lineTo(popupRight, popupBottom)
+        if (bottomLeft) corner(popupLeft, popupBottom, left = true, top = false, clockWise = true, radius = corner) else lineTo(popupLeft, popupBottom)
         close()
     }
 
