@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.custom.view.dock
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Rect
 import android.view.Gravity
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -58,11 +57,11 @@ class DockViewImpl(
 
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
         super.setLayoutParams(params)
-        if (params != null && params.run { width > 0 || height > 0 } && itemConfig.isZero && !isInEditMode) {
-            val padding = padding * 2
+        val padding = padding * 2
+        if (params != null && params.run { width > padding || height > padding } && itemConfig.isZero && !isInEditMode) {
             val width = if (params.width > padding) params.width else params.height
-            val height = if (params.height > padding) params.height else params.height
-            val new = itemConfig.copy(width = width, height = height)
+            val height = if (params.height > padding) params.height else params.width
+            val new = itemConfig.copy(width = width - padding, height = height - padding)
             submit(config = new)
         }
     }
