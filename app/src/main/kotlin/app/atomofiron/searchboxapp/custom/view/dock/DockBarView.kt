@@ -12,7 +12,7 @@ import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
-class DockOverlayView(
+class DockBarView(
     context: Context,
     attrs: AttributeSet?,
     defStyleAttr: Int,
