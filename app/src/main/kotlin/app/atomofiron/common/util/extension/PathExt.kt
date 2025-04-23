@@ -6,9 +6,26 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
 
-fun Path.corner(x0: Float, y0: Float, left: Boolean, top: Boolean, clockWise: Boolean, radius: Float, offsetX: Float = 0f, offsetY: Float = 0f) {
-    val x1 = x0 + radius * dX(!top, clockWise)
-    val y1 = y0 + radius * dY(!left, clockWise)
+fun Path.corner(x: Float, y: Float, left: Boolean, top: Boolean, clockWise: Boolean, radius: Float, offsetX: Float = 0f, offsetY: Float = 0f) {
+    var count = if (left) 0 else 1
+    count += if (top) 0 else 1
+    count += if (clockWise) 1 else 0
+    val x0 = x + when (count) {
+        0, 2 -> radius * dX(top, clockWise)
+        else -> 0f
+    }
+    val y0 = y + when (count) {
+        1, 3 -> radius * dY(left, clockWise)
+        else -> 0f
+    }
+    val x1 = x + when (count) {
+        1, 3 -> radius * dX(!top, clockWise)
+        else -> 0f
+    }
+    val y1 = y + when (count) {
+        0, 2 -> radius * dY(!left, clockWise)
+        else -> 0f
+    }
     corner(x0, y0, x1, y1, clockWise, offsetX, offsetY)
 }
 

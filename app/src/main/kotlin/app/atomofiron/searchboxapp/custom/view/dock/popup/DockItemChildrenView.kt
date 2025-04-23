@@ -190,22 +190,22 @@ class DockItemChildrenView(
         reset()
         when (config.popup.ground) {
             Ground.Bottom -> {
-                corner(left - corner, top, left = false, top = true, clockWise = true, radius = corner, offsetX = -offset, offsetY = -offset)
-                corner(left, bottom - corner, left = true, top = false, clockWise = false, radius = corner, offsetX = -offset, offsetY = offset)
-                corner(right - corner, bottom, left = false, top = false, clockWise = false, radius = corner, offsetX = offset, offsetY = offset)
-                corner(right, top + corner, left = true, top = true, clockWise = true, radius = corner, offsetX = offset, offsetY = -offset)
+                corner(left, top, left = false, top = true, clockWise = true, radius = corner, offsetX = -offset, offsetY = -offset)
+                corner(left, bottom, left = true, top = false, clockWise = false, radius = corner, offsetX = -offset, offsetY = offset)
+                corner(right, bottom, left = false, top = false, clockWise = false, radius = corner, offsetX = offset, offsetY = offset)
+                corner(right, top, left = true, top = true, clockWise = true, radius = corner, offsetX = offset, offsetY = -offset)
             }
             Ground.Right -> {
-                corner(left, bottom + corner, left = true, top = true, clockWise = true, radius = corner, offsetX = -offset, offsetY = offset)
-                corner(right - corner, bottom, left = false, top = false, clockWise = false, radius = corner, offsetX = offset, offsetY = offset)
-                corner(right, top + corner, left = false, top = true, clockWise = false, radius = corner, offsetX = offset, offsetY = -offset)
-                corner(left + corner, top, left = true, top = false, clockWise = true, radius = corner, offsetX = -offset, offsetY = -offset)
+                corner(left, bottom, left = true, top = true, clockWise = true, radius = corner, offsetX = -offset, offsetY = offset)
+                corner(right, bottom, left = false, top = false, clockWise = false, radius = corner, offsetX = offset, offsetY = offset)
+                corner(right, top, left = false, top = true, clockWise = false, radius = corner, offsetX = offset, offsetY = -offset)
+                corner(left, top, left = true, top = false, clockWise = true, radius = corner, offsetX = -offset, offsetY = -offset)
             }
             Ground.Left -> {
-                corner(right, top - corner, left = false, top = false, clockWise = true, radius = corner, offsetX = offset, offsetY = -offset)
-                corner(left + corner, top, left = true, top = true, clockWise = false, radius = corner, offsetX = -offset, offsetY = -offset)
-                corner(left, bottom - corner, left = true, top = false, clockWise = false, radius = corner, offsetX = -offset, offsetY = offset)
-                corner(right - corner, bottom, left = false, top = true, clockWise = true, radius = corner, offsetX = offset, offsetY = offset)
+                corner(right, top, left = false, top = false, clockWise = true, radius = corner, offsetX = offset, offsetY = -offset)
+                corner(left, top, left = true, top = true, clockWise = false, radius = corner, offsetX = -offset, offsetY = -offset)
+                corner(left, bottom, left = true, top = false, clockWise = false, radius = corner, offsetX = -offset, offsetY = offset)
+                corner(right, bottom, left = false, top = true, clockWise = true, radius = corner, offsetX = offset, offsetY = offset)
             }
         }
         close()
@@ -214,10 +214,10 @@ class DockItemChildrenView(
         right = left + childrenView.width
         bottom = top + childrenView.height
         moveTo(right - corner, bottom)
-        corner(right - corner, bottom, left = false, top = false, clockWise = false, radius = corner)
-        corner(right, top + corner, left = false, top = true, clockWise = false, radius = corner)
-        corner(left + corner, top, left = true, top = true, clockWise = false, radius = corner)
-        corner(left, bottom - corner, left = true, top = false, clockWise = false, radius = corner)
+        corner(right, bottom, left = false, top = false, clockWise = false, radius = corner)
+        corner(right, top, left = false, top = true, clockWise = false, radius = corner)
+        corner(left, top, left = true, top = true, clockWise = false, radius = corner)
+        corner(left, bottom, left = true, top = false, clockWise = false, radius = corner)
         close()
     }
 
