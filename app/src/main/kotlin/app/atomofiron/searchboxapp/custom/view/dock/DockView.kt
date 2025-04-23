@@ -26,8 +26,8 @@ interface DockView {
 class DockViewImpl(
     context: Context,
     items: List<DockItem> = emptyList(),
-    private var mode: DockMode? = null,
     private var itemConfig: DockItemConfig = DockItemConfig.Stub,
+    private var mode: DockMode? = null,
 ) : RecyclerView(context), DockView, Forwarding {
 
     private var listener: ((DockItem) -> Unit)? = null

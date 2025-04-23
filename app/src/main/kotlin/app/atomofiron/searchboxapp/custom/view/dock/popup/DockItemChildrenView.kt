@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Outline
 import android.graphics.Path
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -14,6 +15,7 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewOutlineProvider
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.core.graphics.withClip
 import androidx.core.view.updateLayoutParams
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.corner
@@ -21,7 +23,7 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.drawable.PathDrawable
-import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
+import app.atomofiron.searchboxapp.custom.view.dock.DockViewImpl
 import app.atomofiron.searchboxapp.custom.view.dock.DockItem
 import app.atomofiron.searchboxapp.custom.view.dock.DockItemChildren
 import app.atomofiron.searchboxapp.custom.view.dock.DockItemConfig
@@ -38,7 +40,6 @@ private const val COLLAPSED = 0f
 private const val EXPANDED = 1f
 
 // todo on the first and last item
-// todo support sides
 
 @SuppressLint("ViewConstructor")
 class DockItemChildrenView(
@@ -51,37 +52,50 @@ class DockItemChildrenView(
     private val holder = LayoutInflater.from(context)
         .let { ItemDockBinding.inflate(it, this, true) }
         .let { DockItemHolder(it) { collapse() } }
-    private val childrenView = DockBarView(context, items = children, itemConfig = config, mode = DockMode.Popup(config.popup, children.columns))
+    private val childrenView = DockViewImpl(context, children, config, mode = DockMode.Popup(config.popup, children.columns))
     private val backgroundPath = Path()
+    private var clipPath = Path()
+    private var combinedPath = Path()
     private val corner = resources.getDimension(R.dimen.dock_overlay_corner)
     private val offset = resources.getDimension(R.dimen.dock_item_half_margin).roundToInt().toFloat()
     private val animator = ValueAnimator.ofFloat(COLLAPSED)
     private var currentValue = COLLAPSED
     private var targetValue = COLLAPSED
-    private val clipPath = Path()
 
     init {
         setWillNotDraw(false)
         holder.bind(DockItem(R.drawable.ic_cross, 0), config)
-        holder.itemView.setBackgroundColor(context.findColorByAttr(MaterialAttr.colorSurfaceContainer))
         holder.itemView.setOnClickListener { toggle() }
-        holder.itemView.elevation = resources.getDimension(R.dimen.overlay_elevation)
-        holder.itemView.background = PathDrawable(backgroundPath, context.findColorByAttr(MaterialAttr.colorSurfaceContainer))
         holder.itemView.updateLayoutParams {
             width = config.width
             height = config.height
         }
-        childrenView.elevation = resources.getDimension(R.dimen.overlay_elevation)
-        childrenView.outlineProvider = OutlineProvider(corner)
+        childrenView.outlineProvider = ChildrenOutlineProvider(corner)
         childrenView.clipToOutline = true
+        childrenView.background = null
+        childrenView.elevation = 0f
         childrenView.setListener(::onSelect)
         addView(childrenView)
-        childrenView.updateLayoutParams {
+        childrenView.updateLayoutParams<LayoutParams> {
             width = WRAP_CONTENT
             height = WRAP_CONTENT
+            gravity = when (config.popup.ground) {
+                Ground.Bottom -> Gravity.CENTER_HORIZONTAL or Gravity.BOTTOM
+                Ground.Left -> Gravity.CENTER_VERTICAL or Gravity.LEFT
+                Ground.Right -> Gravity.CENTER_VERTICAL or Gravity.RIGHT
+            }
         }
         animator.addUpdateListener(this)
         animator.interpolator = DecelerateInterpolator()
+
+        elevation = resources.getDimension(R.dimen.overlay_elevation)
+        background = PathDrawable(combinedPath, context.findColorByAttr(MaterialAttr.colorSurfaceContainer))
+    }
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        childrenView.place()
+        updateBackgroundPath()
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -90,43 +104,47 @@ class DockItemChildrenView(
         }
     }
 
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        placeChildren()
-        updateBackgroundPath()
-    }
-
     override fun onAnimationUpdate(animation: ValueAnimator) {
         currentValue = animation.animatedValue as Float
         if (currentValue == COLLAPSED && targetValue == COLLAPSED) {
-            remove()
-        } else {
-            val width = childrenView.width + config.width.toFloat() * 0 // todo
-            val height = childrenView.height + config.height.toFloat()
-            val radius = currentValue * sqrt(width * width + height * height)
-            clipPath.reset()
-            clipPath.addCircle(this.width / 2f, this.height / 2f, radius, Path.Direction.CW)
-            invalidate()
-            invalidateOutline()
+            return remove()
         }
+        val centerX = config.width / 2f
+        val centerY = config.height / 2f
+        var radius = childrenView.run { sqrt(width * width + height * height.toFloat()) }
+        radius += config.run { sqrt(width * width + height * height.toFloat()) / 2 }
+        radius *= currentValue
+        combinedPath.set(backgroundPath)
+        if (currentValue > COLLAPSED && currentValue < EXPANDED) {
+            clipPath.reset()
+            clipPath.addCircle(centerX, centerY, radius, Path.Direction.CW)
+            combinedPath.op(backgroundPath, clipPath, Path.Op.INTERSECT)
+        }
+        // fixes shadow offset
+        combinedPath.addRect(centerX, centerY + radius.dec(), centerX.inc(), centerY + radius, Path.Direction.CW)
+        invalidate()
+        invalidateOutline()
     }
 
     override fun draw(canvas: Canvas) {
-        if (currentValue != targetValue) {
-            canvas.clipPath(clipPath)
+        if (currentValue == EXPANDED) {
+            super.draw(canvas)
+        } else if (currentValue > COLLAPSED) {
+            // can't clip children by the clipToOutline because of outline.setPath() doesn't work on android 12-13
+            canvas.withClip(clipPath) {
+                super.draw(canvas)
+            }
         }
-        super.draw(canvas)
     }
 
     fun expand() = animTo(EXPANDED)
 
     private fun collapse(withDelay: Boolean = false) = animTo(COLLAPSED, withDelay)
 
-    private fun toggle() {
-        when (targetValue) {
-            COLLAPSED -> expand()
-            EXPANDED -> collapse()
-        }
+    private fun toggle() = when (targetValue) {
+        COLLAPSED -> expand()
+        EXPANDED -> collapse()
+        else -> Unit
     }
 
     private fun remove() {
@@ -151,31 +169,59 @@ class DockItemChildrenView(
         selectListener(item)
     }
 
-    private fun placeChildren() {
-        childrenView.translationX = when (config.ground) {
-            Ground.Bottom -> (width - childrenView.width) / 2f
-            Ground.Left -> childrenView.width + width + offset
-            Ground.Right -> -childrenView.width - offset
+    private fun DockViewImpl.place() {
+        translationX = when (config.popup.ground) {
+            Ground.Bottom -> 0f
+            Ground.Left -> offset + config.width
+            Ground.Right -> -offset - config.width
         }
-        childrenView.translationY = when (config.ground) {
-            Ground.Bottom -> -offset - childrenView.height
-            Ground.Left,
-            Ground.Right -> childrenView.height / 2f + height / 2f
+        translationY = when (config.popup.ground) {
+            Ground.Bottom -> -offset - config.height
+            Ground.Left -> 0f
+            Ground.Right -> 0f
         }
     }
 
-    private fun updateBackgroundPath() {
-        val width = width.toFloat()
-        val height = height.toFloat()
-        backgroundPath.reset()
-        backgroundPath.corner(-corner, 0f, left = false, top = true, clockWise = true, radius = corner, offsetX = -offset, offsetY = -offset)
-        backgroundPath.corner(0f, height - corner, left = true, top = false, clockWise = false, radius = corner, offsetX = -offset, offsetY = offset)
-        backgroundPath.corner(width - corner, height, left = false, top = false, clockWise = false, radius = corner, offsetX = offset, offsetY = offset)
-        backgroundPath.corner(width, corner, left = true, top = true, clockWise = true, radius = corner, offsetX = offset, offsetY = -offset)
-        backgroundPath.close()
+    private fun updateBackgroundPath() = backgroundPath.run {
+        var left = holder.itemView.x
+        var top = holder.itemView.y
+        var right = left + config.width
+        var bottom = top + config.height
+        reset()
+        when (config.popup.ground) {
+            Ground.Bottom -> {
+                corner(left - corner, top, left = false, top = true, clockWise = true, radius = corner, offsetX = -offset, offsetY = -offset)
+                corner(left, bottom - corner, left = true, top = false, clockWise = false, radius = corner, offsetX = -offset, offsetY = offset)
+                corner(right - corner, bottom, left = false, top = false, clockWise = false, radius = corner, offsetX = offset, offsetY = offset)
+                corner(right, top + corner, left = true, top = true, clockWise = true, radius = corner, offsetX = offset, offsetY = -offset)
+            }
+            Ground.Right -> {
+                corner(left, bottom + corner, left = true, top = true, clockWise = true, radius = corner, offsetX = -offset, offsetY = offset)
+                corner(right - corner, bottom, left = false, top = false, clockWise = false, radius = corner, offsetX = offset, offsetY = offset)
+                corner(right, top + corner, left = false, top = true, clockWise = false, radius = corner, offsetX = offset, offsetY = -offset)
+                corner(left + corner, top, left = true, top = false, clockWise = true, radius = corner, offsetX = -offset, offsetY = -offset)
+            }
+            Ground.Left -> {
+                corner(right, top - corner, left = false, top = false, clockWise = true, radius = corner, offsetX = offset, offsetY = -offset)
+                corner(left + corner, top, left = true, top = true, clockWise = false, radius = corner, offsetX = -offset, offsetY = -offset)
+                corner(left, bottom - corner, left = true, top = false, clockWise = false, radius = corner, offsetX = -offset, offsetY = offset)
+                corner(right - corner, bottom, left = false, top = true, clockWise = true, radius = corner, offsetX = offset, offsetY = offset)
+            }
+        }
+        close()
+        left = childrenView.x
+        top = childrenView.y
+        right = left + childrenView.width
+        bottom = top + childrenView.height
+        moveTo(right - corner, bottom)
+        corner(right - corner, bottom, left = false, top = false, clockWise = false, radius = corner)
+        corner(right, top + corner, left = false, top = true, clockWise = false, radius = corner)
+        corner(left + corner, top, left = true, top = true, clockWise = false, radius = corner)
+        corner(left, bottom - corner, left = true, top = false, clockWise = false, radius = corner)
+        close()
     }
 
-    private class OutlineProvider(private val corner: Float) : ViewOutlineProvider() {
+    private class ChildrenOutlineProvider(private val corner: Float) : ViewOutlineProvider() {
         override fun getOutline(view: View, outline: Outline) = outline.setRoundRect(0, 0, view.width, view.height, corner)
     }
 }
