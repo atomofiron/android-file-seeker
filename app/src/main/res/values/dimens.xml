@@ -71,6 +71,9 @@
 	<dimen name="content_margin_quarter">4dp</dimen>
 	<dimen name="content_margin_three_quarter">12dp</dimen>
 
+	<dimen name="dock_width">80dp</dimen>
+	<!-- dock_height = joystick_size - joystick_padding -->
+	<dimen name="dock_height">68dp</dimen>
 	<dimen name="dock_overlay_corner">16dp</dimen>
 	<dimen name="dock_elevation">@dimen/m3_comp_navigation_bar_container_elevation</dimen>
 	<dimen name="dock_item_corner">12dp</dimen>
