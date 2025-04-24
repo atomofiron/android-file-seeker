@@ -6,7 +6,7 @@
     <app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
         app:key="pref_app_update"
         />
-    <app.atomofiron.searchboxapp.custom.preference.SwitchPreference
+    <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
         app:title="@string/pref_use_su"
         app:key="pref_use_su"
         app:defaultValue="false"
@@ -44,7 +44,7 @@
             app:entryValues="@array/theme_val"
             app:icon="@drawable/ic_theme"
             />
-        <app.atomofiron.searchboxapp.custom.preference.SwitchPreference
+        <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
             app:title="@string/pref_deep_black"
             app:key="pref_deep_black"
             app:defaultValue="false"
@@ -77,7 +77,7 @@
             app:icon="@drawable/ic_export_import"
             app:isPreferenceVisible="false"
             />
-        <app.atomofiron.searchboxapp.custom.preference.SwitchPreference
+        <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
             app:title="@string/pref_embedded_toybox"
             app:key="pref_toybox_path"
             app:icon="@drawable/ic_shell"
@@ -87,7 +87,7 @@
     <PreferenceCategory
         android:key="pref_category_debug"
         app:title="@string/pref_category_debug">
-        <app.atomofiron.searchboxapp.custom.preference.SwitchPreference
+        <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
             app:title="@string/pref_leak_canary"
             app:key="pref_leak_canary"
             app:widgetLayout="@layout/widget_switch"

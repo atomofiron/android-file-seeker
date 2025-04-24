@@ -10,7 +10,7 @@ import androidx.preference.PreferenceViewHolder
 import androidx.preference.R
 import androidx.preference.SwitchPreferenceCompat
 
-class SwitchPreference : SwitchPreferenceCompat, View.OnClickListener {
+class HapticSwitchPreference : SwitchPreferenceCompat, View.OnClickListener {
 
     private var newValue: Boolean? = null
 
