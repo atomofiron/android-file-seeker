@@ -31,6 +31,8 @@
     <dimen name="navigation_view_size">80dp</dimen>
     <dimen name="card_max_width">512dp</dimen>
     <dimen name="joystick_size">@dimen/navigation_view_size</dimen>
+    <dimen name="joystick_padding">12dp</dimen>
+	<dimen name="joystick_elevation">@dimen/dock_elevation</dimen>
     <dimen name="item_explorer_file_size">36dp</dimen>
     <dimen name="edge_size">48dp</dimen>
     <dimen name="item_explorer_min_height">40dp</dimen>
@@ -70,6 +72,7 @@
 	<dimen name="content_margin_three_quarter">12dp</dimen>
 
 	<dimen name="dock_overlay_corner">16dp</dimen>
+	<dimen name="dock_elevation">@dimen/m3_comp_navigation_bar_container_elevation</dimen>
 	<dimen name="dock_item_corner">12dp</dimen>
 	<!-- dock_item_half_margin = (dock_overlay_corner - dock_item_corner) / 2 -->
 	<dimen name="dock_item_half_margin">2dp</dimen>

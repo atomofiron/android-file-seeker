@@ -28,6 +28,5 @@
 		android:layout_width="@dimen/joystick_size"
 		android:layout_height="@dimen/joystick_size"
 		android:layout_gravity="bottom|center_horizontal"
-		android:padding="16dp"
 		/>
 </lib.atomofiron.insets.InsetsProviderFrameLayout>
