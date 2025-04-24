@@ -18,7 +18,6 @@ import app.atomofiron.searchboxapp.model.Layout
 
 interface DockView {
     fun setMode(mode: DockMode)
-    fun setTransparent(value: Boolean)
     fun submit(items: List<DockItem>)
     fun setListener(listener: (DockItem) -> Unit)
 }
@@ -35,7 +34,10 @@ class DockViewImpl(
     private val adapter = DockAdapter { listener?.invoke(it) }
     private val gridManager = GridLayoutManager(context, 322)
     private val padding = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
-    private val color = context.findColorByAttr(MaterialAttr.colorSurfaceContainer)
+    private val shape = DockBottomShape(
+        context.findColorByAttr(MaterialAttr.colorSurfaceContainer),
+        corners = resources.getDimension(R.dimen.dock_overlay_corner),
+    )
 
     init {
         noClip()
@@ -44,7 +46,10 @@ class DockViewImpl(
         itemAnimator = null
         layoutManager = gridManager
         overScrollMode = OVER_SCROLL_NEVER
-        setBackgroundColor(color)
+        isHorizontalScrollBarEnabled = false
+        isVerticalScrollBarEnabled = false
+        background = shape
+        elevation = resources.getDimension(R.dimen.dock_elevation)
         setPadding(padding, padding, padding, padding)
         adapter.submitList(items)
         super.setAdapter(adapter)
@@ -100,10 +105,6 @@ class DockViewImpl(
 
     override fun setMode(mode: DockMode) = submit(mode)
 
-    override fun setTransparent(value: Boolean) {
-        if (value) background = null else setBackgroundColor(color)
-    }
-
     private fun submit(
         mode: DockMode? = this.mode,
         config: DockItemConfig = itemConfig,
@@ -157,5 +158,18 @@ class DockViewImpl(
             }
             super.setLayoutParams(this)
         }
+        val notch = adapter.currentList
+            .takeIf { isBottom && this is DockMode.Pinned }
+            ?.indexOfFirst { it === DockItem.Notch }
+            ?.takeIf { it >= 0 }
+            ?.let {
+                val joystick = resources.getDimension(R.dimen.joystick_size)
+                DockNotch(
+                    bias = (0.5f + it) / adapter.itemCount,
+                    width = joystick,
+                    height = joystick - resources.getDimension(R.dimen.joystick_padding),
+                )
+            }
+        shape.setNotch(notch)
     }
 }

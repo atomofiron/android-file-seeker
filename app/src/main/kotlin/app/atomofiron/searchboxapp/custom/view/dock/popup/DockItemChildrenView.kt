@@ -73,7 +73,6 @@ class DockItemChildrenView(
         childrenView.outlineProvider = ChildrenOutlineProvider(corner)
         childrenView.clipToOutline = true
         childrenView.elevation = 0f
-        childrenView.setTransparent(true)
         childrenView.setListener(::onSelect)
         addView(childrenView)
         childrenView.updateLayoutParams<LayoutParams> {

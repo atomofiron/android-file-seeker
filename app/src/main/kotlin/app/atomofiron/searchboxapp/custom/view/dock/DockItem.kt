@@ -13,7 +13,7 @@ data class DockItem(
     val children: DockItemChildren = DockItemChildren.Stub,
 ) {
     companion object {
-        val Stub = DockItem(0, 0, enabled = false)
+        val Notch = DockItem(0, 0, enabled = false)
     }
     val id = label.toLong()
 }

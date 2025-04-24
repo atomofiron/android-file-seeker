@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
 import androidx.core.view.children
-import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 
@@ -28,7 +27,7 @@ class DockBarView(
 
     init {
         noClip()
-        translationZ = resources.getDimension(MaterialDimen.m3_comp_navigation_bar_container_elevation)
+        translationZ = resources.getDimension(R.dimen.dock_elevation)
     }
 
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
