@@ -76,6 +76,7 @@
 	<dimen name="dock_item_corner">12dp</dimen>
 	<!-- dock_item_half_margin = (dock_overlay_corner - dock_item_corner) / 2 -->
 	<dimen name="dock_item_half_margin">2dp</dimen>
+	<dimen name="dock_notch_inset">8dp</dimen>
 
 	<dimen name="item_card_corner_radius">16dp</dimen>
 	<dimen name="stroke_width">1dp</dimen>

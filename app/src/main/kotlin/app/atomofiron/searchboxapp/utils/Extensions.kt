@@ -74,6 +74,10 @@ fun String.convert(): Int {
 
 fun Int.immutable(): Int = this or PendingIntent.FLAG_IMMUTABLE
 
+inline fun <E> Iterable<E>.findIndexedOrNull(predicate: (E) -> Boolean): Pair<Int, E?>? {
+    return findIndexed(predicate).takeIf { it.second != null }
+}
+
 inline fun <E> Iterable<E>.findIndexed(predicate: (E) -> Boolean): Pair<Int, E?> {
     for ((index, item) in this.withIndex()) {
         if (predicate(item)) return index to item

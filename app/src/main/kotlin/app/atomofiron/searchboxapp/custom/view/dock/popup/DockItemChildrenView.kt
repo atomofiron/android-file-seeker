@@ -47,7 +47,7 @@ class DockItemChildrenView(
     context: Context,
     children: DockItemChildren,
     private val config: DockItemConfig,
-    private val selectListener: (DockItem) -> Unit,
+    private val selectListener: (DockItem.Button) -> Unit,
 ) : FrameLayout(context), ValueAnimator.AnimatorUpdateListener {
 
     private val close = ItemDockBinding.inflate(LayoutInflater.from(context), this, true)
@@ -164,7 +164,7 @@ class DockItemChildrenView(
         animator.start()
     }
 
-    private fun onSelect(item: DockItem) {
+    private fun onSelect(item: DockItem.Button) {
         collapse(withDelay = true)
         selectListener(item)
     }

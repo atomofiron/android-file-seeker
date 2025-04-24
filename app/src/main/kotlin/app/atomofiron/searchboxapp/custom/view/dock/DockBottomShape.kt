@@ -27,13 +27,13 @@ class DockBottomShape(
         paint.isAntiAlias = true
     }
 
-    fun setNotch(notch: DockNotch?) {
-        if (notch == this.notch) {
-            return
+    fun setNotch(notch: DockNotch?): DockBottomShape {
+        if (notch != this.notch) {
+            this.notch = notch
+            updatePath()
+            invalidateSelf()
         }
-        this.notch = notch
-        updatePath()
-        invalidateSelf()
+        return this
     }
 
     override fun draw(canvas: Canvas) = canvas.drawPath(path, paint)

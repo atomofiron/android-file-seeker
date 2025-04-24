@@ -6,7 +6,9 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.ListAdapter
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 
-class DockAdapter(private val selectListener: (DockItem) -> Unit) : ListAdapter<DockItem, DockItemHolder>(DockItemCallback()) {
+class DockAdapter(
+    private val selectListener: (DockItem.Button) -> Unit,
+) : ListAdapter<DockItem, DockItemHolder>(DockItemCallback()) {
 
     var itemConfig = DockItemConfig.Stub
         set(value) {
@@ -35,6 +37,7 @@ class DockAdapter(private val selectListener: (DockItem) -> Unit) : ListAdapter<
             width = itemConfig.width
             height = itemConfig.height
         }
-        holder.bind(currentList[position], itemConfig)
+        val item = currentList[position] as? DockItem.Button
+        holder.bind(item ?: DockItem.Stub, itemConfig)
     }
 }

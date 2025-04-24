@@ -19,10 +19,10 @@ import kotlin.math.min
 
 class DockItemHolder(
     val binding: ItemDockBinding,
-    private val selectListener: (DockItem) -> Unit,
+    private val selectListener: (DockItem.Button) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    private lateinit var item: DockItem
+    private lateinit var item: DockItem.Button
     private var config = DockItemConfig.Stub
 
     init {
@@ -35,7 +35,7 @@ class DockItemHolder(
         }
     }
 
-    fun bind(item: DockItem, config: DockItemConfig) {
+    fun bind(item: DockItem.Button, config: DockItemConfig) {
         if (config != this.config) {
             binding.popup.removeAllViews()
         }
@@ -44,7 +44,7 @@ class DockItemHolder(
         bind(item)
     }
 
-    private fun bind(item: DockItem) = binding.run {
+    private fun bind(item: DockItem.Button) = binding.run {
         when (item.icon) {
             0 -> icon.setImageDrawable(null)
             else -> icon.setImageResource(item.icon)
