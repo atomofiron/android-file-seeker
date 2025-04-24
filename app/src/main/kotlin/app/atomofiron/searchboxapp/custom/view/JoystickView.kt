@@ -50,15 +50,16 @@ class JoystickView @JvmOverloads constructor(
     private var glowColor = 0
 
     private val animator = ValueAnimator.ofFloat()
-    private val blurRadius = resources.getDimension(R.dimen.joystick_elevation)
-    private var trackTouchEvent = false
+    private val shadowRadius = resources.getDimension(R.dimen.joystick_elevation)
+    private val glowRadius = shadowRadius * 2
+    private var trackTouches = false
     private var pressure = 0f
     private val maxRadius get() = min(width, height) / 2 - padding
-    private val minRadius get() = maxRadius - blurRadius / 2
+    private val minRadius get() = maxRadius - shadowRadius / 2
 
     private var composition = JoystickComposition.Default
-    private var bitmap = createBitmap(1, 1, Bitmap.Config.ALPHA_8)
-    private var blurCanvas = Canvas(bitmap)
+    private var blurBitmap = createBitmap(1, 1, Bitmap.Config.ALPHA_8)
+    private var blurCanvas = Canvas(blurBitmap)
     private val offset = IntArray(2)
 
     init {
@@ -72,17 +73,17 @@ class JoystickView @JvmOverloads constructor(
         val hw = icon.intrinsicWidth / 2
         val hv = icon.intrinsicHeight / 2
         icon.setBounds(-hw, -hv, hw, hv)
-        paintBlur.maskFilter = BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.NORMAL)
+        paintBlur.maskFilter = BlurMaskFilter(shadowRadius, BlurMaskFilter.Blur.NORMAL)
     }
 
     @SuppressLint("DrawAllocation")
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         val size = min(right - left, bottom - top)
-        if (size != 0 && bitmap.width != size) {
-            bitmap.recycle()
-            bitmap = createBitmap(size, size)
-            blurCanvas = Canvas(bitmap)
+        if (size != 0 && blurBitmap.width != size) {
+            blurBitmap.recycle()
+            blurBitmap = createBitmap(size, size)
+            blurCanvas = Canvas(blurBitmap)
         }
     }
 
@@ -114,30 +115,34 @@ class JoystickView @JvmOverloads constructor(
         invalidate()
     }
 
-    @SuppressLint("ClickableViewAccessibility")
-    override fun onTouchEvent(event: MotionEvent): Boolean {
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
-            MotionEvent.ACTION_DOWN -> press()
-            MotionEvent.ACTION_MOVE -> if (trackTouchEvent && event.outside()) release()
+            MotionEvent.ACTION_DOWN -> if (!event.outside()) press()
+            MotionEvent.ACTION_MOVE -> if (trackTouches && event.outside()) release()
             MotionEvent.ACTION_UP,
-            MotionEvent.ACTION_CANCEL -> if (trackTouchEvent) release()
+            MotionEvent.ACTION_CANCEL -> when {
+                trackTouches -> release()
+                else -> return true
+            }
         }
-        return super.onTouchEvent(event)
+        return super.dispatchTouchEvent(event)
     }
 
     override fun draw(canvas: Canvas) {
         super.draw(canvas)
-        val width = bitmap.width
-        val height = bitmap.height
+        val width = blurBitmap.width
+        val height = blurBitmap.height
         val cx = width / 2f
         val cy = height / 2f
         val radius = fromToBy(maxRadius, minRadius, pressure)
         blurCanvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
-        blurCanvas.drawCircle(cx, cy, radius, paint)
-        val glowing = bitmap.extractAlpha(paintBlur, offset)
+        blurCanvas.drawCircle(cx, cy, maxRadius, paint)
+        val blurRadius = fromToBy(shadowRadius, glowRadius, pressure)
+        paintBlur.maskFilter = BlurMaskFilter(blurRadius, BlurMaskFilter.Blur.NORMAL)
+        val glowing = blurBitmap.extractAlpha(paintBlur, offset)
         val dx = offset.first().toFloat()
-        val dy = offset.last() + blurRadius * (1f - pressure) / 2f
-        glowingPaint.color = ColorUtils.compositeColors(ColorUtils.setAlphaComponent(glowColor, (FULL * pressure).toInt()), shadowColor)
+        val dy = offset.last() + shadowRadius * (1f - pressure) / 2f
+        glowingPaint.color = calcBlurColor()
         canvas.drawBitmap(glowing, dx, dy, glowingPaint)
         canvas.drawCircle(cx, cy, radius, paint)
 
@@ -145,6 +150,12 @@ class JoystickView @JvmOverloads constructor(
         canvas.translate(cx, cy)
         canvas.scale(scale, scale)
         icon.draw(canvas)
+    }
+
+    private fun calcBlurColor(): Int {
+        val glowAlpha = (FULL * pressure).toInt()
+        val foreground = ColorUtils.setAlphaComponent(glowColor, glowAlpha)
+        return ColorUtils.compositeColors(foreground, shadowColor)
     }
 
     private fun fromToBy(from: Float, to: Float, by: Float) = from + (to - from) * by
@@ -156,7 +167,7 @@ class JoystickView @JvmOverloads constructor(
     }
 
     private fun press() {
-        trackTouchEvent = true
+        trackTouches = true
         if (composition.withHaptic) performHapticFeedback(PRESS)
         play(RELEASED, PRESSED)
         pressure = 1f
@@ -164,7 +175,7 @@ class JoystickView @JvmOverloads constructor(
     }
 
     private fun release() {
-        trackTouchEvent = false
+        trackTouches = false
         if (composition.withHaptic) performHapticFeedback(RELEASE)
         play(PRESSED, RELEASED)
     }
