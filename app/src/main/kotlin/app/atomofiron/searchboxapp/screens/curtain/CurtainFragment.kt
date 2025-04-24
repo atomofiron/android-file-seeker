@@ -115,11 +115,12 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         val verticalPadding = resources.getDimensionPixelSize(R.dimen.curtain_padding)
         val minPadding = resources.getDimensionPixelSize(R.dimen.content_margin)
         val half = resources.getDimensionPixelSize(R.dimen.content_margin_half)
+        val joystickPadding = resources.getDimensionPixelSize(R.dimen.joystick_padding)
         root.setInsetsModifier { _, windowInsets ->
             val ime = windowInsets[ExtType.ime]
             curtainSheet.updatePaddingRelative(bottom = ime.bottom)
             val navigationBars = max(0, windowInsets[ExtType.navigationBars].bottom - ime.bottom)
-            val joystick = max(0, windowInsets[ExtType.joystickBottom].bottom - ime.bottom)
+            val joystick = max(0, windowInsets[ExtType.joystickBottom].bottom - joystickPadding - ime.bottom)
             val bottomPadding = when {
                 joystick > 0 -> joystick + half
                 else -> navigationBars + max(verticalPadding - ime.bottom, minPadding)
