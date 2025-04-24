@@ -58,7 +58,13 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/inverse_glowing"
             />
-
+        <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/with_haptic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/with_haptic"
+            />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btn_default"
             android:layout_width="wrap_content"
@@ -66,14 +72,6 @@
             android:layout_gravity="center_horizontal"
             android:text="@string/by_default"
             style="?materialButtonOutlinedStyle"
-            />
-
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/with_haptic"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/with_haptic"
             />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

@@ -87,7 +87,7 @@ class JoystickDelegate(
 
         override fun onClick(view: View) {
             entity = when (view.id) {
-                R.id.btn_default -> entity.withPrimary(view.context).copy(overrideTheme = false, invForDark = false)
+                R.id.btn_default -> JoystickComposition.Default.withPrimary(view.context)
                 else -> throw Exception()
             }
             binding.bind(entity)
