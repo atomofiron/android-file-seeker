@@ -2,15 +2,13 @@ package app.atomofiron.searchboxapp.screens.preferences
 
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.preference.UpdateActionListener
-import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExportImportDelegate
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
-import app.atomofiron.searchboxapp.utils.Shell
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 class PreferencePresenter(
     scope: CoroutineScope,
@@ -18,8 +16,7 @@ class PreferencePresenter(
     router: PreferenceRouter,
     exportImportDelegate: ExportImportDelegate.ExportImportOutput,
     preferenceClickOutput: PreferenceClickOutput,
-    private val preferenceStore: PreferenceStore,
-    appStore: AppStore,
+    preferenceStore: PreferenceStore,
     updateDelegate: UpdateActionListener,
 ) : BasePresenter<PreferenceViewModel, PreferenceRouter>(scope, router),
     ExportImportDelegate.ExportImportOutput by exportImportDelegate,
@@ -27,30 +24,17 @@ class PreferencePresenter(
     UpdateActionListener by updateDelegate
 {
 
-    val resources by appStore.resourcesProperty
-
     init {
         preferenceStore.appTheme.collect(scope) {
             viewState.showDeepBlack.value = it !is AppTheme.Light
         }
-        onSubscribeData()
-    }
-
-    override fun onSubscribeData() {
-        preferenceStore.useSu.collect(scope) {
-            if (it) onUseSuEnabled()
+        scope.launch {
+            val useSu = preferenceStore.useSu.value
+            if (useSu && !onUseSuChanged(true)) {
+                preferenceStore { setUseSu(false) }
+            }
         }
     }
 
-    private suspend fun onUseSuEnabled() {
-        val output = Shell.checkSu()
-        if (!output.success) {
-            val error = output.error.trim()
-            preferenceStore.setUseSu(false)
-            val message = error
-                .takeIf { it.isNotBlank() }
-                ?: resources.getString(R.string.not_allowed)
-            viewState.showAlert(message)
-        }
-    }
+    override fun onSubscribeData() = Unit
 }

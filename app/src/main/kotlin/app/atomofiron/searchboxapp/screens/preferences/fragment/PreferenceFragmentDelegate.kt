@@ -47,6 +47,9 @@ class PreferenceFragmentDelegate(
 
     private fun updatePreference(preference: Preference, newValue: Any? = null): Boolean {
         when (val key = preference.key) {
+            PreferenceKeys.KeyUseSu.name -> newValue?.let {
+                return clickOutput.onUseSuChanged(newValue as Boolean)
+            }
             PreferenceKeys.KeySpecialCharacters.name -> preference.updateStringSummary(newValue as String?)
             PreferenceKeys.KeyAppTheme.name -> {
                 var name = newValue?.toString() ?: preference.preferenceDataStore?.getString(key, null)

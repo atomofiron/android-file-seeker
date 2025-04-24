@@ -66,18 +66,22 @@ class PreferenceModule {
     @PreferenceScope
     fun preferenceClickPresenterDelegate(
         scope: CoroutineScope,
+        viewState: PreferenceViewState,
         router: PreferenceRouter,
         exportImportDelegate: ExportImportDelegate.ExportImportOutput,
         preferenceStore: PreferenceStore,
         curtainChannel: CurtainChannel,
+        appStore: AppStore,
         appSource: AppSource,
     ): PreferenceClickOutput {
         return PreferenceClickPresenterDelegate(
             scope,
+            viewState,
             router,
             exportImportDelegate,
             preferenceStore,
             curtainChannel,
+            appStore,
             appSource,
         )
     }
@@ -97,7 +101,6 @@ class PreferenceModule {
         exportImportDelegate: ExportImportDelegate.ExportImportOutput,
         preferenceClickOutput: PreferenceClickOutput,
         preferenceStore: PreferenceStore,
-        appStore: AppStore,
         updateDelegate: UpdateActionListener,
     ): PreferencePresenter {
         return PreferencePresenter(
@@ -107,7 +110,6 @@ class PreferenceModule {
             exportImportDelegate,
             preferenceClickOutput,
             preferenceStore,
-            appStore,
             updateDelegate,
         )
     }
