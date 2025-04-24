@@ -18,6 +18,7 @@ import android.widget.FrameLayout
 import androidx.core.graphics.withClip
 import androidx.core.view.updateLayoutParams
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.coerceInRange
 import app.atomofiron.common.util.extension.corner
 import app.atomofiron.common.util.extension.nearby
 import app.atomofiron.common.util.findColorByAttr
@@ -31,6 +32,7 @@ import app.atomofiron.searchboxapp.custom.view.dock.DockItemConfig
 import app.atomofiron.searchboxapp.custom.view.dock.DockItemHolder
 import app.atomofiron.searchboxapp.custom.view.dock.DockMode
 import app.atomofiron.searchboxapp.model.Layout.Ground
+import app.atomofiron.searchboxapp.utils.Alpha
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -48,9 +50,7 @@ class DockItemChildrenView(
     private val selectListener: (DockItem) -> Unit,
 ) : FrameLayout(context), ValueAnimator.AnimatorUpdateListener {
 
-    private val holder = LayoutInflater.from(context)
-        .let { ItemDockBinding.inflate(it, this, true) }
-        .let { DockItemHolder(it) { collapse() } }
+    private val close = ItemDockBinding.inflate(LayoutInflater.from(context), this, true)
     private val childrenView = DockViewImpl(context, children, config, mode = DockMode.Popup(config.popup, children.columns))
     private val backgroundPath = Path()
     private var clipPath = Path()
@@ -63,16 +63,17 @@ class DockItemChildrenView(
 
     init {
         setWillNotDraw(false)
-        holder.bind(DockItem(R.drawable.ic_cross, 0), config)
-        holder.itemView.setOnClickListener { toggle() }
-        holder.itemView.updateLayoutParams {
+        DockItemHolder(close) { collapse() }
+            .bind(DockItem(R.drawable.ic_cross, 0), config)
+        close.root.setOnClickListener { collapse() }
+        close.root.updateLayoutParams {
             width = config.width
             height = config.height
         }
         childrenView.outlineProvider = ChildrenOutlineProvider(corner)
         childrenView.clipToOutline = true
-        childrenView.background = null
         childrenView.elevation = 0f
+        childrenView.setTransparent(true)
         childrenView.setListener(::onSelect)
         addView(childrenView)
         childrenView.updateLayoutParams<LayoutParams> {
@@ -123,6 +124,10 @@ class DockItemChildrenView(
         combinedPath.addRect(centerX, centerY + radius.dec(), centerX.inc(), centerY + radius, Path.Direction.CW)
         invalidate()
         invalidateOutline()
+
+        val cross = (currentValue * 3 - 1).coerceInRange(Alpha.INVISIBLE, Alpha.VISIBLE)
+        close.icon.alpha = cross
+        close.icon.rotation = 45 * (cross - 1f)
     }
 
     override fun draw(canvas: Canvas) {
@@ -138,12 +143,9 @@ class DockItemChildrenView(
 
     fun expand() = animTo(EXPANDED)
 
-    private fun collapse(withDelay: Boolean = false) = animTo(COLLAPSED, withDelay)
-
-    private fun toggle() = when (targetValue) {
-        COLLAPSED -> expand()
-        EXPANDED -> collapse()
-        else -> Unit
+    private fun collapse(withDelay: Boolean = false) = when {
+        targetValue == COLLAPSED && !withDelay -> remove()
+        else -> animTo(COLLAPSED, withDelay)
     }
 
     private fun remove() {
@@ -192,8 +194,8 @@ class DockItemChildrenView(
 
     private fun updateBackgroundPath() = backgroundPath.run {
         val ground = config.popup.ground
-        val closeLeft = holder.itemView.x - offset
-        val closeTop = holder.itemView.y - offset
+        val closeLeft = close.root.x - offset
+        val closeTop = close.root.y - offset
         val closeRight = closeLeft + config.width + offset * 2
         val closeBottom = closeTop + config.height + offset * 2
         val popupLeft = childrenView.x

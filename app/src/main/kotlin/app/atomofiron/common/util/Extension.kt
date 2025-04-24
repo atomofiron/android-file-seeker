@@ -128,3 +128,14 @@ fun ViewGroup.noClip() {
     clipChildren = false
     clipToOutline = false
 }
+
+fun Float.coerceInRange(from: Float, to: Float) = when {
+    from > to -> when {
+        this < to -> to
+        this > from -> from
+        else -> this
+    }
+    this < from -> from
+    this > to -> to
+    else -> this
+}
