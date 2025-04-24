@@ -14,10 +14,11 @@ import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockItemChildrenView
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 
 class DockItemHolder(
-    private val binding: ItemDockBinding,
+    val binding: ItemDockBinding,
     private val selectListener: (DockItem) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -84,7 +85,7 @@ class DockItemHolder(
             Ground.Bottom -> parent.run { width - paddingRight + offset } - root.left
             Ground.Left, Ground.Right -> minLeft + popup.spaceWidth
         }
-        val minTop = when (ground) {
+        var minTop = when (ground) {
             Ground.Bottom -> -popup.spaceHeight - offset
             Ground.Left, Ground.Right -> min(parent.paddingTop, root.top) - offset - root.top
         }
@@ -96,6 +97,12 @@ class DockItemHolder(
         if (abs(maxBottom - bottomThreshold) < corner * 2) {
             maxBottom = bottomThreshold
         }
+        maxBottom = max(maxBottom, bottomThreshold)
+        val topThreshold = -offset
+        if (abs(minTop - topThreshold) < corner * 2) {
+            minTop = topThreshold
+        }
+        minTop = min(minTop, -topThreshold)
         val popupConfig = popup.copy(rect = Rect(minLeft, minTop, maxRight, maxBottom))
         val childConfig = config.copy(width = root.width, height = root.height, popup = popupConfig)
         val childrenView = DockItemChildrenView(root.context, item.children, childConfig, selectListener)
