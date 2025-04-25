@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.finder
 
 import android.content.Context
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
@@ -17,10 +16,13 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
+import app.atomofiron.searchboxapp.custom.view.dock.DockItem
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderSpanSizeLookup
 import app.atomofiron.searchboxapp.screens.finder.history.adapter.HistoryAdapter
+import app.atomofiron.searchboxapp.screens.finder.model.FinderDock
 import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.model.finderDockItems
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.set
@@ -63,13 +65,8 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
             adapter = finderAdapter
         }
 
-        binding.bottomBar.isItemActiveIndicatorEnabled = false
-        binding.bottomBar.setOnItemSelectedListener(::onNavigationItemSelected)
-        binding.navigationRail.menu.removeItem(R.id.placeholder)
-        binding.navigationRail.setOnItemSelectedListener(::onNavigationItemSelected)
-        binding.navigationRail.isItemActiveIndicatorEnabled = false
-        binding.bottomBar.menu.findItem(R.id.menu_settings).icon = NoticeableDrawable(requireContext(), R.drawable.ic_settings)
-        binding.navigationRail.menu.findItem(R.id.menu_settings).icon = NoticeableDrawable(requireContext(), R.drawable.ic_settings)
+        binding.dockBar.submit(finderDockItems(NoticeableDrawable(requireContext(), R.drawable.ic_settings)))
+        binding.dockBar.setListener(::onNavigationItemSelected)
 
         binding.drawer.run {
             onGravityChangeListener = presenter::onDrawerGravityChange
@@ -87,12 +84,11 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         onApplyInsets(view)
     }
 
-    private fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_explorer -> presenter.onExplorerOptionSelected()
-            R.id.menu_settings -> presenter.onSettingsOptionSelected()
+    private fun onNavigationItemSelected(item: DockItem) {
+        when (item.id) {
+            FinderDock.Files -> presenter.onExplorerOptionSelected()
+            FinderDock.Settings -> presenter.onSettingsOptionSelected()
         }
-        return false
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -116,18 +112,18 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         viewCollect(snackbar, collector = ::onShowSnackbar)
         viewCollect(showHistory) { binding.drawer.open() }
         viewCollect(permissionRequiredWarning, collector = ::showPermissionRequiredWarning)
-        viewCollect(settingsNotification, collector = ::setSettingsNotification)
+        viewCollect(settingsNotification) {
+            binding.dockBar[FinderDock.Settings] = it
+        }
     }
 
     override fun onApplyInsets(root: View) = binding.run {
         LayoutDelegate(
             this.root,
             recyclerView = recyclerView,
-            bottomView = bottomBar,
-            railView = navigationRail,
-            joystickPlaceholder = bottomBar.menu.findItem(R.id.placeholder),
+            dockView = dockBar,
         )
-        insetsBackground.setAdditional(ExtType.rail)
+        insetsBackground.setAdditional(ExtType.dock)
     }
 
     override fun onBack(): Boolean {
@@ -158,10 +154,5 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         binding.snackbarContainer.makeSnackbar(R.string.access_to_storage_forbidden, Snackbar.LENGTH_LONG)
             .setAction(R.string.allow) { presenter.onAllowStorageClick() }
             .show()
-    }
-
-    private fun setSettingsNotification(value: Boolean) {
-        binding.bottomBar.menu[R.id.menu_settings] = value
-        binding.navigationRail.menu[R.id.menu_settings] = value
     }
 }
