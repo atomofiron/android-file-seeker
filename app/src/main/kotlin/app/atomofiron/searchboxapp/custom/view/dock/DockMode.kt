@@ -7,7 +7,10 @@ sealed interface DockMode {
     val ground: Ground
     val isBottom get() = ground.isBottom
 
-    data class Pinned(override val ground: Ground) : DockMode
+    data class Pinned(
+        override val ground: Ground,
+        val notch: DockNotch?,
+    ) : DockMode
 
     data class Popup(val config: DockPopupConfig, val columns: Int) : DockMode {
         override val ground get() = config.ground

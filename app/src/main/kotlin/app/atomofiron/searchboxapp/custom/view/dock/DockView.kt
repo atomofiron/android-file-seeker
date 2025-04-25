@@ -15,13 +15,17 @@ import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
 import app.atomofiron.searchboxapp.model.Layout
-import app.atomofiron.searchboxapp.utils.findIndexedOrNull
+import app.atomofiron.searchboxapp.poop
+import app.atomofiron.searchboxapp.utils.removeOneIf
 
 interface DockView {
+    val items: List<DockItem>
     fun setMode(mode: DockMode)
     fun submit(items: List<DockItem>)
-    fun setListener(listener: (DockItem.Button) -> Unit)
+    fun setListener(listener: (DockItem) -> Unit)
 }
+
+private val NotchStub = DockItem(DockItem.Id.Undefined, icon = null, label = 0, enabled = false)
 
 @SuppressLint("ViewConstructor")
 class DockViewImpl(
@@ -31,7 +35,7 @@ class DockViewImpl(
     private var mode: DockMode? = null,
 ) : RecyclerView(context), DockView, Forwarding {
 
-    private var listener: ((DockItem.Button) -> Unit)? = null
+    private var listener: ((DockItem) -> Unit)? = null
     private val adapter = DockAdapter { listener?.invoke(it) }
     private val gridManager = GridLayoutManager(context, 322)
     private val padding = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
@@ -40,6 +44,9 @@ class DockViewImpl(
         context.findColorByAttr(MaterialAttr.colorSurfaceContainer),
         corners = resources.getDimension(R.dimen.dock_overlay_corner),
     )
+    private val mutableItems = mutableListOf<DockItem>()
+    private val itemCount get() = mutableItems.size
+    override val items: List<DockItem> get() = mutableItems
 
     init {
         noClip()
@@ -57,9 +64,9 @@ class DockViewImpl(
         super.setAdapter(adapter)
         if (isInEditMode) {
             adapter.itemConfig = DockItemConfig.Stub.copy(width = MATCH_PARENT, height = WRAP_CONTENT)
-            adapter.submitList(Array(5) { DockItem(R.drawable.ic_circle_cross, R.string.done) }.toList())
+            adapter.submitList(Array(5) { DockItem(DockItem.Id(it.toLong()), R.drawable.ic_circle_cross, R.string.done) }.toList())
             layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-            mode = DockMode.Pinned(Layout.Ground.Bottom)
+            mode = DockMode.Pinned(Layout.Ground.Bottom, null)
         }
         mode?.apply()
     }
@@ -96,11 +103,14 @@ class DockViewImpl(
         }
     }
 
-    override fun setListener(listener: (DockItem.Button) -> Unit) {
+    override fun setListener(listener: (DockItem) -> Unit) {
         this.listener = listener
     }
 
     override fun submit(items: List<DockItem>) {
+        poop("submit ${items.size}")
+        mutableItems.clear()
+        mutableItems.addAll(items)
         adapter.submitList(items)
         mode?.apply()
     }
@@ -122,6 +132,23 @@ class DockViewImpl(
     }
 
     private fun DockMode.apply() {
+        val notch = (this as? DockMode.Pinned)?.notch
+        when (notch != null) {
+            mutableItems.any { it === NotchStub } -> Unit
+            else -> mutableItems.run {
+                when (notch) {
+                    null -> removeOneIf { it === NotchStub }
+                    else -> add(size / 2, NotchStub)
+                }
+                adapter.submitList(mutableItems)
+            }
+        }
+        background = when (this) {
+            is DockMode.Pinned -> notch?.let {
+                DockNotch(width = notch.width + 2 * notchInset, height = notch.height + notchInset)
+            }?.let { shape.setNotch(it) }
+            is DockMode.Popup -> null
+        }
         gridManager.orientation = when (this) {
             is DockMode.Pinned -> VERTICAL
             is DockMode.Popup -> when (true) {
@@ -131,7 +158,7 @@ class DockViewImpl(
             }
         }
         gridManager.spanCount = when (this) {
-            is DockMode.Pinned -> if (isBottom) adapter.itemCount else 1
+            is DockMode.Pinned -> if (isBottom) itemCount else 1
             is DockMode.Popup -> columns
         }.coerceAtLeast(1)
         adapter.itemConfig = when (this) {
@@ -160,16 +187,5 @@ class DockViewImpl(
             }
             super.setLayoutParams(this)
         }
-        background = adapter.currentList
-            .takeIf { isBottom && this is DockMode.Pinned }
-            ?.findIndexedOrNull { it is DockItem.Notch }
-            ?.let { (index, item) ->
-                item as DockItem.Notch
-                DockNotch(
-                    bias = (0.5f + index) / adapter.itemCount,
-                    width = item.width + 2 * notchInset,
-                    height = item.height + notchInset,
-                )
-            }?.let { shape.setNotch(it) }
     }
 }

@@ -64,7 +64,7 @@ class DockBottomShape(
         y = rect.top
         corner(x, y, top = true, left = true, clockWise = true, radius = corners)
         notch?.let { notch ->
-            x = rect.left + rect.width() * notch.bias - notch.radius
+            x = rect.left + rect.width() / 2 - notch.radius
             corner(x, y, left = false, top = true, clockWise = true, corners)
             y += notch.height
             corner(x, y, left = true, top = false, clockWise = false, notch.radius)

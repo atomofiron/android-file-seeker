@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 
 class DockAdapter(
-    private val selectListener: (DockItem.Button) -> Unit,
+    private val selectListener: (DockItem) -> Unit,
 ) : ListAdapter<DockItem, DockItemHolder>(DockItemCallback()) {
 
     var itemConfig = DockItemConfig.Stub
@@ -22,7 +22,7 @@ class DockAdapter(
         setHasStableIds(true)
     }
 
-    override fun getItemId(position: Int): Long = currentList[position].id
+    override fun getItemId(position: Int): Long = currentList[position].id.value
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DockItemHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -37,7 +37,6 @@ class DockAdapter(
             width = itemConfig.width
             height = itemConfig.height
         }
-        val item = currentList[position] as? DockItem.Button
-        holder.bind(item ?: DockItem.Stub, itemConfig)
+        holder.bind(currentList[position], itemConfig)
     }
 }

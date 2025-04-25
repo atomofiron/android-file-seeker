@@ -15,8 +15,8 @@ class DockBarView(
     context: Context,
     attrs: AttributeSet?,
     defStyleAttr: Int,
-    private val dockBarView: DockViewImpl,
-) : FrameLayout(context, attrs, defStyleAttr), DockView by dockBarView, Forwarding by dockBarView {
+    val dockView: DockViewImpl,
+) : FrameLayout(context, attrs, defStyleAttr), DockView by dockView, Forwarding by dockView {
 
     @JvmOverloads
     constructor(
@@ -31,9 +31,9 @@ class DockBarView(
     }
 
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {
-        if (params != null && dockBarView.parent == null) {
-            dockBarView.layoutParams = LayoutParams(params.width, params.height)
-            addView(dockBarView)
+        if (params != null && dockView.parent == null) {
+            dockView.layoutParams = LayoutParams(params.width, params.height)
+            addView(dockView)
         }
         params?.width = MATCH_PARENT
         params?.height = MATCH_PARENT
@@ -41,10 +41,10 @@ class DockBarView(
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
-        if (event.pointerCount == 1) for (child in dockBarView.children) {
+        if (event.pointerCount == 1) for (child in dockView.children) {
             val popup = child.findViewById<ViewGroup>(R.id.popup).getChildAt(0)
             popup ?: continue
-            val moved = event.offset(-(dockBarView.x + child.x), -(dockBarView.y + child.y))
+            val moved = event.offset(-(dockView.x + child.x), -(dockView.y + child.y))
             if (popup.dispatchTouchEvent(moved)) {
                 return true
             }
@@ -55,6 +55,7 @@ class DockBarView(
     private fun MotionEvent.offset(dx: Float, dy: Float) = MotionEvent.obtain(downTime, eventTime, action, x + dx, y + dy, pressure, size, metaState, xPrecision, yPrecision, deviceId, edgeFlags)
 }
 
+@Suppress("unused")
 interface Forwarding {
     fun setPadding(left: Int, top: Int, right: Int, bottom: Int)
     fun setPaddingRelative(start: Int, top: Int, end: Int, bottom: Int)

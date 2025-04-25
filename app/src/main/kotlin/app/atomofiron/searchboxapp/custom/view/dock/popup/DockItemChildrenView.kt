@@ -42,12 +42,14 @@ private const val DELAY = 256L
 private const val COLLAPSED = 0f
 private const val EXPANDED = 1f
 
+private val CrossItem = DockItem(DockItem.Id.Undefined, R.drawable.ic_cross, 0)
+
 @SuppressLint("ViewConstructor")
 class DockItemChildrenView(
     context: Context,
     children: DockItemChildren,
     private val config: DockItemConfig,
-    private val selectListener: (DockItem.Button) -> Unit,
+    private val selectListener: (DockItem) -> Unit,
 ) : FrameLayout(context), ValueAnimator.AnimatorUpdateListener {
 
     private val close = ItemDockBinding.inflate(LayoutInflater.from(context), this, true)
@@ -64,7 +66,7 @@ class DockItemChildrenView(
     init {
         setWillNotDraw(false)
         DockItemHolder(close) { collapse() }
-            .bind(DockItem(R.drawable.ic_cross, 0), config)
+            .bind(CrossItem, config)
         close.root.setOnClickListener { collapse() }
         close.root.updateLayoutParams {
             width = config.width
@@ -164,7 +166,7 @@ class DockItemChildrenView(
         animator.start()
     }
 
-    private fun onSelect(item: DockItem.Button) {
+    private fun onSelect(item: DockItem) {
         collapse(withDelay = true)
         selectListener(item)
     }
