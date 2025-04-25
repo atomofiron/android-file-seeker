@@ -20,7 +20,6 @@ import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.DockNotch
 import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.model.ScreenSize
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getDisplayCompat
 import app.atomofiron.searchboxapp.utils.isRtl
@@ -95,7 +94,6 @@ object LayoutDelegate {
             InsetsSource.submit(ExtType.rail, insets)
         }
         dockView?.dockView?.insetsSource { view ->
-            poop("insetsSource ${view.width} ${view.height}")
             val insets = when {
                 layout.isBottom -> Insets.of(0, 0, 0, view.height)
                 layout.isLeft -> Insets.of(view.width, 0, 0, 0)

@@ -15,7 +15,6 @@ import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
 import app.atomofiron.searchboxapp.model.Layout
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.utils.removeOneIf
 
 interface DockView {
@@ -108,7 +107,6 @@ class DockViewImpl(
     }
 
     override fun submit(items: List<DockItem>) {
-        poop("submit ${items.size}")
         mutableItems.clear()
         mutableItems.addAll(items)
         adapter.submitList(items)

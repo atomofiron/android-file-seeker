@@ -18,7 +18,6 @@ import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeError
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerDock
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.explorerDockItems
@@ -29,8 +28,6 @@ import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.recyclerView
 import app.atomofiron.searchboxapp.utils.set
 import com.google.android.material.snackbar.Snackbar
-import lib.atomofiron.insets.ExtendedWindowInsets
-import lib.atomofiron.insets.addInsetsListener
 import lib.atomofiron.insets.insetsPadding
 
 class ExplorerFragment : Fragment(R.layout.fragment_explorer),
@@ -125,9 +122,6 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     override fun onApplyInsets(root: View) {
         binding.run {
-            root.addInsetsListener {
-                poop("onApplyInsets ${it[ExtType.dock]}")
-            }
             explorerTabs.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
             LayoutDelegate(
                 this.root,
