@@ -494,14 +494,14 @@ class FastScroller2(
     @VisibleForTesting
     fun isPointInsideVerticalThumb(x: Float, y: Float): Boolean {
         return when {
-            onTheLeft -> x <= verticalThumbArea
-            else -> x >= mRecyclerViewWidth - verticalThumbArea
+            onTheLeft -> x.toInt() in paddingLeft.let { it..(it + verticalThumbArea) }
+            else -> x.toInt() in (mRecyclerViewWidth - paddingRight).let { (it - verticalThumbArea)..it }
         } && y >= mVerticalThumbCenterY - mVerticalThumbHeight / 2 && y <= mVerticalThumbCenterY + mVerticalThumbHeight / 2
     }
 
     @VisibleForTesting
     fun isPointInsideHorizontalThumb(x: Float, y: Float): Boolean {
-        return (y >= mRecyclerViewHeight - horizontalThumbArea)
+        return y.toInt() in (mRecyclerViewHeight - paddingBottom).let { (it - horizontalThumbArea).. it }
                 && x >= mHorizontalThumbCenterX - mHorizontalThumbWidth / 2 && x <= mHorizontalThumbCenterX + mHorizontalThumbWidth / 2
     }
 
