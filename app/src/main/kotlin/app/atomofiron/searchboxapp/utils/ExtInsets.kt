@@ -5,6 +5,7 @@ import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.TypeSet
 
 object ExtType : ExtendedWindowInsets.Type() {
+    val dock = define("dock")
     val rail = define("rail")
     val navigation = define("navigation")
     val joystickTop = define("joystickTop")

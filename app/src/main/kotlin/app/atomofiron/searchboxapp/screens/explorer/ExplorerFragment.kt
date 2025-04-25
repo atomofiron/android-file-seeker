@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.explorer
 
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.MenuItem
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -13,12 +12,16 @@ import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.FragmentExplorerBinding
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
-import app.atomofiron.fileseeker.databinding.FragmentExplorerBinding
+import app.atomofiron.searchboxapp.custom.view.dock.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.poop
+import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerDock
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapter
+import app.atomofiron.searchboxapp.screens.explorer.fragment.explorerDockItems
 import app.atomofiron.searchboxapp.screens.main.util.KeyCodeConsumer
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getString
@@ -26,6 +29,8 @@ import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.recyclerView
 import app.atomofiron.searchboxapp.utils.set
 import com.google.android.material.snackbar.Snackbar
+import lib.atomofiron.insets.ExtendedWindowInsets
+import lib.atomofiron.insets.addInsetsListener
 import lib.atomofiron.insets.insetsPadding
 
 class ExplorerFragment : Fragment(R.layout.fragment_explorer),
@@ -54,13 +59,8 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     private fun FragmentExplorerBinding.initView() {
         pager.adapter = pagerAdapter
-        bottomBar.isItemActiveIndicatorEnabled = false
-        bottomBar.setOnItemSelectedListener(::onNavigationItemSelected)
-        bottomBar.menu.findItem(R.id.menu_settings).icon = NoticeableDrawable(requireContext(), R.drawable.ic_settings)
-        navigationRail.menu.findItem(R.id.menu_settings).icon = NoticeableDrawable(requireContext(), R.drawable.ic_settings)
-        binding.navigationRail.menu.removeItem(R.id.placeholder)
-        navigationRail.setOnItemSelectedListener(::onNavigationItemSelected)
-        navigationRail.isItemActiveIndicatorEnabled = false
+        dockBar.submit(explorerDockItems(NoticeableDrawable(requireContext(), R.drawable.ic_settings)))
+        dockBar.setListener(::onNavigationItemSelected)
         pager.recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
         pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
@@ -87,12 +87,11 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
         secondButton.setTextColor(textColors)
     }
 
-    private fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_search -> presenter.onSearchOptionSelected()
-            R.id.menu_settings -> presenter.onSettingsOptionSelected()
+    private fun onNavigationItemSelected(item: DockItem) {
+        when (item.id) {
+            ExplorerDock.Search -> presenter.onSearchOptionSelected()
+            ExplorerDock.Settings -> presenter.onSettingsOptionSelected()
         }
-        return false
     }
 
     override fun ExplorerViewState.onViewCollect() {
@@ -116,7 +115,9 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
             getCurrentTabView().scrollTo(item)
         }
         viewCollect(alerts, collector = ::showSnackbar)
-        viewCollect(settingsNotification, collector = ::setSettingsNotification)
+        viewCollect(settingsNotification) {
+            binding.dockBar[ExplorerDock.Settings] = it
+        }
         viewCollect(currentTab) {
             binding.pager.currentItem = it.index
         }
@@ -124,13 +125,14 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     override fun onApplyInsets(root: View) {
         binding.run {
-            explorerTabs.insetsPadding(ExtType { barsWithCutout + rail }, start = true, top = true, end = true)
+            root.addInsetsListener {
+                poop("onApplyInsets ${it[ExtType.dock]}")
+            }
+            explorerTabs.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
             LayoutDelegate(
                 this.root,
-                bottomView = bottomBar,
-                railView = navigationRail,
+                dockView = dockBar,
                 //tabLayout = explorerTabs,
-                joystickPlaceholder = bottomBar.menu.findItem(R.id.placeholder),
             )
         }
     }
@@ -161,10 +163,5 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
                 }
             }
         }.show()
-    }
-
-    private fun setSettingsNotification(value: Boolean) {
-        binding.bottomBar.menu[R.id.menu_settings] = value
-        binding.navigationRail.menu[R.id.menu_settings] = value
     }
 }

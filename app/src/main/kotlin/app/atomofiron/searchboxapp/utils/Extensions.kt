@@ -5,6 +5,8 @@ import android.view.Menu
 import androidx.annotation.IdRes
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
+import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
+import app.atomofiron.searchboxapp.custom.view.dock.DockItem
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Locale
@@ -87,6 +89,15 @@ inline fun <E> Iterable<E>.findIndexed(predicate: (E) -> Boolean): Pair<Int, E?>
 
 operator fun Menu.set(@IdRes id: Int, value: Boolean) {
     (findItem(id).icon as? NoticeableDrawable)?.forceShowDot(value)
+}
+
+operator fun DockBarView.set(id: DockItem.Id, value: Boolean) {
+    for (item in items) {
+        if (item.id != id) continue
+        val drawable = (item.icon as? DockItem.Icon.Res)?.drawable as? NoticeableDrawable
+        drawable ?: continue
+        drawable.forceShowDot(value)
+    }
 }
 
 fun Boolean.toInt(): Int = if (this) 1 else -1

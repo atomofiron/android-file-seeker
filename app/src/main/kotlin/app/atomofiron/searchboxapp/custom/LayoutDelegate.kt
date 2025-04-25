@@ -15,8 +15,12 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.custom.view.JoystickView
+import app.atomofiron.searchboxapp.custom.view.dock.DockMode
+import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
+import app.atomofiron.searchboxapp.custom.view.dock.DockNotch
 import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.model.ScreenSize
+import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getDisplayCompat
 import app.atomofiron.searchboxapp.utils.isRtl
@@ -37,6 +41,7 @@ object LayoutDelegate {
     operator fun invoke(
         root: ViewGroup,
         recyclerView: RecyclerView? = null,
+        dockView: DockBarView? = null,
         bottomView: BottomNavigationView? = null,
         railView: NavigationRailView? = null,
         tabLayout: MaterialButtonToggleGroup? = null,
@@ -48,12 +53,21 @@ object LayoutDelegate {
         val insetsProvider = (root as View).findInsetsProvider()!!
         var layout = Layout(Layout.Ground.Bottom, withJoystick = true, root.isRtl())
         val railDelegate = railView?.insetsPadding(ExtType { barsWithCutout + joystickTop })
+        val dockDelegate = dockView?.insetsPadding(ExtType { barsWithCutout + joystickTop })
+        val notch = root.resources.run {
+            val size = getDimensionPixelSize(R.dimen.joystick_size) - 2 * getDimensionPixelSize(R.dimen.joystick_padding)
+            DockNotch(size)
+        }
+        val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + navigation + rail + dock }, start = true, top = appBarLayout == null, end = true, bottom = true)
         root.setLayoutListener { new ->
             layout = new
             joystickPlaceholder?.isVisible = layout.withJoystick
             bottomView?.isVisible = !layout.isWide
             railView?.isVisible = layout.isWide
             tabLayout?.isVisible = !layout.isWide
+            dockView?.setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.ground.isBottom }))
+            dockDelegate?.applyDockLayout(layout)
+            recyclerDelegate?.combining(if (layout.isBottom) null else InsetsCombining(ExtType.invoke { displayCutout + dock }) )
             /* нужно только когда есть табы
             explorerViews?.forEach {
                 it.systemUiView.update(statusBar = landscape)
@@ -61,11 +75,9 @@ object LayoutDelegate {
             railView?.applyLayout(railDelegate, layout)
             insetsProvider.requestInsets()
         }
-        snackbarContainer?.insetsPadding(ExtType.invoke { barsWithCutout + ime + navigation + rail })
-        appBarLayout?.insetsPadding(ExtType.invoke { barsWithCutout + rail + joystickFlank }, start = true, top = true, end = true)
-        recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + navigation + rail }, start = true, top = appBarLayout == null, end = true, bottom = true)
-            ?.combining(InsetsCombining(ExtType.invoke { displayCutout + rail }))
-        headerView?.insetsPadding(ExtType.invoke { barsWithCutout + navigation + rail }, start = true, top = true, end = true)
+        snackbarContainer?.insetsPadding(ExtType.invoke { barsWithCutout + ime + navigation + rail + dock })
+        appBarLayout?.insetsPadding(ExtType.invoke { barsWithCutout + rail + dock + joystickFlank }, start = true, top = true, end = true)
+        headerView?.insetsPadding(ExtType.invoke { barsWithCutout + navigation + rail + dock }, start = true, top = true, end = true)
         bottomView?.insetsPadding(start = true, end = true, bottom = true)
         bottomView?.insetsSource { view ->
             val insets = when {
@@ -82,6 +94,16 @@ object LayoutDelegate {
             }
             InsetsSource.submit(ExtType.rail, insets)
         }
+        dockView?.dockView?.insetsSource { view ->
+            poop("insetsSource ${view.width} ${view.height}")
+            val insets = when {
+                layout.isBottom -> Insets.of(0, 0, 0, view.height)
+                layout.isLeft -> Insets.of(view.width, 0, 0, 0)
+                layout.isRight -> Insets.of(0, 0, view.width, 0)
+                else -> Insets.NONE
+            }
+            InsetsSource.submit(ExtType.dock, insets)
+        }
     }
 
     private fun NavigationRailView.applyLayout(railDelegate: ViewInsetsDelegate?, layout: Layout) {
@@ -97,6 +119,16 @@ object LayoutDelegate {
             is FrameLayout.LayoutParams -> params.gravity = gravity
             is CoordinatorLayout.LayoutParams -> params.gravity = gravity
             else -> throw IllegalArgumentException("Unsupported layout params ${params.javaClass.name}")
+        }
+    }
+
+    private fun ViewInsetsDelegate.applyDockLayout(layout: Layout) {
+        changeInsets {
+            when {
+                layout.isBottom -> padding(start, end, bottom)
+                layout.isStart -> padding(start, top, bottom)
+                else -> padding(top, end, bottom)
+            }
         }
     }
 

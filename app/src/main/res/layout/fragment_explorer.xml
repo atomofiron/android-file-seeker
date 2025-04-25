@@ -52,31 +52,9 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         />
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:clickable="true"
-        android:focusable="false"
-        app:menu="@menu/nav_explorer"
-        app:itemTextColor="?android:textColorPrimary"
-        app:itemIconTint="?android:textColorPrimary"
-        app:labelVisibilityMode="labeled"
-        app:itemTextAppearanceActiveBoldEnabled="false"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
-    <com.google.android.material.navigationrail.NavigationRailView
-        android:id="@+id/navigation_rail"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:background="@color/transparent"
-        app:menu="@menu/nav_explorer"
-        app:labelVisibilityMode="unlabeled"
-        app:itemTextColor="?android:textColorPrimary"
-        app:itemIconTint="?android:textColorPrimary"
-        app:elevation="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
+    <app.atomofiron.searchboxapp.custom.view.dock.DockBarView
+        android:id="@+id/dock_bar"
+        android:layout_width="@dimen/dock_width"
+        android:layout_height="@dimen/dock_height"
         />
 </lib.atomofiron.insets.InsetsProviderFrameLayout>

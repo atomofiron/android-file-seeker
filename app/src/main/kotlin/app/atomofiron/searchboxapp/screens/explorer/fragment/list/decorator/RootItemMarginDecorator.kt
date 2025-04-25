@@ -41,7 +41,7 @@ class RootItemMarginDecorator(resources: Resources) : RecyclerView.ItemDecoratio
     }
 
     override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
-        val cutout = windowInsets[ExtType { displayCutout + rail }]
+        val cutout = windowInsets[ExtType { displayCutout + dock }]
         update(leftMargin = max(margin - cutout.left, 0), rightMargin = max(margin - cutout.right, 0))
     }
 
