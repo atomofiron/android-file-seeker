@@ -1,8 +1,8 @@
 package app.atomofiron.searchboxapp.screens.result.state
 
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.view.dock.DockItem
-import app.atomofiron.searchboxapp.custom.view.dock.DockItemChildren
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 
 data class ResultDockState(
     val status: DockItem,

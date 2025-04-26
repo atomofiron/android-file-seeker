@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.custom.view.dock
+package app.atomofiron.searchboxapp.custom.view.dock.item
 
 data class DockItemChildren(
     val columns: Int,

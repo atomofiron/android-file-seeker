@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.custom.view.dock
+package app.atomofiron.searchboxapp.custom.view.dock.item
 
 import android.graphics.Rect
 import androidx.core.view.isNotEmpty
@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
-import app.atomofiron.searchboxapp.custom.view.dock.DockItem.Icon
-import app.atomofiron.searchboxapp.custom.view.dock.DockItem.Label
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Icon
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Label
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockItemChildrenView
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import kotlin.math.abs

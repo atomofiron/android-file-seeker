@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.custom.view.dock
+package app.atomofiron.searchboxapp.custom.view.dock.item
 
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
 import app.atomofiron.searchboxapp.model.Layout

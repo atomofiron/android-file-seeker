@@ -1,12 +1,10 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.app.PendingIntent
-import android.view.Menu
-import androidx.annotation.IdRes
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
-import app.atomofiron.searchboxapp.custom.view.dock.DockItem
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Locale

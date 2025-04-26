@@ -17,7 +17,7 @@ import app.atomofiron.fileseeker.databinding.FragmentResultBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.custom.addFastScroll
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
-import app.atomofiron.searchboxapp.custom.view.dock.DockItem
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition

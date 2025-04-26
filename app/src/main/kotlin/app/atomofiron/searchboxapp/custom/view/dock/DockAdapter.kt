@@ -5,6 +5,10 @@ import android.view.ViewGroup
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.ListAdapter
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemCallback
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemHolder
 
 class DockAdapter(
     private val selectListener: (DockItem) -> Unit,

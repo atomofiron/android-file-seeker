@@ -27,10 +27,10 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.drawable.PathDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.DockViewImpl
-import app.atomofiron.searchboxapp.custom.view.dock.DockItem
-import app.atomofiron.searchboxapp.custom.view.dock.DockItemChildren
-import app.atomofiron.searchboxapp.custom.view.dock.DockItemConfig
-import app.atomofiron.searchboxapp.custom.view.dock.DockItemHolder
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemHolder
 import app.atomofiron.searchboxapp.custom.view.dock.DockMode
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import app.atomofiron.searchboxapp.utils.Alpha

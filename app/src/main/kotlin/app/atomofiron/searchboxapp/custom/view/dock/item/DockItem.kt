@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.custom.view.dock
+package app.atomofiron.searchboxapp.custom.view.dock.item
 
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes

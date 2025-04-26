@@ -16,7 +16,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.setScreenSizeListener
 import app.atomofiron.fileseeker.databinding.FragmentTextViewerBinding
-import app.atomofiron.searchboxapp.custom.view.dock.DockItem
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
