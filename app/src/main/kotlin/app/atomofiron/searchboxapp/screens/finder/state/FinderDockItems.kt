@@ -12,7 +12,7 @@ fun finderDockItems(settings: Drawable) = listOf(
     DockItem(
         FinderDock.Files,
         DockItem.Icon(R.drawable.ic_tree),
-        DockItem.Label(R.string.search),
+        DockItem.Label(R.string.explorer),
     ),
     DockItem(
         FinderDock.Settings,
