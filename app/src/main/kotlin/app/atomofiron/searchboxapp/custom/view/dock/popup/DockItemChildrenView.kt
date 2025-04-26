@@ -42,7 +42,7 @@ private const val DELAY = 256L
 private const val COLLAPSED = 0f
 private const val EXPANDED = 1f
 
-private val CrossItem = DockItem(DockItem.Id.Undefined, R.drawable.ic_cross, 0)
+private val CrossItem = DockItem(DockItem.Id.Undefined, DockItem.Icon(R.drawable.ic_cross))
 
 @SuppressLint("ViewConstructor")
 class DockItemChildrenView(

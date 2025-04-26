@@ -1,16 +1,15 @@
 package app.atomofiron.searchboxapp.custom.view.dock
 
 import android.graphics.Rect
-import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.util.MaterialColor
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
+import app.atomofiron.searchboxapp.custom.view.dock.DockItem.Icon
+import app.atomofiron.searchboxapp.custom.view.dock.DockItem.Label
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockItemChildrenView
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import kotlin.math.abs
@@ -29,9 +28,7 @@ class DockItemHolder(
         binding.run {
             root.noClip()
             popup.noClip()
-            root.setOnClickListener(::onClick)
-            icon.imageTintList = ContextCompat.getColorStateList(root.context, MaterialColor.m3_navigation_item_icon_tint)
-            label.setTextColor(ContextCompat.getColorStateList(root.context, MaterialColor.m3_navigation_item_text_color))
+            root.setOnClickListener { onClick() }
         }
     }
 
@@ -47,22 +44,27 @@ class DockItemHolder(
     private fun bind(item: DockItem) = binding.run {
         when (val it = item.icon) {
             null -> icon.setImageDrawable(null)
-            is DockItem.Icon.Res -> icon.setImageDrawable(it.drawable)
-            is DockItem.Icon.ResId -> icon.setImageResource(it.resId)
+            is Icon.Value -> icon.setImageDrawable(it.drawable)
+            is Icon.Res -> icon.setImageResource(it.resId)
         }
-        when (item.label) {
-            0 -> label.text = null
-            else -> label.setText(item.label)
+        when (val it = item.label) {
+            null -> label.text = null
+            is Label.Value -> label.text = it.value
+            is Label.Res -> label.setText(it.resId)
         }
-        label.isVisible = item.label != 0
+        icon.isVisible = item.icon != null
+        label.isVisible = item.label != null
         root.isSelected = item.selected
         root.isEnabled = item.enabled
+        val emptyLabel = (item.label as? Label.Value)?.value?.isEmpty() == true
+        icon.isEnabled = emptyLabel
+        icon.isDuplicateParentStateEnabled = !emptyLabel
         if (item.children.isEmpty()) {
             popup.removeAllViews()
         }
     }
 
-    private fun onClick(view: View) = when {
+    private fun onClick() = when {
         item.children.isEmpty() -> selectListener(item)
         else -> binding.showPopup()
     }

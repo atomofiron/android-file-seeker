@@ -24,7 +24,7 @@ interface DockView {
     fun setListener(listener: (DockItem) -> Unit)
 }
 
-private val NotchStub = DockItem(DockItem.Id.Undefined, icon = null, label = 0, enabled = false)
+private val NotchStub = DockItem(DockItem.Id.Undefined, enabled = false)
 
 @SuppressLint("ViewConstructor")
 class DockViewImpl(
@@ -63,7 +63,7 @@ class DockViewImpl(
         super.setAdapter(adapter)
         if (isInEditMode) {
             adapter.itemConfig = DockItemConfig.Stub.copy(width = MATCH_PARENT, height = WRAP_CONTENT)
-            adapter.submitList(Array(5) { DockItem(DockItem.Id(it.toLong()), R.drawable.ic_circle_cross, R.string.done) }.toList())
+            adapter.submitList(Array(5) { DockItem(DockItem.Id(it.toLong()), DockItem.Icon(R.drawable.ic_circle_cross), DockItem.Label(R.string.done)) }.toList())
             layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
             mode = DockMode.Pinned(Layout.Ground.Bottom, null)
         }
