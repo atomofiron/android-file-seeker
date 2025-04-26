@@ -11,8 +11,8 @@ import androidx.core.view.isVisible
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.RegexInputField
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem.SearchAndReplaceItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.SearchAndReplaceItem
 import java.util.regex.Pattern
 
 class FieldHolder(parent: ViewGroup, layoutId: Int, private val listener: OnActionListener) :

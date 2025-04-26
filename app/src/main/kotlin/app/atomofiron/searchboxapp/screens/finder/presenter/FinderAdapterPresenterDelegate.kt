@@ -9,7 +9,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolde
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ConfigHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.FieldHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ProgressHolder
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
 class FinderAdapterPresenterDelegate(
     private val viewState: FinderViewState,

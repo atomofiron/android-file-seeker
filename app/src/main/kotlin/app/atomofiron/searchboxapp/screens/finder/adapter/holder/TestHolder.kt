@@ -10,7 +10,7 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import java.util.regex.Pattern
 
 class TestHolder(parent: ViewGroup, layoutId: Int) : GeneralHolder<FinderStateItem>(parent, layoutId), TextWatcher {

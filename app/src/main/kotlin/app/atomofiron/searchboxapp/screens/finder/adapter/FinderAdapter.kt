@@ -4,8 +4,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.*
-import app.atomofiron.searchboxapp.screens.finder.model.FinderItemType
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderItemType
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
 class FinderAdapter : ListAdapter<FinderStateItem, GeneralHolder<FinderStateItem>>(FinderDiffUtilCallback()) {
 

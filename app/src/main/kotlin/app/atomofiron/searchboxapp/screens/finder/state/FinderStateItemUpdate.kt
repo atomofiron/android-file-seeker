@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.finder.model
+package app.atomofiron.searchboxapp.screens.finder.state
 
 sealed class FinderStateItemUpdate(val index: Int) {
     class Changed(index: Int, val item: FinderStateItem) : FinderStateItemUpdate(index)

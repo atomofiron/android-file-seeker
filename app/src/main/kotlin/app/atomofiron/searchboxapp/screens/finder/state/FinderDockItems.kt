@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.finder.model
+package app.atomofiron.searchboxapp.screens.finder.state
 
 import android.graphics.drawable.Drawable
 import app.atomofiron.fileseeker.R
@@ -11,12 +11,12 @@ enum class FinderDock(override val value: Long) : DockItem.Id {
 fun finderDockItems(settings: Drawable) = listOf(
     DockItem(
         FinderDock.Files,
-        R.drawable.ic_tree,
-        R.string.search,
+        DockItem.Icon(R.drawable.ic_tree),
+        DockItem.Label(R.string.search),
     ),
     DockItem(
         FinderDock.Settings,
-        settings,
-        R.string.settings,
+        DockItem.Icon(settings),
+        DockItem.Label(R.string.settings),
     ),
 )

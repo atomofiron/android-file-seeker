@@ -18,9 +18,9 @@ import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeError
-import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerDock
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapter
-import app.atomofiron.searchboxapp.screens.explorer.fragment.explorerDockItems
+import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock
+import app.atomofiron.searchboxapp.screens.explorer.state.explorerDockItems
 import app.atomofiron.searchboxapp.screens.main.util.KeyCodeConsumer
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getString

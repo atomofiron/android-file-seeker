@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.finder.adapter
 
 import android.annotation.SuppressLint
 import androidx.recyclerview.widget.DiffUtil
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
 class FinderDiffUtilCallback : DiffUtil.ItemCallback<FinderStateItem>() {
 

@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 
 import android.view.ViewGroup
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
 class DisclaimerHolder(
     parent: ViewGroup,

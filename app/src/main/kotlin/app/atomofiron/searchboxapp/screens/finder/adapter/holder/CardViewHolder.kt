@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import app.atomofiron.fileseeker.R
 import app.atomofiron.common.recycler.GeneralHolder
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
 abstract class CardViewHolder(parent: ViewGroup, layoutId: Int)
     : GeneralHolder<FinderStateItem>(wrapWithCard(parent, layoutId)) {

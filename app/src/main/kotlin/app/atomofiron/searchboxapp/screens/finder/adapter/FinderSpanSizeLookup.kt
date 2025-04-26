@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.finder.adapter
 
 import androidx.recyclerview.widget.GridLayoutManager
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import kotlin.math.max
 
 class FinderSpanSizeLookup(

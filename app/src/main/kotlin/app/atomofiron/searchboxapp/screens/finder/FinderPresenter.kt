@@ -15,7 +15,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ConfigHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.FieldHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ProgressHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderTargetsPresenterDelegate
 import kotlinx.coroutines.CoroutineScope

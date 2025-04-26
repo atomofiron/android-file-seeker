@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.finder.model
+package app.atomofiron.searchboxapp.screens.finder.state
 
 import app.atomofiron.fileseeker.R
 

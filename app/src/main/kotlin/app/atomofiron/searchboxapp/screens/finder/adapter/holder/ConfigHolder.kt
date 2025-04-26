@@ -6,7 +6,7 @@ import android.widget.CompoundButton
 import androidx.core.view.isGone
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
 class ConfigHolder(
     parent: ViewGroup,

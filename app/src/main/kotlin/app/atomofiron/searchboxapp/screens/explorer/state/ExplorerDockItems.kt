@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.explorer.fragment
+package app.atomofiron.searchboxapp.screens.explorer.state
 
 import android.graphics.drawable.Drawable
 import app.atomofiron.fileseeker.R
@@ -11,12 +11,13 @@ enum class ExplorerDock(override val value: Long) : DockItem.Id {
 fun explorerDockItems(settings: Drawable) = listOf(
     DockItem(
         ExplorerDock.Search,
-        R.drawable.ic_search,
-        R.string.search,
+        DockItem.Icon(R.drawable.ic_search),
+        DockItem.Label(R.string.search),
     ),
     DockItem(
         ExplorerDock.Settings,
-        settings,
-        R.string.settings,
+        DockItem.Icon(settings),
+        DockItem.Label(R.string.settings),
+        enabled = false,
     ),
 )
