@@ -7,7 +7,7 @@ import app.atomofiron.searchboxapp.injectable.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
-import app.atomofiron.searchboxapp.screens.finder.model.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerRouter
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState
 import app.atomofiron.searchboxapp.screens.viewer.presenter.curtain.CurtainSearchDelegate

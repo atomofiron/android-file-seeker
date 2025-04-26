@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <lib.atomofiron.insets.InsetsProviderFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/result_cl"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,37 +15,18 @@
             android:id="@+id/recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:paddingBottom="@dimen/dock_notch_inset"
             />
     </app.atomofiron.searchboxapp.screens.explorer.fragment.SwipeMarkerLayout>
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
-        android:clickable="true"
-        android:focusable="false"
-        app:menu="@menu/nav_result"
-        app:itemTextColor="?android:textColorPrimary"
-        app:itemIconTint="?android:textColorPrimary"
-        app:labelVisibilityMode="labeled"
-        app:itemTextAppearanceActiveBoldEnabled="false"
-        />
     <app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
         android:id="@+id/system_ui_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
-    <com.google.android.material.navigationrail.NavigationRailView
-        android:id="@+id/navigation_rail"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        android:background="@color/transparent"
-        app:menu="@menu/nav_result"
-        app:itemTextColor="?android:textColorPrimary"
-        app:itemIconTint="?android:textColorPrimary"
-        app:labelVisibilityMode="unlabeled"
-        app:elevation="0dp"
+    <app.atomofiron.searchboxapp.custom.view.dock.DockBarView
+        android:id="@+id/dock_bar"
+        android:layout_width="@dimen/dock_width"
+        android:layout_height="@dimen/dock_height"
         />
     <app.atomofiron.searchboxapp.custom.view.SnackbarContainerLayout
         android:id="@+id/snackbar_container"

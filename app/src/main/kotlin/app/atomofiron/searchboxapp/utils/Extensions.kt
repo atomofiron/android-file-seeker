@@ -87,14 +87,10 @@ inline fun <E> Iterable<E>.findIndexed(predicate: (E) -> Boolean): Pair<Int, E?>
     return -1 to null
 }
 
-operator fun Menu.set(@IdRes id: Int, value: Boolean) {
-    (findItem(id).icon as? NoticeableDrawable)?.forceShowDot(value)
-}
-
 operator fun DockBarView.set(id: DockItem.Id, value: Boolean) {
     for (item in items) {
         if (item.id != id) continue
-        val drawable = (item.icon as? DockItem.Icon.Res)?.drawable as? NoticeableDrawable
+        val drawable = (item.icon as? DockItem.Icon.Value)?.drawable as? NoticeableDrawable
         drawable ?: continue
         drawable.forceShowDot(value)
     }

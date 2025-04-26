@@ -75,8 +75,6 @@
 		<item name="isBlackDeep">true</item>
 
 		<item name="materialCardViewStyle">@style/CardViewStyle.Amoled</item>
-		<item name="bottomNavigationStyle">@style/BottomNavigationStyle.Amoled</item>
-		<item name="navigationRailStyle">@style/NavigationRailStyle.Amoled</item>
 		<item name="appBarLayoutStyle">@style/AppBarLayoutStyle.Amoled</item>
 		<item name="collapsingToolbarLayoutStyle">@style/CollapsingToolbarLayoutStyle.Amoled</item>
 	</style>
@@ -91,8 +89,6 @@
 		<item name="isBlackDeep">true</item>
 
 		<item name="materialCardViewStyle">@style/CardViewStyle.Amoled</item>
-		<item name="bottomNavigationStyle">@style/BottomNavigationStyle.Amoled</item>
-		<item name="navigationRailStyle">@style/NavigationRailStyle.Amoled</item>
 		<item name="appBarLayoutStyle">@style/AppBarLayoutStyle.Amoled</item>
 		<item name="collapsingToolbarLayoutStyle">@style/CollapsingToolbarLayoutStyle.Amoled</item>
 	</style>
@@ -104,10 +100,6 @@
 	<style name="CardViewStyle" parent="@style/Widget.Material3.CardView.Elevated" />
 
 	<style name="CardViewStyle.Amoled" parent="@style/Widget.Material3.CardView.Elevated" />
-
-	<style name="BottomNavigationStyle.Amoled" parent="@style/Widget.Material3.BottomNavigationView" />
-
-	<style name="NavigationRailStyle.Amoled" parent="@style/Widget.Material3.NavigationRailView" />
 
 	<style name="AppBarLayoutStyle.Amoled" parent="@style/Widget.Material3.AppBarLayout" />
 

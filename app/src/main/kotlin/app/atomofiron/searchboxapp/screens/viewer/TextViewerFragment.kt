@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.screens.viewer
 
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -17,11 +16,13 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.setScreenSizeListener
 import app.atomofiron.fileseeker.databinding.FragmentTextViewerBinding
+import app.atomofiron.searchboxapp.custom.view.dock.DockItem
 import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.viewer.recycler.TextViewerAdapter
-import app.atomofiron.searchboxapp.utils.updateItem
+import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState
+import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState.Companion.Default as DefaultDockState
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_NO_SCROLL
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
@@ -56,11 +57,8 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
             (recyclerView.layoutParams as CoordinatorLayout.LayoutParams).run {
                 behavior = AppBarLayout.ScrollingViewBehavior()
             }
-            navigationRail.menu.removeItem(R.id.placeholder)
-            navigationRail.isItemActiveIndicatorEnabled = false
-            navigationRail.setOnItemSelectedListener(::onBottomMenuItemClick)
-            bottomBar.isItemActiveIndicatorEnabled = false
-            bottomBar.setOnItemSelectedListener(::onBottomMenuItemClick)
+            dockBar.submit(DefaultDockState)
+            dockBar.setListener(::onBottomMenuItemClick)
             if (BuildConfig.DEBUG) toolbar.menu.add("Test")
             toolbar.setNavigationOnClickListener { presenter.onNavigationClick() }
             toolbar.setOnMenuItemClickListener { item ->
@@ -89,10 +87,8 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
             LayoutDelegate(
                 root as ViewGroup,
                 recyclerView = recyclerView,
-                bottomView = bottomBar,
-                railView = navigationRail,
+                dockView = dockBar,
                 appBarLayout = appbarLayout,
-                joystickPlaceholder = bottomBar.menu.findItem(R.id.placeholder),
             )
         }
     }
@@ -110,13 +106,12 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
 
     override fun onBack(): Boolean = presenter.onBackClick() || super.onBack()
 
-    private fun onBottomMenuItemClick(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_search -> presenter.onSearchClick()
-            R.id.menu_previous -> presenter.onPreviousClick()
-            R.id.menu_next -> presenter.onNextClick()
+    private fun onBottomMenuItemClick(item: DockItem) {
+        when (item.id) {
+            DefaultDockState.status.id -> presenter.onSearchClick()
+            DefaultDockState.previous.id -> presenter.onPreviousClick()
+            DefaultDockState.next.id -> presenter.onNextClick()
         }
-        return false
     }
 
     private fun onTaskChanged(task: SearchTask?) {
@@ -126,22 +121,21 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         binding.toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), iconId)
     }
 
-    private fun onStatusChanged(status: TextViewerViewState.Status) {
+    private fun onStatusChanged(state: TextViewerViewState.Status) {
         var index: Int? = null
         var count: Int? = null
-        val text = if (status.countMax == 0) null else {
-            index = status.count
-            count = status.countMax
+        val text = if (state.countMax == 0) null else {
+            index = state.count
+            count = state.countMax
             "$index / $count"
         }
-        val iconId = if (status.loading) R.drawable.progress_loop else R.drawable.ic_circle_check
-        binding.run {
-            bottomBar.updateItem(R.id.menu_status, iconId, text)
-            navigationRail.updateItem(R.id.menu_status, iconId, text)
-            arrayOf(bottomBar.menu, navigationRail.menu).forEach {
-                it.findItem(R.id.menu_previous).isEnabled = !status.loading && index != null && index > 1
-                it.findItem(R.id.menu_next).isEnabled = !status.loading && count != null && index != count
-            }
+        val statusIconId = if (state.loading) R.drawable.progress_loop else R.drawable.ic_circle_check
+        TextViewerDockState {
+            copy(
+                status = status.with(statusIconId).copy(label = DockItem.Label(text)),
+                previous = previous.copy(enabled = !state.loading && index != null && index > 1),
+                next = next.copy(enabled = !state.loading && count != null && index != count),
+            )
         }
     }
 

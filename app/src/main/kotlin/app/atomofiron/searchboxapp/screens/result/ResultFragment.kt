@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.screens.result
 import android.content.res.Configuration
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -13,17 +12,19 @@ import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.unsafeLazy
-import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.fileseeker.databinding.FragmentResultBinding
+import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.custom.addFastScroll
+import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
+import app.atomofiron.searchboxapp.custom.view.dock.DockItem
 import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
 import app.atomofiron.searchboxapp.utils.makeSnackbar
-import com.google.android.material.navigation.NavigationBarView
+import com.google.android.material.snackbar.Snackbar
+import app.atomofiron.searchboxapp.screens.result.state.ResultDockState.Companion.Default as DefaultDockState
 
 class ResultFragment : Fragment(R.layout.fragment_result),
     BaseFragment<ResultFragment, ResultViewState, ResultPresenter> by BaseFragmentImpl()
@@ -59,23 +60,19 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             adapter = resultAdapter
             addFastScroll()
         }
-        binding.navigationRail.menu.removeItem(R.id.placeholder)
-        binding.navigationRail.isItemActiveIndicatorEnabled = false
-        binding.navigationRail.setOnItemSelectedListener(::onBottomMenuItemClick)
-        binding.bottomBar.isItemActiveIndicatorEnabled = false
-        binding.bottomBar.setOnItemSelectedListener(::onBottomMenuItemClick)
+        binding.dockBar.submit(DefaultDockState)
+        binding.dockBar.setListener(::onBottomMenuItemClick)
         viewState.onViewCollect()
         onApplyInsets(view)
     }
 
-    private fun onBottomMenuItemClick(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.menu_stop -> presenter.onStopClick()
-            R.id.menu_sorting -> Unit
-            R.id.menu_export -> presenter.onExportClick()
-            R.id.menu_share -> presenter.onShareClick()
+    private fun onBottomMenuItemClick(item: DockItem) {
+        when (item.id) {
+            DefaultDockState.status.id -> presenter.onStopClick()
+            DefaultDockState.sorting.id -> Unit
+            DefaultDockState.export.id -> presenter.onExportClick()
+            DefaultDockState.share.id -> presenter.onShareClick()
         }
-        return false
     }
 
     override fun ResultViewState.onViewCollect() {
@@ -89,10 +86,8 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             LayoutDelegate(
                 this.root,
                 recyclerView = recyclerView,
-                bottomView = bottomBar,
-                railView = navigationRail,
+                dockView = dockBar,
                 snackbarContainer = binding.snackbarContainer,
-                joystickPlaceholder = bottomBar.menu.findItem(R.id.placeholder),
             )
         }
     }
@@ -102,24 +97,18 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         resultAdapter.notifyItemChanged(0)
     }
 
-    private fun NavigationBarView.onTaskChange(task: SearchTask) {
-        var item = menu.findItem(R.id.menu_stop)
-        if (item.isEnabled != task.inProgress) {
-            item.isEnabled = task.inProgress
-        }
-        item = menu.findItem(R.id.menu_export)
-        if (item.isEnabled != !task.result.isEmpty) {
-            item.isEnabled = !task.result.isEmpty
-        }
-        item = menu.findItem(R.id.menu_share)
-        if (item.isEnabled != (!task.inProgress && task.count > 0)) {
-            item.isEnabled = true
+    private fun DockBarView.onTaskChange(task: SearchTask) {
+        DefaultDockState.run {
+            submit(copy(
+                status = status.copy(enabled = task.inProgress),
+                share = share.copy(enabled = !task.result.isEmpty),
+                export = export.copy(enabled = !task.result.isEmpty),
+            ))
         }
     }
 
     private fun onTaskChange(task: SearchTask) {
-        binding.bottomBar.onTaskChange(task)
-        binding.navigationRail.onTaskChange(task)
+        binding.dockBar.onTaskChange(task)
 
         resultAdapter.setResult(task.result as SearchResult.FinderResult)
 

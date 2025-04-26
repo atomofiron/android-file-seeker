@@ -80,8 +80,8 @@ class ExplorerView(
     }
 
     private fun ViewExplorerBinding.applyInsets() {
-        recyclerView.insetsPadding(ExtType { barsWithCutout + navigation + rail + dock })
-        explorerHeader.insetsPadding(ExtType { barsWithCutout + rail + dock }, start = true, top = true, end = true)
+        recyclerView.insetsPadding(ExtType { barsWithCutout + dock })
+        explorerHeader.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
         root.attachInsetsListener(binding.systemUiBackground)
     }
 

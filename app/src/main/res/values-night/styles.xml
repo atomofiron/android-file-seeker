@@ -36,14 +36,6 @@
         <item name="strokeColor">?colorSurfaceVariant</item>
     </style>
 
-    <style name="BottomNavigationStyle.Amoled" parent="@style/Widget.Material3.BottomNavigationView">
-        <item name="android:background">@color/black</item>
-    </style>
-
-    <style name="NavigationRailStyle.Amoled" parent="@style/Widget.Material3.NavigationRailView">
-        <item name="android:background">@color/black</item>
-    </style>
-
     <style name="AppBarLayoutStyle.Amoled" parent="@style/Widget.Material3.AppBarLayout">
         <item name="android:background">@color/black</item>
     </style>

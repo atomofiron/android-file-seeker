@@ -2,21 +2,22 @@ package app.atomofiron.searchboxapp.custom
 
 import android.view.Display
 import android.view.Gravity
-import android.view.MenuItem
 import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.Insets
-import androidx.core.view.*
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
+import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.custom.view.JoystickView
-import app.atomofiron.searchboxapp.custom.view.dock.DockMode
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
+import app.atomofiron.searchboxapp.custom.view.dock.DockMode
 import app.atomofiron.searchboxapp.custom.view.dock.DockNotch
 import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.model.ScreenSize
@@ -24,9 +25,7 @@ import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getDisplayCompat
 import app.atomofiron.searchboxapp.utils.isRtl
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButtonToggleGroup
-import com.google.android.material.navigationrail.NavigationRailView
 import lib.atomofiron.insets.InsetsCombining
 import lib.atomofiron.insets.InsetsSource
 import lib.atomofiron.insets.ViewInsetsDelegate
@@ -41,58 +40,34 @@ object LayoutDelegate {
         root: ViewGroup,
         recyclerView: RecyclerView? = null,
         dockView: DockBarView? = null,
-        bottomView: BottomNavigationView? = null,
-        railView: NavigationRailView? = null,
         tabLayout: MaterialButtonToggleGroup? = null,
         appBarLayout: AppBarLayout? = null,
         headerView: ExplorerHeaderView? = null,
         snackbarContainer: CoordinatorLayout? = null,
-        joystickPlaceholder: MenuItem? = null,
     ) {
         val insetsProvider = (root as View).findInsetsProvider()!!
         var layout = Layout(Layout.Ground.Bottom, withJoystick = true, root.isRtl())
-        val railDelegate = railView?.insetsPadding(ExtType { barsWithCutout + joystickTop })
         val dockDelegate = dockView?.insetsPadding(ExtType { barsWithCutout + joystickTop })
         val notch = root.resources.run {
             val size = getDimensionPixelSize(R.dimen.joystick_size) - 2 * getDimensionPixelSize(R.dimen.joystick_padding)
             DockNotch(size)
         }
-        val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + navigation + rail + dock }, start = true, top = appBarLayout == null, end = true, bottom = true)
+        val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock }, start = true, top = appBarLayout == null, end = true, bottom = true)
         root.setLayoutListener { new ->
             layout = new
-            joystickPlaceholder?.isVisible = layout.withJoystick
-            bottomView?.isVisible = !layout.isWide
-            railView?.isVisible = layout.isWide
             tabLayout?.isVisible = !layout.isWide
-            dockView?.setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.ground.isBottom }))
+            dockView?.setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.run { ground.isBottom && withJoystick } }))
             dockDelegate?.applyDockLayout(layout)
             recyclerDelegate?.combining(if (layout.isBottom) null else InsetsCombining(ExtType.invoke { displayCutout + dock }) )
             /* нужно только когда есть табы
             explorerViews?.forEach {
                 it.systemUiView.update(statusBar = landscape)
             }*/
-            railView?.applyLayout(railDelegate, layout)
             insetsProvider.requestInsets()
         }
-        snackbarContainer?.insetsPadding(ExtType.invoke { barsWithCutout + ime + navigation + rail + dock })
-        appBarLayout?.insetsPadding(ExtType.invoke { barsWithCutout + rail + dock + joystickFlank }, start = true, top = true, end = true)
-        headerView?.insetsPadding(ExtType.invoke { barsWithCutout + navigation + rail + dock }, start = true, top = true, end = true)
-        bottomView?.insetsPadding(start = true, end = true, bottom = true)
-        bottomView?.insetsSource { view ->
-            val insets = when {
-                layout.isBottom -> Insets.of(0, 0, 0, view.height)
-                else -> Insets.NONE
-            }
-            InsetsSource.submit(ExtType.navigation, insets)
-        }
-        railView?.insetsSource { view ->
-            val insets = when {
-                layout.isLeft -> Insets.of(view.width, 0, 0, 0)
-                layout.isRight -> Insets.of(0, 0, view.width, 0)
-                else -> Insets.NONE
-            }
-            InsetsSource.submit(ExtType.rail, insets)
-        }
+        snackbarContainer?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock })
+        appBarLayout?.insetsPadding(ExtType.invoke { barsWithCutout + dock + joystickFlank }, start = true, top = true, end = true)
+        headerView?.insetsPadding(ExtType.invoke { barsWithCutout + dock }, start = true, top = true, end = true)
         dockView?.dockView?.insetsSource { view ->
             val insets = when {
                 layout.isBottom -> Insets.of(0, 0, 0, view.height)
@@ -101,22 +76,6 @@ object LayoutDelegate {
                 else -> Insets.NONE
             }
             InsetsSource.submit(ExtType.dock, insets)
-        }
-    }
-
-    private fun NavigationRailView.applyLayout(railDelegate: ViewInsetsDelegate?, layout: Layout) {
-        if (!layout.isBottom) railDelegate?.changeInsets {
-            if (layout.isStart) padding(start, top, bottom) else padding(top, end, bottom)
-        }
-        val gravity = when (layout.ground) {
-            Layout.Ground.Left -> Gravity.LEFT
-            Layout.Ground.Right -> Gravity.RIGHT
-            Layout.Ground.Bottom -> return
-        }
-        when (val params = layoutParams) {
-            is FrameLayout.LayoutParams -> params.gravity = gravity
-            is CoordinatorLayout.LayoutParams -> params.gravity = gravity
-            else -> throw IllegalArgumentException("Unsupported layout params ${params.javaClass.name}")
         }
     }
 
