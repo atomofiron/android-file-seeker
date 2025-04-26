@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
+import app.atomofiron.searchboxapp.custom.view.dock.NotchStub
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Icon
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Label
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockItemChildrenView
@@ -42,6 +43,9 @@ class DockItemHolder(
     }
 
     private fun bind(item: DockItem) = binding.run {
+        root.updateLayoutParams {
+            width = if (item === NotchStub) config.notch else config.width
+        }
         when (val it = item.icon) {
             null -> icon.setImageDrawable(null)
             is Icon.Value -> icon.setImageDrawable(it.drawable)
