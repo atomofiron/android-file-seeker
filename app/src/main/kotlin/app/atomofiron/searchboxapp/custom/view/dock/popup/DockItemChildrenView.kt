@@ -14,7 +14,6 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewOutlineProvider
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import androidx.core.graphics.withClip
 import androidx.core.view.updateLayoutParams
@@ -38,7 +37,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
 
-private const val DURATION = 512L * 2//
+private const val DURATION = 512L
 private const val DELAY = 256L
 private const val COLLAPSED = 0f
 private const val EXPANDED = 1f
@@ -88,7 +87,6 @@ class DockItemChildrenView(
             }
         }
         animator.addUpdateListener(this)
-        animator.interpolator = DecelerateInterpolator()
         animator.interpolator = AccelerateDecelerateInterpolator()
 
         elevation = resources.getDimension(R.dimen.overlay_elevation)

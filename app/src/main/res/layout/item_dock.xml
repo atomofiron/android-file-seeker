@@ -37,7 +37,7 @@
             android:textAppearance="?textAppearanceLabelMedium"
             />
     </LinearLayout>
-    <FrameLayout
+    <app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupLayout
         android:id="@+id/popup"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
