@@ -2,9 +2,12 @@ package app.atomofiron.searchboxapp.custom.view.dock
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.MATCH_PARENT
@@ -27,7 +30,7 @@ interface DockView {
     fun setListener(listener: (DockItem) -> Unit)
 }
 
-val NotchStub = DockItem(DockItem.Id.Undefined, enabled = false)
+private val NotchStub = DockItem(DockItem.Id.Undefined, enabled = false)
 
 @SuppressLint("ViewConstructor")
 class DockViewImpl(
@@ -40,6 +43,7 @@ class DockViewImpl(
     private var listener: ((DockItem) -> Unit)? = null
     private val adapter = DockAdapter { listener?.invoke(it) }
     private val gridManager = GridLayoutManager(context, 1)
+    private var layoutDecorator = LayoutDecoration(adapter, itemConfig)
     private val padding = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
     private val notchInset = resources.getDimension(R.dimen.dock_notch_inset)
     private val shape = DockBottomShape(
@@ -61,11 +65,11 @@ class DockViewImpl(
         isVerticalScrollBarEnabled = false
         background = shape
         elevation = resources.getDimension(R.dimen.dock_elevation)
+        addItemDecoration(layoutDecorator)
         setPadding(padding, padding, padding, padding)
         adapter.submitList(items)
         super.setAdapter(adapter)
         if (isInEditMode) {
-            adapter.itemConfig = DockItemConfig.Stub.copy(width = MATCH_PARENT, height = WRAP_CONTENT)
             adapter.submitList(Array(5) { DockItem(DockItem.Id(it.toLong()), DockItem.Icon(R.drawable.ic_circle_cross), DockItem.Label(R.string.done)) }.toList())
             layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
             mode = DockMode.Pinned(Layout.Ground.Bottom, null)
@@ -130,6 +134,7 @@ class DockViewImpl(
         }
         this.mode = mode
         itemConfig = config.with(ground = mode?.ground)
+        adapter.set(itemConfig.popup)
         mode?.apply()
     }
 
@@ -191,15 +196,39 @@ class DockViewImpl(
         val itemWidth = getNotch()
             ?.let { (space - it.width - padding * 2) / itemCount.dec() }
             ?.toInt()
-        adapter.itemConfig = when (this) {
+        layoutDecorator.config = when (this) {
             is DockMode.Pinned -> when {
                 isBottom && itemCount > 1 -> when (itemWidth) {
                     null -> itemConfig.copy(width = space / itemCount)
-                    else -> itemConfig.copy(width = itemWidth, notch = space - itemWidth * itemCount.dec())
+                    else -> itemConfig.copy(width = itemWidth).also {
+                        layoutDecorator.notch = space - itemWidth * itemCount.dec()
+                    }
                 }
                 else -> itemConfig.copy(height = WRAP_CONTENT)
             }
             is DockMode.Popup -> itemConfig
+        }
+    }
+
+    private class LayoutDecoration(
+        private val adapter: DockAdapter,
+        var config: DockItemConfig,
+    ) : ItemDecoration() {
+
+        var notch = 0
+
+        override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: State) {
+            val holder = parent.getChildViewHolder(view)
+            val item = adapter.currentList[holder.bindingAdapterPosition]
+            view.updateLayoutParams {
+                if (item === NotchStub) {
+                    width = notch
+                   //outRect.left = notch
+                } else {
+                    width = config.width
+                    height = config.height
+                }
+            }
         }
     }
 }

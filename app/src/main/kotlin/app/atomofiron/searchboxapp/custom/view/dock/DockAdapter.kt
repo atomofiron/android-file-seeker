@@ -2,25 +2,18 @@ package app.atomofiron.searchboxapp.custom.view.dock
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.ListAdapter
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemCallback
-import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemHolder
+import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
 
 class DockAdapter(
     private val selectListener: (DockItem) -> Unit,
 ) : ListAdapter<DockItem, DockItemHolder>(DockItemCallback()) {
 
-    var itemConfig = DockItemConfig.Stub
-        set(value) {
-            if (value != field) {
-                field = value
-                notifyDataSetChanged()
-            }
-        }
+    private var config: DockPopupConfig? = null
 
     init {
         setHasStableIds(true)
@@ -37,10 +30,13 @@ class DockAdapter(
     }
 
     override fun onBindViewHolder(holder: DockItemHolder, position: Int) {
-        holder.itemView.updateLayoutParams {
-            width = itemConfig.width
-            height = itemConfig.height
+        holder.bind(currentList[position], config)
+    }
+
+    fun set(config: DockPopupConfig) {
+        if (config != this.config) {
+            this.config = config
+            notifyDataSetChanged()
         }
-        holder.bind(currentList[position], itemConfig)
     }
 }

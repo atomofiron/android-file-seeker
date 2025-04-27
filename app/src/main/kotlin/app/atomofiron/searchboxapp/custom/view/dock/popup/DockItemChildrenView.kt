@@ -66,7 +66,7 @@ class DockItemChildrenView(
     init {
         setWillNotDraw(false)
         DockItemHolder(close) { collapse() }
-            .bind(CrossItem, config)
+            .bind(CrossItem, config.popup)
         close.root.setOnClickListener { collapse() }
         close.root.updateLayoutParams {
             width = config.width

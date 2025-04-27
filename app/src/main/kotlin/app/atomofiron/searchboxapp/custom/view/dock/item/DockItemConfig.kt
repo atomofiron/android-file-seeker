@@ -6,11 +6,10 @@ import app.atomofiron.searchboxapp.model.Layout
 data class DockItemConfig(
     val width: Int,
     val height: Int,
-    val notch: Int,
     val popup: DockPopupConfig,
 ) {
     companion object {
-        val Stub = DockItemConfig(0, 0, 0, DockPopupConfig.Stub)
+        val Stub = DockItemConfig(0, 0, DockPopupConfig.Stub)
     }
     val isZero get() = width <= 0 || height <= 0
 

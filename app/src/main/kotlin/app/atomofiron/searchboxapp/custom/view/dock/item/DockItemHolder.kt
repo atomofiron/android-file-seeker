@@ -7,6 +7,7 @@ import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Icon
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Label
+import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
 
 class DockItemHolder(
     val binding: ItemDockBinding,
@@ -14,7 +15,7 @@ class DockItemHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private lateinit var item: DockItem
-    private var config = DockItemConfig.Stub
+    private var config: DockPopupConfig? = null
 
     init {
         binding.run {
@@ -24,7 +25,7 @@ class DockItemHolder(
         }
     }
 
-    fun bind(item: DockItem, config: DockItemConfig) {
+    fun bind(item: DockItem, config: DockPopupConfig?) {
         if (config != this.config) {
             binding.popup.removeAllViews()
         }
@@ -58,7 +59,7 @@ class DockItemHolder(
 
     private fun ItemDockBinding.onClick() = when {
         item.children.isEmpty() -> selectListener(item)
-        popup.isEmpty() -> popup.show(root.parent as RecyclerView, config, root, item.children, selectListener)
+        popup.isEmpty() -> popup.show(root.parent as RecyclerView, config!!, root, item.children, selectListener)
         else -> Unit
     }
 }
