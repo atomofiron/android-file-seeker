@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.custom.view.dock
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_DOWN
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout
@@ -50,6 +51,12 @@ class DockBarView(
             val moved = event.offset(-(dockView.x + dx), -(dockView.y + dy))
             if (popup.dispatchTouchEvent(moved)) {
                 return true
+            }
+            when {
+                event.action != ACTION_DOWN -> Unit
+                moved.x.toInt() !in child.run { left..right } -> Unit
+                moved.y.toInt() !in child.run { top..bottom } -> Unit
+                else -> return true
             }
         }
         return super.dispatchTouchEvent(event)
