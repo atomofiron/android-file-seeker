@@ -13,8 +13,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewOutlineProvider
-import android.view.animation.AccelerateDecelerateInterpolator
+import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.BlendModeColorFilterCompat
+import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.withClip
 import androidx.core.view.updateLayoutParams
 import app.atomofiron.common.util.MaterialAttr
@@ -25,14 +28,13 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.drawable.PathDrawable
+import app.atomofiron.searchboxapp.custom.view.dock.DockMode
 import app.atomofiron.searchboxapp.custom.view.dock.DockViewImpl
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
-import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemHolder
-import app.atomofiron.searchboxapp.custom.view.dock.DockMode
 import app.atomofiron.searchboxapp.model.Layout.Ground
-import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.toIntAlpha
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlin.math.sqrt
@@ -41,19 +43,20 @@ private const val DURATION = 512L
 private const val DELAY = 256L
 private const val COLLAPSED = 0f
 private const val EXPANDED = 1f
-
-private val CrossItem = DockItem(DockItem.Id.Undefined, DockItem.Icon(R.drawable.ic_cross))
+private const val CROSS_ROTATION = 45
 
 @SuppressLint("ViewConstructor")
 class DockItemChildrenView(
     context: Context,
-    children: DockItemChildren,
+    item: DockItem,
     private val config: DockItemConfig,
     private val selectListener: (DockItem) -> Unit,
 ) : FrameLayout(context), ValueAnimator.AnimatorUpdateListener {
 
-    private val close = ItemDockBinding.inflate(LayoutInflater.from(context), this, true)
-    private val childrenView = DockViewImpl(context, children, config, mode = DockMode.Popup(config.popup, children.columns))
+    private val ghost = LayoutInflater.from(context)
+        .let { ItemDockBinding.inflate(it, this, true) }
+        .also { DockItemHolder(it) { collapse() }.bind(item, config.popup) }
+    private val childrenView = DockViewImpl(context, item.children, config, mode = DockMode.Popup(config.popup, item.children.columns))
     private val backgroundPath = Path()
     private var clipPath = Path()
     private var combinedPath = Path()
@@ -62,16 +65,23 @@ class DockItemChildrenView(
     private val animator = ValueAnimator.ofFloat(COLLAPSED)
     private var currentValue = COLLAPSED
     private var targetValue = COLLAPSED
+    private val popupElevation = resources.getDimension(R.dimen.overlay_elevation)
+    private val ghostDrawable = ghost.icon.drawable!!
+    private val crossDrawable = ContextCompat.getDrawable(context, R.drawable.ic_plus)!!
 
     init {
+        if (item.children.isEmpty()) {
+            throw IllegalArgumentException("DockItem hasn't children: $item")
+        }
         setWillNotDraw(false)
-        DockItemHolder(close) { collapse() }
-            .bind(CrossItem, config.popup)
-        close.root.setOnClickListener { collapse() }
-        close.root.updateLayoutParams {
+        ghost.root.setOnClickListener { collapse() }
+        ghost.root.updateLayoutParams {
             width = config.width
             height = config.height
         }
+        crossDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(ghost.icon.imageTintList!!.defaultColor, BlendModeCompat.SRC_IN)
+        ghost.icon.foreground = crossDrawable // LayerDrawable make alpha always 255, overriding of LayerDrawable doesn't help
+        ghost.button.clipChildren = false
         childrenView.outlineProvider = ChildrenOutlineProvider(corner)
         childrenView.clipToOutline = true
         childrenView.elevation = 0f
@@ -87,9 +97,8 @@ class DockItemChildrenView(
             }
         }
         animator.addUpdateListener(this)
-        animator.interpolator = AccelerateDecelerateInterpolator()
+        animator.interpolator = DecelerateInterpolator()
 
-        elevation = resources.getDimension(R.dimen.overlay_elevation)
         background = PathDrawable(combinedPath, context.findColorByAttr(MaterialAttr.colorSurfaceContainer))
     }
 
@@ -112,9 +121,9 @@ class DockItemChildrenView(
         }
         val centerX = config.width / 2f
         val centerY = config.height / 2f
-        var radius = childrenView.run { sqrt(width * width + height * height.toFloat()) }
-        radius += config.run { sqrt(width * width + height * height.toFloat()) / 2 }
-        radius *= currentValue
+        val itemRadius = config.run { sqrt(width * width + height * height.toFloat()) / 2 }
+        val popupRadius = childrenView.run { sqrt(width * width + height * height.toFloat()) }
+        val radius = (itemRadius + popupRadius) * currentValue
         combinedPath.set(backgroundPath)
         if (currentValue > COLLAPSED && currentValue < EXPANDED) {
             clipPath.reset()
@@ -126,9 +135,18 @@ class DockItemChildrenView(
         invalidate()
         invalidateOutline()
 
-        val cross = (currentValue * 3 - 1).coerceInRange(Alpha.INVISIBLE, Alpha.VISIBLE)
-        close.icon.alpha = cross
-        close.icon.rotation = 45 * (cross - 1f)
+        val half = ((radius - itemRadius) / (popupRadius / 2)).coerceInRange(0f, 1f)
+        val iconCenter = ghost.icon.run { top + bottom } / 2
+        val buttonCenter = ghost.button.height / 2
+        val offset = (buttonCenter - iconCenter) / 2 * half
+        val ghostAlpha = 1f - half
+        ghostDrawable.alpha = ghostAlpha.toIntAlpha()
+        crossDrawable.alpha = half.toIntAlpha()
+        ghost.icon.rotation = CROSS_ROTATION * half
+        ghost.icon.translationY = offset
+        ghost.label.translationY = offset
+        ghost.label.alpha = ghostAlpha
+        elevation = popupElevation * half
     }
 
     override fun draw(canvas: Canvas) {
@@ -195,8 +213,8 @@ class DockItemChildrenView(
 
     private fun updateBackgroundPath() = backgroundPath.run {
         val ground = config.popup.ground
-        val closeLeft = close.root.x - offset
-        val closeTop = close.root.y - offset
+        val closeLeft = ghost.root.x - offset
+        val closeTop = ghost.root.y - offset
         val closeRight = closeLeft + config.width + offset * 2
         val closeBottom = closeTop + config.height + offset * 2
         val popupLeft = childrenView.x

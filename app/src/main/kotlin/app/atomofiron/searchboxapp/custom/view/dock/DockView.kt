@@ -160,10 +160,10 @@ class DockViewImpl(
         }
         gridManager.orientation = when (this) {
             is DockMode.Pinned -> if (isBottom) HORIZONTAL else VERTICAL
-            is DockMode.Popup -> when (true) {
-                (columns > DockItemChildren.AUTO),
-                isBottom -> VERTICAL
-                else -> HORIZONTAL
+            is DockMode.Popup -> when {
+                columns > DockItemChildren.AUTO -> VERTICAL
+                isBottom -> HORIZONTAL
+                else -> VERTICAL
             }
         }
         gridManager.spanCount = when (this) {

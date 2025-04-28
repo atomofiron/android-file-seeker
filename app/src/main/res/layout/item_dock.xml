@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     >
     <LinearLayout
+        android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="@dimen/dock_item_half_margin"
@@ -15,16 +16,24 @@
         android:duplicateParentState="true"
         android:paddingVertical="8dp"
         >
-        <ImageView
-            android:id="@id/icon"
-            android:layout_width="24dp"
+        <FrameLayout
+            android:id="@+id/icon_box"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:contentDescription="@null"
             android:duplicateParentState="true"
-            android:scaleType="center"
-            app:tint="?android:attr/textColorSecondary"
-            />
+            >
+            <ImageView
+                android:id="@id/icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:contentDescription="@null"
+                android:duplicateParentState="true"
+                android:foreground="@null"
+                app:tint="?android:attr/textColorSecondary"
+                />
+        </FrameLayout>
         <TextView
             android:id="@+id/label"
             android:layout_width="wrap_content"

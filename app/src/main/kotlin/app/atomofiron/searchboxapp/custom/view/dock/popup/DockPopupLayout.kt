@@ -9,7 +9,6 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
-import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import kotlin.math.abs
@@ -26,7 +25,7 @@ class DockPopupLayout @JvmOverloads constructor(
         parent: RecyclerView,
         config: DockPopupConfig,
         itemView: View,
-        children: DockItemChildren,
+        item: DockItem,
         selectListener: (DockItem) -> Unit,
     ) {
         val container = this
@@ -62,7 +61,7 @@ class DockPopupLayout @JvmOverloads constructor(
         minTop = min(minTop, -topThreshold)
         val popupConfig = config.copy(rect = Rect(minLeft, minTop, maxRight, maxBottom))
         val childConfig = DockItemConfig(width = itemView.width, height = itemView.height, popup = popupConfig)
-        val childrenView = DockItemChildrenView(itemView.context, children, childConfig, selectListener)
+        val childrenView = DockItemChildrenView(itemView.context, item, childConfig, selectListener)
         container.addView(childrenView)
         childrenView.updateLayoutParams {
             width = childConfig.width

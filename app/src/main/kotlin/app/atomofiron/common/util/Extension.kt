@@ -14,6 +14,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import app.atomofiron.fileseeker.R
 import com.google.android.material.color.MaterialColors
+import kotlin.math.min
 
 
 fun View.showKeyboard(): Boolean {
@@ -130,6 +131,7 @@ fun ViewGroup.noClip() {
 }
 
 fun Float.coerceInRange(from: Float, to: Float) = when {
+    isNaN() -> min(from, to)
     from > to -> when {
         this < to -> to
         this > from -> from

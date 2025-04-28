@@ -10,7 +10,7 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Label
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
 
 class DockItemHolder(
-    val binding: ItemDockBinding,
+    private val binding: ItemDockBinding,
     private val selectListener: (DockItem) -> Unit,
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -59,7 +59,7 @@ class DockItemHolder(
 
     private fun ItemDockBinding.onClick() = when {
         item.children.isEmpty() -> selectListener(item)
-        popup.isEmpty() -> popup.show(root.parent as RecyclerView, config!!, root, item.children, selectListener)
+        popup.isEmpty() -> popup.show(root.parent as RecyclerView, config!!, root, item, selectListener)
         else -> Unit
     }
 }
