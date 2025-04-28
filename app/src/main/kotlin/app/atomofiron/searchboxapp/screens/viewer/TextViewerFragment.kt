@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.viewer
 
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.updateLayoutParams
@@ -71,7 +70,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
             configureAppBar()
         }
         viewState.onViewCollect()
-        onApplyInsets(view)
+        binding.onApplyInsets()
     }
 
     override fun TextViewerViewState.onViewCollect() {
@@ -82,15 +81,13 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         viewCollect(status, collector = ::onStatusChanged)
     }
 
-    override fun onApplyInsets(root: View) {
-        binding.run {
-            LayoutDelegate(
-                root as ViewGroup,
-                recyclerView = recyclerView,
-                dockView = dockBar,
-                appBarLayout = appbarLayout,
-            )
-        }
+    private fun FragmentTextViewerBinding.onApplyInsets() {
+        LayoutDelegate(
+            root,
+            recyclerView = recyclerView,
+            dockView = dockBar,
+            appBarLayout = appbarLayout,
+        )
     }
 
     private fun FragmentTextViewerBinding.configureAppBar() {

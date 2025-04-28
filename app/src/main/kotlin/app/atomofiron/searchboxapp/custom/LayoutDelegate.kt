@@ -4,7 +4,6 @@ import android.view.Display
 import android.view.Gravity
 import android.view.Surface
 import android.view.View
-import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.Insets
@@ -19,6 +18,8 @@ import app.atomofiron.searchboxapp.custom.view.JoystickView
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.DockMode
 import app.atomofiron.searchboxapp.custom.view.dock.DockNotch
+import app.atomofiron.searchboxapp.custom.view.layout.MeasureProvider
+import app.atomofiron.searchboxapp.custom.view.layout.RootFrameLayout
 import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -37,7 +38,7 @@ import lib.atomofiron.insets.insetsSource
 object LayoutDelegate {
 
     operator fun invoke(
-        root: ViewGroup,
+        root: MeasureProvider,
         recyclerView: RecyclerView? = null,
         dockView: DockBarView? = null,
         tabLayout: MaterialButtonToggleGroup? = null,
@@ -45,15 +46,15 @@ object LayoutDelegate {
         headerView: ExplorerHeaderView? = null,
         snackbarContainer: CoordinatorLayout? = null,
     ) {
-        val insetsProvider = (root as View).findInsetsProvider()!!
-        var layout = Layout(Layout.Ground.Bottom, withJoystick = true, root.isRtl())
+        val insetsProvider = root.view.findInsetsProvider()!!
+        var layout = Layout(Layout.Ground.Bottom, withJoystick = true, root.view.isRtl())
         val dockDelegate = dockView?.insetsPadding(ExtType { barsWithCutout + joystickTop })
-        val notch = root.resources.run {
+        val notch = root.view.resources.run {
             val size = getDimensionPixelSize(R.dimen.joystick_size) - 2 * getDimensionPixelSize(R.dimen.joystick_padding)
             DockNotch(size)
         }
         val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock }, start = true, top = appBarLayout == null, end = true, bottom = true)
-        root.setLayoutListener { new ->
+        root.addLayoutListener { new ->
             layout = new
             tabLayout?.isVisible = !layout.isWide
             dockView?.setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.run { ground.isBottom && withJoystick } }))
@@ -105,17 +106,16 @@ object LayoutDelegate {
         }.also { last = it }
     }
 
-    private fun View.setLayoutListener(callback: (layout: Layout) -> Unit) {
+    private fun MeasureProvider.addLayoutListener(callback: (Layout) -> Unit) {
         var layoutWas: Layout? = null
-        val display = context.getDisplayCompat()
-        addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            val layout = getLayout(display)
+        val display = view.context.getDisplayCompat()
+        addMeasureListener { width, height ->
+            val layout = view.getLayout(width, height, display)
             if (layoutWas != layout) {
                 layoutWas = layout
                 callback(layout)
             }
         }
-        callback(getLayout())
     }
 
     fun View.setScreenSizeListener(listener: (width: ScreenSize, height: ScreenSize) -> Unit) {
@@ -146,11 +146,13 @@ object LayoutDelegate {
         }
     }
 
-    fun View.getLayout(display: Display? = context.getDisplayCompat()): Layout {
-        val width = if (width > 0) width else resources.displayMetrics.widthPixels
-        val height = if (height > 0) height else resources.displayMetrics.heightPixels
+    fun View.getLayout(): Layout = getLayout(measuredWidth, measuredHeight, context.getDisplayCompat())
+
+    fun View.getLayout(width: Int, height: Int, display: Display?): Layout {
+        val w = if (width > 0) width else resources.displayMetrics.widthPixels
+        val h = if (height > 0) height else resources.displayMetrics.heightPixels
         val maxSize = resources.getDimensionPixelSize(R.dimen.bottom_bar_max_width)
-        val atTheBottom = width < height && width < maxSize
+        val atTheBottom = w < h && w < maxSize
         val ground = when {
             atTheBottom -> Layout.Ground.Bottom
             display?.rotation == Surface.ROTATION_270 -> Layout.Ground.Left
@@ -159,8 +161,8 @@ object LayoutDelegate {
         return Layout(ground, withJoystick(ground.isBottom), isRtl())
     }
 
-    fun JoystickView.syncWithLayout(root: FrameLayout) {
-        root.setLayoutListener { layout ->
+    fun JoystickView.syncWithLayout(root: RootFrameLayout) {
+        root.addLayoutListener { layout ->
             this.isVisible = layout.withJoystick
             updateLayoutParams<FrameLayout.LayoutParams> {
                 val flags = when (layout.ground) {

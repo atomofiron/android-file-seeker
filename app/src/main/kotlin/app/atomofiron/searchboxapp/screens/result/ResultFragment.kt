@@ -63,7 +63,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         binding.dockBar.submit(DefaultDockState)
         binding.dockBar.setListener(::onBottomMenuItemClick)
         viewState.onViewCollect()
-        onApplyInsets(view)
+        binding.onApplyInsets()
     }
 
     private fun onBottomMenuItemClick(item: DockItem) {
@@ -81,15 +81,13 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         viewCollect(alerts, collector = ::showSnackbar)
     }
 
-    override fun onApplyInsets(root: View) {
-        binding.run {
-            LayoutDelegate(
-                this.root,
-                recyclerView = recyclerView,
-                dockView = dockBar,
-                snackbarContainer = binding.snackbarContainer,
-            )
-        }
+    private fun FragmentResultBinding.onApplyInsets() {
+        LayoutDelegate(
+            this.root,
+            recyclerView = recyclerView,
+            dockView = dockBar,
+            snackbarContainer = binding.snackbarContainer,
+        )
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

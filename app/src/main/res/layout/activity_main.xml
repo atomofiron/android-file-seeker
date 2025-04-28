@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<lib.atomofiron.insets.InsetsProviderFrameLayout
+<app.atomofiron.searchboxapp.custom.view.layout.RootFrameLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:id="@+id/activity_root"
@@ -29,4 +29,4 @@
 		android:layout_height="@dimen/joystick_size"
 		android:layout_gravity="bottom|center_horizontal"
 		/>
-</lib.atomofiron.insets.InsetsProviderFrameLayout>
+</app.atomofiron.searchboxapp.custom.view.layout.RootFrameLayout>
