@@ -42,9 +42,12 @@ class DockBarView(
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (event.pointerCount == 1) for (child in dockView.children) {
-            val popup = child.findViewById<ViewGroup>(R.id.popup).getChildAt(0)
+            val container = child.findViewById<ViewGroup>(R.id.popup)
+            val popup = container.getChildAt(0)
             popup ?: continue
-            val moved = event.offset(-(dockView.x + child.x), -(dockView.y + child.y))
+            val dx = child.x + container.x + popup.x
+            val dy = child.y + container.y + popup.y
+            val moved = event.offset(-(dockView.x + dx), -(dockView.y + dy))
             if (popup.dispatchTouchEvent(moved)) {
                 return true
             }

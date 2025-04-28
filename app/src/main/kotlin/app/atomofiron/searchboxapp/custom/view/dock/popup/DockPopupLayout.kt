@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.custom.view.dock.popup
 import android.content.Context
 import android.graphics.Rect
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
 import androidx.core.view.updateLayoutParams
@@ -14,6 +15,8 @@ import app.atomofiron.searchboxapp.model.Layout.Ground
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+
+private const val MAX_RATIO = 1.25f
 
 class DockPopupLayout @JvmOverloads constructor(
     context: Context,
@@ -60,12 +63,15 @@ class DockPopupLayout @JvmOverloads constructor(
         }
         minTop = min(minTop, -topThreshold)
         val popupConfig = config.copy(rect = Rect(minLeft, minTop, maxRight, maxBottom))
-        val childConfig = DockItemConfig(width = itemView.width, height = itemView.height, popup = popupConfig)
+        val itemWidth = min(itemView.width, (itemView.height * MAX_RATIO).toInt())
+        val itemHeight = min(itemView.height, (itemView.width * MAX_RATIO).toInt())
+        val childConfig = DockItemConfig(width = itemWidth, height =itemHeight, popup = popupConfig)
         val childrenView = DockItemChildrenView(itemView.context, item, childConfig, selectListener)
         container.addView(childrenView)
-        childrenView.updateLayoutParams {
+        childrenView.updateLayoutParams<LayoutParams> {
             width = childConfig.width
             height = childConfig.height
+            gravity = Gravity.CENTER
         }
         childrenView.expand()
     }
