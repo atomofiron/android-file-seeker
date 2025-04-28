@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
+import android.view.ViewStub
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
@@ -16,13 +17,13 @@ import androidx.preference.forEach
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
+import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.viewCollect
-import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.fileseeker.databinding.FragmentPreferenceBinding
+import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -40,7 +41,7 @@ import lib.atomofiron.insets.attachInsetsListener
 import lib.atomofiron.insets.insetsPadding
 
 class PreferenceFragment : PreferenceFragmentCompat(),
-    BaseFragment<PreferenceFragment, PreferenceViewState, PreferencePresenter> by BaseFragmentImpl()
+    BaseFragment<PreferenceFragment, PreferenceViewState, PreferencePresenter, FragmentPreferenceBinding> by BaseFragmentImpl()
 {
     private lateinit var preferenceDelegate: PreferenceFragmentDelegate
     private lateinit var binding: FragmentPreferenceBinding
@@ -84,7 +85,10 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         recyclerView.layoutParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
             behavior = AppBarLayout.ScrollingViewBehavior()
         }
-        root.addView(recyclerView, 1)
+        root.findViewById<RecyclerView>(R.id.recycler_view)
+            .let { root.indexOfChild(it) }
+            .also { root.removeViewAt(it) }
+            .also { root.addView(recyclerView, it) }
         return root
     }
 
@@ -103,7 +107,11 @@ class PreferenceFragment : PreferenceFragmentCompat(),
             }
             true
         }
-        recyclerView?.insetsPadding(ExtType { barsWithCutout + ime + joystickBottom + joystickFlank }, start = true, end = true, bottom = true)
+        binding.onApplyInsets()
+    }
+
+    override fun FragmentPreferenceBinding.onApplyInsets() {
+        recyclerView.insetsPadding(ExtType { barsWithCutout + ime + joystickBottom + joystickFlank }, start = true, end = true, bottom = true)
         binding.appbarLayout.insetsPadding(ExtType { barsWithCutout + joystickFlank }, top = true)
         binding.toolbar.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, end = true)
         binding.collapsingLayout.fixInsets()

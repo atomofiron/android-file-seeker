@@ -14,7 +14,7 @@ import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentExplorerBinding
 import app.atomofiron.searchboxapp.custom.ExplorerView
-import app.atomofiron.searchboxapp.custom.LayoutDelegate
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeError
@@ -31,7 +31,7 @@ import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.insetsPadding
 
 class ExplorerFragment : Fragment(R.layout.fragment_explorer),
-    BaseFragment<ExplorerFragment, ExplorerViewState, ExplorerPresenter> by BaseFragmentImpl(),
+    BaseFragment<ExplorerFragment, ExplorerViewState, ExplorerPresenter, FragmentExplorerBinding> by BaseFragmentImpl(),
     KeyCodeConsumer
 {
     private lateinit var binding: FragmentExplorerBinding
@@ -51,7 +51,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
         pagerAdapter = ExplorerPagerAdapter(binding.pager, presenter)
         binding.initView()
         viewState.onViewCollect()
-        onApplyInsets(view)
+        binding.onApplyInsets()
     }
 
     private fun FragmentExplorerBinding.initView() {
@@ -120,15 +120,9 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
         }
     }
 
-    override fun onApplyInsets(root: View) {
-        binding.run {
-            explorerTabs.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
-            LayoutDelegate(
-                this.root,
-                dockView = dockBar,
-                //tabLayout = explorerTabs,
-            )
-        }
+    override fun FragmentExplorerBinding.onApplyInsets() {
+        binding.explorerTabs.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
+        binding.root.apply(dockView = binding.dockBar, /*tabLayout = explorerTabs,*/)
     }
 
     override fun onStart() {

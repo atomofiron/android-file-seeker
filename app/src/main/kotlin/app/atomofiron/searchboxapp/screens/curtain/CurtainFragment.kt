@@ -40,7 +40,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
-    BaseFragment<CurtainFragment, CurtainViewState, CurtainPresenter> by BaseFragmentImpl(),
+    BaseFragment<CurtainFragment, CurtainViewState, CurtainPresenter, FragmentCurtainBinding> by BaseFragmentImpl(),
     TranslucentFragment {
     companion object {
         private const val SAVED_STACK = "SAVED_STACK"
@@ -110,7 +110,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         }
     }
 
-    private fun FragmentCurtainBinding.onApplyInsets() {
+    override fun FragmentCurtainBinding.onApplyInsets() {
         root.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
         val verticalPadding = resources.getDimensionPixelSize(R.dimen.curtain_padding)
         val minPadding = resources.getDimensionPixelSize(R.dimen.content_margin)

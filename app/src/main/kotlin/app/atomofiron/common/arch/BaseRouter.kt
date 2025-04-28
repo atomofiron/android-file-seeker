@@ -119,8 +119,8 @@ abstract class BaseRouter(
     }
 
     protected fun List<Fragment>?.findLastVisibleFragment() = this?.filter {
-        it is BaseFragment<*,*,*>
+        it is BaseFragment<*,*,*,*>
     }?.run {
         lastOrNull { it.isVisible } ?: lastOrNull { !it.isHidden }
-    } as? BaseFragment<*,*,*>
+    } as? BaseFragment<*,*,*,*>
 }

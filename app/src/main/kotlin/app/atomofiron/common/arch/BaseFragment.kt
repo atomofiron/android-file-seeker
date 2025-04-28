@@ -3,9 +3,11 @@ package app.atomofiron.common.arch
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 import kotlin.reflect.KClass
 
-interface BaseFragment<F : Fragment, S : Any, P : BasePresenter<*,*>> {
+
+interface BaseFragment<F : Fragment, S : Any, P : BasePresenter<*,*>, B : ViewBinding> {
     val viewState: S
     val presenter: P
     val isLightStatusBar: Boolean? get() = null
@@ -15,7 +17,7 @@ interface BaseFragment<F : Fragment, S : Any, P : BasePresenter<*,*>> {
 
     // reminders
     fun S.onViewCollect() = Unit
-    fun onApplyInsets(root: View) = Unit
+    fun B.onApplyInsets() = Unit
 
     val Fragment.isTopVisible: Boolean get() = parentFragmentManager.fragments.findLast { it.isVisible } === this
 }

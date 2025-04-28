@@ -12,9 +12,9 @@ import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.LayoutDelegate
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.setScreenSizeListener
 import app.atomofiron.fileseeker.databinding.FragmentTextViewerBinding
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.model.finder.SearchResult
@@ -27,7 +27,7 @@ import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
 
 class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
-    BaseFragment<TextViewerFragment, TextViewerViewState, TextViewerPresenter> by BaseFragmentImpl()
+    BaseFragment<TextViewerFragment, TextViewerViewState, TextViewerPresenter, FragmentTextViewerBinding> by BaseFragmentImpl()
 {
     companion object {
         const val KEY_PATH = "KEY_PATH"
@@ -81,13 +81,8 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         viewCollect(status, collector = ::onStatusChanged)
     }
 
-    private fun FragmentTextViewerBinding.onApplyInsets() {
-        LayoutDelegate(
-            root,
-            recyclerView = recyclerView,
-            dockView = dockBar,
-            appBarLayout = appbarLayout,
-        )
+    override fun FragmentTextViewerBinding.onApplyInsets() {
+        root.apply(recyclerView = recyclerView, dockView = dockBar, appBarLayout = appbarLayout)
     }
 
     private fun FragmentTextViewerBinding.configureAppBar() {

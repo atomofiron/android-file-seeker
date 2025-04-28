@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.root
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.viewbinding.ViewBinding
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.fileseeker.R
@@ -11,7 +12,7 @@ import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 
 class RootFragment : Fragment(R.layout.fragment_root),
-    BaseFragment<RootFragment, RootViewState, RootPresenter> by BaseFragmentImpl()
+    BaseFragment<RootFragment, RootViewState, RootPresenter, ViewBinding> by BaseFragmentImpl()
 {
 
     override fun onCreate(savedInstanceState: Bundle?) {

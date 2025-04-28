@@ -37,8 +37,7 @@ import lib.atomofiron.insets.insetsSource
 
 object LayoutDelegate {
 
-    operator fun invoke(
-        root: MeasureProvider,
+    fun MeasureProvider.apply(
         recyclerView: RecyclerView? = null,
         dockView: DockBarView? = null,
         tabLayout: MaterialButtonToggleGroup? = null,
@@ -46,15 +45,15 @@ object LayoutDelegate {
         headerView: ExplorerHeaderView? = null,
         snackbarContainer: CoordinatorLayout? = null,
     ) {
-        val insetsProvider = root.view.findInsetsProvider()!!
-        var layout = Layout(Layout.Ground.Bottom, withJoystick = true, root.view.isRtl())
+        val insetsProvider = view.findInsetsProvider()!!
+        var layout = Layout(Layout.Ground.Bottom, withJoystick = true, view.isRtl())
         val dockDelegate = dockView?.insetsPadding(ExtType { barsWithCutout + joystickTop })
-        val notch = root.view.resources.run {
+        val notch = view.resources.run {
             val size = getDimensionPixelSize(R.dimen.joystick_size) - 2 * getDimensionPixelSize(R.dimen.joystick_padding)
             DockNotch(size)
         }
         val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock }, start = true, top = appBarLayout == null, end = true, bottom = true)
-        root.addLayoutListener { new ->
+        addLayoutListener { new ->
             layout = new
             tabLayout?.isVisible = !layout.isWide
             dockView?.setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.run { ground.isBottom && withJoystick } }))

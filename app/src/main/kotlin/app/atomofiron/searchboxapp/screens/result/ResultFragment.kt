@@ -14,7 +14,7 @@ import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.unsafeLazy
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentResultBinding
-import app.atomofiron.searchboxapp.custom.LayoutDelegate
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.addFastScroll
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
@@ -27,7 +27,7 @@ import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState.Companion.Default as DefaultDockState
 
 class ResultFragment : Fragment(R.layout.fragment_result),
-    BaseFragment<ResultFragment, ResultViewState, ResultPresenter> by BaseFragmentImpl()
+    BaseFragment<ResultFragment, ResultViewState, ResultPresenter, FragmentResultBinding> by BaseFragmentImpl()
 {
 
     private lateinit var binding: FragmentResultBinding
@@ -81,13 +81,8 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         viewCollect(alerts, collector = ::showSnackbar)
     }
 
-    private fun FragmentResultBinding.onApplyInsets() {
-        LayoutDelegate(
-            this.root,
-            recyclerView = recyclerView,
-            dockView = dockBar,
-            snackbarContainer = binding.snackbarContainer,
-        )
+    override fun FragmentResultBinding.onApplyInsets() {
+        root.apply(recyclerView = recyclerView, dockView = dockBar, snackbarContainer = snackbarContainer)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

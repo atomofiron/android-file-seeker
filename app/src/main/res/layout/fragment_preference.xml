@@ -29,6 +29,11 @@
                 />
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
     <app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
         android:id="@+id/system_ui_background"
         android:layout_width="match_parent"

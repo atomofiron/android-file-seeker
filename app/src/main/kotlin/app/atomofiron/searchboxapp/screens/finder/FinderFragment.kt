@@ -14,7 +14,7 @@ import app.atomofiron.common.util.flow.viewCollect
 import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
-import app.atomofiron.searchboxapp.custom.LayoutDelegate
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
@@ -28,7 +28,7 @@ import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.set
 
 class FinderFragment : Fragment(R.layout.fragment_finder),
-    BaseFragment<FinderFragment, FinderViewState, FinderPresenter> by BaseFragmentImpl()
+    BaseFragment<FinderFragment, FinderViewState, FinderPresenter, FragmentFinderBinding> by BaseFragmentImpl()
 {
 
     private lateinit var binding: FragmentFinderBinding
@@ -81,7 +81,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         }
 
         viewState.onViewCollect()
-        onApplyInsets(view)
+        binding.onApplyInsets()
     }
 
     private fun onNavigationItemSelected(item: DockItem) {
@@ -117,12 +117,8 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         }
     }
 
-    override fun onApplyInsets(root: View) = binding.run {
-        LayoutDelegate(
-            this.root,
-            recyclerView = recyclerView,
-            dockView = dockBar,
-        )
+    override fun FragmentFinderBinding.onApplyInsets() {
+        root.apply(recyclerView = recyclerView, dockView = dockBar)
         insetsBackground.setAdditional(ExtType.dock)
     }
 
