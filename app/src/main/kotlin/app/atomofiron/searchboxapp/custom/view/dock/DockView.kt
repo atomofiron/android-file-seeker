@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.MATCH_PARENT
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.WRAP_CONTENT
+import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
@@ -51,6 +53,7 @@ class DockViewImpl(
     private val shape = DockBottomShape(
         corners = resources.getDimension(R.dimen.dock_overlay_corner),
         strokeWidth = resources.getDimension(R.dimen.stroke_width),
+        style = DockStyle.Fill(context.findColorByAttr(MaterialAttr.colorSurfaceContainer)),
     )
     private val mutableItems = mutableListOf<DockItem>()
     private val itemCount get() = mutableItems.size

@@ -15,14 +15,14 @@ import app.atomofiron.common.util.extension.corner
 
 class DockBottomShape(
     private val corners: Float,
-    private var strokeWidth: Float,
+    private val strokeWidth: Float,
+    private var style: DockStyle = DockStyle.Fill(Color.TRANSPARENT),
     private var notch: DockNotch? = null,
 ) : Drawable() {
 
     private val paint = Paint()
     private val path = Path()
     private val rect = RectF()
-    private var style: DockStyle? = null
 
     init {
         paint.color = Color.TRANSPARENT
@@ -48,7 +48,6 @@ class DockBottomShape(
     }
 
     override fun draw(canvas: Canvas) {
-        val style = style ?: return
         paint.style = Paint.Style.FILL
         paint.color = style.fill
         canvas.drawPath(path, paint)
@@ -61,6 +60,7 @@ class DockBottomShape(
 
     override fun onBoundsChange(bounds: Rect) = updatePath()
 
+    @Suppress("DEPRECATION")
     override fun getOutline(outline: Outline) = when {
         Android.R -> outline.setPath(path)
         else -> outline.setConvexPath(path)
@@ -74,6 +74,7 @@ class DockBottomShape(
         paint.setColorFilter(filter)
     }
 
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 
     private fun updatePath() = path.run {
