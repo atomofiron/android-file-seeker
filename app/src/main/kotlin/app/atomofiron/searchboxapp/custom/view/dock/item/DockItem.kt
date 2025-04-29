@@ -42,7 +42,7 @@ data class DockItem(
 
         companion object {
             operator fun invoke(value: Long): Id = Digit(value)
-            val Undefined: Id = Digit(0L)
+            val Undefined: Id = Digit(-1L)
         }
     }
 

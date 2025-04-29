@@ -71,10 +71,10 @@ class DockViewImpl(
         elevation = resources.getDimension(R.dimen.dock_elevation)
         addItemDecoration(layoutDecorator)
         setPadding(padding, padding, padding, padding)
-        adapter.submitList(items)
+        adapter.submit(items)
         super.setAdapter(adapter)
         if (isInEditMode) {
-            adapter.submitList(Array(5) { DockItem(DockItem.Id(it.toLong()), DockItem.Icon(R.drawable.ic_circle_cross), DockItem.Label(R.string.done)) }.toList())
+            adapter.submit(Array(5) { DockItem(DockItem.Id(it.toLong()), DockItem.Icon(R.drawable.ic_circle_cross), DockItem.Label(R.string.done)) }.toList())
             layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
             mode = DockMode.Pinned(Layout.Ground.Bottom, null)
         }
@@ -121,7 +121,7 @@ class DockViewImpl(
     override fun submit(items: List<DockItem>) {
         mutableItems.clear()
         mutableItems.addAll(items)
-        adapter.submitList(items)
+        adapter.submit(items)
         mode?.apply()
     }
 
@@ -159,7 +159,7 @@ class DockViewImpl(
                     null -> removeOneIf { it === NotchStub }
                     else -> add(size / 2, NotchStub)
                 }
-                adapter.submitList(mutableItems)
+                adapter.submit(mutableItems)
            }
         }
         updateItemConfig()
@@ -233,7 +233,7 @@ class DockViewImpl(
 
         override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: State) {
             val holder = parent.getChildViewHolder(view)
-            val item = adapter.currentList[holder.bindingAdapterPosition]
+            val item = adapter[holder.bindingAdapterPosition]
             view.updateLayoutParams {
                 if (item === NotchStub) {
                     width = notch
