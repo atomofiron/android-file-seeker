@@ -20,12 +20,14 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
+import app.atomofiron.searchboxapp.custom.view.dock.shape.DockStyle
 import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.utils.removeOneIf
 
 interface DockView {
     val items: List<DockItem>
     fun setMode(mode: DockMode.Pinned)
+    fun setStyle(style: DockStyle)
     fun submit(items: List<DockItem>)
     fun setListener(listener: (DockItem) -> Unit)
 }
@@ -47,8 +49,8 @@ class DockViewImpl(
     private val padding = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
     private val notchInset = resources.getDimension(R.dimen.dock_notch_inset)
     private val shape = DockBottomShape(
-        context.findColorByAttr(MaterialAttr.colorSurfaceContainer),
         corners = resources.getDimension(R.dimen.dock_overlay_corner),
+        strokeWidth = resources.getDimension(R.dimen.stroke_width),
     )
     private val mutableItems = mutableListOf<DockItem>()
     private val itemCount get() = mutableItems.size
@@ -122,6 +124,8 @@ class DockViewImpl(
     }
 
     override fun setMode(mode: DockMode.Pinned) = submit(mode)
+
+    override fun setStyle(style: DockStyle) = shape.setStyle(style)
 
     private fun submit(
         mode: DockMode? = this.mode,
@@ -212,10 +216,15 @@ class DockViewImpl(
 
     private class LayoutDecoration(
         private val adapter: DockAdapter,
-        var config: DockItemConfig,
+        config: DockItemConfig,
     ) : ItemDecoration() {
 
         var notch = 0
+        var config: DockItemConfig = config
+            set(value) {
+                if (field != value) adapter.notifyDataSetChanged()
+                field = value
+            }
 
         override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: State) {
             val holder = parent.getChildViewHolder(view)
@@ -223,7 +232,6 @@ class DockViewImpl(
             view.updateLayoutParams {
                 if (item === NotchStub) {
                     width = notch
-                   //outRect.left = notch
                 } else {
                     width = config.width
                     height = config.height

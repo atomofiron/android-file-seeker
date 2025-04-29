@@ -12,12 +12,17 @@ import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.common.util.isBlackDeep
+import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.custom.view.JoystickView
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.DockMode
 import app.atomofiron.searchboxapp.custom.view.dock.DockNotch
+import app.atomofiron.searchboxapp.custom.view.dock.shape.DockStyle
 import app.atomofiron.searchboxapp.custom.view.layout.MeasureProvider
 import app.atomofiron.searchboxapp.custom.view.layout.RootFrameLayout
 import app.atomofiron.searchboxapp.model.Layout
@@ -76,6 +81,13 @@ object LayoutDelegate {
                 else -> Insets.NONE
             }
             InsetsSource.submit(ExtType.dock, insets)
+        }
+        dockView?.run {
+            when (true) {
+                !context.isDarkTheme(),
+                !context.isBlackDeep() -> setStyle(DockStyle.Fill(context.findColorByAttr(MaterialAttr.colorSurfaceContainer)))
+                else -> setStyle(DockStyle.Stroke(context.findColorByAttr(MaterialAttr.strokeColor)))
+            }
         }
     }
 
