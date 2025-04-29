@@ -52,7 +52,6 @@ class DockViewImpl(
     private val notchInset = resources.getDimension(R.dimen.dock_notch_inset)
     private val shape = DockBottomShape(
         corners = resources.getDimension(R.dimen.dock_overlay_corner),
-        strokeWidth = resources.getDimension(R.dimen.stroke_width),
         style = DockStyle.Fill(context.findColorByAttr(MaterialAttr.colorSurfaceContainer)),
     )
     private val mutableItems = mutableListOf<DockItem>()
@@ -109,7 +108,7 @@ class DockViewImpl(
                     mode.isBottom -> height -= measuredHeight
                     else -> width -= measuredWidth
                 }
-                submit(config = itemConfig.copy(popup = DockPopupConfig(mode.ground, width, height)))
+                submit(config = itemConfig.copy(popup = DockPopupConfig(mode.ground, width, height, itemConfig.popup.style)))
             }
         }
         mode?.updateItemConfig()
@@ -128,7 +127,10 @@ class DockViewImpl(
 
     override fun setMode(mode: DockMode.Pinned) = submit(mode)
 
-    override fun setStyle(style: DockStyle) = shape.setStyle(style)
+    override fun setStyle(style: DockStyle) {
+        shape.setStyle(style)
+        submit(config = itemConfig.copy(popup = itemConfig.popup.copy(style = style)))
+    }
 
     private fun submit(
         mode: DockMode? = this.mode,

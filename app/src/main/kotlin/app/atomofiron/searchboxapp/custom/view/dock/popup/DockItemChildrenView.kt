@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Outline
 import android.graphics.Path
+import android.graphics.drawable.LayerDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -20,11 +21,9 @@ import androidx.core.graphics.BlendModeColorFilterCompat
 import androidx.core.graphics.BlendModeCompat
 import androidx.core.graphics.withClip
 import androidx.core.view.updateLayoutParams
-import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.coerceInRange
 import app.atomofiron.common.util.extension.corner
 import app.atomofiron.common.util.extension.nearby
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.drawable.PathDrawable
@@ -98,8 +97,11 @@ class DockItemChildrenView(
         }
         animator.addUpdateListener(this)
         animator.interpolator = DecelerateInterpolator()
-
-        background = PathDrawable(combinedPath, context.findColorByAttr(MaterialAttr.colorSurfaceContainer))
+        val style = config.popup.style
+        background = LayerDrawable(arrayOf(
+            PathDrawable.stroke(combinedPath, style.stroke, style.strokeWidth * 2),
+            PathDrawable.fill(combinedPath, style.fill),
+        ))
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -213,21 +215,44 @@ class DockItemChildrenView(
 
     private fun updateBackgroundPath() = backgroundPath.run {
         val ground = config.popup.ground
-        val closeLeft = ghost.root.x - offset
-        val closeTop = ghost.root.y - offset
-        val closeRight = closeLeft + config.width + offset * 2
-        val closeBottom = closeTop + config.height + offset * 2
-        val popupLeft = childrenView.x
-        val popupTop = childrenView.y
-        val popupRight = popupLeft + childrenView.width
-        val popupBottom = popupTop + childrenView.height
+        val inset = config.popup.style.strokeWidth
+        var closeLeft = ghost.root.x - offset
+        var closeTop = ghost.root.y - offset
+        var closeRight = closeLeft + config.width + offset * 2
+        var closeBottom = closeTop + config.height + offset * 2
+        var popupLeft = childrenView.x
+        var popupTop = childrenView.y
+        var popupRight = popupLeft + childrenView.width
+        var popupBottom = popupTop + childrenView.height
         val distance = corner * 2
         val topLeft = !nearby(distance, popupLeft, popupTop, closeRight, closeTop)
         val topRight = !nearby(distance, popupRight, popupTop, closeLeft, closeTop)
         val bottomRight = !nearby(distance, popupRight, popupBottom, closeRight, closeTop, closeLeft, closeBottom)
         val bottomLeft = !nearby(distance, popupLeft, popupBottom, closeLeft, closeTop, closeRight, closeBottom)
+        closeBottom -= inset
+        popupTop += inset
+        when (ground) {
+            Ground.Bottom -> {
+                closeLeft += inset
+                closeRight -= inset
+                popupLeft += inset
+                popupRight -= inset
+            }
+            Ground.Right -> {
+                closeTop += inset
+                closeRight -= inset
+                popupLeft += inset
+                popupBottom -= inset
+            }
+            Ground.Left -> {
+                closeLeft += inset
+                closeTop += inset
+                popupRight -= inset
+                popupBottom -= inset
+            }
+        }
         reset()
-        moveTo(closeLeft, closeTop)
+        moveTo(closeLeft, closeTop + corner)
         when (ground) {
             Ground.Bottom -> {
                 if (bottomLeft) corner(closeLeft, closeTop, left = false, top = true, clockWise = false, radius = corner) else lineTo(closeLeft, closeTop)
@@ -249,7 +274,7 @@ class DockItemChildrenView(
             }
         }
         close()
-        moveTo(popupLeft, popupTop)
+        moveTo(popupLeft, popupTop + corner)
         if (topLeft) corner(popupLeft, popupTop, left = true, top = true, clockWise = true, radius = corner) else lineTo(popupLeft, popupTop)
         if (topRight) corner(popupRight, popupTop, left = false, top = true, clockWise = true, radius = corner) else lineTo(popupRight, popupTop)
         if (bottomRight) corner(popupRight, popupBottom, left = false, top = false, clockWise = true, radius = corner) else lineTo(popupRight, popupBottom)

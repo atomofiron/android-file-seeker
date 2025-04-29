@@ -65,7 +65,7 @@ class DockPopupLayout @JvmOverloads constructor(
         val popupConfig = config.copy(rect = Rect(minLeft, minTop, maxRight, maxBottom))
         val itemWidth = min(itemView.width, (itemView.height * MAX_RATIO).toInt())
         val itemHeight = min(itemView.height, (itemView.width * MAX_RATIO).toInt())
-        val childConfig = DockItemConfig(width = itemWidth, height =itemHeight, popup = popupConfig)
+        val childConfig = DockItemConfig(width = itemWidth, height = itemHeight, popup = popupConfig)
         val childrenView = DockItemChildrenView(itemView.context, item, childConfig, selectListener)
         container.addView(childrenView)
         childrenView.updateLayoutParams<LayoutParams> {

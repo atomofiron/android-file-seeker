@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.custom.drawable
 
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.Outline
 import android.graphics.Paint
@@ -11,14 +12,19 @@ import app.atomofiron.common.util.Android
 
 class PathDrawable(
     private val path: Path,
-    color: Int,
+    private val fill: Int,
+    private val stroke: Int,
+    strokeWidth: Float,
 ) : Drawable() {
+    companion object {
+        fun fill(path: Path, color: Int) = PathDrawable(path, fill = color, stroke = Color.TRANSPARENT, strokeWidth = 0f)
+        fun stroke(path: Path, color: Int, strokeWidth: Float) = PathDrawable(path, fill = Color.TRANSPARENT, stroke = color, strokeWidth)
+    }
 
     private val paint = Paint()
 
     init {
-        paint.style = Paint.Style.FILL
-        paint.color = color
+        paint.strokeWidth = strokeWidth
     }
 
     // needed for shadow to work
@@ -28,7 +34,16 @@ class PathDrawable(
     }
 
     override fun draw(canvas: Canvas) {
-        canvas.drawPath(path, paint)
+        if (fill != Color.TRANSPARENT) {
+            paint.color = fill
+            paint.style = Paint.Style.FILL
+            canvas.drawPath(path, paint)
+        }
+        if (stroke != Color.TRANSPARENT && paint.strokeWidth > 0f) {
+            paint.color = stroke
+            paint.style = Paint.Style.STROKE
+            canvas.drawPath(path, paint)
+        }
     }
 
     override fun setAlpha(alpha: Int) {

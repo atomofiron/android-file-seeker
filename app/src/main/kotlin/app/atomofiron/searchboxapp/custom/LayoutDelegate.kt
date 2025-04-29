@@ -89,6 +89,7 @@ object LayoutDelegate {
                 else -> setStyle(DockStyle.Stroke(
                     fill = context.findColorByAttr(R.attr.colorBackground),
                     stroke = context.findColorByAttr(MaterialAttr.strokeColor),
+                    strokeWidth = resources.getDimension(R.dimen.stroke_width),
                 ))
             }
         }

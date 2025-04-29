@@ -15,7 +15,6 @@ import app.atomofiron.common.util.extension.corner
 
 class DockBottomShape(
     private val corners: Float,
-    private val strokeWidth: Float,
     private var style: DockStyle = DockStyle.Fill(Color.TRANSPARENT),
     private var notch: DockNotch? = null,
 ) : Drawable() {
@@ -27,7 +26,6 @@ class DockBottomShape(
     init {
         paint.color = Color.TRANSPARENT
         paint.isAntiAlias = true
-        paint.strokeWidth = strokeWidth
     }
 
     fun setNotch(notch: DockNotch?): DockBottomShape {
@@ -51,9 +49,10 @@ class DockBottomShape(
         paint.style = Paint.Style.FILL
         paint.color = style.fill
         canvas.drawPath(path, paint)
-        if (style is DockStyle.Stroke) {
+        if (paint.color != Color.TRANSPARENT) {
             paint.style = Paint.Style.STROKE
             paint.color = style.stroke
+            paint.strokeWidth = style.strokeWidth
             canvas.drawPath(path, paint)
         }
     }
@@ -78,11 +77,11 @@ class DockBottomShape(
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 
     private fun updatePath() = path.run {
-        val inset = if (style is DockStyle.Fill) 0f else strokeWidth / 2
+        val inset = style.strokeWidth / 2
         rect.set(bounds)
-        reset()
         var x = rect.left + inset
         var y = rect.bottom
+        reset()
         moveTo(x, y)
         y = rect.top + inset
         corner(x, y, top = true, left = true, clockWise = true, radius = corners)
