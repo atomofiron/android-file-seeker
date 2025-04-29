@@ -7,11 +7,13 @@ import java.util.*
 sealed class AppTheme(
     val name: String,
     val deepBlack: Boolean,
+    val system: Boolean,
+    val onlyDark: Boolean,
 ) {
 
-    class System(deepBlack: Boolean) : AppTheme(NAME_SYSTEM, deepBlack)
-    class Light(deepBlack: Boolean) : AppTheme(NAME_LIGHT, deepBlack)
-    class Dark(deepBlack: Boolean) : AppTheme(NAME_DARK, deepBlack)
+    class System(deepBlack: Boolean) : AppTheme(NAME_SYSTEM, deepBlack, true, false)
+    class Light(deepBlack: Boolean) : AppTheme(NAME_LIGHT, deepBlack, false, false)
+    class Dark(deepBlack: Boolean) : AppTheme(NAME_DARK, deepBlack, false, true)
 
     override fun equals(other: Any?) = when {
         other == null -> false
@@ -22,6 +24,8 @@ sealed class AppTheme(
     }
 
     override fun hashCode(): Int = Objects.hash(this::class, deepBlack)
+
+    override fun toString(): String = "AppTheme{name=$name, deepBlack=$deepBlack}"
 
     companion object {
 

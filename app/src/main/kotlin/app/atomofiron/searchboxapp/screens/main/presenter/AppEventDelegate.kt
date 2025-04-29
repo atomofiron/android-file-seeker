@@ -1,6 +1,8 @@
 package app.atomofiron.searchboxapp.screens.main.presenter
 
 import android.content.Intent
+import android.content.res.Configuration.UI_MODE_NIGHT_MASK
+import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.common.util.Android
@@ -40,6 +42,7 @@ class AppEventDelegate(
 ) : AppEventDelegateApi {
 
     private val context = appStore.context
+    private val activity by appStore.activityProperty
     private var currentTheme: AppTheme? = null
 
     init {
@@ -78,8 +81,22 @@ class AppEventDelegate(
     override fun onActivityFinish() = updateService.completeUpdate()
 
     private fun onThemeApplied(theme: AppTheme) {
-        if (currentTheme != null && theme != currentTheme) {
-            router.recreateActivity()
+        val activityNight = activity
+            ?.resources
+            ?.configuration
+            ?.run { (uiMode and UI_MODE_NIGHT_MASK) == UI_MODE_NIGHT_YES }
+        val systemNight = activity
+            ?.application
+            ?.resources
+            ?.configuration
+            ?.run { (uiMode and UI_MODE_NIGHT_MASK) == UI_MODE_NIGHT_YES }
+        when (true) {
+            (currentTheme == null),
+            (activityNight == null),
+            (systemNight == null) -> Unit
+            (theme.system && activityNight && systemNight && theme.deepBlack != currentTheme?.deepBlack),
+            (theme.onlyDark && activityNight && theme.deepBlack != currentTheme?.deepBlack) -> router.recreateActivity()
+            else -> Unit
         }
         currentTheme = theme
     }
