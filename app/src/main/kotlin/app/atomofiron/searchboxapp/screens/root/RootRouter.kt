@@ -30,7 +30,7 @@ class RootRouter(
         }
     }
 
-    fun onBack(): Boolean {
+    override fun navigateBack(): Boolean {
         val consumed = fragment {
             val lastVisibleFragment = childFragmentManager.fragments.findLastVisibleFragment()
             var consumed = lastVisibleFragment?.onBack() ?: false

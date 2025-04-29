@@ -91,7 +91,7 @@ class ExplorerView(
 
     fun scrollTo(item: Node) = listDelegate.scrollTo(item)
 
-    fun scrollToTop() = binding.recyclerView.scrollToTop()
+    fun scrollToTop(): Boolean = binding.recyclerView.scrollToTop()
 
     fun isCurrentDirVisible(): Boolean? = listDelegate.isCurrentDirVisible()
 

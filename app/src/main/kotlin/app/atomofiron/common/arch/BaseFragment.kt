@@ -1,7 +1,6 @@
 package app.atomofiron.common.arch
 
 import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.viewbinding.ViewBinding
 import kotlin.reflect.KClass
@@ -13,7 +12,7 @@ interface BaseFragment<F : Fragment, S : Any, P : BasePresenter<*,*>, B : ViewBi
     val isLightStatusBar: Boolean? get() = null
 
     fun initViewModel(fragment: F, viewModelClass: KClass<out BaseViewModel<*,F,S,P>>, state: Bundle?)
-    fun onBack(): Boolean = false
+    fun onBack(): Boolean = presenter.onBack()
 
     // reminders
     fun S.onViewCollect() = Unit

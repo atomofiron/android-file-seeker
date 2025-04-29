@@ -35,6 +35,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ScrollingView
 import androidx.core.view.forEachIndexed
+import androidx.core.view.isEmpty
 import androidx.core.view.updatePadding
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.GridLayoutManager
@@ -244,13 +245,13 @@ fun View.isRtl(): Boolean = resources.isRtl()
 fun Resources.isRtl(): Boolean = configuration.layoutDirection == LayoutDirection.RTL
 
 
-fun RecyclerView.scrollToTop() {
-    if (childCount == 0) return
+fun RecyclerView.scrollToTop(): Boolean {
+    if (isEmpty()) return false
     val topChild = getChildAt(0)
     val topHolder = getChildViewHolder(topChild)
     if (topHolder.absoluteAdapterPosition == 0) {
         smoothScrollToPosition(0)
-        return
+        return false
     }
     val spanCount = when (val manager = layoutManager) {
         is GridLayoutManager -> manager.spanCount
@@ -261,6 +262,7 @@ fun RecyclerView.scrollToTop() {
     post {
         smoothScrollToPosition(0)
     }
+    return true
 }
 
 val ViewPager2.recyclerView: RecyclerView get() = getChildAt(0) as RecyclerView

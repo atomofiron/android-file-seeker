@@ -19,5 +19,7 @@ abstract class BasePresenter<M : ViewModel, R : BaseRouter> constructor(
 
     open fun onSaveInstanceState(outState: Bundle) = Unit
 
+    open fun onBack(): Boolean = router.navigateBack()
+
     open fun onCleared() = Unit
 }

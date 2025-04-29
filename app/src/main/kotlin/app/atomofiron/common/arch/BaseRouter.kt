@@ -79,10 +79,12 @@ abstract class BaseRouter(
         }
     }
 
-    fun navigateBack() {
+    open fun navigateBack(): Boolean {
+        var navigated = false
         navigation {
-            navigateUp()
+            navigated = navigateUp()
         }
+        return navigated
     }
 
     fun minimize() {

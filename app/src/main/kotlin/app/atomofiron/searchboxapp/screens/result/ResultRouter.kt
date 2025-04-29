@@ -21,7 +21,7 @@ class ResultRouter(property: WeakProperty<out Fragment>) : BaseRouter(property) 
             .putExtra(Intent.EXTRA_TITLE, title)
             .putExtra(Intent.EXTRA_TEXT, data)
 
-        val activity = activity!!
+        val activity = activity ?: return false
         val success = intent.resolveActivity(activity.packageManager) != null
         if (success) {
             val chooser = Intent.createChooser(intent, "")

@@ -47,11 +47,9 @@ class TextViewerPresenter(
 
     override fun onLineVisible(index: Int) = interactor.readFileToLine(item, index)
 
-    override fun onNavigationClick() {
-        when (viewState.currentTask.value) {
-            null -> super.onNavigationClick()
-            else -> viewState.dropTask()
-        }
+    override fun onNavigationClick(): Boolean = when (viewState.currentTask.value) {
+        null -> super.onNavigationClick()
+        else -> true.also { viewState.dropTask() }
     }
 
     fun onBackClick(): Boolean {

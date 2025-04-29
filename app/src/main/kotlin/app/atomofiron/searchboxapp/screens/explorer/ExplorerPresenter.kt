@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer
 
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
+import app.atomofiron.common.util.flow.valueOrNull
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
@@ -60,6 +61,16 @@ class ExplorerPresenter(
         val currentDir = viewState.getCurrentDir()
         currentDir ?: return
         scrollOrOpenParent(currentDir, isCurrentDirVisible)
+    }
+
+    override fun onBack(): Boolean {
+        val selectedRoot = viewState.firstTabItems
+            .valueOrNull
+            ?.roots
+            ?.find { it.isSelected }
+        selectedRoot ?: return false
+        onRootClick(selectedRoot)
+        return super.onBack()
     }
 
     private fun scrollOrOpenParent(item: Node, isTargetVisible: Boolean) = when {

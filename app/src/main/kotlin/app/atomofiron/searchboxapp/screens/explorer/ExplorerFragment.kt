@@ -125,6 +125,8 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
         binding.root.apply(dockView = binding.dockBar, /*tabLayout = explorerTabs,*/)
     }
 
+    override fun onBack(): Boolean = getCurrentTabView().scrollToTop() || super.onBack()
+
     override fun onStart() {
         super.onStart()
         explorerViews.forEach { it.onItemsVisible() }
