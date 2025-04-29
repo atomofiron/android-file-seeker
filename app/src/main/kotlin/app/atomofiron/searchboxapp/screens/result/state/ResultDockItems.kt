@@ -16,7 +16,7 @@ data class ResultDockState(
                 DockItem.Id(0),
                 DockItem.Icon(R.drawable.ic_circle_stop),
                 DockItem.Label(""),
-                enabled = false,
+                clickable = false,
             ),
             sorting = DockItem(
                 DockItem.Id(1),

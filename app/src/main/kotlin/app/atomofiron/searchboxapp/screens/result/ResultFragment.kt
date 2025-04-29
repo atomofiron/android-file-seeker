@@ -93,7 +93,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
     private fun DockBarView.onTaskChange(task: SearchTask) {
         DefaultDockState.run {
             submit(copy(
-                status = status.copy(enabled = task.inProgress),
+                status = status.copy(clickable = task.inProgress),
                 share = share.copy(enabled = !task.result.isEmpty),
                 export = export.copy(enabled = !task.result.isEmpty),
             ))

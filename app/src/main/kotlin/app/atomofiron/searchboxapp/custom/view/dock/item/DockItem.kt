@@ -9,6 +9,7 @@ data class DockItem(
     val icon: Icon? = null,
     val label: Label? = null,
     val enabled: Boolean = true,
+    val clickable: Boolean? = null, // null = by enabled
     val selected: Boolean = false,
     val children: DockItemChildren = DockItemChildren.Stub,
 ) {
@@ -30,8 +31,13 @@ data class DockItem(
         value class Value(val value: String) : Label
 
         companion object {
+            val Empty = Value("")
             operator fun invoke(@StringRes resId: Int) = Res(resId)
-            operator fun invoke(value: String?) = value?.let { Value(it) }
+            operator fun invoke(value: String?) = when (value) {
+                null -> null
+                Empty.value -> Empty
+                else -> Value(value)
+            }
         }
     }
     interface Id {

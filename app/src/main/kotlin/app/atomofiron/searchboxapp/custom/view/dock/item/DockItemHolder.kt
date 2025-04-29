@@ -47,11 +47,9 @@ class DockItemHolder(
         }
         icon.isVisible = item.icon != null
         label.isVisible = item.label != null
+        button.isEnabled = item.enabled
         root.isSelected = item.selected
-        root.isEnabled = item.enabled
-        val emptyLabel = (item.label as? Label.Value)?.value?.isEmpty() == true
-        icon.isEnabled = emptyLabel
-        icon.isDuplicateParentStateEnabled = !emptyLabel
+        root.isClickable = item.clickable ?: item.enabled
         if (item.children.isEmpty()) {
             popup.clear()
         }

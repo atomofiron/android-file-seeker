@@ -117,15 +117,15 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
     private fun onStatusChanged(state: TextViewerViewState.Status) {
         var index: Int? = null
         var count: Int? = null
-        val text = if (state.countMax == 0) null else {
+        val label = if (state.countMax == 0) DockItem.Label.Empty else {
             index = state.count
             count = state.countMax
-            "$index / $count"
+            DockItem.Label("$index / $count")
         }
         val statusIconId = if (state.loading) R.drawable.progress_loop else R.drawable.ic_circle_check
         TextViewerDockState {
             binding.dockBar.submit(copy(
-                status = status.with(statusIconId).copy(label = DockItem.Label(text)),
+                status = status.with(statusIconId).copy(label = label),
                 previous = previous.copy(enabled = !state.loading && index != null && index > 1),
                 next = next.copy(enabled = !state.loading && count != null && index != count),
             ))
