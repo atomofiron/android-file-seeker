@@ -1,8 +1,19 @@
 package app.atomofiron.searchboxapp.custom.view.dock.shape
 
-sealed interface DockStyle {
-    val color: Int
+import android.graphics.Color
 
-    data class Fill(override val color: Int) : DockStyle
-    data class Stroke(override val color: Int) : DockStyle
+sealed interface DockStyle {
+    val fill: Int
+    val stroke: Int
+
+    data class Fill(
+        override val fill: Int,
+    ) : DockStyle {
+        override val stroke: Int = Color.TRANSPARENT
+    }
+
+    data class Stroke(
+        override val fill: Int,
+        override val stroke: Int,
+    ) : DockStyle
 }

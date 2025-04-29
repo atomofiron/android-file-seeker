@@ -86,7 +86,10 @@ object LayoutDelegate {
             when (true) {
                 !context.isDarkTheme(),
                 !context.isBlackDeep() -> setStyle(DockStyle.Fill(context.findColorByAttr(MaterialAttr.colorSurfaceContainer)))
-                else -> setStyle(DockStyle.Stroke(context.findColorByAttr(MaterialAttr.strokeColor)))
+                else -> setStyle(DockStyle.Stroke(
+                    fill = context.findColorByAttr(R.attr.colorBackground),
+                    stroke = context.findColorByAttr(MaterialAttr.strokeColor),
+                ))
             }
         }
     }

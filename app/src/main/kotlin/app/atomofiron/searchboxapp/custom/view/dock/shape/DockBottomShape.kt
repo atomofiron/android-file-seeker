@@ -22,6 +22,7 @@ class DockBottomShape(
     private val paint = Paint()
     private val path = Path()
     private val rect = RectF()
+    private var style: DockStyle? = null
 
     init {
         paint.color = Color.TRANSPARENT
@@ -39,14 +40,24 @@ class DockBottomShape(
     }
 
     fun setStyle(style: DockStyle) {
-        paint.color = style.color
-        paint.style = when (style) {
-            is DockStyle.Fill -> Paint.Style.FILL
-            is DockStyle.Stroke -> Paint.Style.STROKE
+        if (style != this.style) {
+            this.style = style
+            updatePath()
+            invalidateSelf()
         }
     }
 
-    override fun draw(canvas: Canvas) = canvas.drawPath(path, paint)
+    override fun draw(canvas: Canvas) {
+        val style = style ?: return
+        paint.style = Paint.Style.FILL
+        paint.color = style.fill
+        canvas.drawPath(path, paint)
+        if (style is DockStyle.Stroke) {
+            paint.style = Paint.Style.STROKE
+            paint.color = style.stroke
+            canvas.drawPath(path, paint)
+        }
+    }
 
     override fun onBoundsChange(bounds: Rect) = updatePath()
 
@@ -66,7 +77,7 @@ class DockBottomShape(
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 
     private fun updatePath() = path.run {
-        val inset = if (paint.style == Paint.Style.FILL) 0f else strokeWidth / 2
+        val inset = if (style is DockStyle.Fill) 0f else strokeWidth / 2
         rect.set(bounds)
         reset()
         var x = rect.left + inset
