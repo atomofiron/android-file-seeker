@@ -32,6 +32,8 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>> : RecyclerView.Adap
 
     override fun getItemCount(): Int = mutableItems.size
 
+    operator fun get(position: Int) = mutableItems[position]
+
     final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): H {
         val inflater = LayoutInflater.from(parent.context)
         return onCreateViewHolder(parent, viewType, inflater)
