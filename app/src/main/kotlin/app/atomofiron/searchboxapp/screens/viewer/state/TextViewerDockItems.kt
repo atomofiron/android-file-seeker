@@ -36,6 +36,6 @@ data class TextViewerDockState(
             )
         )
 
-        inline operator fun invoke(block: TextViewerDockState.() -> TextViewerDockState) = Default.run(block)
+        inline operator fun invoke(block: TextViewerDockState.() -> Unit) = Default.run(block)
     }
 }

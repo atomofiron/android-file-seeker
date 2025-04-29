@@ -124,11 +124,11 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         }
         val statusIconId = if (state.loading) R.drawable.progress_loop else R.drawable.ic_circle_check
         TextViewerDockState {
-            copy(
+            binding.dockBar.submit(copy(
                 status = status.with(statusIconId).copy(label = DockItem.Label(text)),
                 previous = previous.copy(enabled = !state.loading && index != null && index > 1),
                 next = next.copy(enabled = !state.loading && count != null && index != count),
-            )
+            ))
         }
     }
 
