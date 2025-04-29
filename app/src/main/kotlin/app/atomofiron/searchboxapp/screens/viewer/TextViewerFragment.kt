@@ -100,7 +100,8 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
 
     private fun onBottomMenuItemClick(item: DockItem) {
         when (item.id) {
-            DefaultDockState.status.id -> presenter.onSearchClick()
+            DefaultDockState.status.id -> Unit
+            DefaultDockState.search.id -> presenter.onSearchClick()
             DefaultDockState.previous.id -> presenter.onPreviousClick()
             DefaultDockState.next.id -> presenter.onNextClick()
         }
