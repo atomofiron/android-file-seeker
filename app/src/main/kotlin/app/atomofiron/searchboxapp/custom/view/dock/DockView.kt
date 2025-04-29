@@ -12,14 +12,14 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.MATCH_PARENT
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.WRAP_CONTENT
-import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
+import app.atomofiron.searchboxapp.custom.view.dock.shape.DockBottomShape
+import app.atomofiron.searchboxapp.custom.view.dock.shape.DockNotch
 import app.atomofiron.searchboxapp.custom.view.dock.shape.DockStyle
 import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.utils.removeOneIf

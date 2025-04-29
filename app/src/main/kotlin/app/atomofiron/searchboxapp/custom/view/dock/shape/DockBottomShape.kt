@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.custom.view.dock
+package app.atomofiron.searchboxapp.custom.view.dock.shape
 
 import android.graphics.Canvas
 import android.graphics.Color
@@ -12,7 +12,6 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.corner
-import app.atomofiron.searchboxapp.custom.view.dock.shape.DockStyle
 
 class DockBottomShape(
     private val corners: Float,

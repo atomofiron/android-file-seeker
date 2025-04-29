@@ -21,7 +21,7 @@ import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.custom.view.JoystickView
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.DockMode
-import app.atomofiron.searchboxapp.custom.view.dock.DockNotch
+import app.atomofiron.searchboxapp.custom.view.dock.shape.DockNotch
 import app.atomofiron.searchboxapp.custom.view.dock.shape.DockStyle
 import app.atomofiron.searchboxapp.custom.view.layout.MeasureProvider
 import app.atomofiron.searchboxapp.custom.view.layout.RootFrameLayout

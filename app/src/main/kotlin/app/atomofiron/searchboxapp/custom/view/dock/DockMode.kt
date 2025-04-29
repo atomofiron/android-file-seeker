@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.custom.view.dock
 
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
+import app.atomofiron.searchboxapp.custom.view.dock.shape.DockNotch
 import app.atomofiron.searchboxapp.model.Layout.Ground
 
 sealed interface DockMode {

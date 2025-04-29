@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.custom.view.dock
+package app.atomofiron.searchboxapp.custom.view.dock.shape
 
 data class DockNotch(
     val width: Float,
