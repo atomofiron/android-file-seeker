@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockDiffCallback
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemHolder
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
@@ -46,19 +47,9 @@ class DockAdapter(
     }
 
     fun submit(items: List<DockItem>) {
-        DiffUtil.calculateDiff(Callback(old = this.items, new =  items))
+        DiffUtil.calculateDiff(DockDiffCallback(old = this.items, new =  items))
             .dispatchUpdatesTo(this)
         this.items.clear()
         this.items.addAll(items)
-    }
-
-    private class Callback(
-        private val old: List<DockItem>,
-        private val new: List<DockItem>,
-    ) : DiffUtil.Callback() {
-        override fun getOldListSize() = old.size
-        override fun getNewListSize() = new.size
-        override fun areItemsTheSame(oldPosition: Int, newPosition: Int): Boolean = old[oldPosition].id == new[newPosition].id
-        override fun areContentsTheSame(oldPosition: Int, newPosition: Int): Boolean = old[oldPosition] == new[newPosition]
     }
 }

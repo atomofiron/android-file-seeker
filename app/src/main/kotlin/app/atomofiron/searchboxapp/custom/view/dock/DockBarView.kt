@@ -10,6 +10,7 @@ import android.widget.FrameLayout
 import androidx.core.view.children
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupLayout
 
 @Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
 class DockBarView(
@@ -43,7 +44,7 @@ class DockBarView(
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (event.pointerCount == 1) for (child in dockView.children) {
-            val container = child.findViewById<ViewGroup>(R.id.popup)
+            val container = child.findViewById<DockPopupLayout>(R.id.popup)
             val popup = container.getChildAt(0)
             popup ?: continue
             val dx = child.x + container.x + popup.x
