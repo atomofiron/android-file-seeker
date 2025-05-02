@@ -74,7 +74,7 @@ class DockViewImpl(
         adapter.submit(items)
         super.setAdapter(adapter)
         if (isInEditMode) {
-            adapter.submit(Array(5) { DockItem(DockItem.Id(it.toLong()), DockItem.Icon(R.drawable.ic_circle_cross), DockItem.Label(R.string.done)) }.toList())
+            adapter.submit(Array(5) { DockItem(DockItem.Id(it), DockItem.Icon(R.drawable.ic_circle_cross), DockItem.Label(R.string.done)) }.toList())
             layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
             mode = DockMode.Pinned(Layout.Ground.Bottom, null)
         }

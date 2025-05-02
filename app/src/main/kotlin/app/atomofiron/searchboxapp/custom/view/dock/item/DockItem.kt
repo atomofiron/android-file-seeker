@@ -46,9 +46,16 @@ data class DockItem(
         @JvmInline
         private value class Digit(override val value: Long) : Id
 
+        open class Auto : Id {
+            override val value = next++
+        }
+
         companion object {
-            operator fun invoke(value: Long): Id = Digit(value)
             val Undefined: Id = Digit(-1L)
+            private var next = Int.MAX_VALUE.toLong()
+
+            operator fun invoke(value: Int): Id = Digit(value.toLong())
+            operator fun invoke(value: Long): Id = Digit(value)
         }
     }
 
