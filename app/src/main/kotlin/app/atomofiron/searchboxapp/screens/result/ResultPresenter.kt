@@ -8,13 +8,14 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.injectable.store.*
 import app.atomofiron.searchboxapp.logE
+import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultItemActionDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import app.atomofiron.searchboxapp.utils.Const
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -30,39 +31,18 @@ class ResultPresenter(
     itemActionDelegate: ResultItemActionDelegate,
 ) : BasePresenter<ResultViewModel, ResultRouter>(scope, router),
     ResultItemActionListener by itemActionDelegate {
-    companion object {
-        private const val UNDEFINED = -1
-    }
     private val taskId = params.taskId
     private val resources by appStore.resourcesProperty
 
     init {
-        val task = finderStore.tasks.find { it.uniqueId == taskId }
-        if (task == null) {
+        if (!finderStore.tasks.any { it.uniqueId == taskId }) {
             logE("No task found!")
             router.navigateBack()
-        } else {
-            viewState.task.value = task
         }
         onSubscribeData()
     }
 
-    override fun onSubscribeData() {
-        if (taskId != UNDEFINED) finderStore.tasksFlow.combine(viewState.checked) { tasks, checked ->
-            tasks.find { it.uniqueId == taskId }?.let { task ->
-                val result = task.result as SearchResult.FinderResult
-                val matches = result.matches.map { match ->
-                    when {
-                        !checked.contains(match.item.uniqueId) -> match
-                        else -> match.update(match.item.copy(isChecked = true))
-                    }
-                }
-                task.copy(result = task.result.copy(matches = matches))
-            }
-        }.collect(scope) { task ->
-            task ?: return@collect
-            viewState.task.value = task
-        }
+    override fun onSubscribeData() = viewState.run {
         preferenceStore.explorerItemComposition.collect(scope) {
             viewState.composition.value = it
         }
@@ -86,6 +66,12 @@ class ResultPresenter(
 
         if (!router.shareFile(title, data)) {
             viewState.showAlert(AlertMessage(R.string.no_activity, important = true))
+        }
+    }
+
+    fun onSortingSelected(sorting: NodeSorting) {
+        scope.launch {
+            finderStore.setSorting(taskId, sorting)
         }
     }
 }

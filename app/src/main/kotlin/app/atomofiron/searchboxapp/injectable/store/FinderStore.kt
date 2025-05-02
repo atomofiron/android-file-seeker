@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.injectable.store
 
 import app.atomofiron.common.util.flow.throttleLatest
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.model.finder.SearchTask
@@ -53,6 +54,18 @@ class FinderStore(
             when (val index = indexOfFirst { it.uuid == item.uuid }) {
                 -1 -> add(item)
                 else -> set(index, item)
+            }
+        }
+    }
+
+    suspend fun setSorting(id: Int, sorting: NodeSorting) {
+        mutableTasks.updateList {
+            val index = indexOfFirst { it.uniqueId == id }
+            val task = getOrNull(index)
+            val result = task?.result as? SearchResult.FinderResult
+            when (null) {
+                task, result -> return
+                else -> set(index, task.copy(result = result.copy(sorting = sorting)))
             }
         }
     }

@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.injectable.service
 
 import android.content.Context
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
@@ -129,12 +128,12 @@ class ExplorerService(
     private fun NodeTab.initRoots() {
         val storagePath = internalStoragePath
         val roots = listOf(
-            NodeRoot(NodeRootType.Photos, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_CAMERA"),
-            NodeRoot(NodeRootType.Videos, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_CAMERA"),
-            NodeRoot(NodeRootType.Screenshots, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_PIC_SCREENSHOTS", "${storagePath}$SUB_PATH_DCIM_SCREENSHOTS"),
-            NodeRoot(NodeRootType.Bluetooth, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_BLUETOOTH", "${storagePath}$SUB_PATH_DOWNLOAD_BLUETOOTH"),
-            NodeRoot(NodeRootType.Downloads, NodeSort.Date.Reversed, "${storagePath}$SUB_PATH_DOWNLOAD"),
-            NodeRoot(NodeRootType.InternalStorage(), NodeSort.Name, storagePath),
+            NodeRoot(NodeRootType.Photos, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_CAMERA"),
+            NodeRoot(NodeRootType.Videos, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_CAMERA"),
+            NodeRoot(NodeRootType.Screenshots, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_PIC_SCREENSHOTS", "${storagePath}$SUB_PATH_DCIM_SCREENSHOTS"),
+            NodeRoot(NodeRootType.Bluetooth, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_BLUETOOTH", "${storagePath}$SUB_PATH_DOWNLOAD_BLUETOOTH"),
+            NodeRoot(NodeRootType.Downloads, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_DOWNLOAD"),
+            NodeRoot(NodeRootType.InternalStorage(), NodeSorting.Name, storagePath),
         )
         this.roots.clear()
         this.roots.addAll(roots)
@@ -266,7 +265,7 @@ class ExplorerService(
 
     private fun updateRootThumbnail(updated: Node, targetRoot: NodeRoot): NodeRoot {
         val newestChild = updated.takeIf { targetRoot.withPreview }
-            ?.sortBy(targetRoot.sort)
+            ?.sortBy(targetRoot.sorting)
             ?.children
             ?.firstOrNull()
         return when {
@@ -295,7 +294,7 @@ class ExplorerService(
                             if (root.isSelected && !updatedRoot.item.isCached) {
                                 tab.tree.clear()
                             }
-                            val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sort)
+                            val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sorting)
                             if (tab.key == key) updatedRoot.copy(item = updatedItem, type = root.type) else root.copy(
                                 type = root.type,
                                 thumbnail = updatedRoot.thumbnail,

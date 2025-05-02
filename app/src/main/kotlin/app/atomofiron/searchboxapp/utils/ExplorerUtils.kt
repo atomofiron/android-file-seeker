@@ -12,6 +12,7 @@ import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
+import kotlin.math.roundToInt
 
 object ExplorerUtils {
     // зато насколько всё становится проще
@@ -170,6 +171,9 @@ object ExplorerUtils {
         val parts = line.split(spaces, 7)
         val last = parts.last()
         val time = last.substring(0, 5)
+        val isFile = parts[0].firstOrNull() == FILE_CHAR
+        val length = if (!isFile) 0 else parts[4].toLong()
+        var hrSize = if (!isFile) size else length.toSize()
         // the name can start with spaces
         val nodeName = name ?: last.substring(6, last.length)
         // todo links name.contains('->')
@@ -177,11 +181,38 @@ object ExplorerUtils {
             access = parts[0],
             owner = parts[2],
             group = parts[3],
-            size = if (parts[0].firstOrNull() == FILE_CHAR) parts[4] else size,
+            size = hrSize,
             date = parts[5],
             time = time,
             name = nodeName,
+            length = length,
         )
+    }
+
+    private fun Long.toSize(): String {
+        if (this == 0L) {
+            return "0B"
+        }
+        var dim = 0
+        var tmp = this
+        var secondary = 0L
+        while (tmp >= 1024 && dim < 5) {
+            secondary = tmp % 1024
+            tmp /= 1024
+            dim++
+        }
+        val builder = StringBuilder()
+        if (tmp <= 9 && secondary >= 950) {
+            tmp++
+            secondary = 0
+        }
+        builder.append(tmp)
+        if (builder.length == 1 && secondary >= 50) {
+            builder.append('.')
+            builder.append((secondary / 100f).roundToInt())
+        }
+        builder.append("BKMGT"[dim])
+        return builder.toString()
     }
 
     private fun parse(parentPath: String, root: Int, properties: NodeProperties): Node {
@@ -213,7 +244,7 @@ object ExplorerUtils {
     }
 
     private fun Node.updateProperties(config: CacheConfig): Node {
-        val output = Shell.exec(Shell[Shell.LS_LAHLD_FILE].format(path, path), config.useSu)
+        val output = Shell.exec(Shell[Shell.LS_LALD_FILE].format(path, path), config.useSu)
         val lines = output.output.trim().split(LF)
         return when {
             output.success && lines.size == 2 -> parseNode(lines.first())
@@ -224,7 +255,7 @@ object ExplorerUtils {
     }
 
     fun Node.update(config: CacheConfig): Node {
-        val output = Shell.exec(Shell[Shell.LS_LAHLD_FILE].format(path, path), config.useSu)
+        val output = Shell.exec(Shell[Shell.LS_LALD_FILE].format(path, path), config.useSu)
         val lines = output.output.trim().split(LF)
         return when {
             output.success && lines.size == 2 -> parseNode(lines.first())
@@ -242,7 +273,7 @@ object ExplorerUtils {
     }
 
     private fun Node.cacheDir(useSu: Boolean): Node {
-        val output = Shell.exec(Shell[Shell.LS_LAHL].format(path), useSu)
+        val output = Shell.exec(Shell[Shell.LS_LAL].format(path), useSu)
         val lines = output.output.split(LF).filter { it.isNotEmpty() }
         return when {
             output.success && lines.isEmpty() -> copy(children = null, error = null)
@@ -386,10 +417,10 @@ object ExplorerUtils {
         return if (this !is T || !isCached) action() else this
     }
 
-    fun Node.sortBy(how: NodeSort): Node = when (how) {
-        is NodeSort.Size,
-        is NodeSort.Name -> sortByName(reversed = how.reversed)
-        is NodeSort.Date -> sortByDate(newFirst = how.reversed)
+    fun Node.sortBy(how: NodeSorting): Node = when (how) {
+        is NodeSorting.Size,
+        is NodeSorting.Name -> sortByName(reversed = how.reversed)
+        is NodeSorting.Date -> sortByDate(newFirst = how.reversed)
     }
 
     fun Node.sortByName(reversed: Boolean = false): Node {
@@ -615,7 +646,7 @@ object ExplorerUtils {
         else -> NodeContent.File.Other
     }
 
-    fun Node.updateWith(item: Node, sort: NodeSort? = null): Node {
+    fun Node.updateWith(item: Node, sorting: NodeSorting? = null): Node {
         var children = when {
             children == null && item.children == null -> null
             children == null || item.children == null -> item.children
@@ -659,7 +690,7 @@ object ExplorerUtils {
             children = children,
             error = item.error,
         ).run {
-            sortBy(sort ?: return@run this)
+            sortBy(sorting ?: return@run this)
         }
     }
 

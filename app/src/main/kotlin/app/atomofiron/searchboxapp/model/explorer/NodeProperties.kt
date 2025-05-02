@@ -8,6 +8,7 @@ data class NodeProperties(
     override val date: String = "",
     override val time: String = "",
     override val name: String = "",
+    override val length: Long = -1,
 ) : INodeProperties
 
 // -rw-r-----  1 root everybody   5348187 2019-06-13 18:19 Magisk-v19.3.zip
@@ -19,6 +20,5 @@ interface INodeProperties {
     val date: String
     val time: String
     val name: String
-    // todo complete
-    val length: Long get() = if (size == "0B") 0 else 1
+    val length: Long
 }

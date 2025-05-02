@@ -23,12 +23,13 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>() {
     private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = false)
 
     fun setResult(results: SearchResult.FinderResult) {
-        val items = ArrayList<ResultItem>(results.matches.size.inc())
         val dirCount = results.matches.count { it.item.isDirectory }
-        val header = ResultItem.Header(dirCount, results.matches.size - dirCount)
-        items.add(header)
-        results.matches.forEach {
-            items.add(ResultItem.Item(it))
+        val fileCount = results.matches.size - dirCount
+        val items = buildList(results.matches.size.inc()) {
+            add(ResultItem.Header(dirCount, fileCount))
+            results.matches.forEach {
+                add(ResultItem.Item(it))
+            }
         }
         super.submit(items)
     }

@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.model.finder
 
-import java.util.*
+import java.util.UUID
 
 data class SearchTask/*<Result : SearchResult>*/(
     val uuid: UUID,
@@ -26,12 +26,7 @@ data class SearchTask/*<Result : SearchResult>*/(
         result: SearchResult = this.result,
         error: String? = this.error,
     ): SearchTask {
-        return copy(
-            state = if (isStopped) SearchState.Stopped(isRemovable) else SearchState.Ended(
-                isRemovable
-            ),
-            result = result,
-            error = error,
-        )
+        val state = if (isStopped) SearchState.Stopped(isRemovable) else SearchState.Ended(isRemovable)
+        return copy(state = state, result = result, error = error)
     }
 }

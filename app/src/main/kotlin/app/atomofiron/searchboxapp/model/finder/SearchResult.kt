@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.model.finder
 
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.utils.Const
 import java.util.*
@@ -35,6 +36,7 @@ sealed class SearchResult {
         val matches: List<ItemMatch> = listOf(),
         override val countTotal: Int = 0,
         val retries: Int = 0,
+        val sorting: NodeSorting = NodeSorting.Date.Reversed,
     ) : SearchResult() {
 
         override fun getCounters(): IntArray = when {

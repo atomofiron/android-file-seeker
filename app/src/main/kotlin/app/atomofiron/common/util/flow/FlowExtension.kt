@@ -4,6 +4,8 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.coroutineScope
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 val <T> SharedFlow<T>.value: T get() = replayCache.last()
 
@@ -29,6 +31,18 @@ operator fun MutableStateFlow<Unit>.invoke() = set(Unit)
 
 fun <T> Flow<T>.collect(scope: CoroutineScope, collector: FlowCollector<T>) {
     scope.launch { collect(collector) }
+}
+
+fun <T> Flow<T>.collect(
+    scope: CoroutineScope,
+    context: CoroutineContext,
+    collector: FlowCollector<T>,
+) {
+    scope.launch(context) { collect(collector) }
+}
+
+fun <T> Flow<T>.launch(scope: CoroutineScope, context: CoroutineContext = EmptyCoroutineContext) {
+    scope.launch(context) { collect { } }
 }
 
 fun <T> Fragment.viewCollect(

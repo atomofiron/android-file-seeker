@@ -109,9 +109,11 @@ fun <E> MutableList<E>.removeOneIf(predicate: (E) -> Boolean): E? {
 }
 
 inline fun <T> List<T>.mutate(action: MutableList<T>.() -> Unit): MutableList<T> {
-    val list = toMutableList()
-    list.action()
-    return list
+    return toMutableList().apply(action)
+}
+
+inline fun <T, R : Comparable<R>> MutableList<T>.sortBy(descending: Boolean = false, crossinline selector: (T) -> R?) {
+    return if (descending) sortByDescending(selector) else sortBy(selector)
 }
 
 fun Int.setColorAlpha(alpha: Int): Int = ColorUtils.setAlphaComponent(this, alpha)

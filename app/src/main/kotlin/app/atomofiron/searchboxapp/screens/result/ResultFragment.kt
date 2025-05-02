@@ -16,12 +16,13 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentResultBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.addFastScroll
-import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
+import app.atomofiron.searchboxapp.screens.result.state.ResultDockState
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState.Companion.Default as DefaultDockState
@@ -67,11 +68,12 @@ class ResultFragment : Fragment(R.layout.fragment_result),
     }
 
     private fun onBottomMenuItemClick(item: DockItem) {
-        when (item.id) {
+        when (val id = item.id) {
             DefaultDockState.status.id -> presenter.onStopClick()
             DefaultDockState.sorting.id -> Unit
             DefaultDockState.export.id -> presenter.onExportClick()
             DefaultDockState.share.id -> presenter.onShareClick()
+            is NodeSorting -> presenter.onSortingSelected(id)
         }
     }
 
@@ -79,6 +81,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         viewCollect(composition, collector = ::onCompositionChange)
         viewCollect(task, collector = ::onTaskChange)
         viewCollect(alerts, collector = ::showSnackbar)
+        viewCollect(dock, collector = ::onDockChanged)
     }
 
     override fun FragmentResultBinding.onApplyInsets() {
@@ -90,19 +93,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         resultAdapter.notifyItemChanged(0)
     }
 
-    private fun DockBarView.onTaskChange(task: SearchTask) {
-        DefaultDockState.run {
-            submit(copy(
-                status = status.copy(clickable = task.inProgress),
-                share = share.copy(enabled = !task.result.isEmpty),
-                export = export.copy(enabled = !task.result.isEmpty),
-            ))
-        }
-    }
-
     private fun onTaskChange(task: SearchTask) {
-        binding.dockBar.onTaskChange(task)
-
         resultAdapter.setResult(task.result as SearchResult.FinderResult)
 
         if (!task.result.isEmpty) {
@@ -117,6 +108,10 @@ class ResultFragment : Fragment(R.layout.fragment_result),
 
     private fun onCompositionChange(composition: ExplorerItemComposition) {
         resultAdapter.setComposition(composition)
+    }
+
+    private fun onDockChanged(state: ResultDockState) {
+        binding.dockBar.submit(state)
     }
 
     private fun showSnackbar(message: AlertMessage.Res) {

@@ -21,9 +21,9 @@ object Shell {
     const val MKDIR = "{toybox} mkdir \"%s\""
     const val RM_RF = "{toybox} rm -rf \"%s\""
     const val MV = "{toybox} mv \"%s\" \"%s\""
-    const val LS_LAHL = "{toybox} ls -lAhL \"%s\""
+    const val LS_LAL = "{toybox} ls -lAL \"%s\""
     // can't use 'file -b' because of Android 10 contains toybox-0.8.0
-    const val LS_LAHLD_FILE = "{toybox} ls -lAhLd \"%s\" && {toybox} file \"%s\""
+    const val LS_LALD_FILE = "{toybox} ls -lALd \"%s\" && {toybox} file \"%s\""
     // 'du -hd 1' is useless because of any error don't allow get info about items below dir with error (Permission denied)
     const val DU_HD0 = "{toybox} du -hd 0 \"%s\""
     // DOT_SLASH is needed because of this shit:

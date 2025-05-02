@@ -118,7 +118,9 @@ class ResultModule {
 
     @Provides
     @ResultScope
-    fun viewState(scope: CoroutineScope): ResultViewState = ResultViewState(scope)
+    fun viewState(params: ResultPresenterParams, scope: CoroutineScope, finderStore: FinderStore): ResultViewState {
+        return ResultViewState(params, finderStore, scope)
+    }
 }
 
 interface ResultDependencies {
