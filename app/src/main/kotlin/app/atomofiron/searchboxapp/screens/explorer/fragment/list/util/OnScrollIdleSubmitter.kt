@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.util
 
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.common.recycler.CoroutineListDiffer
 import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.searchboxapp.model.explorer.Node
 
@@ -9,7 +9,7 @@ class OnScrollIdleSubmitter(
     recyclerView: RecyclerView,
     private val adapter: GeneralAdapter<Node,*>,
     private val visibleItems: Set<Int>,
-) : RecyclerView.OnScrollListener(), AsyncListDiffer.ListListener<Node> {
+) : RecyclerView.OnScrollListener(), CoroutineListDiffer.ListListener<Node> {
 
     private var items: MutableList<Node>? = null
     private var marker: String? = null
@@ -57,7 +57,9 @@ class OnScrollIdleSubmitter(
         }
     }
 
-    override fun onCurrentListChanged(previousList: MutableList<Node>, currentList: MutableList<Node>) = currentList.triggerLastFiles()
+    override fun onItemChanged(index: Int, item: Node) = Unit
+
+    override fun onCurrentListChanged(current: List<Node>) = current.triggerLastFiles()
 
     // to update decoration offsets
     private fun List<Node>.triggerLastFiles() {

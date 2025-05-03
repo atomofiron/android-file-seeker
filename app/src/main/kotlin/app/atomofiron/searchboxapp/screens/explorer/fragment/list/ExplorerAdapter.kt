@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.explorer.fragment.list
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.common.recycler.GeneralHolder
@@ -24,7 +23,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.isDot
 class ExplorerAdapter(
     private val itemActionListener: ExplorerItemActionListener,
     private val separatorClickListener: (Node) -> Unit,
-) : GeneralAdapter<Node, GeneralHolder<Node>>() {
+) : GeneralAdapter<Node, GeneralHolder<Node>>(NodeCallback) {
 
     private lateinit var composition: ExplorerItemComposition
     private var viewCacheLimit = 5 // RecycledViewPool.DEFAULT_MAX_SCRAP
@@ -37,8 +36,6 @@ class ExplorerAdapter(
     init {
         setHasStableIds(true)
     }
-
-    override fun getItemCallback(): DiffUtil.ItemCallback<Node> = NodeCallback
 
     fun setComposition(composition: ExplorerItemComposition) {
         this.composition = composition

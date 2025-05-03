@@ -2,33 +2,19 @@ package app.atomofiron.common.recycler
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.AdapterListUpdateCallback
-import androidx.recyclerview.widget.AsyncDifferConfig
-import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.util.UnreachableException
 
-abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>> : RecyclerView.Adapter<H>(), AsyncListDiffer.ListListener<D> {
+abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>>(
+    itemCallback: DiffUtil.ItemCallback<D>? = null,
+) : RecyclerView.Adapter<H>(), CoroutineListDiffer.ListListener<D> {
     companion object {
         const val UNDEFINED = -1
     }
 
+    private val differ = itemCallback?.let { CoroutineListDiffer(this, it, listener = this) }
     private val mutableItems = mutableListOf<D>()
     val items: List<D> = mutableItems
-    private var updated = mutableListOf<D>()
-
-    private val itemCallback: DiffUtil.ItemCallback<D>? = getItemCallback()
-    private var isCalculating = false
-    private val differ by lazy(LazyThreadSafetyMode.NONE) {
-        itemCallback?.let { callback ->
-            AsyncListDiffer(AdapterListUpdateCallback(this), AsyncDifferConfig.Builder(callback).build())
-        }
-    }
-
-    init {
-        differ?.addListListener(this)
-    }
 
     override fun getItemCount(): Int = mutableItems.size
 
@@ -43,21 +29,12 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>> : RecyclerView.Adap
 
     override fun onBindViewHolder(holder: H, position: Int) = holder.bind(mutableItems[position], position)
 
-    override fun onCurrentListChanged(previousList: List<D>, currentList: List<D>) {
-        isCalculating = false
-        val newItems: List<D> = if (updated.isEmpty()) currentList else currentList.toMutableList().apply {
-            val callback = itemCallback ?: throw UnreachableException()
-            for (newer in updated) {
-                val index = indexOfFirst { callback.areItemsTheSame(it, newer) }
-                if (index >= 0) set(index, newer)
-            }
-        }
-        mutableItems.clear()
-        mutableItems.addAll(newItems)
-    }
+    override fun onItemChanged(index: Int, item: D) = Unit
 
-    // inheritor's fields init after super
-    protected open fun getItemCallback(): DiffUtil.ItemCallback<D>? = null
+    override fun onCurrentListChanged(current: List<D>) {
+        mutableItems.clear()
+        mutableItems.addAll(current)
+    }
 
     fun submit(items: List<D>) {
         val differ = differ
@@ -66,30 +43,22 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>> : RecyclerView.Adap
             mutableItems.addAll(items)
             notifyDataSetChanged()
         } else {
-            isCalculating = true
-            differ.submitList(items)
-            updated.clear()
+            differ.submit(mutableItems, items)
         }
     }
 
     fun submit(item: D, itemIndex: Int = UNDEFINED) {
+        val differ = differ
         val index = when {
             itemIndex > UNDEFINED -> itemIndex
-            itemCallback == null -> throw UnsupportedOperationException()
-            isCalculating -> {
-                val index = updated.indexOfFirst { itemCallback.areItemsTheSame(it, item) }
-                if (index >= 0) updated.removeAt(index)
-                updated.add(item)
-                return
-            }
-            else -> mutableItems.indexOfFirst { itemCallback.areItemsTheSame(it, item) }
-                .also { if (it < 0) return }
+            differ == null -> throw UnsupportedOperationException()
+            else -> return differ.submit(item, itemIndex)
         }
         mutableItems[index] = item
         notifyItemChanged(index)
     }
 
-    fun addListListener(listener: AsyncListDiffer.ListListener<D>) {
-        differ?.addListListener(listener)
+    fun addListListener(listener: CoroutineListDiffer.ListListener<D>) {
+        differ?.addListener(listener)
     }
 }

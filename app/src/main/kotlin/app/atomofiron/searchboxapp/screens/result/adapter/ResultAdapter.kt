@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.result.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.fileseeker.R
@@ -10,7 +9,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
 
-class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>() {
+class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCallback) {
     companion object {
         private const val POSITION_HEADER = 0
         private const val TYPE_HEADER = 2
@@ -43,8 +42,6 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>() {
         POSITION_HEADER -> TYPE_HEADER
         else -> super.getItemViewType(position)
     }
-
-    override fun getItemCallback(): DiffUtil.ItemCallback<ResultItem> = ResultDiffUtilCallback
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
