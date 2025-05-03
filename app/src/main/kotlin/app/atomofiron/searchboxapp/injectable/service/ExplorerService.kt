@@ -473,7 +473,7 @@ class ExplorerService(
                 nextState(item.uniqueId, installing = installing)
             }
             (state?.operation == installing).also {
-                if (it) tab?.let { renderTab(tab) }
+                if (it) tab?.let { get(tab)?.render() }
             }
         }
     }
