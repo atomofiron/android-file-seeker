@@ -92,7 +92,7 @@
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/item_explorer_tv_size"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="19sp"
         android:layout_gravity="end"
         android:paddingEnd="@dimen/common_margin"
         android:textSize="12sp"
@@ -115,12 +115,10 @@
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/item_explorer_cb"
         android:layout_width="@dimen/edge_size"
-        android:layout_height="0dp"
-        android:layout_gravity="end"
+        android:layout_height="@dimen/edge_size"
         android:layout_marginTop="-2dp"
         android:gravity="top"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

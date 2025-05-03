@@ -40,7 +40,6 @@ class CoroutineListDiffer<I : Any>(
                     return@withContext
                 }
                 isCalculating = false
-                result.dispatchUpdatesTo(adapter)
                 if (updated.isNotEmpty()) {
                     for (newer in updated) {
                         val index = actualList.indexOfFirst { itemCallback.areItemsTheSame(it, newer) }
@@ -48,6 +47,7 @@ class CoroutineListDiffer<I : Any>(
                     }
                     updated.clear()
                 }
+                result.dispatchUpdatesTo(adapter)
                 listeners.forEach { it.onCurrentListChanged(actualList) }
             }
         }
