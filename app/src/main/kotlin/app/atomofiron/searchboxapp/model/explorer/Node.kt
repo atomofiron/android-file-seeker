@@ -52,6 +52,7 @@ data class Node constructor(
         other.isFile != isFile -> false
         other.isChecked != isChecked -> false
         other.isCurrent != isCurrent -> false
+        other.hasChildren != hasChildren -> false
         other.content != content -> false
         else -> true
     }

@@ -1,15 +1,13 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.util
 
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.recycler.CoroutineListDiffer
 import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.searchboxapp.model.explorer.Node
 
 class OnScrollIdleSubmitter(
     recyclerView: RecyclerView,
     private val adapter: GeneralAdapter<Node,*>,
-    private val visibleItems: Set<Int>,
-) : RecyclerView.OnScrollListener(), CoroutineListDiffer.ListListener<Node> {
+) : RecyclerView.OnScrollListener() {
 
     private var items: MutableList<Node>? = null
     private var marker: String? = null
@@ -17,14 +15,13 @@ class OnScrollIdleSubmitter(
 
     init {
         recyclerView.addOnScrollListener(this)
-        adapter.addListListener(this)
+        adapter.registerAdapterDataObserver(ChangeListener())
     }
 
     fun submitOnIdle(items: List<Node>, marker: String? = null) {
         if (allowed || marker != this.marker) {
             this.marker = marker
             adapter.submit(items)
-            items.triggerLastFiles()
         } else {
             this.items = items.toMutableList()
         }
@@ -52,23 +49,21 @@ class OnScrollIdleSubmitter(
         allowed = newState == RecyclerView.SCROLL_STATE_IDLE
         if (allowed) {
             adapter.submit(items ?: return)
-            items?.triggerLastFiles()
             items = null
         }
     }
 
-    override fun onItemChanged(index: Int, item: Node) = Unit
-
-    override fun onCurrentListChanged(current: List<Node>) = current.triggerLastFiles()
-
-    // to update decoration offsets
-    private fun List<Node>.triggerLastFiles() {
-        val lastIndex = lastIndex
-        visibleItems.forEach { i ->
-            when {
-                i >= lastIndex -> Unit
-                get(i).parentPath.length <= get(i.inc()).parentPath.length -> Unit
-                else -> adapter.notifyItemChanged(i)
+    private inner class ChangeListener : RecyclerView.AdapterDataObserver() {
+        override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) = onEvent(positionStart)
+        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = onEvent(positionStart)
+        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+            onEvent(fromPosition)
+            onEvent(toPosition)
+        }
+        private fun onEvent(position: Int) {
+            if (position > 0) {
+                // to update decoration offsets
+                adapter.notifyItemChanged(position.dec())
             }
         }
     }
