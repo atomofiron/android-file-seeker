@@ -1,5 +1,7 @@
 package app.fileseeker.convention
 
+// signature key alias atomofiron_2020
+
 @Suppress("ConstPropertyName")
 object AppConfig {
 
