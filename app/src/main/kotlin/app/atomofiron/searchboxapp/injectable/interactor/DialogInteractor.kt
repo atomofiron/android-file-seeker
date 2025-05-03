@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.injectable.interactor
 
-import android.widget.Toast
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
@@ -19,12 +18,6 @@ class DialogInteractor(
         .setMessage(message)
         .setPositiveButton(R.string.ok)
         .setNegativeButton(R.string.copy) {
-            val toast = try {
-                utils.copyToClipboard(resources.getString(R.string.error), message)
-                resources.getString(R.string.copied)
-            } catch (e: Exception) {
-                e.toString()
-            }
-            Toast.makeText(appStore.context, toast, Toast.LENGTH_LONG).show()
+            utils.copyToClipboard(resources.getString(R.string.error), message)
         }.show()
 }
