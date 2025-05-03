@@ -4,7 +4,6 @@ import android.app.Service
 import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
@@ -121,7 +120,8 @@ class MainActivity : AppCompatActivity() {
             if (!view.isVisible) {
                 return@insetsSource InsetsSource.submit(ExtType.joystickBottom, Insets.NONE)
             }
-            val parent = view.parent as View
+            val parent = root.takeIf { it === view.parent }
+                ?: throw IllegalStateException()
             val layout = parent.getLayout()
             when (layout.ground) {
                 Ground.Bottom -> InsetsSource

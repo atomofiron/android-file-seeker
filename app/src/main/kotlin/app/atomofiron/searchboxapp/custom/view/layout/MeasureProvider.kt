@@ -1,12 +1,12 @@
 package app.atomofiron.searchboxapp.custom.view.layout
 
-import android.view.View
 import android.view.View.MeasureSpec
+import android.view.ViewGroup
 
 typealias MeasureListener = (width: Int, height: Int) -> Unit
 
 interface MeasureProvider {
-    val view: View
+    val view: ViewGroup
 
     fun addMeasureListener(listener: MeasureListener)
     fun removeMeasureListener(listener: MeasureListener): Boolean
@@ -15,7 +15,7 @@ interface MeasureProvider {
 
 class MeasureProviderImpl : MeasureProvider {
 
-    override val view: View get() = throw NotImplementedError()
+    override val view: ViewGroup get() = throw NotImplementedError()
 
     private var availableWidth = 0
     private var availableHeight = 0

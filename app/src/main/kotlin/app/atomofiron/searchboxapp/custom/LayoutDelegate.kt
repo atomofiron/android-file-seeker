@@ -4,6 +4,7 @@ import android.view.Display
 import android.view.Gravity
 import android.view.Surface
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.Insets
@@ -50,7 +51,7 @@ object LayoutDelegate {
         headerView: ExplorerHeaderView? = null,
         snackbarContainer: CoordinatorLayout? = null,
     ) {
-        val insetsProvider = view.findInsetsProvider()!!
+        val insetsProvider = (view as View).findInsetsProvider()!!
         var layout = Layout(Layout.Ground.Bottom, withJoystick = true, view.isRtl())
         val dockDelegate = dockView?.insetsPadding(ExtType { barsWithCutout + joystickTop })
         val notch = view.resources.run {
@@ -106,8 +107,8 @@ object LayoutDelegate {
     }
 
     private var last = false
-    private fun View.withJoystick(isBottom: Boolean): Boolean {
-        val insets = ViewCompat.getRootWindowInsets(this)
+    private fun Layout.Ground.withJoystick(root: ViewGroup): Boolean {
+        val insets = ViewCompat.getRootWindowInsets(root)
         insets ?: return true
         val ime = insets.getInsets(Type.ime())
         if (isBottom && ime.bottom > 0) return last
@@ -161,19 +162,20 @@ object LayoutDelegate {
         }
     }
 
-    fun View.getLayout(): Layout = getLayout(measuredWidth, measuredHeight, context.getDisplayCompat())
+    fun ViewGroup.getLayout(): Layout = getLayout(measuredWidth, measuredHeight, context.getDisplayCompat())
 
-    fun View.getLayout(width: Int, height: Int, display: Display?): Layout {
+    fun ViewGroup.getLayout(width: Int, height: Int, display: Display?): Layout {
         val w = if (width > 0) width else resources.displayMetrics.widthPixels
         val h = if (height > 0) height else resources.displayMetrics.heightPixels
         val maxSize = resources.getDimensionPixelSize(R.dimen.bottom_bar_max_width)
-        val atTheBottom = w < h && w < maxSize
         val ground = when {
-            atTheBottom -> Layout.Ground.Bottom
+            w < h && w < maxSize -> Layout.Ground.Bottom
             display?.rotation == Surface.ROTATION_270 -> Layout.Ground.Left
             else -> Layout.Ground.Right
         }
-        return Layout(ground, withJoystick(ground.isBottom), isRtl())
+        val largeScreen = w >= maxSize && h >= maxSize
+        val withJoystick = largeScreen || ground.withJoystick(root = this)
+        return Layout(ground, withJoystick, isRtl())
     }
 
     fun JoystickView.syncWithLayout(root: RootFrameLayout) {
