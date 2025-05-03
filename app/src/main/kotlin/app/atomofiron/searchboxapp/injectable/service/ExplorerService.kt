@@ -139,17 +139,28 @@ class ExplorerService(
         this.roots.addAll(roots)
     }
 
-    suspend fun trySelectRoot(key: NodeTabKey, rootItem: NodeRoot) {
+    private suspend fun tryToggleRoot(key: NodeTabKey, item: Node) {
+        val root = garden.trees[key]?.roots?.find { it.item.uniqueId == item.uniqueId }
+        root ?: return
+        tryToggleRoot(key, root)
+    }
+
+    suspend fun tryToggleRoot(key: NodeTabKey, root: NodeRoot) = tryToggleRoot(key, root.type, root.item)
+
+    private suspend fun tryToggleRoot(key: NodeTabKey, type: NodeRootType, item: Node) {
         renderTab(key) {
-            selectedRootId = when (val typeId = rootItem.type.stableId) {
+            selectedRootId = when (val typeId = type.stableId) {
                 selectedRootId -> 0
                 else -> typeId
             }
         }
-        tryCache(key, rootItem.item)
+        tryCache(key, item)
     }
 
     suspend fun tryToggle(key: NodeTabKey, it: Node) {
+        if (it.isRoot) {
+            return tryToggleRoot(key, it)
+        }
         renderTab(key) {
             val (levelIndex, parent) = tree.findIndexed(it.parentPath)
             val (index, item) = parent?.children

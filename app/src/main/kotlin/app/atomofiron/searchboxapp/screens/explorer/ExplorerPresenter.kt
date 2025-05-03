@@ -42,7 +42,7 @@ class ExplorerPresenter(
 
     override fun onSubscribeData() = Unit
 
-    override fun onRootClick(item: NodeRoot) = explorerInteractor.selectRoot(currentTab, item)
+    override fun onRootClick(item: NodeRoot) = explorerInteractor.toggleRoot(currentTab, item)
 
     fun onSearchOptionSelected() = router.showFinder()
 

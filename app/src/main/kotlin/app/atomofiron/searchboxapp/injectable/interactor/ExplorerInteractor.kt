@@ -56,9 +56,9 @@ class ExplorerInteractor(
 
     fun copyToClipboard(item: Node) = utils.copyToClipboard(item)
 
-    fun selectRoot(tab: NodeTabKey, item: NodeRoot) {
+    fun toggleRoot(tab: NodeTabKey, item: NodeRoot) {
         scope.launch(context) {
-            service.trySelectRoot(tab, item)
+            service.tryToggleRoot(tab, item)
         }
     }
 
