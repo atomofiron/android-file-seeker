@@ -33,7 +33,7 @@ class RootRouter(
     override fun navigateBack(): Boolean {
         val consumed = fragment {
             val lastVisibleFragment = childFragmentManager.fragments.findLastVisibleFragment()
-            var consumed = lastVisibleFragment?.onBack() ?: false
+            var consumed = lastVisibleFragment?.onBack(soft = false) ?: false
             if (!consumed && lastVisibleFragment?.let { !isInitialFragment(it) } == true) {
                 childFragmentManager.switchScreen { isInitialFragment(it) }
                 consumed = true

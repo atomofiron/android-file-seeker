@@ -137,7 +137,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         outState.putIntArray(SAVED_STACK, stack.map { it.layoutId }.toIntArray())
     }
 
-    override fun onBack(): Boolean {
+    override fun onBack(soft: Boolean): Boolean {
         when {
             transitionAnimator.transitionIsRunning -> Unit
             !viewState.cancelable.value -> Unit

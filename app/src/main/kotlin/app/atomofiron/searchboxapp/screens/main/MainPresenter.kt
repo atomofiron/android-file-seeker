@@ -31,10 +31,10 @@ class MainPresenter(
 
     override fun onSubscribeData() = Unit
 
-    fun onEscClick(): Boolean = router.onBack()
+    fun onEscClick(): Boolean = router.onBack(soft = true)
 
     fun onBackButtonClick() = when {
-        router.onBack() -> Unit
+        router.onBack(soft = false) -> Unit
         else -> router.minimize()
     }
 

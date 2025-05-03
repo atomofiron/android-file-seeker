@@ -63,14 +63,16 @@ class ExplorerPresenter(
         scrollOrOpenParent(currentDir, isCurrentDirVisible)
     }
 
-    override fun onBack(): Boolean {
-        val selectedRoot = viewState.firstTabItems
-            .valueOrNull
-            ?.roots
-            ?.find { it.isSelected }
-        selectedRoot ?: return false
-        onRootClick(selectedRoot)
-        return super.onBack()
+    override fun onBack(soft: Boolean): Boolean {
+        if (soft) {
+            val selectedRoot = viewState.firstTabItems
+                .valueOrNull
+                ?.roots
+                ?.find { it.isSelected }
+            selectedRoot ?: return false
+            onRootClick(selectedRoot)
+        }
+        return super.onBack(soft)
     }
 
     private fun scrollOrOpenParent(item: Node, isTargetVisible: Boolean) = when {

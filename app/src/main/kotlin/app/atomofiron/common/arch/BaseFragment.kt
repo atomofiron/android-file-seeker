@@ -12,7 +12,7 @@ interface BaseFragment<F : Fragment, S : Any, P : BasePresenter<*,*>, B : ViewBi
     val isLightStatusBar: Boolean? get() = null
 
     fun initViewModel(fragment: F, viewModelClass: KClass<out BaseViewModel<*,F,S,P>>, state: Bundle?)
-    fun onBack(): Boolean = presenter.onBack()
+    fun onBack(soft: Boolean): Boolean = presenter.onBack(soft)
 
     // reminders
     fun S.onViewCollect() = Unit

@@ -31,6 +31,4 @@ class RootFragment : Fragment(R.layout.fragment_root),
     private fun FragmentRootBinding.applyInsets() {
         snackbarContainer.insetsPadding(ExtType { barsWithCutout + dock })
     }
-
-    override fun onBack(): Boolean = presenter.onBack()
 }

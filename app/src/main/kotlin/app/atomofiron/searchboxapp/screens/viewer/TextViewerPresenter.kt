@@ -52,7 +52,7 @@ class TextViewerPresenter(
         else -> true.also { viewState.dropTask() }
     }
 
-    fun onBackClick(): Boolean {
+    override fun onBack(soft: Boolean): Boolean {
         return (viewState.currentTask.value != null).also {
             if (it) viewState.dropTask()
         }

@@ -14,6 +14,4 @@ class TemplateFragment : Fragment(R.layout.fragment_template),
         super.onCreate(savedInstanceState)
         initViewModel(this, TemplateViewModel::class, savedInstanceState)
     }
-
-    override fun onBack(): Boolean = false
 }

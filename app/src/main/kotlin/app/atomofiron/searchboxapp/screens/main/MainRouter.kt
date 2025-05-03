@@ -32,9 +32,9 @@ class MainRouter(activityProperty: WeakProperty<out FragmentActivity>) : BaseRou
 
     fun showSettings() = navigate(R.id.preferenceFragment)
 
-    fun onBack(): Boolean {
+    fun onBack(soft: Boolean): Boolean {
         val lastVisibleFragment = lastVisibleFragment
-        val consumed = lastVisibleFragment?.onBack() == true
+        val consumed = lastVisibleFragment?.onBack(soft) == true
         return consumed || navigation {
             navigateUp()
         } ?: false

@@ -96,8 +96,6 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         }
     }
 
-    override fun onBack(): Boolean = presenter.onBackClick() || super.onBack()
-
     private fun onBottomMenuItemClick(item: DockItem) {
         when (item.id) {
             DefaultDockState.status.id -> Unit

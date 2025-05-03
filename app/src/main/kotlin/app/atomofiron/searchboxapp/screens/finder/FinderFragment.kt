@@ -122,10 +122,10 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         insetsBackground.setAdditional(ExtType.dock)
     }
 
-    override fun onBack(): Boolean {
+    override fun onBack(soft: Boolean): Boolean {
         val consumed = binding.drawer.isOpened
         binding.drawer.close()
-        return consumed || super.onBack()
+        return consumed || super.onBack(soft)
     }
 
     private fun onStateChange(items: List<FinderStateItem>) = finderAdapter.submitList(items)
