@@ -64,13 +64,13 @@ class FileOperationsDelegate(
         dialogs.builder()
             .setTitle(item.name)
             .setMessageWithOfferDontAskAnymore(true)
-            .setPositiveButton(R.string.launch) { dontAskAnymore ->
+            .setNeutralButton(R.string.launch) { dontAskAnymore ->
                 if (dontAskAnymore) preferences { setActionApk(ActionApk.Launch) }
                 apks.launch(item)
-            }.setNegativeButton(R.string.install) { dontAskAnymore ->
+            }.setPositiveButton(R.string.install) { dontAskAnymore ->
                 if (dontAskAnymore) preferences { setActionApk(ActionApk.Install) }
                 apks.install(item, tab)
-            }.setNeutralButton(R.string.cancel)
+            }.setNegativeButton(R.string.cancel)
             .show()
     }
 }
