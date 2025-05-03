@@ -44,7 +44,9 @@ class ExplorerListDelegate(
     }
 
     fun set(items: List<Node>) {
+        val wasEmpty = this.items.isEmpty()
         this.items = items
+        if (wasEmpty) checkCurrentIn(items.indices)
     }
 
     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = checkCurrentIn(positionStart..<(positionStart + itemCount))
