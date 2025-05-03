@@ -55,8 +55,8 @@ class DockBarView(
             }
             when {
                 event.action != ACTION_DOWN -> Unit
-                moved.x.toInt() !in child.run { left..right } -> Unit
-                moved.y.toInt() !in child.run { top..bottom } -> Unit
+                moved.x.toInt() !in child.run { 0..width } -> Unit
+                moved.y.toInt() !in child.run { 0..height } -> Unit
                 else -> return true
             }
         }
