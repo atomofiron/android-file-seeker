@@ -39,8 +39,9 @@ open class ServiceModule {
     @Provides
     @Singleton
     fun resultService(
+        appStore: AppStore,
         clipboardManager: ClipboardManager,
-    ): UtilService = UtilService(clipboardManager)
+    ): UtilService = UtilService(appStore, clipboardManager)
 
     @Provides
     @Singleton

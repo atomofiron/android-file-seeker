@@ -9,7 +9,9 @@ import app.atomofiron.common.util.property.MutableStrongProperty
 import app.atomofiron.common.util.property.MutableWeakProperty
 import kotlinx.coroutines.CoroutineScope
 
-class AppStore constructor(
+// todo add interface AppStore
+
+class AppStore(
     val context: Context,
     val scope: CoroutineScope,
     val resourcesProperty: AppResources,

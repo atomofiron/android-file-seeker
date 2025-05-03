@@ -4,6 +4,7 @@ import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.DialogInteractor
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
+import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import dagger.Module
 import dagger.Provides
@@ -22,5 +23,5 @@ class InteractorModule {
 
     @Provides
     @Singleton
-    fun dialogs(appStore: AppStore) = DialogInteractor(appStore)
+    fun dialogs(appStore: AppStore, utils: UtilService) = DialogInteractor(appStore, utils)
 }

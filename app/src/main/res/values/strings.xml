@@ -43,7 +43,7 @@
     <string name="need_restart">Restart required</string>
     <string name="history">History</string>
     <string name="copy">Copy</string>
-    <string name="copied">Copied</string>
+    <string name="copied">Copied to the clipboard</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

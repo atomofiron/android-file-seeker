@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.utils
 
-import android.content.Context
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.common.util.applyIf
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.common.util.with
@@ -12,7 +12,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
 typealias ButtonCallback = (dontAskAgain: Boolean) -> Unit
 
-class DialogBuilder(context: WeakProperty<out Context>) {
+class DialogBuilder(context: WeakProperty<out AppCompatActivity>) {
 
     private val context by context
 

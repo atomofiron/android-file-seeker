@@ -6,6 +6,7 @@ import android.content.pm.PackageInstaller
 import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import app.atomofiron.searchboxapp.android.AbstractApp
+import app.atomofiron.searchboxapp.android.InstallReceiver
 import app.atomofiron.searchboxapp.di.module.ChannelModule
 import app.atomofiron.searchboxapp.di.module.CommonModule
 import app.atomofiron.searchboxapp.di.module.DelegateModule
@@ -83,4 +84,5 @@ interface AppComponent :
 
     fun inject(target: AbstractApp)
     fun inject(target: FinderWorker)
+    fun inject(target: InstallReceiver)
 }

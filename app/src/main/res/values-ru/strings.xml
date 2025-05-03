@@ -42,7 +42,7 @@
     <string name="need_restart">Нужен перезапуск</string>
 	<string name="history">История</string>
     <string name="copy">Скопировать</string>
-    <string name="copied">Скопировано</string>
+    <string name="copied">Скопировано в буфер обмена</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
