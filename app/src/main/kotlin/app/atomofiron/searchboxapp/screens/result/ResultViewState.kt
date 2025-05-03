@@ -3,9 +3,9 @@ package app.atomofiron.searchboxapp.screens.result
 import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.DeferredStateFlow
-import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.launch
 import app.atomofiron.common.util.flow.set
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
@@ -81,8 +81,13 @@ class ResultViewState(
                 sorting.children.selectionMatches(new) -> sorting
                 else -> new.toDockItem(sorting.label).copy(children = sorting.children.makeSelected(new))
             }
+            val status = if (status.clickable == task.inProgress) status else status.copy(
+                clickable = task.inProgress,
+                icon = DockItem.Icon(if (task.inProgress) R.drawable.ic_circle_stop else R.drawable.ic_circle_check),
+                label = DockItem.Label(if (task.inProgress) R.string.stop else R.string.completed),
+            )
             copy(
-                status = status.copy(clickable = task.inProgress),
+                status = status,
                 sorting = sorting,
                 share = share.copy(enabled = !task.result.isEmpty),
                 export = export.copy(enabled = !task.result.isEmpty),

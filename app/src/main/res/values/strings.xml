@@ -20,6 +20,7 @@
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
     <string name="stop">Stop</string>
+    <string name="completed">Completed</string>
     <string name="sorting">Sorting</string>
     <string name="sorting_a_z">A-Z</string>
     <string name="sorting_z_a">Z-A</string>

@@ -19,6 +19,7 @@
     <string name="cancel">Отмена</string>
     <string name="close">Закрыть</string>
     <string name="stop">Остановить</string>
+    <string name="completed">Завершён</string>
     <string name="sorting">Сортировка</string>
     <string name="sorting_a_z">А-Я</string>
     <string name="sorting_z_a">Я-А</string>
