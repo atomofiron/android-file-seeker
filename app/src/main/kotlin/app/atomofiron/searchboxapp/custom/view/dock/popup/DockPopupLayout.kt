@@ -35,24 +35,30 @@ class DockPopupLayout @JvmOverloads constructor(
         val corner = resources.getDimensionPixelSize(R.dimen.dock_overlay_corner)
         val offset = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
         val ground = config.ground
+
+        val itemWidth = min(itemView.width, (itemView.height * MAX_RATIO).toInt())
+        val itemHeight = min(itemView.height, (itemView.width * MAX_RATIO).toInt())
+        val containerLeft = itemView.left + (container.width - itemWidth) / 2
+        val containerTop = itemView.top + (container.height - itemHeight) / 2
+
         val minLeft = when (ground) {
-            Ground.Bottom -> min(parent.paddingLeft, itemView.left) - offset - itemView.left
-            Ground.Left -> itemView.width + offset
+            Ground.Bottom -> min(parent.paddingLeft, containerLeft) - offset - containerLeft
+            Ground.Left -> itemWidth + offset
             Ground.Right -> -config.spaceWidth - offset
         }
         val maxRight = when (ground) {
-            Ground.Bottom -> parent.run { width - paddingRight + offset } - itemView.left
+            Ground.Bottom -> parent.run { width - paddingRight + offset } - containerLeft
             Ground.Left, Ground.Right -> minLeft + config.spaceWidth
         }
         var minTop = when (ground) {
             Ground.Bottom -> -config.spaceHeight - offset
-            Ground.Left, Ground.Right -> min(parent.paddingTop, itemView.top) - offset - itemView.top
+            Ground.Left, Ground.Right -> min(parent.paddingTop, containerTop) - offset - containerTop
         }
         var maxBottom = when (ground) {
             Ground.Bottom -> -offset
-            Ground.Left, Ground.Right -> parent.run { height - paddingBottom + offset } - itemView.top
+            Ground.Left, Ground.Right -> parent.run { height - paddingBottom + offset } - containerTop
         }
-        val bottomThreshold = itemView.height + offset
+        val bottomThreshold = itemHeight + offset
         if (abs(maxBottom - bottomThreshold) < corner * 2) {
             maxBottom = bottomThreshold
         }
@@ -63,8 +69,6 @@ class DockPopupLayout @JvmOverloads constructor(
         }
         minTop = min(minTop, -topThreshold)
         val popupConfig = config.copy(rect = Rect(minLeft, minTop, maxRight, maxBottom))
-        val itemWidth = min(itemView.width, (itemView.height * MAX_RATIO).toInt())
-        val itemHeight = min(itemView.height, (itemView.width * MAX_RATIO).toInt())
         val childConfig = DockItemConfig(width = itemWidth, height = itemHeight, popup = popupConfig)
         val childrenView = DockItemChildrenView(itemView.context, item, childConfig, selectListener)
         container.addView(childrenView)
