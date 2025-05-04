@@ -62,4 +62,6 @@ data class DockItem(
     fun with(@DrawableRes resId: Int) = copy(icon = Icon.Res(resId))
 
     fun with(drawable: Drawable) = copy(icon = Icon.Value(drawable))
+
+    fun withOutChildren() = copy(children = DockItemChildren.Stub)
 }
