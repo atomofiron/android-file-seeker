@@ -72,7 +72,7 @@ class ExplorerPresenter(
             selectedRoot ?: return false
             onRootClick(selectedRoot)
         }
-        return super.onBack(soft)
+        return soft || super.onBack(false)
     }
 
     private fun scrollOrOpenParent(item: Node, isTargetVisible: Boolean) = when {

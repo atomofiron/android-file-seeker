@@ -11,4 +11,6 @@ class RootPresenter(
     override fun onSubscribeData() = Unit
 
     fun onChildrenCreated() = router.checkCurrentScreen()
+
+    override fun onBack(soft: Boolean) = router.onBack(soft) || super.onBack(soft)
 }
