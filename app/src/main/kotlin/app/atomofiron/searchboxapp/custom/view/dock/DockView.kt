@@ -114,6 +114,7 @@ class DockViewImpl(
                 submit(config = itemConfig.copy(popup = DockPopupConfig(mode.ground, width, height, itemConfig.popup.style)))
             }
         }
+        mode?.updateDecoration()
     }
 
     override fun setListener(listener: (DockItem) -> Unit) {
