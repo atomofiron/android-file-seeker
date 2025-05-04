@@ -70,12 +70,11 @@ class DockItemHolder(
 
     private fun ItemDockBinding.createRippleBackground(): ShapeDrawable {
         val corners = root.resources.getDimension(R.dimen.dock_item_corner)
-        val padding = root.resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
         val ripple = root.context.findColorByAttr(MaterialAttr.colorControlHighlight)
         val shape = RoundRectShape(FloatArray(8) { corners }, null, null)
         val shapeDrawable = ShapeDrawable(shape)
-        shapeDrawable.setPadding(padding, padding, padding, padding)
-        val background = RippleDrawable(ColorStateList.valueOf(ripple), shapeDrawable, ShapeDrawable(shape))
+        val mask = ShapeDrawable(shape)
+        val background = RippleDrawable(ColorStateList.valueOf(ripple), shapeDrawable, mask)
         button.background = background
         return shapeDrawable
     }

@@ -9,6 +9,7 @@
         android:id="@+id/button"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="@dimen/dock_item_half_margin"
         android:orientation="vertical"
         android:gravity="center"
         android:paddingVertical="8dp"
