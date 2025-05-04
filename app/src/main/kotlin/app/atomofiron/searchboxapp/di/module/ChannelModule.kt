@@ -25,7 +25,7 @@ open class ChannelModule {
 
     @Provides
     @Singleton
-    open fun provideCurtainChannel(appStore: AppStore): CurtainChannel = CurtainChannel(appStore.scope)
+    open fun provideCurtainChannel(appStore: AppStore): CurtainChannel = CurtainChannel(appStore.appScope)
 
     @Provides
     @Singleton

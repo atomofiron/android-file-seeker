@@ -19,7 +19,7 @@ class InteractorModule {
         appStore: AppStore,
         apkService: ApkService,
         explorerService: ExplorerService,
-    ): ApkInteractor = ApkInteractor(appStore.scope, apkService, explorerService)
+    ): ApkInteractor = ApkInteractor(appStore.appScope, apkService, explorerService)
 
     @Provides
     @Singleton

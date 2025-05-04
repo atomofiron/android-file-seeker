@@ -7,30 +7,52 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import app.atomofiron.common.util.property.MutableStrongProperty
 import app.atomofiron.common.util.property.MutableWeakProperty
+import app.atomofiron.common.util.property.StrongProperty
+import app.atomofiron.common.util.property.WeakProperty
 import kotlinx.coroutines.CoroutineScope
 
-// todo add interface AppStore
+// todo soo then all deps should be provided as impls of interfaces (because of SomeDep : AppStore by appStore)
 
-class AppStore(
-    val context: Context,
-    val scope: CoroutineScope,
-    val resourcesProperty: AppResources,
-) {
-    val activityProperty = MutableWeakProperty<AppCompatActivity>(null)
-    val windowProperty = MutableWeakProperty<Window>(null)
-    val insetsControllerProperty = MutableStrongProperty<WindowInsetsControllerCompat?>()
+interface AppStore {
+    val context: Context
+    val resources: Resources
+    val appScope: CoroutineScope
+    val activity: AppCompatActivity?
+    val resourcesProperty: StrongProperty<Resources>
+    val activityProperty: WeakProperty<AppCompatActivity>
+    val windowProperty: WeakProperty<Window>
+    val insetsControllerProperty: StrongProperty<WindowInsetsControllerCompat?>
+}
 
-    fun onActivityCreate(activity: AppCompatActivity) {
+interface AppStoreConsumer {
+    fun onActivityCreate(activity: AppCompatActivity)
+    fun onResourcesChange(resources: Resources)
+    fun onActivityDestroy()
+}
+
+class AndroidStore(
+    override val context: Context,
+    override val appScope: CoroutineScope,
+    override val resourcesProperty: AppResources,
+) : AppStore, AppStoreConsumer {
+    override val activityProperty = MutableWeakProperty<AppCompatActivity>(null)
+    override val windowProperty = MutableWeakProperty<Window>(null)
+    override val insetsControllerProperty = MutableStrongProperty<WindowInsetsControllerCompat?>()
+
+    override val activity by activityProperty
+    override val resources by resourcesProperty
+
+    override fun onActivityCreate(activity: AppCompatActivity) {
         activityProperty.value = activity
         windowProperty.value = activity.window
         insetsControllerProperty.value = WindowInsetsControllerCompat(activity.window, activity.window.decorView)
     }
 
-    fun onResourcesChange(resources: Resources) {
+    override fun onResourcesChange(resources: Resources) {
         resourcesProperty.value = resources
     }
 
-    fun onActivityDestroy() {
+    override fun onActivityDestroy() {
         insetsControllerProperty.value = null
     }
 }

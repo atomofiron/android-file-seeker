@@ -6,14 +6,13 @@ import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.utils.DialogBuilder
 
 class DialogInteractor(
-    private val appStore: AppStore,
+    appStore: AppStore,
     private val utils: UtilService,
-) {
-    private val resources by appStore.resourcesProperty
+) : AppStore by appStore {
 
-    fun builder() = DialogBuilder(appStore.activityProperty)
+    fun builder() = DialogBuilder(activityProperty)
 
-    fun showError(message: String) = DialogBuilder(appStore.activityProperty)
+    fun showError(message: String) = DialogBuilder(activityProperty)
         .setTitle(R.string.error)
         .setMessage(message)
         .setPositiveButton(R.string.ok)

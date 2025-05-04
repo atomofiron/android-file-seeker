@@ -38,9 +38,17 @@ open class StoreModule {
 
     @Provides
     @Singleton
-    open fun provideAppStore(context: Context, resources: AppResources, scope: CoroutineScope): AppStore {
-        return AppStore(context, scope, resources)
+    open fun provideAndroidStore(context: Context, resources: AppResources, scope: CoroutineScope): AndroidStore {
+        return AndroidStore(context, scope, resources)
     }
+
+    @Provides
+    @Singleton
+    open fun provideAppStoreConsumer(store: AndroidStore): AppStoreConsumer = store
+
+    @Provides
+    @Singleton
+    open fun provideAppStore(store: AndroidStore): AppStore = store
 
     @Provides
     @Singleton

@@ -45,7 +45,7 @@ class ExplorerService(
     private val appStore: AppStore,
     private val store: ExplorerStore,
     private val preferenceStore: PreferenceStore,
-) {
+) : AppStore by appStore {
     companion object {
         private const val SUB_PATH_CAMERA = "DCIM/Camera/"
         private const val SUB_PATH_PIC_SCREENSHOTS = "Pictures/Screenshots/"
@@ -55,7 +55,6 @@ class ExplorerService(
         private const val SUB_PATH_BLUETOOTH = "Bluetooth/"
     }
 
-    private val scope = appStore.scope
     private val previewSize = context.resources.getDimensionPixelSize(R.dimen.preview_size)
     private var delayedRender: Job? = null
 
@@ -70,7 +69,7 @@ class ExplorerService(
     init {
         val useSuDefined = Job()
         val toyboxDefined = Job()
-        scope.launch(Dispatchers.IO) {
+        appScope.launch(Dispatchers.IO) {
             withGarden {
                 useSuDefined.join()
                 toyboxDefined.join()
@@ -79,15 +78,15 @@ class ExplorerService(
         }
         // todo try move out
         val thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size)
-        preferenceStore.useSu.collect(scope) {
+        preferenceStore.useSu.collect(appScope) {
             useSuDefined.complete()
             config = CacheConfig(it, thumbnailSize)
         }
-        preferenceStore.toyboxVariant.collect(scope) {
+        preferenceStore.toyboxVariant.collect(appScope) {
             toyboxDefined.complete()
             context.resolveToybox(it)
         }
-        store.current.collect(scope) {
+        store.current.collect(appScope) {
             preferenceStore.setOpenedDirPath(it?.path)
         }
     }
@@ -110,7 +109,7 @@ class ExplorerService(
             val tree = NodeTab(key, states)
             tree.initRoots()
             trees[key] = tree
-            scope.launch {
+            appScope.launch {
                 withGarden(key) { tab ->
                     tab.updateRootsAsync()
                 }
@@ -210,7 +209,7 @@ class ExplorerService(
     }
 
     private fun updateRootAsync(key: NodeTabKey, root: NodeRoot) {
-        scope.launch {
+        appScope.launch {
             withGarden {
                 withCachingState(root.stableId) {
                     var updated = root.item.update(config)
@@ -500,7 +499,7 @@ class ExplorerService(
         // todo make good
         items.forEach {
             when {
-                it.isDirectory -> scope.launch {
+                it.isDirectory -> appScope.launch {
                     it.delete(config.useSu)
                 }
                 else -> it.delete()
@@ -538,7 +537,7 @@ class ExplorerService(
             }
         }
         val jobs = items.map { item ->
-            scope.launch {
+            appScope.launch {
                 val result = item.delete(config.useSu)
                 withGarden(key) { tab ->
                     tab.tree.replaceItem(item.uniqueId, item.parentPath, result)
@@ -596,7 +595,7 @@ class ExplorerService(
 
     private fun renderTabLazily(key: NodeTabKey) {
         if (delayedRender == null) {
-            delayedRender = scope.launch {
+            delayedRender = appScope.launch {
                 delay(128)
                 delayedRender = null
                 renderTab(key)
@@ -762,7 +761,7 @@ class ExplorerService(
     private fun NodeGarden.withCachingState(id: Int, caching: suspend CoroutineScope.() -> Unit): Job? {
         var state = states.find { it.uniqueId == id }
         if (state != null) return state.cachingJob
-        val job = scope.launch(start = CoroutineStart.LAZY, block = caching)
+        val job = appScope.launch(start = CoroutineStart.LAZY, block = caching)
         state = states.updateState(id) {
             nextState(id, cachingJob = job)
         }
@@ -797,7 +796,7 @@ class ExplorerService(
     }
 
     private fun resolveSizeAsync(key: NodeTabKey, item: Node) {
-        scope.launch {
+        appScope.launch {
             val size = item.resolveSize(config.useSu)
             if (size == item.size) {
                 return@launch

@@ -7,6 +7,7 @@ import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.service.WindowService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.AppStoreConsumer
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import dagger.BindsInstance
 import dagger.Component
@@ -61,12 +62,13 @@ class MainModule {
         scope: CoroutineScope,
         router: MainRouter,
         appStore: AppStore,
+        appStoreConsumer: AppStoreConsumer,
         preferenceStore: PreferenceStore,
         updateStore: AppUpdateStore,
         mainChannel: MainChannel,
         updateService: AppUpdateService,
     ): AppEventDelegate {
-        return AppEventDelegate(scope, router, appStore, preferenceStore, updateStore, mainChannel, updateService)
+        return AppEventDelegate(scope, router, appStore, appStoreConsumer, preferenceStore, updateStore, mainChannel, updateService)
     }
 
     @Provides
@@ -85,6 +87,7 @@ class MainModule {
 interface MainDependencies {
     fun windowService(): WindowService
     fun appStore(): AppStore
+    fun appStoreConsumer(): AppStoreConsumer
     fun preferenceStore(): PreferenceStore
     fun mainChannel(): MainChannel
     fun initialDelegate(): InitialDelegate

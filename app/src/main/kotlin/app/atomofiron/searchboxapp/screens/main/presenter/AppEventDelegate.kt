@@ -15,6 +15,7 @@ import app.atomofiron.searchboxapp.android.showUpdateNotification
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.AppStoreConsumer
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
@@ -35,14 +36,13 @@ class AppEventDelegate(
     private val scope: CoroutineScope,
     private val router: MainRouter,
     private val appStore: AppStore,
+    private val appStoreConsumer: AppStoreConsumer,
     private val preferences: PreferenceStore,
     updateStore: AppUpdateStore,
     private val mainChannel: MainChannel,
     private val updateService: AppUpdateService,
-) : AppEventDelegateApi {
+) : AppStore by appStore, AppEventDelegateApi {
 
-    private val context = appStore.context
-    private val activity by appStore.activityProperty
     private var currentTheme: AppTheme? = null
 
     init {
@@ -51,8 +51,8 @@ class AppEventDelegate(
     }
 
     override fun onActivityCreate(activity: AppCompatActivity) {
-        appStore.onActivityCreate(activity)
-        appStore.onResourcesChange(activity.resources)
+        appStoreConsumer.onActivityCreate(activity)
+        appStoreConsumer.onResourcesChange(activity.resources)
         updateService.onActivityCreate(activity)
     }
 
@@ -76,7 +76,7 @@ class AppEventDelegate(
 
     override fun onMaximize() = mainChannel.maximized.invoke(scope)
 
-    override fun onActivityDestroy() = appStore.onActivityDestroy()
+    override fun onActivityDestroy() = appStoreConsumer.onActivityDestroy()
 
     override fun onActivityFinish() = updateService.completeUpdate()
 

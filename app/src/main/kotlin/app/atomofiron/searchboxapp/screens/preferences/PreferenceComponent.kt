@@ -142,7 +142,7 @@ class PreferenceModule {
         appStore: AppStore,
         watcher: LeakWatcher,
     ): PreferenceDataStore {
-        return LegacyPreferenceDataStore(preferences, appStore.scope, watcher)
+        return LegacyPreferenceDataStore(preferences, appStore.appScope, watcher)
     }
 }
 
