@@ -158,7 +158,7 @@ class ExplorerService(
     }
 
     suspend fun tryToggle(key: NodeTabKey, it: Node) {
-        if (it.isRoot) {
+        if (it.isRoot && it.isCurrent) {
             return tryToggleRoot(key, it)
         }
         renderTab(key) {
