@@ -1,10 +1,7 @@
 package app.atomofiron.searchboxapp.custom.view.dock.item
 
-import android.content.res.ColorStateList
-import android.graphics.Color
-import android.graphics.drawable.RippleDrawable
-import android.graphics.drawable.ShapeDrawable
-import android.graphics.drawable.shapes.RoundRectShape
+import android.view.View
+import androidx.core.graphics.Insets
 import androidx.core.view.isEmpty
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -15,7 +12,6 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Icon
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Label
-import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
 
 class DockItemHolder(
     private val binding: ItemDockBinding,
@@ -23,28 +19,31 @@ class DockItemHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private lateinit var item: DockItem
-    private var config: DockPopupConfig? = null
-    private val underlayColor = binding.root.context.findColorByAttr(android.R.attr.colorBackground)
-    private val selectedColor = binding.root.context.findColorByAttr(MaterialAttr.colorSecondaryContainer)
-    private val shapeDrawable: ShapeDrawable = binding.createRippleBackground()
+    private var config: DockItemConfig? = null
+    private val drawable = DockItemDrawable(
+        binding.root.context.findColorByAttr(MaterialAttr.colorControlHighlight),
+        binding.root.resources.getDimension(R.dimen.dock_item_corner),
+    )
 
     init {
         binding.run {
             root.noClip()
             popup.noClip()
+            button.background = drawable
             button.setOnClickListener { onClick() }
         }
     }
 
-    fun bind(item: DockItem, config: DockPopupConfig?) {
+    fun bind(item: DockItem, config: DockItemConfig?) {
         if (config != this.config) {
-            binding.popup.removeAllViews()
+            binding.popup.clear()
         }
         this.item = item
         this.config = config
         bind(item)
-        // todo define it in DockView
-        updateBackground(transparent = config?.ground?.isBottom != false)
+        config ?: return
+        drawable.setColors(config.colors)
+        drawable.setInsets(config.insets)
     }
 
     private fun bind(item: DockItem) = binding.run {
@@ -68,29 +67,20 @@ class DockItemHolder(
         }
     }
 
-    private fun ItemDockBinding.createRippleBackground(): ShapeDrawable {
-        val corners = root.resources.getDimension(R.dimen.dock_item_corner)
-        val ripple = root.context.findColorByAttr(MaterialAttr.colorControlHighlight)
-        val shape = RoundRectShape(FloatArray(8) { corners }, null, null)
-        val shapeDrawable = ShapeDrawable(shape)
-        val mask = ShapeDrawable(shape)
-        val background = RippleDrawable(ColorStateList.valueOf(ripple), shapeDrawable, mask)
-        button.background = background
-        return shapeDrawable
-    }
-
-    private fun updateBackground(transparent: Boolean?) {
-        val defaultColor = if (transparent == false) underlayColor else Color.TRANSPARENT
-        val colors = ColorStateList(
-            arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf(0)),
-            intArrayOf(selectedColor, defaultColor),
-        )
-        shapeDrawable.setTintList(colors)
-    }
-
-    private fun ItemDockBinding.onClick() = when {
-        item.children.isEmpty() -> selectListener(item)
-        popup.isEmpty() -> popup.show(root.parent as RecyclerView, config!!, root, item, selectListener)
-        else -> Unit
+    private fun ItemDockBinding.onClick() {
+        if (item.children.isEmpty()) {
+            selectListener(item)
+        } else if (popup.isEmpty()) {
+            var config = config!!
+            config = config.copy(insets = Insets.of(config.insets.top, config.insets.top, config.insets.bottom, config.insets.bottom))
+            binding.root.elevation = 1f
+            val popupView = popup.show(root.parent as RecyclerView, config, root, item, selectListener)
+            popupView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
+                override fun onViewAttachedToWindow(v: View) = Unit
+                override fun onViewDetachedFromWindow(v: View) {
+                    binding.root.elevation = 0f
+                }
+            })
+        }
     }
 }

@@ -4,11 +4,15 @@ import android.graphics.Color
 
 sealed interface DockStyle {
     val fill: Int
+    val transparent: Boolean
+    val selected: Int
     val stroke: Int
     val strokeWidth: Float
 
     data class Fill(
         override val fill: Int,
+        override val transparent: Boolean,
+        override val selected: Int,
     ) : DockStyle {
         override val stroke = Color.TRANSPARENT
         override val strokeWidth = 0f
@@ -16,7 +20,13 @@ sealed interface DockStyle {
 
     data class Stroke(
         override val fill: Int,
+        override val transparent: Boolean,
+        override val selected: Int,
         override val stroke: Int,
         override val strokeWidth: Float,
     ) : DockStyle
+
+    companion object {
+        val Stub = Fill(Color.TRANSPARENT, false, Color.TRANSPARENT)
+    }
 }

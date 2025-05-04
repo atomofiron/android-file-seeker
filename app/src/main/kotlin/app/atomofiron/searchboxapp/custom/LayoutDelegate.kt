@@ -62,7 +62,26 @@ object LayoutDelegate {
         addLayoutListener { new ->
             layout = new
             tabLayout?.isVisible = !layout.isWide
-            dockView?.setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.run { ground.isBottom && withJoystick } }))
+            dockView?.run {
+                val transparent = !layout.ground.isBottom
+                val deepBlackDark = context.isDarkTheme() && context.isBlackDeep()
+                val fill = when {
+                    deepBlackDark || transparent -> context.findColorByAttr(R.attr.colorBackground)
+                    else -> context.findColorByAttr(MaterialAttr.colorSurfaceContainer)
+                }
+                val selected = context.findColorByAttr(MaterialAttr.colorSecondaryContainer)
+                when {
+                    deepBlackDark -> DockStyle.Stroke(
+                        fill = fill,
+                        transparent = transparent,
+                        selected = selected,
+                        stroke = context.findColorByAttr(MaterialAttr.strokeColor),
+                        strokeWidth = resources.getDimension(R.dimen.stroke_width),
+                    )
+                    else -> DockStyle.Fill(fill = fill, transparent = transparent, selected = selected)
+                }.let { setStyle(it) }
+                setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.run { ground.isBottom && withJoystick } }))
+            }
             dockDelegate?.applyDockLayout(layout)
             recyclerDelegate?.combining(if (layout.isBottom) null else InsetsCombining(ExtType.invoke { displayCutout + dock }) )
             /* нужно только когда есть табы
@@ -82,17 +101,6 @@ object LayoutDelegate {
                 else -> Insets.NONE
             }
             InsetsSource.submit(ExtType.dock, insets)
-        }
-        dockView?.run {
-            when (true) {
-                !context.isDarkTheme(),
-                !context.isBlackDeep() -> setStyle(DockStyle.Fill(context.findColorByAttr(MaterialAttr.colorSurfaceContainer)))
-                else -> setStyle(DockStyle.Stroke(
-                    fill = context.findColorByAttr(R.attr.colorBackground),
-                    stroke = context.findColorByAttr(MaterialAttr.strokeColor),
-                    strokeWidth = resources.getDimension(R.dimen.stroke_width),
-                ))
-            }
         }
     }
 

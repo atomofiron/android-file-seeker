@@ -54,7 +54,7 @@ class DockItemChildrenView(
 
     private val ghost = LayoutInflater.from(context)
         .let { ItemDockBinding.inflate(it, this, true) }
-        .also { DockItemHolder(it) { collapse() }.bind(item.withOutChildren(), config = null) }
+        .also { DockItemHolder(it) { collapse() }.bind(item.withOutChildren(), config) }
     private val childrenView = DockViewImpl(context, item.children, config, mode = DockMode.Popup(config.popup, item.children.columns))
     private val backgroundPath = Path()
     private var clipPath = Path()
@@ -171,7 +171,7 @@ class DockItemChildrenView(
 
     private fun remove() {
         animator.cancel()
-        (parent as ViewGroup).removeView(this)
+        (parent as DockPopupLayout).clear()
     }
 
     private fun animTo(value: Float, withDelay: Boolean = false) {

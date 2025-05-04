@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.custom.view.dock.popup
 
-import android.graphics.Color
 import android.graphics.Rect
 import app.atomofiron.searchboxapp.custom.view.dock.shape.DockStyle
 import app.atomofiron.searchboxapp.model.Layout.Ground
@@ -20,6 +19,6 @@ data class DockPopupConfig(
         ground: Ground,
         spaceWidth: Int,
         spaceHeight: Int,
-        style: DockStyle = DockStyle.Fill(Color.TRANSPARENT),
+        style: DockStyle = DockStyle.Stub,
     ) : this(ground, Rect(0, 0, spaceWidth, spaceHeight), style)
 }

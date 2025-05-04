@@ -26,15 +26,16 @@ class DockPopupLayout @JvmOverloads constructor(
 
     fun show(
         parent: RecyclerView,
-        config: DockPopupConfig,
+        config: DockItemConfig,
         itemView: View,
         item: DockItem,
         selectListener: (DockItem) -> Unit,
-    ) {
+    ): DockItemChildrenView {
         val container = this
         val corner = resources.getDimensionPixelSize(R.dimen.dock_overlay_corner)
         val offset = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
-        val ground = config.ground
+        val popup = config.popup
+        val ground = popup.ground
 
         val itemWidth = min(itemView.width, (itemView.height * MAX_RATIO).toInt())
         val itemHeight = min(itemView.height, (itemView.width * MAX_RATIO).toInt())
@@ -44,14 +45,14 @@ class DockPopupLayout @JvmOverloads constructor(
         val minLeft = when (ground) {
             Ground.Bottom -> min(parent.paddingLeft, containerLeft) - offset - containerLeft
             Ground.Left -> itemWidth + offset
-            Ground.Right -> -config.spaceWidth - offset
+            Ground.Right -> -popup.spaceWidth - offset
         }
         val maxRight = when (ground) {
             Ground.Bottom -> parent.run { width - paddingRight + offset } - containerLeft
-            Ground.Left, Ground.Right -> minLeft + config.spaceWidth
+            Ground.Left, Ground.Right -> minLeft + popup.spaceWidth
         }
         var minTop = when (ground) {
-            Ground.Bottom -> -config.spaceHeight - offset
+            Ground.Bottom -> -popup.spaceHeight - offset
             Ground.Left, Ground.Right -> min(parent.paddingTop, containerTop) - offset - containerTop
         }
         var maxBottom = when (ground) {
@@ -68,8 +69,8 @@ class DockPopupLayout @JvmOverloads constructor(
             minTop = topThreshold
         }
         minTop = min(minTop, -topThreshold)
-        val popupConfig = config.copy(rect = Rect(minLeft, minTop, maxRight, maxBottom))
-        val childConfig = DockItemConfig(width = itemWidth, height = itemHeight, popup = popupConfig)
+        val popupConfig = popup.copy(rect = Rect(minLeft, minTop, maxRight, maxBottom))
+        val childConfig = config.copy(width = itemWidth, height = itemHeight, popup = popupConfig)
         val childrenView = DockItemChildrenView(itemView.context, item, childConfig, selectListener)
         container.addView(childrenView)
         childrenView.updateLayoutParams<LayoutParams> {
@@ -78,6 +79,7 @@ class DockPopupLayout @JvmOverloads constructor(
             gravity = Gravity.CENTER
         }
         childrenView.expand()
+        return childrenView
     }
 
     fun clear() = removeAllViews()

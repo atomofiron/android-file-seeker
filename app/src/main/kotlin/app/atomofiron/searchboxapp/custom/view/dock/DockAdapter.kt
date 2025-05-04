@@ -7,14 +7,14 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockDiffCallback
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemHolder
-import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
 
 class DockAdapter(
+    private var config: DockItemConfig,
     private val selectListener: (DockItem) -> Unit,
 ) : RecyclerView.Adapter<DockItemHolder>() {
 
-    private var config: DockPopupConfig? = null
     private val items = mutableListOf<DockItem>()
 
     init {
@@ -39,7 +39,7 @@ class DockAdapter(
         holder.bind(items[position], config)
     }
 
-    fun set(config: DockPopupConfig) {
+    fun set(config: DockItemConfig) {
         if (config != this.config) {
             this.config = config
             notifyDataSetChanged()
