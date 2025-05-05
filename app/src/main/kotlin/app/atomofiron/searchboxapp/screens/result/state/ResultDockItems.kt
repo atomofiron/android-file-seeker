@@ -16,8 +16,8 @@ data class ResultDockState(
         val Default = ResultDockState(
             status = DockItem(
                 DockItem.Id.Auto(),
-                DockItem.Icon(R.drawable.ic_circle_stop),
-                DockItem.Label.Empty,
+                DockItem.Icon(R.drawable.ic_circle_check),
+                DockItem.Label(R.string.completed),
                 clickable = false,
             ),
             sorting = DockItem(

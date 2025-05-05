@@ -33,7 +33,7 @@ class ResultViewState(
     val composition = DeferredStateFlow<ExplorerItemComposition>()
     val alerts = ChannelFlow<AlertMessage.Res>()
     val checked = MutableStateFlow(listOf<Int>())
-    val dock = MutableStateFlow(ResultDockState.Default) // todo pass default sorting
+    val dock = MutableStateFlow(ResultDockState.Default)
 
     init {
         transformState()
