@@ -11,7 +11,6 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.view.ViewOutlineProvider
 import android.view.animation.DecelerateInterpolator
@@ -81,7 +80,7 @@ class DockItemChildrenView(
         crossDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(ghost.icon.imageTintList!!.defaultColor, BlendModeCompat.SRC_IN)
         ghost.icon.foreground = crossDrawable // LayerDrawable make alpha always 255, overriding of LayerDrawable doesn't help
         ghost.button.clipChildren = false
-        childrenView.outlineProvider = ChildrenOutlineProvider(corner)
+        childrenView.outlineProvider = ChildrenOutlineProvider(corner, config.popup.ground, config.popup.style.strokeWidth.roundToInt())
         childrenView.clipToOutline = true
         childrenView.elevation = 0f
         childrenView.setListener(::onSelect)
@@ -125,15 +124,24 @@ class DockItemChildrenView(
         val centerY = config.height / 2f
         val itemRadius = config.run { sqrt(width * width + height * height.toFloat()) / 2 }
         val popupRadius = childrenView.run { sqrt(width * width + height * height.toFloat()) }
-        val radius = (itemRadius + popupRadius) * currentValue
+        val maxRadius = itemRadius + popupRadius
+        val radius = maxRadius * currentValue
         combinedPath.set(backgroundPath)
         if (currentValue > COLLAPSED && currentValue < EXPANDED) {
             clipPath.reset()
             clipPath.addCircle(centerX, centerY, radius, Path.Direction.CW)
             combinedPath.op(backgroundPath, clipPath, Path.Op.INTERSECT)
         }
+        val dotOffset = (itemRadius + radius).coerceAtLeast(maxRadius.dec())
+        var (dotX, dotY) = when (config.popup.ground) {
+            Ground.Left -> -dotOffset to 0f
+            Ground.Right -> dotOffset to 0f
+            Ground.Bottom -> 0f to dotOffset
+        }
+        dotX += centerX
+        dotY += centerY
         // fixes shadow offset
-        combinedPath.addRect(centerX, centerY + radius.dec(), centerX.inc(), centerY + radius, Path.Direction.CW)
+        combinedPath.addRect(dotX, dotY, dotX.dec(), dotY.dec(), Path.Direction.CW)
         invalidate()
         invalidateOutline()
 
@@ -282,7 +290,18 @@ class DockItemChildrenView(
         close()
     }
 
-    private class ChildrenOutlineProvider(private val corner: Float) : ViewOutlineProvider() {
-        override fun getOutline(view: View, outline: Outline) = outline.setRoundRect(0, 0, view.width, view.height, corner)
+    private class ChildrenOutlineProvider(
+        private val corner: Float,
+        private val ground: Ground,
+        private val strokeWidth: Int,
+    ) : ViewOutlineProvider() {
+        override fun getOutline(view: View, outline: Outline) {
+            val (left, right, bottom) = when (ground) {
+                Ground.Left -> Triple(0, strokeWidth, strokeWidth)
+                Ground.Right -> Triple(strokeWidth, 0, strokeWidth)
+                Ground.Bottom -> Triple(strokeWidth, strokeWidth, 0)
+            }
+            outline.setRoundRect(left, strokeWidth, view.width - right, view.height - bottom, corner)
+        }
     }
 }
