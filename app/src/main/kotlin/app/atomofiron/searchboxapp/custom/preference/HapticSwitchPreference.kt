@@ -9,10 +9,12 @@ import androidx.core.view.HapticFeedbackConstantsCompat.TOGGLE_ON
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.R
 import androidx.preference.SwitchPreferenceCompat
+import java.lang.ref.WeakReference
 
 class HapticSwitchPreference : SwitchPreferenceCompat, View.OnClickListener {
 
     private var newValue: Boolean? = null
+    private var view = WeakReference<View>(null)
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -24,6 +26,7 @@ class HapticSwitchPreference : SwitchPreferenceCompat, View.OnClickListener {
         holder.itemView
             .findViewById<SwitchCompat>(R.id.switchWidget)
             .setOnClickListener(this)
+        view = WeakReference(holder.itemView)
     }
 
     override fun callChangeListener(newValue: Any?): Boolean {
@@ -34,8 +37,16 @@ class HapticSwitchPreference : SwitchPreferenceCompat, View.OnClickListener {
     override fun onClick(view: View) {
         view as SwitchCompat
         if (view.isChecked == newValue) {
-            newValue = null
             view.performHapticFeedback(if (view.isChecked) TOGGLE_ON else TOGGLE_OFF)
         }
+        newValue = null
+    }
+
+    override fun onClick() {
+        super.onClick()
+        if (isChecked == newValue) {
+            view.get()?.performHapticFeedback(if (isChecked) TOGGLE_ON else TOGGLE_OFF)
+        }
+        newValue = null
     }
 }
