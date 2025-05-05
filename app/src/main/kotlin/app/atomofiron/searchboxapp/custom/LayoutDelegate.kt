@@ -61,28 +61,9 @@ object LayoutDelegate {
         val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock }, start = true, top = appBarLayout == null, end = true, bottom = true)
         addLayoutListener { new ->
             layout = new
+            val tappableBottom = insetsProvider.current[ExtType.tappableElement].bottom > 0
             tabLayout?.isVisible = !layout.isWide
-            dockView?.run {
-                val transparent = !layout.ground.isBottom
-                val deepBlackDark = context.isDarkTheme() && context.isBlackDeep()
-                val fill = when {
-                    deepBlackDark || transparent -> context.findColorByAttr(R.attr.colorBackground)
-                    else -> context.findColorByAttr(MaterialAttr.colorSurfaceContainer)
-                }
-                val selected = context.findColorByAttr(MaterialAttr.colorSecondaryContainer)
-                when {
-                    deepBlackDark -> DockStyle.Stroke(
-                        fill = fill,
-                        transparent = transparent,
-                        selected = selected,
-                        stroke = context.findColorByAttr(MaterialAttr.strokeColor),
-                        strokeWidth = resources.getDimension(R.dimen.stroke_width),
-                    )
-                    else -> DockStyle.Fill(fill = fill, transparent = transparent, selected = selected)
-                }.let { setStyle(it) }
-                setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.run { ground.isBottom && withJoystick } }))
-            }
-            dockDelegate?.applyDockLayout(layout)
+            dockView?.apply(layout, notch, dockDelegate!!, tappableBottom)
             recyclerDelegate?.combining(if (layout.isBottom) null else InsetsCombining(ExtType.invoke { displayCutout + dock }) )
             /* нужно только когда есть табы
             explorerViews?.forEach {
@@ -104,14 +85,36 @@ object LayoutDelegate {
         }
     }
 
-    private fun ViewInsetsDelegate.applyDockLayout(layout: Layout) {
-        changeInsets {
+    private fun DockBarView.apply(layout: Layout, notch: DockNotch, delegate: ViewInsetsDelegate, tappableBottom: Boolean) {
+        delegate.changeInsets {
             when {
+                !tappableBottom && !layout.isBottom -> when {
+                    layout.isStart -> padding(start, top)
+                    layout.isEnd -> padding(top, end)
+                }
                 layout.isBottom -> padding(start, end, bottom)
                 layout.isStart -> padding(start, top, bottom)
-                else -> padding(top, end, bottom)
+                layout.isEnd -> padding(top, end, bottom)
             }
         }
+        val transparent = !layout.ground.isBottom
+        val deepBlackDark = context.isDarkTheme() && context.isBlackDeep()
+        val fill = when {
+            deepBlackDark || transparent -> context.findColorByAttr(R.attr.colorBackground)
+            else -> context.findColorByAttr(MaterialAttr.colorSurfaceContainer)
+        }
+        val selected = context.findColorByAttr(MaterialAttr.colorSecondaryContainer)
+        when {
+            deepBlackDark -> DockStyle.Stroke(
+                fill = fill,
+                transparent = transparent,
+                selected = selected,
+                stroke = context.findColorByAttr(MaterialAttr.strokeColor),
+                strokeWidth = resources.getDimension(R.dimen.stroke_width),
+            )
+            else -> DockStyle.Fill(fill = fill, transparent = transparent, selected = selected)
+        }.let { setStyle(it) }
+        setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.run { ground.isBottom && withJoystick } }))
     }
 
     private var last = false
