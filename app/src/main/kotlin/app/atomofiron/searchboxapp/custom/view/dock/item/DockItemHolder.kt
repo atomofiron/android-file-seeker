@@ -84,6 +84,6 @@ class DockItemHolder(
                 }
             })
         }
-        ViewCompat.performHapticFeedback(root, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
+        ViewCompat.performHapticFeedback(root, HapticFeedbackConstantsCompat.CLOCK_TICK)
     }
 }
