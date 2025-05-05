@@ -175,14 +175,16 @@ object LayoutDelegate {
     fun ViewGroup.getLayout(width: Int, height: Int, display: Display?): Layout {
         val w = if (width > 0) width else resources.displayMetrics.widthPixels
         val h = if (height > 0) height else resources.displayMetrics.heightPixels
-        val maxSize = resources.getDimensionPixelSize(R.dimen.bottom_bar_max_width)
+        val maxSpace = resources.getDimensionPixelSize(R.dimen.bottom_bar_max_width)
+        val minSpace = resources.getDimensionPixelSize(R.dimen.min_space_with_joystick)
         val ground = when {
-            w < h && w < maxSize -> Layout.Ground.Bottom
+            w < h && w < maxSpace -> Layout.Ground.Bottom
             display?.rotation == Surface.ROTATION_270 -> Layout.Ground.Left
             else -> Layout.Ground.Right
         }
-        val largeScreen = w >= maxSize && h >= maxSize
-        val withJoystick = largeScreen || ground.withJoystick(root = this)
+        val largeScreen = w >= maxSpace && h >= maxSpace
+        val smallScreen = w < minSpace && h < minSpace
+        val withJoystick = !smallScreen && (largeScreen || ground.withJoystick(root = this))
         return Layout(ground, withJoystick, isRtl())
     }
 

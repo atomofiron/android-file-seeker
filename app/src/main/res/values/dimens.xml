@@ -54,6 +54,7 @@
 	<dimen name="compact_column_min_width">100dp</dimen>
 	<dimen name="item_ripple_corner_radius">16dp</dimen>
 	<dimen name="content_padding_bottom">32dp</dimen>
+	<dimen name="min_space_with_joystick">420dp</dimen>
 	<dimen name="bottom_bar_max_width">480dp</dimen>
 	<dimen name="screen_compact">480dp</dimen>
 	<dimen name="screen_medium">600dp</dimen>
