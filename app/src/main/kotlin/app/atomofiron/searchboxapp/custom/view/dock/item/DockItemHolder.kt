@@ -2,6 +2,8 @@ package app.atomofiron.searchboxapp.custom.view.dock.item
 
 import android.view.View
 import androidx.core.graphics.Insets
+import androidx.core.view.HapticFeedbackConstantsCompat
+import androidx.core.view.ViewCompat
 import androidx.core.view.isEmpty
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -73,7 +75,7 @@ class DockItemHolder(
         } else if (popup.isEmpty()) {
             var config = config!!
             config = config.copy(insets = Insets.of(config.insets.top, config.insets.top, config.insets.bottom, config.insets.bottom))
-            binding.root.elevation = 1f
+            root.elevation = 1f
             val popupView = popup.show(root.parent as RecyclerView, config, root, item, selectListener)
             popupView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
@@ -82,5 +84,6 @@ class DockItemHolder(
                 }
             })
         }
+        ViewCompat.performHapticFeedback(root, HapticFeedbackConstantsCompat.CONTEXT_CLICK)
     }
 }
