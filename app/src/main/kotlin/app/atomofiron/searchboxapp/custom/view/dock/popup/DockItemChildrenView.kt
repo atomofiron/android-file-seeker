@@ -98,7 +98,7 @@ class DockItemChildrenView(
         animator.interpolator = DecelerateInterpolator()
         val style = config.popup.style
         background = LayerDrawable(arrayOf(
-            PathDrawable.stroke(combinedPath, style.stroke, style.strokeWidth * 2),
+            PathDrawable.stroke(combinedPath, config.popup.stroke, style.strokeWidth * 2),
             PathDrawable.fill(combinedPath, style.fill),
         ))
     }

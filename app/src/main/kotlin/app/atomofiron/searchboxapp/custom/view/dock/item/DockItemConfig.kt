@@ -12,7 +12,7 @@ data class DockItemConfig(
     val popup: DockPopupConfig,
 ) {
     companion object {
-        val Stub = DockItemConfig(0, 0, DockItemColors(0, 0), Insets.NONE, DockPopupConfig.Stub)
+        val Stub = DockItemConfig(0, 0, DockItemColors(0, 0, 0, 0), Insets.NONE, DockPopupConfig.Stub)
     }
     val isZero get() = width <= 0 || height <= 0
 

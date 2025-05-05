@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.MATCH_PARENT
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.WRAP_CONTENT
+import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
@@ -49,12 +51,20 @@ class DockViewImpl(
     private var listener: ((DockItem) -> Unit)? = null
     private val adapter = DockAdapter(itemConfig) { listener?.invoke(it) }
     private val gridManager = GridLayoutManager(context, 1)
+    private val colors = DockItemColors(
+        default = Color.TRANSPARENT,
+        selected = context.findColorByAttr(MaterialAttr.colorSecondaryContainer),
+        hovered = context.findColorByAttr(MaterialAttr.colorControlHighlight),
+        focused = context.findColorByAttr(MaterialAttr.colorPrimary),
+    )
     private val padding = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
     private val contentPadding = resources.getDimensionPixelSize(R.dimen.content_margin)
     private val notchInset = resources.getDimension(R.dimen.dock_notch_inset)
     private var layoutDecorator = LayoutDecoration(adapter, itemConfig)
+    private val strokeColor = context.findColorByAttr(MaterialAttr.strokeColor)
     private val shape = DockBottomShape(
         corners = resources.getDimension(R.dimen.dock_overlay_corner),
+        stroke = strokeColor,
         style = DockStyle.Stub,
     )
     private val mutableItems = mutableListOf<DockItem>()
@@ -111,7 +121,7 @@ class DockViewImpl(
                     mode.isBottom -> height -= measuredHeight
                     else -> width -= measuredWidth
                 }
-                submit(config = itemConfig.copy(popup = DockPopupConfig(mode.ground, width, height, itemConfig.popup.style)))
+                submit(config = itemConfig.copy(popup = DockPopupConfig(mode.ground, width, height, strokeColor, itemConfig.popup.style)))
             }
         }
         mode?.updateDecoration()
@@ -132,7 +142,7 @@ class DockViewImpl(
 
     override fun setStyle(style: DockStyle) {
         shape.setStyle(style)
-        val colors = DockItemColors(if (style.transparent) style.fill else Color.TRANSPARENT, selected = style.selected)
+        val colors = colors.copy(default = if (style.transparent) style.fill else Color.TRANSPARENT)
         val insets = when {
             style.transparent -> Insets.of(contentPadding - padding, padding, contentPadding - padding, padding)
             else -> Insets.of(padding, padding, padding, padding)
