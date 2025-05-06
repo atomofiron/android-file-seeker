@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.custom.drawable
 
 import android.R.attr.state_activated
-import android.R.attr.state_enabled
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.BlendMode
@@ -17,16 +16,13 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.utils.Alpha
-import app.atomofiron.searchboxapp.utils.toIntAlpha
 
 class NoticeableDrawable(
     private val drawable: Drawable,
     private var dotColor: Int,
-    private val overrideAlpha: Boolean = false,
 ) : Drawable(), Drawable.Callback {
-    private var clipOutPath = Path()
-    private val circlePath = Path()
+
+    private val clipOutPath = Path()
     private val paint = Paint()
 
     private var drawDot = false
@@ -34,7 +30,6 @@ class NoticeableDrawable(
 
     private val dotRadius: Float get() = bounds.width().toFloat() / 6
     private val holeRadius: Float get() = bounds.width().toFloat() / 4
-    private var dotAlpha = Alpha.VISIBLE_INT
     private val holeX: Float get() = bounds.right - dotRadius
     private val holeY: Float get() = dotRadius
 
@@ -46,15 +41,13 @@ class NoticeableDrawable(
         context: Context,
         @DrawableRes iconId: Int,
         @ColorRes dotColorId: Int = R.color.red,
-        overrideAlpha: Boolean = false,
-    ) : this(context, ContextCompat.getDrawable(context, iconId)!!, dotColorId, overrideAlpha)
+    ) : this(context, ContextCompat.getDrawable(context, iconId)!!, dotColorId)
 
     constructor(
         context: Context,
         icon: Drawable,
         @ColorRes dotColorId: Int = R.color.red,
-        overrideAlpha: Boolean = false,
-    ) : this(icon, ContextCompat.getColor(context, dotColorId), overrideAlpha)
+    ) : this(icon, ContextCompat.getColor(context, dotColorId))
 
     fun setDotColor(color: Int): NoticeableDrawable {
         dotColor = color
@@ -82,11 +75,6 @@ class NoticeableDrawable(
         drawDot = state.contains(state_activated).also {
             if (it != drawDot) invalidateSelf()
         }
-        val isEnabled = !state.contains(-state_enabled)
-        dotAlpha = Alpha.enabled(isEnabled).toIntAlpha()
-        if (overrideAlpha) {
-            alpha = dotAlpha
-        }
         return super.onStateChange(state)
     }
 
@@ -94,12 +82,9 @@ class NoticeableDrawable(
         super.setBounds(left, top, right, bottom)
         drawable.setBounds(left, top, right, bottom)
 
-        circlePath.reset()
-        circlePath.addCircle(holeX, holeY, holeRadius, Path.Direction.CW)
-        circlePath.close()
         clipOutPath.reset()
-        clipOutPath.addRect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat(), Path.Direction.CW)
-        clipOutPath.op(circlePath, Path.Op.DIFFERENCE)
+        clipOutPath.addCircle(holeX, holeY, holeRadius, Path.Direction.CW)
+        clipOutPath.addRect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat(), Path.Direction.CCW)
         clipOutPath.close()
     }
 
@@ -109,7 +94,7 @@ class NoticeableDrawable(
         }
         if (drawDot || forceDrawDot) {
             paint.color = dotColor
-            paint.alpha = dotAlpha
+            paint.alpha = alpha
             canvas.drawCircle(holeX, holeY, dotRadius, paint)
             canvas.clipPath(clipOutPath)
         }
@@ -142,9 +127,7 @@ class NoticeableDrawable(
     @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override fun getOpacity(): Int = drawable.opacity
 
-    override fun invalidateDrawable(who: Drawable) {
-        callback?.invalidateDrawable(this)
-    }
+    override fun invalidateDrawable(who: Drawable) = invalidateSelf()
 
     override fun scheduleDrawable(who: Drawable, what: Runnable, `when`: Long) {
         callback?.scheduleDrawable(this, what, `when`)
@@ -152,5 +135,10 @@ class NoticeableDrawable(
 
     override fun unscheduleDrawable(who: Drawable, what: Runnable) {
         callback?.unscheduleDrawable(this, what)
+    }
+
+    override fun mutate(): Drawable {
+        drawable.mutate()
+        return this
     }
 }
