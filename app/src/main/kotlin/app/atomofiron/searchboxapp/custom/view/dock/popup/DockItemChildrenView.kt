@@ -262,33 +262,38 @@ class DockItemChildrenView(
             }
         }
         reset()
-        moveTo(closeLeft, closeTop + corner)
         when (ground) {
             Ground.Bottom -> {
-                if (bottomLeft) corner(closeLeft, closeTop, left = false, top = true, clockWise = false, radius = corner) else lineTo(closeLeft, closeTop)
-                if (bottomRight) corner(closeRight, closeTop, left = true, top = true, clockWise = false, radius = corner) else lineTo(closeRight, closeTop)
-                corner(closeRight, closeBottom, left = false, top = false, clockWise = true, radius = corner)
-                corner(closeLeft, closeBottom, left = true, top = false, clockWise = true, radius = corner)
+                if (bottomLeft) corner(closeLeft, closeTop, left = false, top = true, clockWise = true, radius = corner) else lineTo(closeLeft, closeTop)
+                corner(closeLeft, closeBottom, left = true, top = false, clockWise = false, radius = corner)
+                corner(closeRight, closeBottom, left = false, top = false, clockWise = false, radius = corner)
+                if (bottomRight) corner(closeRight, closeTop, left = true, top = true, clockWise = true, radius = corner) else lineTo(closeRight, closeTop)
+                if (bottomRight) corner(popupRight, popupBottom, left = false, top = false, clockWise = false, radius = corner) else lineTo(popupRight, popupBottom)
+                if (topRight) corner(popupRight, popupTop, left = false, top = true, clockWise = false, radius = corner) else lineTo(popupRight, popupTop)
+                if (topLeft) corner(popupLeft, popupTop, left = true, top = true, clockWise = false, radius = corner) else lineTo(popupLeft, popupTop)
+                if (bottomLeft) corner(popupLeft, popupBottom, left = true, top = false, clockWise = false, radius = corner) else lineTo(popupLeft, popupBottom)
             }
             Ground.Right -> {
-                if (topRight) corner(closeLeft, closeTop, left = true, top = false, clockWise = false, radius = corner) else lineTo(closeLeft, closeTop)
-                corner(closeRight, closeTop, left = false, top = true, clockWise = true, radius = corner)
-                corner(closeRight, closeBottom, left = false, top = false, clockWise = true, radius = corner)
-                if (bottomRight) corner(closeLeft, closeBottom, left = true, top = true, clockWise = false, radius = corner) else lineTo(closeLeft, closeBottom)
+                if (bottomRight) corner(closeLeft, closeBottom, left = true, top = true, clockWise = true, radius = corner) else lineTo(closeLeft, closeBottom)
+                corner(closeRight, closeBottom, left = false, top = false, clockWise = false, radius = corner)
+                corner(closeRight, closeTop, left = false, top = true, clockWise = false, radius = corner)
+                if (topRight) corner(closeLeft, closeTop, left = true, top = false, clockWise = true, radius = corner) else lineTo(closeLeft, closeTop)
+                if (topRight) corner(popupRight, popupTop, left = false, top = true, clockWise = false, radius = corner) else lineTo(popupRight, popupTop)
+                if (topLeft) corner(popupLeft, popupTop, left = true, top = true, clockWise = false, radius = corner) else lineTo(popupLeft, popupTop)
+                if (bottomLeft) corner(popupLeft, popupBottom, left = true, top = false, clockWise = false, radius = corner) else lineTo(popupLeft, popupBottom)
+                if (bottomRight) corner(popupRight, popupBottom, left = false, top = false, clockWise = false, radius = corner) else lineTo(popupRight, popupBottom)
             }
             Ground.Left -> {
-                corner(closeLeft, closeTop, left = true, top = true, clockWise = true, radius = corner)
-                if (topLeft) corner(closeRight, closeTop, left = false, top = false, clockWise = false, radius = corner) else lineTo(closeRight, closeTop)
-                if (bottomLeft) corner(closeRight, closeBottom, left = false, top = true, clockWise = false, radius = corner) else lineTo(closeRight, closeBottom)
-                corner(closeLeft, closeBottom, left = true, top = false, clockWise = true, radius = corner)
+                if (topLeft) corner(closeRight, closeTop, left = false, top = false, clockWise = true, radius = corner) else lineTo(closeRight, closeTop)
+                corner(closeLeft, closeTop, left = true, top = true, clockWise = false, radius = corner)
+                corner(closeLeft, closeBottom, left = true, top = false, clockWise = false, radius = corner)
+                if (bottomLeft) corner(closeRight, closeBottom, left = false, top = true, clockWise = true, radius = corner) else lineTo(closeRight, closeBottom)
+                if (bottomLeft) corner(popupLeft, popupBottom, left = true, top = false, clockWise = false, radius = corner) else lineTo(popupLeft, popupBottom)
+                if (bottomRight) corner(popupRight, popupBottom, left = false, top = false, clockWise = false, radius = corner) else lineTo(popupRight, popupBottom)
+                if (topRight) corner(popupRight, popupTop, left = false, top = true, clockWise = false, radius = corner) else lineTo(popupRight, popupTop)
+                if (topLeft) corner(popupLeft, popupTop, left = true, top = true, clockWise = false, radius = corner) else lineTo(popupLeft, popupTop)
             }
         }
-        close()
-        moveTo(popupLeft, popupTop + corner)
-        if (topLeft) corner(popupLeft, popupTop, left = true, top = true, clockWise = true, radius = corner) else lineTo(popupLeft, popupTop)
-        if (topRight) corner(popupRight, popupTop, left = false, top = true, clockWise = true, radius = corner) else lineTo(popupRight, popupTop)
-        if (bottomRight) corner(popupRight, popupBottom, left = false, top = false, clockWise = true, radius = corner) else lineTo(popupRight, popupBottom)
-        if (bottomLeft) corner(popupLeft, popupBottom, left = true, top = false, clockWise = true, radius = corner) else lineTo(popupLeft, popupBottom)
         close()
     }
 
