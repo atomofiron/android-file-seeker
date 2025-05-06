@@ -1,7 +1,13 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.app.PendingIntent
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.StateListDrawable
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.FastScroller2
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
@@ -137,3 +143,16 @@ inline fun <reified E> List<E>.findOnMut(predicate: (E) -> Boolean): E? {
     }
     return null
 }
+
+fun RecyclerView.addFastScroll(inTheEnd: Boolean) = FastScroller2(
+    this,
+    ContextCompat.getDrawable(context, R.drawable.scroll_thumb) as StateListDrawable,
+    ContextCompat.getDrawable(context, R.drawable.scroll_track) as Drawable,
+    ContextCompat.getDrawable(context, R.drawable.scroll_thumb) as StateListDrawable,
+    ContextCompat.getDrawable(context, R.drawable.scroll_track) as Drawable,
+    thickness = resources.getDimensionPixelSize(R.dimen.fastscroll_thickness),
+    mScrollbarMinimumRange = resources.getDimensionPixelSize(R.dimen.fastscroll_minimum_range),
+    minDragAreaSize = resources.getDimensionPixelSize(R.dimen.fastscroll_area),
+    minThumbLength = resources.getDimensionPixelSize(R.dimen.fastscroll_minimum_size),
+    inTheEnd = inTheEnd,
+)

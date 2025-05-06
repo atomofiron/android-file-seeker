@@ -15,7 +15,7 @@ import app.atomofiron.common.util.unsafeLazy
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentResultBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
-import app.atomofiron.searchboxapp.custom.addFastScroll
+import app.atomofiron.searchboxapp.custom.addExplorerFastScroll
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
@@ -59,7 +59,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             itemAnimator = null
             layoutManager = LinearLayoutManager(requireContext())
             adapter = resultAdapter
-            addFastScroll()
+            addExplorerFastScroll()
         }
         binding.dockBar.submit(DefaultDockState)
         binding.dockBar.setListener(::onBottomMenuItemClick)

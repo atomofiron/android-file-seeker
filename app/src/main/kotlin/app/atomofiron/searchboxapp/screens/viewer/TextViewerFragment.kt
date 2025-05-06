@@ -22,6 +22,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.viewer.recycler.TextViewerAdapter
 import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState
 import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState.Companion.Default as DefaultDockState
+import app.atomofiron.searchboxapp.utils.addFastScroll
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_NO_SCROLL
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
@@ -48,6 +49,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         super.onViewCreated(view, savedInstanceState)
 
         binding = FragmentTextViewerBinding.bind(view).apply {
+            recyclerView.addFastScroll(inTheEnd = true)
             recyclerView.run {
                 layoutManager = LinearLayoutManager(context)
                 adapter = viewerAdapter

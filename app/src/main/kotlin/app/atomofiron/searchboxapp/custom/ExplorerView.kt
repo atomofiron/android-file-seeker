@@ -6,16 +6,13 @@ import android.graphics.Canvas
 import android.graphics.ColorFilter
 import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
-import android.graphics.drawable.StateListDrawable
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ViewExplorerBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
@@ -29,7 +26,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.OnScrollI
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.ExtType
-import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
+import app.atomofiron.searchboxapp.utils.addFastScroll
 import app.atomofiron.searchboxapp.utils.scrollToTop
 import lib.atomofiron.insets.attachInsetsListener
 import lib.atomofiron.insets.insetsPadding
@@ -60,7 +57,7 @@ class ExplorerView(
     )
 
     init {
-        binding.recyclerView.addFastScroll()
+        binding.recyclerView.addExplorerFastScroll()
         binding.applyInsets()
         binding.init()
     }
@@ -122,38 +119,20 @@ class ExplorerView(
     interface ExplorerViewOutput : ExplorerItemActionListener, RootAdapter.RootClickListener
 }
 
-fun RecyclerView.addFastScroll() {
-    val container = parent as View
-    val scroller = FastScroller2(
-        this,
-        ContextCompat.getDrawable(context, R.drawable.scroll_thumb) as StateListDrawable,
-        ContextCompat.getDrawable(context, R.drawable.scroll_track) as Drawable,
-        ContextCompat.getDrawable(context, R.drawable.scroll_thumb) as StateListDrawable,
-        ContextCompat.getDrawable(context, R.drawable.scroll_track) as Drawable,
-        thickness = resources.getDimensionPixelSize(R.dimen.fastscroll_thickness),
-        mScrollbarMinimumRange = resources.getDimensionPixelSize(R.dimen.fastscroll_minimum_range),
-        minDragAreaSize = resources.getDimensionPixelSize(R.dimen.fastscroll_area),
-        minThumbLength = resources.getDimensionPixelSize(R.dimen.fastscroll_minimum_size),
-        inTheEnd = false,
-        callback = {
-            when (it) {
-                FastScroller2.Action.Redraw -> container.foreground?.invalidateSelf()
-                FastScroller2.Action.DragStart -> parent.disallowInterceptTouches()
-            }
-        },
-    )
-    // вся эта поебота нужна для того,
+fun RecyclerView.addExplorerFastScroll() {
+    val scroller = addFastScroll(inTheEnd = false)
+    // вся это нужно для того,
     // чтобы скролл рисовался поверх пинящегося заголовка,
     // который лежит с ресайклером в одном контейнере
     removeItemDecoration(scroller)
     val foreground = object : Drawable() {
         val stub = RecyclerView.State()
-        override fun draw(canvas: Canvas) = scroller.onDrawOver(canvas, this@addFastScroll, stub)
+        override fun draw(canvas: Canvas) = scroller.onDrawOver(canvas, this@addExplorerFastScroll, stub)
         override fun setAlpha(alpha: Int) = Unit
         override fun setColorFilter(colorFilter: ColorFilter?) = Unit
         override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
     }
-    container.foreground = foreground
+    (parent as View).foreground = foreground
     addOnScrollListener(object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) = foreground.invalidateSelf()
     })
