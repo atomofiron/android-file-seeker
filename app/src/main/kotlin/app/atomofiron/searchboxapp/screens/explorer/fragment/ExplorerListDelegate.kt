@@ -14,6 +14,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.Root
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
+import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.withoutDot
 import lib.atomofiron.insets.attachInsetsListener
 import kotlin.math.min
@@ -46,7 +47,9 @@ class ExplorerListDelegate(
     fun set(items: List<Node>) {
         val wasEmpty = this.items.isEmpty()
         this.items = items
-        if (wasEmpty) checkCurrentIn(items.indices)
+        currentDir?.takeIf { wasEmpty }?.let {
+            recyclerView.postDelayed({ scrollTo(it) }, Const.COMMON_DELAY)
+        }
     }
 
     override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = checkCurrentIn(positionStart..<(positionStart + itemCount))
@@ -140,7 +143,7 @@ class ExplorerListDelegate(
                     val area = recyclerView.run { height - paddingTop - paddingBottom}
                     val childCount = item.children?.size ?: 0
                     val dy = (holder.itemView.height * (childCount.inc()) + space * 2).coerceAtMost(area)
-                    if (dy < 0) recyclerView.smoothScrollBy(0, dy)
+                    if (dy > 0) recyclerView.smoothScrollBy(0, dy)
                 }
             }
             else -> {
