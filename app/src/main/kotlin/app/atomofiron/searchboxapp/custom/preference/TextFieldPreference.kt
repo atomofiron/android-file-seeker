@@ -17,8 +17,8 @@ import app.atomofiron.searchboxapp.custom.view.TextField
 import app.atomofiron.searchboxapp.utils.Alpha
 
 class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(context, attrs) {
-    private lateinit var editText: TextField
-    private lateinit var summary: View
+
+    private val editText = TextField(context)
     private var value = ""
     private var filter: ((String) -> String?)? = null
 
@@ -29,42 +29,35 @@ class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(co
     override fun onGetDefaultValue(array: TypedArray, index: Int): String? = array.getString(index)
 
     override fun onSetInitialValue(defaultValue: Any?) {
-        value = (defaultValue as? String) ?: getPersistedString(value)
+        value = getPersistedString((defaultValue as String?) ?: value)
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)
 
         if (editText.parent == null) {
-            summary = holder.itemView.findViewById(android.R.id.summary)
-            editText.layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
-                addRule(RelativeLayout.BELOW, android.R.id.title)
-            }
-            editText.setText(value)
-            (summary.parent as ViewGroup).addView(editText, 1)
+            val summary = holder.itemView.findViewById<View>(android.R.id.summary)
+            addField(summary)
         }
-    }
-
-    override fun onAttached() {
-        super.onAttached()
-        initField(context)
+        editText.setText(value)
     }
 
     public override fun onClick() {
-        summary.alpha = Alpha.INVISIBLE
         editText.isVisible = true
         editText.performClick()
     }
 
-    private fun initField(context: Context) {
-        editText = TextField(context)
+    private fun addField(summary: View) {
+        val container = summary.parent as ViewGroup
+        container.addView(editText, 1)
         editText.isGone = true
+        editText.layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
+            addRule(RelativeLayout.BELOW, android.R.id.title)
+        }
         editText.setOnSubmitListener(::onSubmit)
         editText.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) {
-                summary.alpha = Alpha.VISIBLE
-                editText.isGone = true
-            }
+            summary.alpha = if (hasFocus) Alpha.INVISIBLE else Alpha.VISIBLE
+            editText.isGone = !hasFocus
         }
     }
 
