@@ -264,7 +264,7 @@ class DockItemChildrenView(
         reset()
         when (ground) {
             Ground.Bottom -> {
-                if (bottomLeft) corner(closeLeft, closeTop, left = false, top = true, clockWise = true, radius = corner) else lineTo(closeLeft, closeTop)
+                if (bottomLeft) corner(closeLeft, closeTop, left = false, top = true, clockWise = true, radius = corner) else moveTo(closeLeft, closeTop)
                 corner(closeLeft, closeBottom, left = true, top = false, clockWise = false, radius = corner)
                 corner(closeRight, closeBottom, left = false, top = false, clockWise = false, radius = corner)
                 if (bottomRight) corner(closeRight, closeTop, left = true, top = true, clockWise = true, radius = corner) else lineTo(closeRight, closeTop)
@@ -274,7 +274,7 @@ class DockItemChildrenView(
                 if (bottomLeft) corner(popupLeft, popupBottom, left = true, top = false, clockWise = false, radius = corner) else lineTo(popupLeft, popupBottom)
             }
             Ground.Right -> {
-                if (bottomRight) corner(closeLeft, closeBottom, left = true, top = true, clockWise = true, radius = corner) else lineTo(closeLeft, closeBottom)
+                if (bottomRight) corner(closeLeft, closeBottom, left = true, top = true, clockWise = true, radius = corner) else moveTo(closeLeft, closeBottom)
                 corner(closeRight, closeBottom, left = false, top = false, clockWise = false, radius = corner)
                 corner(closeRight, closeTop, left = false, top = true, clockWise = false, radius = corner)
                 if (topRight) corner(closeLeft, closeTop, left = true, top = false, clockWise = true, radius = corner) else lineTo(closeLeft, closeTop)
@@ -284,7 +284,7 @@ class DockItemChildrenView(
                 if (bottomRight) corner(popupRight, popupBottom, left = false, top = false, clockWise = false, radius = corner) else lineTo(popupRight, popupBottom)
             }
             Ground.Left -> {
-                if (topLeft) corner(closeRight, closeTop, left = false, top = false, clockWise = true, radius = corner) else lineTo(closeRight, closeTop)
+                if (topLeft) corner(closeRight, closeTop, left = false, top = false, clockWise = true, radius = corner) else moveTo(closeRight, closeTop)
                 corner(closeLeft, closeTop, left = true, top = true, clockWise = false, radius = corner)
                 corner(closeLeft, closeBottom, left = true, top = false, clockWise = false, radius = corner)
                 if (bottomLeft) corner(closeRight, closeBottom, left = false, top = true, clockWise = true, radius = corner) else lineTo(closeRight, closeBottom)
