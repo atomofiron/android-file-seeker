@@ -6,7 +6,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Outline
 import android.graphics.Path
-import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -66,7 +65,7 @@ class DockItemChildrenView(
     private var currentValue = COLLAPSED
     private var targetValue = COLLAPSED
     private val popupElevation = resources.getDimension(R.dimen.overlay_elevation)
-    private val ghostDrawable: Drawable? = ghost.icon.drawable
+    private val ghostDrawable = ghost.icon.drawable ?: ContextCompat.getDrawable(context, R.drawable.ic_dock_empty)!!
     private val crossDrawable = ContextCompat.getDrawable(context, R.drawable.ic_plus)!!.mutate()
 
     init {
@@ -80,6 +79,7 @@ class DockItemChildrenView(
             height = config.height
         }
         crossDrawable.colorFilter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(ghost.icon.imageTintList!!.defaultColor, BlendModeCompat.SRC_IN)
+        ghost.icon.setImageDrawable(ghostDrawable)
         ghost.icon.foreground = crossDrawable // LayerDrawable make alpha always 255, overriding of LayerDrawable doesn't help
         ghost.button.clipChildren = false
         childrenView.outlineProvider = ChildrenOutlineProvider(corner, config.popup.ground, config.popup.style.strokeWidth.roundToInt())
@@ -152,7 +152,7 @@ class DockItemChildrenView(
         val buttonCenter = ghost.button.height / 2
         val offset = (buttonCenter - iconCenter) / 2 * half
         val ghostAlpha = 1f - half
-        ghostDrawable?.alpha = ghostAlpha.toIntAlpha()
+        ghostDrawable.alpha = ghostAlpha.toIntAlpha()
         crossDrawable.alpha = half.toIntAlpha()
         ghost.icon.rotation = CROSS_ROTATION * half
         ghost.icon.translationY = offset
@@ -188,7 +188,7 @@ class DockItemChildrenView(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         animator.cancel()
-        ghostDrawable?.alpha = Alpha.VISIBLE_INT
+        ghostDrawable.alpha = Alpha.VISIBLE_INT
     }
 
     private fun animTo(value: Float, withDelay: Boolean = false) {
