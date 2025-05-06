@@ -6,6 +6,7 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Outline
 import android.graphics.Path
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -32,6 +33,7 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemHolder
 import app.atomofiron.searchboxapp.model.Layout.Ground
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.toIntAlpha
 import kotlin.math.abs
 import kotlin.math.roundToInt
@@ -64,8 +66,8 @@ class DockItemChildrenView(
     private var currentValue = COLLAPSED
     private var targetValue = COLLAPSED
     private val popupElevation = resources.getDimension(R.dimen.overlay_elevation)
-    private val ghostDrawable = ghost.icon.drawable!!
-    private val crossDrawable = ContextCompat.getDrawable(context, R.drawable.ic_plus)!!
+    private val ghostDrawable: Drawable? = ghost.icon.drawable
+    private val crossDrawable = ContextCompat.getDrawable(context, R.drawable.ic_plus)!!.mutate()
 
     init {
         if (item.children.isEmpty()) {
@@ -150,7 +152,7 @@ class DockItemChildrenView(
         val buttonCenter = ghost.button.height / 2
         val offset = (buttonCenter - iconCenter) / 2 * half
         val ghostAlpha = 1f - half
-        ghostDrawable.alpha = ghostAlpha.toIntAlpha()
+        ghostDrawable?.alpha = ghostAlpha.toIntAlpha()
         crossDrawable.alpha = half.toIntAlpha()
         ghost.icon.rotation = CROSS_ROTATION * half
         ghost.icon.translationY = offset
@@ -179,9 +181,14 @@ class DockItemChildrenView(
         else -> animTo(COLLAPSED, withDelay)
     }
 
-    private fun remove() {
+    fun remove() {
+        (parent as DockPopupLayout?)?.clear()
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
         animator.cancel()
-        (parent as DockPopupLayout).clear()
+        ghostDrawable?.alpha = Alpha.VISIBLE_INT
     }
 
     private fun animTo(value: Float, withDelay: Boolean = false) {

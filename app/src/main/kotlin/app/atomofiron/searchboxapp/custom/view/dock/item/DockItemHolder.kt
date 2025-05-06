@@ -83,7 +83,8 @@ class DockItemHolder(
             popupView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
                 override fun onViewAttachedToWindow(v: View) = Unit
                 override fun onViewDetachedFromWindow(v: View) {
-                    binding.root.elevation = 0f
+                    root.elevation = 0f
+                    icon.drawable?.callback = icon
                 }
             })
         }

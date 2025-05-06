@@ -24,6 +24,8 @@ class DockPopupLayout @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
+    private var childrenView: DockItemChildrenView? = null
+
     fun show(
         parent: RecyclerView,
         config: DockItemConfig,
@@ -31,6 +33,7 @@ class DockPopupLayout @JvmOverloads constructor(
         item: DockItem,
         selectListener: (DockItem) -> Unit,
     ): DockItemChildrenView {
+        clear()
         val container = this
         val corner = resources.getDimensionPixelSize(R.dimen.dock_overlay_corner)
         val offset = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
@@ -79,12 +82,16 @@ class DockPopupLayout @JvmOverloads constructor(
             gravity = Gravity.CENTER
         }
         childrenView.expand()
+        this.childrenView = childrenView
         return childrenView
     }
 
-    fun clear() = removeAllViews()
+    fun clear() {
+        removeView(childrenView)
+        childrenView = null
+    }
 
     fun collapse() {
-        (getChildAt(0) as? DockItemChildrenView)?.collapse()
+        childrenView?.collapse()
     }
 }
