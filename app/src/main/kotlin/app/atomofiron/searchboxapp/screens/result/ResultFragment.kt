@@ -21,7 +21,6 @@ import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState
 import app.atomofiron.searchboxapp.utils.makeSnackbar
@@ -112,7 +111,6 @@ class ResultFragment : Fragment(R.layout.fragment_result),
     }
 
     private fun onDockChanged(state: ResultDockState) {
-        poop("onDockChanged ${state.status.clickable}")
         binding.dockBar.submit(state)
     }
 
