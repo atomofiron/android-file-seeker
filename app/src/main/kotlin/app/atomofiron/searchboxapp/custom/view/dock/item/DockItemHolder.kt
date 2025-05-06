@@ -4,7 +4,7 @@ import android.view.View
 import androidx.core.graphics.Insets
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ViewCompat
-import androidx.core.view.isEmpty
+import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.MaterialAttr
@@ -23,8 +23,9 @@ class DockItemHolder(
     private lateinit var item: DockItem
     private var config: DockItemConfig? = null
     private val drawable = DockItemDrawable(
-        binding.root.context.findColorByAttr(MaterialAttr.colorControlHighlight),
-        binding.root.resources.getDimension(R.dimen.dock_item_corner),
+        ripple = binding.root.context.findColorByAttr(MaterialAttr.colorControlHighlight),
+        corners = binding.root.resources.getDimension(R.dimen.dock_item_corner),
+        stroke = binding.root.resources.getDimension(R.dimen.dock_item_stroke),
     )
 
     init {
@@ -72,7 +73,9 @@ class DockItemHolder(
     private fun ItemDockBinding.onClick() {
         if (item.children.isEmpty()) {
             selectListener(item)
-        } else if (popup.isEmpty()) {
+        } else if (popup.isNotEmpty()) {
+            popup.collapse()
+        } else {
             var config = config!!
             config = config.copy(insets = Insets.of(config.insets.top, config.insets.top, config.insets.bottom, config.insets.bottom))
             root.elevation = 1f

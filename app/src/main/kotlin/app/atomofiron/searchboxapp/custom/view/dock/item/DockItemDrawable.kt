@@ -7,8 +7,10 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.graphics.drawable.RippleDrawable
 import android.graphics.drawable.ShapeDrawable
+import android.graphics.drawable.StateListDrawable
 import android.graphics.drawable.shapes.RectShape
 import androidx.core.graphics.Insets
 import app.atomofiron.common.util.Android
@@ -16,14 +18,24 @@ import app.atomofiron.common.util.extension.corner
 
 class DockItemDrawable private constructor(
     ripple: ColorStateList,
+    layers: Drawable,
     private val content: Drawable,
+    private val focused: Drawable,
+    private val hovered: Drawable,
     mask: Drawable,
-) : RippleDrawable(ripple, content, mask) {
+) : RippleDrawable(ripple, layers, mask) {
     companion object {
-        operator fun invoke(ripple: Int, corners: Float): DockItemDrawable {
+        operator fun invoke(ripple: Int, corners: Float, stroke: Float): DockItemDrawable {
             val content = ShapeDrawable(DockItemShape(corners))
+            val focused = ShapeDrawable(DockItemShape(corners, stroke))
+            val hovered = ShapeDrawable(DockItemShape(corners))
+            val layers = LayerDrawable(arrayOf(
+                StateListDrawable().apply { addState(intArrayOf(0), content) },
+                StateListDrawable().apply { addState(intArrayOf(android.R.attr.state_hovered), hovered) },
+                StateListDrawable().apply { addState(intArrayOf(android.R.attr.state_focused), focused) },
+            ))
             val mask = ShapeDrawable(DockItemShape(corners))
-            return DockItemDrawable(ColorStateList.valueOf(ripple), content, mask)
+            return DockItemDrawable(ColorStateList.valueOf(ripple), layers, content, focused, hovered, mask)
         }
     }
 
@@ -43,6 +55,8 @@ class DockItemDrawable private constructor(
             intArrayOf(colors.selected, colors.default),
         )
         content.setTintList(list)
+        focused.setTint(colors.focused)
+        hovered.setTint(colors.hovered)
     }
 
     fun setInsets(insets: Insets) {
@@ -59,21 +73,32 @@ class DockItemDrawable private constructor(
     }
 }
 
-private class DockItemShape(private val radius: Float) : RectShape() {
+private class DockItemShape(
+    private val radius: Float,
+    private val strokeWidth: Float = 0f,
+) : RectShape() {
 
     private val path = Path()
 
     override fun onResize(width: Float, height: Float) {
         super.onResize(width, height)
+        val inset = strokeWidth / 2
         path.reset()
-        path.corner(0f, 0f, left = true, top = true, clockWise = true, radius)
-        path.corner(width, 0f, left = false, top = true, clockWise = true, radius)
-        path.corner(width, height, left = false, top = false, clockWise = true, radius)
-        path.corner(0f, height, left = true, top = false, clockWise = true, radius)
+        path.corner(inset, inset, left = true, top = true, clockWise = true, radius)
+        path.corner(width - inset, inset, left = false, top = true, clockWise = true, radius)
+        path.corner(width - inset, height - inset, left = false, top = false, clockWise = true, radius)
+        path.corner(inset, height - inset, left = true, top = false, clockWise = true, radius)
         path.close()
     }
 
-    override fun draw(canvas: Canvas, paint: Paint) = canvas.drawPath(path, paint)
+    override fun draw(canvas: Canvas, paint: Paint) {
+        paint.strokeWidth = strokeWidth
+        paint.style = when (strokeWidth) {
+            0f -> Paint.Style.FILL
+            else -> Paint.Style.STROKE
+        }
+        canvas.drawPath(path, paint)
+    }
 
     override fun getOutline(outline: Outline) = when {
         Android.R -> outline.setPath(path)

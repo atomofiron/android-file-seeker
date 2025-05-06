@@ -83,4 +83,8 @@ class DockPopupLayout @JvmOverloads constructor(
     }
 
     fun clear() = removeAllViews()
+
+    fun collapse() {
+        (getChildAt(0) as? DockItemChildrenView)?.collapse()
+    }
 }

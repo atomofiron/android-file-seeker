@@ -75,6 +75,7 @@
 	<dimen name="dock_overlay_corner">16dp</dimen>
 	<dimen name="dock_elevation">@dimen/m3_comp_navigation_bar_container_elevation</dimen>
 	<dimen name="dock_item_corner">12dp</dimen>
+	<dimen name="dock_item_stroke">1dp</dimen>
 	<!-- dock_item_half_margin = (dock_overlay_corner - dock_item_corner) / 2 -->
 	<dimen name="dock_item_half_margin">2dp</dimen>
 	<dimen name="dock_notch_inset">8dp</dimen>

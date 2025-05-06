@@ -172,7 +172,9 @@ class DockItemChildrenView(
 
     fun expand() = animTo(EXPANDED)
 
-    private fun collapse(withDelay: Boolean = false) = when {
+    fun collapse() = collapse(withDelay = false)
+
+    private fun collapse(withDelay: Boolean) = when {
         targetValue == COLLAPSED && !withDelay -> remove()
         else -> animTo(COLLAPSED, withDelay)
     }
