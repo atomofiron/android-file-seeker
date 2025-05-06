@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
+import app.atomofiron.searchboxapp.utils.Const.SLASH
 import kotlinx.coroutines.Job
 import kotlin.math.roundToInt
 
@@ -21,9 +22,7 @@ object ExplorerUtils {
     private const val ROOT_PARENT_PATH = "root_parent_path"
 
     private const val TOTAL = "total"
-    private const val SLASH = "/"
-    private const val ROOT = SLASH
-    private const val ROOT_NAME = "Root"
+    private const val ROOT = SLASH.toString()
     private const val DIR_CHAR = 'd'
     private const val LINK_CHAR = 'l'
     private const val FILE_CHAR = '-'
@@ -120,14 +119,33 @@ object ExplorerUtils {
     fun String.completePath(directory: Boolean): String {
         return when {
             this == ROOT -> ROOT
-            directory -> replace(endingSlashes, SLASH)
+            directory -> replace(endingSlashes, SLASH.toString())
             else -> replace(endingSlashes, "")
         }
     }
 
     fun String.parent(): String = replace(lastPart, "")
 
-    fun String.name(): String = split(slashes).findLast { it.isNotEmpty() } ?: ROOT_NAME
+    fun String.name(): String {
+        if (isEmpty()) {
+            return this
+        }
+        var nonSlash = false
+        var end = length
+        for (i in indices.reversed()) {
+            if (nonSlash && get(i) == SLASH) {
+                return substring(i.inc(), end)
+            }
+            if (!nonSlash && get(i) != SLASH) {
+                nonSlash = true
+                end = i.inc()
+            }
+        }
+        return when {
+            nonSlash -> substring(0, end)
+            else -> SLASH.toString()
+        }
+    }
 
     fun copy(from: Node, to: Node, useSu: Boolean): Node {
         val output = Shell.exec(Shell[Shell.COPY].format(from.path, to.path), useSu)

@@ -33,6 +33,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.Const.UNDEFINEDL
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.name
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
@@ -209,14 +210,13 @@ class FinderWorker(
         }
         return false
     }
-
-    private val forNameLineListener: (String) -> Unit = { line ->
+    private val forNameLineListener: (String) -> Unit = { path ->
+        val name = path.name()
         when {
-            useRegex && !pattern.matcher(line).find() -> Unit
-            !useRegex && !line.contains(query, ignoreCase) -> Unit
+            useRegex && !pattern.matcher(name).find() -> Unit
+            !useRegex && !name.contains(query, ignoreCase) -> Unit
             else -> appScope.launch {
-                val item = newNode(line)
-                addToResult(ItemMatch.Single(item))
+                addToResult(ItemMatch.Single(newNode(path)))
             }.let { progressJobs.add(it) }
         }
     }
