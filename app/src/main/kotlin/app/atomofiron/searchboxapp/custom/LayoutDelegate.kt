@@ -103,14 +103,8 @@ object LayoutDelegate {
             deepBlackDark || transparent -> context.findColorByAttr(R.attr.colorBackground)
             else -> context.findColorByAttr(MaterialAttr.colorSurfaceContainer)
         }
-        when {
-            deepBlackDark -> DockStyle.Stroke(
-                fill = fill,
-                transparent = transparent,
-                strokeWidth = resources.getDimension(R.dimen.stroke_width),
-            )
-            else -> DockStyle.Fill(fill = fill, transparent = transparent)
-        }.let { setStyle(it) }
+        val strokeWidth = if (deepBlackDark) resources.getDimension(R.dimen.stroke_width) else 0f
+        setStyle(DockStyle(fill = fill, transparent = transparent, strokeWidth = strokeWidth))
         setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.run { ground.isBottom && withJoystick } }))
     }
 
