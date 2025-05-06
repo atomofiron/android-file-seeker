@@ -51,15 +51,18 @@ class ResultPresenter(
     fun onStopClick() = interactor.stop(viewState.task.value.uuid)
 
     fun onShareClick() {
-        val task = viewState.task.value
-        val data = task.result as SearchResult.FinderResult
-        val items = data.matches.map { it.item }
+        val result = viewState.task.value.result as SearchResult.FinderResult
+        val checkedOnly = result.matches.any { it.item.isChecked }
+        val items = result.matches.mapNotNull { match ->
+            match.item.takeIf { !checkedOnly || it.isChecked }
+        }
         router.shareWith(items)
     }
 
     fun onExportClick() {
-        val task = viewState.task.value
-        val data = (task.result as SearchResult.FinderResult).toMarkdown()
+        val result = viewState.task.value.result as SearchResult.FinderResult
+        val checkedOnly = result.matches.any { it.item.isChecked }
+        val data = result.toMarkdown(checkedOnly)
         val locale = ConfigurationCompat.getLocales(resources.configuration)[0]
         val date = SimpleDateFormat(Const.DATE_PATTERN, locale).format(Date())
         val title = "search_$date.md.txt";

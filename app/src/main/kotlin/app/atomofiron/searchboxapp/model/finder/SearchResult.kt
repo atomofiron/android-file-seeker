@@ -4,7 +4,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.utils.Const
-import java.util.*
+import java.util.Objects
 
 
 sealed class SearchResult {
@@ -44,9 +44,12 @@ sealed class SearchResult {
             else -> intArrayOf(matches.size, matches.size)
         }
 
-        fun toMarkdown(): String {
+        fun toMarkdown(checkedOnly: Boolean): String {
             val data = StringBuilder()
             for (item in matches) {
+                if (checkedOnly && !item.isChecked) {
+                    continue
+                }
                 val name = if (item.item.isDirectory) item.item.name + Const.SLASH else item.item.name
                 val line = String.format("[%s](%s)\n", name, item.item.path.replace(" ", "\\ "))
                 data.append(line)
