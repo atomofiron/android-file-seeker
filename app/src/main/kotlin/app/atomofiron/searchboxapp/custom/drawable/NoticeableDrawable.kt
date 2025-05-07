@@ -35,6 +35,7 @@ class NoticeableDrawable(
 
     init {
         paint.isAntiAlias = true
+        drawable.callback = this
     }
 
     constructor(

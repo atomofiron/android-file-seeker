@@ -168,16 +168,20 @@ class BallsDrawable private constructor(
     }
 
     fun checkSet() {
-        val drawable = when (val ref = callback) {
-            is WeakDrawableCallback -> (ref.view as? ImageView)?.drawable
-            is ImageView -> ref.drawable
-            else -> null
-        }
-        when (drawable === this) {
+        when (isSet()) {
             flags.contains(Flag.Set) -> return
             true -> flags.add(Flag.Set)
             false -> flags.remove(Flag.Set)
         }
         checkFlags()
+    }
+
+    private fun Drawable.isSet(): Boolean {
+        return when (val ref = callback) {
+            is WeakDrawableCallback -> (ref.view as? ImageView)?.drawable === this
+            is ImageView -> ref.drawable === this
+            is Drawable -> ref === this || ref.isSet()
+            else -> false
+        }
     }
 }
