@@ -11,6 +11,8 @@ data class DockItem(
     val enabled: Boolean = true,
     val clickable: Boolean? = null, // null = by enabled
     val selected: Boolean = false,
+    val progress: Boolean = false,
+    val notice: Boolean = false,
     val children: DockItemChildren = DockItemChildren.Stub,
 ) {
     sealed interface Icon {

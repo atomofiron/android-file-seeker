@@ -2,6 +2,8 @@ package app.atomofiron.searchboxapp.screens.viewer
 
 import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.set
+import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
@@ -9,9 +11,11 @@ import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsStateDelegate
+import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState
 import app.atomofiron.searchboxapp.utils.toInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 
 class TextViewerViewState(
     private val scope: CoroutineScope,
@@ -42,7 +46,7 @@ class TextViewerViewState(
 
     val insertInQuery = ChannelFlow<String>()
 
-    val status = MutableStateFlow(Status())
+    private val status = MutableStateFlow(Status())
     /** line index -> line match index */
     val matchesCursor = MutableStateFlow(MatchCursor())
 
@@ -51,6 +55,24 @@ class TextViewerViewState(
     val tasks = session.tasks
     val textLines = session.textLines
     val currentTask = MutableStateFlow<SearchTask?>(null)
+
+    val dock = status.map { state ->
+        var index: Int? = null
+        var count: Int? = null
+        val label = if (state.countMax == 0) DockItem.Label.Empty else {
+            index = state.count
+            count = state.countMax
+            DockItem.Label("$index / $count")
+        }
+        val statusIconId = if (state.loading) R.drawable.progress_loop else R.drawable.ic_circle_check
+        TextViewerDockState.Default.run {
+            copy(
+                status = status.with(statusIconId).copy(label = label, progress = state.loading),
+                previous = previous.copy(enabled = !state.loading && index != null && index > 1),
+                next = next.copy(enabled = !state.loading && count != null && index != count),
+            )
+        }
+    }
 
     /** @return value >= 0 если нужно подгрузить файл. */
     fun changeCursor(increment: Boolean): Int {

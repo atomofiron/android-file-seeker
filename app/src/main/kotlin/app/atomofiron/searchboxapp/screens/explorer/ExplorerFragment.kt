@@ -15,18 +15,16 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentExplorerBinding
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
-import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock
-import app.atomofiron.searchboxapp.screens.explorer.state.explorerDockItems
+import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDockState
 import app.atomofiron.searchboxapp.screens.main.util.KeyCodeConsumer
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.recyclerView
-import app.atomofiron.searchboxapp.utils.set
 import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.insetsPadding
 
@@ -56,7 +54,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     private fun FragmentExplorerBinding.initView() {
         pager.adapter = pagerAdapter
-        dockBar.submit(explorerDockItems(NoticeableDrawable(requireContext(), R.drawable.ic_settings)))
+        dockBar.submit(ExplorerDockState.Default)
         dockBar.setListener(::onNavigationItemSelected)
         pager.recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
         pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
@@ -112,9 +110,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
             getCurrentTabView().scrollTo(item)
         }
         viewCollect(alerts, collector = ::showSnackbar)
-        viewCollect(settingsNotification) {
-            binding.dockBar[ExplorerDock.Settings] = it
-        }
+        viewCollect(dock, collector = binding.dockBar::submit)
         viewCollect(currentTab) {
             binding.pager.currentItem = it.index
         }

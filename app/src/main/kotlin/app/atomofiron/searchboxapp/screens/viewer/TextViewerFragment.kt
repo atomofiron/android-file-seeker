@@ -80,7 +80,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         viewCollect(textLines, collector = viewerAdapter::submit)
         viewCollect(currentTask, collector = ::onTaskChanged)
         viewCollect(matchesCursor, collector = ::onMatchCursorChanged)
-        viewCollect(status, collector = ::onStatusChanged)
+        viewCollect(dock, collector = binding.dockBar::submit)
     }
 
     override fun FragmentTextViewerBinding.onApplyInsets() {
@@ -112,24 +112,6 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         viewerAdapter.setMatches(matches)
         val iconId = if (task == null) R.drawable.ic_back else R.drawable.ic_cross
         binding.toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), iconId)
-    }
-
-    private fun onStatusChanged(state: TextViewerViewState.Status) {
-        var index: Int? = null
-        var count: Int? = null
-        val label = if (state.countMax == 0) DockItem.Label.Empty else {
-            index = state.count
-            count = state.countMax
-            DockItem.Label("$index / $count")
-        }
-        val statusIconId = if (state.loading) R.drawable.progress_loop else R.drawable.ic_circle_check
-        TextViewerDockState {
-            binding.dockBar.submit(copy(
-                status = status.with(statusIconId).copy(label = label),
-                previous = previous.copy(enabled = !state.loading && index != null && index > 1),
-                next = next.copy(enabled = !state.loading && count != null && index != count),
-            ))
-        }
     }
 
     private fun onMatchCursorChanged(cursor: TextViewerViewState.MatchCursor) = viewerAdapter.setCursor(cursor)

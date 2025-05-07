@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.custom.view.dock.item
 
 import android.view.View
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.Insets
 import androidx.core.view.HapticFeedbackConstantsCompat
 import androidx.core.view.ViewCompat
@@ -12,6 +13,8 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
+import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable.Companion.setBallsDrawable
+import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Icon
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Label
 
@@ -55,12 +58,19 @@ class DockItemHolder(
             is Icon.Value -> icon.setImageDrawable(it.drawable)
             is Icon.Res -> icon.setImageResource(it.resId)
         }
+        if (item.progress) {
+            icon.setBallsDrawable()
+        }
+        if (item.notice) icon.drawable
+            .let { it ?: ContextCompat.getDrawable(icon.context, R.drawable.ic_dock_empty)!! }
+            .let { NoticeableDrawable(icon.context, it).forceShowDot(true) }
+            .let { icon.setImageDrawable(it) }
         when (val it = item.label) {
             null -> label.text = null
             is Label.Value -> label.text = it.value
             is Label.Res -> label.setText(it.resId)
         }
-        icon.isVisible = item.icon != null
+        icon.isVisible = icon.drawable != null
         label.isVisible = item.label != null
         button.isEnabled = item.enabled
         button.isSelected = item.selected

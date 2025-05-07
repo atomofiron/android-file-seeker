@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import java.util.*
@@ -144,7 +145,7 @@ class TextViewerService(
 
     private fun findSession(item: Node): TextViewerSession? = textViewerStore.sessions[item.uniqueId]
 
-    private fun TextViewerSession.readNextLines() {
+    private suspend fun TextViewerSession.readNextLines() {
         val reader = reader ?: return
         textLoading.value = true
         val lines = ArrayList<TextLine>(Const.TEXT_FILE_PAGINATION_STEP)
@@ -164,6 +165,7 @@ class TextViewerService(
         }
         val text = textLines.value.toMutableList()
         text.addAll(lines)
+        delay(3000)
         textLines.value = text
         textLoading.value = false
     }
