@@ -10,22 +10,33 @@ import android.graphics.PixelFormat
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.Drawable
+import android.util.Size
 import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import app.atomofiron.common.util.WeakDrawableCallback
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.fileseeker.R
 import kotlin.math.min
 
-class BallsDrawable private constructor(context: Context) : Drawable(), ValueAnimator.AnimatorUpdateListener, View.OnAttachStateChangeListener {
+private enum class Flag {
+    Visible, Attached, Set
+}
+
+class BallsDrawable private constructor(
+    context: Context,
+    private val intrinsicSize: Size,
+) : Drawable(), ValueAnimator.AnimatorUpdateListener, View.OnAttachStateChangeListener {
     companion object {
         private const val DURATION = 512L
 
         fun ImageView.setBallsDrawable(): BallsDrawable {
-            val drawable = BallsDrawable(context)
+            val intrinsicSize = resources.getDimensionPixelSize(R.dimen.icon_size)
+            val drawable = BallsDrawable(context, Size(intrinsicSize, intrinsicSize))
             drawable.callback = WeakDrawableCallback(this)
             setImageDrawable(drawable)
+            drawable.checkSet()
             removeOnAttachStateChangeListener(drawable)
             addOnAttachStateChangeListener(drawable)
             if (isAttachedToWindow) drawable.onViewAttachedToWindow(this)
@@ -37,10 +48,10 @@ class BallsDrawable private constructor(context: Context) : Drawable(), ValueAni
     private val paintCircle = Paint()
     private val paintBall = Paint()
     private var animValue = 0.0
-    private var isAttachedToWindow = false
 
     private val ballCirclePath = Path()
     private val animator = ValueAnimator.ofFloat(0f, Math.PI.toFloat())
+    private val flags = mutableSetOf<Flag>()
 
     init {
         val colorAccent = context.findColorByAttr(MaterialAttr.colorAccent)
@@ -58,25 +69,30 @@ class BallsDrawable private constructor(context: Context) : Drawable(), ValueAni
         paintCircle.isAntiAlias = true
     }
 
+    override fun getIntrinsicWidth(): Int = intrinsicSize.width
+
+    override fun getIntrinsicHeight(): Int = intrinsicSize.height
+
     override fun onViewAttachedToWindow(view: View) {
-        isAttachedToWindow = true
-        animator.removeUpdateListener(this)
-        animator.addUpdateListener(this)
-        updateAnimation()
+        flags.add(Flag.Attached)
+        checkFlags()
     }
 
     override fun onViewDetachedFromWindow(view: View) {
-        isAttachedToWindow = false
-        animator.removeUpdateListener(this)
-        updateAnimation()
+        flags.remove(Flag.Attached)
+        checkFlags()
     }
 
-    private fun updateAnimation() {
-        val enable = isAttachedToWindow// && isVisible
-        when {
-            !enable -> animator.pause()
-            animator.isPaused -> animator.resume()
-            !animator.isStarted -> animator.start()
+    private fun checkFlags() {
+        if (flags.size < Flag.entries.size) {
+            animator.removeUpdateListener(this)
+            animator.pause()
+        } else if (animator.isPaused) {
+            animator.addUpdateListener(this)
+            animator.resume()
+        } else if (!animator.isStarted) {
+            animator.addUpdateListener(this)
+            animator.start()
         }
     }
 
@@ -125,6 +141,9 @@ class BallsDrawable private constructor(context: Context) : Drawable(), ValueAni
     override fun onAnimationUpdate(animation: ValueAnimator) {
         animValue = (animator.animatedValue as Float).toDouble()
         invalidateSelf()
+        if (animValue == 0.0) {
+            checkSet()
+        }
     }
 
     override fun setAlpha(alpha: Int) = Unit
@@ -134,8 +153,31 @@ class BallsDrawable private constructor(context: Context) : Drawable(), ValueAni
     @Deprecated("", ReplaceWith(""))
     override fun getOpacity(): Int = PixelFormat.UNKNOWN
 
+    override fun setVisible(visible: Boolean, restart: Boolean): Boolean {
+        when {
+            visible -> flags.add(Flag.Visible)
+            else -> flags.remove(Flag.Visible)
+        }
+        checkFlags()
+        return super.setVisible(visible, restart)
+    }
+
     fun setColor(color: Int) {
         paintCircle.color = color
         paintBall.color = color
+    }
+
+    fun checkSet() {
+        val drawable = when (val ref = callback) {
+            is WeakDrawableCallback -> (ref.view as? ImageView)?.drawable
+            is ImageView -> ref.drawable
+            else -> null
+        }
+        when (drawable === this) {
+            flags.contains(Flag.Set) -> return
+            true -> flags.add(Flag.Set)
+            false -> flags.remove(Flag.Set)
+        }
+        checkFlags()
     }
 }
