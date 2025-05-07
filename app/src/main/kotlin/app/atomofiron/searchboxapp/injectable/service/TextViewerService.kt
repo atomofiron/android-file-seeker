@@ -16,7 +16,6 @@ import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
 import java.util.*
@@ -165,7 +164,6 @@ class TextViewerService(
         }
         val text = textLines.value.toMutableList()
         text.addAll(lines)
-        delay(3000)
         textLines.value = text
         textLoading.value = false
     }
