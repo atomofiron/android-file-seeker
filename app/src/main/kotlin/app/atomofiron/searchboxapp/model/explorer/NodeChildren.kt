@@ -9,7 +9,9 @@ data class NodeChildren(
     val isOpened: Boolean,
 ) : List<Node> by items {
 
-    val names = items.map { it.name }.toMutableList()
+    private val names = items.map { it.name }.toMutableList()
+    var dirs = items.count { it.isDirectory }
+        private set
 
     override fun hashCode(): Int = Objects.hash(isOpened, items.map { it.path })
 
@@ -25,12 +27,13 @@ data class NodeChildren(
         }
     }
 
-    inline fun update(updateNames: Boolean = true, action: MutableList<Node>.() -> Unit) {
+    inline fun update(updateMetadata: Boolean = true, action: MutableList<Node>.() -> Unit) {
         items.action()
-        if (updateNames) updateChildrenNames()
+        if (updateMetadata) updateMetadata()
     }
 
-    fun updateChildrenNames() {
+    fun updateMetadata() {
+        dirs = items.count { it.isDirectory }
         names.clear()
         items.forEach { names.add(it.name) }
     }

@@ -55,6 +55,7 @@
         android:gravity="bottom"
         android:textStyle="bold"
         android:textColor="?attr/colorContent"
+        android:textDirection="locale"
         app:layout_constraintStart_toEndOf="@+id/barrier_start"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -64,15 +65,28 @@
         android:id="@+id/item_explorer_tv_description"
         android:layout_width="0dp"
         android:layout_height="19sp"
-        android:layout_gravity="start|bottom"
         android:textSize="12sp"
         android:typeface="monospace"
         android:maxLines="1"
         android:ellipsize="end"
         app:layout_constraintStart_toEndOf="@+id/barrier_start"
         app:layout_constraintTop_toBottomOf="@id/item_explorer_tv_title"
-        app:layout_constraintEnd_toStartOf="@+id/item_explorer_tv_size"
+        app:layout_constraintEnd_toStartOf="@+id/item_explorer_tv_details"
         tools:text="0000-00-00 00:00 -rwxrwxrwx atomofiron everybody"
+        />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/item_explorer_tv_details"
+        android:layout_width="wrap_content"
+        android:layout_height="19sp"
+        android:layout_marginEnd="@dimen/edge_size"
+        android:textSize="12sp"
+        android:typeface="monospace"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:paddingHorizontal="@dimen/padding_mini"
+        app:layout_constraintTop_toBottomOf="@id/item_explorer_tv_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:text="1080x2600-00:01:00"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/item_explorer_error_tv"
@@ -100,7 +114,7 @@
         android:gravity="end"
         app:layout_constraintTop_toBottomOf="@id/item_explorer_tv_title"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:text="000KB"
+        tools:text="000K"
         />
     <app.atomofiron.searchboxapp.custom.view.BallsView
         android:id="@+id/item_explorer_ps"

@@ -7,6 +7,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainPreferenceExplorerItemBinding
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
@@ -18,12 +19,15 @@ import lib.atomofiron.insets.insetsPadding
 class ExplorerItemDelegate(
     private val preferenceStore: PreferenceStore
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
-    private val dir = Node(
-        path = "/sdcard/Android/",
-        parentPath = "/sdcard/",
-        properties = NodeProperties("drwxrwx---", "atomofiron", "everybody", "4K", "19-01-2038", "03:14", "Android"),
-        content = NodeContent.Directory(),
-    )
+    private val dir = run {
+        val properties = NodeProperties("drwxrwx---", "owner", "group", "4K", "2038-01-19", "03:14", "Android")
+        val dirContent = NodeContent.Directory()
+        val fileContent = NodeContent.File.Unknown
+        val items = Array(3) { Node("", "", content = dirContent) }.toList() +
+                Array(14) { Node("", "", content = fileContent) }.toList()
+        val children = NodeChildren(items.toMutableList(), isOpened = false)
+        Node(path = "/sdcard/Android/", parentPath = "/sdcard/", properties = properties, content = dirContent, children = children)
+    }
 
     private var composition = preferenceStore.explorerItemComposition.value
 
@@ -35,6 +39,7 @@ class ExplorerItemDelegate(
     }
 
     private fun CurtainPreferenceExplorerItemBinding.init() {
+        preferenceDetails.isChecked = composition.visibleDetails
         preferenceAccess.isChecked = composition.visibleAccess
         preferenceOwner.isChecked = composition.visibleOwner
         preferenceGroup.isChecked = composition.visibleGroup
@@ -46,6 +51,7 @@ class ExplorerItemDelegate(
 
         val holder = ExplorerHolder(preferenceExplorerItem.root)
         val onClickListener = Listener(holder)
+        preferenceDetails.setOnClickListener(onClickListener)
         preferenceAccess.setOnClickListener(onClickListener)
         preferenceOwner.setOnClickListener(onClickListener)
         preferenceGroup.setOnClickListener(onClickListener)
@@ -72,6 +78,7 @@ class ExplorerItemDelegate(
             view as CompoundButton
             val isChecked = view.isChecked
             composition = when (view.id) {
+                R.id.preference_details -> composition.copy(visibleDetails = isChecked)
                 R.id.preference_access -> composition.copy(visibleAccess = isChecked)
                 R.id.preference_owner -> composition.copy(visibleOwner = isChecked)
                 R.id.preference_group -> composition.copy(visibleGroup = isChecked)

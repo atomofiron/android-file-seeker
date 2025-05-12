@@ -120,9 +120,13 @@
     <string name="pref_explorer_item">Файл / Директория</string>
     <string name="pref_joystick">Настройки кнопки ESC</string>
     <string name="create">Создать</string>
+    <string name="date">Дата</string>
+    <string name="time">Время</string>
     <string name="owner">Владелец</string>
     <string name="group">Группа</string>
+    <string name="size">Размер</string>
     <string name="empty_check_box">Пустой чек бокс</string>
+    <string name="item_explorer_details">Детали</string>
     <string name="item_explorer_background">Чередующийся фон</string>
     <string name="create_a_new">Создать новый(ую)</string>
     <string name="make_a_clone">Создать копию</string>
@@ -161,6 +165,7 @@
     <string name="download">Скачать</string>
     <string name="install">Установить</string>
     <string name="launch">Запустить</string>
+    <string name="apk_info">%s\nИмя пакета: %s\nВерсия: %s (%d)</string>
     <string name="update">Обновить</string>
     <string name="channel_name_updates">Обновления</string>
     <string name="tip">В Файлах укажите где искать</string>

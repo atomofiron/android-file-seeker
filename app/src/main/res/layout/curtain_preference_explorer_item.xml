@@ -32,14 +32,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingEnd="@dimen/padding_large"
-            android:text="19-01-2038"
+            android:text="@string/date"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingEnd="@dimen/padding_large"
-            android:text="03:14"
+            android:text="@string/time"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_access"
@@ -63,11 +63,18 @@
             android:text="@string/group"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
+            android:id="@+id/preference_details"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="@dimen/padding_large"
+            android:text="@string/item_explorer_details"
+            />
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingEnd="@dimen/padding_large"
-            android:text="4KB"
+            android:text="@string/size"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_box"

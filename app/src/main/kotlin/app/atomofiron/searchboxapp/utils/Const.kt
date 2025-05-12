@@ -9,13 +9,10 @@ object Const {
     const val SPACE = " "
     const val EMPTY = ""
     const val QUOTE = "\""
-    const val ANDROID_DIR = "/Android/"
 
-    const val DEFAULT_TEXT_FORMATS = "txt java xml html htm smali log js css json kt md mkd markdown cm ad adoc"
     const val DEFAULT_SPECIAL_CHARACTERS = "\\ [ { ? + * ^ $"
     const val DEFAULT_MAX_SIZE = 10485760
     const val DEFAULT_MAX_DEPTH = 1024
-    const val DEFAULT_EXPLORER_ITEM = 248
 
     const val SCHEME_FILE = "file"
     const val SCHEME_PACKAGE = "package"

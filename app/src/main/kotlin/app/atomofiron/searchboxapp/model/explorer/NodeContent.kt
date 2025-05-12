@@ -9,6 +9,7 @@ sealed class NodeContent(
     // null - пока неизвестно, известен тип или нет,
     // поэтому тут null
     val mimeType: String? = null,
+    val details: String? = null,
 ) {
     companion object {
         const val AnyType = "*/*"

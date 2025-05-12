@@ -4,6 +4,7 @@ import android.view.Gravity
 import app.atomofiron.searchboxapp.model.preference.ActionApk
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
+import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.Const
@@ -30,7 +31,7 @@ object PreferenceKeys {
     val KeyMaxDepth = PreferenceKey("pref_max_depth", Const.DEFAULT_MAX_DEPTH)
     val KeyUseSu = PreferenceKey("pref_use_su", false)
     val KeyActionApk = PreferenceKey("pref_actionApk", ActionApk.Ask.ordinal)
-    val KeyExplorerItem = PreferenceKey("pref_explorer_item", Const.DEFAULT_EXPLORER_ITEM)
+    val KeyExplorerItem = PreferenceKey("pref_explorer_item", ExplorerItemComposition.DEFAULT)
     val KeyJoystick = PreferenceKey("pref_joystick", JoystickComposition.DEFAULT)
     val KeyToybox = PreferenceKey(PREF_TOYBOX, ToyboxVariant.Undefined.EMPTY)
 

@@ -124,9 +124,13 @@
     <string name="create">Create</string>
     <string name="clone">Clone</string>
     <string name="create_file_or_dir">Create a file or directory</string>
+    <string name="date">Date</string>
+    <string name="time">Time</string>
     <string name="owner">Owner</string>
     <string name="group">Group</string>
+    <string name="size">Size</string>
     <string name="empty_check_box">Empty check box</string>
+    <string name="item_explorer_details">Details</string>
     <string name="item_explorer_background">Striped background</string>
     <string name="create_a_new">Create a new</string>
     <string name="make_a_clone">Make a clone</string>
@@ -166,6 +170,7 @@
     <string name="download">Download</string>
     <string name="install">Install</string>
     <string name="launch">Launch</string>
+    <string name="apk_info">%s\nPackage: %s\nVersion: %s (%d)</string>
     <string name="update">Update</string>
     <string name="channel_name_updates">Updates</string>
     <string name="tip">In Files specify where to search</string>

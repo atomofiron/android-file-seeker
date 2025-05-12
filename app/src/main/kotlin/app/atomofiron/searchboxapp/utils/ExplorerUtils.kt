@@ -442,7 +442,7 @@ object ExplorerUtils {
     }
 
     fun Node.sortByName(reversed: Boolean = false): Node {
-        children?.update(updateNames = false) {
+        children?.update(updateMetadata = false) {
             sortBy { it.name.lowercase() }
             if (reversed) reverse()
             sortBy { !it.isDirectory }
@@ -451,7 +451,7 @@ object ExplorerUtils {
     }
 
     private fun Node.sortByDate(newFirst: Boolean = true): Node {
-        children?.update(updateNames = false) {
+        children?.update(updateMetadata = false) {
             sortBy { it.time }
             sortBy { it.date }
             if (newFirst) reverse()

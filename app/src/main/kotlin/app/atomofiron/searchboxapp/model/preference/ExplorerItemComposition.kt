@@ -9,16 +9,20 @@ data class ExplorerItemComposition(
     val visibleSize: Boolean,
     val visibleBox: Boolean,
     val visibleBg: Boolean,
+    val visibleDetails: Boolean,
 ) {
     companion object {
-        private const val ACCESS = 0b00000001
-        private const val OWNER = 0b00000010
-        private const val GROUP = 0b00000100
-        private const val DATE = 0b00001000
-        private const val TIME = 0b00010000
-        private const val SIZE = 0b00100000
-        private const val BOX = 0b01000000
-        private const val BG = 0b10000000
+        private const val ACCESS =  0b000000001
+        private const val OWNER =   0b000000010
+        private const val GROUP =   0b000000100
+        private const val DATE =    0b000001000
+        private const val TIME =    0b000010000
+        private const val SIZE =    0b000100000
+        private const val BOX =     0b001000000
+        private const val BG =      0b010000000
+        private const val DETAILS = 0b100000000
+
+        const val DEFAULT = DATE or TIME or SIZE or BOX or BG or DETAILS
     }
 
     constructor(flags: Int) : this(
@@ -30,6 +34,7 @@ data class ExplorerItemComposition(
         flags and SIZE == SIZE,
         flags and BOX == BOX,
         flags and BG == BG,
+        flags and DETAILS == DETAILS,
     )
 
     val flags: Int get() {
@@ -42,6 +47,7 @@ data class ExplorerItemComposition(
         if (visibleSize) flags += SIZE
         if (visibleBox) flags += BOX
         if (visibleBg) flags += BG
+        if (visibleDetails) flags += DETAILS
         return flags
     }
 }
