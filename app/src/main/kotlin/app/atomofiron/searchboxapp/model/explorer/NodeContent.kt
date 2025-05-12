@@ -9,7 +9,7 @@ sealed class NodeContent(
     // null - пока неизвестно, известен тип или нет,
     // поэтому тут null
     val mimeType: String? = null,
-    val details: String? = null,
+    open val details: String? = null,
 ) {
     companion object {
         const val AnyType = "*/*"
@@ -34,6 +34,7 @@ sealed class NodeContent(
     sealed class File(
         mimeType: String? = null,
         open val thumbnail: Thumbnail? = null,
+        override val details: String? = null,
     ) : NodeContent(mimeType) {
         // прямая связь
         val isEmpty: Boolean get() = thumbnail == null
@@ -57,7 +58,7 @@ sealed class NodeContent(
         data class Apk(
             override val thumbnail: Thumbnail? = null,
             val info: ApkInfo? = null,
-        ) : File("application/vnd.android.package-archive", thumbnail = thumbnail)
+        ) : File("application/vnd.android.package-archive", thumbnail = thumbnail, details = info?.versionName)
         sealed class Archive(
             mimeType: String,
         ) : File(mimeType) {

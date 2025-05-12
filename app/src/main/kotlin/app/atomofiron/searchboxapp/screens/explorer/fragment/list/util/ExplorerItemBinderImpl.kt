@@ -133,6 +133,7 @@ class ExplorerItemBinderImpl(
         tvError.isVisible = error != null
         psProgress.isVisible = item.withOperation
         cbBox.isInvisible = item.withOperation
+        tvDetails.maxWidth = itemView.resources.displayMetrics.widthPixels / 3
 
         ivIcon.ifVisible {
             ivIcon.setImageResource(item.getIcon())
