@@ -7,7 +7,6 @@ import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
@@ -20,7 +19,6 @@ class ExplorerPresenter(
     private val viewState: ExplorerViewState,
     router: ExplorerRouter,
     private val explorerStore: ExplorerStore,
-    private val preferenceStore: PreferenceStore,
     private val explorerInteractor: ExplorerInteractor,
     itemListener: ExplorerItemActionListenerDelegate,
     mainChannel: MainChannel,
@@ -32,9 +30,6 @@ class ExplorerPresenter(
     private val currentTab get() = viewState.currentTab.value
 
     init {
-        preferenceStore.explorerItemComposition.collect(scope) {
-            viewState.itemComposition.value = it
-        }
         mainChannel.maximized.collect(scope) {
             explorerInteractor.updateRoots(currentTab)
         }

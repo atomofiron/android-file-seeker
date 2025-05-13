@@ -88,7 +88,6 @@ class ExplorerModule {
         viewState: ExplorerViewState,
         router: ExplorerRouter,
         explorerStore: ExplorerStore,
-        preferenceStore: PreferenceStore,
         explorerInteractor: ExplorerInteractor,
         itemListener: ExplorerItemActionListenerDelegate,
         mainChannel: MainChannel,
@@ -98,7 +97,6 @@ class ExplorerModule {
             viewState,
             router,
             explorerStore,
-            preferenceStore,
             explorerInteractor,
             itemListener,
             mainChannel,
@@ -123,9 +121,10 @@ class ExplorerModule {
         scope: CoroutineScope,
         explorerStore: ExplorerStore,
         interactor: ExplorerInteractor,
+        preferenceStore: PreferenceStore,
         preferenceChannel: PreferenceChannel,
     ): ExplorerViewState {
-        return ExplorerViewState(scope, explorerStore, interactor, preferenceChannel)
+        return ExplorerViewState(scope, explorerStore, interactor, preferenceStore, preferenceChannel)
     }
 }
 
