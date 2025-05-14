@@ -27,6 +27,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.addFastScroll
+import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
 import app.atomofiron.searchboxapp.utils.scrollToTop
 import lib.atomofiron.insets.attachInsetsListener
 import lib.atomofiron.insets.insetsPadding
@@ -120,7 +121,16 @@ class ExplorerView(
 }
 
 fun RecyclerView.addExplorerFastScroll() {
-    val scroller = addFastScroll(inTheEnd = false)
+    val container = parent as View
+    val scroller = addFastScroll(
+        inTheEnd = false,
+        callback = {
+            when (it) {
+                FastScroller2.Action.Redraw -> container.foreground?.invalidateSelf()
+                FastScroller2.Action.DragStart -> parent.disallowInterceptTouches()
+            }
+        },
+    )
     // вся это нужно для того,
     // чтобы скролл рисовался поверх пинящегося заголовка,
     // который лежит с ресайклером в одном контейнере
@@ -132,7 +142,7 @@ fun RecyclerView.addExplorerFastScroll() {
         override fun setColorFilter(colorFilter: ColorFilter?) = Unit
         override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
     }
-    (parent as View).foreground = foreground
+    container.foreground = foreground
     addOnScrollListener(object : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) = foreground.invalidateSelf()
     })
