@@ -86,9 +86,15 @@ class DockPopupLayout @JvmOverloads constructor(
         return childrenView
     }
 
+    fun bind(item: DockItem) {
+        childrenView?.bind(item)
+    }
+
     fun clear() {
-        removeView(childrenView)
-        childrenView = null
+        childrenView?.let {
+            childrenView = null
+            removeView(it)
+        }
     }
 
     fun collapse() {

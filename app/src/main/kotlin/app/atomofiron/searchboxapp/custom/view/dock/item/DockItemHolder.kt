@@ -41,7 +41,7 @@ class DockItemHolder(
     }
 
     fun bind(item: DockItem, config: DockItemConfig?) {
-        if (config != this.config) {
+        if (item.children.isEmpty() || config != this.config) {
             binding.popup.clear()
         }
         this.item = item
@@ -75,9 +75,7 @@ class DockItemHolder(
         button.isEnabled = item.enabled
         button.isSelected = item.selected
         button.isClickable = item.clickable ?: item.enabled
-        if (item.children.isEmpty()) {
-            popup.clear()
-        }
+        popup.bind(item)
     }
 
     private fun ItemDockBinding.onClick() {

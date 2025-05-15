@@ -45,7 +45,6 @@ private val NotchStub = DockItem(DockItem.Id.Undefined, enabled = false)
 @SuppressLint("ViewConstructor")
 class DockViewImpl(
     context: Context,
-    items: List<DockItem> = emptyList(),
     private var itemConfig: DockItemConfig = DockItemConfig.Stub,
     private var mode: DockMode? = null,
 ) : RecyclerView(context), DockView, Forwarding {
@@ -86,7 +85,6 @@ class DockViewImpl(
         elevation = resources.getDimension(R.dimen.dock_elevation)
         addItemDecoration(layoutDecorator)
         setPadding(padding, padding, padding, padding)
-        adapter.submit(items)
         super.setAdapter(adapter)
         if (isInEditMode) {
             adapter.submit(Array(5) { DockItem(DockItem.Id(it), DockItem.Icon(R.drawable.ic_circle_cross), DockItem.Label(R.string.done)) }.toList())

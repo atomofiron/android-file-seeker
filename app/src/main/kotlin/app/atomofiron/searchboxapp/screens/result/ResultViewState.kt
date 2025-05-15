@@ -79,7 +79,7 @@ class ResultViewState(
         return dock.value.run {
             val sorting = when  {
                 sorting.children.selectionMatches(new) -> sorting
-                else -> new.toDockItem(sorting.label).copy(children = sorting.children.makeSelected(new))
+                else -> new.toDockItem(sorting.id, sorting.label).copy(children = sorting.children.makeSelected(new))
             }
             val status = if (status.clickable == task.inProgress) status else status.copy(
                 clickable = task.inProgress,

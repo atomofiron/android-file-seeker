@@ -25,6 +25,8 @@ class DockAdapter(
 
     override fun getItemId(position: Int): Long = items[position].id.value
 
+    override fun getItemViewType(position: Int): Int = position
+
     operator fun get(position: Int): DockItem = items[position]
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DockItemHolder {

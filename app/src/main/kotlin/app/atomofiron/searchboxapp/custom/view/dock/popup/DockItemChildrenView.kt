@@ -52,10 +52,9 @@ class DockItemChildrenView(
     private val selectListener: (DockItem) -> Unit,
 ) : FrameLayout(context), ValueAnimator.AnimatorUpdateListener {
 
-    private val ghost = LayoutInflater.from(context)
-        .let { ItemDockBinding.inflate(it, this, true) }
-        .also { DockItemHolder(it) { collapse() }.bind(item.withOutChildren(), config) }
-    private val childrenView = DockViewImpl(context, item.children, config, mode = DockMode.Popup(config.popup, item.children.columns))
+    private val ghost = ItemDockBinding.inflate(LayoutInflater.from(context), this, true)
+    private val ghostHolder = DockItemHolder(ghost) { collapse() }
+    private val childrenView = DockViewImpl(context, config, DockMode.Popup(config.popup, item.children.columns))
     private val backgroundPath = Path()
     private var clipPath = Path()
     private var combinedPath = Path()
@@ -65,13 +64,15 @@ class DockItemChildrenView(
     private var currentValue = COLLAPSED
     private var targetValue = COLLAPSED
     private val popupElevation = resources.getDimension(R.dimen.overlay_elevation)
-    private val ghostDrawable = ghost.icon.drawable ?: ContextCompat.getDrawable(context, R.drawable.ic_dock_empty)!!
+    private val invisibleIcon by lazy { ContextCompat.getDrawable(context, R.drawable.ic_dock_empty)!! }
+    private var ghostDrawable = invisibleIcon
     private val crossDrawable = ContextCompat.getDrawable(context, R.drawable.ic_plus)!!.mutate()
 
     init {
         if (item.children.isEmpty()) {
             throw IllegalArgumentException("DockItem hasn't children: $item")
         }
+        bind(item)
         setWillNotDraw(false)
         ghost.root.setOnClickListener { collapse() }
         ghost.root.updateLayoutParams {
@@ -174,6 +175,13 @@ class DockItemChildrenView(
         }
     }
 
+    fun bind(item: DockItem) {
+        childrenView.submit(item.children)
+        ghostHolder.bind(item.withOutChildren(), config)
+        ghostDrawable = ghost.icon.drawable ?: invisibleIcon
+        onAnimationValue(currentValue)
+    }
+
     fun expand() = animTo(EXPANDED)
 
     fun collapse() = collapse(withDelay = false)
@@ -196,24 +204,25 @@ class DockItemChildrenView(
     private fun animTo(value: Float, withDelay: Boolean = false) {
         if (value == targetValue) {
             return
-        } else if (!config.popup.animated) {
+        }
+        targetValue = value
+        if (config.popup.animated) {
+            animator.cancel()
+            animator.startDelay = if (withDelay) DELAY else 0L
+            animator.setFloatValues(currentValue, targetValue)
+            animator.duration = (abs(targetValue - currentValue) * DURATION).toLong()
+            animator.start()
+        } else {
             postDelayed(
                 { onAnimationValue(value) },
                 if (withDelay) DELAY else 0L,
             )
-            return
         }
-        targetValue = value
-        animator.cancel()
-        animator.startDelay = if (withDelay) DELAY else 0L
-        animator.setFloatValues(currentValue, targetValue)
-        animator.duration = (abs(targetValue - currentValue) * DURATION).toLong()
-        animator.start()
     }
 
     private fun onSelect(item: DockItem) {
-        collapse(withDelay = true)
         selectListener(item)
+        collapse(withDelay = true)
     }
 
     private fun DockViewImpl.place() {
