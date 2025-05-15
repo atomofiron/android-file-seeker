@@ -28,19 +28,19 @@ data class NodeRoot(
         else -> false
     }
 
-    sealed class NodeRootType {
+    sealed class NodeRootType(val editable: Boolean = false) {
         val stableId: Int = Objects.hash(this::class)
 
         data object Photos : NodeRootType()
         data object Videos : NodeRootType()
         data object Camera : NodeRootType()
         data object Screenshots : NodeRootType()
-        data object Downloads : NodeRootType()
-        data object Bluetooth : NodeRootType()
+        data object Downloads : NodeRootType(editable = true)
+        data object Bluetooth : NodeRootType(editable = true)
         data class InternalStorage(
             val used: Long = 0,
             val free: Long = 0,
-        ) : NodeRootType()
+        ) : NodeRootType(editable = true)
         data object Favorite : NodeRootType()
     }
 

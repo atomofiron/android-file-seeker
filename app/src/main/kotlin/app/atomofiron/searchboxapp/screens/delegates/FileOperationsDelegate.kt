@@ -33,7 +33,8 @@ class FileOperationsDelegate(
         val first = merged.firstOrNull() ?: return null
         val ids = when {
             merged.size > 1 -> manyFilesOptions
-            first.isRoot -> rootOptions
+            first.content.rootType?.editable == true -> rootOptions
+            first.isRoot -> return null
             first.isDirectory -> directoryOptions
             else -> oneFileOptions.mutate {
                 if (first.content is File.Apk) {
