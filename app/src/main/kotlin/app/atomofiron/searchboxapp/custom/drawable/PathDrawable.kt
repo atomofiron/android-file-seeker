@@ -30,7 +30,7 @@ class PathDrawable(
     // needed for shadow to work
     override fun getOutline(outline: Outline) = when {
         Android.R -> outline.setPath(path)
-        else -> outline.setConvexPath(path)
+        else -> Unit
     }
 
     override fun draw(canvas: Canvas) {

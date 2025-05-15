@@ -69,7 +69,7 @@ class DockBottomShape(
     override fun getOutline(outline: Outline) = when {
         style.transparent -> Unit
         Android.R -> outline.setPath(path)
-        else -> outline.setConvexPath(path)
+        else -> Unit
     }
 
     override fun setAlpha(alpha: Int) {
