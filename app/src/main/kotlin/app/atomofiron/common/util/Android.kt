@@ -6,33 +6,33 @@ import androidx.annotation.ChecksSdkIntAtLeast
 
 object Android {
 
-    object Below {
-        val R get() = SDK_INT < Sdk.R
-        val T get() = SDK_INT < Sdk.TIRAMISU
-    }
+    @ChecksSdkIntAtLeast(api = Sdk.N_MR1)
+    val N1 = SDK_INT >= Sdk.N_MR1
+    @ChecksSdkIntAtLeast(api = Sdk.O)
+    val O = SDK_INT >= Sdk.O
+    @ChecksSdkIntAtLeast(api = Sdk.O_MR1)
+    val O1 = SDK_INT >= Sdk.O_MR1
+    @ChecksSdkIntAtLeast(api = Sdk.P)
+    val P = SDK_INT >= Sdk.P
+    @ChecksSdkIntAtLeast(api = Sdk.Q)
+    val Q = SDK_INT >= Sdk.Q
+    @ChecksSdkIntAtLeast(api = Sdk.R)
+    val R = SDK_INT >= Sdk.R
+    @ChecksSdkIntAtLeast(api = Sdk.S)
+    val S = SDK_INT >= Sdk.S
+    @ChecksSdkIntAtLeast(api = Sdk.S_V2)
+    val S2 = SDK_INT >= Sdk.S_V2
+    @ChecksSdkIntAtLeast(api = Sdk.TIRAMISU)
+    val T = SDK_INT >= Sdk.TIRAMISU
+    @ChecksSdkIntAtLeast(api = Sdk.UPSIDE_DOWN_CAKE)
+    val U = SDK_INT >= Sdk.UPSIDE_DOWN_CAKE
+    @ChecksSdkIntAtLeast(api = Sdk.VANILLA_ICE_CREAM)
+    val V = SDK_INT >= Sdk.VANILLA_ICE_CREAM
 
-    val N_MR1 @ChecksSdkIntAtLeast(api = Sdk.N_MR1)
-        get() = SDK_INT >= Sdk.N_MR1
-    val O @ChecksSdkIntAtLeast(api = Sdk.O)
-        get() = SDK_INT >= Sdk.O
-    val O_MR1 @ChecksSdkIntAtLeast(api = Sdk.O_MR1)
-        get() = SDK_INT >= Sdk.O_MR1
-    val P @ChecksSdkIntAtLeast(api = Sdk.P)
-        get() = SDK_INT >= Sdk.P
-    val Q @ChecksSdkIntAtLeast(api = Sdk.Q)
-        get() = SDK_INT >= Sdk.Q
-    val R @ChecksSdkIntAtLeast(api = Sdk.R)
-        get() = SDK_INT >= Sdk.R
-    val S @ChecksSdkIntAtLeast(api = Sdk.S)
-        get() = SDK_INT >= Sdk.S
-    val S_V2 @ChecksSdkIntAtLeast(api = Sdk.S_V2)
-        get() = SDK_INT >= Sdk.S_V2
-    val T @ChecksSdkIntAtLeast(api = Sdk.TIRAMISU)
-        get() = SDK_INT >= Sdk.TIRAMISU
-    val U @ChecksSdkIntAtLeast(api = Sdk.UPSIDE_DOWN_CAKE)
-        get() = SDK_INT >= Sdk.UPSIDE_DOWN_CAKE
-    val V @ChecksSdkIntAtLeast(api = Sdk.VANILLA_ICE_CREAM)
-        get() = SDK_INT >= Sdk.VANILLA_ICE_CREAM
+    object Below {
+        val R = !Android.R
+        val T = !Android.T
+    }
 
     operator fun get(sdk: Int) = when (sdk) {
         Sdk.BASE -> "Android 1.0"
