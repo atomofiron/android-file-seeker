@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.MATCH_PARENT
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.WRAP_CONTENT
+import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.noClip
@@ -31,6 +32,7 @@ import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.utils.removeOneIf
 
 interface DockView {
+    val canDrawShadow get() = Android.R
     val items: List<DockItem>
     fun setMode(mode: DockMode.Pinned)
     fun setStyle(style: DockStyle)
@@ -121,7 +123,7 @@ class DockViewImpl(
                     mode.isBottom -> height -= measuredHeight
                     else -> width -= measuredWidth
                 }
-                submit(config = itemConfig.copy(popup = DockPopupConfig(mode.ground, width, height, strokeColor, itemConfig.popup.style)))
+                submit(config = itemConfig.copy(popup = DockPopupConfig(mode.ground, width, height, strokeColor, animated = canDrawShadow, itemConfig.popup.style)))
             }
         }
         mode?.updateDecoration()

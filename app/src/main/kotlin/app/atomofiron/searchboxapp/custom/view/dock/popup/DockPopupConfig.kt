@@ -8,10 +8,11 @@ data class DockPopupConfig(
     val ground: Ground,
     val rect: Rect,
     val style: DockStyle,
-    val stroke: Int
+    val stroke: Int,
+    val animated: Boolean,
 ) {
     companion object {
-        val Stub = DockPopupConfig(Ground.Bottom, 0, 0, 0)
+        val Stub = DockPopupConfig(Ground.Bottom, 0, 0, 0, animated = false)
     }
     val spaceWidth get() = rect.width()
     val spaceHeight get() = rect.height()
@@ -21,6 +22,7 @@ data class DockPopupConfig(
         spaceWidth: Int,
         spaceHeight: Int,
         stroke: Int,
+        animated: Boolean,
         style: DockStyle = DockStyle.Stub,
-    ) : this(ground, Rect(0, 0, spaceWidth, spaceHeight), style, stroke)
+    ) : this(ground, Rect(0, 0, spaceWidth, spaceHeight), style, stroke, animated)
 }

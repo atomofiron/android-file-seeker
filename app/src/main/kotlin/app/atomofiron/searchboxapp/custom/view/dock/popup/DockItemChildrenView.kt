@@ -117,8 +117,10 @@ class DockItemChildrenView(
         }
     }
 
-    override fun onAnimationUpdate(animation: ValueAnimator) {
-        currentValue = animation.animatedValue as Float
+    override fun onAnimationUpdate(animation: ValueAnimator) = onAnimationValue(animation.animatedValue as Float)
+
+    private fun onAnimationValue(value: Float) {
+        currentValue = value
         if (currentValue == COLLAPSED && targetValue == COLLAPSED) {
             return remove()
         }
@@ -193,6 +195,12 @@ class DockItemChildrenView(
 
     private fun animTo(value: Float, withDelay: Boolean = false) {
         if (value == targetValue) {
+            return
+        } else if (!config.popup.animated) {
+            postDelayed(
+                { onAnimationValue(value) },
+                if (withDelay) DELAY else 0L,
+            )
             return
         }
         targetValue = value
