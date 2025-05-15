@@ -2,30 +2,32 @@ package app.atomofiron.searchboxapp.model.other
 
 import android.content.res.Resources
 import androidx.annotation.StringRes
+import app.atomofiron.searchboxapp.model.other.UniText.Fmt
 import app.atomofiron.searchboxapp.model.other.UniText.Res
 import app.atomofiron.searchboxapp.model.other.UniText.Str
 
 sealed interface UniText {
     @JvmInline
-    value class Res(val value: Int) : UniText
+    value class Res(@StringRes val value: Int) : UniText
     @JvmInline
     value class Str(val value: String) : UniText
 
-    companion object {
-        operator fun invoke(@StringRes text: Int) = Res(text)
-        operator fun invoke(text: String) = Str(text)
-    }
+    class Fmt(@StringRes val res: Int, val args: Array<out Any>) : UniText
 
-    operator fun get(resources: Resources) = when (this) {
-        is Res -> resources.getString(value)
-        is Str -> value
+    companion object {
+        operator fun invoke(text: String) = Str(text)
+        operator fun invoke(@StringRes text: Int) = Res(text)
+        operator fun invoke(@StringRes text: Int, vararg args: Any) = Fmt(text, args)
     }
 }
 
-fun String.uni() = UniText(this)
+@JvmName("getNullable")
+operator fun Resources.get(text: UniText?) = text?.let { get(it) }
 
-operator fun Resources.get(text: UniText?) = when (text) {
-    null -> null
+operator fun Resources.get(text: UniText) = when (text) {
+    is Fmt -> getString(text.res, *text.args)
     is Res -> getString(text.value)
     is Str -> text.value
 }
+
+fun String.toUni() = UniText(this)

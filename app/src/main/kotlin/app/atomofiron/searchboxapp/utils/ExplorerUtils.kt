@@ -1,14 +1,20 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.content.pm.PackageManager
-import androidx.core.content.pm.PackageInfoCompat
 import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
-import app.atomofiron.searchboxapp.model.explorer.*
+import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeChildren
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
-import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
+import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.model.explorer.NodeProperties
+import app.atomofiron.searchboxapp.model.explorer.NodeRoot
+import app.atomofiron.searchboxapp.model.explorer.NodeSorting
+import app.atomofiron.searchboxapp.model.explorer.NodeState
+import app.atomofiron.searchboxapp.model.explorer.Operation
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import app.atomofiron.searchboxapp.utils.Const.SLASH
@@ -410,20 +416,14 @@ object ExplorerUtils {
             is NodeContent.File.Movie -> NodeContent.File.Movie(0, path.createVideoThumbnail(config)?.forNode)
             is NodeContent.File.Music -> NodeContent.File.Music(0, path.createAudioThumbnail(config)?.forNode)
             is NodeContent.File.Apk -> {
-                val packageManager = packageManager.value ?: return this
-                val packageInfo = packageManager.getPackageArchiveInfo(path, 0)
-                val info = packageInfo?.applicationInfo
-                info ?: return this
-                info.sourceDir = path
-                info.publicSourceDir = path
+                val packageManager = packageManager.value
+                    ?: return this
+                val appInfo = packageManager.getPackageArchiveInfo(path, 0)
+                    ?.applicationInfo
+                    ?: return this
                 NodeContent.File.Apk(
-                    thumbnail = info.loadIcon(packageManager).forNode,
-                    ApkInfo(
-                        appName = info.loadLabel(packageManager).toString(),
-                        versionName = packageInfo.versionName.toString(),
-                        versionCode = PackageInfoCompat.getLongVersionCode(packageInfo).toInt(),
-                        packageName = packageInfo.packageName,
-                    )
+                    thumbnail = appInfo.loadIcon(packageManager).forNode,
+                    info = packageManager.apkInfo(path),
                 )
             }
             else -> return this

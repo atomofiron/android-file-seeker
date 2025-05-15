@@ -36,8 +36,12 @@ class ApkInteractor(
     }
 
     fun launch(item: Node) {
-        val info = (item.content as? NodeContent.File.Apk)?.info
-        info ?: return
+        val content = item.content as? NodeContent.File.Apk
+        launch(content ?: return)
+    }
+
+    fun launch(content: NodeContent.File.Apk) {
+        val info = content.info ?: return
         apkService.launchApk(info.packageName)
     }
 }

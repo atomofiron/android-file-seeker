@@ -9,6 +9,8 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.*
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import app.atomofiron.common.util.DialogDelegate
+import app.atomofiron.common.util.DialogMaker
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
@@ -19,7 +21,9 @@ import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 abstract class BaseRouter(
     fragmentProperty: WeakProperty<out Fragment>,
     protected val activityProperty: WeakProperty<out FragmentActivity> = activityProperty(fragmentProperty),
-) : FileSharingDelegate by FileSharingDelegateImpl(activityProperty) {
+) : FileSharingDelegate by FileSharingDelegateImpl(activityProperty)
+    , DialogMaker by DialogDelegate(activityProperty)
+{
     companion object {
         const val RECIPIENT = "RECIPIENT"
 

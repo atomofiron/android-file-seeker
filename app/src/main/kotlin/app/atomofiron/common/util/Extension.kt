@@ -134,7 +134,7 @@ inline fun <T> T.applyIf(predicate: Boolean, action: T.() -> Unit) = when {
     else -> this
 }
 
-inline fun <T,Q : Any> T.with(it: Q?, action: T.(Q) -> Unit) = apply {
+inline fun <T,Q : Any> T.withNotNull(it: Q?, action: T.(Q) -> Unit) = apply {
     it?.let { action(this, it) }
 }
 

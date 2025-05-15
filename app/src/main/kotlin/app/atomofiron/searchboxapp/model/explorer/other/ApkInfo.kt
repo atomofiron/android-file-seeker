@@ -5,4 +5,8 @@ class ApkInfo(
     val versionName: String,
     val versionCode: Int,
     val packageName: String,
+    val minSdkVersion: Int,
+    val targetSdkVersion: Int,
+    val compileSdkVersion: Int?,
+    val signature: ApkSignature?,
 )

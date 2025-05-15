@@ -43,6 +43,8 @@
 	<string name="history">История</string>
     <string name="copy">Скопировать</string>
     <string name="copied">Скопировано в буфер обмена</string>
+    <string name="dont_show_anymore">больше не показывать</string>
+    <string name="remember_my_choice">запомнить мой выбор</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -97,6 +99,8 @@
     <string name="no_such_file_or_directory">Файла или директории не существует</string>
     <string name="permission_denied">Нет доступа</string>
     <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="unknown">неизвестно</string>
+    <string name="unavailable">недоступно</string>
     <string name="a_lot_of_errors">Много ошибок</string>
     <string name="not_allowed">Не позволено</string>
     <string name="pref_export_import">Экспорт / Импорт</string>
@@ -165,7 +169,7 @@
     <string name="download">Скачать</string>
     <string name="install">Установить</string>
     <string name="launch">Запустить</string>
-    <string name="apk_info">%s\nИмя пакета: %s\nВерсия: %s (%d)</string>
+    <string name="apk_info">Название: %s\nИмя пакета: %s\nВерсия: %s (%d)\nМинимальная SDK: %s\nЦелевая SDK: %s\nСборочная SDK: %s\nПодписавший: %s</string>
     <string name="update">Обновить</string>
     <string name="channel_name_updates">Обновления</string>
     <string name="tip">В Файлах укажите где искать</string>

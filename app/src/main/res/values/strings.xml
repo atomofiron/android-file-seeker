@@ -44,6 +44,8 @@
     <string name="history">History</string>
     <string name="copy">Copy</string>
     <string name="copied">Copied to the clipboard</string>
+    <string name="dont_show_anymore">don\'t show anymore</string>
+    <string name="remember_my_choice">remember my choice</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -98,6 +100,8 @@
     <string name="no_such_file_or_directory">No such file or directory</string>
     <string name="permission_denied">Permission denied</string>
     <string name="unknown_error">Unknown error</string>
+    <string name="unknown">unknown</string>
+    <string name="unavailable">unavailable</string>
     <string name="a_lot_of_errors">A lot of errors</string>
     <string name="not_allowed">Not allowed</string>
     <string name="pref_export_import">Export / Import</string>
@@ -170,7 +174,7 @@
     <string name="download">Download</string>
     <string name="install">Install</string>
     <string name="launch">Launch</string>
-    <string name="apk_info">%s\nPackage: %s\nVersion: %s (%d)</string>
+    <string name="apk_info"><b>Name:</b> %s\nPackage: %s\nVersion: %s (%d)\nMin SDK: %s\nTarget SDK: %s\nCompile SDK: %s\nSigner: %s</string>
     <string name="update">Update</string>
     <string name="channel_name_updates">Updates</string>
     <string name="tip">In Files specify where to search</string>
