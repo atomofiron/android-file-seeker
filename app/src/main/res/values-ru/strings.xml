@@ -129,7 +129,7 @@
     <string name="owner">Владелец</string>
     <string name="group">Группа</string>
     <string name="size">Размер</string>
-    <string name="empty_check_box">Пустой чек бокс</string>
+    <string name="empty_check_box">Пустая метка</string>
     <string name="item_explorer_details">Детали</string>
     <string name="item_explorer_background">Чередующийся фон</string>
     <string name="create_a_new">Создать новый(ую)</string>

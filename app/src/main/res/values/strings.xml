@@ -133,7 +133,7 @@
     <string name="owner">Owner</string>
     <string name="group">Group</string>
     <string name="size">Size</string>
-    <string name="empty_check_box">Empty check box</string>
+    <string name="empty_check_box">Empty mark</string>
     <string name="item_explorer_details">Details</string>
     <string name="item_explorer_background">Striped background</string>
     <string name="create_a_new">Create a new</string>
