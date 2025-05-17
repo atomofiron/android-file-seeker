@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.convert
 import app.atomofiron.searchboxapp.utils.getColorByAttr
+import com.bumptech.glide.Glide
 
 class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     companion object {
@@ -48,20 +49,21 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
         binding.cardThumbnail.clipToOutline = true
     }
 
-    override fun onBind(item: NodeRoot, position: Int) {
+    override fun onBind(item: NodeRoot, position: Int) = binding.run {
         val withArc = item.type is NodeRootType.InternalStorage
-        binding.cardArc.isVisible = withArc
-        binding.root.isSelected = item.isSelected
-        binding.root.isEnabled = item.item.isCached
-        binding.root.alpha = Alpha.enabled(item.item.isCached)
-        binding.cardTitle.text = item.type.getTitle(itemView.resources)
-        binding.cardThumbnail.imageTintList = if (item.withPreview) null else colors
-        binding.cardThumbnail.background = item.getThumbnailBackground()
-        binding.cardThumbnail.run {
-            when (val thumbnail = item.thumbnail) {
-                null -> setImageDrawable(item.getIcon())
-                else -> setImageBitmap(thumbnail)
-            }
+        cardArc.isVisible = withArc
+        root.isSelected = item.isSelected
+        root.isEnabled = item.item.isCached
+        root.alpha = Alpha.enabled(item.item.isCached)
+        cardTitle.text = item.type.getTitle(itemView.resources)
+        cardThumbnail.imageTintList = if (item.withPreview) null else colors
+        cardThumbnail.background = item.getThumbnailBackground()
+        when (val thumbnail = item.thumbnail) {
+            null -> cardThumbnail.setImageDrawable(item.getIcon())
+            else -> Glide
+                .with(root.context)
+                .load(thumbnail.value)
+                .into(cardThumbnail)
         }
         item.bindType()
     }

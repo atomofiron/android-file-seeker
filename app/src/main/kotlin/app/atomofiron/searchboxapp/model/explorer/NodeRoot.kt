@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.model.explorer
 
-import android.graphics.Bitmap
+import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import java.util.Objects
 
@@ -9,7 +9,7 @@ data class NodeRoot(
     val type: NodeRootType,
     val item: Node,
     val sorting: NodeSorting,
-    val thumbnail: Bitmap? = null,
+    val thumbnail: Thumbnail.FilePath? = null,
     val thumbnailPath: String = "",
     // todo make true due rendering only
     val isSelected: Boolean = false,
@@ -47,7 +47,7 @@ data class NodeRoot(
     override fun equals(other: Any?): Boolean = when {
         other !is NodeRoot -> false
         other.type != type -> false
-        other.thumbnail !== thumbnail -> false
+        other.thumbnail != thumbnail -> false
         other.isSelected != isSelected -> false
         !other.item.areContentsTheSame(item) -> false
         else -> true

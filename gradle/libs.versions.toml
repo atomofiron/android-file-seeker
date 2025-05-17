@@ -28,6 +28,7 @@ datastore = "1.1.2"
 exif = "1.3.7"
 asyncInflater = "1.0.0"
 ktor = "3.0.3"
+glide = "4.12.0"
 
 [libraries]
 kotlinx-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -60,6 +61,7 @@ leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", v
 play-core = { group = "com.google.android.play", name = "app-update", version.ref = "appUpdate" }
 play-core-ktx = { group = "com.google.android.play", name = "app-update-ktx", version.ref = "appUpdate" }
 insets = { group = "io.github.atomofiron", name = "extended-insets", version.ref = "insets" }
+glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "glide" }
 ktor-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
 ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }

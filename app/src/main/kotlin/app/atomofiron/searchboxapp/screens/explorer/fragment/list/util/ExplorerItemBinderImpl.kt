@@ -27,6 +27,7 @@ import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.isRtl
+import com.bumptech.glide.Glide
 import com.google.android.material.textview.MaterialTextView
 
 class ExplorerItemBinderImpl(
@@ -111,6 +112,10 @@ class ExplorerItemBinderImpl(
 
         val thumbnail = (item.content as? NodeContent.File)?.thumbnail
         when (thumbnail) {
+            is Thumbnail.FilePath -> Glide
+                .with(itemView.context)
+                .load(thumbnail.value)
+                .into(ivThumbnail)
             is Thumbnail.Bitmap -> ivThumbnail.setImageBitmap(thumbnail.value)
             is Thumbnail.Drawable -> ivThumbnail.setImageDrawable(thumbnail.value)
             null -> ivThumbnail.setImageDrawable(null)

@@ -15,6 +15,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeState
 import app.atomofiron.searchboxapp.model.explorer.Operation
+import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import app.atomofiron.searchboxapp.utils.Const.SLASH
@@ -408,12 +409,12 @@ object ExplorerUtils {
             content.isCached -> return this
         }
         content = when (content) {
-            is NodeContent.File.Picture.Png -> NodeContent.File.Picture.Png(path.createImageThumbnail(config)?.forNode)
-            is NodeContent.File.Picture.Jpeg -> NodeContent.File.Picture.Jpeg(path.createImageThumbnail(config)?.forNode)
-            is NodeContent.File.Picture.Gif -> NodeContent.File.Picture.Gif(path.createImageThumbnail(config)?.forNode)
-            is NodeContent.File.Picture.Webp -> NodeContent.File.Picture.Webp(path.createImageThumbnail(config)?.forNode)
-            is NodeContent.File.Picture.Avif -> NodeContent.File.Picture.Avif(path.createImageThumbnail(config)?.forNode)
-            is NodeContent.File.Movie -> NodeContent.File.Movie(0, path.createVideoThumbnail(config)?.forNode)
+            is NodeContent.File.Picture.Png -> NodeContent.File.Picture.Png(Thumbnail.FilePath(path))
+            is NodeContent.File.Picture.Jpeg -> NodeContent.File.Picture.Jpeg(Thumbnail.FilePath(path))
+            is NodeContent.File.Picture.Gif -> NodeContent.File.Picture.Gif(Thumbnail.FilePath(path))
+            is NodeContent.File.Picture.Webp -> NodeContent.File.Picture.Webp(Thumbnail.FilePath(path))
+            is NodeContent.File.Picture.Avif -> NodeContent.File.Picture.Avif(Thumbnail.FilePath(path))
+            is NodeContent.File.Movie -> NodeContent.File.Movie(0, Thumbnail.FilePath(path))
             is NodeContent.File.Music -> NodeContent.File.Music(0, path.createAudioThumbnail(config)?.forNode)
             is NodeContent.File.Apk -> {
                 val packageManager = packageManager.value

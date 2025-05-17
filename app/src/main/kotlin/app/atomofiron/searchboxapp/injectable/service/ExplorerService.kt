@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
+import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
@@ -285,7 +286,7 @@ class ExplorerService(
                 val config = config.copy(thumbnailSize = previewSize, legacySizeBig = true)
                 val updatedChild = newestChild.copy(content = NodeContent.Unknown).update(config)
                 val content = updatedChild.content as? NodeContent.File
-                targetRoot.copy(item = updated, thumbnail = content?.thumbnail?.bitmap, thumbnailPath = newestChild.path)
+                targetRoot.copy(item = updated, thumbnail = content?.thumbnail as? Thumbnail.FilePath, thumbnailPath = newestChild.path)
             }
         }
     }

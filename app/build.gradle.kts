@@ -50,6 +50,7 @@ dependencies {
     implementation(libs.ktor.json)
     implementation(libs.ktor.cio)
     implementation(libs.insets)
+    implementation(libs.glide)
     debugImplementation(libs.leakcanary)
     testImplementation(libs.junit)
     testImplementation(kotlin("test"))

@@ -7,9 +7,11 @@ sealed interface Thumbnail {
     @JvmInline
     value class Bitmap(val value: AndroidBitmap): Thumbnail
     @JvmInline
+    value class FilePath(val value: String): Thumbnail
+    @JvmInline
     value class Drawable(val value: AndroidDrawable): Thumbnail
 
-    val bitmap: AndroidBitmap? get() = (this as? Bitmap)?.value
+    val path: String? get() = (this as? FilePath)?.value
 
     val drawable: AndroidDrawable? get() = (this as? Drawable)?.value
 }
