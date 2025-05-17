@@ -370,19 +370,24 @@ class ExplorerService(
         withCachingState(it.uniqueId) {
             val done = it.copy(children = children)
                 .resolveDirChildren(config.useSu)
-            renderTab(key, lazy = true) {
+            withTab(key) {
                 states.updateState(it.uniqueId) {
                     nextState(it.uniqueId, cachingJob = null)
                 }
                 if (!done) {
                     return@withCachingState
                 }
-                val item = tree.findNode(it.uniqueId) ?: return@renderTab
+                val item = tree.findNode(it.uniqueId) ?: return@withTab
                 val items = item.children?.items ?: return@withCachingState
                 items.forEachIndexed { index, current ->
                     val resolved = children.find { child -> child.uniqueId == current.uniqueId }
                     resolved ?: return@forEachIndexed
-                    items[index] = current.updateWith(resolved.content, resolved.properties)
+                    val updated = current.updateWith(resolved.content, resolved.properties)
+                    val old = items[index]
+                    items[index] = updated
+                    if (item.isOpened && !updated.areContentsTheSame(old)) {
+                        store.emitUpdate(updated)
+                    }
                 }
             }
         }
@@ -783,7 +788,6 @@ class ExplorerService(
                 return render()
             }
             updated = current.updateWith(updated)
-            val c = updated.content.isCached
             // todo replace everywhere
             val replaced = tree.replaceItem(updated)
             when {
@@ -791,7 +795,9 @@ class ExplorerService(
                 updated.isDirectory -> garden.resolveDirChildren(key, updated)
             }
             updated = updateStateFor(updated, children = updated.children?.fetch(isOpened = current.isOpened))
-            store.emitUpdate(updated)
+            if (!updated.areContentsTheSame(item)) {
+                store.emitUpdate(updated)
+            }
         }
     }
 
@@ -801,12 +807,14 @@ class ExplorerService(
             if (size == item.size) {
                 return@launch
             }
-            renderTab(key, lazy = true) {
+            withTab(key) {
                 val current = tree.findNode(item.uniqueId)
                 current ?: return@launch
                 val updated = current.copy(properties = item.properties.copy(size = size))
                 val replaced = tree.replaceItem(updated)
-                if (!replaced) return@launch
+                if (replaced && !updated.areContentsTheSame(item)) {
+                    store.emitUpdate(updated)
+                }
             }
         }
     }
