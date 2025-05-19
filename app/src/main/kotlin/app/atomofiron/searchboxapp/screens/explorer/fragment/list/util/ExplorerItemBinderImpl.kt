@@ -159,10 +159,10 @@ class ExplorerItemBinderImpl(
         if (composition.visibleOwner) string.append(item.owner).append(SPACE)
         if (composition.visibleGroup) string.append(item.group).append(SPACE)
         tvDescription.text = string.toString()
-        tvDetails.isVisible = composition.visibleDetails
         tvDetails.text = item
             .takeIf { composition.visibleDetails }
             ?.getDetails()
+        tvDetails.isVisible = tvDetails.text.isNotEmpty()
         tvSize.text = when {
             !composition.visibleSize -> EMPTY
             !preview && item.isDirectory && !item.hasChildren -> EMPTY
