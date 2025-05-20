@@ -63,6 +63,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
             else -> Glide
                 .with(root.context)
                 .load(thumbnail.value)
+                .placeholder(item.getIcon())
                 .into(cardThumbnail)
         }
         item.bindType()
