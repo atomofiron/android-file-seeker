@@ -1,6 +1,6 @@
 package app.atomofiron.fileseeker.service
 
-import app.atomofiron.common.util.human
+import app.atomofiron.common.util.forHumans
 import app.atomofiron.searchboxapp.model.network.GithubError
 import app.atomofiron.searchboxapp.model.network.GithubRelease
 import app.atomofiron.searchboxapp.model.network.Loading
@@ -49,7 +49,7 @@ class UpdateApi {
             else -> Rslt.Err(response.body<GithubError>().run { "[$status] $message" })
         }
     } catch (t: Throwable) {
-        Rslt.Err(t.human())
+        Rslt.Err(t.forHumans())
     }
 
     fun download(url: String, dst: File): Flow<Loading> = flow {
@@ -71,11 +71,11 @@ class UpdateApi {
                 }
                 when (val cause = channel.closedCause) {
                     null -> emit(Loading.Completed)
-                    else -> emit(Loading.Error(cause.human()))
+                    else -> emit(Loading.Error(cause.forHumans()))
                 }
             }
         } catch (t: Throwable) {
-            emit(Loading.Error(t.human()))
+            emit(Loading.Error(t.forHumans()))
         }
     }
 }

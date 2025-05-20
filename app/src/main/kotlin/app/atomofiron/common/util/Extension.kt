@@ -122,7 +122,7 @@ inline fun <T,Q : Any> T.withNotNull(it: Q?, action: T.(Q) -> Unit) = apply {
     it?.let { action(this, it) }
 }
 
-fun Throwable.human() = "${this::class.simpleName}: $message"
+fun Throwable.forHumans() = "${this::class.simpleName}: $message"
 
 fun ViewParent.noClip() = (this as? ViewGroup)?.noClip()
 

@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
 import app.atomofiron.common.util.Android
-import app.atomofiron.common.util.human
+import app.atomofiron.common.util.forHumans
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -79,11 +79,11 @@ class ApkService(
                 session.commit(pendingIntent.intentSender)
                 Rslt.Ok()
             } catch (e: Exception) {
-                Rslt.Err(e.human())
+                Rslt.Err(e.forHumans())
             }
         }
     } catch (e: Exception) {
-        Rslt.Err(e.human())
+        Rslt.Err(e.forHumans())
     }
 
     fun launchable(packageName: String): Boolean = context.packageManager.launchable(packageName)
