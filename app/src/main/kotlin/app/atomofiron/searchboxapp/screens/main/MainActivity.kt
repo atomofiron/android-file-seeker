@@ -9,6 +9,7 @@ import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.Insets
+import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -18,11 +19,10 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.common.util.isDarkTheme
-import app.atomofiron.common.util.setFitsSystemWindowsTheFuckToFalse
 import app.atomofiron.fileseeker.R
-import app.atomofiron.fileseeker.databinding.ActivityMainBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.getLayout
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.syncWithLayout
+import app.atomofiron.fileseeker.databinding.ActivityMainBinding
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
@@ -48,8 +48,6 @@ class MainActivity : AppCompatActivity() {
 
         // system bars color breaks at least on Android 15 after app theme has been changed
         // enableEdgeToEdge() don't help you in that hell, it doesn't work too
-        // UPD 29.04.2025: enableEdgeToEdge() sucks, WindowCompat.setDecorFitsSystemWindows() is not enough
-        window.setFitsSystemWindowsTheFuckToFalse()
 
         val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.setView(this)
@@ -70,6 +68,7 @@ class MainActivity : AppCompatActivity() {
 
         presenter.onActivityCreate(this)
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding.joystick.setOnClickListener { onEscClick() }
         binding.joystick.syncWithLayout(binding.root)
 

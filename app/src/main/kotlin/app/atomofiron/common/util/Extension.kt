@@ -7,31 +7,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
-import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import app.atomofiron.fileseeker.R
 import com.google.android.material.color.MaterialColors
 import kotlin.math.min
 
-fun Window.setFitsSystemWindowsTheFuckToFalse() {
-    WindowCompat.setDecorFitsSystemWindows(this, false)
-    // WindowCompat.setDecorFitsSystemWindows() is not enough
-    decorView.giveMeFuckingInsets(4)
-}
-
-private fun View.giveMeFuckingInsets(downCount: Int) {
-    fitsSystemWindows = false
-    if (downCount > 0) (this as? ViewGroup)?.let {
-        for (i in 0..<childCount) {
-            getChildAt(i).giveMeFuckingInsets(downCount.dec())
-        }
-    }
-}
 
 fun View.showKeyboard(): Boolean {
     requestFocus()
