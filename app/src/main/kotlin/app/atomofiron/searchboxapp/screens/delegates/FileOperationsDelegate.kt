@@ -9,7 +9,6 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent.File
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.model.other.UniText
-import app.atomofiron.searchboxapp.model.preference.ActionApk
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.merge
 import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.common.util.Android
@@ -20,7 +19,7 @@ private val oneFileOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.men
 private val manyFilesOptions = listOf(R.id.menu_delete)
 
 class FileOperationsDelegate(
-    private val preferences: PreferenceStore,
+    preferences: PreferenceStore,
     private val apks: ApkInteractor,
     private val dialogs: DialogMaker,
 ) {
@@ -28,7 +27,6 @@ class FileOperationsDelegate(
 
     fun operations(items: List<Node>, supported: List<Int>? = null): ExplorerItemOptions? {
         val merged = items.merge()
-        val checked = mutableListOf<Int>()
         val disabled = mutableListOf<Int>()
         val first = merged.firstOrNull() ?: return null
         val ids = when {
@@ -38,11 +36,6 @@ class FileOperationsDelegate(
             first.isDirectory -> directoryOptions
             else -> oneFileOptions.mutate {
                 if (first.content is File.AndroidApp) {
-                    when (preferences.actionApk.value) {
-                        ActionApk.Ask -> Unit
-                        ActionApk.Launch -> checked.add(R.id.menu_launch)
-                        ActionApk.Install -> checked.add(R.id.menu_install)
-                    }
                     add(R.id.menu_apk)
                     add(R.id.menu_launch)
                     add(R.id.menu_install)
@@ -52,15 +45,11 @@ class FileOperationsDelegate(
                 }
             }
         }.filter { supported?.contains(it) != false }
-        return ExplorerItemOptions(ids, merged, itemComposition, checked = checked, disabled = disabled)
+        return ExplorerItemOptions(ids, merged, itemComposition, disabled = disabled)
     }
 
     fun processApk(item: Node, tab: NodeTabKey? = null) {
-        when (preferences.actionApk.value) {
-            ActionApk.Ask -> if (apks.launchable(item)) askAboutApk(item, tab) else apks.install(item, tab)
-            ActionApk.Install -> apks.install(item, tab)
-            ActionApk.Launch -> if (apks.launchable(item)) apks.launch(item) else apks.install(item, tab)
-        }
+        if (apks.launchable(item)) askAboutApk(item, tab) else apks.install(item, tab)
     }
 
     private fun askAboutApk(item: Node, tab: NodeTabKey?) {
@@ -85,17 +74,11 @@ class FileOperationsDelegate(
             icon = content.thumbnail?.drawable,
             title = UniText(item.name),
             message = UniText(R.string.apk_info, *args),
-            withCheckbox = DialogMaker.CheckBox.RememberMyChoice,
             negative = DialogMaker.Cancel,
             positive = UniText(R.string.install),
-            onPositiveClick = { checked ->
-                if (checked) preferences { setActionApk(ActionApk.Install) }
-                apks.install(item, tab)
-            },
-            neutral = UniText(R.string.launch) to { checked ->
-                if (checked) preferences { setActionApk(ActionApk.Launch) }
-                apks.launch(content)
-            },
+            onPositiveClick = { apks.install(item, tab) },
+            neutral = UniText(R.string.launch) to { apks.launch(content) },
+            cancelable = true,
         )
     }
 }

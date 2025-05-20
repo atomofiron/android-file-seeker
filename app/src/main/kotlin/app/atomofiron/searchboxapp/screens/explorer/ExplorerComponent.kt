@@ -75,10 +75,9 @@ class ExplorerModule {
         explorerStore: ExplorerStore,
         explorerInteractor: ExplorerInteractor,
         apkInteractor: ApkInteractor,
-        preferences: PreferenceStore,
         curtainChannel: CurtainChannel,
     ): ExplorerCurtainMenuDelegate {
-        return ExplorerCurtainMenuDelegate(scope, viewState, router, explorerStore, explorerInteractor, apkInteractor, preferences, curtainChannel)
+        return ExplorerCurtainMenuDelegate(scope, viewState, router, explorerStore, explorerInteractor, apkInteractor, curtainChannel)
     }
 
     @Provides

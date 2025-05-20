@@ -46,6 +46,7 @@ class InstallReceiver : BroadcastReceiver() {
         inject()
         val packageName = intent.getStringExtra(EXTRA_PACKAGE_NAME)
         dialogs.show(
+            cancelable = false,
             title = UniText(R.string.install_succeeded),
             negative = DialogMaker.Cancel,
             positive = UniText(R.string.launch),

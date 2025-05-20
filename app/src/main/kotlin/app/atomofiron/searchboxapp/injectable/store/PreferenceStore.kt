@@ -10,7 +10,6 @@ import app.atomofiron.common.util.flow.asProperty
 import app.atomofiron.searchboxapp.model.preference.*
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKey
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyActionApk
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppOrientation
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppTheme
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppUpdateCode
@@ -64,14 +63,6 @@ class PreferenceStore(
 
     suspend fun setUseSu(value: Boolean) {
         edit { it[KeyUseSu] = value }
-    }
-
-    val actionApk = getFlow(KeyActionApk) {
-        ActionApk.entries[it]
-    }
-
-    suspend fun setActionApk(value: ActionApk) {
-        edit { it[KeyActionApk] = value.ordinal }
     }
 
     val openedDirPath = getFlow(KeyOpenedDirPath)

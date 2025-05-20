@@ -27,6 +27,7 @@ class DialogDelegate(activity: WeakProperty<out FragmentActivity>) : DialogMaker
     }
 
     override fun showError(message: String) = show(
+        cancelable = false,
         title = UniText(R.string.error),
         message = UniText(message),
         neutral = UniText(R.string.copy) to {

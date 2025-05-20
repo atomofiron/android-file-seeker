@@ -9,10 +9,8 @@ import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
-import app.atomofiron.searchboxapp.model.preference.ActionApk
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerViewState
@@ -30,7 +28,6 @@ class ExplorerCurtainMenuDelegate(
     private val explorerStore: ExplorerStore,
     private val explorerInteractor: ExplorerInteractor,
     private val apkInteractor: ApkInteractor,
-    private val preferences: PreferenceStore,
     curtainChannel: CurtainChannel,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>(), Recipient, MenuListener {
     private companion object {
@@ -94,7 +91,6 @@ class ExplorerCurtainMenuDelegate(
             R.id.menu_open_with -> router.openWith(items.first())
             R.id.menu_install -> apkInteractor.install(items.first(), viewState.currentTab.value)
             R.id.menu_launch -> apkInteractor.launch(items.first())
-            -R.id.menu_apk -> preferences { setActionApk(ActionApk.Ask) }
             R.id.menu_copy_path -> {
                 explorerInteractor.copyToClipboard(items.first())
                 viewState.showAlert(AlertMessage(R.string.copied))

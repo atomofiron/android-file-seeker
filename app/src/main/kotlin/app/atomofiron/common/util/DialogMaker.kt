@@ -18,7 +18,7 @@ interface DialogMaker {
         title: UniText? = null,
         message: UniText? = null,
         withCheckbox: CheckBox? = null,
-        cancelable: Boolean = false,
+        cancelable: Boolean,
         onCancel: (() -> Unit)? = null,
         onDismiss: (() -> Unit)? = null,
         neutral: DialogMakerButton? = null,

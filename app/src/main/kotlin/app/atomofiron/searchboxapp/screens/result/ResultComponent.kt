@@ -96,9 +96,8 @@ class ResultModule {
         interactor: ResultInteractor,
         apks: ApkInteractor,
         curtainChannel: CurtainChannel,
-        preferences: PreferenceStore,
     ): ResultCurtainMenuDelegate {
-        return ResultCurtainMenuDelegate(scope, viewState, router, interactor, apks, preferences, curtainChannel)
+        return ResultCurtainMenuDelegate(scope, viewState, router, interactor, apks, curtainChannel)
     }
 
     @Provides

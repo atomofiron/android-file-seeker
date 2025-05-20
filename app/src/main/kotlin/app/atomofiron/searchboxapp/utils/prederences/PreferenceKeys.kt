@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.utils.prederences
 
 import android.view.Gravity
-import app.atomofiron.searchboxapp.model.preference.ActionApk
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
@@ -30,7 +29,6 @@ object PreferenceKeys {
     val KeyMaxSize = PreferenceKey("pref_max_size", Const.DEFAULT_MAX_SIZE)
     val KeyMaxDepth = PreferenceKey("pref_max_depth", Const.DEFAULT_MAX_DEPTH)
     val KeyUseSu = PreferenceKey("pref_use_su", false)
-    val KeyActionApk = PreferenceKey("pref_actionApk", ActionApk.Ask.ordinal)
     val KeyExplorerItem = PreferenceKey("pref_explorer_item", ExplorerItemComposition.DEFAULT)
     val KeyJoystick = PreferenceKey("pref_joystick", JoystickComposition.DEFAULT)
     val KeyToybox = PreferenceKey(PREF_TOYBOX, ToyboxVariant.Undefined.EMPTY)
