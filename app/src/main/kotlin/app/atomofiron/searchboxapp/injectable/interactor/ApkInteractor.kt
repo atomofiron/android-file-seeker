@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.injectable.interactor
 
 import app.atomofiron.common.util.DialogMaker
+import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
@@ -35,7 +36,9 @@ class ApkInteractor(
                 else -> apkService.installApk(file, action = Intents.ACTION_INSTALL_APP)
             }
             if (result is Rslt.Err) {
-                dialogs.showError(result.error)
+                withMain {
+                    dialogs.showError(result.error)
+                }
             }
         }
     }
