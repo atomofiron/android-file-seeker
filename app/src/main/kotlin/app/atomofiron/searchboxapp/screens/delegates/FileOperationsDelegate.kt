@@ -12,6 +12,7 @@ import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.merge
 import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.common.util.Android
+import app.atomofiron.common.util.extension.then
 
 private val rootOptions = listOf(R.id.menu_create)
 private val directoryOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_create, R.id.menu_clone, R.id.menu_copy_path)
@@ -48,11 +49,7 @@ class FileOperationsDelegate(
         return ExplorerItemOptions(ids, merged, itemComposition, disabled = disabled)
     }
 
-    fun processApk(item: Node, tab: NodeTabKey? = null) {
-        if (apks.launchable(item)) askAboutApk(item, tab) else apks.install(item, tab)
-    }
-
-    private fun askAboutApk(item: Node, tab: NodeTabKey?) {
+    fun askForApk(item: Node, tab: NodeTabKey? = null) {
         val content = item.content as? File.AndroidApp
         val info = content?.info ?: return
         val unavailable = dialogs[UniText(R.string.unavailable)]
@@ -77,7 +74,7 @@ class FileOperationsDelegate(
             negative = DialogMaker.Cancel,
             positive = UniText(R.string.install),
             onPositiveClick = { apks.install(item, tab) },
-            neutral = UniText(R.string.launch) to { apks.launch(content) },
+            neutral = apks.launchable(item) then { UniText(R.string.launch) to { apks.launch(content) } },
             cancelable = true,
         )
     }

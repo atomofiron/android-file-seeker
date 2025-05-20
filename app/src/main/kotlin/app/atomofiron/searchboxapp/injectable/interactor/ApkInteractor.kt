@@ -23,7 +23,7 @@ class ApkInteractor(
 ) {
     fun install(item: Node, tab: NodeTabKey? = null) {
         val content = item.content as? NodeContent.File.AndroidApp
-        content?: return
+        content ?: return
         val file = File(item.path)
         scope.launch(Dispatchers.IO) {
             if (tab != null) {
@@ -31,9 +31,10 @@ class ApkInteractor(
                 if (allowed != true) return@launch
                 explorerService.tryMarkInstalling(tab, item, installing = null)
             }
+            val stringId = content.info?.stringId()
             val result = when {
-                content.splitApk -> apkService.installApks(file, action = Intents.ACTION_INSTALL_APP)
-                else -> apkService.installApk(file, action = Intents.ACTION_INSTALL_APP)
+                content.splitApk -> apkService.installApks(file, stringId = stringId, action = Intents.ACTION_INSTALL_APP)
+                else -> apkService.installApk(file, stringId = stringId, action = Intents.ACTION_INSTALL_APP)
             }
             if (result is Rslt.Err) {
                 withMain {

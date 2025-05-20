@@ -21,14 +21,15 @@ class ApkService(
     private val context: Context,
     private val installer: PackageInstaller,
 ) {
-    fun installApks(zip: File, action: String? = null): Rslt<Unit> {
+    fun installApks(zip: File, action: String? = null, stringId: String? = null): Rslt<Unit> {
         return ZipInputStream(BufferedInputStream(FileInputStream(zip))).use { stream ->
             install(zip.length(), action) {
                 var entry: ZipEntry? = stream.nextEntry
                     ?: return@install Rslt.Err("archive is empty")
                 while (entry != null) {
                     if (!entry.isDirectory && entry.name.endsWith(Const.DOT_APK, ignoreCase = true)) {
-                        openWrite(entry.name, 0, entry.size).use { output ->
+                        val name = entry.name.let { name -> stringId?.let { it + name } ?: name }
+                        openWrite(name, 0, entry.size).use { output ->
                             stream.copyTo(output)
                             fsync(output)
                         }
@@ -40,9 +41,9 @@ class ApkService(
         }
     }
 
-    fun installApk(file: File, action: String? = null, silently: Boolean = false): Rslt<Unit> {
+    fun installApk(file: File, action: String? = null, stringId: String? = null, silently: Boolean = false): Rslt<Unit> {
         return install(file.length(), action, silently) {
-            openWrite(file.path, 0, file.length()).use { output ->
+            openWrite(stringId ?: file.name, 0, file.length()).use { output ->
                 file.inputStream().use { input ->
                     input.copyTo(output)
                 }

@@ -9,4 +9,6 @@ class ApkInfo(
     val targetSdkVersion: Int,
     val compileSdkVersion: Int?,
     val signature: ApkSignature?,
-)
+) {
+    fun stringId() = appName + versionCode
+}
