@@ -76,7 +76,7 @@ class ApkService(
             val pendingIntent = PendingIntent.getBroadcast(context, sessionId, intent, flags)
             try {
                 session.commit(pendingIntent.intentSender)
-                Rslt.Ok(Unit)
+                Rslt.Ok()
             } catch (e: Exception) {
                 Rslt.Err(e.human())
             }

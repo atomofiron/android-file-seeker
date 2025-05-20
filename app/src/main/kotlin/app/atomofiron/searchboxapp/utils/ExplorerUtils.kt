@@ -418,7 +418,6 @@ object ExplorerUtils {
         return copy(content = content)
     }
 
-    @Throws(IOException::class)
     private fun Node.cacheFile(config: CacheConfig): Node {
         val content = when (content) {
             is NodeContent.File.Picture.Png -> NodeContent.File.Picture.Png(Thumbnail.FilePath(path))
@@ -428,28 +427,42 @@ object ExplorerUtils {
             is NodeContent.File.Picture.Avif -> NodeContent.File.Picture.Avif(Thumbnail.FilePath(path))
             is NodeContent.File.Movie -> NodeContent.File.Movie(0, Thumbnail.FilePath(path))
             is NodeContent.File.Music -> NodeContent.File.Music(0, path.createAudioThumbnail(config)?.forNode)
-            is NodeContent.File.Zip -> content.getApksContent(path)
-            is NodeContent.File.AndroidApp -> if (content.splitApk) content.getApksContent(path) else content.getApkContent(path)
-            else -> null
-        } ?: return this
+            is NodeContent.File.Zip -> content.tryGetApksContent(path).contentOrNodeError(this) { return it }
+            is NodeContent.File.AndroidApp -> when {
+                content.splitApk -> content.tryGetApksContent(path).contentOrNodeError(this) { return it }
+                else -> content.getApkContent(path).contentOrNodeError(this) { return it }
+            }
+            else -> return this
+        }
         return copy(content = content)
     }
 
+    private inline fun Rslt<out NodeContent>.contentOrNodeError(node: Node, action: (withError: Node) -> Nothing): NodeContent {
+        return unwrapOrElse {
+            action(node.copy(error = NodeError.Message(it)))
+        }
+    }
+
+    private fun NodeContent.File.tryGetApksContent(zipPath: String): Rslt<NodeContent.File.AndroidApp> = try {
+        getApksContent(zipPath)
+    } catch (e: Exception) {
+        Rslt.Err(e.toString())
+    }
+
     @Throws(IOException::class)
-    private fun NodeContent.File.getApksContent(zipPath: String): NodeContent.File.AndroidApp? {
+    private fun NodeContent.File.getApksContent(zipPath: String): Rslt<NodeContent.File.AndroidApp> {
         val tempDir = System.getProperty("java.io.tmpdir")
-            ?: return null
-        val random = Random.nextUInt()
-        val tmp = File("$tempDir/apks/$random")
+            ?: return Rslt.Err("No temp dir")
+        val tmp = File("$tempDir/$TEMP_APKS_DIR/${Random.nextUInt()}")
         tmp.delete()
         tmp.parentFile
             ?.mkdir()
             ?.takeIf { tmp.createNewFile() }
-            ?: return null
+            ?: return Rslt.Err("Can't create temp file")
         ZipInputStream(BufferedInputStream(FileInputStream(zipPath))).use { stream ->
             var entry: ZipEntry? = stream.nextEntry
             while (entry != null) {
-                if (entry.name == "base.apk") {
+                if (entry.name == BASE_APK) {
                     FileOutputStream(tmp).use {
                         stream.copyTo(it)
                     }
@@ -459,26 +472,26 @@ object ExplorerUtils {
             }
         }
         if (tmp.length() == 0L) {
-            return null
+            return Rslt.Err("Temp file is empty")
         }
         return getApkContent(tmp.absolutePath).also {
             tmp.delete()
         }
     }
 
-    private fun NodeContent.File.getApkContent(apkPath: String): NodeContent.File.AndroidApp? {
+    private fun NodeContent.File.getApkContent(apkPath: String): Rslt<NodeContent.File.AndroidApp> {
         val packageManager = packageManager.value
-            ?: return null
+            ?: return Rslt.Err("No package manager")
         val appInfo = packageManager.getPackageArchiveInfo(apkPath, 0)
             ?.applicationInfo
-            ?: return null
+            ?: return Rslt.Err("No application info")
         val thumbnail = appInfo.loadIcon(packageManager).forNode
         val info = packageManager.apkInfo(apkPath)
         return when (this) {
             is NodeContent.File.Zip -> NodeContent.File.AndroidApp(thumbnail, info, splitApk = true)
             is NodeContent.File.AndroidApp -> copy(thumbnail, info)
-            else -> null
-        }
+            else -> return Rslt.Err("Wrong node content type")
+        }.toRslt()
     }
 
     private inline fun <reified T : NodeContent> NodeContent?.ifNotCached(action: () -> T): T {

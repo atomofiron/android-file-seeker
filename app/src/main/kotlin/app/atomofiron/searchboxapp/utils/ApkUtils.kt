@@ -9,6 +9,8 @@ import app.atomofiron.common.util.extension.signature
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 
+const val BASE_APK = "base.apk"
+const val TEMP_APKS_DIR = "apks"
 private const val flags = PackageManager.GET_SIGNATURES or PackageManager.GET_SIGNING_CERTIFICATES
 
 fun PackageManager.apkInfo(path: String): ApkInfo? {

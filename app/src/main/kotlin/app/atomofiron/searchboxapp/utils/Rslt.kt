@@ -9,3 +9,10 @@ sealed interface Rslt<T> {
         }
     }
 }
+
+fun <T> T.toRslt() = Rslt.Ok(this)
+
+inline fun <T> Rslt<T>.unwrapOrElse(action: (error: String) -> T): T = when (this) {
+    is Rslt.Ok -> data
+    is Rslt.Err -> action(error)
+}
