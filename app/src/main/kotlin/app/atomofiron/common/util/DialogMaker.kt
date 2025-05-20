@@ -11,7 +11,7 @@ interface DialogMaker {
 
     operator fun get(text: UniText): String
 
-    fun showError(message: String)
+    fun showError(message: String?)
 
     fun show(
         icon: Drawable? = null,

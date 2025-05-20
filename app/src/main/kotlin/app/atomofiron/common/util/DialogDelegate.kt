@@ -26,15 +26,17 @@ class DialogDelegate(activity: WeakProperty<out FragmentActivity>) : DialogMaker
         is Str -> text.value
     }
 
-    override fun showError(message: String) = show(
+    override fun showError(message: String?) = show(
         cancelable = false,
-        title = UniText(R.string.error),
+        title = if (message == null) UniText(R.string.unknown_error) else UniText(R.string.error),
         message = UniText(message),
-        neutral = UniText(R.string.copy) to {
-            val activity = activity
-            activity?.getSystemService(Context.CLIPBOARD_SERVICE)
-                ?.let { it as ClipboardManager }
-                ?.copy(activity, label = activity.resources.getString(R.string.error), text = message, activity.resources)
+        neutral = message?.let {
+            UniText(R.string.copy) to {
+                val activity = activity
+                activity?.getSystemService(Context.CLIPBOARD_SERVICE)
+                    ?.let { it as ClipboardManager }
+                    ?.copy(activity, label = activity.resources.getString(R.string.error), text = message, activity.resources)
+            }
         },
     )
 

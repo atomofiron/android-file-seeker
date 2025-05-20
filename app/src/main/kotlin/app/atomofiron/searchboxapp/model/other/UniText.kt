@@ -16,6 +16,7 @@ sealed interface UniText {
 
     companion object {
         operator fun invoke(text: String) = Str(text)
+        operator fun invoke(text: String?) = text?.let { Str(text) }
         operator fun invoke(@StringRes text: Int) = Res(text)
         operator fun invoke(@StringRes text: Int, vararg args: Any) = Fmt(text, args)
     }
