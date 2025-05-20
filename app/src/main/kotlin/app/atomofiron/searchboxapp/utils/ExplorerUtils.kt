@@ -20,7 +20,16 @@ import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import app.atomofiron.searchboxapp.utils.Const.SLASH
 import kotlinx.coroutines.Job
+import java.io.BufferedInputStream
+import java.io.File
+import java.io.FileInputStream
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 import kotlin.math.roundToInt
+import kotlin.random.Random
+import kotlin.random.nextUInt
 
 object ExplorerUtils {
     // зато насколько всё становится проще
@@ -72,6 +81,7 @@ object ExplorerUtils {
     private const val EXT_SVG = ".svg"
     private const val EXT_APK = ".apk"
     private const val EXT_ZIP = ".zip"
+    private const val EXT_APKS = ".apks"
     private const val EXT_TAR = ".tar"
     private const val EXT_BZ2 = ".bz2"
     private const val EXT_DMG = ".dmg"
@@ -198,7 +208,7 @@ object ExplorerUtils {
         val time = last.substring(0, 5)
         val isFile = parts[0].firstOrNull() == FILE_CHAR
         val length = if (!isFile) 0 else parts[4].toLong()
-        var hrSize = if (!isFile) size else length.toSize()
+        val hrSize = if (!isFile) size else length.toSize()
         // the name can start with spaces
         val nodeName = name ?: last.substring(6, last.length)
         // todo links name.contains('->')
@@ -293,8 +303,15 @@ object ExplorerUtils {
 
     private fun Node.ensureCached(config: CacheConfig, oldProps: NodeProperties): Node = when {
         isDirectory -> cacheDir(config.useSu)
-        isCached -> this
-        else -> cacheFile(config, oldProps)
+        length == 0L && oldProps.size != size -> resolveFileType()
+        length == 0L -> this
+        isCached && oldProps.size == size -> this
+        // if size changed -> cache again
+        else -> try {
+            cacheFile(config)
+        } catch (e: Exception) {
+            this.copy(error = NodeError.Message(e.toString()))
+        }
     }
 
     private fun Node.cacheDir(useSu: Boolean): Node {
@@ -344,27 +361,28 @@ object ExplorerUtils {
         val content = when (true) {
             (content is NodeContent.Directory) -> content
             type.isBlank(),
-            type.startsWith(FILE_DATA),
-            type.startsWith(FILE_EMPTY) -> name.resolveFileType()
-            type.startsWith(DIRECTORY) -> content.ifNotCached { NodeContent.Directory() }
+            (type == FILE_DATA) -> name.resolveFileType(content)
+            (type == FILE_EMPTY) -> name.resolveFileType()
+            (type == DIRECTORY) -> content.ifNotCached { NodeContent.Directory() }
             type.startsWith(FILE_PNG) -> content.ifNotCached { NodeContent.File.Picture.Png() }
             type.startsWith(FILE_JPEG) -> content.ifNotCached { NodeContent.File.Picture.Jpeg() }
             type.startsWith(FILE_GIF) -> content.ifNotCached { NodeContent.File.Picture.Gif() }
             type.startsWith(FILE_ZIP) -> when {
-                path.endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Apk() }
+                path.endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { NodeContent.File.AndroidApp.Apk() }
+                path.endsWith(EXT_APKS, ignoreCase = true) -> content.ifNotCached { NodeContent.File.AndroidApp.Apks() }
                 path.endsWith(EXT_OSZ, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.Map() }
                 path.endsWith(EXT_OSK, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.Skin() }
                 path.endsWith(EXT_OLZ, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.LazerMap() }
                 path.endsWith(EXT_OSR, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.Replay() }
                 path.endsWith(EXT_OSB, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.Storyboard() }
-                else -> content.ifNotCached { NodeContent.File.Archive.Zip() }
+                else -> content.ifNotCached { NodeContent.File.Zip() }
             }
             type.startsWith(FILE_BZIP2) -> when {
                 name.endsWith(EXT_DMG) -> content.ifNotCached { NodeContent.File.Dmg }
-                else -> content.ifNotCached { NodeContent.File.Archive.Bzip2() }
+                else -> content.ifNotCached { NodeContent.File.Bzip2() }
             }
-            type.startsWith(FILE_GZIP) -> content.ifNotCached { NodeContent.File.Archive.Gz() }
-            type.startsWith(FILE_TAR) -> content.ifNotCached { NodeContent.File.Archive.Tar() }
+            type.startsWith(FILE_GZIP) -> content.ifNotCached { NodeContent.File.Gz() }
+            type.startsWith(FILE_TAR) -> content.ifNotCached { NodeContent.File.Tar() }
             type.startsWith(FILE_XZ) -> content.ifNotCached { NodeContent.File.Xz }
             type.startsWith(FILE_SH_SCRIPT) -> NodeContent.File.Text.Script
             type.startsWith(FILE_UTF8_TEXT),
@@ -400,15 +418,9 @@ object ExplorerUtils {
         return copy(content = content)
     }
 
-    private fun Node.cacheFile(config: CacheConfig, oldProps: NodeProperties): Node {
-        var content = content
-        when {
-            length == 0L && oldProps.size != size -> return resolveFileType()
-            length == 0L -> return this
-            oldProps.size != size -> Unit // size changed -> cache again
-            content.isCached -> return this
-        }
-        content = when (content) {
+    @Throws(IOException::class)
+    private fun Node.cacheFile(config: CacheConfig): Node {
+        val content = when (content) {
             is NodeContent.File.Picture.Png -> NodeContent.File.Picture.Png(Thumbnail.FilePath(path))
             is NodeContent.File.Picture.Jpeg -> NodeContent.File.Picture.Jpeg(Thumbnail.FilePath(path))
             is NodeContent.File.Picture.Gif -> NodeContent.File.Picture.Gif(Thumbnail.FilePath(path))
@@ -416,20 +428,57 @@ object ExplorerUtils {
             is NodeContent.File.Picture.Avif -> NodeContent.File.Picture.Avif(Thumbnail.FilePath(path))
             is NodeContent.File.Movie -> NodeContent.File.Movie(0, Thumbnail.FilePath(path))
             is NodeContent.File.Music -> NodeContent.File.Music(0, path.createAudioThumbnail(config)?.forNode)
-            is NodeContent.File.Apk -> {
-                val packageManager = packageManager.value
-                    ?: return this
-                val appInfo = packageManager.getPackageArchiveInfo(path, 0)
-                    ?.applicationInfo
-                    ?: return this
-                NodeContent.File.Apk(
-                    thumbnail = appInfo.loadIcon(packageManager).forNode,
-                    info = packageManager.apkInfo(path),
-                )
-            }
-            else -> return this
-        }
+            is NodeContent.File.Zip -> content.getApksContent(path)
+            is NodeContent.File.AndroidApp -> if (content.splitApk) content.getApksContent(path) else content.getApkContent(path)
+            else -> null
+        } ?: return this
         return copy(content = content)
+    }
+
+    @Throws(IOException::class)
+    private fun NodeContent.File.getApksContent(zipPath: String): NodeContent.File.AndroidApp? {
+        val tempDir = System.getProperty("java.io.tmpdir")
+            ?: return null
+        val random = Random.nextUInt()
+        val tmp = File("$tempDir/apks/$random")
+        tmp.delete()
+        tmp.parentFile
+            ?.mkdir()
+            ?.takeIf { tmp.createNewFile() }
+            ?: return null
+        ZipInputStream(BufferedInputStream(FileInputStream(zipPath))).use { stream ->
+            var entry: ZipEntry? = stream.nextEntry
+            while (entry != null) {
+                if (entry.name == "base.apk") {
+                    FileOutputStream(tmp).use {
+                        stream.copyTo(it)
+                    }
+                    break
+                }
+                entry = stream.nextEntry
+            }
+        }
+        if (tmp.length() == 0L) {
+            return null
+        }
+        return getApkContent(tmp.absolutePath).also {
+            tmp.delete()
+        }
+    }
+
+    private fun NodeContent.File.getApkContent(apkPath: String): NodeContent.File.AndroidApp? {
+        val packageManager = packageManager.value
+            ?: return null
+        val appInfo = packageManager.getPackageArchiveInfo(apkPath, 0)
+            ?.applicationInfo
+            ?: return null
+        val thumbnail = appInfo.loadIcon(packageManager).forNode
+        val info = packageManager.apkInfo(apkPath)
+        return when (this) {
+            is NodeContent.File.Zip -> NodeContent.File.AndroidApp(thumbnail, info, splitApk = true)
+            is NodeContent.File.AndroidApp -> copy(thumbnail, info)
+            else -> null
+        }
     }
 
     private inline fun <reified T : NodeContent> NodeContent?.ifNotCached(action: () -> T): T {
@@ -625,12 +674,13 @@ object ExplorerUtils {
         endsWith(EXT_GIF, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Picture.Gif() }
         endsWith(EXT_WEBP, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Picture.Webp() }
         endsWith(EXT_AVIF, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Picture.Avif() }
-        endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Apk() }
-        endsWith(EXT_ZIP, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Archive.Zip() }
-        endsWith(EXT_TAR, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Archive.Tar() }
-        endsWith(EXT_BZ2, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Archive.Bzip2() }
-        endsWith(EXT_GZ, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Archive.Gz() }
-        endsWith(EXT_RAR, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Archive.Rar() }
+        endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { NodeContent.File.AndroidApp.Apk() }
+        endsWith(EXT_APKS, ignoreCase = true) -> content.ifNotCached { NodeContent.File.AndroidApp.Apks() }
+        endsWith(EXT_ZIP, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Zip() }
+        endsWith(EXT_TAR, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Tar() }
+        endsWith(EXT_BZ2, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Bzip2() }
+        endsWith(EXT_GZ, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Gz() }
+        endsWith(EXT_RAR, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Rar() }
         endsWith(EXT_SH, ignoreCase = true) -> NodeContent.File.Text.Script
         endsWith(EXT_TXT, ignoreCase = true),
         endsWith(EXT_INI, ignoreCase = true),
@@ -700,7 +750,8 @@ object ExplorerUtils {
         }
         val content = when (true) {
             (item.content::class != content::class),
-            !content.isCached -> item.content
+            item.content.isCached -> item.content
+            content.isCached -> content
             else -> content
         }
         return copy(

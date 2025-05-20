@@ -168,6 +168,7 @@
     <string name="retry">Повторить</string>
     <string name="download">Скачать</string>
     <string name="install">Установить</string>
+    <string name="install_succeeded">Установка выполнена</string>
     <string name="launch">Запустить</string>
     <string name="apk_info">Название: %s\nИмя пакета: %s\nВерсия: %s (%d)\nМинимальная SDK: %s\nЦелевая SDK: %s\nСборочная SDK: %s\nПодписавший: %s</string>
     <string name="update">Обновить</string>

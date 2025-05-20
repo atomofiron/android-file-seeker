@@ -143,7 +143,8 @@ class AppUpdateServiceGithubImpl(
         !exists() -> false
         length() != asset.size -> false
         BuildConfig.DEBUG -> true
-        else -> context.apkInfo(path)?.let { it.versionCode > BuildConfig.VERSION_CODE } == true
+        else -> context.packageManager.apkInfo(path)
+            ?.let { it.versionCode > BuildConfig.VERSION_CODE }== true
     }.let { verified ->
         if (!verified) delete()
         takeIf { verified }

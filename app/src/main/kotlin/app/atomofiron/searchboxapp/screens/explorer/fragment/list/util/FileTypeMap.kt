@@ -19,7 +19,7 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.File.Text.Svg -> R.drawable.ic_explorer_vector
     is NodeContent.File.Picture -> R.drawable.ic_explorer_picture
     is NodeContent.File.Movie -> R.drawable.ic_explorer_movie
-    is NodeContent.File.Apk -> R.drawable.ic_explorer_apk
+    is NodeContent.File.AndroidApp -> R.drawable.ic_explorer_apk
     is NodeContent.File.Archive,
     is NodeContent.File.Dmg -> R.drawable.ic_explorer_archive_file
     is NodeContent.File.Text.Osu -> R.drawable.ic_file_osu

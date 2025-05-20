@@ -14,10 +14,9 @@ object Const {
     const val DEFAULT_MAX_SIZE = 10485760
     const val DEFAULT_MAX_DEPTH = 1024
 
-    const val SCHEME_FILE = "file"
     const val SCHEME_PACKAGE = "package"
-    const val NULL = "null"
     const val MIME_TYPE_ANY = "*/*"
+    const val DOT_APK = ".apk"
 
     const val UNDEFINED = -1
     const val UNDEFINEDL = -1L

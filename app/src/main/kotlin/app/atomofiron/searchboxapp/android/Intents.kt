@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.utils.Const
 object Intents {
     const val ACTION_UPDATE = "ACTION_UPDATE"
     const val ACTION_INSTALL_UPDATE = "ACTION_INSTALL_UPDATE"
+    const val ACTION_INSTALL_APP = "ACTION_INSTALL_APP"
 
     private const val PACKAGE_SCHEME = "package:"
     private const val MAX_REQUEST_CODE = 65536

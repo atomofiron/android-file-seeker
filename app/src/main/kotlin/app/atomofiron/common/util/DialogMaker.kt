@@ -33,6 +33,7 @@ interface DialogMaker {
     }
 
     companion object {
-        fun cancel(onClick: (checked: Boolean) -> Unit): DialogMakerButton = UniText(R.string.cancel) to onClick
+        val Cancel = Cancel { }
+        fun Cancel(onClick: (checked: Boolean) -> Unit): DialogMakerButton = UniText(R.string.cancel) to onClick
     }
 }

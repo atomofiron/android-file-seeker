@@ -8,7 +8,7 @@ sealed class NodeContent(
     // '*/*' - значит тип неизвестен,
     // null - пока неизвестно, известен тип или нет,
     // поэтому тут null
-    val mimeType: String? = null,
+    open val mimeType: String? = null,
     open val details: String? = null,
 ) {
     companion object {
@@ -55,21 +55,34 @@ sealed class NodeContent(
             data class Webp(override val thumbnail: Thumbnail? = null) : Picture("image/webp")
             data class Avif(override val thumbnail: Thumbnail? = null) : Picture("image/avif")
         }
-        data class Apk(
-            override val thumbnail: Thumbnail? = null,
-            val info: ApkInfo? = null,
-        ) : File("application/vnd.android.package-archive", thumbnail = thumbnail, details = info?.versionName)
-        sealed class Archive(
-            mimeType: String,
-        ) : File(mimeType) {
-            abstract val children: List<Node>?
 
-            data class Zip(override val children: List<Node>? = null) : Archive("application/zip")
-            data class Bzip2(override val children: List<Node>? = null) : Archive("application/x-bzip2")
-            data class Gz(override val children: List<Node>? = null) : Archive("application/gzip")
-            data class Tar(override val children: List<Node>? = null) : Archive("application/x-tar")
-            data class Rar(override val children: List<Node>? = null) : Archive("application/vnd.rar")
+        sealed class Archive(mimeType: String) : File(mimeType) {
+            open val children: List<Node>? = null
         }
+
+        data class Zip(
+            override val children: List<Node>? = null,
+            override val mimeType: String = "application/zip",
+        ) : Archive(mimeType)
+
+        data class Bzip2(override val children: List<Node>? = null) : Archive("application/x-bzip2")
+        data class Gz(override val children: List<Node>? = null) : Archive("application/gzip")
+        data class Tar(override val children: List<Node>? = null) : Archive("application/x-tar")
+        data class Rar(override val children: List<Node>? = null) : Archive("application/vnd.rar")
+
+        data class AndroidApp(
+            override val thumbnail: Thumbnail.Drawable? = null,
+            val info: ApkInfo? = null,
+            val splitApk: Boolean = false, // todo
+        ) : Archive(if (splitApk) "application/zip" else "application/vnd.android.package-archive") {
+            override val details: String? = info?.versionName
+
+            companion object {
+                fun Apk() = AndroidApp(splitApk = false)
+                fun Apks() = AndroidApp(splitApk = true)
+            }
+        }
+
         sealed class Osu(
             mimeType: String,
         ) : File(mimeType) {

@@ -37,7 +37,7 @@ class FileOperationsDelegate(
             first.isRoot -> return null
             first.isDirectory -> directoryOptions
             else -> oneFileOptions.mutate {
-                if (first.content is File.Apk) {
+                if (first.content is File.AndroidApp) {
                     when (preferences.actionApk.value) {
                         ActionApk.Ask -> Unit
                         ActionApk.Launch -> checked.add(R.id.menu_launch)
@@ -64,7 +64,7 @@ class FileOperationsDelegate(
     }
 
     private fun askAboutApk(item: Node, tab: NodeTabKey?) {
-        val content = item.content as? File.Apk
+        val content = item.content as? File.AndroidApp
         val info = content?.info ?: return
         val unavailable = dialogs[UniText(R.string.unavailable)]
         val args = arrayOf(
@@ -86,7 +86,7 @@ class FileOperationsDelegate(
             title = UniText(item.name),
             message = UniText(R.string.apk_info, *args),
             withCheckbox = DialogMaker.CheckBox.RememberMyChoice,
-            negative = UniText(R.string.cancel) to { },
+            negative = DialogMaker.Cancel,
             positive = UniText(R.string.install),
             onPositiveClick = { checked ->
                 if (checked) preferences { setActionApk(ActionApk.Install) }
