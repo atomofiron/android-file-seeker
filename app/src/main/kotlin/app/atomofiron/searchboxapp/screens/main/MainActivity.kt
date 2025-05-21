@@ -2,14 +2,11 @@ package app.atomofiron.searchboxapp.screens.main
 
 import android.app.Service
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.SystemBarStyle
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
@@ -49,13 +46,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge( // it's actually useless, but let's keep it here
-            statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
-            navigationBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
-        )
         // system insets providing breaks at least on Android 15 after app theme has been changed
         // enableEdgeToEdge() won’t help you in this hell
         // UPD 29.04.2025: WindowCompat.setDecorFitsSystemWindows() is not enough
+        // UPD 21.05.2025: LOL enableEdgeToEdge() breaks the delivery of inserts!
         window.reallyDisableFitsSystemWindows()
 
         val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
