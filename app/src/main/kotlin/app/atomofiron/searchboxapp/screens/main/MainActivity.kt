@@ -2,11 +2,14 @@ package app.atomofiron.searchboxapp.screens.main
 
 import android.app.Service
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowCompat
@@ -46,8 +49,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // system bars color breaks at least on Android 15 after app theme has been changed
-        // enableEdgeToEdge() don't help you in that hell, it doesn't work too
+        enableEdgeToEdge( // it's actually useless, but let's keep it here
+            statusBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+            navigationBarStyle = SystemBarStyle.auto(Color.TRANSPARENT, Color.TRANSPARENT),
+        )
+        // system insets providing breaks at least on Android 15 after app theme has been changed
+        // enableEdgeToEdge() won’t help you in this hell - it doesn’t work well enough
+        WindowCompat.setDecorFitsSystemWindows(window, false)
 
         val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.setView(this)
@@ -68,7 +76,6 @@ class MainActivity : AppCompatActivity() {
 
         presenter.onActivityCreate(this)
 
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         binding.joystick.setOnClickListener { onEscClick() }
         binding.joystick.syncWithLayout(binding.root)
 
