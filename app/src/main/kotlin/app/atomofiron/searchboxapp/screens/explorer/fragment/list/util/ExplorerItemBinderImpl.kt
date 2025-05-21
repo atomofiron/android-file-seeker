@@ -118,6 +118,7 @@ class ExplorerItemBinderImpl(
                 .into(ivThumbnail)
             is Thumbnail.Bitmap -> ivThumbnail.setImageBitmap(thumbnail.value)
             is Thumbnail.Drawable -> ivThumbnail.setImageDrawable(thumbnail.value)
+            is Thumbnail.Res -> ivThumbnail.setImageResource(thumbnail.value)
             null -> ivThumbnail.setImageDrawable(null)
         }
 
@@ -151,7 +152,7 @@ class ExplorerItemBinderImpl(
         onItemActionListener = listener
     }
 
-    override fun bindComposition(composition: ExplorerItemComposition, preview: Boolean) {
+    override fun bindComposition(composition: ExplorerItemComposition) {
         val string = StringBuilder()
         if (composition.visibleDate) string.append(item.date).append(SPACE)
         if (composition.visibleTime) string.append(item.time).append(SPACE)
@@ -163,11 +164,7 @@ class ExplorerItemBinderImpl(
             .takeIf { composition.visibleDetails }
             ?.getDetails()
         tvDetails.isVisible = tvDetails.text.isNotEmpty()
-        tvSize.text = when {
-            !composition.visibleSize -> EMPTY
-            !preview && item.isDirectory && !item.hasChildren -> EMPTY
-            else -> item.size
-        }
+        tvSize.text = if (composition.visibleSize) item.size else EMPTY
         cbBox.buttonTintList = if (composition.visibleBox) defaultBoxTintList else transparentBoxTintList
     }
 

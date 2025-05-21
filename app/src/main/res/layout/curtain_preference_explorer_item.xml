@@ -8,23 +8,33 @@
     >
 
     <include
-        android:id="@+id/preference_explorer_item"
+        android:id="@+id/preference_explorer_dir"
         layout="@layout/item_explorer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        />
+    <include
+        android:id="@+id/preference_explorer_file"
+        layout="@layout/item_explorer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/preference_explorer_dir"
+        app:layout_constraintEnd_toEndOf="parent"
         />
     <com.google.android.flexbox.FlexboxLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingTop="@dimen/common_margin_half"
         app:flexWrap="wrap"
         app:flexDirection="row"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/preference_explorer_item"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/preference_explorer_file"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         >
         <com.google.android.material.checkbox.MaterialCheckBox

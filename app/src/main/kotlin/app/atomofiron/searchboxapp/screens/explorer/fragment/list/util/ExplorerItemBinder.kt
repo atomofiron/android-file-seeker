@@ -7,7 +7,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemAc
 interface ExplorerItemBinder {
     fun setOnItemActionListener(listener: ExplorerItemActionListener?)
     fun onBind(item: Node)
-    fun bindComposition(composition: ExplorerItemComposition, preview: Boolean = false)
+    fun bindComposition(composition: ExplorerItemComposition)
     fun disableClicks()
     fun hideCheckBox()
     fun setGreyBackgroundColor(visible: Boolean = true)

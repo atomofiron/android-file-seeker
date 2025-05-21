@@ -55,6 +55,7 @@ fun VariantDimension.buildConfig(debug: Boolean) {
     val fileProvider = if (debug) AppConfig.fileProviderDebug else AppConfig.fileProvider
     buildConfigField("boolean", "DEBUG_BUILD", debug.toString())
     buildConfigField("String", "PACKAGE_NAME", "\"$packageId\"")
+    buildConfigField("String", "VERSION_NAME", "\"${AppConfig.versionName}\"")
     buildConfigField("String", "AUTHORITY", "\"$fileProvider\"")
     manifestPlaceholders["PACKAGE_NAME"] = packageId
     manifestPlaceholders["PROVIDER"] = fileProvider

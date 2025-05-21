@@ -71,7 +71,7 @@ sealed class NodeContent(
         data class Rar(override val children: List<Node>? = null) : Archive("application/vnd.rar")
 
         data class AndroidApp(
-            override val thumbnail: Thumbnail.Drawable? = null,
+            override val thumbnail: Thumbnail? = null,
             val info: ApkInfo? = null,
             val splitApk: Boolean = false, // todo
         ) : Archive(if (splitApk) "application/zip" else "application/vnd.android.package-archive") {

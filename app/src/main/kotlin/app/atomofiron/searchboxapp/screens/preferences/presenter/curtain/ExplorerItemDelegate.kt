@@ -1,8 +1,13 @@
 package app.atomofiron.searchboxapp.screens.preferences.presenter.curtain
 
+import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.*
+import app.atomofiron.common.util.property.StrongProperty
+import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.fileseeker.BuildConfig
+import app.atomofiron.fileseeker.BuildConfig.VERSION_NAME
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainPreferenceExplorerItemBinding
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
@@ -10,6 +15,8 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
+import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
+import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -17,16 +24,24 @@ import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 
 class ExplorerItemDelegate(
-    private val preferenceStore: PreferenceStore
+    private val preferenceStore: PreferenceStore,
+    private val resources: StrongProperty<Resources>,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
     private val dir = run {
         val properties = NodeProperties("drwxrwx---", "owner", "group", "4K", "2038-01-19", "03:14", "Android")
         val dirContent = NodeContent.Directory()
         val fileContent = NodeContent.File.Unknown
-        val items = Array(3) { Node("", "", content = dirContent) }.toList() +
-                Array(14) { Node("", "", content = fileContent) }.toList()
+        val items = Array(17) { Node("", "", content = if (it < 3) dirContent else fileContent) }.toList()
         val children = NodeChildren(items.toMutableList(), isOpened = false)
-        Node(path = "/sdcard/Android/", parentPath = "/sdcard/", properties = properties, content = dirContent, children = children)
+        Node(path = "", properties = properties, content = dirContent, children = children)
+    }
+    private val file = run {
+        val name = "File Seeker ${resources.value?.getString(R.string.version_name) ?: VERSION_NAME}.apk"
+        val properties = NodeProperties("drwxrwx---", "owner", "group", "47K", "2038-01-19", "03:14", name)
+        val thumbnail = Thumbnail(R.mipmap.ic_launcher)
+        val apkInfo = ApkInfo("", VERSION_NAME, 0, "", 0, 0, null, null)
+        val content = NodeContent.File.AndroidApp(thumbnail, apkInfo)
+        Node(path = "", properties = properties, content = content)
     }
 
     private var composition = preferenceStore.explorerItemComposition.value
@@ -49,8 +64,10 @@ class ExplorerItemDelegate(
         preferenceBox.isChecked = composition.visibleBox
         preferenceBg.isChecked = composition.visibleBg
 
-        val holder = ExplorerHolder(preferenceExplorerItem.root)
-        val onClickListener = Listener(holder)
+        val dirHolder = ExplorerHolder(preferenceExplorerDir.root)
+        val fileHolder = ExplorerHolder(preferenceExplorerFile.root)
+        val holders = arrayOf(dirHolder, fileHolder)
+        val onClickListener = Listener(*holders)
         preferenceDetails.setOnClickListener(onClickListener)
         preferenceAccess.setOnClickListener(onClickListener)
         preferenceOwner.setOnClickListener(onClickListener)
@@ -61,17 +78,24 @@ class ExplorerItemDelegate(
         preferenceBox.setOnClickListener(onClickListener)
         preferenceBg.setOnClickListener(onClickListener)
 
-        holder.bind(dir)
-        holder.bindComposition(composition)
-        holder.disableClicks()
-        holder.setGreyBackgroundColor(composition.visibleBg)
+        dirHolder.bind(dir)
+        fileHolder.bind(file)
+        holders.bind()
 
-        preferenceExplorerItem.itemExplorerIvIcon.alpha = Alpha.VISIBLE
-        preferenceExplorerItem.itemExplorerTvSize.text = dir.size
+        preferenceExplorerDir.itemExplorerIvIcon.alpha = Alpha.VISIBLE
+        preferenceExplorerDir.itemExplorerTvSize.text = dir.size
+    }
+
+    private fun Array<out ExplorerHolder>.bind() {
+        forEachIndexed { index, holder ->
+            holder.disableClicks()
+            holder.bindComposition(composition)
+            holder.setGreyBackgroundColor(composition.visibleBg && (index % 2 != size % 2))
+        }
     }
 
     private inner class Listener(
-        private val holder: ExplorerHolder,
+        private vararg val holders: ExplorerHolder,
     ) : View.OnClickListener {
 
         override fun onClick(view: View) {
@@ -89,8 +113,7 @@ class ExplorerItemDelegate(
                 R.id.preference_bg -> composition.copy(visibleBg = isChecked)
                 else -> throw Exception()
             }
-            holder.bindComposition(composition, preview = true)
-            holder.setGreyBackgroundColor(composition.visibleBg)
+            holders.bind()
             preferenceStore { setExplorerItemComposition(composition) }
         }
     }

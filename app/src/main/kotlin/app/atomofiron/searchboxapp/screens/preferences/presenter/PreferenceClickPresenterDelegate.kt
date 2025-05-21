@@ -33,7 +33,7 @@ class PreferenceClickPresenterDelegate(
             val adapter: CurtainApi.Adapter<*> = when (controller.requestId) {
                 R.layout.curtain_about -> AboutDelegate(router, appSource)
                 R.layout.curtain_preference_export_import -> ExportImportDelegate(exportImportDelegate)
-                R.layout.curtain_preference_explorer_item -> ExplorerItemDelegate(preferenceStore)
+                R.layout.curtain_preference_explorer_item -> ExplorerItemDelegate(preferenceStore, appStore.resourcesProperty)
                 R.layout.curtain_preference_joystick -> JoystickDelegate(preferenceStore)
                 else -> return@collectForMe
             }
