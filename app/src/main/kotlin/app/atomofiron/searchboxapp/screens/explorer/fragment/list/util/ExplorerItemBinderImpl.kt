@@ -16,6 +16,7 @@ import androidx.core.view.isVisible
 import app.atomofiron.common.util.ifVisible
 import com.google.android.material.checkbox.MaterialCheckBox
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.LemonDrawable
 import app.atomofiron.searchboxapp.custom.drawable.translated
 import app.atomofiron.searchboxapp.custom.view.BallsView
 import app.atomofiron.searchboxapp.model.explorer.*
@@ -110,11 +111,14 @@ class ExplorerItemBinderImpl(
         itemView.setOnLongClickListener(onLongClickListener)
         cbBox.setOnCheckedChangeListener(onCheckListener)
 
-        val thumbnail = (item.content as? NodeContent.File)?.thumbnail
+        val thumbnail = (item.content as? NodeContent.File)
+            ?.takeIf { item.length > 0 }
+            ?.thumbnail
         when (thumbnail) {
             is Thumbnail.FilePath -> Glide
                 .with(itemView.context)
                 .load(thumbnail.value)
+                .error(LemonDrawable())
                 .into(ivThumbnail)
             is Thumbnail.Bitmap -> ivThumbnail.setImageBitmap(thumbnail.value)
             is Thumbnail.Drawable -> ivThumbnail.setImageDrawable(thumbnail.value)
