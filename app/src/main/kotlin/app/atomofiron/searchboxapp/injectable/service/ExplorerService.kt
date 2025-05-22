@@ -77,7 +77,6 @@ class ExplorerService(
                 context.resolveToybox(preferenceStore.toyboxVariant.value)
             }
         }
-        // todo try move out
         val thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size)
         preferenceStore.useSu.collect(appScope) {
             useSuDefined.complete()
