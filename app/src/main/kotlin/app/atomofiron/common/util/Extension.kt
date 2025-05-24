@@ -3,6 +3,7 @@ package app.atomofiron.common.util
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -93,7 +94,11 @@ fun Context.findDimensByAttr(@AttrRes vararg attrs: Int): IntArray {
 }
 
 @ColorInt
-fun Context.findColorByAttr(@AttrRes attr: Int) = ContextCompat.getColor(this, findResIdByAttr(attr))
+fun Context.findColorByAttr(@AttrRes attr: Int): Int {
+    val colorId = findResIdByAttr(attr)
+    if (colorId == 0) return Color.MAGENTA
+    return ContextCompat.getColor(this, colorId)
+}
 
 @ColorInt
 fun Context.materialColor(@AttrRes attr: Int) = MaterialColors.getColor(this, attr, -1)
