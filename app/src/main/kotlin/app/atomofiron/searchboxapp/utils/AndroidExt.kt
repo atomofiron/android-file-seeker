@@ -22,10 +22,8 @@ import android.util.LayoutDirection
 import android.util.TypedValue
 import android.view.Display
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewParent
 import android.view.WindowManager
-import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
 import androidx.annotation.StringRes
@@ -35,7 +33,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ScrollingView
-import androidx.core.view.forEachIndexed
 import androidx.core.view.isEmpty
 import androidx.core.view.updatePadding
 import androidx.documentfile.provider.DocumentFile
@@ -45,12 +42,9 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Data
 import app.atomofiron.common.util.Android
-import app.atomofiron.common.util.MaterialId
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable.Companion.setBallsDrawable
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
-import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.Serializable
@@ -151,33 +145,6 @@ fun Context.getFrequency(): Int {
         }
     }
     return refreshRate?.toInt() ?: DEFAULT_FREQUENCY
-}
-
-fun NavigationBarView.updateItem(itemId: Int, iconId: Int, title: String?, enabled: Boolean? = null) {
-    updateItem(itemId, iconId, null, title, enabled)
-}
-
-fun NavigationBarView.updateItem(itemId: Int, icon: Drawable, title: String?, enabled: Boolean? = null) {
-    updateItem(itemId, 0, icon, title, enabled)
-}
-
-private fun NavigationBarView.updateItem(itemId: Int, iconId: Int, icon: Drawable?, title: String?, enabled: Boolean?) {
-    val menuView = getChildAt(0) as ViewGroup
-    menu.forEachIndexed { index, item ->
-        if (item.itemId != itemId) return@forEachIndexed
-        val itemView = menuView.getChildAt(index)
-        val drawable = when {
-            icon != null -> icon
-            iconId == R.drawable.progress_loop -> {
-                val iv = itemView.findViewById<ImageView>(MaterialId.navigation_bar_item_icon_view)
-                iv.setBallsDrawable()
-            }
-            else -> ContextCompat.getDrawable(context, iconId)
-        }
-        enabled?.let { item.isEnabled = enabled }
-        item.icon = drawable
-        item.title = title
-    }
 }
 
 fun Drawable.updateState(enabled: Boolean? = null, checked: Boolean? = null, activated: Boolean? = null) {
