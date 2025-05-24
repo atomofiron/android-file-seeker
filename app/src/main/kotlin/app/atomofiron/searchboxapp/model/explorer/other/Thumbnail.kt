@@ -27,5 +27,3 @@ sealed interface Thumbnail {
 }
 
 val AndroidBitmap.forNode: Thumbnail get() = Thumbnail.Bitmap(this)
-
-val AndroidDrawable.forNode get() = Thumbnail.Drawable(this)

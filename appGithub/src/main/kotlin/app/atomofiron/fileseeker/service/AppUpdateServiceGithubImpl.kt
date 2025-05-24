@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.network.GithubAsset
 import app.atomofiron.searchboxapp.model.network.GithubRelease
 import app.atomofiron.searchboxapp.model.network.Loading
@@ -96,7 +97,7 @@ class AppUpdateServiceGithubImpl(
                 val state = store.state.value
                 store.set(AppUpdateState.Installing)
                 scope.launch {
-                    val rslt = apks.installApk(file, action = Intents.ACTION_INSTALL_UPDATE, silently = true)
+                    val rslt = apks.installApk(NodeRef(file.path), Intents.ACTION_INSTALL_UPDATE, silently = true)
                     if (rslt is Err) AppUpdateState.Error(rslt.error)
                     if (!context.isGranted(REQUEST_INSTALL_PACKAGES)) {
                         store.set(state)
@@ -143,7 +144,7 @@ class AppUpdateServiceGithubImpl(
         !exists() -> false
         length() != asset.size -> false
         BuildConfig.DEBUG -> true
-        else -> context.packageManager.apkInfo(path)
+        else -> context.packageManager.apkInfo(path, icon = false)
             ?.let { it.versionCode > BuildConfig.VERSION_CODE }== true
     }.let { verified ->
         if (!verified) delete()

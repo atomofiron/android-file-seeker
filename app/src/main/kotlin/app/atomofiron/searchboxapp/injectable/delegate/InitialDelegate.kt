@@ -13,10 +13,11 @@ import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.utils.ExplorerUtils
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppTheme
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDeepBlack
+import androidx.core.content.edit
 
 class InitialDelegate(
     private val context: Context,
-    private val packageManager: PackageManager,
+    packageManager: PackageManager,
 ) {
     companion object {
         private const val PRIVATE_PREFERENCES_NAME = "initial_preferences"
@@ -35,10 +36,10 @@ class InitialDelegate(
     }
 
     fun updateTheme(appTheme: AppTheme) {
-        sp.edit()
-            .putString(KeyAppTheme.name, appTheme.name)
-            .putBoolean(KeyDeepBlack.name, appTheme.deepBlack)
-            .apply()
+        sp.edit {
+            putString(KeyAppTheme.name, appTheme.name)
+            putBoolean(KeyDeepBlack.name, appTheme.deepBlack)
+        }
         applyTheme()
     }
 

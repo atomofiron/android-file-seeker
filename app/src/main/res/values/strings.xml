@@ -1,5 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">File Seeker</string>
+    <string name="ellipsis" translatable="false">…</string>
     <string name="tips">Tips</string>
 
     <string name="case_sens">Case sensitivity</string>
@@ -175,7 +176,7 @@
     <string name="install">Install</string>
     <string name="install_succeeded">Install succeeded</string>
     <string name="launch">Launch</string>
-    <string name="apk_info"><b>Name:</b> %s\nPackage: %s\nVersion: %s (%d)\nMin SDK: %s\nTarget SDK: %s\nCompile SDK: %s\nSigner: %s</string>
+    <string name="apk_info">Package: %s\nVersion: %s\nMin SDK: %s\nTarget SDK: %s\nCompile SDK: %s\nSigner: %s</string>
     <string name="update">Update</string>
     <string name="channel_name_updates">Updates</string>
     <string name="tip">In Files specify where to search</string>
@@ -183,6 +184,7 @@
     <string name="by_default">Reset to default</string>
     <string name="dash" translatable="false">—</string>
     <string name="fix_android_12">Starting from Android 12, the search may be interrupted by the system, which will cause it to partially or fully restart</string>
+    <string name="fetching">Fetching metadata…</string>
     <plurals name="x_dirs">
         <item quantity="zero">%d directories</item>
         <item quantity="one">%d directory</item>

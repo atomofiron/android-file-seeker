@@ -14,6 +14,7 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegate
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
@@ -62,13 +63,14 @@ class MainModule {
         scope: CoroutineScope,
         router: MainRouter,
         appStore: AppStore,
+        operations: FileOperationsDelegate,
         appStoreConsumer: AppStoreConsumer,
         preferenceStore: PreferenceStore,
         updateStore: AppUpdateStore,
         mainChannel: MainChannel,
         updateService: AppUpdateService,
     ): AppEventDelegate {
-        return AppEventDelegate(scope, router, appStore, appStoreConsumer, preferenceStore, updateStore, mainChannel, updateService)
+        return AppEventDelegate(scope, router, appStore, appStoreConsumer, operations, preferenceStore, updateStore, mainChannel, updateService)
     }
 
     @Provides
@@ -87,6 +89,7 @@ class MainModule {
 interface MainDependencies {
     fun windowService(): WindowService
     fun appStore(): AppStore
+    fun fileOperationsDelegate(): FileOperationsDelegate
     fun appStoreConsumer(): AppStoreConsumer
     fun preferenceStore(): PreferenceStore
     fun mainChannel(): MainChannel

@@ -5,27 +5,17 @@ import androidx.annotation.StringRes
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.other.UniText
 
-typealias DialogMakerButton = Pair<UniText, (checked: Boolean) -> Unit>
+typealias DialogButton = Pair<UniText, (checked: Boolean) -> Unit>
 
 interface DialogMaker {
 
+    fun loadingIcon(): Drawable?
+
     operator fun get(text: UniText): String
 
-    fun showError(message: String?)
+    fun showError(message: UniText? = null)
 
-    fun show(
-        icon: Drawable? = null,
-        title: UniText? = null,
-        message: UniText? = null,
-        withCheckbox: CheckBox? = null,
-        cancelable: Boolean,
-        onCancel: (() -> Unit)? = null,
-        onDismiss: (() -> Unit)? = null,
-        neutral: DialogMakerButton? = null,
-        negative: DialogMakerButton? = null,
-        positive: UniText = UniText(R.string.ok),
-        onPositiveClick: (checked: Boolean) -> Unit = { },
-    )
+    infix fun show(config: DialogConfig): DialogUpdater?
 
     enum class CheckBox(@StringRes val label: Int) {
         DontShowAnymore(R.string.dont_show_anymore),
@@ -34,6 +24,6 @@ interface DialogMaker {
 
     companion object {
         val Cancel = Cancel { }
-        fun Cancel(onClick: (checked: Boolean) -> Unit): DialogMakerButton = UniText(R.string.cancel) to onClick
+        fun Cancel(onClick: (checked: Boolean) -> Unit): DialogButton = UniText(R.string.cancel) to onClick
     }
 }

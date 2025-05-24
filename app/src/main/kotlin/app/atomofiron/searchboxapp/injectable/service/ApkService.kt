@@ -4,15 +4,17 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import androidx.core.net.toUri
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.forHumans
 import app.atomofiron.searchboxapp.android.Intents
+import app.atomofiron.searchboxapp.model.explorer.NodeContent.File.AndroidApp
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.launch
 import app.atomofiron.searchboxapp.utils.launchable
 import java.io.BufferedInputStream
-import java.io.File
 import java.io.FileInputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -21,9 +23,15 @@ class ApkService(
     private val context: Context,
     private val installer: PackageInstaller,
 ) {
-    fun installApks(zip: File, action: String? = null, stringId: String? = null): Rslt<Unit> {
-        return ZipInputStream(BufferedInputStream(FileInputStream(zip))).use { stream ->
-            install(zip.length(), action) {
+    fun install(content: AndroidApp, action: String): Rslt<Unit> = when {
+        content.splitApk -> installApks(content, action)
+        else -> installApk(content.ref, action, stringId = content.info?.stringId())
+    }
+
+    private fun installApks(content: AndroidApp, action: String): Rslt<Unit> {
+        val stringId = content.info?.stringId()
+        return ZipInputStream(BufferedInputStream(content.ref.stream())).use { stream ->
+            install(stream.available().toLong(), action) {
                 var entry: ZipEntry? = stream.nextEntry
                     ?: return@install Rslt.Err("archive is empty")
                 while (entry != null) {
@@ -41,13 +49,16 @@ class ApkService(
         }
     }
 
-    fun installApk(file: File, action: String? = null, stringId: String? = null, silently: Boolean = false): Rslt<Unit> {
-        return install(file.length(), action, silently) {
-            openWrite(stringId ?: file.name, 0, file.length()).use { output ->
-                file.inputStream().use { input ->
-                    input.copyTo(output)
+    fun installApk(ref: NodeRef, action: String, stringId: String? = null, silently: Boolean = false): Rslt<Unit> {
+        val stream = ref.stream()
+        stream ?: return Rslt.Err("unknown error")
+        val length = stream.available().toLong()
+        return install(length, action, silently) {
+            openWrite(stringId ?: "unused", 0, length).use { output ->
+                stream.use {
+                    it.copyTo(output)
+                    fsync(output)
                 }
-                fsync(output)
             }
             return@install Rslt.Ok()
         }
@@ -55,7 +66,7 @@ class ApkService(
 
     private fun install(
         length: Long,
-        action: String? = null,
+        action: String,
         silently: Boolean = false,
         block: PackageInstaller.Session.() -> Rslt<Unit>,
     ) = try {
@@ -89,4 +100,9 @@ class ApkService(
     fun launchable(packageName: String): Boolean = context.packageManager.launchable(packageName)
 
     fun launchApk(packageName: String) = context.launch(packageName)
+
+    private fun NodeRef.stream() = when {
+        isContent -> context.contentResolver.openInputStream(path.toUri())
+        else -> FileInputStream(path)
+    }
 }

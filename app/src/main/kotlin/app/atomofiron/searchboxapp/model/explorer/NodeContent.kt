@@ -41,19 +41,40 @@ sealed class NodeContent(
         override val isCached: Boolean get() = thumbnail != null
 
         data class Movie(
+            override val thumbnail: Thumbnail,
             val duration: Int = 0,
-            override val thumbnail: Thumbnail? = null,
-        ) : File()
+        ) : File() {
+            override val isCached: Boolean = duration > -1
+            constructor(path: String) : this(Thumbnail(path))
+        }
+
         data class Music(
             val duration: Int = 0,
             override val thumbnail: Thumbnail? = null,
         ) : File(mimeType = "audio/*")
-        sealed class Picture(mimeType: String) : File(mimeType) {
-            data class Png(override val thumbnail: Thumbnail? = null) : Picture("image/png")
-            data class Jpeg(override val thumbnail: Thumbnail? = null) : Picture("image/jpeg")
-            data class Gif(override val thumbnail: Thumbnail? = null) : Picture("image/gif")
-            data class Webp(override val thumbnail: Thumbnail? = null) : Picture("image/webp")
-            data class Avif(override val thumbnail: Thumbnail? = null) : Picture("image/avif")
+
+        sealed class Picture(
+            mimeType: String,
+            override val details: String? = "", // todo
+        ) : File(mimeType) { // todo remove children
+
+            override val isCached: Boolean = details != null
+
+            data class Png(val path: String) : Picture("image/png") {
+                override val thumbnail = Thumbnail(path)
+            }
+            data class Jpeg(val path: String) : Picture("image/jpeg") {
+                override val thumbnail = Thumbnail(path)
+            }
+            data class Gif(val path: String) : Picture("image/gif") {
+                override val thumbnail = Thumbnail(path)
+            }
+            data class Webp(val path: String) : Picture("image/webp") {
+                override val thumbnail = Thumbnail(path)
+            }
+            data class Avif(val path: String) : Picture("image/avif") {
+                override val thumbnail = Thumbnail(path)
+            }
         }
 
         sealed class Archive(mimeType: String) : File(mimeType) {
@@ -70,16 +91,21 @@ sealed class NodeContent(
         data class Tar(override val children: List<Node>? = null) : Archive("application/x-tar")
         data class Rar(override val children: List<Node>? = null) : Archive("application/vnd.rar")
 
-        data class AndroidApp(
-            override val thumbnail: Thumbnail? = null,
-            val info: ApkInfo? = null,
-            val splitApk: Boolean = false, // todo
-        ) : Archive(if (splitApk) "application/zip" else "application/vnd.android.package-archive") {
-            override val details: String? = info?.versionName
 
+        data class AndroidApp private constructor(
+            val ref: NodeRef,
+            val splitApk: Boolean,
+            val info: ApkInfo? = null,
+        ) : Archive(mimeType = if (splitApk) "application/zip" else "application/vnd.android.package-archive") {
+            override val details: String? = info?.versionName
+            override val thumbnail: Thumbnail? get() = info?.icon
+
+            @Suppress("FunctionName")
             companion object {
-                fun Apk() = AndroidApp(splitApk = false)
-                fun Apks() = AndroidApp(splitApk = true)
+                fun Apk(path: String) = Apk(NodeRef(path))
+                fun Apks(path: String) = Apks(NodeRef(path))
+                fun Apk(ref: NodeRef, info: ApkInfo? = null) = AndroidApp(ref, splitApk = false, info)
+                fun Apks(ref: NodeRef, info: ApkInfo? = null) = AndroidApp(ref, splitApk = true, info)
             }
         }
 

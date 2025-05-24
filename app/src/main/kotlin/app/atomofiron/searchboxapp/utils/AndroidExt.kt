@@ -16,6 +16,7 @@ import android.os.Build.VERSION_CODES.P
 import android.os.Build.VERSION_CODES.TIRAMISU
 import android.os.Bundle
 import android.os.Parcelable
+import android.provider.OpenableColumns
 import android.util.AttributeSet
 import android.util.LayoutDirection
 import android.util.TypedValue
@@ -51,6 +52,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.snackbar.Snackbar
+import java.io.File
 import java.io.Serializable
 import java.util.Locale
 import kotlin.math.max
@@ -318,3 +320,18 @@ fun Context.document(uri: Uri) = DocumentFile.fromSingleUri(this, uri)!!
 fun View.dpf(value: Int) = (resources.displayMetrics.density * value)
 
 fun View.dp(value: Int) = dpf(value).roundToInt()
+
+fun Uri.name(context: Context): String? {
+    val path = path ?: return null
+    if (scheme == Const.SCHEME_CONTENT) {
+        context.contentResolver.query(this, null, null, null, null)?.use { cursor ->
+            val index = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+            if (index != -1 && cursor.moveToFirst()) {
+                return cursor.getString(index)
+            }
+        }
+    } else if (scheme == Const.SCHEME_FILE) {
+        return File(path).name
+    }
+    return null
+}

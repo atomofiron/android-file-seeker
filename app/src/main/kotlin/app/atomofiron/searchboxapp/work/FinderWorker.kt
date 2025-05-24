@@ -32,7 +32,6 @@ import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.*
-import app.atomofiron.searchboxapp.utils.Const.UNDEFINEDL
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.name
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import kotlinx.coroutines.*
@@ -80,7 +79,7 @@ class FinderWorker(
     private val useRegex = inputData.getBoolean(KEY_USE_REGEX, false)
     private val query: String = inputData.getString(KEY_QUERY) ?: ""
     private lateinit var pattern: Pattern
-    private val maxSize = inputData.getLong(KEY_MAX_SIZE, UNDEFINEDL)
+    private val maxSize = inputData.getLong(KEY_MAX_SIZE, 0L)
     private val ignoreCase = inputData.getBoolean(KEY_CASE_INSENSITIVE, false)
     private val excludeDirs = inputData.getBoolean(KEY_EXCLUDE_DIRS, false)
     private val forContent = inputData.getBoolean(KEY_FOR_CONTENT, false)

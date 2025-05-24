@@ -170,13 +170,14 @@
     <string name="install">Установить</string>
     <string name="install_succeeded">Установка выполнена</string>
     <string name="launch">Запустить</string>
-    <string name="apk_info">Название: %s\nИмя пакета: %s\nВерсия: %s (%d)\nМинимальная SDK: %s\nЦелевая SDK: %s\nСборочная SDK: %s\nПодписавший: %s</string>
+    <string name="apk_info">Название: %s\nИмя пакета: %s\nВерсия: %s\nМинимальная SDK: %s\nЦелевая SDK: %s\nСборочная SDK: %s\nПодписавший: %s</string>
     <string name="update">Обновить</string>
     <string name="channel_name_updates">Обновления</string>
     <string name="tip">В Файлах укажите где искать</string>
     <string name="search_here">Ищем здесь:</string>
     <string name="by_default">Цвет по умолчанию</string>
     <string name="fix_android_12">Начиная с 12 версии Android поиск может прерываться системой, из-за чего он будет частично или полностью перезапускаться</string>
+    <string name="fetching">Получение метаданных…</string>
     <plurals name="x_dirs">
         <item quantity="one">%d директория</item>
         <item quantity="few">%d директории</item>

@@ -15,3 +15,6 @@ inline infix fun <T> Boolean.then(action: () -> T): T? {
 inline infix fun <T> Boolean.then(value: T): T? {
     return value.takeIf { this }
 }
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Any?.unit() = Unit

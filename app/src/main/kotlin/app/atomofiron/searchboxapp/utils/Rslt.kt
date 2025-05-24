@@ -12,6 +12,12 @@ sealed interface Rslt<T> {
 
 fun <T> T.toRslt() = Rslt.Ok(this)
 
+@Suppress("NOTHING_TO_INLINE")
+inline fun <T> Rslt<T>.unwrapOr(value: T): T = when (this) {
+    is Rslt.Ok -> data
+    is Rslt.Err -> value
+}
+
 inline fun <T> Rslt<T>.unwrapOrElse(action: (error: String) -> T): T = when (this) {
     is Rslt.Ok -> data
     is Rslt.Err -> action(error)

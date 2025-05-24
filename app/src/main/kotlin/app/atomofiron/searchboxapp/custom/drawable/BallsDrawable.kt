@@ -2,7 +2,9 @@ package app.atomofiron.searchboxapp.custom.drawable
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.Paint
 import android.graphics.Path
@@ -24,16 +26,26 @@ private enum class Flag {
     Visible, Attached, Set
 }
 
+// todo replace flags with checking of visibility and drawing
+// todo create the new animation
+
 class BallsDrawable private constructor(
-    context: Context,
+    color: Int,
     private val intrinsicSize: Size,
+    flag: Flag? = null,
 ) : Drawable(), ValueAnimator.AnimatorUpdateListener, View.OnAttachStateChangeListener {
     companion object {
         private const val DURATION = 512L
 
+        operator fun invoke(context: Context): BallsDrawable {
+            val color = context.findColorByAttr(MaterialAttr.colorAccent)
+            return BallsDrawable(color, Size(100, 100), Flag.Attached)
+        }
+
         fun ImageView.setBallsDrawable(): BallsDrawable {
             val intrinsicSize = resources.getDimensionPixelSize(R.dimen.icon_size)
-            val drawable = BallsDrawable(context, Size(intrinsicSize, intrinsicSize))
+            val color = context.findColorByAttr(MaterialAttr.colorAccent)
+            val drawable = BallsDrawable(color, Size(intrinsicSize, intrinsicSize))
             drawable.callback = WeakDrawableCallback(this)
             setImageDrawable(drawable)
             drawable.checkSet()
@@ -54,9 +66,9 @@ class BallsDrawable private constructor(
     private val flags = mutableSetOf<Flag>()
 
     init {
-        val colorAccent = context.findColorByAttr(MaterialAttr.colorAccent)
-        paintCircle.color = colorAccent
-        paintBall.color = colorAccent
+        flag?.let { flags.add(it) }
+        paintCircle.color = color
+        paintBall.color = color
         if (oneBall) {
             paintBall.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
         }
@@ -98,6 +110,7 @@ class BallsDrawable private constructor(
 
     override fun setBounds(left: Int, top: Int, right: Int, bottom: Int) {
         super.setBounds(left, top, right, bottom)
+        checkSet()
 
         val width = (right - left).toFloat()
         val height = (bottom - top).toFloat()
@@ -149,6 +162,11 @@ class BallsDrawable private constructor(
     override fun setAlpha(alpha: Int) = Unit
 
     override fun setColorFilter(colorFilter: ColorFilter?) = Unit
+
+    override fun setTintList(tint: ColorStateList?) {
+        super.setTintList(tint)
+        setColor(tint?.defaultColor ?: Color.TRANSPARENT)
+    }
 
     @Deprecated("", ReplaceWith(""))
     override fun getOpacity(): Int = PixelFormat.UNKNOWN

@@ -6,14 +6,15 @@ import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent
+import app.atomofiron.searchboxapp.model.explorer.NodeContent.File.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.Operation
+import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
+import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.utils.Rslt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 
 class ApkInteractor(
     private val scope: CoroutineScope,
@@ -22,41 +23,44 @@ class ApkInteractor(
     private val dialogs: DialogMaker,
 ) {
     fun install(item: Node, tab: NodeTabKey? = null) {
-        val content = item.content as? NodeContent.File.AndroidApp
+        val content = item.content as? AndroidApp
         content ?: return
-        val file = File(item.path)
+        install(content, tab)
+    }
+
+    fun install(content: AndroidApp, tab: NodeTabKey? = null) {
         scope.launch(Dispatchers.IO) {
             if (tab != null) {
-                val allowed = explorerService.tryMarkInstalling(tab, item, Operation.Installing)
+                val allowed = explorerService.tryMarkInstalling(tab, content.ref, Operation.Installing)
                 if (allowed != true) return@launch
-                explorerService.tryMarkInstalling(tab, item, installing = null)
+                explorerService.tryMarkInstalling(tab, content.ref, installing = null)
             }
-            val stringId = content.info?.stringId()
-            val result = when {
-                content.splitApk -> apkService.installApks(file, stringId = stringId, action = Intents.ACTION_INSTALL_APP)
-                else -> apkService.installApk(file, stringId = stringId, action = Intents.ACTION_INSTALL_APP)
-            }
+            val result = apkService.install(content, Intents.ACTION_INSTALL_APP)
             if (result is Rslt.Err) {
                 withMain {
-                    dialogs.showError(result.error)
+                    dialogs.showError(UniText(result.error))
                 }
             }
         }
     }
 
     fun launchable(item: Node): Boolean {
-        val info = (item.content as? NodeContent.File.AndroidApp)?.info
+        val info = (item.content as? AndroidApp)?.info
+        return launchable(info)
+    }
+
+    fun launchable(info: ApkInfo?): Boolean {
         info ?: return false
         return apkService.launchable(info.packageName)
     }
 
     fun launch(item: Node) {
-        val content = item.content as? NodeContent.File.AndroidApp
-        launch(content ?: return)
+        val content = item.content as? AndroidApp
+        launch(content?.info ?: return)
     }
 
-    fun launch(content: NodeContent.File.AndroidApp) {
-        val info = content.info ?: return
+    fun launch(info: ApkInfo?) {
+        info ?: return
         apkService.launchApk(info.packageName)
     }
 }

@@ -469,12 +469,12 @@ class ExplorerService(
         }
     }
 
-    suspend fun tryMarkInstalling(tab: NodeTabKey?, item: Node, installing: Operation.Installing?): Boolean? {
+    suspend fun tryMarkInstalling(tab: NodeTabKey?, ref: NodeRef, installing: Operation.Installing?): Boolean? {
         return withGarden {
-            var state = states.find { it.uniqueId == item.uniqueId }
+            var state = states.find { it.uniqueId == ref.uniqueId }
             if (state?.operation == installing) return false
-            state = states.updateState(item.uniqueId) {
-                nextState(item.uniqueId, installing = installing)
+            state = states.updateState(ref.uniqueId) {
+                nextState(ref.uniqueId, installing = installing)
             }
             (state?.operation == installing).also {
                 if (it) tab?.let { get(tab)?.render() }

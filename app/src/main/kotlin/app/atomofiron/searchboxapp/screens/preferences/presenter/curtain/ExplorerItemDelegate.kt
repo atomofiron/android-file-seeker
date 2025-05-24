@@ -3,10 +3,8 @@ package app.atomofiron.searchboxapp.screens.preferences.presenter.curtain
 import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.*
+import android.widget.CompoundButton
 import app.atomofiron.common.util.property.StrongProperty
-import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.fileseeker.BuildConfig.VERSION_NAME
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainPreferenceExplorerItemBinding
@@ -15,6 +13,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
@@ -36,11 +35,10 @@ class ExplorerItemDelegate(
         Node(path = "", properties = properties, content = dirContent, children = children)
     }
     private val file = run {
-        val name = "File Seeker ${resources.value?.getString(R.string.version_name) ?: VERSION_NAME}.apk"
+        val name = "File Seeker ${resources.value.getString(R.string.version_name)}.apk"
         val properties = NodeProperties("drwxrwx---", "owner", "group", "47K", "2038-01-19", "03:14", name)
-        val thumbnail = Thumbnail(R.mipmap.ic_launcher)
-        val apkInfo = ApkInfo("", VERSION_NAME, 0, "", 0, 0, null, null)
-        val content = NodeContent.File.AndroidApp(thumbnail, apkInfo)
+        val apkInfo = ApkInfo(Thumbnail(R.mipmap.ic_launcher), "", VERSION_NAME, 0, "", 0, 0, null, null)
+        val content = NodeContent.File.AndroidApp.Apk(NodeRef(""), apkInfo)
         Node(path = "", properties = properties, content = content)
     }
 

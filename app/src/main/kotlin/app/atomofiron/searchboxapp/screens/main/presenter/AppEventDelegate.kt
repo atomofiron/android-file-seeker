@@ -18,9 +18,11 @@ import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.AppStoreConsumer
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
 import app.atomofiron.searchboxapp.model.other.UpdateNotification
 import app.atomofiron.searchboxapp.model.preference.AppTheme
+import app.atomofiron.searchboxapp.screens.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.main.MainRouter
 import kotlinx.coroutines.CoroutineScope
 
@@ -37,6 +39,7 @@ class AppEventDelegate(
     private val router: MainRouter,
     private val appStore: AppStore,
     private val appStoreConsumer: AppStoreConsumer,
+    private val operations: FileOperationsDelegate,
     private val preferences: PreferenceStore,
     updateStore: AppUpdateStore,
     private val mainChannel: MainChannel,
@@ -58,6 +61,7 @@ class AppEventDelegate(
 
     override fun onIntent(intent: Intent) {
         when (intent.action) {
+            Intent.ACTION_VIEW -> intent.data?.viewFile()
             Intent.ACTION_SEND -> {
                 val uri = when {
                     Android.T -> intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
@@ -113,4 +117,6 @@ class AppEventDelegate(
             else -> context.dismissUpdateNotification()
         }
     }
+
+    private fun Uri.viewFile() = operations.askForApks(NodeRef(path = toString()), context.contentResolver)
 }

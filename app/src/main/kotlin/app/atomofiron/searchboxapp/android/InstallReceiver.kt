@@ -10,6 +10,7 @@ import android.content.pm.PackageInstaller.STATUS_FAILURE
 import android.content.pm.PackageInstaller.STATUS_PENDING_USER_ACTION
 import android.content.pm.PackageInstaller.STATUS_SUCCESS
 import androidx.core.content.IntentCompat
+import app.atomofiron.common.util.DialogConfig
 import app.atomofiron.common.util.DialogMaker
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.DaggerInjector
@@ -39,18 +40,22 @@ class InstallReceiver : BroadcastReceiver() {
     private fun Context.showError(intent: Intent) {
         inject()
         val message = intent.getStringExtra(EXTRA_STATUS_MESSAGE) ?: getString(R.string.unknown_error)
-        dialogs.showError(message)
+        dialogs.showError(UniText(message))
     }
 
     private fun Context.offerLaunch(intent: Intent) {
         inject()
         val packageName = intent.getStringExtra(EXTRA_PACKAGE_NAME)
-        dialogs.show(
-            cancelable = false,
+        dialogs show DialogConfig(
+            cancelable = true,
             title = UniText(R.string.install_succeeded),
             negative = DialogMaker.Cancel,
             positive = UniText(R.string.launch),
-            onPositiveClick = { launch(packageName.toString()) },
+            onPositiveClick = {
+                if (!launch(packageName.toString())) {
+                    dialogs.showError()
+                }
+            },
         )
     }
 
