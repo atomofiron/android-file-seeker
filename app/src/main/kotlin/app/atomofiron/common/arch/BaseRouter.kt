@@ -9,8 +9,8 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.*
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
-import app.atomofiron.common.util.DialogDelegateImpl
-import app.atomofiron.common.util.DialogDelegate
+import app.atomofiron.common.util.dialog.DialogDelegate
+import app.atomofiron.common.util.dialog.DialogDelegateImpl
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R

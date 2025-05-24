@@ -1,4 +1,4 @@
-package app.atomofiron.common.util
+package app.atomofiron.common.util.dialog
 
 import android.content.ClipboardManager
 import android.content.Context
@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.extension.copy
 import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.common.util.withNotNull
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.DialogCheckboxBinding
 import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable

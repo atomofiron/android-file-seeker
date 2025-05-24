@@ -1,4 +1,4 @@
-package app.atomofiron.common.util
+package app.atomofiron.common.util.dialog
 
 interface DialogUpdater {
     fun update(action: DialogConfig.() -> DialogConfig)

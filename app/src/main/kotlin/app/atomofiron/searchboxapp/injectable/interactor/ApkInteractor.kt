@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.injectable.interactor
 
-import app.atomofiron.common.util.DialogDelegate
+import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.injectable.service.ApkService

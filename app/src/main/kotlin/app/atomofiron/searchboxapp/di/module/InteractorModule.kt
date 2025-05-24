@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.di.module
 
-import app.atomofiron.common.util.DialogDelegate
+import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService

@@ -10,8 +10,8 @@ import android.content.pm.PackageInstaller.STATUS_FAILURE
 import android.content.pm.PackageInstaller.STATUS_PENDING_USER_ACTION
 import android.content.pm.PackageInstaller.STATUS_SUCCESS
 import androidx.core.content.IntentCompat
-import app.atomofiron.common.util.DialogConfig
-import app.atomofiron.common.util.DialogDelegate
+import app.atomofiron.common.util.dialog.DialogConfig
+import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.model.other.UniText

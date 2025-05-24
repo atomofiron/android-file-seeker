@@ -1,4 +1,4 @@
-package app.atomofiron.common.util
+package app.atomofiron.common.util.dialog
 
 import android.graphics.drawable.Drawable
 import app.atomofiron.fileseeker.R
