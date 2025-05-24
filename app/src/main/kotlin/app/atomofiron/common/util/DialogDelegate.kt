@@ -7,7 +7,7 @@ import app.atomofiron.searchboxapp.model.other.UniText
 
 typealias DialogButton = Pair<UniText, (checked: Boolean) -> Unit>
 
-interface DialogMaker {
+interface DialogDelegate {
 
     fun loadingIcon(): Drawable?
 

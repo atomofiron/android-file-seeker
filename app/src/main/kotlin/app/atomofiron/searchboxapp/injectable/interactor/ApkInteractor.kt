@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.injectable.interactor
 
-import app.atomofiron.common.util.DialogMaker
+import app.atomofiron.common.util.DialogDelegate
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.injectable.service.ApkService
@@ -20,7 +20,7 @@ class ApkInteractor(
     private val scope: CoroutineScope,
     private val apkService: ApkService,
     private val explorerService: ExplorerService,
-    private val dialogs: DialogMaker,
+    private val dialogs: DialogDelegate,
 ) {
     fun install(item: Node, tab: NodeTabKey? = null) {
         val content = item.content as? AndroidApp

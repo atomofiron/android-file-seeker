@@ -8,7 +8,7 @@ data class DialogConfig(
     val icon: Drawable? = null,
     val title: UniText? = null,
     val message: UniText? = null,
-    val withCheckbox: DialogMaker.CheckBox? = null,
+    val withCheckbox: DialogDelegate.CheckBox? = null,
     val cancelable: Boolean,
     val onCancel: (() -> Unit)? = null,
     val onDismiss: (() -> Unit)? = null,

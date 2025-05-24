@@ -4,7 +4,7 @@ import android.content.ContentResolver
 import androidx.core.net.toUri
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.DialogConfig
-import app.atomofiron.common.util.DialogMaker
+import app.atomofiron.common.util.DialogDelegate
 import app.atomofiron.common.util.extension.then
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.fileseeker.R
@@ -36,7 +36,7 @@ private val manyFilesOptions = listOf(R.id.menu_delete)
 class FileOperationsDelegate(
     preferences: PreferenceStore,
     private val apks: ApkInteractor,
-    private val dialogs: DialogMaker,
+    private val dialogs: DialogDelegate,
 ) {
     private val itemComposition by preferences.explorerItemComposition
 
@@ -70,7 +70,7 @@ class FileOperationsDelegate(
             icon = info.icon?.drawable,
             title = UniText(info.appName),
             message = info.toMessage(),
-            negative = DialogMaker.Cancel,
+            negative = DialogDelegate.Cancel,
             positive = UniText(R.string.install),
             onPositiveClick = { apks.install(content, tab) },
             neutral = apks.launchable(info) then { UniText(R.string.launch) to { apks.launch(info) } },
@@ -85,7 +85,7 @@ class FileOperationsDelegate(
             icon = dialogs.loadingIcon(),
             title = UniText(R.string.fetching),
             message = null.toMessage(),
-            negative = DialogMaker.Cancel,
+            negative = DialogDelegate.Cancel,
             positive = UniText(R.string.install),
             onPositiveClick = { apks.install(content) },
             onDismiss = { scope?.cancel() }
@@ -113,7 +113,7 @@ class FileOperationsDelegate(
                         icon = info.icon?.drawable,
                         title = UniText(info.appName),
                         message = info.toMessage(),
-                        negative = DialogMaker.Cancel,
+                        negative = DialogDelegate.Cancel,
                         positive = UniText(R.string.install),
                         neutral = apks.launchable(info) then { UniText(R.string.launch) to { apks.launch(info) } },
                     )

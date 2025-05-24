@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.di.module
 
-import app.atomofiron.common.util.DialogMaker
+import app.atomofiron.common.util.DialogDelegate
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
@@ -18,6 +18,6 @@ class InteractorModule {
         appStore: AppStore,
         apkService: ApkService,
         explorerService: ExplorerService,
-        dialogs: DialogMaker,
+        dialogs: DialogDelegate,
     ): ApkInteractor = ApkInteractor(appStore.appScope, apkService, explorerService, dialogs)
 }

@@ -23,7 +23,7 @@ import kotlin.LazyThreadSafetyMode.NONE
 
 private const val STUB = "stub"
 
-class DialogDelegateImpl(activity: WeakProperty<out FragmentActivity>) : DialogMaker {
+class DialogDelegateImpl(activity: WeakProperty<out FragmentActivity>) : DialogDelegate {
 
     private val activity by activity
     private val resources get() = activity?.resources

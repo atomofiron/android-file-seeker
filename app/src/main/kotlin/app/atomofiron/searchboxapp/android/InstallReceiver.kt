@@ -11,7 +11,7 @@ import android.content.pm.PackageInstaller.STATUS_PENDING_USER_ACTION
 import android.content.pm.PackageInstaller.STATUS_SUCCESS
 import androidx.core.content.IntentCompat
 import app.atomofiron.common.util.DialogConfig
-import app.atomofiron.common.util.DialogMaker
+import app.atomofiron.common.util.DialogDelegate
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.model.other.UniText
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class InstallReceiver : BroadcastReceiver() {
 
     @Inject
-    lateinit var dialogs: DialogMaker
+    lateinit var dialogs: DialogDelegate
 
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.getIntExtra(EXTRA_STATUS, STATUS_FAILURE)) {
@@ -49,7 +49,7 @@ class InstallReceiver : BroadcastReceiver() {
         dialogs show DialogConfig(
             cancelable = true,
             title = UniText(R.string.install_succeeded),
-            negative = DialogMaker.Cancel,
+            negative = DialogDelegate.Cancel,
             positive = UniText(R.string.launch),
             onPositiveClick = {
                 if (!launch(packageName.toString())) {
