@@ -100,7 +100,6 @@ class FileOperationsDelegate(
             else -> FileInputStream(ref.path)
         }
         val job = scope.launch {
-            delay(3000)
             content = content
                 .getApksContent(stream)
                 .also { stream?.close() }
