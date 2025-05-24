@@ -12,6 +12,7 @@
         android:id="@+id/item_explorer_ps"
         android:layout_width="@dimen/common_size"
         android:layout_height="@dimen/common_size"
+        app:fillCenter="false"
         app:layout_constraintStart_toStartOf="@+id/progress_tv_label"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/progress_tv_label"

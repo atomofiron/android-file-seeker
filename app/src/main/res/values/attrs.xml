@@ -25,7 +25,7 @@
     </declare-styleable>
 
     <declare-styleable name="BallsView">
-        <attr name="oneBall" format="boolean" />
+        <attr name="fillCenter" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="SystemUiBackgroundView">

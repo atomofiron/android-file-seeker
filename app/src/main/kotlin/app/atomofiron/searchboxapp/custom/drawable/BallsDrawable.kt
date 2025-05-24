@@ -8,9 +8,8 @@ import android.graphics.Color
 import android.graphics.ColorFilter
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.Path.Direction
 import android.graphics.PixelFormat
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.Drawable
 import android.util.Size
 import android.view.animation.LinearInterpolator
@@ -19,56 +18,55 @@ import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import kotlin.math.cos
-import kotlin.math.min
+import kotlin.math.max
+import kotlin.math.pow
 import kotlin.math.sin
 
-// todo create the new animation
-
+private const val DURATION = 512L
 private const val START = 0f
+private const val PI = Math.PI.toFloat()
+private const val END = PI
+private const val EPSILON = 0.05f
+private const val ARC_60 = 60f
+private const val OFFSET_90 = 90f
+private const val OFFSET_180 = 180f
 
 class BallsDrawable private constructor(
     color: Int,
+    private val fillCenter: Boolean,
     private val intrinsicSize: Size,
 ) : Drawable(), ValueAnimator.AnimatorUpdateListener {
     companion object {
-        private const val DURATION = 512L
 
-        operator fun invoke(context: Context): BallsDrawable {
+        operator fun invoke(context: Context, fillCenter: Boolean = true): BallsDrawable {
             val color = context.findColorByAttr(MaterialAttr.colorAccent)
-            return BallsDrawable(color, Size(100, 100))
+            val intrinsicSize = context.resources.getDimensionPixelSize(R.dimen.icon_size)
+            return BallsDrawable(color, fillCenter, Size(intrinsicSize, intrinsicSize))
         }
 
-        fun ImageView.setBallsDrawable(): BallsDrawable {
-            val intrinsicSize = resources.getDimensionPixelSize(R.dimen.icon_size)
-            val color = context.findColorByAttr(MaterialAttr.colorAccent)
-            val drawable = BallsDrawable(color, Size(intrinsicSize, intrinsicSize))
+        fun ImageView.setBallsDrawable(fillCenter: Boolean = true): BallsDrawable {
+            val drawable = BallsDrawable(context, fillCenter)
             setImageDrawable(drawable)
             return drawable
         }
     }
 
-    private var oneBall = false
-    private val paintCircle = Paint()
-    private val paintBall = Paint()
+    private val paint = Paint()
     private var animValue = START
     private var invalidated = true
 
-    private val ballCirclePath = Path()
-    private val animator = ValueAnimator.ofFloat(0f, Math.PI.toFloat())
+    private val path = Path()
+    private val animator = ValueAnimator.ofFloat(START, END)
 
     init {
-        paintCircle.color = color
-        paintBall.color = color
-        if (oneBall) {
-            paintBall.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
-        }
-        animator.duration = DURATION
+        paint.isAntiAlias = true
+        paint.color = color
+        paint.strokeCap = Paint.Cap.ROUND
+        animator.duration = DURATION * if (fillCenter) 1 else 2
         animator.repeatCount = ValueAnimator.INFINITE
         animator.repeatMode = ValueAnimator.RESTART
         animator.interpolator = LinearInterpolator()
-
-        paintBall.isAntiAlias = true
-        paintCircle.isAntiAlias = true
+        path.fillType = Path.FillType.EVEN_ODD
     }
 
     override fun getIntrinsicWidth(): Int = intrinsicSize.width
@@ -88,45 +86,13 @@ class BallsDrawable private constructor(
         }
     }
 
-    override fun setBounds(left: Int, top: Int, right: Int, bottom: Int) {
-        super.setBounds(left, top, right, bottom)
-
-        val width = (right - left).toFloat()
-        val height = (bottom - top).toFloat()
-        val centerX = width / 2
-        val centerY = height / 2
-        var size = min(width, height)
-        size -= size % 2
-        val radius = size / 6
-        val radiusMask = size / 2
-        ballCirclePath.addCircle(centerX, centerY - radiusMask - radius, radiusMask, Path.Direction.CW)
-        ballCirclePath.addCircle(centerX, centerY + radiusMask + radius, radiusMask, Path.Direction.CW)
-    }
-
     override fun draw(canvas: Canvas) {
-        val width = bounds.width()
-        val height = bounds.height()
-        val centerX = width.toFloat() / 2
-        val centerY = height.toFloat() / 2
-        var size = min(width, height).toFloat()
-        size -= size % 2
-        val radius = size / 6
-        val radiusRotate = size / (if (oneBall) 4 else 3)
-        val radiusMask = size / 2
-        val sin = sin(animValue) * radiusRotate
-        val cos = cos(animValue) * radiusRotate
-        val x1 = centerX + cos
-        val y1 = centerY + sin
-
-        if (oneBall) {
-            canvas.drawCircle(centerX, centerY, radiusMask, paintCircle)
-            canvas.drawCircle(x1, y1, radius, paintBall)
+        if (fillCenter) {
+            canvas.draw(slugs = true, animValue)
+            canvas.drawMuons()
         } else {
-            val x2 = centerX - cos
-            val y2 = centerY - sin
-            canvas.clipPath(ballCirclePath)
-            canvas.drawCircle(x1, y1, radius, paintBall)
-            canvas.drawCircle(x2, y2, radius, paintBall)
+            canvas.draw(slugs = false, animValue)
+            canvas.draw(slugs = false, animValue - PI / 2)
         }
         invalidated = false
         anim(true)
@@ -140,13 +106,47 @@ class BallsDrawable private constructor(
         animValue = new
         invalidateSelf()
         invalidated = true
+        path.reset()
+
+        var width = bounds.width().toFloat()
+        val inset = width / 8
+        width -= inset * 2
+        val centerY = bounds.height() / 2f
+        val radius = width / 4
+        val x = radius + width / 2 * (cos(new) / 2 + 0.5f)
+        val scale = radius * sin(new) / 2
+        path.addCircle(inset + x, centerY, radius + scale, Direction.CW)
+        path.addCircle(inset + width - x, centerY, radius - scale, Direction.CW)
+    }
+
+    private fun Canvas.drawMuons() {
+        paint.style = Paint.Style.FILL
+        drawPath(path, paint)
+    }
+
+    private fun Canvas.draw(slugs: Boolean, value: Float) {
+        val width = bounds.width()
+        val height = bounds.height()
+        val offset = OFFSET_180 * value / END // 0..180
+        val cos = cos(value * 2).inc() / 2 // 0..1
+        val sweepAngle = if (slugs) max(EPSILON, ARC_60 * (1 - cos)) else EPSILON
+        val startAngle = OFFSET_90 + offset - sweepAngle / 2
+        val stroke = width / 16
+        paint.strokeWidth = when {
+            slugs -> stroke + stroke * cos.pow(2) * 3
+            else -> max(0f, -stroke + stroke * cos.pow(2) * 6)
+        }
+        val inset = paint.strokeWidth / 2
+        paint.style = Paint.Style.STROKE
+        drawArc(inset, inset, width - inset, height - inset, startAngle, sweepAngle, false, paint)
+        drawArc(inset, inset, width - inset, height - inset, startAngle + OFFSET_180, sweepAngle, false, paint)
+
     }
 
     override fun setAlpha(alpha: Int) = Unit
 
     override fun setColorFilter(colorFilter: ColorFilter?) {
-        paintBall.setColorFilter(colorFilter)
-        paintCircle.setColorFilter(colorFilter)
+        paint.setColorFilter(colorFilter)
     }
 
     override fun setTintList(tint: ColorStateList?) {
@@ -158,7 +158,6 @@ class BallsDrawable private constructor(
     override fun getOpacity(): Int = PixelFormat.UNKNOWN
 
     fun setColor(color: Int) {
-        paintCircle.color = color
-        paintBall.color = color
+        paint.color = color
     }
 }

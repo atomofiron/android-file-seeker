@@ -5,6 +5,7 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable
 import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable.Companion.setBallsDrawable
 
 class BallsView @JvmOverloads constructor(
@@ -13,11 +14,12 @@ class BallsView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : AppCompatImageView(context, attrs, defStyleAttr) {
 
-    private val drawable = setBallsDrawable()
+    private val drawable: BallsDrawable
 
     init {
         val styled = context.obtainStyledAttributes(attrs, R.styleable.BallsView, defStyleAttr, 0)
-        val oneBall = styled.getBoolean(R.styleable.BallsView_oneBall, true)
+        val fillCenter = styled.getBoolean(R.styleable.BallsView_fillCenter, true)
+        drawable = setBallsDrawable(fillCenter)
         styled.recycle()
 
         setLayerType(LAYER_TYPE_HARDWARE, null)
