@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.di.module
 
-import app.atomofiron.common.util.DialogDelegate
+import app.atomofiron.common.util.DialogDelegateImpl
 import app.atomofiron.common.util.DialogMaker
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.store.AppStore
@@ -15,7 +15,7 @@ open class DelegateModule {
 
     @Provides
     @Singleton
-    open fun provideDialogMaker(appStore: AppStore): DialogMaker = DialogDelegate(appStore.activityProperty)
+    open fun provideDialogMaker(appStore: AppStore): DialogMaker = DialogDelegateImpl(appStore.activityProperty)
 
     @Provides
     @Singleton
