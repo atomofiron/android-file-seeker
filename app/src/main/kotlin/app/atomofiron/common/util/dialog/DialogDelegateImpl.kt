@@ -13,7 +13,7 @@ import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.common.util.withNotNull
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.DialogCheckboxBinding
-import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable
+import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.UniText.Fmt
 import app.atomofiron.searchboxapp.model.other.UniText.Res
@@ -29,7 +29,7 @@ class DialogDelegateImpl(activity: WeakProperty<out FragmentActivity>) : DialogD
     private val activity by activity
     private val resources get() = activity?.resources
 
-    override fun loadingIcon(): Drawable? = activity?.let { BallsDrawable(it) }
+    override fun loadingIcon(): Drawable? = activity?.let { MuonsDrawable(it) }
 
     override operator fun get(text: UniText) = when (text) {
         is Fmt -> activity?.resources?.getString(text.res, *text.args).toString()

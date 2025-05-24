@@ -116,7 +116,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="000K"
         />
-    <app.atomofiron.searchboxapp.custom.view.BallsView
+    <app.atomofiron.searchboxapp.custom.view.MuonsView
         android:id="@+id/item_explorer_ps"
         android:layout_width="24dp"
         android:layout_height="24dp"

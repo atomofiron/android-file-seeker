@@ -12,7 +12,7 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.common.util.Unreachable
-import app.atomofiron.searchboxapp.custom.view.BallsView
+import app.atomofiron.searchboxapp.custom.view.MuonsView
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchState
@@ -23,7 +23,7 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
     private val tvLabel = itemView.findViewById<TextView>(R.id.progress_tv_label)
     private val tvParams = itemView.findViewById<TextView>(R.id.progress_tv_params)
     private val tvStatus = itemView.findViewById<TextView>(R.id.progress_tv_status)
-    private val bView = itemView.findViewById<BallsView>(R.id.item_explorer_ps)
+    private val bView = itemView.findViewById<MuonsView>(R.id.item_explorer_ps)
     private val btnAction = itemView.findViewById<Button>(R.id.progress_btn_action)
 
     init {

@@ -5,16 +5,16 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable
-import app.atomofiron.searchboxapp.custom.drawable.BallsDrawable.Companion.setBallsDrawable
+import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
+import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Companion.setBallsDrawable
 
-class BallsView @JvmOverloads constructor(
+class MuonsView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : AppCompatImageView(context, attrs, defStyleAttr) {
 
-    private val drawable: BallsDrawable
+    private val drawable: MuonsDrawable
 
     init {
         val styled = context.obtainStyledAttributes(attrs, R.styleable.BallsView, defStyleAttr, 0)

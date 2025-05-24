@@ -18,7 +18,7 @@ import com.google.android.material.checkbox.MaterialCheckBox
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.LemonDrawable
 import app.atomofiron.searchboxapp.custom.drawable.translated
-import app.atomofiron.searchboxapp.custom.view.BallsView
+import app.atomofiron.searchboxapp.custom.view.MuonsView
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
@@ -52,7 +52,7 @@ class ExplorerItemBinderImpl(
     private val tvSize = itemView.findViewById<TextView>(R.id.item_explorer_tv_size)
     private val cbBox = itemView.findViewById<MaterialCheckBox>(R.id.item_explorer_cb)
     private val tvError = itemView.findViewById<TextView>(R.id.item_explorer_error_tv)
-    private val psProgress = itemView.findViewById<BallsView>(R.id.item_explorer_ps)
+    private val psProgress = itemView.findViewById<MuonsView>(R.id.item_explorer_ps)
 
     var onItemActionListener: ExplorerItemBinderActionListener? = null
 

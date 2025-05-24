@@ -31,21 +31,21 @@ private const val ARC_60 = 60f
 private const val OFFSET_90 = 90f
 private const val OFFSET_180 = 180f
 
-class BallsDrawable private constructor(
+class MuonsDrawable private constructor(
     color: Int,
     private val fillCenter: Boolean,
     private val intrinsicSize: Size,
 ) : Drawable(), ValueAnimator.AnimatorUpdateListener {
     companion object {
 
-        operator fun invoke(context: Context, fillCenter: Boolean = true): BallsDrawable {
+        operator fun invoke(context: Context, fillCenter: Boolean = true): MuonsDrawable {
             val color = context.findColorByAttr(MaterialAttr.colorAccent)
             val intrinsicSize = context.resources.getDimensionPixelSize(R.dimen.icon_size)
-            return BallsDrawable(color, fillCenter, Size(intrinsicSize, intrinsicSize))
+            return MuonsDrawable(color, fillCenter, Size(intrinsicSize, intrinsicSize))
         }
 
-        fun ImageView.setBallsDrawable(fillCenter: Boolean = true): BallsDrawable {
-            val drawable = BallsDrawable(context, fillCenter)
+        fun ImageView.setBallsDrawable(fillCenter: Boolean = true): MuonsDrawable {
+            val drawable = MuonsDrawable(context, fillCenter)
             setImageDrawable(drawable)
             return drawable
         }
