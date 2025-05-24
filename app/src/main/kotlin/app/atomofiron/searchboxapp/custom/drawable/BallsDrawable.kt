@@ -13,45 +13,36 @@ import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.drawable.Drawable
 import android.util.Size
-import android.view.View
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
-import app.atomofiron.common.util.WeakDrawableCallback
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
+import kotlin.math.cos
 import kotlin.math.min
+import kotlin.math.sin
 
-private enum class Flag {
-    Visible, Attached, Set
-}
-
-// todo replace flags with checking of visibility and drawing
 // todo create the new animation
+
+private const val START = 0f
 
 class BallsDrawable private constructor(
     color: Int,
     private val intrinsicSize: Size,
-    flag: Flag? = null,
-) : Drawable(), ValueAnimator.AnimatorUpdateListener, View.OnAttachStateChangeListener {
+) : Drawable(), ValueAnimator.AnimatorUpdateListener {
     companion object {
         private const val DURATION = 512L
 
         operator fun invoke(context: Context): BallsDrawable {
             val color = context.findColorByAttr(MaterialAttr.colorAccent)
-            return BallsDrawable(color, Size(100, 100), Flag.Attached)
+            return BallsDrawable(color, Size(100, 100))
         }
 
         fun ImageView.setBallsDrawable(): BallsDrawable {
             val intrinsicSize = resources.getDimensionPixelSize(R.dimen.icon_size)
             val color = context.findColorByAttr(MaterialAttr.colorAccent)
             val drawable = BallsDrawable(color, Size(intrinsicSize, intrinsicSize))
-            drawable.callback = WeakDrawableCallback(this)
             setImageDrawable(drawable)
-            drawable.checkSet()
-            removeOnAttachStateChangeListener(drawable)
-            addOnAttachStateChangeListener(drawable)
-            if (isAttachedToWindow) drawable.onViewAttachedToWindow(this)
             return drawable
         }
     }
@@ -59,14 +50,13 @@ class BallsDrawable private constructor(
     private var oneBall = false
     private val paintCircle = Paint()
     private val paintBall = Paint()
-    private var animValue = 0.0
+    private var animValue = START
+    private var invalidated = true
 
     private val ballCirclePath = Path()
     private val animator = ValueAnimator.ofFloat(0f, Math.PI.toFloat())
-    private val flags = mutableSetOf<Flag>()
 
     init {
-        flag?.let { flags.add(it) }
         paintCircle.color = color
         paintBall.color = color
         if (oneBall) {
@@ -85,18 +75,8 @@ class BallsDrawable private constructor(
 
     override fun getIntrinsicHeight(): Int = intrinsicSize.height
 
-    override fun onViewAttachedToWindow(view: View) {
-        flags.add(Flag.Attached)
-        checkFlags()
-    }
-
-    override fun onViewDetachedFromWindow(view: View) {
-        flags.remove(Flag.Attached)
-        checkFlags()
-    }
-
-    private fun checkFlags() {
-        if (flags.size < Flag.entries.size) {
+    private fun anim(value: Boolean) {
+        if (!value) {
             animator.removeUpdateListener(this)
             animator.pause()
         } else if (animator.isPaused) {
@@ -110,7 +90,6 @@ class BallsDrawable private constructor(
 
     override fun setBounds(left: Int, top: Int, right: Int, bottom: Int) {
         super.setBounds(left, top, right, bottom)
-        checkSet()
 
         val width = (right - left).toFloat()
         val height = (bottom - top).toFloat()
@@ -129,77 +108,57 @@ class BallsDrawable private constructor(
         val height = bounds.height()
         val centerX = width.toFloat() / 2
         val centerY = height.toFloat() / 2
-        var size = Math.min(width, height).toFloat()
+        var size = min(width, height).toFloat()
         size -= size % 2
         val radius = size / 6
         val radiusRotate = size / (if (oneBall) 4 else 3)
         val radiusMask = size / 2
-        val sin = Math.sin(animValue) * radiusRotate
-        val cos = Math.cos(animValue) * radiusRotate
+        val sin = sin(animValue) * radiusRotate
+        val cos = cos(animValue) * radiusRotate
         val x1 = centerX + cos
         val y1 = centerY + sin
 
         if (oneBall) {
             canvas.drawCircle(centerX, centerY, radiusMask, paintCircle)
-            canvas.drawCircle(x1.toFloat(), y1.toFloat(), radius, paintBall)
+            canvas.drawCircle(x1, y1, radius, paintBall)
         } else {
             val x2 = centerX - cos
             val y2 = centerY - sin
             canvas.clipPath(ballCirclePath)
-            canvas.drawCircle(x1.toFloat(), y1.toFloat(), radius, paintBall)
-            canvas.drawCircle(x2.toFloat(), y2.toFloat(), radius, paintBall)
+            canvas.drawCircle(x1, y1, radius, paintBall)
+            canvas.drawCircle(x2, y2, radius, paintBall)
         }
+        invalidated = false
+        anim(true)
     }
 
     override fun onAnimationUpdate(animation: ValueAnimator) {
-        animValue = (animator.animatedValue as Float).toDouble()
-        invalidateSelf()
-        if (animValue == 0.0) {
-            checkSet()
+        val new = animator.animatedValue as Float
+        if (new < animValue && invalidated) {
+            return anim(false)
         }
+        animValue = new
+        invalidateSelf()
+        invalidated = true
     }
 
     override fun setAlpha(alpha: Int) = Unit
 
-    override fun setColorFilter(colorFilter: ColorFilter?) = Unit
+    override fun setColorFilter(colorFilter: ColorFilter?) {
+        paintBall.setColorFilter(colorFilter)
+        paintCircle.setColorFilter(colorFilter)
+    }
 
     override fun setTintList(tint: ColorStateList?) {
         super.setTintList(tint)
         setColor(tint?.defaultColor ?: Color.TRANSPARENT)
     }
 
-    @Deprecated("", ReplaceWith(""))
+    @Suppress("OVERRIDE_DEPRECATION")
     override fun getOpacity(): Int = PixelFormat.UNKNOWN
-
-    override fun setVisible(visible: Boolean, restart: Boolean): Boolean {
-        when {
-            visible -> flags.add(Flag.Visible)
-            else -> flags.remove(Flag.Visible)
-        }
-        checkFlags()
-        return super.setVisible(visible, restart)
-    }
 
     fun setColor(color: Int) {
         paintCircle.color = color
         paintBall.color = color
-    }
-
-    fun checkSet() {
-        when (isSet()) {
-            flags.contains(Flag.Set) -> return
-            true -> flags.add(Flag.Set)
-            false -> flags.remove(Flag.Set)
-        }
-        checkFlags()
-    }
-
-    private fun Drawable.isSet(): Boolean {
-        return when (val ref = callback) {
-            is WeakDrawableCallback -> (ref.view as? ImageView)?.drawable === this
-            is ImageView -> ref.drawable === this
-            is Drawable -> ref === this || ref.isSet()
-            else -> false
-        }
     }
 }
