@@ -29,7 +29,9 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>>(
 
     override fun onBindViewHolder(holder: H, position: Int) = holder.bind(mutableItems[position], position)
 
-    override fun onItemChanged(index: Int, item: D) = Unit
+    override fun onItemChanged(index: Int, item: D) {
+        mutableItems[index] = item
+    }
 
     override fun onCurrentListChanged(current: List<D>) {
         mutableItems.clear()
@@ -47,15 +49,14 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>>(
         }
     }
 
-    fun submit(item: D, itemIndex: Int = UNDEFINED) {
+    fun submit(item: D, index: Int = UNDEFINED) {
         val differ = differ
-        val index = when {
-            itemIndex > UNDEFINED -> itemIndex
-            differ == null -> throw UnsupportedOperationException()
-            else -> return differ.submit(item, itemIndex)
+        if (differ == null) {
+            mutableItems[index] = item
+            notifyItemChanged(index)
+        } else {
+            differ.submit(item, index)
         }
-        mutableItems[index] = item
-        notifyItemChanged(index)
     }
 
     fun addListListener(listener: CoroutineListDiffer.ListListener<D>) {

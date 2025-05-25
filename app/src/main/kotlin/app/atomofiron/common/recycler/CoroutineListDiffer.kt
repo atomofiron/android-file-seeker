@@ -57,14 +57,10 @@ class CoroutineListDiffer<I : Any>(
     }
 
     fun submit(item: I, index: Int = UNDEFINED) {
-        val actualList = actualList
         val itemIndex = when {
-            isCalculating -> return updated.indexOfFirst { itemCallback.areItemsTheSame(it, item) }.let {
-                when {
-                    it >= 0 -> updated[it] = item
-                    else -> updated.add(item)
-                }
-            }
+            isCalculating -> return updated
+                .indexOfFirst { itemCallback.areItemsTheSame(it, item) }
+                .let { if (it >= 0) updated[it] = item else updated.add(item) }
             index > UNDEFINED -> index
             else -> actualList.indexOfFirst { itemCallback.areItemsTheSame(it, item) }
                 .also { if (it < 0) return }
