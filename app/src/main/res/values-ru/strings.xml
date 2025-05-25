@@ -170,7 +170,7 @@
     <string name="install">Установить</string>
     <string name="install_succeeded">Установка выполнена</string>
     <string name="launch">Запустить</string>
-    <string name="apk_info">Название: %s\nИмя пакета: %s\nВерсия: %s\nМинимальная SDK: %s\nЦелевая SDK: %s\nСборочная SDK: %s\nПодписавший: %s</string>
+    <string name="apk_info">Имя пакета: %s\nВерсия: %s\nМинимальная SDK: %s\nЦелевая SDK: %s\nСборочная SDK: %s\nПодписавший: %s</string>
     <string name="update">Обновить</string>
     <string name="channel_name_updates">Обновления</string>
     <string name="tip">В Файлах укажите где искать</string>

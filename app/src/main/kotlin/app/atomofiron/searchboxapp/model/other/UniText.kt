@@ -12,7 +12,8 @@ sealed interface UniText {
     @JvmInline
     value class Str(val value: String) : UniText
 
-    class Fmt(@StringRes val res: Int, val args: Array<out Any>) : UniText
+    @Suppress("ArrayInDataClass")
+    data class Fmt(@StringRes val res: Int, val args: Array<out Any>) : UniText
 
     companion object {
         operator fun invoke(text: String) = Str(text)
