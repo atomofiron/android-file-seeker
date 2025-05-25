@@ -590,21 +590,11 @@ class ExplorerService(
         }
     }
 
-    private suspend inline fun renderTab(key: NodeTabKey, lazy: Boolean = false, block: NodeTab.() -> Unit) {
+    private suspend inline fun renderTab(key: NodeTabKey, block: NodeTab.() -> Unit) {
         withGarden {
             val tab = get(key) ?: return
             tab.block()
-            if (lazy) renderTabLazily(key) else tab.render()
-        }
-    }
-
-    private fun renderTabLazily(key: NodeTabKey) {
-        if (delayedRender == null) {
-            delayedRender = appScope.launch {
-                delay(128)
-                delayedRender = null
-                renderTab(key)
-            }
+            tab.render()
         }
     }
 
