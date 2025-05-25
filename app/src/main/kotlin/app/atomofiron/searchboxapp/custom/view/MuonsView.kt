@@ -19,8 +19,6 @@ class MuonsView @JvmOverloads constructor(
             val fillCenter = getBoolean(R.styleable.MuonsView_fillCenter, true)
             setMuonsDrawable(fillCenter)
         }
-
-        setLayerType(LAYER_TYPE_HARDWARE, null)
     }
 
     fun setTint(color: Int) {
