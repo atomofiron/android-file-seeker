@@ -1,12 +1,12 @@
 package app.atomofiron.searchboxapp.custom.view
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.util.AttributeSet
-import android.view.View
 import androidx.appcompat.widget.AppCompatImageView
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
-import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Companion.setBallsDrawable
+import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Companion.setMuonsDrawable
+import androidx.core.content.withStyledAttributes
 
 class MuonsView @JvmOverloads constructor(
     context: Context,
@@ -14,21 +14,16 @@ class MuonsView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : AppCompatImageView(context, attrs, defStyleAttr) {
 
-    private val drawable: MuonsDrawable
-
     init {
-        val styled = context.obtainStyledAttributes(attrs, R.styleable.BallsView, defStyleAttr, 0)
-        val fillCenter = styled.getBoolean(R.styleable.BallsView_fillCenter, true)
-        drawable = setBallsDrawable(fillCenter)
-        styled.recycle()
+        context.withStyledAttributes(attrs, R.styleable.MuonsView, defStyleAttr, 0) {
+            val fillCenter = getBoolean(R.styleable.MuonsView_fillCenter, true)
+            setMuonsDrawable(fillCenter)
+        }
 
         setLayerType(LAYER_TYPE_HARDWARE, null)
     }
 
-    fun setColor(color: Int) = drawable.setColor(color)
-
-    override fun setVisibility(visibility: Int) {
-        super.setVisibility(visibility)
-        drawable.setVisible(visibility == View.VISIBLE, false)
+    fun setTint(color: Int) {
+        imageTintList = ColorStateList.valueOf(color)
     }
 }

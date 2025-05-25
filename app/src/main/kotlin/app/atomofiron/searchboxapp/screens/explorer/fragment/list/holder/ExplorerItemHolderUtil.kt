@@ -72,6 +72,6 @@ private fun ItemExplorerBinding.makeOpposite(
     itemExplorerTvDescription.setTextColor(content)
     itemExplorerTvDetails.setTextColor(content)
     itemExplorerErrorTv.setTextColor(content)
-    itemExplorerPs.setColor(content)
+    itemExplorerPs.setTint(content)
     root.tag = TAG_EXPLORER_OPENED_ITEM
 }

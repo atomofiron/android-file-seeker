@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.viewer
 import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.finder.SearchResult
@@ -64,10 +65,13 @@ class TextViewerViewState(
             count = state.countMax
             DockItem.Label("$index / $count")
         }
-        val statusIconId = if (state.loading) R.drawable.progress_loop else R.drawable.ic_circle_check
         TextViewerDockState.Default.run {
+            val status = when {
+                state.loading -> status.with(MuonsDrawable())
+                else -> status.with(R.drawable.ic_circle_check)
+            }
             copy(
-                status = status.with(statusIconId).copy(label = label, progress = state.loading),
+                status = status.copy(label = label, progress = state.loading),
                 previous = previous.copy(enabled = !state.loading && index != null && index > 1),
                 next = next.copy(enabled = !state.loading && count != null && index != count),
             )

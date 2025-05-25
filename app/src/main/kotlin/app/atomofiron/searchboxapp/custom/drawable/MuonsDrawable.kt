@@ -30,13 +30,19 @@ private const val EPSILON = 0.05f
 private const val ARC_60 = 60f
 private const val OFFSET_90 = 90f
 private const val OFFSET_180 = 180f
+private const val STROKE_WIDTH = 1f / 16
+private const val CIRCLES_PADDING = 1f / 6
 
 class MuonsDrawable private constructor(
-    color: Int,
+    private val defaultColor: Int,
     private val fillCenter: Boolean,
     private val intrinsicSize: Size,
 ) : Drawable(), ValueAnimator.AnimatorUpdateListener {
     companion object {
+
+        operator fun invoke(color: Int = Color.MAGENTA, fillCenter: Boolean = true): MuonsDrawable {
+            return MuonsDrawable(color, fillCenter, Size(1, 1))
+        }
 
         operator fun invoke(context: Context, fillCenter: Boolean = true): MuonsDrawable {
             val color = context.findColorByAttr(MaterialAttr.colorAccent)
@@ -44,7 +50,7 @@ class MuonsDrawable private constructor(
             return MuonsDrawable(color, fillCenter, Size(intrinsicSize, intrinsicSize))
         }
 
-        fun ImageView.setBallsDrawable(fillCenter: Boolean = true): MuonsDrawable {
+        fun ImageView.setMuonsDrawable(fillCenter: Boolean = true): MuonsDrawable {
             val drawable = MuonsDrawable(context, fillCenter)
             setImageDrawable(drawable)
             return drawable
@@ -53,14 +59,14 @@ class MuonsDrawable private constructor(
 
     private val paint = Paint()
     private var animValue = START
-    private var invalidated = true
+    private var drawn = true
 
     private val path = Path()
+    private var tint: ColorStateList? = null
     private val animator = ValueAnimator.ofFloat(START, END)
 
     init {
         paint.isAntiAlias = true
-        paint.color = color
         paint.strokeCap = Paint.Cap.ROUND
         animator.duration = DURATION * if (fillCenter) 1 else 2
         animator.repeatCount = ValueAnimator.INFINITE
@@ -75,6 +81,7 @@ class MuonsDrawable private constructor(
 
     private fun anim(value: Boolean) {
         if (!value) {
+            // memory leaks in ValueAnimator
             animator.removeUpdateListener(this)
             animator.pause()
         } else if (animator.isPaused) {
@@ -94,27 +101,27 @@ class MuonsDrawable private constructor(
             canvas.draw(slugs = false, animValue)
             canvas.draw(slugs = false, animValue - PI / 2)
         }
-        invalidated = false
+        drawn = true
         anim(true)
     }
 
     override fun onAnimationUpdate(animation: ValueAnimator) {
         val new = animator.animatedValue as Float
-        if (new < animValue && invalidated) {
+        if (new < animValue && !drawn) {
             return anim(false)
         }
         animValue = new
+        drawn = false
         invalidateSelf()
-        invalidated = true
-        path.reset()
 
         var width = bounds.width().toFloat()
-        val inset = width / 8
+        val inset = width * CIRCLES_PADDING
         width -= inset * 2
         val centerY = bounds.height() / 2f
         val radius = width / 4
         val x = radius + width / 2 * (cos(new) / 2 + 0.5f)
         val scale = radius * sin(new) / 2
+        path.reset()
         path.addCircle(inset + x, centerY, radius + scale, Direction.CW)
         path.addCircle(inset + width - x, centerY, radius - scale, Direction.CW)
     }
@@ -131,7 +138,7 @@ class MuonsDrawable private constructor(
         val cos = cos(value * 2).inc() / 2 // 0..1
         val sweepAngle = if (slugs) max(EPSILON, ARC_60 * (1 - cos)) else EPSILON
         val startAngle = OFFSET_90 + offset - sweepAngle / 2
-        val stroke = width / 16
+        val stroke = width * STROKE_WIDTH
         paint.strokeWidth = when {
             slugs -> stroke + stroke * cos.pow(2) * 3
             else -> max(0f, -stroke + stroke * cos.pow(2) * 6)
@@ -143,21 +150,32 @@ class MuonsDrawable private constructor(
 
     }
 
-    override fun setAlpha(alpha: Int) = Unit
+    override fun setTintList(tint: ColorStateList?) {
+        this.tint = tint
+        invalidateSelf()
+    }
+
+    override fun onStateChange(state: IntArray): Boolean {
+        invalidateSelf()
+        return super.onStateChange(state)
+    }
+
+    override fun setAlpha(alpha: Int) = paint.setAlpha(alpha)
+
+    override fun getColorFilter(): ColorFilter? = paint.colorFilter
 
     override fun setColorFilter(colorFilter: ColorFilter?) {
         paint.setColorFilter(colorFilter)
+        super.invalidateSelf()
     }
 
-    override fun setTintList(tint: ColorStateList?) {
-        super.setTintList(tint)
-        setColor(tint?.defaultColor ?: Color.TRANSPARENT)
+    override fun invalidateSelf() {
+        paint.color = tint
+            ?.run { getColorForState(state, defaultColor) }
+            ?: defaultColor
+        super.invalidateSelf()
     }
 
     @Suppress("OVERRIDE_DEPRECATION")
     override fun getOpacity(): Int = PixelFormat.UNKNOWN
-
-    fun setColor(color: Int) {
-        paint.color = color
-    }
 }
