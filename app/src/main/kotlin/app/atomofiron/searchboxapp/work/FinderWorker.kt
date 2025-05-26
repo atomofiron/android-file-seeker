@@ -274,6 +274,7 @@ class FinderWorker(
                 else -> searchByName(where)
             }
             waitForJobs()
+            debugDelay(5)
             updateTask {
                 toEnded()
             }

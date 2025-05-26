@@ -8,6 +8,7 @@ import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.extension.then
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -105,6 +106,7 @@ class FileOperationsDelegate(
                 .also { stream?.close() }
                 .unwrapOrElse { return@launch showError(it) }
             withMain {
+                debugDelay(3)
                 val info = content.info!!
                 updater.update {
                     copy(

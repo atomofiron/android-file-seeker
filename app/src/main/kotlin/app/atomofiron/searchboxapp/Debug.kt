@@ -5,6 +5,7 @@ import android.util.Log
 import android.view.View
 import android.view.View.MeasureSpec
 import app.atomofiron.fileseeker.BuildConfig
+import kotlinx.coroutines.delay
 
 private var timestamp: Long = 0
 private var nanotimestamp: Long = 0
@@ -20,6 +21,8 @@ fun Any.logE(s: String) {
     }
     Log.e("searchboxapp", "[ERROR] [${this.javaClass.simpleName}] $s")
 }
+
+suspend fun debugDelay(seconds: Int = 1) = if (BuildConfig.DEBUG) delay(seconds * 1000L) else Unit
 
 fun Any.poop(s: String) = poop(this.javaClass.simpleName, s)
 

@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-suspend fun withMain(action: CoroutineScope.() -> Unit) = withContext(Dispatchers.Main, action)
+suspend fun withMain(action: suspend CoroutineScope.() -> Unit) = withContext(Dispatchers.Main, action)
 
 
 inline infix fun <T> Boolean.then(action: () -> T): T? {
