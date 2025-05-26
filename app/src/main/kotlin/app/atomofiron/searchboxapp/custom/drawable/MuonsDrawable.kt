@@ -10,6 +10,8 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Path.Direction
 import android.graphics.PixelFormat
+import android.graphics.Rect
+import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.util.Size
 import android.view.animation.LinearInterpolator
@@ -19,18 +21,19 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import kotlin.math.cos
 import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sin
 
-private const val DURATION = 512L
-private const val START = 0f
 private const val PI = Math.PI.toFloat()
-private const val END = PI
+private const val START = PI / 2
+private const val END = START + PI
+private const val DURATION = 512L
 private const val EPSILON = 0.05f
 private const val ARC_60 = 60f
-private const val OFFSET_90 = 90f
-private const val OFFSET_180 = 180f
-private const val STROKE_WIDTH = 1f / 16
+private const val ROTATE_90 = 90f
+private const val ROTATE_180 = 180f
+private const val STROKE_WIDTH = 1f / 12
 private const val CIRCLES_PADDING = 1f / 6
 
 class MuonsDrawable private constructor(
@@ -64,20 +67,34 @@ class MuonsDrawable private constructor(
     private val path = Path()
     private var tint: ColorStateList? = null
     private val animator = ValueAnimator.ofFloat(START, END)
+    private val rect = RectF()
+    private var size = 0f
+    private var startX = 0f
+    private var startY = 0f
 
     init {
         paint.isAntiAlias = true
         paint.strokeCap = Paint.Cap.ROUND
+        path.fillType = Path.FillType.EVEN_ODD
         animator.duration = DURATION * if (fillCenter) 1 else 2
         animator.repeatCount = ValueAnimator.INFINITE
         animator.repeatMode = ValueAnimator.RESTART
         animator.interpolator = LinearInterpolator()
-        path.fillType = Path.FillType.EVEN_ODD
     }
 
     override fun getIntrinsicWidth(): Int = intrinsicSize.width
 
     override fun getIntrinsicHeight(): Int = intrinsicSize.height
+
+    override fun onBoundsChange(bounds: Rect) {
+        super.onBoundsChange(bounds)
+        bounds.run {
+            size = min(width(), height()).toFloat()
+            val dif = (width() - height()) / 2f
+            startX = max(0f, dif)
+            startY = max(0f, -dif)
+        }
+    }
 
     private fun anim(value: Boolean) {
         if (!value) {
@@ -106,24 +123,31 @@ class MuonsDrawable private constructor(
     }
 
     override fun onAnimationUpdate(animation: ValueAnimator) {
-        val new = animator.animatedValue as Float
+        val new = animator.animatedValue as Float % PI
         if (new < animValue && !drawn) {
             return anim(false)
         }
         animValue = new
         drawn = false
+        updatePath()
         invalidateSelf()
+    }
 
-        var width = bounds.width().toFloat()
-        val inset = width * CIRCLES_PADDING
-        width -= inset * 2
+    private fun updatePath() {
+        val padding = size * CIRCLES_PADDING
+        val area = size - padding * 2
+        val offset = padding + startX
         val centerY = bounds.height() / 2f
-        val radius = width / 4
-        val x = radius + width / 2 * (cos(new) / 2 + 0.5f)
-        val scale = radius * sin(new) / 2
+        val diameter = area / 2
+        val radius = diameter / 2
+        val cos = cos(animValue) // -1..1
+        val x = diameter + radius * cos
+        val scaling = sin(animValue) / 2
+        val increasing = radius * scaling
+        val decreasing = -increasing + increasing * scaling
         path.reset()
-        path.addCircle(inset + x, centerY, radius + scale, Direction.CW)
-        path.addCircle(inset + width - x, centerY, radius - scale, Direction.CW)
+        path.addCircle(offset + x, centerY, radius + increasing, Direction.CW)
+        path.addCircle(offset + area - x, centerY, radius + decreasing, Direction.CW)
     }
 
     private fun Canvas.drawMuons() {
@@ -132,22 +156,21 @@ class MuonsDrawable private constructor(
     }
 
     private fun Canvas.draw(slugs: Boolean, value: Float) {
-        val width = bounds.width()
-        val height = bounds.height()
-        val offset = OFFSET_180 * value / END // 0..180
+        val rotate = ROTATE_180 * value / PI // 0..180
         val cos = cos(value * 2).inc() / 2 // 0..1
         val sweepAngle = if (slugs) max(EPSILON, ARC_60 * (1 - cos)) else EPSILON
-        val startAngle = OFFSET_90 + offset - sweepAngle / 2
-        val stroke = width * STROKE_WIDTH
+        val startAngle = rotate - sweepAngle / 2
+        val stroke = size * STROKE_WIDTH
+        paint.style = Paint.Style.STROKE
         paint.strokeWidth = when {
-            slugs -> stroke + stroke * cos.pow(2) * 3
-            else -> max(0f, -stroke + stroke * cos.pow(2) * 6)
+            slugs -> stroke + stroke * cos.pow(2) * 2
+            else -> max(0f, -stroke + stroke * cos.pow(2) * 4)
         }
         val inset = paint.strokeWidth / 2
-        paint.style = Paint.Style.STROKE
-        drawArc(inset, inset, width - inset, height - inset, startAngle, sweepAngle, false, paint)
-        drawArc(inset, inset, width - inset, height - inset, startAngle + OFFSET_180, sweepAngle, false, paint)
-
+        rect.set(bounds)
+        rect.inset(startX + inset, startY + inset)
+        drawArc(rect, startAngle - ROTATE_90, sweepAngle, false, paint)
+        drawArc(rect, startAngle + ROTATE_90, sweepAngle, false, paint)
     }
 
     override fun setTintList(tint: ColorStateList?) {
