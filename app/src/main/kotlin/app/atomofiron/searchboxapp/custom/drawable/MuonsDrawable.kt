@@ -94,16 +94,14 @@ class MuonsDrawable private constructor(
             startX = max(0f, dif)
             startY = max(0f, -dif)
         }
+        updatePath()
     }
 
     private fun anim(value: Boolean) {
         if (!value) {
             // memory leaks in ValueAnimator
             animator.removeUpdateListener(this)
-            animator.pause()
-        } else if (animator.isPaused) {
-            animator.addUpdateListener(this)
-            animator.resume()
+            animator.cancel()
         } else if (!animator.isStarted) {
             animator.addUpdateListener(this)
             animator.start()
@@ -123,12 +121,16 @@ class MuonsDrawable private constructor(
     }
 
     override fun onAnimationUpdate(animation: ValueAnimator) {
-        val new = animator.animatedValue as Float % PI
-        if (new < animValue && !drawn) {
-            return anim(false)
+        val new = animation.animatedValue as Float % PI
+        if (new < START && animValue > START && !drawn) {
+            animValue = START
+            anim(false)
+        } else if (new != animValue) {
+            animValue = new
+            drawn = false
+        } else {
+            return
         }
-        animValue = new
-        drawn = false
         updatePath()
         invalidateSelf()
     }
