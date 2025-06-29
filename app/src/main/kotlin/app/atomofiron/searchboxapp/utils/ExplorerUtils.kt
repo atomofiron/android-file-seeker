@@ -71,6 +71,7 @@ object ExplorerUtils {
     private const val FILE_APL_EXE = "Mach-O 64-bit x86-64 executable"
     private const val FILE_APLS_EXE = "Mach-O 64-bit arm64 executable"
 
+    private const val EXT_APNG = ".apng"
     private const val EXT_PNG = ".png"
     private const val EXT_JPG = ".jpg"
     private const val EXT_JPEG = ".jpeg"
@@ -364,9 +365,9 @@ object ExplorerUtils {
             (type == FILE_DATA) -> content.resolveFileType(path)
             (type == FILE_EMPTY) -> content.resolveFileType(path)
             (type == DIRECTORY) -> content.ifNotCached { NodeContent.Directory() }
-            type.startsWith(FILE_PNG) -> content.ifNotCached { NodeContent.File.Picture.Png(path) }
-            type.startsWith(FILE_JPEG) -> content.ifNotCached { NodeContent.File.Picture.Jpeg(path) }
-            type.startsWith(FILE_GIF) -> content.ifNotCached { NodeContent.File.Picture.Gif(path) }
+            type.startsWith(FILE_PNG) -> content.ifNotCached { NodeContent.File.Picture.run { if (path.endsWith(EXT_APNG)) apng(path, type) else png(path, type) } }
+            type.startsWith(FILE_JPEG) -> content.ifNotCached { NodeContent.File.Picture.jpeg(path, type) }
+            type.startsWith(FILE_GIF) -> content.ifNotCached { NodeContent.File.Picture.gif(path, type) }
             type.startsWith(FILE_ZIP) -> when {
                 path.endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { AndroidApp.Apk(path) }
                 path.endsWith(EXT_APKS, ignoreCase = true) -> content.ifNotCached { AndroidApp.Apks(path) }
@@ -669,12 +670,13 @@ object ExplorerUtils {
     private fun resolveFileType(path: String) = null.resolveFileType(path)
 
     private fun NodeContent?.resolveFileType(path: String): NodeContent = when (true) {
-        path.endsWith(EXT_PNG, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.Png(path) }
+        path.endsWith(EXT_APNG, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.apng(path) }
+        path.endsWith(EXT_PNG, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.png(path) }
         path.endsWith(EXT_JPG, ignoreCase = true),
-        path.endsWith(EXT_JPEG, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.Jpeg(path) }
-        path.endsWith(EXT_GIF, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.Gif(path) }
-        path.endsWith(EXT_WEBP, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.Webp(path) }
-        path.endsWith(EXT_AVIF, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.Avif(path) }
+        path.endsWith(EXT_JPEG, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.jpeg(path) }
+        path.endsWith(EXT_GIF, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.gif(path) }
+        path.endsWith(EXT_WEBP, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.webp(path) }
+        path.endsWith(EXT_AVIF, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.avif(path) }
         path.endsWith(EXT_APK, ignoreCase = true) -> ifNotCached { AndroidApp.Apk(path) }
         path.endsWith(EXT_APKS, ignoreCase = true) -> ifNotCached { AndroidApp.Apks(path) }
         path.endsWith(EXT_ZIP, ignoreCase = true) -> ifNotCached { NodeContent.File.Zip() }

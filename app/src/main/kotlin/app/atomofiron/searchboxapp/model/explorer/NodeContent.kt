@@ -4,6 +4,7 @@ import app.atomofiron.common.util.unsafeLazy
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 
+@Suppress("DataClassPrivateConstructor")
 sealed class NodeContent(
     // '*/*' - значит тип неизвестен,
     // null - пока неизвестно, известен тип или нет,
@@ -34,6 +35,7 @@ sealed class NodeContent(
     sealed class File(
         mimeType: String? = null,
         open val thumbnail: Thumbnail? = null,
+        open val description: String? = null,
         override val details: String? = null,
     ) : NodeContent(mimeType) {
         // прямая связь
@@ -53,27 +55,22 @@ sealed class NodeContent(
             override val thumbnail: Thumbnail? = null,
         ) : File(mimeType = "audio/*")
 
-        sealed class Picture(
-            mimeType: String,
+        data class Picture private constructor(
+            override val thumbnail: Thumbnail?,
+            override val mimeType: String,
+            override val description: String? = null,
             override val details: String? = "", // todo
-        ) : File(mimeType) { // todo remove children
+        ) : File(mimeType) {
 
             override val isCached: Boolean = details != null
 
-            data class Png(val path: String) : Picture("image/png") {
-                override val thumbnail = Thumbnail(path)
-            }
-            data class Jpeg(val path: String) : Picture("image/jpeg") {
-                override val thumbnail = Thumbnail(path)
-            }
-            data class Gif(val path: String) : Picture("image/gif") {
-                override val thumbnail = Thumbnail(path)
-            }
-            data class Webp(val path: String) : Picture("image/webp") {
-                override val thumbnail = Thumbnail(path)
-            }
-            data class Avif(val path: String) : Picture("image/avif") {
-                override val thumbnail = Thumbnail(path)
+            companion object {
+                fun png(path: String, description: String? = null) = Picture(Thumbnail(path), mimeType = "image/png", description = description)
+                fun apng(path: String, description: String? = null) = Picture(Thumbnail(path), mimeType = "image/apng", description = description)
+                fun jpeg(path: String, description: String? = null) = Picture(Thumbnail(path), mimeType = "image/jpeg", description = description)
+                fun gif(path: String, description: String? = null) = Picture(Thumbnail(path), mimeType = "image/gif", description = description)
+                fun webp(path: String) = Picture(Thumbnail(path), mimeType = "image/webp")
+                fun avif(path: String) = Picture(Thumbnail(path), mimeType = "image/avif")
             }
         }
 
@@ -133,7 +130,7 @@ sealed class NodeContent(
             data object Plain : Text()
             data object Script : Text()
             data object Osu : Text("application/x-osu-beatmap")
-            data object Svg : Picture("image/svg+xml")
+            data object Svg : Text("image/svg+xml")
             data object Ino : Text()
         }
         data object Pdf : File("application/pdf")
