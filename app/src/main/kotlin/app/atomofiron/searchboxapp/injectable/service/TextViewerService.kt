@@ -65,7 +65,7 @@ class TextViewerService(
     private val useSu: Boolean get() = preferenceStore.useSu.value
 
     fun getFileSession(path: String): TextViewerSession {
-        val item = Node(path, content = NodeContent.Unknown)
+        val item = Node(path, content = NodeContent.Undefined)
         var session = findSession(item)
         if (session == null) {
             session = TextViewerSession(item)

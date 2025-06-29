@@ -9,7 +9,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
-import app.atomofiron.searchboxapp.model.explorer.NodeContent.File.AndroidApp
+import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
@@ -183,7 +183,7 @@ object ExplorerUtils {
         }
         val content = when {
             directory -> NodeContent.Directory()
-            else -> NodeContent.File.Unknown
+            else -> NodeContent.Unknown
         }
         val item = Node(path = targetPath, parentPath = parent.path, rootId = parent.rootId, content = content)
         return when {
@@ -363,53 +363,53 @@ object ExplorerUtils {
             (content is NodeContent.Directory) -> content
             type.isBlank(),
             (type == FILE_DATA) -> content.resolveFileType(path)
-            (type == FILE_EMPTY) -> NodeContent.File.Empty
+            (type == FILE_EMPTY) -> NodeContent.Empty
             (type == DIRECTORY) -> content.ifNotCached { NodeContent.Directory() }
-            type.startsWith(FILE_PNG) -> content.ifNotCached { NodeContent.File.Picture.run { if (path.endsWith(EXT_APNG)) apng(path, type) else png(path, type) } }
-            type.startsWith(FILE_JPEG) -> content.ifNotCached { NodeContent.File.Picture.jpeg(path, type) }
-            type.startsWith(FILE_GIF) -> content.ifNotCached { NodeContent.File.Picture.gif(path, type) }
+            type.startsWith(FILE_PNG) -> content.ifNotCached { NodeContent.Picture.run { if (path.endsWith(EXT_APNG)) apng(path, type) else png(path, type) } }
+            type.startsWith(FILE_JPEG) -> content.ifNotCached { NodeContent.Picture.jpeg(path, type) }
+            type.startsWith(FILE_GIF) -> content.ifNotCached { NodeContent.Picture.gif(path, type) }
             type.startsWith(FILE_ZIP) -> when {
                 path.endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { AndroidApp.apk(path) }
                 path.endsWith(EXT_APKS, ignoreCase = true) -> content.ifNotCached { AndroidApp.apks(path) }
                 content is AndroidApp -> return this
-                path.endsWith(EXT_OSZ, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.Map() }
-                path.endsWith(EXT_OSK, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.Skin() }
-                path.endsWith(EXT_OLZ, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.LazerMap() }
-                path.endsWith(EXT_OSR, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.Replay() }
-                path.endsWith(EXT_OSB, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.Storyboard() }
-                else -> content.ifNotCached { NodeContent.File.Zip() }
+                path.endsWith(EXT_OSZ, ignoreCase = true) -> content.ifNotCached { NodeContent.Osu.Map() }
+                path.endsWith(EXT_OSK, ignoreCase = true) -> content.ifNotCached { NodeContent.Osu.Skin() }
+                path.endsWith(EXT_OLZ, ignoreCase = true) -> content.ifNotCached { NodeContent.Osu.LazerMap() }
+                path.endsWith(EXT_OSR, ignoreCase = true) -> content.ifNotCached { NodeContent.Osu.Replay() }
+                path.endsWith(EXT_OSB, ignoreCase = true) -> content.ifNotCached { NodeContent.Osu.Storyboard() }
+                else -> content.ifNotCached { NodeContent.Zip() }
             }
             type.startsWith(FILE_BZIP2) -> when {
-                name.endsWith(EXT_DMG) -> content.ifNotCached { NodeContent.File.Dmg }
-                else -> content.ifNotCached { NodeContent.File.Bzip2() }
+                name.endsWith(EXT_DMG) -> content.ifNotCached { NodeContent.Dmg }
+                else -> content.ifNotCached { NodeContent.Bzip2() }
             }
-            type.startsWith(FILE_GZIP) -> content.ifNotCached { NodeContent.File.Gz() }
-            type.startsWith(FILE_TAR) -> content.ifNotCached { NodeContent.File.Tar() }
-            type.startsWith(FILE_XZ) -> content.ifNotCached { NodeContent.File.Xz }
+            type.startsWith(FILE_GZIP) -> content.ifNotCached { NodeContent.Gz() }
+            type.startsWith(FILE_TAR) -> content.ifNotCached { NodeContent.Tar() }
+            type.startsWith(FILE_XZ) -> content.ifNotCached { NodeContent.Xz }
             type.startsWith(FILE_UTF8_TEXT),
             type.startsWith(FILE_ASCII_TEXT) -> when {
-                path.endsWith(EXT_SVG, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Svg }
-                path.endsWith(EXT_OSU, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Osu }
-                path.endsWith(EXT_CPP, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Cpp }
-                path.endsWith(EXT_INO, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Ino }
-                else -> NodeContent.File.Text.Plain
+                path.endsWith(EXT_SVG, ignoreCase = true) -> content.ifNotCached { NodeContent.Text.Svg }
+                path.endsWith(EXT_OSU, ignoreCase = true) -> content.ifNotCached { NodeContent.Text.Osu }
+                path.endsWith(EXT_CPP, ignoreCase = true) -> content.ifNotCached { NodeContent.Text.Cpp }
+                path.endsWith(EXT_INO, ignoreCase = true) -> content.ifNotCached { NodeContent.Text.Ino }
+                else -> NodeContent.Text.Plain
             }
             type.startsWith(FILE_BOOTING),
-            type.startsWith(FILE_BOOT_IMAGE) -> NodeContent.File.DataImage
-            type.startsWith(FILE_OGG) -> content.ifNotCached { NodeContent.File.Music() }
-            type.startsWith(FILE_PDF) -> content.ifNotCached { NodeContent.File.Pdf }
-            type.startsWith(FILE_ELF_EXE) -> content.ifNotCached { NodeContent.File.Elf }
+            type.startsWith(FILE_BOOT_IMAGE) -> NodeContent.DataImage
+            type.startsWith(FILE_OGG) -> content.ifNotCached { NodeContent.Music() }
+            type.startsWith(FILE_PDF) -> content.ifNotCached { NodeContent.Pdf }
+            type.startsWith(FILE_ELF_EXE) -> content.ifNotCached { NodeContent.Elf }
             type.startsWith(FILE_ELF_RE) -> when {
-                name.endsWith(EXT_FAP) -> content.ifNotCached { NodeContent.File.Fap }
-                else -> content.ifNotCached { NodeContent.File.Elf }
+                name.endsWith(EXT_FAP) -> content.ifNotCached { NodeContent.Fap }
+                else -> content.ifNotCached { NodeContent.Elf }
             }
-            type.startsWith(FILE_PEM) -> content.ifNotCached { NodeContent.File.Cert }
-            type.startsWith(FILE_ELF_SO) -> content.ifNotCached { NodeContent.File.ElfSo }
+            type.startsWith(FILE_PEM) -> content.ifNotCached { NodeContent.Cert }
+            type.startsWith(FILE_ELF_SO) -> content.ifNotCached { NodeContent.ElfSo }
             type.startsWith(FILE_MSP_EXE),
-            type.startsWith(FILE_MS_EXE) -> content.ifNotCached { NodeContent.File.ExeMs }
-            type.startsWith(FILE_APLS_EXE) -> content.ifNotCached { NodeContent.File.ExeApls }
-            type.startsWith(FILE_APL_EXE) -> content.ifNotCached { NodeContent.File.ExeApl }
-            type.matches(FILE_SH_SCRIPT) -> NodeContent.File.Text.ShellScript
+            type.startsWith(FILE_MS_EXE) -> content.ifNotCached { NodeContent.ExeMs }
+            type.startsWith(FILE_APLS_EXE) -> content.ifNotCached { NodeContent.ExeApls }
+            type.startsWith(FILE_APL_EXE) -> content.ifNotCached { NodeContent.ExeApl }
+            type.matches(FILE_SH_SCRIPT) -> NodeContent.Text.ShellScript
             else -> {
                 val ext = name.lastIndexOf(Const.DOT).inc()
                     .let { if (it == 0) name.length else it }
@@ -423,10 +423,10 @@ object ExplorerUtils {
 
     private fun Node.cacheFile(config: CacheConfig): Node {
         val content = when (content) {
-            is NodeContent.File.Picture,
-            is NodeContent.File.Movie -> content
-            is NodeContent.File.Music -> NodeContent.File.Music(path.createAudioThumbnail(config)?.forNode, 0)
-            is NodeContent.File.Zip -> cache(content).contentOrNodeError(this) { return it }.let { zip ->
+            is NodeContent.Picture,
+            is NodeContent.Movie -> content
+            is NodeContent.Music -> NodeContent.Music(path.createAudioThumbnail(config)?.forNode, 0)
+            is NodeContent.Zip -> cache(content).contentOrNodeError(this) { return it }.let { zip ->
                 when (zip.children?.any { it.name == BASE_APK }) {
                     null, false -> zip
                     true -> AndroidApp.apks(path, children = zip.children).let { apks ->
@@ -460,7 +460,7 @@ object ExplorerUtils {
         e.toRslt()
     }
 
-    private fun Node.cache(content: NodeContent.File.Zip): Rslt<NodeContent.File.Zip> = try {
+    private fun Node.cache(content: NodeContent.Zip): Rslt<NodeContent.Zip> = try {
         val children = mutableListOf<Node>()
         ZipInputStream(BufferedInputStream(FileInputStream(path))).use { stream ->
             var entry: ZipEntry? = stream.nextEntry
@@ -527,7 +527,7 @@ object ExplorerUtils {
                 is NodeContent.File -> children to content
                 else -> null to resolveFileType(path)
             }
-            else -> null to NodeContent.Unknown
+            else -> null to NodeContent.Undefined
         }
         return copy(children = children, properties = properties, content = content)
     }
@@ -551,7 +551,7 @@ object ExplorerUtils {
                 }
                 when {
                     item.isDirectory -> items.add(item)
-                    item.content is NodeContent.Unknown -> files.add(item.copy(content = resolveFileType(item.path)))
+                    item.content is NodeContent.Undefined -> files.add(item.copy(content = resolveFileType(item.path)))
                     else -> files.add(item)
                 }
             }
@@ -672,57 +672,57 @@ object ExplorerUtils {
     private fun resolveFileType(path: String) = null.resolveFileType(path)
 
     private fun NodeContent?.resolveFileType(path: String): NodeContent = when (true) {
-        path.endsWith(EXT_APNG, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.apng(path) }
-        path.endsWith(EXT_PNG, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.png(path) }
+        path.endsWith(EXT_APNG, ignoreCase = true) -> ifNotCached { NodeContent.Picture.apng(path) }
+        path.endsWith(EXT_PNG, ignoreCase = true) -> ifNotCached { NodeContent.Picture.png(path) }
         path.endsWith(EXT_JPG, ignoreCase = true),
-        path.endsWith(EXT_JPEG, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.jpeg(path) }
-        path.endsWith(EXT_GIF, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.gif(path) }
-        path.endsWith(EXT_WEBP, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.webp(path) }
-        path.endsWith(EXT_AVIF, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.avif(path) }
+        path.endsWith(EXT_JPEG, ignoreCase = true) -> ifNotCached { NodeContent.Picture.jpeg(path) }
+        path.endsWith(EXT_GIF, ignoreCase = true) -> ifNotCached { NodeContent.Picture.gif(path) }
+        path.endsWith(EXT_WEBP, ignoreCase = true) -> ifNotCached { NodeContent.Picture.webp(path) }
+        path.endsWith(EXT_AVIF, ignoreCase = true) -> ifNotCached { NodeContent.Picture.avif(path) }
         path.endsWith(EXT_APK, ignoreCase = true) -> ifNotCached { AndroidApp.apk(path) }
         path.endsWith(EXT_APKS, ignoreCase = true) -> ifNotCached { AndroidApp.apks(path) }
-        path.endsWith(EXT_ZIP, ignoreCase = true) -> ifNotCached { NodeContent.File.Zip() }
-        path.endsWith(EXT_TAR, ignoreCase = true) -> ifNotCached { NodeContent.File.Tar() }
-        path.endsWith(EXT_BZ2, ignoreCase = true) -> ifNotCached { NodeContent.File.Bzip2() }
-        path.endsWith(EXT_GZ, ignoreCase = true) -> ifNotCached { NodeContent.File.Gz() }
-        path.endsWith(EXT_RAR, ignoreCase = true) -> ifNotCached { NodeContent.File.Rar() }
-        path.endsWith(EXT_SH, ignoreCase = true) -> NodeContent.File.Text.ShellScript
+        path.endsWith(EXT_ZIP, ignoreCase = true) -> ifNotCached { NodeContent.Zip() }
+        path.endsWith(EXT_TAR, ignoreCase = true) -> ifNotCached { NodeContent.Tar() }
+        path.endsWith(EXT_BZ2, ignoreCase = true) -> ifNotCached { NodeContent.Bzip2() }
+        path.endsWith(EXT_GZ, ignoreCase = true) -> ifNotCached { NodeContent.Gz() }
+        path.endsWith(EXT_RAR, ignoreCase = true) -> ifNotCached { NodeContent.Rar() }
+        path.endsWith(EXT_SH, ignoreCase = true) -> NodeContent.Text.ShellScript
         path.endsWith(EXT_TXT, ignoreCase = true),
         path.endsWith(EXT_INI, ignoreCase = true),
         path.endsWith(EXT_KT, ignoreCase = true),
         path.endsWith(EXT_KTS, ignoreCase = true),
         path.endsWith(EXT_SWIFT, ignoreCase = true),
         path.endsWith(EXT_YAML, ignoreCase = true),
-        path.endsWith(EXT_HTML, ignoreCase = true) -> NodeContent.File.Text.Plain
-        path.endsWith(EXT_SVG, ignoreCase = true) -> ifNotCached { NodeContent.File.Text.Svg }
-        path.endsWith(EXT_IMG, ignoreCase = true) -> NodeContent.File.DataImage
+        path.endsWith(EXT_HTML, ignoreCase = true) -> NodeContent.Text.Plain
+        path.endsWith(EXT_SVG, ignoreCase = true) -> ifNotCached { NodeContent.Text.Svg }
+        path.endsWith(EXT_IMG, ignoreCase = true) -> NodeContent.DataImage
         path.endsWith(EXT_MP4, ignoreCase = true),
         path.endsWith(EXT_MKV, ignoreCase = true),
         path.endsWith(EXT_MOV, ignoreCase = true),
         path.endsWith(EXT_WEBM, ignoreCase = true),
         path.endsWith(EXT_3GP, ignoreCase = true),
-        path.endsWith(EXT_AVI, ignoreCase = true) -> ifNotCached { NodeContent.File.Movie(path) }
+        path.endsWith(EXT_AVI, ignoreCase = true) -> ifNotCached { NodeContent.Movie(path) }
         path.endsWith(EXT_MP3, ignoreCase = true),
         path.endsWith(EXT_M4A, ignoreCase = true),
         path.endsWith(EXT_OGG, ignoreCase = true),
         path.endsWith(EXT_WAV, ignoreCase = true),
         path.endsWith(EXT_FLAC, ignoreCase = true),
         path.endsWith(EXT_OGA, ignoreCase = true),
-        path.endsWith(EXT_AAC, ignoreCase = true) -> ifNotCached { NodeContent.File.Music() }
-        path.endsWith(EXT_PDF, ignoreCase = true) -> ifNotCached { NodeContent.File.Pdf }
-        path.endsWith(EXT_TORRENT, ignoreCase = true) -> ifNotCached { NodeContent.File.Torrent }
-        path.endsWith(EXT_FAP, ignoreCase = true) -> ifNotCached { NodeContent.File.Fap }
-        path.endsWith(EXT_EXE, ignoreCase = true) -> ifNotCached { NodeContent.File.ExeMs }
-        path.endsWith(EXT_SWF, ignoreCase = true) -> ifNotCached { NodeContent.File.Flash }
+        path.endsWith(EXT_AAC, ignoreCase = true) -> ifNotCached { NodeContent.Music() }
+        path.endsWith(EXT_PDF, ignoreCase = true) -> ifNotCached { NodeContent.Pdf }
+        path.endsWith(EXT_TORRENT, ignoreCase = true) -> ifNotCached { NodeContent.Torrent }
+        path.endsWith(EXT_FAP, ignoreCase = true) -> ifNotCached { NodeContent.Fap }
+        path.endsWith(EXT_EXE, ignoreCase = true) -> ifNotCached { NodeContent.ExeMs }
+        path.endsWith(EXT_SWF, ignoreCase = true) -> ifNotCached { NodeContent.Flash }
         path.endsWith(EXT_PEM, ignoreCase = true),
         path.endsWith(EXT_P12, ignoreCase = true),
-        path.endsWith(EXT_CRT, ignoreCase = true) -> ifNotCached { NodeContent.File.Cert }
-        path.endsWith(EXT_OSZ, ignoreCase = true) -> ifNotCached { NodeContent.File.Osu.Map() }
-        path.endsWith(EXT_OSK, ignoreCase = true) -> ifNotCached { NodeContent.File.Osu.Skin() }
-        path.endsWith(EXT_OLZ, ignoreCase = true) -> ifNotCached { NodeContent.File.Osu.LazerMap() }
-        path.endsWith(EXT_OSR, ignoreCase = true) -> ifNotCached { NodeContent.File.Osu.Replay() }
-        path.endsWith(EXT_OSB, ignoreCase = true) -> ifNotCached { NodeContent.File.Osu.Storyboard() }
-        else -> NodeContent.File.Other
+        path.endsWith(EXT_CRT, ignoreCase = true) -> ifNotCached { NodeContent.Cert }
+        path.endsWith(EXT_OSZ, ignoreCase = true) -> ifNotCached { NodeContent.Osu.Map() }
+        path.endsWith(EXT_OSK, ignoreCase = true) -> ifNotCached { NodeContent.Osu.Skin() }
+        path.endsWith(EXT_OLZ, ignoreCase = true) -> ifNotCached { NodeContent.Osu.LazerMap() }
+        path.endsWith(EXT_OSR, ignoreCase = true) -> ifNotCached { NodeContent.Osu.Replay() }
+        path.endsWith(EXT_OSB, ignoreCase = true) -> ifNotCached { NodeContent.Osu.Storyboard() }
+        else -> NodeContent.Other
     }
 
     fun Node.updateWith(item: Node, sorting: NodeSorting? = null): Node {

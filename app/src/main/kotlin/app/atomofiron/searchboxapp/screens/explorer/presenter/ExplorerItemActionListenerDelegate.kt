@@ -4,7 +4,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent.File
+import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.screens.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerViewState
@@ -37,7 +37,7 @@ class ExplorerItemActionListenerDelegate(
     private fun openItem(item: Node) {
         when {
             item.isDirectory -> explorerInteractor.toggleDir(currentTab, item)
-            item.content is File.AndroidApp -> operations.askForApk(item.content, currentTab)
+            item.content is AndroidApp -> operations.askForApk(item.content, currentTab)
             else -> router.showFile(item)
         }
     }

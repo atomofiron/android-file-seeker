@@ -7,7 +7,7 @@ import android.content.pm.PackageInstaller
 import androidx.core.net.toUri
 import app.atomofiron.common.util.Android
 import app.atomofiron.searchboxapp.android.Intents
-import app.atomofiron.searchboxapp.model.explorer.NodeContent.File.AndroidApp
+import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.Rslt

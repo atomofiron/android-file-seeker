@@ -267,7 +267,7 @@ class FinderWorker(
             finderStore.addOrUpdate(task)
 
             val where = inputData.getStringArray(KEY_WHERE_PATHS)!!.map { path ->
-                Node(path, content = NodeContent.File.Unknown).update(cacheConfig)
+                Node(path, content = NodeContent.Unknown).update(cacheConfig)
             }
             when {
                 forContent -> searchForContent(where)
@@ -299,7 +299,7 @@ class FinderWorker(
         return Result.success(dataBuilder.build())
     }
 
-    private fun newNode(path: String) = Node(path, rootId = task.uniqueId, content = NodeContent.File.Unknown).update(cacheConfig)
+    private fun newNode(path: String) = Node(path, rootId = task.uniqueId, content = NodeContent.Unknown).update(cacheConfig)
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return ForegroundInfo(Notifications.ID_FOREGROUND, foregroundNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)

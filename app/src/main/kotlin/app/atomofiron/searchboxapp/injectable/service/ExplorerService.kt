@@ -284,7 +284,7 @@ class ExplorerService(
             targetRoot.thumbnailPath == newestChild.path -> targetRoot
             else -> {
                 val config = config.copy(thumbnailSize = previewSize, legacySizeBig = true)
-                val updatedChild = newestChild.copy(content = NodeContent.Unknown).update(config)
+                val updatedChild = newestChild.copy(content = NodeContent.Undefined).update(config)
                 val content = updatedChild.content as? NodeContent.File
                 targetRoot.copy(item = updated, thumbnail = content?.thumbnail as? Thumbnail.FilePath, thumbnailPath = newestChild.path)
             }

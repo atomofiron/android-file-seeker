@@ -29,7 +29,7 @@ class ExplorerItemDelegate(
     private val dir = run {
         val properties = NodeProperties("drwxrwx---", "owner", "group", "4K", "2038-01-19", "03:14", "Android")
         val dirContent = NodeContent.Directory()
-        val fileContent = NodeContent.File.Unknown
+        val fileContent = NodeContent.Unknown
         val items = Array(17) { Node("", "", content = if (it < 3) dirContent else fileContent) }.toList()
         val children = NodeChildren(items.toMutableList(), isOpened = false)
         Node(path = "", properties = properties, content = dirContent, children = children)
@@ -38,7 +38,7 @@ class ExplorerItemDelegate(
         val name = "File Seeker ${resources.value.getString(R.string.version_name)}.apk"
         val properties = NodeProperties("drwxrwx---", "owner", "group", "47K", "2038-01-19", "03:14", name)
         val apkInfo = ApkInfo(Thumbnail(R.mipmap.ic_launcher), "", VERSION_NAME, 0, "", 0, 0, null, null)
-        val content = NodeContent.File.AndroidApp.apk(NodeRef(""), apkInfo)
+        val content = NodeContent.AndroidApp.apk(NodeRef(""), apkInfo)
         Node(path = "", properties = properties, content = content)
     }
 

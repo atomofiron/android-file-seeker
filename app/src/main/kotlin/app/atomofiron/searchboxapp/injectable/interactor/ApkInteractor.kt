@@ -6,7 +6,7 @@ import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent.File.AndroidApp
+import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.Operation
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo

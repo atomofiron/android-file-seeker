@@ -9,7 +9,7 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.signature
 import app.atomofiron.common.util.extension.then
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.model.explorer.NodeContent.File.AndroidApp
+import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.packageManager

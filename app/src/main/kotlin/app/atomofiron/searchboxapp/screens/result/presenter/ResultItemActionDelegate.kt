@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.result.presenter
 
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent.File
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
@@ -21,8 +21,8 @@ class ResultItemActionDelegate(
     override fun onItemClick(item: Node) {
         when {
             item.isDirectory -> Unit // todo open dir
-            item.content is File.Text -> router.openFile(item.path, viewState.task.value.uuid)
-            item.content is File.AndroidApp -> operations.askForApk(item.content)
+            item.content is NodeContent.Text -> router.openFile(item.path, viewState.task.value.uuid)
+            item.content is NodeContent.AndroidApp -> operations.askForApk(item.content)
             else -> router.openWith(item)
         }
     }

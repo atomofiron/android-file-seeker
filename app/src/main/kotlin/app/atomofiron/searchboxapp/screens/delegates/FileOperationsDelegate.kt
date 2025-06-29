@@ -12,7 +12,7 @@ import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent.File
+import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
@@ -50,7 +50,7 @@ class FileOperationsDelegate(
             first.isRoot -> return null
             first.isDirectory -> directoryOptions
             else -> oneFileOptions.mutate {
-                if (first.content is File.AndroidApp) {
+                if (first.content is AndroidApp) {
                     add(R.id.menu_apk)
                     add(R.id.menu_launch)
                     add(R.id.menu_install)
@@ -63,7 +63,7 @@ class FileOperationsDelegate(
         return ExplorerItemOptions(ids, merged, itemComposition, disabled = disabled)
     }
 
-    fun askForApk(content: File.AndroidApp, tab: NodeTabKey? = null) {
+    fun askForApk(content: AndroidApp, tab: NodeTabKey? = null) {
         val info = content.info ?: return
         dialogs show DialogConfig(
             cancelable = true,
@@ -79,7 +79,7 @@ class FileOperationsDelegate(
 
     fun askForApks(ref: NodeRef, contentResolver: ContentResolver) {
         var scope: CoroutineScope? = null
-        var content = File.AndroidApp.apks(ref)
+        var content = AndroidApp.apks(ref)
         val updater = dialogs show DialogConfig(
             cancelable = false,
             icon = dialogs.loadingIcon(),
