@@ -44,7 +44,7 @@ class ApkService(
                     }
                     entry = stream.nextEntry
                 }
-                return@install Rslt.Ok()
+                return@install Rslt.Ok
             }
         }
     }
@@ -60,7 +60,7 @@ class ApkService(
                     fsync(output)
                 }
             }
-            return@install Rslt.Ok()
+            return@install Rslt.Ok
         }
     }
 
@@ -88,7 +88,7 @@ class ApkService(
             val pendingIntent = PendingIntent.getBroadcast(context, sessionId, intent, flags)
             try {
                 session.commit(pendingIntent.intentSender)
-                Rslt.Ok()
+                Rslt.Ok
             } catch (e: Exception) {
                 e.toRslt()
             }
