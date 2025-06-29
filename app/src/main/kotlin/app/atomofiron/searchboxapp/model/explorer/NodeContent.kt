@@ -78,15 +78,6 @@ sealed class NodeContent(
         override val isCached get() = children != null
     }
 
-    /*sealed class Zip(
-        override val children: List<Node>? = null,
-        override val mimeType: String = "application/zip",
-    ) : Archive(mimeType) {
-        companion object {
-            private data class Zip() : File.Zip()
-            operator fun invoke() = Zip()
-        }
-    }*/
     data class Zip(
         override val children: List<Node>? = null,
         override val mimeType: String = "application/zip",
