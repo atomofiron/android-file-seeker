@@ -128,7 +128,6 @@ object ExplorerUtils {
     private const val EXT_OSB = ".osb" // osu storyboard
 
     private val spaces = Regex(" +")
-    private val slashes = Regex("/+")
     private val lastPart = Regex("(?<=/)/*[^/]+/*$|^/+\$")
     private val endingSlashes = Regex("/*$")
     private val fileType = Regex(": +")
@@ -364,7 +363,7 @@ object ExplorerUtils {
             (content is NodeContent.Directory) -> content
             type.isBlank(),
             (type == FILE_DATA) -> content.resolveFileType(path)
-            (type == FILE_EMPTY) -> content.resolveFileType(path)
+            (type == FILE_EMPTY) -> NodeContent.File.Empty
             (type == DIRECTORY) -> content.ifNotCached { NodeContent.Directory() }
             type.startsWith(FILE_PNG) -> content.ifNotCached { NodeContent.File.Picture.run { if (path.endsWith(EXT_APNG)) apng(path, type) else png(path, type) } }
             type.startsWith(FILE_JPEG) -> content.ifNotCached { NodeContent.File.Picture.jpeg(path, type) }
@@ -718,6 +717,11 @@ object ExplorerUtils {
         path.endsWith(EXT_PEM, ignoreCase = true),
         path.endsWith(EXT_P12, ignoreCase = true),
         path.endsWith(EXT_CRT, ignoreCase = true) -> ifNotCached { NodeContent.File.Cert }
+        path.endsWith(EXT_OSZ, ignoreCase = true) -> ifNotCached { NodeContent.File.Osu.Map() }
+        path.endsWith(EXT_OSK, ignoreCase = true) -> ifNotCached { NodeContent.File.Osu.Skin() }
+        path.endsWith(EXT_OLZ, ignoreCase = true) -> ifNotCached { NodeContent.File.Osu.LazerMap() }
+        path.endsWith(EXT_OSR, ignoreCase = true) -> ifNotCached { NodeContent.File.Osu.Replay() }
+        path.endsWith(EXT_OSB, ignoreCase = true) -> ifNotCached { NodeContent.File.Osu.Storyboard() }
         else -> NodeContent.File.Other
     }
 

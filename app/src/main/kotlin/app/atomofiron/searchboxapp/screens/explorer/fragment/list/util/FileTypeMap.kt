@@ -45,6 +45,7 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.File.Xz,
     is NodeContent.File.Other,
     is NodeContent.File.Flash,
+    is NodeContent.File.Empty,
     is NodeContent.File.Unknown -> R.drawable.ic_explorer_unknown
 }
 

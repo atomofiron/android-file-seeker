@@ -42,6 +42,8 @@ sealed class NodeContent(
         val isEmpty get() = thumbnail == null
         override val isCached get() = thumbnail != null
 
+        data object Empty : File()
+
         data class Movie(
             override val thumbnail: Thumbnail,
             val duration: Int = 0,
