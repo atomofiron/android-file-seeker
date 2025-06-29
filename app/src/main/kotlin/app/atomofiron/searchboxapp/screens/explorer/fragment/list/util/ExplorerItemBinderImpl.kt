@@ -17,6 +17,7 @@ import app.atomofiron.common.util.ifVisible
 import com.google.android.material.checkbox.MaterialCheckBox
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.LemonDrawable
+import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.drawable.translated
 import app.atomofiron.searchboxapp.custom.view.MuonsView
 import app.atomofiron.searchboxapp.model.explorer.*
@@ -43,6 +44,7 @@ class ExplorerItemBinderImpl(
 
     private var dirIcon = ContextCompat.getDrawable(itemView.context, R.drawable.ic_explorer_folder)!!.mutate().translated()
     private var fileIcon = ContextCompat.getDrawable(itemView.context, R.drawable.ic_explorer_file)!!.mutate().translated()
+    private val placeholder = MuonsDrawable(itemView.context)
 
     private val ivIcon = itemView.findViewById<ImageView>(R.id.item_explorer_iv_icon)
     private val ivThumbnail = itemView.findViewById<ImageView>(R.id.item_explorer_iv_thumbnail)
@@ -118,6 +120,7 @@ class ExplorerItemBinderImpl(
             is Thumbnail.FilePath -> Glide
                 .with(itemView.context)
                 .load(thumbnail.value)
+                .placeholder(placeholder)
                 .error(LemonDrawable())
                 .into(ivThumbnail)
             is Thumbnail.Bitmap -> ivThumbnail.setImageBitmap(thumbnail.value)
