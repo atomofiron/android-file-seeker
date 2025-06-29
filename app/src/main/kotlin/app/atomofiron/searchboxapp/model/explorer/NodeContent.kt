@@ -17,7 +17,7 @@ sealed class NodeContent(
     }
     val commonMimeType: String by unsafeLazy { mimeType?.run { substring(0, indexOf('/')) + "/*" } ?: AnyType }
     open val rootType: NodeRoot.NodeRootType? = null
-    open val isCached: Boolean = false
+    open val isCached = true
 
     data object Unknown : NodeContent()
     data object Link : NodeContent()
@@ -29,7 +29,7 @@ sealed class NodeContent(
         enum class Type {
             Ordinary, Android, Camera, Download, Movies, Music, Pictures,
         }
-        override val isCached: Boolean get() = rootType != null
+        override val isCached = rootType != null
     }
 
     sealed class File(
@@ -38,24 +38,23 @@ sealed class NodeContent(
         open val description: String? = null,
         override val details: String? = null,
     ) : NodeContent(mimeType) {
-        // прямая связь
-        val isEmpty get() = thumbnail == null
-        override val isCached get() = thumbnail?.ready == true
 
         data object Empty : File()
 
         data class Movie(
             override val thumbnail: Thumbnail,
-            val duration: Int = 0,
+            val duration: Int = 0, // todo
         ) : File() {
-            override val isCached: Boolean = duration > -1
+            override val isCached = duration >= 0
             constructor(path: String) : this(Thumbnail(path))
         }
 
         data class Music(
             override val thumbnail: Thumbnail? = null,
-            val duration: Int = 0,
-        ) : File(mimeType = "audio/*")
+            val duration: Int = 0, // todo
+        ) : File(mimeType = "audio/*") {
+            override val isCached = duration >= 0
+        }
 
         data class Picture private constructor(
             override val thumbnail: Thumbnail,
@@ -63,9 +62,6 @@ sealed class NodeContent(
             override val description: String? = null,
             override val details: String? = "", // todo
         ) : File(mimeType) {
-
-            override val isCached: Boolean = details != null
-
             companion object {
                 fun png(path: String, description: String? = null) = Picture(Thumbnail(path), mimeType = "image/png", description = description)
                 fun apng(path: String, description: String? = null) = Picture(Thumbnail(path), mimeType = "image/apng", description = description)
@@ -74,6 +70,7 @@ sealed class NodeContent(
                 fun webp(path: String) = Picture(Thumbnail(path), mimeType = "image/webp")
                 fun avif(path: String) = Picture(Thumbnail(path), mimeType = "image/avif")
             }
+            override val isCached = details != null
         }
 
         sealed class Archive(mimeType: String) : File(mimeType) {
