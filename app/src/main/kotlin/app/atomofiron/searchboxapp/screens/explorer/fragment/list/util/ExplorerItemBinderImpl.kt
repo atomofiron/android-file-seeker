@@ -104,6 +104,8 @@ class ExplorerItemBinderImpl(
         fileIcon.setTint(tvDetails.currentTextColor)
         dirIcon.alpha = Alpha.LEVEL_67
         fileIcon.alpha = Alpha.LEVEL_67
+
+        placeholder.setPadding(placeholder.intrinsicSize / 6)
     }
 
     override fun onBind(item: Node) {

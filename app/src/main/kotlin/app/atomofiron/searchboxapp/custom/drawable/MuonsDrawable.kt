@@ -40,7 +40,7 @@ private const val STUB_SIZE = 1
 class MuonsDrawable private constructor(
     private val defaultColor: Int,
     private val fillCenter: Boolean,
-    private val intrinsicSize: Int,
+    val intrinsicSize: Int,
 ) : Drawable(), ValueAnimator.AnimatorUpdateListener {
     companion object {
 
@@ -70,6 +70,7 @@ class MuonsDrawable private constructor(
     private val animator = ValueAnimator.ofFloat(START, END)
     private val rect = RectF()
     private var size = 0f
+    private var padding = 0
     private var startX = 0f
     private var startY = 0f
 
@@ -89,23 +90,7 @@ class MuonsDrawable private constructor(
 
     override fun onBoundsChange(bounds: Rect) {
         super.onBoundsChange(bounds)
-        val width = bounds.width()
-        val height = bounds.height()
-        size = min(width, height).toFloat()
-        startX = (width - size) / 2
-        startY = (height - size) / 2
-        updatePath()
-    }
-
-    private fun anim(value: Boolean) {
-        if (!value) {
-            // memory leaks in ValueAnimator
-            animator.removeUpdateListener(this)
-            animator.cancel()
-        } else if (!animator.isStarted) {
-            animator.addUpdateListener(this)
-            animator.start()
-        }
+        updateSize()
     }
 
     override fun draw(canvas: Canvas) {
@@ -133,6 +118,33 @@ class MuonsDrawable private constructor(
         }
         updatePath()
         invalidateSelf()
+    }
+
+    fun setPadding(padding: Int) {
+        if (padding != this.padding) {
+            this.padding = padding
+            updateSize()
+        }
+    }
+
+    private fun updateSize() {
+        val width = bounds.width()
+        val height = bounds.height()
+        size = min(width, height) - padding * 2f
+        startX = (width - size) / 2
+        startY = (height - size) / 2
+        updatePath()
+    }
+
+    private fun anim(value: Boolean) {
+        if (!value) {
+            // memory leaks in ValueAnimator
+            animator.removeUpdateListener(this)
+            animator.cancel()
+        } else if (!animator.isStarted) {
+            animator.addUpdateListener(this)
+            animator.start()
+        }
     }
 
     private fun updatePath() {
