@@ -39,8 +39,8 @@ sealed class NodeContent(
         override val details: String? = null,
     ) : NodeContent(mimeType) {
         // прямая связь
-        val isEmpty: Boolean get() = thumbnail == null
-        override val isCached: Boolean get() = thumbnail != null
+        val isEmpty get() = thumbnail == null
+        override val isCached get() = thumbnail != null
 
         data class Movie(
             override val thumbnail: Thumbnail,
@@ -56,7 +56,7 @@ sealed class NodeContent(
         ) : File(mimeType = "audio/*")
 
         data class Picture private constructor(
-            override val thumbnail: Thumbnail?,
+            override val thumbnail: Thumbnail,
             override val mimeType: String,
             override val description: String? = null,
             override val details: String? = "", // todo
@@ -76,6 +76,7 @@ sealed class NodeContent(
 
         sealed class Archive(mimeType: String) : File(mimeType) {
             open val children: List<Node>? = null
+            override val isCached get() = children != null || thumbnail != null
         }
 
         /*sealed class Zip(
