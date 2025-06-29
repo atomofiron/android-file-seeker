@@ -24,7 +24,7 @@ object Const {
     const val COMMON_DURATION = 512L
     const val COMMON_DELAY = 256L
 
-    const val DATE_PATTERN = "yyyy-MM-DD_HH-mm-ss"
+    const val DATE_PATTERN = "yyyy-MM-dd_HH-mm-ss"
     const val MIME_TYPE_TEXT = "text/plain"
     const val GITHUB_URL = "https://github.com/Atomofiron/android-search-box-app"
     const val FORPDA_URL = "https://4pda.ru/forum/index.php?showtopic=1000070&view=findpost&p=98557921"

@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.pm.PackageInstaller
 import androidx.core.net.toUri
 import app.atomofiron.common.util.Android
-import app.atomofiron.common.util.forHumans
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.File.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -14,6 +13,7 @@ import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.launch
 import app.atomofiron.searchboxapp.utils.launchable
+import app.atomofiron.searchboxapp.utils.toRslt
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import java.util.zip.ZipEntry
@@ -90,11 +90,11 @@ class ApkService(
                 session.commit(pendingIntent.intentSender)
                 Rslt.Ok()
             } catch (e: Exception) {
-                Rslt.Err(e.forHumans())
+                e.toRslt()
             }
         }
     } catch (e: Exception) {
-        Rslt.Err(e.forHumans())
+        e.toRslt()
     }
 
     fun launchable(packageName: String): Boolean = context.packageManager.launchable(packageName)

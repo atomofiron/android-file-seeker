@@ -167,7 +167,7 @@ class FinderWorker(
             val item = newNode(path)
             val itemMatch = when (val result = TextViewerService.searchInside(params, path, useSu)) {
                 is Rslt.Ok -> result.data.toItemMatchMultiply(item)
-                is Rslt.Err -> ItemMatch.MultiplyError(item, count, result.error)
+                is Rslt.Err -> ItemMatch.MultiplyError(item, count, result.message)
             }
             addToResult(itemMatch)
         }.let { progressJobs.add(it) }

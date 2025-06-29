@@ -5,6 +5,8 @@ import app.atomofiron.searchboxapp.model.network.GithubError
 import app.atomofiron.searchboxapp.model.network.GithubRelease
 import app.atomofiron.searchboxapp.model.network.Loading
 import app.atomofiron.searchboxapp.utils.Rslt
+import app.atomofiron.searchboxapp.utils.toErr
+import app.atomofiron.searchboxapp.utils.toRslt
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -45,11 +47,14 @@ class UpdateApi {
     suspend fun releases(): Rslt<List<GithubRelease>> = try {
         val response = client.get(RELEASES)
         when {
-            response.status.ok() -> Rslt.Ok(response.body<List<GithubRelease>>())
-            else -> Rslt.Err(response.body<GithubError>().run { "[$status] $message" })
+            response.status.ok() -> response.body<List<GithubRelease>>()
+                .toRslt()
+            else -> response.body<GithubError>()
+                .run { "[$status] $message" }
+                .toErr()
         }
     } catch (t: Throwable) {
-        Rslt.Err(t.forHumans())
+        t.toRslt()
     }
 
     fun download(url: String, dst: File): Flow<Loading> = flow {

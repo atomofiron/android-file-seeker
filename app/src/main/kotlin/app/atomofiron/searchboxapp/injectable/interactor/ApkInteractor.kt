@@ -38,7 +38,7 @@ class ApkInteractor(
             val result = apkService.install(content, Intents.ACTION_INSTALL_APP)
             if (result is Rslt.Err) {
                 withMain {
-                    dialogs.showError(UniText(result.error))
+                    dialogs.showError(UniText(result.message))
                 }
             }
         }

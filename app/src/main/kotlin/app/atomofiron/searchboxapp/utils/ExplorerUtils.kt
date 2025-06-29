@@ -20,6 +20,13 @@ import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import app.atomofiron.searchboxapp.utils.Const.SLASH
 import kotlinx.coroutines.Job
+import java.io.BufferedInputStream
+import java.io.FileInputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.zip.ZipEntry
+import java.util.zip.ZipInputStream
 import kotlin.math.roundToInt
 
 object ExplorerUtils {
@@ -216,8 +223,9 @@ object ExplorerUtils {
     }
 
     private fun Long.toSize(): String {
-        if (this == 0L) {
-            return "0B"
+        when {
+            this == 0L -> return "0B"
+            this < 0L -> return "?B"
         }
         var dim = 0
         var tmp = this
@@ -413,22 +421,23 @@ object ExplorerUtils {
 
     private fun Node.cacheFile(config: CacheConfig): Node {
         val content = when (content) {
-            is NodeContent.File.Picture.Png -> NodeContent.File.Picture.Png(path)
-            is NodeContent.File.Picture.Jpeg -> NodeContent.File.Picture.Jpeg(path)
-            is NodeContent.File.Picture.Gif -> NodeContent.File.Picture.Gif(path)
-            is NodeContent.File.Picture.Webp -> NodeContent.File.Picture.Webp(path)
-            is NodeContent.File.Picture.Avif -> NodeContent.File.Picture.Avif(path)
-            is NodeContent.File.Movie -> NodeContent.File.Movie(path)
+            is NodeContent.File.Picture,
+            is NodeContent.File.Movie -> content
             is NodeContent.File.Music -> NodeContent.File.Music(0, path.createAudioThumbnail(config)?.forNode)
-            is NodeContent.File.Zip -> AndroidApp.Apks(path)
-                .tryGetApksContent(path)
-                .contentOrNodeError(this) { return it }
+            is NodeContent.File.Zip -> cache(content).contentOrNodeError(this) { return it }.let { zip ->
+                when (zip.children?.any { it.name == BASE_APK }) {
+                    null, false -> zip
+                    true -> AndroidApp.Apks(path)
+                        .tryGetApksContent(path)
+                        .contentOrNodeError(this) { return it }
+                }
+            }
             is AndroidApp -> when {
                 content.splitApk -> content
                     .tryGetApksContent(path)
                     .contentOrNodeError(this) { return it }
                 else -> content
-                    .getApkContent(path)
+                    .tryGetApkContent(path)
                     .contentOrNodeError(this) { return it }
             }
             else -> return this
@@ -436,7 +445,7 @@ object ExplorerUtils {
         return copy(content = content)
     }
 
-    private inline fun Rslt<out NodeContent>.contentOrNodeError(node: Node, action: (withError: Node) -> Nothing): NodeContent {
+    private inline fun <C : NodeContent> Rslt<C>.contentOrNodeError(node: Node, action: (withError: Node) -> Nothing): C {
         return unwrapOrElse {
             action(node.copy(error = NodeError.Message(it)))
         }
@@ -445,7 +454,30 @@ object ExplorerUtils {
     private fun AndroidApp.tryGetApksContent(zipPath: String): Rslt<AndroidApp> = try {
         getApksContent(zipPath)
     } catch (e: Exception) {
-        Rslt.Err(e.toString())
+        e.toRslt()
+    }
+
+    private fun Node.cache(content: NodeContent.File.Zip): Rslt<NodeContent.File.Zip> = try {
+        val children = mutableListOf<Node>()
+        ZipInputStream(BufferedInputStream(FileInputStream(path))).use { stream ->
+            var entry: ZipEntry? = stream.nextEntry
+            while (entry != null) {
+                val new = when {
+                    entry.isDirectory -> NodeContent.Directory()
+                    else -> resolveFileType(entry.name)
+                }
+                val dateTime = SimpleDateFormat(NodeProperties.DATE_TIME_FORMAT, Locale.ROOT)
+                    .format(Date(entry.time))
+                    .split(NodeProperties.DATE_TIME_SEPARATOR)
+                val properties = NodeProperties(name = entry.name, date = dateTime.first(), time = dateTime.last(), size = entry.size.toSize(), length = entry.size)
+                val node = Node("$path/${entry.name}", parentPath = path, rootId = uniqueId, properties = properties, content = new)
+                children.add(node)
+                entry = stream.nextEntry
+            }
+        }
+        content.copy(children = children).toRslt()
+    } catch (e: Exception) {
+        e.toRslt()
     }
 
     private inline fun <reified T : NodeContent> NodeContent?.ifNotCached(action: () -> T): T {

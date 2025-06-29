@@ -54,7 +54,7 @@ class TextViewerService(
             return if (output.success || output.code == 1 && output.error.isEmpty()) {
                 val indexes = lineIndexToMatches.keys.sorted()
                 val result = TextSearchResult(count, lineIndexToMatches, indexes)
-                Rslt.Ok(result)
+                result.toRslt()
             } else  {
                 logE("searchInFile !success, error: ${output.error}")
                 Rslt.Err(output.error)
@@ -182,7 +182,7 @@ class TextViewerService(
     private fun TextViewerSession.searchInside(task: SearchTask): SearchTask {
         return when (val result = searchInside(task.params, item.value.path, useSu)) {
             is Rslt.Ok -> task.toEnded(result = result.data)
-            is Rslt.Err -> task.toEnded(error = result.error)
+            is Rslt.Err -> task.toEnded(error = result.message)
         }
     }
 

@@ -9,7 +9,12 @@ data class NodeProperties(
     override val time: String = "",
     override val name: String = "",
     override val length: Long = -1,
-) : INodeProperties
+) : INodeProperties {
+    companion object {
+        const val DATE_TIME_SEPARATOR = " "
+        const val DATE_TIME_FORMAT = "yyyy-MM-dd${DATE_TIME_SEPARATOR}HH:mm"
+    }
+}
 
 // -rw-r-----  1 root everybody   5348187 2019-06-13 18:19 Magisk-v19.3.zip
 interface INodeProperties {

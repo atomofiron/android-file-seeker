@@ -74,6 +74,7 @@ fun AndroidApp.getApksContent(input: InputStream?): Rslt<AndroidApp> {
         ?.mkdir()
         ?.takeIf { tmp.createNewFile() }
         ?: return Rslt.Err("Can't create temp file")
+    var containsBaseApk = false
     ZipInputStream(BufferedInputStream(input)).use { stream ->
         var entry: ZipEntry? = stream.nextEntry
         while (entry != null) {
@@ -81,20 +82,20 @@ fun AndroidApp.getApksContent(input: InputStream?): Rslt<AndroidApp> {
                 FileOutputStream(tmp).use {
                     stream.copyTo(it)
                 }
+                containsBaseApk = true
                 break
             }
             entry = stream.nextEntry
         }
     }
-    if (tmp.length() == 0L) {
-        return Rslt.Err("Temp file is empty")
-    }
-    return getApkContent(tmp.absolutePath).also {
-        tmp.delete()
-    }
+    return when {
+        !containsBaseApk -> Rslt.Err("$BASE_APK not found")
+        tmp.length() == 0L -> Rslt.Err("Temp file is empty")
+        else -> tryGetApkContent(tmp.absolutePath)
+    }.also { tmp.delete() }
 }
 
-fun AndroidApp.getApkContent(apkPath: String): Rslt<AndroidApp> {
+fun AndroidApp.tryGetApkContent(apkPath: String): Rslt<AndroidApp> {
     val packageManager = packageManager.value
         ?: return Rslt.Err("No package manager")
     val info = packageManager.apkInfo(apkPath)
