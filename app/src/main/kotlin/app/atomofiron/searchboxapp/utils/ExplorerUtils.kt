@@ -370,8 +370,8 @@ object ExplorerUtils {
             type.startsWith(FILE_JPEG) -> content.ifNotCached { NodeContent.File.Picture.jpeg(path, type) }
             type.startsWith(FILE_GIF) -> content.ifNotCached { NodeContent.File.Picture.gif(path, type) }
             type.startsWith(FILE_ZIP) -> when {
-                path.endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { AndroidApp.Apk(path) }
-                path.endsWith(EXT_APKS, ignoreCase = true) -> content.ifNotCached { AndroidApp.Apks(path) }
+                path.endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { AndroidApp.apk(path) }
+                path.endsWith(EXT_APKS, ignoreCase = true) -> content.ifNotCached { AndroidApp.apks(path) }
                 content is AndroidApp -> return this
                 path.endsWith(EXT_OSZ, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.Map() }
                 path.endsWith(EXT_OSK, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Osu.Skin() }
@@ -430,9 +430,10 @@ object ExplorerUtils {
             is NodeContent.File.Zip -> cache(content).contentOrNodeError(this) { return it }.let { zip ->
                 when (zip.children?.any { it.name == BASE_APK }) {
                     null, false -> zip
-                    true -> AndroidApp.Apks(path)
-                        .tryGetApksContent(path)
-                        .contentOrNodeError(this) { return it }
+                    true -> AndroidApp.apks(path, children = zip.children).let { apks ->
+                        apks.tryGetApksContent(path)
+                            .contentOrNodeError(this, apks) { return it }
+                    }
                 }
             }
             is AndroidApp -> when {
@@ -448,9 +449,9 @@ object ExplorerUtils {
         return copy(content = content)
     }
 
-    private inline fun <C : NodeContent> Rslt<C>.contentOrNodeError(node: Node, action: (withError: Node) -> Nothing): C {
+    private inline fun <C : NodeContent> Rslt<C>.contentOrNodeError(node: Node, content: NodeContent? = null, action: (withError: Node) -> Nothing): C {
         return unwrapOrElse {
-            action(node.copy(error = NodeError.Message(it)))
+            action(node.copy(content = content ?: node.content, error = NodeError.Message(it)))
         }
     }
 
@@ -679,8 +680,8 @@ object ExplorerUtils {
         path.endsWith(EXT_GIF, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.gif(path) }
         path.endsWith(EXT_WEBP, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.webp(path) }
         path.endsWith(EXT_AVIF, ignoreCase = true) -> ifNotCached { NodeContent.File.Picture.avif(path) }
-        path.endsWith(EXT_APK, ignoreCase = true) -> ifNotCached { AndroidApp.Apk(path) }
-        path.endsWith(EXT_APKS, ignoreCase = true) -> ifNotCached { AndroidApp.Apks(path) }
+        path.endsWith(EXT_APK, ignoreCase = true) -> ifNotCached { AndroidApp.apk(path) }
+        path.endsWith(EXT_APKS, ignoreCase = true) -> ifNotCached { AndroidApp.apks(path) }
         path.endsWith(EXT_ZIP, ignoreCase = true) -> ifNotCached { NodeContent.File.Zip() }
         path.endsWith(EXT_TAR, ignoreCase = true) -> ifNotCached { NodeContent.File.Tar() }
         path.endsWith(EXT_BZ2, ignoreCase = true) -> ifNotCached { NodeContent.File.Bzip2() }

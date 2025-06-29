@@ -103,16 +103,16 @@ sealed class NodeContent(
             val ref: NodeRef,
             val splitApk: Boolean,
             val info: ApkInfo? = null,
+            override val children: List<Node>? = null,
         ) : Archive(mimeType = if (splitApk) "application/zip" else "application/vnd.android.package-archive") {
             override val details: String? = info?.versionName
             override val thumbnail: Thumbnail? get() = info?.icon
 
-            @Suppress("FunctionName")
             companion object {
-                fun Apk(path: String) = Apk(NodeRef(path))
-                fun Apks(path: String) = Apks(NodeRef(path))
-                fun Apk(ref: NodeRef, info: ApkInfo? = null) = AndroidApp(ref, splitApk = false, info)
-                fun Apks(ref: NodeRef, info: ApkInfo? = null) = AndroidApp(ref, splitApk = true, info)
+                fun apk(path: String, children: List<Node>? = null) = apk(NodeRef(path), children = children)
+                fun apks(path: String, children: List<Node>? = null) = apks(NodeRef(path), children = children)
+                fun apk(ref: NodeRef, info: ApkInfo? = null, children: List<Node>? = null) = AndroidApp(ref, splitApk = false, info, children)
+                fun apks(ref: NodeRef, info: ApkInfo? = null, children: List<Node>? = null) = AndroidApp(ref, splitApk = true, info, children)
             }
         }
 

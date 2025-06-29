@@ -25,7 +25,6 @@ import app.atomofiron.searchboxapp.utils.unwrapOrElse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.FileInputStream
 
@@ -80,7 +79,7 @@ class FileOperationsDelegate(
 
     fun askForApks(ref: NodeRef, contentResolver: ContentResolver) {
         var scope: CoroutineScope? = null
-        var content = File.AndroidApp.Apks(ref)
+        var content = File.AndroidApp.apks(ref)
         val updater = dialogs show DialogConfig(
             cancelable = false,
             icon = dialogs.loadingIcon(),
