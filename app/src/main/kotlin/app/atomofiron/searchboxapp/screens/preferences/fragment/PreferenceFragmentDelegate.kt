@@ -39,7 +39,7 @@ class PreferenceFragmentDelegate(
             PreferenceKeys.KeySpecialCharacters.name -> {
                 preference as TextFieldPreference
                 preference.setFilter {
-                    it.replace(Regex("[ ]+"), Const.SPACE).trim()
+                    it.replace(Regex(" +"), Const.SPACE.toString()).trim()
                 }
             }
         }
