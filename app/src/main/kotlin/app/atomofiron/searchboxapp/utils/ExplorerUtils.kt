@@ -88,6 +88,7 @@ object ExplorerUtils {
     private const val EXT_RAR = ".rar"
     private const val EXT_TXT = ".txt"
     private const val EXT_INI = ".ini"
+    private const val EXT_CPP = ".cpp"
     private const val EXT_INO = ".ino"
     private const val EXT_KT = ".kt"
     private const val EXT_KTS = ".kts"
@@ -391,6 +392,7 @@ object ExplorerUtils {
             type.startsWith(FILE_ASCII_TEXT) -> when {
                 path.endsWith(EXT_SVG, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Svg }
                 path.endsWith(EXT_OSU, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Osu }
+                path.endsWith(EXT_CPP, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Cpp }
                 path.endsWith(EXT_INO, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Ino }
                 else -> NodeContent.File.Text.Plain
             }

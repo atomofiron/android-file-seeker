@@ -131,7 +131,8 @@ sealed class NodeContent(
             data object Script : Text()
             data object Osu : Text("application/x-osu-beatmap")
             data object Svg : Text("image/svg+xml")
-            data object Ino : Text()
+            data object Cpp : Text("text/x-c++src")
+            data object Ino : Text("text/x-arduino")
         }
         data object Pdf : File("application/pdf")
         data object Torrent : File("application/x-bittorrent")
