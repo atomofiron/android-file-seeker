@@ -387,7 +387,7 @@ object ExplorerUtils {
             type.startsWith(FILE_GZIP) -> content.ifNotCached { NodeContent.File.Gz() }
             type.startsWith(FILE_TAR) -> content.ifNotCached { NodeContent.File.Tar() }
             type.startsWith(FILE_XZ) -> content.ifNotCached { NodeContent.File.Xz }
-            type.startsWith(FILE_SH_SCRIPT) -> NodeContent.File.Text.Script
+            type.startsWith(FILE_SH_SCRIPT) -> NodeContent.File.Text.ShellScript
             type.startsWith(FILE_UTF8_TEXT),
             type.startsWith(FILE_ASCII_TEXT) -> when {
                 path.endsWith(EXT_SVG, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Svg }
@@ -686,7 +686,7 @@ object ExplorerUtils {
         path.endsWith(EXT_BZ2, ignoreCase = true) -> ifNotCached { NodeContent.File.Bzip2() }
         path.endsWith(EXT_GZ, ignoreCase = true) -> ifNotCached { NodeContent.File.Gz() }
         path.endsWith(EXT_RAR, ignoreCase = true) -> ifNotCached { NodeContent.File.Rar() }
-        path.endsWith(EXT_SH, ignoreCase = true) -> NodeContent.File.Text.Script
+        path.endsWith(EXT_SH, ignoreCase = true) -> NodeContent.File.Text.ShellScript
         path.endsWith(EXT_TXT, ignoreCase = true),
         path.endsWith(EXT_INI, ignoreCase = true),
         path.endsWith(EXT_KT, ignoreCase = true),
