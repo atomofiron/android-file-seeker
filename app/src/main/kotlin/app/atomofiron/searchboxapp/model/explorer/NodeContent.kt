@@ -53,8 +53,8 @@ sealed class NodeContent(
         }
 
         data class Music(
-            val duration: Int = 0,
             override val thumbnail: Thumbnail? = null,
+            val duration: Int = 0,
         ) : File(mimeType = "audio/*")
 
         data class Picture private constructor(

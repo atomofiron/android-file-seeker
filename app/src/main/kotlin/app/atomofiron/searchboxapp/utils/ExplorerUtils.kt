@@ -425,7 +425,7 @@ object ExplorerUtils {
         val content = when (content) {
             is NodeContent.File.Picture,
             is NodeContent.File.Movie -> content
-            is NodeContent.File.Music -> NodeContent.File.Music(0, path.createAudioThumbnail(config)?.forNode)
+            is NodeContent.File.Music -> NodeContent.File.Music(path.createAudioThumbnail(config)?.forNode, 0)
             is NodeContent.File.Zip -> cache(content).contentOrNodeError(this) { return it }.let { zip ->
                 when (zip.children?.any { it.name == BASE_APK }) {
                     null, false -> zip
