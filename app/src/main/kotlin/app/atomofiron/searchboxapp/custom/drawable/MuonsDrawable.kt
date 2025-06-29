@@ -13,9 +13,9 @@ import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
-import android.util.Size
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
+import androidx.annotation.DimenRes
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
@@ -35,26 +35,27 @@ private const val ROTATE_90 = 90f
 private const val ROTATE_180 = 180f
 private const val STROKE_WIDTH = 1f / 12
 private const val CIRCLES_PADDING = 1f / 6
+private const val STUB_SIZE = 1
 
 class MuonsDrawable private constructor(
     private val defaultColor: Int,
     private val fillCenter: Boolean,
-    private val intrinsicSize: Size,
+    private val intrinsicSize: Int,
 ) : Drawable(), ValueAnimator.AnimatorUpdateListener {
     companion object {
 
         operator fun invoke(color: Int = Color.MAGENTA, fillCenter: Boolean = true): MuonsDrawable {
-            return MuonsDrawable(color, fillCenter, Size(1, 1))
+            return MuonsDrawable(color, fillCenter, STUB_SIZE)
         }
 
-        operator fun invoke(context: Context, fillCenter: Boolean = true): MuonsDrawable {
+        operator fun invoke(context: Context, @DimenRes sizeRes: Int = R.dimen.icon_size, fillCenter: Boolean = true): MuonsDrawable {
             val color = context.findColorByAttr(MaterialAttr.colorAccent)
-            val intrinsicSize = context.resources.getDimensionPixelSize(R.dimen.icon_size)
-            return MuonsDrawable(color, fillCenter, Size(intrinsicSize, intrinsicSize))
+            val intrinsicSize = context.resources.getDimensionPixelSize(sizeRes)
+            return MuonsDrawable(color, fillCenter, intrinsicSize)
         }
 
         fun ImageView.setMuonsDrawable(fillCenter: Boolean = true): MuonsDrawable {
-            val drawable = MuonsDrawable(context, fillCenter)
+            val drawable = MuonsDrawable(context, fillCenter = fillCenter)
             setImageDrawable(drawable)
             return drawable
         }
@@ -82,18 +83,17 @@ class MuonsDrawable private constructor(
         animator.interpolator = LinearInterpolator()
     }
 
-    override fun getIntrinsicWidth(): Int = intrinsicSize.width
+    override fun getIntrinsicWidth(): Int = intrinsicSize
 
-    override fun getIntrinsicHeight(): Int = intrinsicSize.height
+    override fun getIntrinsicHeight(): Int = intrinsicSize
 
     override fun onBoundsChange(bounds: Rect) {
         super.onBoundsChange(bounds)
-        bounds.run {
-            size = min(width(), height()).toFloat()
-            val dif = (width() - height()) / 2f
-            startX = max(0f, dif)
-            startY = max(0f, -dif)
-        }
+        val width = bounds.width()
+        val height = bounds.height()
+        size = min(width, height).toFloat()
+        startX = (width - size) / 2
+        startY = (height - size) / 2
         updatePath()
     }
 
