@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_SETTLING
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.isRtl
 import kotlin.math.abs
@@ -29,6 +30,9 @@ class SwipeMarkerDelegate(resources: Resources) {
     private var downPoint: PointF? = null
 
     private fun onDown(rv: RecyclerView, x: Float, y: Float): Boolean {
+        if (rv.scrollState == SCROLL_STATE_SETTLING) {
+            return false
+        }
         val itemView = rv.findChildViewUnder(x, y)
         if (itemView?.id != R.id.item_explorer) {
             return false
