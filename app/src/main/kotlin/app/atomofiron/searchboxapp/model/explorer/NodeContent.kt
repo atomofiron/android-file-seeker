@@ -40,7 +40,7 @@ sealed class NodeContent(
     ) : NodeContent(mimeType) {
         // прямая связь
         val isEmpty get() = thumbnail == null
-        override val isCached get() = thumbnail != null
+        override val isCached get() = thumbnail?.ready == true
 
         data object Empty : File()
 
@@ -78,7 +78,7 @@ sealed class NodeContent(
 
         sealed class Archive(mimeType: String) : File(mimeType) {
             open val children: List<Node>? = null
-            override val isCached get() = children != null || thumbnail != null
+            override val isCached get() = children != null
         }
 
         /*sealed class Zip(
@@ -107,9 +107,15 @@ sealed class NodeContent(
             val info: ApkInfo? = null,
             override val children: List<Node>? = null,
         ) : Archive(mimeType = if (splitApk) "application/zip" else "application/vnd.android.package-archive") {
-            override val details: String? = info?.versionName
-            override val thumbnail: Thumbnail? get() = info?.icon
 
+            override val details: String? = info?.versionName
+
+            override val isCached = thumbnail?.ready == true
+
+            override val thumbnail: Thumbnail? get() = when (info) {
+                null -> Thumbnail.Loading
+                else -> info.icon
+            }
             companion object {
                 fun apk(path: String, children: List<Node>? = null) = apk(NodeRef(path), children = children)
                 fun apks(path: String, children: List<Node>? = null) = apks(NodeRef(path), children = children)

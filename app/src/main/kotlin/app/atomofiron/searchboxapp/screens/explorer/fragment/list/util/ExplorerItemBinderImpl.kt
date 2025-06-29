@@ -126,6 +126,7 @@ class ExplorerItemBinderImpl(
             is Thumbnail.Bitmap -> ivThumbnail.setImageBitmap(thumbnail.value)
             is Thumbnail.Drawable -> ivThumbnail.setImageDrawable(thumbnail.value)
             is Thumbnail.Res -> ivThumbnail.setImageResource(thumbnail.value)
+            is Thumbnail.Loading -> ivThumbnail.setImageDrawable(placeholder)
             null -> ivThumbnail.setImageDrawable(null)
         }
 

@@ -5,14 +5,20 @@ import android.graphics.Bitmap as AndroidBitmap
 import android.graphics.drawable.Drawable as AndroidDrawable
 
 sealed interface Thumbnail {
+
+    val ready: Boolean get() = true
+
+    data object Loading: Thumbnail {
+        override val ready = false
+    }
     @JvmInline
-    value class Bitmap(val value: AndroidBitmap): Thumbnail
+    value class Bitmap(val value: AndroidBitmap) : Thumbnail
     @JvmInline
-    value class FilePath(val value: String): Thumbnail
+    value class FilePath(val value: String) : Thumbnail
     @JvmInline
-    value class Drawable(val value: AndroidDrawable): Thumbnail
+    value class Drawable(val value: AndroidDrawable) : Thumbnail
     @JvmInline
-    value class Res(@DrawableRes val value: Int): Thumbnail
+    value class Res(@DrawableRes val value: Int) : Thumbnail
 
     val path: String? get() = (this as? FilePath)?.value
 
