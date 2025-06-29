@@ -60,7 +60,7 @@ object ExplorerUtils {
     private const val FILE_EMPTY = "empty"
     private const val FILE_BOOTING = "Android bootimg" // img
     private const val FILE_BOOT_IMAGE = "Android boot image v2" // img
-    private const val FILE_SH_SCRIPT = "/bin/sh script" // sh
+    private val FILE_SH_SCRIPT = Regex("^[^ ]+ script") // sh
     private const val FILE_OGG = "Ogg data, opus audio" // oga
     private const val FILE_PEM = "PEM certificate" // pem
     private const val FILE_ELF_EXE = "ELF executable"
@@ -386,7 +386,6 @@ object ExplorerUtils {
             type.startsWith(FILE_GZIP) -> content.ifNotCached { NodeContent.File.Gz() }
             type.startsWith(FILE_TAR) -> content.ifNotCached { NodeContent.File.Tar() }
             type.startsWith(FILE_XZ) -> content.ifNotCached { NodeContent.File.Xz }
-            type.startsWith(FILE_SH_SCRIPT) -> NodeContent.File.Text.ShellScript
             type.startsWith(FILE_UTF8_TEXT),
             type.startsWith(FILE_ASCII_TEXT) -> when {
                 path.endsWith(EXT_SVG, ignoreCase = true) -> content.ifNotCached { NodeContent.File.Text.Svg }
@@ -410,6 +409,7 @@ object ExplorerUtils {
             type.startsWith(FILE_MS_EXE) -> content.ifNotCached { NodeContent.File.ExeMs }
             type.startsWith(FILE_APLS_EXE) -> content.ifNotCached { NodeContent.File.ExeApls }
             type.startsWith(FILE_APL_EXE) -> content.ifNotCached { NodeContent.File.ExeApl }
+            type.matches(FILE_SH_SCRIPT) -> NodeContent.File.Text.ShellScript
             else -> {
                 val ext = name.lastIndexOf(Const.DOT).inc()
                     .let { if (it == 0) name.length else it }
