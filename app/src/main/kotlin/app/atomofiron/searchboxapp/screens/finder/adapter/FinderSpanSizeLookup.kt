@@ -27,12 +27,17 @@ private data class Cell(
     val rowId: Int,
 )
 
+interface AdapterHolderListener {
+    fun onCreate(holder: Holder, viewType: Int)
+    fun onBind(holder: Holder, position: Int)
+}
+
 class FinderSpanSizeLookup(
     private val adapter: ListAdapter<out GeneralItem, *>,
     private val manager: GridLayoutManager,
     resources: Resources,
 )  : GridLayoutManager.SpanSizeLookup()
-    , FinderAdapter.OnHolderCreateListener
+    , AdapterHolderListener
     , View.OnLayoutChangeListener
 {
 

@@ -5,11 +5,11 @@ import androidx.recyclerview.widget.ListAdapter
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.OptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.DisclaimerHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.OptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
@@ -17,13 +17,12 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TitleHolder
 import app.atomofiron.searchboxapp.screens.finder.state.FinderItemType
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKey
 
 class FinderAdapter(
     private val output: FinderAdapterOutput,
 ) : ListAdapter<FinderStateItem, GeneralHolder<FinderStateItem>>(FinderDiffUtilCallback()) {
 
-    var holderListener: OnHolderCreateListener? = null
+    var holderListener: AdapterHolderListener? = null
 
     init {
         setHasStableIds(true)
@@ -54,10 +53,5 @@ class FinderAdapter(
     override fun onBindViewHolder(holder: GeneralHolder<FinderStateItem>, position: Int) {
         holder.bind(getItem(position), position)
         holderListener?.onBind(holder, position)
-    }
-
-    interface OnHolderCreateListener {
-        fun onCreate(holder: GeneralHolder<*>, viewType: Int)
-        fun onBind(holder: GeneralHolder<*>, position: Int)
     }
 }
