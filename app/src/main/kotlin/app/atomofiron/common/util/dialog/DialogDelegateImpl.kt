@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
@@ -123,6 +124,10 @@ class DialogDelegateImpl(activity: WeakProperty<out FragmentActivity>) : DialogD
                     setButton(AlertDialog.BUTTON_NEUTRAL, null) { _, _ -> onClick(checked) }
                 }
             }
+            window?.findViewById<View>(androidx.appcompat.R.id.alertTitle)
+                ?.isVisible = config.title != null
+            window?.findViewById<View>(androidx.appcompat.R.id.contentPanel)
+                ?.isVisible = config.message != null
             config.withCheckbox?.let {
                 checkboxLayout.checkbox.setText(it.label)
                 dialog.setView(checkboxLayout.root)
