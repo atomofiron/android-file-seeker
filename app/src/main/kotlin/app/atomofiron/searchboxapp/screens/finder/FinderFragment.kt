@@ -65,7 +65,6 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         layoutManager.reverseLayout = true
         binding.recyclerView.run {
             addOnLayoutChangeListener(spanSizeLookup)
-            addOnChildAttachStateChangeListener(spanSizeLookup)
             layoutManager = this@FinderFragment.layoutManager
             itemAnimator = null
             adapter = finderAdapter
