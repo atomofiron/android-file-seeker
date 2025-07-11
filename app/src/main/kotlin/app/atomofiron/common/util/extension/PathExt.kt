@@ -39,8 +39,8 @@ fun Path.corner(x: Float, y: Float, left: Boolean, top: Boolean, clockWise: Bool
 }
 
 private fun Path.corner(x0: Float, y0: Float, x1: Float, y1: Float, clockWise: Boolean, offsetX: Float = 0f, offsetY: Float = 0f) {
-    var dx = (x1 - x0).round()
-    var dy = (y1 - y0).round()
+    var dx = (x1 - x0).fix()
+    var dy = (y1 - y0).fix()
     if (abs(dx) != abs(dy)) {
         throw IllegalArgumentException("($x0,$y0) - ($x1,$y1), ${abs(dx)} != ${abs(dy)}, ${widthPixels}x$heightPixels $densityDpi $density $scaledDensity")
     }
