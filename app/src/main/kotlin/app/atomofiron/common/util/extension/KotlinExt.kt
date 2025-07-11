@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 suspend fun withMain(action: suspend CoroutineScope.() -> Unit) = withContext(Dispatchers.Main, action)
 
@@ -39,6 +40,8 @@ fun Long.pow(exp: Long): Long {
     }
     return result
 }
+
+fun Float.round(): Float = (this * 10000).roundToInt() / 10000f
 
 fun <T> MutableList<T>.clear(from: Int, to: Int = size) {
     if (from <= to) subList(from, to).clear()

@@ -1,11 +1,33 @@
 package app.atomofiron.common.util.extension
 
 import android.graphics.Path
+import android.util.DisplayMetrics
+import app.atomofiron.common.util.extension.CornerPathDebug.density
+import app.atomofiron.common.util.extension.CornerPathDebug.densityDpi
+import app.atomofiron.common.util.extension.CornerPathDebug.heightPixels
+import app.atomofiron.common.util.extension.CornerPathDebug.scaledDensity
+import app.atomofiron.common.util.extension.CornerPathDebug.widthPixels
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sign
+
+object CornerPathDebug {
+    var widthPixels = 0
+    var heightPixels = 0
+    var densityDpi = 0
+    var density = 0f
+    var scaledDensity = 0f
+
+    operator fun invoke(metrics: DisplayMetrics) {
+        widthPixels = metrics.widthPixels
+        heightPixels = metrics.heightPixels
+        densityDpi = metrics.densityDpi
+        density = metrics.density
+        scaledDensity = metrics.scaledDensity
+    }
+}
 
 fun Path.corner(x: Float, y: Float, left: Boolean, top: Boolean, clockWise: Boolean, radius: Float, offsetX: Float = 0f, offsetY: Float = 0f) {
     val flag = (left == top) == clockWise
@@ -17,10 +39,10 @@ fun Path.corner(x: Float, y: Float, left: Boolean, top: Boolean, clockWise: Bool
 }
 
 private fun Path.corner(x0: Float, y0: Float, x1: Float, y1: Float, clockWise: Boolean, offsetX: Float = 0f, offsetY: Float = 0f) {
-    var dx = x1 - x0
-    var dy = y1 - y0
+    var dx = (x1 - x0).round()
+    var dy = (y1 - y0).round()
     if (abs(dx) != abs(dy)) {
-        throw IllegalArgumentException("($x0,$y0) - ($x1,$y1)")
+        throw IllegalArgumentException("($x0,$y0) - ($x1,$y1), ${abs(dx)} != ${abs(dy)}, ${widthPixels}x$heightPixels $densityDpi $density $scaledDensity")
     }
     var start = when {
         dx < 0 && dy < 0 -> 0f // 90f
