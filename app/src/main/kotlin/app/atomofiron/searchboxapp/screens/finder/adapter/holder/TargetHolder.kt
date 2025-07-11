@@ -23,6 +23,8 @@ class TargetHolder(
         chipView.setOnClickListener { output.onTargetClick(item, !chipView.isSelected) }
     }
 
+    override fun minWidth(): Float = throw UnsupportedOperationException()
+
     override fun onBind(item: Node, position: Int) {
         val icon = ContextCompat.getDrawable(context, item.getIcon())
         chipView.chipIcon = icon

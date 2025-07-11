@@ -2,6 +2,7 @@
 	<dimen name="infinity">999dp</dimen>
 	<dimen name="fab_margin">16dp</dimen>
 	<dimen name="corner_radius">16dp</dimen>
+	<dimen name="text_field_corner">8dp</dimen>
 	<dimen name="common_margin_extra">32dp</dimen>
 	<dimen name="common_margin_large">24dp</dimen>
 	<dimen name="common_margin">16dp</dimen>
@@ -55,11 +56,19 @@
 	<dimen name="item_ripple_corner_radius">16dp</dimen>
 	<dimen name="content_padding_bottom">32dp</dimen>
 	<dimen name="min_space_with_joystick">420dp</dimen>
-	<dimen name="bottom_bar_max_width">480dp</dimen>
 	<dimen name="screen_compact">480dp</dimen>
+	<dimen name="bottom_bar_max_width">@dimen/screen_compact</dimen>
 	<dimen name="screen_medium">600dp</dimen>
-	<dimen name="finder_column_width">300dp</dimen>
-	<dimen name="curtain_max_width">480dp</dimen>
+	<dimen name="finder_query_field">300dp</dimen>
+	<dimen name="finder_test_field">300dp</dimen>
+	<dimen name="finder_buttons">240dp</dimen>
+	<dimen name="finder_config">400dp</dimen>
+	<dimen name="finder_char">48dp</dimen>
+	<dimen name="finder_task">320dp</dimen>
+	<dimen name="finder_pref_max">260dp</dimen>
+	<dimen name="finder_pref_characters">220dp</dimen>
+	<dimen name="finder_disclaimer">300dp</dimen>
+	<dimen name="curtain_max_width">@dimen/screen_compact</dimen>
 	<dimen name="curtain_padding">48dp</dimen>
 	<dimen name="drag_handle_width">32dp</dimen>
 	<dimen name="drag_handle_height">4dp</dimen>
@@ -95,4 +104,6 @@
 	<dimen name="fastscroll_thickness">6dp</dimen>
     <dimen name="fastscroll_minimum_range">50dp</dimen>
     <dimen name="fastscroll_minimum_size">56dp</dimen>
+    <dimen name="collapsed_hint">12sp</dimen>
+    <dimen name="collapsed_hint_margin">19dp</dimen>
 </resources>

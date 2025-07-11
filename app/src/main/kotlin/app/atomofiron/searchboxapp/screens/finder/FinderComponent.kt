@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.finder
 
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.property.WeakProperty
 import dagger.BindsInstance
 import dagger.Component
@@ -47,7 +48,6 @@ class FinderModule {
         viewState: FinderViewState,
         router: FinderRouter,
         finderAdapterDelegate: FinderAdapterPresenterDelegate,
-        finderStore: FinderStore,
         targetsDelegate: FinderTargetsPresenterDelegate,
         preferenceStore: PreferenceStore,
         preferenceChannel: PreferenceChannel
@@ -59,7 +59,6 @@ class FinderModule {
             finderAdapterDelegate,
             targetsDelegate,
             preferenceStore,
-            finderStore,
             preferenceChannel,
         )
     }
@@ -70,8 +69,9 @@ class FinderModule {
         viewState: FinderViewState,
         router: FinderRouter,
         interactor: FinderInteractor,
+        preferenceStore: PreferenceStore,
     ): FinderAdapterPresenterDelegate {
-        return FinderAdapterPresenterDelegate(viewState, router, interactor)
+        return FinderAdapterPresenterDelegate(viewState, router, interactor, preferenceStore)
     }
 
     @Provides
@@ -96,8 +96,13 @@ class FinderModule {
 
     @Provides
     @FinderScope
-    fun viewState(scope: CoroutineScope,
-        preferenceChannel: PreferenceChannel,): FinderViewState = FinderViewState(scope, preferenceChannel)
+    fun viewState(
+        scope: CoroutineScope,
+        preferenceChannel: PreferenceChannel,
+        preferencesStore: PreferenceStore,
+        preferences: PreferenceDataStore,
+        finderStore: FinderStore,
+    ): FinderViewState = FinderViewState(scope, preferenceChannel, preferencesStore, preferences, finderStore)
 }
 
 interface FinderDependencies {
@@ -106,4 +111,5 @@ interface FinderDependencies {
     fun preferenceStore(): PreferenceStore
     fun finderService(): FinderService
     fun finderStore(): FinderStore
+    fun preferences(): PreferenceDataStore
 }

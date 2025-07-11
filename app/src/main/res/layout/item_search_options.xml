@@ -5,72 +5,43 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingTop="@dimen/common_margin_half"
+    android:layout_marginBottom="@dimen/common_margin_half"
     app:flexWrap="wrap"
     >
-    <com.google.android.material.textview.MaterialTextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/title_margin"
-        android:layout_marginBottom="@dimen/common_margin_nano"
-        android:textSize="@dimen/title_size"
-        android:textColor="?attr/colorContent"
-        android:textStyle="bold"
-        android:text="@string/options_title"
-        />
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/config_cb_case_sense"
+    <com.google.android.material.chip.Chip
+        android:id="@+id/case_sense"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="7dp"
-        android:paddingStart="6dp"
+        android:layout_marginHorizontal="@dimen/common_margin_half"
         android:text="@string/case_sens"
-        android:ellipsize="none"
-        android:singleLine="true"
+        android:checkable="true"
+        app:chipIcon="@drawable/ic_config_case"
         />
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/config_cb_use_regexp"
+    <com.google.android.material.chip.Chip
+        android:id="@+id/use_regexp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="7dp"
-        android:paddingStart="6dp"
+        android:layout_marginHorizontal="@dimen/common_margin_half"
         android:text="@string/use_regular_expression"
-        android:ellipsize="none"
-        android:singleLine="true"
+        android:checkable="true"
+        app:chipIcon="@drawable/ic_config_regex"
         />
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/config_cb_in_content"
+    <com.google.android.material.chip.Chip
+        android:id="@+id/content_search"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="7dp"
-        android:paddingStart="6dp"
+        android:layout_marginHorizontal="@dimen/common_margin_half"
         android:text="@string/search_in_the_content"
-        android:ellipsize="none"
-        android:singleLine="true"
+        android:checkable="true"
+        app:chipIcon="@drawable/ic_config_text"
         />
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/config_cb_exclude_dirs"
+    <com.google.android.material.chip.Chip
+        android:id="@+id/exclude_dirs"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="7dp"
-        android:paddingStart="6dp"
+        android:layout_marginHorizontal="@dimen/common_margin_half"
         android:text="@string/pref_exclude_dirs"
-        android:singleLine="true"
-        />
-    <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/config_cb_replace"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="1dp"
-        android:layout_marginEnd="7dp"
-        android:paddingStart="6dp"
-        android:text="@string/enable_replace"
-        android:ellipsize="none"
-        android:singleLine="true"
-        android:visibility="gone"
+        android:checkable="true"
+        app:chipIcon="@drawable/ic_config_folder"
         />
 </com.google.android.flexbox.FlexboxLayout>

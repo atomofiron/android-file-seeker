@@ -63,20 +63,25 @@ fun Long.convert(suffixes: Array<String>, lossless: Boolean = true, separator: S
     return "$value$separator${suffixes.last()}"
 }
 
-fun String.convert(): Int {
-    val digits = Regex("\\d+|0")
-    val metrics = Regex("([gGгГ]|[mMмМ]|[kKкК])?[bBбБ]")
-    var value = digits.find(this)?.value?.toFloat()
-    value ?: return 0
-    val rate = metrics.find(this)?.value
-    rate ?: return 0
-    value *= when (rate.first()) {
+fun String.convert(): Int = convertOrNull() as Int
+
+fun String.convertOrNull(): Int? {
+    val digits = Regex("\\d+")
+    val metrics = Regex("([gGгГ]|[mMмМ]|[kKкК])?[bBбБ]?$")
+    val value = digits.find(this)
+        ?.value
+        ?.toIntOrNull()
+        ?: return null
+    val rate = metrics.find(this)
+        ?.value
+        ?.takeIf { it.isNotEmpty() }
+        ?: return value
+    return value * when (rate.firstOrNull()) {
         'g', 'G', 'г', 'Г' -> 1024 * 1024 * 1024
         'm', 'M', 'м', 'М' -> 1024 * 1024
         'k', 'K', 'к', 'К' -> 1024
         else -> 1
     }
-    return value.toInt()
 }
 
 fun Int.immutable(): Int = this or PendingIntent.FLAG_IMMUTABLE
@@ -117,6 +122,36 @@ fun <E> MutableList<E>.removeOneIf(predicate: (E) -> Boolean): E? {
 
 inline fun <T> List<T>.mutate(action: MutableList<T>.() -> Unit): MutableList<T> {
     return toMutableList().apply(action)
+}
+
+inline fun <T, reified I : T> MutableList<T>.replace(action: (I) -> T) {
+    val index = indexOfFirst { it is I }
+    if (index >= 0) {
+        set(index, action(get(index) as I))
+    }
+}
+
+inline fun <T,R> Iterable<T>.findNotNull(predicate: (T) -> R?): R {
+    for (element in this) {
+        val value = predicate(element)
+        if (value != null) return value
+    }
+    throw IllegalStateException(toString())
+}
+
+fun <T> MutableList<T>.move(from: Int, to: Int) {
+    val step = when {
+        from == to -> return
+        from < to -> 1
+        else -> -1
+    }
+    val element = get(from)
+    var free = from
+    while (free != to) {
+        set(free, get(free + step))
+        free += step
+    }
+    set(to, element)
 }
 
 inline fun <T, R : Comparable<R>> MutableList<T>.sortBy(descending: Boolean = false, crossinline selector: (T) -> R?) {

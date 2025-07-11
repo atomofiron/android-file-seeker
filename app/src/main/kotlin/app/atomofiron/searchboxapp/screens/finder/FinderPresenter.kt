@@ -6,16 +6,18 @@ import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
-import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ConfigHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.FieldHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ProgressHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.OptionsHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
-import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderTargetsPresenterDelegate
 import kotlinx.coroutines.CoroutineScope
@@ -27,44 +29,31 @@ class FinderPresenter(
     finderAdapterDelegate: FinderAdapterPresenterDelegate,
     targetsDelegate: FinderTargetsPresenterDelegate,
     private val preferenceStore: PreferenceStore,
-    private val finderStore: FinderStore,
     private val preferenceChannel: PreferenceChannel
 ) : BasePresenter<FinderViewModel, FinderRouter>(scope, router),
     FinderAdapterOutput,
-    FieldHolder.OnActionListener by finderAdapterDelegate,
+    QueryFieldHolder.OnActionListener by finderAdapterDelegate,
     CharactersHolder.OnActionListener by finderAdapterDelegate,
-    ConfigHolder.FinderConfigListener by finderAdapterDelegate,
+    EditCharactersHolder.OnEditCharactersListener by finderAdapterDelegate,
+    EditMaxDepthHolder.OnEditMaxDepthListener by finderAdapterDelegate,
+    TestHolder.OnTestChangeListener by finderAdapterDelegate,
+    EditMaxSizeHolder.OnEditMaxSizeListener by finderAdapterDelegate,
+    OptionsHolder.FinderConfigListener by finderAdapterDelegate,
     ButtonsHolder.FinderButtonsListener by finderAdapterDelegate,
-    ProgressHolder.OnActionListener by finderAdapterDelegate,
+    TaskHolder.OnActionListener by finderAdapterDelegate,
     TargetsHolder.FinderTargetsOutput by targetsDelegate
 {
 
     init {
-        viewState.run {
-            uniqueItems.add(FinderStateItem.SearchAndReplaceItem())
-            uniqueItems.add(FinderStateItem.SpecialCharactersItem(arrayOf()))
-            uniqueItems.add(FinderStateItem.TestItem())
-            uniqueItems.add(FinderStateItem.ButtonsItem)
-        }
         onSubscribeData()
-        viewState.switchConfigItemVisibility()
     }
 
     override fun onSubscribeData() {
         preferenceStore.drawerGravity.collect(scope) { gravity ->
             viewState.historyDrawerGravity.value = gravity
         }
-        preferenceStore.specialCharacters.collect(scope) { chs ->
-            viewState.updateUniqueItem(FinderStateItem.SpecialCharactersItem(chs))
-        }
         viewState.reloadHistory.collect(scope) {
             preferenceChannel.notifyHistoryImported()
-        }
-        finderStore.tasksFlow.collect(scope) { tasks ->
-            viewState.progressItems.clear()
-            viewState.progressItems.addAll(tasks.map { FinderStateItem.ProgressItem(it) })
-            viewState.progressItems.reverse()
-            viewState.updateState()
         }
     }
 

@@ -54,7 +54,7 @@ class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(co
         editText.layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
             addRule(RelativeLayout.BELOW, android.R.id.title)
         }
-        editText.setOnSubmitListener(::onSubmit)
+        editText.addOnSubmitListener(::onSubmit)
         editText.setOnFocusChangeListener { _, hasFocus ->
             summary.alpha = if (hasFocus) Alpha.INVISIBLE else Alpha.VISIBLE
             editText.isGone = !hasFocus

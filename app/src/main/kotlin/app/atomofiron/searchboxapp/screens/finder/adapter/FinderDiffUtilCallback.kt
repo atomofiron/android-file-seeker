@@ -7,7 +7,7 @@ import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 class FinderDiffUtilCallback : DiffUtil.ItemCallback<FinderStateItem>() {
 
     override fun areItemsTheSame(oldItem: FinderStateItem, newItem: FinderStateItem): Boolean = when {
-        oldItem.layoutId != newItem.layoutId -> false
+        oldItem.type != newItem.type -> false
         oldItem.stableId != newItem.stableId -> false
         else -> true
     }

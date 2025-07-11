@@ -10,7 +10,9 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
-class TargetsHolder(parent: ViewGroup, layoutId: Int, output: FinderTargetsOutput) : GeneralHolder<FinderStateItem>(parent, layoutId) {
+class TargetsHolder(parent: ViewGroup, output: FinderTargetsOutput) : GeneralHolder<FinderStateItem>(parent, R.layout.item_finder_targets) {
+
+    override val hungry = true
 
     private val recyclerView = itemView.findViewById<RecyclerView>(R.id.item_rv_targets)
     private val adapter = TargetAdapter(output)
@@ -22,7 +24,7 @@ class TargetsHolder(parent: ViewGroup, layoutId: Int, output: FinderTargetsOutpu
     }
 
     override fun onBind(item: FinderStateItem, position: Int) {
-        item as FinderStateItem.TargetsItem
+        item as FinderStateItem.Targets
         adapter.submitList(item.targets)
     }
 
@@ -36,6 +38,7 @@ class TargetsHolder(parent: ViewGroup, layoutId: Int, output: FinderTargetsOutpu
     }
 
     private class DiffUtilCallback : DiffUtil.ItemCallback<Node>() {
+
         override fun areItemsTheSame(oldItem: Node, newItem: Node): Boolean = oldItem.uniqueId == newItem.uniqueId
 
         override fun areContentsTheSame(oldItem: Node, newItem: Node) = when {

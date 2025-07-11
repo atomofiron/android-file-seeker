@@ -5,5 +5,5 @@
     android:layout_height="wrap_content"
     android:id="@+id/item_ll_characters"
     android:orientation="horizontal"
-    android:layout_marginVertical="@dimen/common_margin_half"
+    android:gravity="bottom"
     />

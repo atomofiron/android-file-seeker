@@ -26,6 +26,8 @@ import android.view.ViewParent
 import android.view.WindowManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.annotation.StyleRes
 import androidx.annotation.StyleableRes
@@ -265,6 +267,10 @@ fun Context.getDisplayCompat(): Display? = when {
     Android.R -> display
     else -> (getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
 }
+
+fun Context.drawable(@DrawableRes resId: Int): Drawable = ContextCompat.getDrawable(this, resId)!!
+// todo replace everywhere
+fun Context.color(@ColorRes resId: Int): Int = ContextCompat.getColor(this, resId)
 
 // it was sweaty...
 fun ViewParent.disallowInterceptTouches() {

@@ -12,18 +12,18 @@ open class TextField @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
 ) : AutoHideKeyboardField(context, attrs), TextWatcher {
-    private var onSubmitListener: OnSubmitListener? = null
+
+    private var listeners = mutableListOf<OnSubmitListener>()
 
     private var submittedValue: CharSequence = ""
 
     init {
         hideKeyboardOnDetached = false
         addTextChangedListener(this)
-        imeOptions = imeOptions or EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS or EditorInfo.IME_ACTION_DONE
+        imeOptions = imeOptions or EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         inputType = inputType or InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         isSingleLine = true
         isLongClickable = false
-        setHintTextColor(0)
     }
 
     override fun setText(text: CharSequence?, type: BufferType?) {
@@ -32,12 +32,16 @@ open class TextField @JvmOverloads constructor(
         submittedValue = text ?: ""
     }
 
-    open fun setOnSubmitListener(listener: OnSubmitListener?) {
-        onSubmitListener = listener
+    open fun addOnSubmitListener(listener: OnSubmitListener) {
+        if (listener !in listeners) {
+            listeners.add(listener)
+        }
     }
 
     open fun onSubmit(value: String) {
-        onSubmitListener?.onSubmit(value)
+        listeners.forEach {
+            it.onSubmit(value)
+        }
     }
 
     override fun isSuggestionsEnabled(): Boolean = false
@@ -57,7 +61,7 @@ open class TextField @JvmOverloads constructor(
 
     override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(focused, direction, previouslyFocusedRect)
-        if (!focused) {
+        if (!focused && (imeOptions and EditorInfo.IME_ACTION_DONE != 0)) {
             setText(submittedValue, BufferType.NORMAL)
         }
     }

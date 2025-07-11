@@ -33,10 +33,7 @@ class DrawerView @JvmOverloads constructor(
     private val ibDrawerSide: ImageButton = findViewById(R.id.drawer_ib_drawer_side)
     val recyclerView: RecyclerView = findViewById(R.id.drawer_rv)
     val isOpened: Boolean get() = drawerStateListener.isOpened
-
-    var gravity: Int
-        get() = (layoutParams as? DrawerLayout.LayoutParams)?.gravity ?: Gravity.NO_GRAVITY
-        set(value) = updateGravity(value)
+    val gravity: Int get() = (layoutParams as? DrawerLayout.LayoutParams)?.gravity ?: Gravity.NO_GRAVITY
 
     private val drawerStateListener = DrawerStateListenerImpl()
     var onGravityChangeListener: ((gravity: Int) -> Unit)? = null
@@ -67,6 +64,8 @@ class DrawerView @JvmOverloads constructor(
         ibDrawerSide.setImageResource(icDrawer)
         updateInsets()
     }
+
+    fun setGravity(gravity: Int) = updateGravity(gravity)
 
     fun open() = (parent as DrawerLayout).openDrawer(gravity)
 

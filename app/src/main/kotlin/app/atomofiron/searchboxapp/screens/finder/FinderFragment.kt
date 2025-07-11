@@ -8,6 +8,7 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.flow.viewCollect
@@ -32,8 +33,9 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 {
 
     private lateinit var binding: FragmentFinderBinding
-    private val finderAdapter = FinderAdapter()
+    private lateinit var finderAdapter: FinderAdapter
     private lateinit var layoutManager: GridLayoutManager
+    private lateinit var spanSizeLookup: FinderSpanSizeLookup
 
     private val historyAdapter: HistoryAdapter by lazy {
         HistoryAdapter(requireContext(), object : HistoryAdapter.OnItemClickListener {
@@ -48,9 +50,11 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         super.onCreate(savedInstanceState)
         initViewModel(this, FinderViewModel::class, savedInstanceState)
 
-        finderAdapter.output = presenter
+        finderAdapter = FinderAdapter(output = presenter, viewState.preferences)
         layoutManager = GridLayoutManager(context, 1)
-        layoutManager.spanSizeLookup = FinderSpanSizeLookup(finderAdapter, layoutManager)
+        spanSizeLookup = FinderSpanSizeLookup(finderAdapter, layoutManager, resources)
+        finderAdapter.holderListener = spanSizeLookup
+        layoutManager.spanSizeLookup = spanSizeLookup
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,11 +62,14 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
         binding = FragmentFinderBinding.bind(view)
 
+        layoutManager.reverseLayout = true
         binding.recyclerView.run {
-            this@FinderFragment.layoutManager.reverseLayout = true
+            addOnLayoutChangeListener(spanSizeLookup)
+            addOnChildAttachStateChangeListener(spanSizeLookup)
             layoutManager = this@FinderFragment.layoutManager
             itemAnimator = null
             adapter = finderAdapter
+            spanSizeLookup.recyclerView = this
         }
 
         binding.dockBar.submit(finderDockItems(NoticeableDrawable(requireContext(), R.drawable.ic_settings)))
@@ -72,12 +79,6 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
             onGravityChangeListener = presenter::onDrawerGravityChange
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = historyAdapter
-        }
-
-        val columnWidth = resources.getDimensionPixelSize(R.dimen.finder_column_width)
-        binding.recyclerView.addOnLayoutChangeListener { recyclerView, left, _, right, _, _, _, _, _ ->
-            val width = right - left - recyclerView.paddingStart - recyclerView.paddingEnd
-            layoutManager.spanCount = (width / columnWidth).coerceAtLeast(1)
         }
 
         viewState.onViewCollect()
@@ -103,11 +104,11 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     }
 
     override fun FinderViewState.onViewCollect() {
-        viewCollect(historyDrawerGravity) { binding.drawer.gravity = it }
+        viewCollect(historyDrawerGravity, collector = binding.drawer::setGravity)
         viewCollect(reloadHistory, collector = historyAdapter::reload)
         viewCollect(history, collector = historyAdapter::add)
         viewCollect(insertInQuery, collector = ::onInsertInQuery)
-        viewCollect(searchItems, collector = ::onStateChange)
+        viewCollect(items, collector = ::onStateChange)
         viewCollect(replaceQuery, collector = ::onReplaceQuery)
         viewCollect(snackbar, collector = ::onShowSnackbar)
         viewCollect(showHistory) { binding.drawer.open() }
@@ -118,7 +119,9 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     }
 
     override fun FragmentFinderBinding.onApplyInsets() {
-        root.apply(recyclerView = recyclerView, dockView = dockBar)
+        root.apply(recyclerView = recyclerView, dockView = dockBar) {
+            spanSizeLookup.onMeasure(it)
+        }
         insetsBackground.setAdditional(ExtType.dock)
     }
 

@@ -24,7 +24,7 @@ import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
-import app.atomofiron.searchboxapp.model.finder.SearchConfig
+import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult.FinderResult
 import app.atomofiron.searchboxapp.model.finder.toItemMatchMultiply
@@ -63,14 +63,14 @@ class FinderWorker(
         private const val KEY_MAX_DEPTH = "KEY_MAX_DEPTH"
         private const val KEY_WHERE_PATHS = "KEY_WHERE_PATHS"
 
-        fun inputData(query: String, useSu: Boolean, config: SearchConfig, maxSize: Int, maxDepth: Int, where: Array<String>) = Data.Builder()
+        fun inputData(query: String, useSu: Boolean, config: SearchOptions, maxSize: Int, maxDepth: Int, where: Array<String>) = Data.Builder()
             .putString(KEY_QUERY, query)
             .putBoolean(KEY_USE_SU, useSu)
             .putBoolean(KEY_USE_REGEX, config.useRegex)
             .putInt(KEY_MAX_SIZE, maxSize)
             .putBoolean(KEY_CASE_INSENSITIVE, config.ignoreCase)
             .putBoolean(KEY_EXCLUDE_DIRS, config.excludeDirs)
-            .putBoolean(KEY_FOR_CONTENT, config.searchInContent)
+            .putBoolean(KEY_FOR_CONTENT, config.contentSearch)
             .putInt(KEY_MAX_DEPTH, maxDepth)
             .putStringArray(KEY_WHERE_PATHS, where)
             .build()

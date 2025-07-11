@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.utils.prederences
 
 import android.view.Gravity
+import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
@@ -14,12 +15,15 @@ object PreferenceKeys {
     const val PREF_LEAK_CANARY = "pref_leak_canary"
     const val PREF_CATEGORY_SYSTEM = "pref_category_system"
     const val PREF_CATEGORY_DEBUG = "pref_category_debug"
-    const val PREF_TOYBOX = "pref_toybox_path"
+    private const val PREF_TOYBOX = "pref_toybox_path"
 
     val KeyOpenedDirPath = PreferenceKey("pref_opened_dir_path", "")
     val KeyDrawerGravity = PreferenceKey("pref_drawer_gravity", Gravity.START)
     val KeyAppUpdateCode = PreferenceKey("pref_app_update_code", 0)
     val KeyShownNotificationUpdateCode = PreferenceKey("pref_shown_notification_update_code", 0)
+    val KeyTestField = PreferenceKey("pref_test_field", "")
+    val KeyShowSearchOptions = PreferenceKey("pref_show_search_options", true)
+    val KeySearchOptions = PreferenceKey("pref_search_options", SearchOptions.DEFAULT)
     val KeySpecialCharacters = PreferenceKey("pref_special_characters", Const.DEFAULT_SPECIAL_CHARACTERS)
     val KeyAppOrientation = PreferenceKey("pref_app_orientation", AppOrientation.UNDEFINED.ordinal.toString())
     val KeyAppTheme = PreferenceKey("pref_app_theme", AppTheme.defaultName())

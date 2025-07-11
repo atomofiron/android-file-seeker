@@ -9,7 +9,7 @@ import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.finder.SearchConfig
+import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.work.FinderWorker
@@ -31,7 +31,7 @@ class FinderService(
         }
     }
 
-    fun search(query: String, where: List<Node>, config: SearchConfig) {
+    fun search(query: String, where: List<Node>, config: SearchOptions) {
         val maxSize = preferenceStore.maxFileSizeForSearch.value
         val maxDepth = preferenceStore.maxDepthForSearch.value
         val useSu = preferenceStore.useSu.value

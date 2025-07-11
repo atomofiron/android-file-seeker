@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import app.atomofiron.common.util.extension.CornerPathDebug
 import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.collect
@@ -62,6 +63,7 @@ class MainActivity : AppCompatActivity() {
 
         updateTheme(viewState.setTheme.value)
         onCreateView(savedInstanceState)
+        CornerPathDebug(resources.displayMetrics)
     }
 
     private fun onCreateView(savedInstanceState: Bundle?) {

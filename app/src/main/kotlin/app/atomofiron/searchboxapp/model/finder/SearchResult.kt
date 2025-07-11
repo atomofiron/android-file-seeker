@@ -31,7 +31,7 @@ sealed class SearchResult {
     }
 
     data class FinderResult(
-        private val forContent: Boolean,
+        private val inContent: Boolean,
         override val count: Int = 0,
         val matches: List<ItemMatch> = listOf(),
         override val countTotal: Int = 0,
@@ -40,7 +40,7 @@ sealed class SearchResult {
     ) : SearchResult() {
 
         override fun getCounters(): IntArray = when {
-            forContent -> intArrayOf(count, matches.size, countTotal)
+            inContent -> intArrayOf(count, matches.size, countTotal)
             else -> intArrayOf(matches.size, matches.size)
         }
 
@@ -63,7 +63,7 @@ sealed class SearchResult {
             val left = matches.filter { !it.item.path.startsWith(removed.path) }
             val items = matches.toMutableList()
             val count = left.sumOf { it.count }
-            return FinderResult(forContent, count, items, countTotal.dec())
+            return FinderResult(inContent, count, items, countTotal.dec())
         }
 
         fun contains(itemCounter: ItemMatch) = matches.contains(itemCounter)
@@ -72,7 +72,7 @@ sealed class SearchResult {
             val items = matches.toMutableList()
             val count = count + itemCounter.count
             items.add(itemCounter)
-            return FinderResult(forContent, count, items, countTotal.inc())
+            return FinderResult(inContent, count, items, countTotal.inc())
         }
     }
 

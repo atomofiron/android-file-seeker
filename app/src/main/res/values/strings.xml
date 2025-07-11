@@ -31,10 +31,9 @@
     <string name="sorting_largest">Largest</string>
     <string name="no_activity">You have no application able to open a file of this type</string>
     <string name="results">Your search returned %d results</string>
-    <string name="find">Find</string>
-    <string name="search_in_the_content">Search in the files content</string>
+    <string name="find">Search…</string>
+    <string name="search_in_the_content">Content search</string>
     <string name="pref_general">General</string>
-    <string name="pref_search">@string/search</string>
     <string name="regex">Use regexp</string>
     <string name="multiline">\'Multiline\' flag</string>
     <string name="bad_ex">Incorrect regular expression</string>
@@ -68,12 +67,11 @@
     <string name="fucking_provider">Сould not open file due to system limitations, try to copy the absolute path to the file and open it in another application</string>
     <string name="pref_theme">App theme</string>
     <string name="pref_deep_black">Deep black</string>
-    <string name="pref_max_depth">Max depth of the search</string>
+    <string name="pref_max_depth">Max depth</string>
     <string name="pref_max_size">Max file size</string>
     <string name="max_size_sum">If search in the content</string>
     <string name="pref_exclude_dirs">Exclude directories</string>
     <string name="exclude_dirs_summary">From search results</string>
-    <string name="max_size_summary">When searching by content</string>
     <string name="pref_use_su">Use super user</string>
     <string name="preferences">Preferences</string>
     <string name="pref_about">About the App</string>
@@ -87,7 +85,7 @@
     <string name="search_completed">Search completed: %s</string>
     <string name="pref_special_characters">Special characters</string>
     <string name="search">Search</string>
-    <string name="use_regular_expression">Use regular expression</string>
+    <string name="use_regular_expression">Regular expression</string>
     <string name="enable_replace">Replace the text</string>
     <string name="exit">Exit</string>
     <string name="click_back_to_exit">Click Back to close the App</string>
@@ -179,7 +177,6 @@
     <string name="apk_info">Package: %s\nVersion: %s\nMin SDK: %s\nTarget SDK: %s\nCompile SDK: %s\nSigner: %s</string>
     <string name="update">Update</string>
     <string name="channel_name_updates">Updates</string>
-    <string name="tip">In Files specify where to search</string>
     <string name="search_here">Search here:</string>
     <string name="by_default">Reset to default</string>
     <string name="dash" translatable="false">—</string>

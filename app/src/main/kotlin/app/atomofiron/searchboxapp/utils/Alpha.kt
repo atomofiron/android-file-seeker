@@ -22,6 +22,7 @@ object Alpha {
 
     fun visible(value: Boolean) = if (value) VISIBLE else INVISIBLE
     fun enabled(value: Boolean) = if (value) VISIBLE else HALF
+    fun enabledInt(value: Boolean) = if (value) VISIBLE_INT else HALF_INT
 }
 
 fun Float.toIntAlpha(): Int = (this * Alpha.VISIBLE_INT).toInt().coerceIn(Alpha.INVISIBLE_INT, Alpha.VISIBLE_INT)

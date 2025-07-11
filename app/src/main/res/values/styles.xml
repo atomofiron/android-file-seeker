@@ -29,8 +29,10 @@
 
 		<item name="isDarkTheme">@bool/isNightTheme</item>
 		<item name="materialCardViewStyle">@style/CardViewStyle</item>
+		<item name="chipStyle">@style/ChipStyle</item>
 		<item name="materialButtonOutlinedStyle">@style/OutlinedButtonStyle</item>
-		<item name="textInputOutlinedDenseStyle">@style/InputOutlinedDenseStyle</item>
+		<item name="textInputStyle">@style/TextInputLayoutOutlinedBox</item>
+		<item name="textInputOutlinedDenseStyle">@style/TextInputLayoutOutlinedBox.Dense</item>
 
 		<item name="colorControlHighlight" tools:ignore="PrivateResource">@color/mtrl_btn_text_btn_ripple_color</item>
 		<item name="strokeColor">?colorSurfaceVariant</item>
@@ -107,8 +109,21 @@
 
 	<style name="OutlinedButtonStyle" parent="@style/Widget.Material3.Button.OutlinedButton" />
 
-	<style name="InputOutlinedDenseStyle" parent="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense" />
+	<style name="ChipStyle" parent="@style/Widget.Material3.Chip.Assist">
+		<item name="chipStrokeColor">?colorSurfaceVariant</item>
+		<item name="chipIconTint">@color/m3_chip_text_color</item>
+	</style>
 
-	<style name="InputOutlinedDenseStyle2" parent="@style/Widget.Material3.TabLayout" />
+	<style name="TextInputLayoutOutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+		<item name="shapeAppearance">@style/ShapeAppearance.Corners</item>
+	</style>
+
+	<style name="TextInputLayoutOutlinedBox.Dense" parent="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
+	</style>
+
+	<style name="ShapeAppearance.Corners" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+		<item name="cornerFamily">rounded</item>
+		<item name="cornerSize">8dp</item>
+	</style>
 
 </resources>

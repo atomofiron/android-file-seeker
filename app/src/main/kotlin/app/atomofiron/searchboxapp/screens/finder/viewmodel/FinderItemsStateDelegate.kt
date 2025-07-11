@@ -2,88 +2,100 @@ package app.atomofiron.searchboxapp.screens.finder.viewmodel
 
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.S
+import app.atomofiron.common.util.flow.transform
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Buttons
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Disclaimer
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.EditCharacters
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.MaxDepth
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.MaxSize
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Options
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Query
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.SpecialCharacters
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Targets
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.TestField
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Title
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlin.reflect.KClass
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
-class FinderItemsStateDelegate(override val isLocal: Boolean) : FinderItemsState {
-    override val uniqueItems = mutableListOf<FinderStateItem>()
-    override val progressItems = mutableListOf<FinderStateItem.ProgressItem>()
-    override val targets = mutableListOf<Node>()
-    override val searchItems = MutableStateFlow<List<FinderStateItem>>(listOf())
-    override var configItem = FinderStateItem.ConfigItem()
+class FinderItemsStateDelegate(
+    isLocal: Boolean,
+    preferences: PreferenceStore,
+    tasks: Flow<List<SearchTask>>,
+) : FinderItemsState {
 
-    // todo add state machine
-    override fun updateState() {
-        val items = mutableListOf<FinderStateItem>()
-        items.addAll(uniqueItems)
-        when {
-            isLocal -> Unit
-            targets.isEmpty() -> items.add(FinderStateItem.TipItem(R.string.tip))
-            else -> {
-                items.add(FinderStateItem.TargetsItem(targets.toList()))
-                items.add(FinderStateItem.TipItem(R.string.search_here))
+    private val query = MutableStateFlow("")
+    override val targets = MutableStateFlow<List<Node>>(mutableListOf())
+    private val mutableToggles = MutableStateFlow(Options(isLocal = true))
+    override val toggles = when {
+        isLocal -> mutableToggles
+        else -> preferences.searchOptions.transform(::Options)
+    }
+    private val localOptions = toggles.map { listOf(it) }
+    private val globalOptions = combine(
+        toggles,
+        preferences.specialCharacters,
+        preferences.maxDepthForSearch,
+        preferences.maxFileSizeForSearch,
+        preferences.showSearchOptions,
+    ) { config, chars, depth, size, show ->
+        buildList {
+            add(Buttons)
+            if (show) {
+                add(config)
+                add(MaxSize(size))
+                add(MaxDepth(depth))
+                add(EditCharacters(chars.toList()))
+                add(Title(R.string.options_title))
             }
         }
-        if (SDK_INT >= S && !isLocal && progressItems.any { it.task.withRetries }) {
-            items.add(FinderStateItem.DisclaimerItem)
+    }
+    override val items = combine(
+        combine(
+            query,
+            preferences.testField,
+            preferences.specialCharacters,
+            if (isLocal) localOptions else globalOptions,
+            toggles,
+        ) { query, test, chars, options, config ->
+            buildList {
+                add(Query(query, useRegex = config.useRegex))
+                add(TestField(value = test, query = query, useRegex = config.useRegex, ignoreCase = config.ignoreCase))
+                add(1, SpecialCharacters(chars))
+                addAll(options)
+            }
+        },
+        targets,
+        tasks.map { it.map(FinderStateItem::Task).reversed() },
+    ) { items, targets, tasks ->
+        buildList {
+            addAll(items)
+            if (!isLocal && targets.isNotEmpty()) {
+                add(Targets(targets.toList()))
+                add(Title(R.string.search_here))
+            }
+            if (SDK_INT >= S && !isLocal && tasks.any { it.task.withRetries }) {
+                add(Disclaimer)
+            }
+            addAll(tasks)
         }
-        items.addAll(progressItems)
-        searchItems.value = items
     }
 
     override fun updateSearchQuery(value: String) {
-        updateUniqueItem(FinderStateItem.TestItem::class) {
-            it.copy(searchQuery = value)
-        }
-        val item = getUniqueItem(FinderStateItem.SearchAndReplaceItem::class)
-        item.query = value
-        // do not notify
+        query.value = value
     }
 
-    override fun updateConfig(item: FinderStateItem.ConfigItem) {
-        val prevConfigItem = configItem
-        configItem = item
-        updateUniqueItem(item)
-
-        val ignoreCaseChanged = prevConfigItem.ignoreCase xor item.ignoreCase
-        val replaceEnabledChanged = prevConfigItem.replaceEnabled xor item.replaceEnabled
-        val useRegexpChanged = prevConfigItem.useRegex xor item.useRegex
-        val multilineSearchChanged = prevConfigItem.excludeDirs xor item.excludeDirs
-
-        if (replaceEnabledChanged || useRegexpChanged) {
-            updateUniqueItem(FinderStateItem.SearchAndReplaceItem::class) {
-                it.copy(replaceEnabled = item.replaceEnabled, useRegex = item.useRegex)
-            }
-        }
-        if (ignoreCaseChanged || useRegexpChanged || multilineSearchChanged) {
-            updateUniqueItem(FinderStateItem.TestItem::class) {
-                it.copy(useRegex = item.useRegex, ignoreCase = item.ignoreCase)
-            }
-        }
+    override fun updateConfig(item: Options) {
+        mutableToggles.value = item
     }
 
-    @Suppress("UNCHECKED_CAST")
-    override fun <I : FinderStateItem> getUniqueItem(kClass: KClass<I>): I {
-        return uniqueItems.find { it::class == kClass } as I
-    }
-
-    override fun <I : FinderStateItem> updateUniqueItem(item: I) {
-        val index = uniqueItems.indexOfFirst { it::class == item::class }
-        if (index < 0) return
-        uniqueItems.removeAt(index)
-        uniqueItems.add(index, item)
-        updateState()
-    }
-
-    override fun <I : FinderStateItem> updateUniqueItem(kClass: KClass<I>, action: (I) -> I) {
-        val index = uniqueItems.indexOfFirst { it::class == kClass }
-        var item = uniqueItems[index]
-        @Suppress("UNCHECKED_CAST")
-        item = action(item as I)
-        uniqueItems[index] = item
-        updateState()
+    override fun updateTargets(targets: List<Node>) {
+        this.targets.value = targets
     }
 }

@@ -1,66 +1,63 @@
 package app.atomofiron.searchboxapp.screens.finder.state
 
 import androidx.annotation.StringRes
-import app.atomofiron.fileseeker.R
+import app.atomofiron.common.recycler.GeneralItem
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.finder.ISearchConfig
-import app.atomofiron.searchboxapp.model.finder.SearchConfig
+import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import java.util.Objects
 
-// all children mast be 'data classes'
-sealed class FinderStateItem(val stableId: Int, val layoutId: Int) {
-    companion object {
-        private const val SEARCH_ID = 1
-        private const val CHARACTERS_ID = 2
-        private const val CONFIG_ID = 3
-        private const val BUTTONS_ID = 4
-        private const val TEST_ID = 5
-        private const val DISCLAIMER_ID = 6
-        private const val TARGETS_ID = 7
-    }
+sealed class FinderStateItem(
+    val type: FinderItemType,
+    override val stableId: Long = type.id.toLong(),
+) : GeneralItem {
+    val viewType = type.id
 
-    data class SearchAndReplaceItem(
-        var query: String = "", // mutable field
-        val replaceEnabled: Boolean = false,
+    constructor(type: FinderItemType, stableId: Int) : this(type, stableId.toLong())
+
+    data class Query(
+        val query: String = "",
         val useRegex: Boolean = false,
-    ) : FinderStateItem(SEARCH_ID, R.layout.item_field_search)
+        val replaceEnabled: Boolean = false,
+    ) : FinderStateItem(FinderItemType.FIND)
 
-    data class SpecialCharactersItem(
+    data class SpecialCharacters(
         val characters: Array<String>,
-    ) : FinderStateItem(CHARACTERS_ID, R.layout.item_characters) {
+    ) : FinderStateItem(FinderItemType.CHARACTERS) {
         override fun equals(other: Any?): Boolean = when {
             this === other -> true
-            other !is SpecialCharactersItem -> false
+            other !is SpecialCharacters -> false
             else -> characters.contentEquals(other.characters)
         }
         override fun hashCode(): Int = Objects.hash(this::class, characters)
     }
 
-    data class ConfigItem(
-        val config: SearchConfig = SearchConfig(),
+    data class Title(@StringRes val stringId: Int) : FinderStateItem(FinderItemType.TITLE, stringId)
+
+    data class Options(
+        val toggles: SearchOptions = SearchOptions(),
         val isLocal: Boolean = false,
-    ) : FinderStateItem(CONFIG_ID, R.layout.item_search_options), ISearchConfig by config
+    ) : FinderStateItem(FinderItemType.OPTIONS), ISearchConfig by toggles
 
-    data object ButtonsItem : FinderStateItem(BUTTONS_ID, R.layout.item_finder_buttons)
+    data class MaxDepth(val value: Int) : FinderStateItem(FinderItemType.MAX_DEPTH)
 
-    data class TestItem(
-        val searchQuery: String = "",
+    data class MaxSize(val value: Int) : FinderStateItem(FinderItemType.MAX_SIZE)
+
+    data class EditCharacters(val value: List<String>) : FinderStateItem(FinderItemType.EDIT_CHARS)
+
+    data object Buttons : FinderStateItem(FinderItemType.BUTTONS)
+
+    data class TestField(
+        val value: String = "",
+        val query: String = "",
         val useRegex: Boolean = false,
         val ignoreCase: Boolean = true,
-    ) : FinderStateItem(TEST_ID, R.layout.item_test)
+    ) : FinderStateItem(FinderItemType.TEST)
 
-    data class ProgressItem(
-        val task: SearchTask,
-    ) : FinderStateItem(task.uniqueId, R.layout.item_progress)
+    data class Task(val task: SearchTask) : FinderStateItem(FinderItemType.PROGRESS, task.uniqueId)
 
-    data class TargetsItem(
-        val targets: List<Node>,
-    ) : FinderStateItem(TARGETS_ID, R.layout.item_finder_targets)
+    data class Targets(val targets: List<Node>) : FinderStateItem(FinderItemType.TARGETS)
 
-    data class TipItem(
-        @StringRes val titleId: Int,
-    ) : FinderStateItem(titleId.hashCode(), R.layout.item_finder_tip)
-
-    data object DisclaimerItem : FinderStateItem(DISCLAIMER_ID, R.layout.item_finder_disclaimer)
+    data object Disclaimer : FinderStateItem(FinderItemType.DISCLAIMER)
 }

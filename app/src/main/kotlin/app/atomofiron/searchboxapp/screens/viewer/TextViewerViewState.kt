@@ -22,7 +22,11 @@ class TextViewerViewState(
     private val scope: CoroutineScope,
     private val session: TextViewerSession,
     preferenceStore: PreferenceStore,
-) : FinderItemsState by FinderItemsStateDelegate(isLocal = true) {
+) : FinderItemsState by FinderItemsStateDelegate(
+    isLocal = true,
+    preferenceStore,
+    session.tasks,
+) {
 
     data class Status(
         val loading: Boolean = false,
@@ -120,13 +124,6 @@ class TextViewerViewState(
             value = value.copy(count = value.count + increment.toInt())
         }
         return none
-    }
-
-    fun setTasks(tasks: List<SearchTask>) {
-        val items = tasks.map { FinderStateItem.ProgressItem(it) }
-        progressItems.clear()
-        progressItems.addAll(items)
-        updateState()
     }
 
     fun sendInsertInQuery(value: String) {

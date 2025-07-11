@@ -1,15 +1,24 @@
 package app.atomofiron.searchboxapp.screens.finder.state
 
-import app.atomofiron.fileseeker.R
+import app.atomofiron.common.util.Increment
+
+private val ids = Increment.new()
 
 enum class FinderItemType(val id: Int) {
-    FIND(R.layout.item_field_search),
-    CHARACTERS(R.layout.item_characters),
-    CONFIGS(R.layout.item_search_options),
-    TEST(R.layout.item_test),
-    BUTTONS(R.layout.item_finder_buttons),
-    PROGRESS(R.layout.item_progress),
-    TARGETS(R.layout.item_finder_targets),
-    TIP(R.layout.item_finder_tip),
-    DISCLAIMER(R.layout.item_finder_disclaimer),
+    FIND(ids()),
+    CHARACTERS(ids()),
+    TEST(ids()),
+    BUTTONS(ids()),
+    OPTIONS(ids()),
+    MAX_SIZE(ids()),
+    MAX_DEPTH(ids()),
+    EDIT_CHARS(ids()),
+    TITLE(ids()),
+    PROGRESS(ids()),
+    TARGETS(ids()),
+    DISCLAIMER(ids());
+
+    companion object {
+        operator fun get(id: Int): FinderItemType? = entries.find { it.id == id }
+    }
 }

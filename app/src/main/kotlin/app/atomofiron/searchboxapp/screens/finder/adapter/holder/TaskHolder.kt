@@ -19,7 +19,10 @@ import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.utils.Alpha
 
-class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListener) : CardViewHolder(parent, layoutId) {
+class TaskHolder(parent: ViewGroup, listener: OnActionListener) : CardViewHolder(parent, R.layout.item_progress) {
+
+    override val hungry = false
+
     private val tvLabel = itemView.findViewById<TextView>(R.id.progress_tv_label)
     private val tvParams = itemView.findViewById<TextView>(R.id.progress_tv_params)
     private val tvStatus = itemView.findViewById<TextView>(R.id.progress_tv_status)
@@ -28,11 +31,11 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
 
     init {
         itemView.setOnClickListener {
-            listener.onItemClick(item as FinderStateItem.ProgressItem)
+            listener.onItemClick(item as FinderStateItem.Task)
         }
         btnAction.setOnClickListener { view ->
             view.isEnabled = false
-            val item = item as FinderStateItem.ProgressItem
+            val item = item as FinderStateItem.Task
             when (item.task.state) {
                 is SearchState.Progress -> listener.onProgressStopClick(item)
                 is SearchState.Stopping -> Unreachable
@@ -43,8 +46,10 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
         tvParams.setSingleLine()
     }
 
+    override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_task)
+
     override fun onBind(item: FinderStateItem, position: Int) {
-        item as FinderStateItem.ProgressItem
+        item as FinderStateItem.Task
         val task = item.task
         tvParams.setParams(task.params)
         tvStatus.setStatus(task.result)
@@ -76,12 +81,12 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
         val status = SpannableStringBuilder("* * ").append(params.query)
         when {
             params.ignoreCase -> R.drawable.ic_params_case_off
-            else -> R.drawable.ic_params_case
+            else -> R.drawable.ic_params_case_on
         }.let {
             status.setIcon(it, 0, 1)
         }
         when {
-            params.useRegex -> R.drawable.ic_params_regex
+            params.useRegex -> R.drawable.ic_params_regex_on
             else -> R.drawable.ic_params_regex_off
         }.let {
             status.setIcon(it, 2, 3)
@@ -111,8 +116,8 @@ class ProgressHolder(parent: ViewGroup, layoutId: Int, listener: OnActionListene
     }
 
     interface OnActionListener {
-        fun onItemClick(item: FinderStateItem.ProgressItem)
-        fun onProgressStopClick(item: FinderStateItem.ProgressItem)
-        fun onProgressRemoveClick(item: FinderStateItem.ProgressItem)
+        fun onItemClick(item: FinderStateItem.Task)
+        fun onProgressStopClick(item: FinderStateItem.Task)
+        fun onProgressRemoveClick(item: FinderStateItem.Task)
     }
 }

@@ -3,12 +3,12 @@ package app.atomofiron.searchboxapp.screens.preferences.fragment
 import android.content.res.Resources
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.Q
-import androidx.preference.*
+import androidx.preference.Preference
+import androidx.preference.PreferenceGroup
+import androidx.preference.get
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.preference.TextFieldPreference
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState
-import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
 
 class PreferenceFragmentDelegate(
@@ -34,15 +34,6 @@ class PreferenceFragmentDelegate(
     private fun setPreferenceListeners(preference: Preference) {
         preference.onPreferenceChangeListener = this
         preference.onPreferenceClickListener = this
-
-        when (preference.key) {
-            PreferenceKeys.KeySpecialCharacters.name -> {
-                preference as TextFieldPreference
-                preference.setFilter {
-                    it.replace(Regex(" +"), Const.SPACE.toString()).trim()
-                }
-            }
-        }
     }
 
     private fun updatePreference(preference: Preference, newValue: Any? = null): Boolean {
@@ -50,7 +41,6 @@ class PreferenceFragmentDelegate(
             PreferenceKeys.KeyUseSu.name -> newValue?.let {
                 return clickOutput.onUseSuChanged(newValue as Boolean)
             }
-            PreferenceKeys.KeySpecialCharacters.name -> preference.updateStringSummary(newValue as String?)
             PreferenceKeys.KeyAppTheme.name -> {
                 var name = newValue?.toString() ?: preference.preferenceDataStore?.getString(key, null)
                 name = AppTheme.fromString(name).name

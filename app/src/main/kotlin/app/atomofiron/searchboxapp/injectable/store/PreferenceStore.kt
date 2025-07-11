@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.*
 import androidx.datastore.preferences.preferencesDataStore
 import app.atomofiron.common.util.flow.StateFlowProperty
 import app.atomofiron.common.util.flow.asProperty
+import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.preference.*
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKey
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
@@ -20,10 +21,13 @@ import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyJoystick
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyMaxDepth
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyMaxSize
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyOpenedDirPath
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeySearchOptions
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyShowSearchOptions
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeySpecialCharacters
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyToybox
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyUseSu
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyShownNotificationUpdateCode
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyTestField
 import app.atomofiron.searchboxapp.utils.prederences.get
 import app.atomofiron.searchboxapp.utils.prederences.remove
 import app.atomofiron.searchboxapp.utils.prederences.set
@@ -76,10 +80,28 @@ class PreferenceStore(
         }
     }
 
-    val drawerGravity = getFlow(KeyDrawerGravity)
+    var drawerGravity = getFlow(KeyDrawerGravity)
 
     suspend fun setDrawerGravity(value: Int) {
         edit { it[KeyDrawerGravity] = value }
+    }
+
+    val testField = getFlow(KeyTestField)
+
+    suspend fun setTestField(value: String) {
+        edit { it[KeyTestField] = value }
+    }
+
+    val showSearchOptions = getFlow(KeyShowSearchOptions)
+
+    suspend fun setShowSearchOptions(value: Boolean) {
+        edit { it[KeyShowSearchOptions] = value }
+    }
+
+    val searchOptions = getFlow(KeySearchOptions, ::SearchOptions)
+
+    suspend fun setSearchOptions(value: SearchOptions) {
+        edit { it[KeySearchOptions] = value.toInt() }
     }
 
     val specialCharacters = getFlow(KeySpecialCharacters) {

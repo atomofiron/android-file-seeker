@@ -27,9 +27,6 @@ class TextViewerPresenter(
     private val item: Node get() = viewState.item.value
 
     init {
-        session.tasks.collect(scope) {
-            viewState.setTasks(it)
-        }
         session.textLoading.collect(scope, viewState::setLoading)
         params.initialTaskId?.let { taskId ->
             interactor.fetchTask(item, taskId) { task ->

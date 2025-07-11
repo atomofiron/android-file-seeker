@@ -1,40 +1,72 @@
 package app.atomofiron.searchboxapp.screens.finder.adapter
 
 import android.view.ViewGroup
+import androidx.preference.Preference
+import androidx.preference.PreferenceDataStore
 import androidx.recyclerview.widget.ListAdapter
 import app.atomofiron.common.recycler.GeneralHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.*
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.OptionsHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.DisclaimerHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TitleHolder
 import app.atomofiron.searchboxapp.screens.finder.state.FinderItemType
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKey
 
-class FinderAdapter : ListAdapter<FinderStateItem, GeneralHolder<FinderStateItem>>(FinderDiffUtilCallback()) {
+class FinderAdapter(
+    private val output: FinderAdapterOutput,
+    private val preferences: PreferenceDataStore,
+) : ListAdapter<FinderStateItem, GeneralHolder<FinderStateItem>>(FinderDiffUtilCallback()) {
 
-    lateinit var output: FinderAdapterOutput
+    var holderListener: OnHolderCreateListener? = null
 
     init {
         setHasStableIds(true)
     }
 
-    override fun getItemId(position: Int): Long = currentList[position].stableId.toLong()
+    override fun getItemId(position: Int): Long = getItem(position).stableId
 
-    override fun getItemViewType(position: Int): Int = currentList[position].layoutId
+    override fun getItemViewType(position: Int): Int = getItem(position).viewType
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GeneralHolder<FinderStateItem> {
-        return when (viewType) {
-            FinderItemType.FIND.id -> FieldHolder(parent, viewType, output)
-            FinderItemType.CHARACTERS.id -> CharactersHolder(parent, viewType, output)
-            FinderItemType.CONFIGS.id -> ConfigHolder(parent, viewType, output)
-            FinderItemType.TEST.id -> TestHolder(parent, viewType)
-            FinderItemType.BUTTONS.id -> ButtonsHolder(parent, viewType, output)
-            FinderItemType.PROGRESS.id -> ProgressHolder(parent, viewType, output)
-            FinderItemType.TARGETS.id -> TargetsHolder(parent, viewType, output)
-            FinderItemType.TIP.id -> TipHolder(parent, viewType)
-            FinderItemType.DISCLAIMER.id -> DisclaimerHolder(parent, viewType)
-            else -> throw IllegalArgumentException("viewType = $viewType")
-        }
+        return when (FinderItemType[viewType]) {
+            FinderItemType.FIND -> QueryFieldHolder(parent, output)
+            FinderItemType.CHARACTERS -> CharactersHolder(parent, output)
+            FinderItemType.OPTIONS -> OptionsHolder(parent, output)
+            FinderItemType.TITLE -> TitleHolder(parent)
+            FinderItemType.TEST -> TestHolder(parent, output)
+            FinderItemType.BUTTONS -> ButtonsHolder(parent, output)
+            FinderItemType.PROGRESS -> TaskHolder(parent, output)
+            FinderItemType.MAX_DEPTH -> EditMaxDepthHolder(parent, output)
+            FinderItemType.MAX_SIZE -> EditMaxSizeHolder(parent, output)
+            FinderItemType.EDIT_CHARS -> EditCharactersHolder(parent, output)
+            FinderItemType.TARGETS -> TargetsHolder(parent, output)
+            FinderItemType.DISCLAIMER -> DisclaimerHolder(parent)
+            null -> throw IllegalArgumentException("viewType = $viewType")
+        }.also { holderListener?.onCreate(it, viewType) }
+    }
+
+    private fun Preference.init(key: PreferenceKey<*>): Any {
+        this.key = key.name
+        preferenceDataStore = preferences
+        return key.default as Any
     }
 
     override fun onBindViewHolder(holder: GeneralHolder<FinderStateItem>, position: Int) {
-        holder.bind(currentList[position], position)
+        holder.bind(getItem(position), position)
+        holderListener?.onBind(holder, position)
+    }
+
+    interface OnHolderCreateListener {
+        fun onCreate(holder: GeneralHolder<*>, viewType: Int)
+        fun onBind(holder: GeneralHolder<*>, position: Int)
     }
 }

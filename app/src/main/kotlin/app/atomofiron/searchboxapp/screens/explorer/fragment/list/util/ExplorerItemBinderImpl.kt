@@ -146,7 +146,7 @@ class ExplorerItemBinderImpl(
         val withThumbnail = thumbnail != null
         ivIcon.isVisible = !withThumbnail
         ivThumbnail.isVisible = withThumbnail
-        tvError.isVisible = error != null
+        tvError.isVisible = error?.isNotBlank() == true
         psProgress.isVisible = item.withOperation
         cbBox.isInvisible = item.withOperation
         tvDetails.maxWidth = itemView.resources.displayMetrics.widthPixels / 3

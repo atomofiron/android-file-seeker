@@ -4,10 +4,15 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
+import androidx.preference.PreferenceDataStore
 import androidx.work.WorkManager
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
 import dagger.Module
 import dagger.Provides
+import debug.LeakWatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
@@ -43,5 +48,14 @@ open class CommonModule {
     @Singleton
     open fun provideCoroutineScope(): CoroutineScope {
         return CoroutineScope(Dispatchers.Default)
+    }
+
+    @Provides
+    fun preferenceDataStore(
+        preferences: PreferenceStore,
+        appStore: AppStore,
+        watcher: LeakWatcher,
+    ): PreferenceDataStore {
+        return LegacyPreferenceDataStore(preferences, appStore.appScope, watcher)
     }
 }

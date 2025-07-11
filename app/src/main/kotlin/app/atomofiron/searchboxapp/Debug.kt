@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp
 
 import android.annotation.SuppressLint
+import android.content.res.Resources
 import android.util.Log
 import android.view.View
 import android.view.View.MeasureSpec
@@ -27,6 +28,11 @@ suspend fun debugDelay(seconds: Int = 1) = if (BuildConfig.DEBUG) delay(seconds 
 fun Any.poop(s: String) = poop(this.javaClass.simpleName, s)
 
 fun Any.poop(context: Any, s: String) = poop(context.javaClass.simpleName, s)
+
+private fun Resources.name(resId: Int): String = when {
+    resId > 1000 -> getResourceEntryName(resId)
+    else -> resId.toString()
+}
 
 @SuppressLint("ResourceType")
 fun View.info() = "${this::class.java.simpleName}(${if (id <= 1) id.toString() else resources.getResourceEntryName(id)})"

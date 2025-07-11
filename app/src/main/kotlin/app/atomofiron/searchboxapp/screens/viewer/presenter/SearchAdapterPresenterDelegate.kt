@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.viewer.presenter
 
+import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.arch.Recipient
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
@@ -18,21 +19,14 @@ class SearchAdapterPresenterDelegate(
     private val viewState: TextViewerViewState,
     private val router: TextViewerRouter,
     private val interactor: TextViewerInteractor,
-    preferenceStore: PreferenceStore,
+    private val preferences: PreferenceStore,
+    dataStore: PreferenceDataStore,
     curtainChannel: CurtainChannel,
 ) : Recipient, FinderAdapterOutput {
 
-    private val curtainDelegate = CurtainSearchDelegate(this, viewState, scope)
+    private val curtainDelegate = CurtainSearchDelegate(this, viewState, dataStore, scope)
 
     init {
-        viewState.run {
-            uniqueItems.add(FinderStateItem.SearchAndReplaceItem())
-            val characters = preferenceStore.specialCharacters.value
-            uniqueItems.add(FinderStateItem.SpecialCharactersItem(characters))
-            uniqueItems.add(FinderStateItem.ConfigItem(isLocal = true))
-            uniqueItems.add(FinderStateItem.TestItem())
-            updateState()
-        }
         curtainChannel.flow.collectForMe(scope) { controller ->
             curtainDelegate.setController(controller)
         }
@@ -40,7 +34,7 @@ class SearchAdapterPresenterDelegate(
 
     fun show() = router.showCurtain(recipient, R.layout.curtain_text_viewer_search)
 
-    override fun onConfigChange(item: FinderStateItem.ConfigItem) = viewState.updateConfig(item)
+    override fun onConfigChange(item: FinderStateItem.Options) = viewState.updateConfig(item)
 
     override fun onConfigVisibilityClick() = Unit
 
@@ -51,23 +45,31 @@ class SearchAdapterPresenterDelegate(
     override fun onSearchChange(value: String) = viewState.updateSearchQuery(value)
 
     override fun onSearchClick(value: String) {
-        val config = viewState.getUniqueItem(FinderStateItem.ConfigItem::class)
+        val config = viewState.toggles.value
         val params = SearchParams(value, config.ignoreCase, config.useRegex)
         interactor.search(viewState.item.value, params)
     }
 
-    override fun onItemClick(item: FinderStateItem.ProgressItem) {
+    override fun onEditCharacters(new: List<String>) = preferences { setSpecialCharacters(new.toTypedArray()) }
+
+    override fun onEditMaxDepth(new: Int) = Unit
+
+    override fun onItemClick(item: FinderStateItem.Task) {
         if (viewState.trySelectTask(item.task)) {
             curtainDelegate.controller?.close()
         }
     }
 
-    override fun onProgressRemoveClick(item: FinderStateItem.ProgressItem) {
+    override fun onProgressRemoveClick(item: FinderStateItem.Task) {
         interactor.removeTask(viewState.item.value, item.task.uniqueId)
         viewState.dropTask()
     }
 
     override fun onReplaceClick(value: String) = Unit
 
-    override fun onProgressStopClick(item: FinderStateItem.ProgressItem) = Unit
+    override fun onProgressStopClick(item: FinderStateItem.Task) = Unit
+
+    override fun onTestTextChange(value: String) = Unit
+
+    override fun onEditMaxSize(new: Int) = Unit
 }

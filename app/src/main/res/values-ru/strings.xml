@@ -29,9 +29,8 @@
     <string name="sorting_largest">Большие</string>
     <string name="no_activity">У вас нет приложения, способного открыть файл этого типа</string>
     <string name="results">Поиск дал %d результатов</string>
-    <string name="find">Найти</string>
-    <string name="search_in_the_content">Искать по содержимому файлов</string>
-    <string name="pref_search">@string/search</string>
+    <string name="find">Найти…</string>
+    <string name="search_in_the_content">По содержимому файлов</string>
     <string name="pref_general">Общие</string>
     <string name="regex">Поиск по шаблону</string>
     <string name="multiline">Флаг \'multiline\'</string>
@@ -66,12 +65,11 @@
     <string name="fucking_provider">Не удалось открыть файл из-за системных ограничений, попробуйте скопировать абсолютный путь к файлу и открыть его в другом приложении</string>
     <string name="pref_theme">Тема оформления</string>
     <string name="pref_deep_black">Глубокий чёрный</string>
-    <string name="pref_max_depth">Максимальная глубина поиска</string>
+    <string name="pref_max_depth">Максимальная глубина</string>
     <string name="pref_max_size">Максимальный размер файла</string>
     <string name="max_size_sum">При поиске по содержимому</string>
     <string name="pref_exclude_dirs">Исключить директории</string>
     <string name="exclude_dirs_summary">Из результатов поиска</string>
-    <string name="max_size_summary">При поиске по содержимому</string>
     <string name="pref_use_su">Использовать root</string>
     <string name="preferences">Настройки</string>
     <string name="pref_about">О Приложении</string>
@@ -85,7 +83,7 @@
     <string name="search_completed">Поиск завершён: %s</string>
     <string name="pref_special_characters">Специальные символы</string>
     <string name="search">Поиск</string>
-    <string name="use_regular_expression">Использовать регулярное выражение</string>
+    <string name="use_regular_expression">Регулярное выражение</string>
     <string name="enable_replace">Замена текста</string>
     <string name="exit">Выйти</string>
     <string name="click_back_to_exit">Нажмите Назад, чтобы закрыть приложение</string>
@@ -173,8 +171,7 @@
     <string name="apk_info">Имя пакета: %s\nВерсия: %s\nМинимальная SDK: %s\nЦелевая SDK: %s\nСборочная SDK: %s\nПодписавший: %s</string>
     <string name="update">Обновить</string>
     <string name="channel_name_updates">Обновления</string>
-    <string name="tip">В Файлах укажите где искать</string>
-    <string name="search_here">Ищем здесь:</string>
+    <string name="search_here">Места поиска:</string>
     <string name="by_default">Цвет по умолчанию</string>
     <string name="fix_android_12">Начиная с 12 версии Android поиск может прерываться системой, из-за чего он будет частично или полностью перезапускаться</string>
     <string name="fetching">Получение метаданных…</string>

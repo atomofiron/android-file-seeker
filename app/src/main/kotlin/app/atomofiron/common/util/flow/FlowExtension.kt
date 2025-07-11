@@ -79,3 +79,19 @@ fun <T> Flow<T>.throttleLatest(duration: Long): Flow<T> = conflate().transform {
     emit(it)
     delay(duration)
 }
+
+fun <T,R> StateFlow<T>.transform(transform: (T) -> R): StateFlow<R> {
+    val original = this
+    return object : StateFlow<R>, Flow<R> by original.map(transform) {
+        override val value: R get() = transform(original.value)
+        override val replayCache: List<R>
+            //get() = original.replayCache.map(transform)
+            get() = throw NotImplementedError()
+
+        override suspend fun collect(collector: FlowCollector<R>): Nothing {
+            original.collect {
+                collector.emit(transform(it))
+            }
+        }
+    }
+}

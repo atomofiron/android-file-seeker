@@ -57,7 +57,6 @@ class ResultModule {
         scope: CoroutineScope,
         viewState: ResultViewState,
         finderStore: FinderStore,
-        preferenceStore: PreferenceStore,
         interactor: ResultInteractor,
         router: ResultRouter,
         appStore: AppStore,
@@ -68,7 +67,6 @@ class ResultModule {
             scope,
             viewState,
             finderStore,
-            preferenceStore,
             interactor,
             router,
             appStore,
@@ -117,8 +115,13 @@ class ResultModule {
 
     @Provides
     @ResultScope
-    fun viewState(params: ResultPresenterParams, scope: CoroutineScope, finderStore: FinderStore): ResultViewState {
-        return ResultViewState(params, finderStore, scope)
+    fun viewState(
+        params: ResultPresenterParams,
+        scope: CoroutineScope,
+        finderStore: FinderStore,
+        preferenceStore: PreferenceStore,
+    ): ResultViewState {
+        return ResultViewState(params, finderStore, scope, preferenceStore)
     }
 }
 

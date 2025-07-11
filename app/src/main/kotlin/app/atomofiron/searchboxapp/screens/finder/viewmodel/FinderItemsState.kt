@@ -2,30 +2,16 @@ package app.atomofiron.searchboxapp.screens.finder.viewmodel
 
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlin.reflect.KClass
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 
 interface FinderItemsState {
-    /* 1 search/replace
-     * characters
-     * config (optional for finder screen)
-     * test field
-     * progressItems (only finder screen)
-     * targetItems (only finder screen)
-     */
-    val uniqueItems: MutableList<FinderStateItem>
-    val progressItems: MutableList<FinderStateItem.ProgressItem>
-    val targets: MutableList<Node>
-    val configItem: FinderStateItem.ConfigItem
+    val targets: StateFlow<List<Node>>
+    val toggles: StateFlow<FinderStateItem.Options>
 
-    val searchItems: MutableStateFlow<List<FinderStateItem>>
-    val isLocal: Boolean
+    val items: Flow<List<FinderStateItem>>
 
-    fun updateState()
     fun updateSearchQuery(value: String)
-    fun updateConfig(item: FinderStateItem.ConfigItem)
-
-    fun <I : FinderStateItem> getUniqueItem(kClass: KClass<I>): I
-    fun <I : FinderStateItem> updateUniqueItem(item: I)
-    fun <I : FinderStateItem> updateUniqueItem(kClass: KClass<I>, action: (I) -> I)
+    fun updateConfig(item: FinderStateItem.Options)
+    fun updateTargets(targets: List<Node>)
 }

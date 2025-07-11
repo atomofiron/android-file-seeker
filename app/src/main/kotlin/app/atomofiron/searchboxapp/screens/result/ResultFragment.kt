@@ -20,9 +20,7 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
-import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
-import app.atomofiron.searchboxapp.screens.result.state.ResultDockState
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState.Companion.Default as DefaultDockState
@@ -78,10 +76,10 @@ class ResultFragment : Fragment(R.layout.fragment_result),
     }
 
     override fun ResultViewState.onViewCollect() {
-        viewCollect(composition, collector = ::onCompositionChange)
+        viewCollect(composition, collector = resultAdapter::setComposition)
         viewCollect(task, collector = ::onTaskChange)
         viewCollect(alerts, collector = ::showSnackbar)
-        viewCollect(dock, collector = ::onDockChanged)
+        viewCollect(dock, collector = binding.dockBar::submit)
     }
 
     override fun FragmentResultBinding.onApplyInsets() {
@@ -104,14 +102,6 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             errorSnackbar.setText(task.error).show()
         }
         snackbarError = task.error
-    }
-
-    private fun onCompositionChange(composition: ExplorerItemComposition) {
-        resultAdapter.setComposition(composition)
-    }
-
-    private fun onDockChanged(state: ResultDockState) {
-        binding.dockBar.submit(state)
     }
 
     private fun showSnackbar(message: AlertMessage.Res) {

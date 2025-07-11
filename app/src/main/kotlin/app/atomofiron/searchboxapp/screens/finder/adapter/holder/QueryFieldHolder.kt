@@ -12,12 +12,17 @@ import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.RegexInputField
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
-import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.SearchAndReplaceItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Query
 import java.util.regex.Pattern
 
-class FieldHolder(parent: ViewGroup, layoutId: Int, private val listener: OnActionListener) :
-        GeneralHolder<FinderStateItem>(parent, layoutId) {
-    private val params: SearchAndReplaceItem get() = item as SearchAndReplaceItem
+class QueryFieldHolder(
+    parent: ViewGroup,
+    private val listener: OnActionListener,
+) : GeneralHolder<FinderStateItem>(parent, R.layout.item_query_field) {
+
+    override val hungry = true
+
+    private val params: Query get() = item as Query
 
     private val etFind = itemView.findViewById<RegexInputField>(R.id.item_find_rt_find)
     private val btnFind = itemView.findViewById<View>(R.id.item_find_ib_find)
@@ -27,12 +32,14 @@ class FieldHolder(parent: ViewGroup, layoutId: Int, private val listener: OnActi
         btnFind.setOnClickListener {
             listener.onSearchClick(etFind.text.toString())
         }
-        etFind.addTextChangedListener(TextChangeListener())
+        etFind.addTextChangedListener(this@QueryFieldHolder.TextChangeListener())
         etFind.setOnEditorActionListener(::onEditorAction)
     }
 
+    override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_query_field)
+
     override fun onBind(item: FinderStateItem, position: Int) {
-        item as SearchAndReplaceItem
+        item as Query
         viewReplace.isVisible = item.replaceEnabled
         etFind.imeOptions = when {
             item.replaceEnabled -> (etFind.imeOptions and EditorInfo.IME_ACTION_SEARCH.inv()) or EditorInfo.IME_ACTION_NEXT
@@ -84,7 +91,7 @@ class FieldHolder(parent: ViewGroup, layoutId: Int, private val listener: OnActi
             val value = s.toString()
             updateWarning(value)
 
-            val item = item as SearchAndReplaceItem
+            val item = item as Query
             if (value != item.query) {
                 listener.onSearchChange(value)
             }

@@ -48,8 +48,12 @@
         <item name="strokeColor">?colorSurfaceVariant</item>
     </style>
 
-    <style name="InputOutlinedDenseStyle" parent="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
+    <style name="TextInputLayoutOutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="boxStrokeColor">@color/bg_edit_text_outlined</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Corners</item>
+    </style>
+
+    <style name="TextInputLayoutOutlinedBox.Dense" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense">
     </style>
 
 </resources>

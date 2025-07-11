@@ -14,28 +14,6 @@
         app:widgetLayout="@layout/widget_switch"
         />
     <PreferenceCategory
-        app:title="@string/pref_search">
-        <app.atomofiron.searchboxapp.custom.preference.TextFieldPreference
-            app:title="@string/pref_special_characters"
-            app:key="pref_special_characters"
-            app:defaultValue="\\ [ { ? + * ^ $"
-            app:icon="@drawable/ic_symbols"
-            />
-        <app.atomofiron.searchboxapp.custom.preference.NumberPreference
-            app:title="@string/pref_max_depth"
-            app:key="pref_max_depth"
-            app:defaultValue="1024"
-            app:icon="@drawable/ic_tornado"
-            />
-        <app.atomofiron.searchboxapp.custom.preference.ByteSizePreference
-            app:title="@string/pref_max_size"
-            app:key="pref_max_size"
-            app:defaultValue="10485760"
-            android:summary="@string/max_size_summary"
-            app:icon="@drawable/ic_weight"
-            />
-    </PreferenceCategory>
-    <PreferenceCategory
         app:title="@string/user_interface">
         <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
             app:title="@string/pref_theme"

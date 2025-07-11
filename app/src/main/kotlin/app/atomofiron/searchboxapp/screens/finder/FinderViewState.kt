@@ -1,14 +1,14 @@
 package app.atomofiron.searchboxapp.screens.finder
 
 import android.view.Gravity
+import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
-import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
-import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.ConfigItem
+import app.atomofiron.searchboxapp.injectable.store.FinderStore
+import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsStateDelegate
 import kotlinx.coroutines.CoroutineScope
@@ -17,7 +17,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class FinderViewState(
     private val scope: CoroutineScope,
     preferenceChannel: PreferenceChannel,
-) : FinderItemsState by FinderItemsStateDelegate(isLocal = false) {
+    preferencesStore: PreferenceStore,
+    val preferences: PreferenceDataStore,
+    val finderStore: FinderStore,
+) : FinderItemsState by FinderItemsStateDelegate(
+    isLocal = false,
+    preferencesStore,
+    finderStore.tasksFlow,
+) {
 
     val inactiveTargets = MutableStateFlow(emptyList<Int>())
     val historyDrawerGravity = MutableStateFlow(Gravity.START)
@@ -33,28 +40,6 @@ class FinderViewState(
     fun showPermissionRequiredWarning() {
         permissionRequiredWarning(scope)
     }
-
-    fun updateTargets(targets: List<Node>) {
-        this.targets.clear()
-        this.targets.addAll(targets)
-        updateState()
-    }
-
-    fun switchConfigItemVisibility() {
-        var index = uniqueItems.indexOfFirst { it is ConfigItem }
-        if (index < 0) {
-            index = uniqueItems.indexOfFirst { it is FinderStateItem.ButtonsItem }
-            when {
-                uniqueItems.size >= index -> uniqueItems.add(configItem)
-                else -> uniqueItems[index.inc()] = configItem
-            }
-        } else {
-            uniqueItems.removeAt(index)
-        }
-        updateState()
-    }
-
-    fun reloadHistory() = reloadHistory.invoke(scope)
 
     fun insertInQuery(value: String) {
         insertInQuery[scope] = value
@@ -73,6 +58,4 @@ class FinderViewState(
     }
 
     fun showHistory() = showHistory.invoke(scope)
-
-    private inline fun updateConfig(action: ConfigItem.() -> ConfigItem) = updateConfig(configItem.action())
 }

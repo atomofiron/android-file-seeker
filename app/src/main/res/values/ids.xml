@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="finder_id_max_depth" />
+    <item type="id" name="finder_id_max_size" />
+    <item type="id" name="finder_id_chars" />
+</resources>

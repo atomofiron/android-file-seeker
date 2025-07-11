@@ -4,23 +4,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import app.atomofiron.fileseeker.R
 import app.atomofiron.common.recycler.GeneralHolder
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.SpecialCharacters
 
 class CharactersHolder(
     parent: ViewGroup,
-    layoutId: Int,
     private val listener: OnActionListener
-) : GeneralHolder<FinderStateItem>(parent, layoutId), View.OnClickListener {
-    private var currentItem: FinderStateItem.SpecialCharactersItem? = null
+) : GeneralHolder<FinderStateItem>(parent, R.layout.item_characters), View.OnClickListener {
+
+    override val hungry = false
+
+    override fun minWidth(): Float = itemView.resources.run {
+        (itemOrNull as SpecialCharacters?)
+            ?.characters
+            ?.size
+            ?.let { it * getDimension(R.dimen.finder_char) }
+            ?: getDimension(R.dimen.finder_query_field)
+    }
 
     override fun onBind(item: FinderStateItem, position: Int) {
-        if (currentItem == item) {
-            return
-        }
-        item as FinderStateItem.SpecialCharactersItem
-        currentItem = item
+        item as SpecialCharacters
         val itemView = itemView
         itemView as ViewGroup
         itemView.removeAllViews()

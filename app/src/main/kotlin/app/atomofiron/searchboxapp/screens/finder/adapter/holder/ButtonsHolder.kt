@@ -8,9 +8,11 @@ import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
 class ButtonsHolder(
     parent: ViewGroup,
-    layoutId: Int,
     private val listener: FinderButtonsListener
-) : GeneralHolder<FinderStateItem>(parent, layoutId) {
+) : GeneralHolder<FinderStateItem>(parent, R.layout.item_finder_buttons) {
+
+    override val hungry = false
+
     private val btnHistory = itemView.findViewById<Button>(R.id.item_config_history)
     private val btnVisibility = itemView.findViewById<Button>(R.id.item_config_visibility)
 
@@ -22,6 +24,8 @@ class ButtonsHolder(
             listener.onConfigVisibilityClick()
         }
     }
+
+    override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_buttons)
 
     override fun onBind(item: FinderStateItem, position: Int) = Unit
 

@@ -3,10 +3,10 @@ package app.atomofiron.searchboxapp.screens.result
 import androidx.core.os.ConfigurationCompat
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.AlertMessage
-import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
-import app.atomofiron.searchboxapp.injectable.store.*
+import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
@@ -17,14 +17,13 @@ import app.atomofiron.searchboxapp.utils.Const
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
 
 class ResultPresenter(
     params: ResultPresenterParams,
     scope: CoroutineScope,
     private val viewState: ResultViewState,
     private val finderStore: FinderStore,
-    private val preferenceStore: PreferenceStore,
     private val interactor: ResultInteractor,
     router: ResultRouter,
     appStore: AppStore,
@@ -42,11 +41,7 @@ class ResultPresenter(
         onSubscribeData()
     }
 
-    override fun onSubscribeData() = viewState.run {
-        preferenceStore.explorerItemComposition.collect(scope) {
-            viewState.composition.value = it
-        }
-    }
+    override fun onSubscribeData() = Unit
 
     fun onStopClick() = interactor.stop(viewState.task.value.uuid)
 

@@ -9,10 +9,10 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
+import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
-import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.model.toDockItem
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState
@@ -27,10 +27,11 @@ class ResultViewState(
     params: ResultPresenterParams,
     private val finderStore: FinderStore,
     private val scope: CoroutineScope,
+    preferenceStore: PreferenceStore,
 ) {
     private val taskId = params.taskId
     val task = DeferredStateFlow<SearchTask>()
-    val composition = DeferredStateFlow<ExplorerItemComposition>()
+    val composition = preferenceStore.explorerItemComposition
     val alerts = ChannelFlow<AlertMessage.Res>()
     val checked = MutableStateFlow(listOf<Int>())
     val dock = MutableStateFlow(ResultDockState.Default)

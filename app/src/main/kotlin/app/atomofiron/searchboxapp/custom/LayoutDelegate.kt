@@ -50,17 +50,22 @@ object LayoutDelegate {
         appBarLayout: AppBarLayout? = null,
         headerView: ExplorerHeaderView? = null,
         snackbarContainer: CoordinatorLayout? = null,
+        preMeasureCallback: ((width: Int) -> Unit)? = null,
     ) {
         val insetsProvider = (view as View).findInsetsProvider()!!
-        var layout = Layout(Layout.Ground.Bottom, withJoystick = true, view.isRtl())
+        var layoutWas: Layout? = null
         val dockDelegate = dockView?.insetsPadding(ExtType { barsWithCutout + joystickTop })
         val notch = view.resources.run {
             val size = getDimensionPixelSize(R.dimen.joystick_size) - 2 * getDimensionPixelSize(R.dimen.joystick_padding)
             DockNotch(size)
         }
         val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock }, start = true, top = appBarLayout == null, end = true, bottom = true)
-        addLayoutListener { new ->
-            layout = new
+        addLayoutListener { width, layout ->
+            preMeasureCallback?.invoke(width)
+            if (layout == layoutWas) {
+                return@addLayoutListener
+            }
+            layoutWas = layout
             val tappableBottom = insetsProvider.current[ExtType.tappableElement].bottom > 0
             tabLayout?.isVisible = !layout.isWide
             dockView?.apply(layout, notch, dockDelegate!!, tappableBottom)
@@ -75,7 +80,9 @@ object LayoutDelegate {
         appBarLayout?.insetsPadding(ExtType.invoke { barsWithCutout + dock + joystickFlank }, start = true, top = true, end = true)
         headerView?.insetsPadding(ExtType.invoke { barsWithCutout + dock }, start = true, top = true, end = true)
         dockView?.dockView?.insetsSource { view ->
+            val layout = layoutWas
             val insets = when {
+                layout == null -> Insets.NONE
                 layout.isBottom -> Insets.of(0, 0, 0, view.height)
                 layout.isLeft -> Insets.of(view.width, 0, 0, 0)
                 layout.isRight -> Insets.of(0, 0, view.width, 0)
@@ -124,14 +131,14 @@ object LayoutDelegate {
         }.also { last = it }
     }
 
-    private fun MeasureProvider.addLayoutListener(callback: (Layout) -> Unit) {
-        var layoutWas: Layout? = null
+    private fun MeasureProvider.addLayoutListener(callback: (width: Int, Layout) -> Unit) {
         val display = view.context.getDisplayCompat()
+        var widthWas = 0
         addMeasureListener { width, height ->
-            val layout = view.getLayout(width, height, display)
-            if (layoutWas != layout) {
-                layoutWas = layout
-                callback(layout)
+            if (width != widthWas) {
+                widthWas = width
+                val layout = view.getLayout(width, height, display)
+                callback(width, layout)
             }
         }
     }
@@ -183,7 +190,12 @@ object LayoutDelegate {
     }
 
     fun JoystickView.syncWithLayout(root: RootFrameLayout) {
-        root.addLayoutListener { layout ->
+        var was: Layout? = null
+        root.addLayoutListener { width, layout ->
+            if (layout == was) {
+                return@addLayoutListener
+            }
+            was = layout
             this.isVisible = layout.withJoystick
             updateLayoutParams<FrameLayout.LayoutParams> {
                 val flags = when (layout.ground) {

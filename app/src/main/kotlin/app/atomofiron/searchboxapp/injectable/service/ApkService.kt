@@ -23,9 +23,13 @@ class ApkService(
     private val context: Context,
     private val installer: PackageInstaller,
 ) {
-    fun install(content: AndroidApp, action: String): Rslt<Unit> = when {
-        content.splitApk -> installApks(content, action)
-        else -> installApk(content.ref, action, stringId = content.info?.stringId())
+    fun install(content: AndroidApp, action: String): Rslt<Unit> = try {
+        when {
+            content.splitApk -> installApks(content, action)
+            else -> installApk(content.ref, action, stringId = content.info?.stringId())
+        }
+    } catch (e: Exception) {
+        e.toRslt()
     }
 
     private fun installApks(content: AndroidApp, action: String): Rslt<Unit> {

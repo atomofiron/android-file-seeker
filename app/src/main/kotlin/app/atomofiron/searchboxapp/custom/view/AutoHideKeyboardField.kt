@@ -7,25 +7,36 @@ import android.util.AttributeSet
 import android.view.KeyEvent
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import androidx.appcompat.widget.AppCompatEditText
 import app.atomofiron.fileseeker.R
+import com.google.android.material.textfield.TextInputEditText
+import androidx.core.content.withStyledAttributes
 
-open class AutoHideKeyboardField : AppCompatEditText {
+open class AutoHideKeyboardField : TextInputEditText {
     private val inputMethodManager: InputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
     protected var hideKeyboardOnFocusLost: Boolean = true
     protected var hideKeyboardOnDetached: Boolean = true
 
     constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet? = null) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
-        val styled = context.obtainStyledAttributes(attrs, R.styleable.AutoHideKeyboardField, defStyleAttr, 0)
-        hideKeyboardOnFocusLost = styled.getBoolean(R.styleable.AutoHideKeyboardField_hideKeyboardOnFocusLost, hideKeyboardOnFocusLost)
-        styled.recycle()
+    constructor(context: Context, attrs: AttributeSet? = null) : super(context, attrs) {
+        attrs?.obtain()
+    }
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        attrs?.obtain(defStyleAttr)
     }
 
     init {
         imeOptions = imeOptions or EditorInfo.IME_FLAG_NO_EXTRACT_UI or EditorInfo.IME_FLAG_NO_FULLSCREEN
+    }
+
+    private fun AttributeSet.obtain(defStyleAttr: Int = 0) {
+        context.withStyledAttributes(this, R.styleable.AutoHideKeyboardField, defStyleAttr, 0) {
+            hideKeyboardOnFocusLost = getBoolean(R.styleable.AutoHideKeyboardField_hideKeyboardOnFocusLost, hideKeyboardOnFocusLost)
+        }
+    }
+
+    fun hideKeyboardOnFocusLost(value: Boolean = true) {
+        hideKeyboardOnFocusLost = value
     }
 
     override fun onKeyPreIme(keyCode: Int, event: KeyEvent): Boolean {

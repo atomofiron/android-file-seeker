@@ -134,16 +134,6 @@ class PreferenceModule {
         appWatcher: LeakWatcher,
         preferenceChannel: PreferenceChannel,
     ): PreferenceViewState = PreferenceViewState(scope, preferenceDataStore, preferenceStore, preferenceChannel, updateStore, appWatcher)
-
-    @Provides
-    @PreferenceScope
-    fun preferenceDataStore(
-        preferences: PreferenceStore,
-        appStore: AppStore,
-        watcher: LeakWatcher,
-    ): PreferenceDataStore {
-        return LegacyPreferenceDataStore(preferences, appStore.appScope, watcher)
-    }
 }
 
 interface PreferenceDependencies {
@@ -156,4 +146,5 @@ interface PreferenceDependencies {
     fun appStore(): AppStore
     fun updateStore(): AppUpdateStore
     fun appUpdateService(): AppUpdateService
+    fun preferenceDataStore(): PreferenceDataStore
 }
