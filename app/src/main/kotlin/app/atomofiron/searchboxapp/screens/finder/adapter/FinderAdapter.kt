@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.finder.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import app.atomofiron.common.recycler.AdapterHolderListener
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolder
