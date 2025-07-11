@@ -86,10 +86,10 @@ class PreferenceStore(
         edit { it[KeyDrawerGravity] = value }
     }
 
-    val testField = getFlow(KeyTestField)
+    val testField = getNullableFlow(KeyTestField)
 
-    suspend fun setTestField(value: String) {
-        edit { it[KeyTestField] = value }
+    suspend fun setTestField(value: String?) {
+        edit { if (value == null) it.remove(KeyTestField) else it[KeyTestField] = value }
     }
 
     val showSearchOptions = getFlow(KeyShowSearchOptions)
@@ -186,6 +186,12 @@ class PreferenceStore(
 
     private fun <V> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {
         return data.mapNotNull { it[key] ?: key.default }
+            .shareInOne(scope)
+            .asProperty()
+    }
+
+    private fun <V> getNullableFlow(key: PreferenceKey<V>): StateFlowProperty<V?> {
+        return data.map { it[key] }
             .shareInOne(scope)
             .asProperty()
     }

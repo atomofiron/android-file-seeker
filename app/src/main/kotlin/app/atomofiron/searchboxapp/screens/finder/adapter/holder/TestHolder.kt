@@ -26,6 +26,7 @@ class TestHolder(
 
     private val binding = ItemTextFieldBinding.bind(itemView)
     override val item get() = super.item as TestField
+    private val default = parent.resources.getString(R.string.try_find_this_text)
     private val span get() = RoundedBackgroundSpan(
         backgroundColor = context.findColorByAttr(MaterialAttr.colorSurfaceVariant),
         borderColor = context.findColorByAttr(MaterialAttr.colorSecondary),
@@ -39,7 +40,7 @@ class TestHolder(
         binding.field.run {
             isSingleLine = false
             maxLines = 5
-            setText(R.string.try_find_this_text)
+            setText(default)
             addTextChangedListener(this@TestHolder)
             imeOptions = imeOptions and EditorInfo.IME_ACTION_DONE.inv()
             inputType = inputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE
@@ -50,9 +51,9 @@ class TestHolder(
 
     override fun onBind(item: FinderStateItem, position: Int) {
         item as TestField
-        when (item.value) {
-            binding.field.text.toString() -> test(item)
-            else -> binding.field.setText(item.value)
+        val new = item.value ?: default
+        if (new != binding.field.text?.toString()) {
+            binding.field.setText(new)
         }
     }
 
@@ -108,13 +109,16 @@ class TestHolder(
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
     override fun afterTextChanged(s: Editable?) {
-        if (s != null) {
-            output.onTestTextChange(s.toString())
-            test(item.copy(value = s.toString()))
+        val string = s?.toString()
+        when (string) {
+            null, item.value -> Unit
+            default -> output.onTestTextChange(null)
+            else -> output.onTestTextChange(string)
         }
+        test(item.copy(value = string ?: ""))
     }
 
     interface OnTestChangeListener {
-        fun onTestTextChange(value: String)
+        fun onTestTextChange(value: String?)
     }
 }

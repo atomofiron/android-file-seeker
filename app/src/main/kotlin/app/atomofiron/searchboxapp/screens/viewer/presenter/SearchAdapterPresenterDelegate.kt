@@ -67,7 +67,7 @@ class SearchAdapterPresenterDelegate(
 
     override fun onProgressStopClick(item: FinderStateItem.Task) = Unit
 
-    override fun onTestTextChange(value: String) = Unit
+    override fun onTestTextChange(value: String?) = Unit
 
     override fun onEditMaxSize(new: Int) = Unit
 }

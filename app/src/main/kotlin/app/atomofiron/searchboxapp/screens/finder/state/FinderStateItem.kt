@@ -49,7 +49,7 @@ sealed class FinderStateItem(
     data object Buttons : FinderStateItem(FinderItemType.BUTTONS)
 
     data class TestField(
-        val value: String = "",
+        val value: String? = null,
         val query: String = "",
         val useRegex: Boolean = false,
         val ignoreCase: Boolean = true,

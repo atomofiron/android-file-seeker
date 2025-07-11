@@ -46,7 +46,7 @@ class FinderAdapterPresenterDelegate(
 
     override fun onSearchChange(value: String) = viewState.updateSearchQuery(value)
 
-    override fun onTestTextChange(value: String) = preferences { setTestField(value) }
+    override fun onTestTextChange(value: String?) = preferences { setTestField(value) }
 
     override fun onItemClick(item: FinderStateItem.Task) {
         router.showResult(item.task.uniqueId)
