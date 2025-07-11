@@ -1,12 +1,10 @@
-package app.atomofiron.searchboxapp.screens.finder.adapter
+package app.atomofiron.common.recycler
 
 import android.content.res.Resources
 import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.recycler.GeneralHolder
-import app.atomofiron.common.recycler.GeneralItem
 import app.atomofiron.common.util.extension.ceilToInt
 import app.atomofiron.common.util.extension.clear
 import app.atomofiron.fileseeker.R
