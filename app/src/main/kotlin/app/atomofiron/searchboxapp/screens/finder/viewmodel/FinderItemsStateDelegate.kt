@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.finder.viewmodel
 
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.S
-import app.atomofiron.common.util.flow.transform
+import app.atomofiron.common.util.flow.mapState
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -35,7 +35,7 @@ class FinderItemsStateDelegate(
     private val mutableToggles = MutableStateFlow(Options(isLocal = true))
     override val toggles = when {
         isLocal -> mutableToggles
-        else -> preferences.searchOptions.transform(::Options)
+        else -> preferences.searchOptions.mapState(::Options)
     }
     private val localOptions = toggles.map { listOf(it) }
     private val globalOptions = combine(

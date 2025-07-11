@@ -80,7 +80,7 @@ fun <T> Flow<T>.throttleLatest(duration: Long): Flow<T> = conflate().transform {
     delay(duration)
 }
 
-fun <T,R> StateFlow<T>.transform(transform: (T) -> R): StateFlow<R> {
+fun <T,R> StateFlow<T>.mapState(transform: (T) -> R): StateFlow<R> {
     val original = this
     return object : StateFlow<R>, Flow<R> by original.map(transform) {
         override val value: R get() = transform(original.value)
