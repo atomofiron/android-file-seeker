@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.screens.viewer.presenter
 
-import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.arch.Recipient
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
@@ -20,11 +19,10 @@ class SearchAdapterPresenterDelegate(
     private val router: TextViewerRouter,
     private val interactor: TextViewerInteractor,
     private val preferences: PreferenceStore,
-    dataStore: PreferenceDataStore,
     curtainChannel: CurtainChannel,
 ) : Recipient, FinderAdapterOutput {
 
-    private val curtainDelegate = CurtainSearchDelegate(this, viewState, dataStore, scope)
+    private val curtainDelegate = CurtainSearchDelegate(this, viewState, scope)
 
     init {
         curtainChannel.flow.collectForMe(scope) { controller ->

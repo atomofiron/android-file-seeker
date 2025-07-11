@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.screens.finder
 
 import android.view.Gravity
-import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.invoke
@@ -18,7 +17,6 @@ class FinderViewState(
     private val scope: CoroutineScope,
     preferenceChannel: PreferenceChannel,
     preferencesStore: PreferenceStore,
-    val preferences: PreferenceDataStore,
     val finderStore: FinderStore,
 ) : FinderItemsState by FinderItemsStateDelegate(
     isLocal = false,

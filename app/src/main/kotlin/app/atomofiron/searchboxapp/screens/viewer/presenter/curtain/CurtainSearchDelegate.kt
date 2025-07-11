@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.viewer.presenter.curtain
 
 import android.view.LayoutInflater
 import android.widget.EditText
-import androidx.preference.PreferenceDataStore
 import androidx.recyclerview.widget.GridLayoutManager
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
@@ -21,14 +20,13 @@ import lib.atomofiron.insets.insetsPadding
 class CurtainSearchDelegate(
     output: FinderAdapterOutput,
     private val viewState: TextViewerViewState,
-    preferences: PreferenceDataStore,
     scope: CoroutineScope,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
 
     private val node: Node get() = viewState.item.value
     private val composition = viewState.composition
 
-    private val finderAdapter = FinderAdapter(output, preferences)
+    private val finderAdapter = FinderAdapter(output)
 
     init {
         viewState.items.collect(scope, collector = finderAdapter::submitList)

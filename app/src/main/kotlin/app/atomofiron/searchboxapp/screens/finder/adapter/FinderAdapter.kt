@@ -1,8 +1,6 @@
 package app.atomofiron.searchboxapp.screens.finder.adapter
 
 import android.view.ViewGroup
-import androidx.preference.Preference
-import androidx.preference.PreferenceDataStore
 import androidx.recyclerview.widget.ListAdapter
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
@@ -23,7 +21,6 @@ import app.atomofiron.searchboxapp.utils.prederences.PreferenceKey
 
 class FinderAdapter(
     private val output: FinderAdapterOutput,
-    private val preferences: PreferenceDataStore,
 ) : ListAdapter<FinderStateItem, GeneralHolder<FinderStateItem>>(FinderDiffUtilCallback()) {
 
     var holderListener: OnHolderCreateListener? = null
@@ -52,12 +49,6 @@ class FinderAdapter(
             FinderItemType.DISCLAIMER -> DisclaimerHolder(parent)
             null -> throw IllegalArgumentException("viewType = $viewType")
         }.also { holderListener?.onCreate(it, viewType) }
-    }
-
-    private fun Preference.init(key: PreferenceKey<*>): Any {
-        this.key = key.name
-        preferenceDataStore = preferences
-        return key.default as Any
     }
 
     override fun onBindViewHolder(holder: GeneralHolder<FinderStateItem>, position: Int) {

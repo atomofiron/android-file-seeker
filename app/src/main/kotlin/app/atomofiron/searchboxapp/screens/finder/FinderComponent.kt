@@ -1,20 +1,19 @@
 package app.atomofiron.searchboxapp.screens.finder
 
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.property.WeakProperty
-import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
-import dagger.Provides
-import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.interactor.FinderInteractor
 import app.atomofiron.searchboxapp.injectable.service.FinderService
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
+import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderTargetsPresenterDelegate
+import dagger.BindsInstance
+import dagger.Component
+import dagger.Module
+import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
@@ -100,9 +99,8 @@ class FinderModule {
         scope: CoroutineScope,
         preferenceChannel: PreferenceChannel,
         preferencesStore: PreferenceStore,
-        preferences: PreferenceDataStore,
         finderStore: FinderStore,
-    ): FinderViewState = FinderViewState(scope, preferenceChannel, preferencesStore, preferences, finderStore)
+    ): FinderViewState = FinderViewState(scope, preferenceChannel, preferencesStore, finderStore)
 }
 
 interface FinderDependencies {
@@ -111,5 +109,4 @@ interface FinderDependencies {
     fun preferenceStore(): PreferenceStore
     fun finderService(): FinderService
     fun finderStore(): FinderStore
-    fun preferences(): PreferenceDataStore
 }

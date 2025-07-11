@@ -1,20 +1,19 @@
 package app.atomofiron.searchboxapp.screens.viewer
 
 import androidx.fragment.app.Fragment
-import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
-import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
-import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
 import app.atomofiron.searchboxapp.injectable.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.injectable.service.TextViewerService
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.viewer.presenter.SearchAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
+import dagger.BindsInstance
+import dagger.Component
+import dagger.Module
+import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
 @Scope
@@ -73,10 +72,9 @@ class TextViewerModule {
         router: TextViewerRouter,
         interactor: TextViewerInteractor,
         preferenceStore: PreferenceStore,
-        dataStore: PreferenceDataStore,
         curtainChannel: CurtainChannel,
     ): SearchAdapterPresenterDelegate {
-        return SearchAdapterPresenterDelegate(scope, viewState, router, interactor, preferenceStore, dataStore, curtainChannel)
+        return SearchAdapterPresenterDelegate(scope, viewState, router, interactor, preferenceStore, curtainChannel)
     }
 
     @Provides
@@ -108,7 +106,6 @@ class TextViewerModule {
 
 interface TextViewerDependencies {
     fun preferenceStore(): PreferenceStore
-    fun preferenceDataStore(): PreferenceDataStore
     fun curtainChannel(): CurtainChannel
     fun textViewerService(): TextViewerService
 }
