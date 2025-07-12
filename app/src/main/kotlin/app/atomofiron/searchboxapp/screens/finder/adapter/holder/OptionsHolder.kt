@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 
+import android.view.View
 import android.view.ViewGroup
 import android.widget.CompoundButton
 import androidx.core.view.children
@@ -17,7 +18,7 @@ import com.google.android.flexbox.FlexboxLayout
 
 class OptionsHolder(
     parent: ViewGroup,
-    private val listener: FinderConfigListener
+    private val listener: FinderConfigListener,
 ) : GeneralHolder<FinderStateItem>(parent, R.layout.item_search_options) {
 
     override val hungry = true
@@ -82,8 +83,8 @@ class OptionsHolder(
             center -> for (line in flexLines) {
                 val firstIndex = line.firstIndex
                 val lastIndex = firstIndex + line.itemCount.dec()
-                val firstLeft = getChildAt(firstIndex).run { left - marginLeft }
-                val lastRight = getChildAt(lastIndex).run { right + marginRight }
+                val firstLeft = getPresentedChildAt(firstIndex, 1).run { left - marginLeft }
+                val lastRight = getPresentedChildAt(lastIndex, -1).run { right + marginRight }
                 val space = firstLeft - paddingLeft + (width - lastRight - paddingRight)
                 for (i in firstIndex..lastIndex) {
                     getChildAt(i).translationX = space / 2f
@@ -92,6 +93,17 @@ class OptionsHolder(
             else -> for (child in children) {
                 child.translationX = 0f
             }
+        }
+    }
+
+    private fun ViewGroup.getPresentedChildAt(index: Int, inc: Int): View {
+        var index = index
+        while (true) {
+            return getChildAt(index)
+                .takeIf { !it.isGone }
+                .also { index += inc }
+                .also { require(index >= 0) }
+                ?: continue
         }
     }
 
