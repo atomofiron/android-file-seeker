@@ -44,14 +44,17 @@ class CurtainSearchDelegate(
         holder.setGreyBackgroundColor()
 
         val layoutManager = GridLayoutManager(binding.root.context, 1)
-        val spanSizeLookup = FinderSpanSizeLookup(finderAdapter, layoutManager, binding.root.resources)
+        val spanSizeLookup = FinderSpanSizeLookup(binding.recyclerView, finderAdapter, layoutManager, binding.root.resources)
         finderAdapter.holderListener = spanSizeLookup
-        binding.sheetViewerSearchRv.adapter = finderAdapter
-        binding.sheetViewerSearchRv.itemAnimator = null
-        binding.sheetViewerSearchRv.layoutManager = layoutManager
+        binding.recyclerView.run {
+            adapter = finderAdapter
+            itemAnimator = null
+            this.layoutManager = layoutManager
+            spanSizeLookup.recycler = this
+        }
 
         binding.root.insetsPadding(ExtType.curtain, top = true)
-        binding.sheetViewerSearchRv.insetsPadding(ExtType.curtain, bottom = true)
+        binding.recyclerView.insetsPadding(ExtType.curtain, bottom = true)
 
         return CurtainApi.ViewHolder(binding.root)
     }

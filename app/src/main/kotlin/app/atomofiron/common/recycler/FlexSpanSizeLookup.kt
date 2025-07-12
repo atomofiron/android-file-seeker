@@ -31,6 +31,7 @@ interface AdapterHolderListener {
 }
 
 class FinderSpanSizeLookup(
+    recyclerView: RecyclerView?,
     private val adapter: ListAdapter<out GeneralItem, *>,
     private val manager: GridLayoutManager,
     resources: Resources,
@@ -39,8 +40,8 @@ class FinderSpanSizeLookup(
     , View.OnLayoutChangeListener
 {
 
+    lateinit var recycler: RecyclerView
     private val portraitWidth = resources.getDimension(R.dimen.screen_compact)
-    lateinit var recyclerView: RecyclerView
     private val itemCount get() = adapter.itemCount
     private val holders = LinkedList<Holder>()
     private val cache = hashMapOf<Long,Cell>()
@@ -52,6 +53,7 @@ class FinderSpanSizeLookup(
     private val repeatTrigger = RepeatTrigger()
 
     init {
+        if (recyclerView != null) recycler = recyclerView
         manager.spanCount = COLUMNS_INT
         adapter.registerAdapterDataObserver(ItemObserver())
     }
@@ -81,8 +83,8 @@ class FinderSpanSizeLookup(
         updateArea(right - left)
     }
 
-    private fun updateArea(width: Int = recyclerView.width) {
-        val available = width.toFloat() - recyclerView.run { paddingStart + paddingEnd }
+    private fun updateArea(width: Int = recycler.width) {
+        val available = width.toFloat() - recycler.run { paddingStart + paddingEnd }
         if (available != availableArea) {
             availableArea = available
             columnWidth = availableArea / COLUMNS_INT
@@ -218,11 +220,11 @@ class FinderSpanSizeLookup(
 
     private inner class RepeatTrigger : View.OnLayoutChangeListener {
 
-        val parent get() = recyclerView.parent as View
+        val parent get() = recycler.parent as View
 
         override fun onLayoutChange(v: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
             parent.removeOnLayoutChangeListener(this)
-            recyclerView.requestLayout()
+            recycler.requestLayout()
         }
 
         operator fun invoke() {

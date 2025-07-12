@@ -45,7 +45,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
         finderAdapter = FinderAdapter(output = presenter)
         layoutManager = GridLayoutManager(context, 1)
-        spanSizeLookup = FinderSpanSizeLookup(finderAdapter, layoutManager, resources)
+        spanSizeLookup = FinderSpanSizeLookup(recyclerView = null, finderAdapter, layoutManager, resources)
         finderAdapter.holderListener = spanSizeLookup
         layoutManager.spanSizeLookup = spanSizeLookup
     }
@@ -61,7 +61,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
             layoutManager = this@FinderFragment.layoutManager
             itemAnimator = null
             adapter = finderAdapter
-            spanSizeLookup.recyclerView = this
+            spanSizeLookup.recycler = this
         }
 
         binding.drawer.run {
