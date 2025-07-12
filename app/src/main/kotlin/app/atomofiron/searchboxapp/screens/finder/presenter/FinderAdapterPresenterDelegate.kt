@@ -78,9 +78,10 @@ class FinderAdapterPresenterDelegate(
             router.permissions
                 .request(POST_NOTIFICATIONS)
                 .any {
-                    storagePermissionDelegate.request {
-                        startSearch(value, targets)
-                    }
+                    storagePermissionDelegate.request(
+                        granted = { startSearch(value, targets) },
+                        denied = { viewState.showPermissionRequiredWarning() }
+                    )
                 }
         }
     }

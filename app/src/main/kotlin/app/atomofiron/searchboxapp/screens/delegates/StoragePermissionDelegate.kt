@@ -18,10 +18,9 @@ class StoragePermissionDelegate(
     private val activity: WeakProperty<out ComponentActivity>,
 ) : ActivityResultCallback<ActivityResult> {
 
+    private val permissions = PermissionDelegate.create(activity)
     private var contractLauncher: ActivityResultLauncher<Intent>? = null
     private var callback: (() -> Unit)? = null
-
-    private val permissions = PermissionDelegate.create(activity)
 
     init {
         activity.observe { // leaks?
@@ -40,9 +39,7 @@ class StoragePermissionDelegate(
         callback?.takeIf { granted == true }?.invoke()
     }
 
-    fun request(granted: () -> Unit) = request(granted, {})
-
-    fun request(granted: () -> Unit, denied: ((shouldShowRationale: Boolean) -> Unit)) {
+    fun request(granted: () -> Unit, denied: (shouldShowRationale: Boolean) -> Unit) {
         when {
             Android.Below.R -> permissions.request(WRITE_EXTERNAL_STORAGE)
                 .granted { granted() }
