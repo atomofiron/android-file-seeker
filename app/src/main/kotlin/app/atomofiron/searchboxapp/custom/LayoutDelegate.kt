@@ -59,7 +59,7 @@ object LayoutDelegate {
             val size = getDimensionPixelSize(R.dimen.joystick_size) - 2 * getDimensionPixelSize(R.dimen.joystick_padding)
             DockNotch(size)
         }
-        val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock }, start = true, top = appBarLayout == null, end = true, bottom = true)
+        val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock + joystick }, start = true, top = appBarLayout == null, end = true, bottom = true)
         addLayoutListener { width, layout ->
             preMeasureCallback?.invoke(width)
             if (layout == layoutWas) {

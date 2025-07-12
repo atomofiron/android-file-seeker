@@ -9,6 +9,7 @@ object ExtType : ExtendedWindowInsets.Type() {
     val joystickTop = define("joystickTop")
     val joystickFlank = define("joystickFlank")
     val joystickBottom = define("joystickBottom")
+    val joystick = joystickBottom + joystickFlank
     val curtain = define("curtain")
 
     inline operator fun invoke(block: ExtType.() -> TypeSet): TypeSet = ExtType.block()
