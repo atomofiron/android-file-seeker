@@ -53,8 +53,13 @@ class FinderSpanSizeLookup(
     private val repeatTrigger = RepeatTrigger()
 
     init {
-        if (recyclerView != null) recycler = recyclerView
+        if (recyclerView != null) {
+            recycler = recyclerView
+            recyclerView.addOnLayoutChangeListener(this)
+            updateArea(resources.displayMetrics.widthPixels)
+        }
         manager.spanCount = COLUMNS_INT
+        manager.spanSizeLookup = this
         adapter.registerAdapterDataObserver(ItemObserver())
     }
 
@@ -85,7 +90,7 @@ class FinderSpanSizeLookup(
 
     private fun updateArea(width: Int = recycler.width) {
         val available = width.toFloat() - recycler.run { paddingStart + paddingEnd }
-        if (available != availableArea) {
+        if (available > 0 && available != availableArea) {
             availableArea = available
             columnWidth = availableArea / COLUMNS_INT
             portraitColumns = (portraitWidth / columnWidth).toUInt().coerceAtLeast(1u)

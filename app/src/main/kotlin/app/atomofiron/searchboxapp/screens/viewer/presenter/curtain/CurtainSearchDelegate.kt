@@ -29,7 +29,7 @@ class CurtainSearchDelegate(
     private val finderAdapter = FinderAdapter(output)
 
     init {
-        viewState.items.collect(scope, collector = finderAdapter::submitList)
+        viewState.items.collect(scope) { finderAdapter.submitList(it.reversed()) }
         viewState.insertInQuery.collect(scope, collector = ::insertInQuery)
     }
 
@@ -43,14 +43,13 @@ class CurtainSearchDelegate(
         holder.hideCheckBox()
         holder.setGreyBackgroundColor()
 
-        val layoutManager = GridLayoutManager(binding.root.context, 1)
-        val spanSizeLookup = FinderSpanSizeLookup(binding.recyclerView, finderAdapter, layoutManager, binding.root.resources)
-        finderAdapter.holderListener = spanSizeLookup
         binding.recyclerView.run {
+            val layoutManager = GridLayoutManager(binding.root.context, 1)
             adapter = finderAdapter
             itemAnimator = null
             this.layoutManager = layoutManager
-            spanSizeLookup.recycler = this
+            val spanSizeLookup = FinderSpanSizeLookup(binding.recyclerView, finderAdapter, layoutManager, binding.root.resources)
+            finderAdapter.holderListener = spanSizeLookup
         }
 
         binding.root.insetsPadding(ExtType.curtain, top = true)

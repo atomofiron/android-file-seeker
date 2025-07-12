@@ -45,9 +45,8 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
         finderAdapter = FinderAdapter(output = presenter)
         layoutManager = GridLayoutManager(context, 1)
-        spanSizeLookup = FinderSpanSizeLookup(recyclerView = null, finderAdapter, layoutManager, resources)
+        spanSizeLookup = FinderSpanSizeLookup(null, finderAdapter, layoutManager, resources)
         finderAdapter.holderListener = spanSizeLookup
-        layoutManager.spanSizeLookup = spanSizeLookup
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
