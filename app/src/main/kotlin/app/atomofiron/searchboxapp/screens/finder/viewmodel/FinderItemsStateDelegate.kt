@@ -45,15 +45,15 @@ class FinderItemsStateDelegate(
         preferences.maxFileSizeForSearch,
         preferences.showSearchOptions,
     ) { config, chars, depth, size, show ->
-        buildList {
-            add(Buttons)
-            if (show) {
-                add(config)
-                add(MaxSize(size))
-                add(MaxDepth(depth))
-                add(EditCharacters(chars.toList()))
-                add(Title(R.string.options_title))
-            }
+        when {
+            show -> listOf(
+                config,
+                MaxSize(size),
+                MaxDepth(depth),
+                EditCharacters(chars.toList()),
+                Title(R.string.options_title),
+            )
+            else -> emptyList()
         }
     }
     override val items = combine(
@@ -66,8 +66,9 @@ class FinderItemsStateDelegate(
         ) { query, test, chars, options, config ->
             buildList {
                 add(Query(query, useRegex = config.useRegex))
+                add(SpecialCharacters(chars))
+                add(Buttons)
                 add(TestField(value = test, query = query, useRegex = config.useRegex, ignoreCase = config.ignoreCase))
-                add(1, SpecialCharacters(chars))
                 addAll(options)
             }
         },
@@ -77,8 +78,8 @@ class FinderItemsStateDelegate(
         buildList {
             addAll(items)
             if (!isLocal && targets.isNotEmpty()) {
-                add(Targets(targets.toList()))
-                add(Title(R.string.search_here))
+                add(4, Title(R.string.search_here))
+                add(4, Targets(targets.toList()))
             }
             if (SDK_INT >= S && !isLocal && tasks.any { it.task.withRetries }) {
                 add(Disclaimer)
