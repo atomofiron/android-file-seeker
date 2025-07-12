@@ -18,16 +18,17 @@ class FinderTargetsPresenterDelegate(
 ) : TargetsHolder.FinderTargetsOutput {
 
     init {
-        val merged = combine(explorerStore.current, explorerStore.searchTargets) { current, targets ->
-            when (current) {
-                null -> targets
-                else -> targets.mutate {
+        val merged = combine(explorerStore.current, explorerStore.searchTargets, explorerStore.storageRoot) { current, targets, storage ->
+            when {
+                current != null -> targets.mutate {
                     removeOneIf { it.uniqueId == current.uniqueId }
                     add(0, current)
                 }
+                targets.isEmpty() -> listOfNotNull(storage)
+                else -> targets
             }
         }
-        // zip() ignoring new values from 'current'
+        // zip() ignores new values from 'current'
         combine(merged, viewState.inactiveTargets) { targets, inactive ->
             viewState.inactiveTargets.update { value ->
                 value.filter { id -> targets.any { it.uniqueId == id } }

@@ -4,6 +4,7 @@ import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
 
 class MutableWeakProperty<T : Any>(value: T? = null) : WeakProperty<T>(value) {
+
     override var value: T?
         get() = reference.get()
         set(value) {
@@ -16,8 +17,6 @@ class MutableWeakProperty<T : Any>(value: T? = null) : WeakProperty<T>(value) {
     operator fun setValue(any: Any, property: KProperty<*>, value: T) {
         this.value = value
     }
-
-    inline operator fun <R> invoke(crossinline action: (value: T) -> R): R? = value?.run(action)
 
     override fun observe(observer: (T?) -> Unit) {
         super.observe(observer)

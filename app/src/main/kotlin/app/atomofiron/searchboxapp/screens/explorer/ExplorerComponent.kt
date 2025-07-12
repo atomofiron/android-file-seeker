@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.explorer
 import android.content.Context
 import android.content.res.AssetManager
 import androidx.fragment.app.Fragment
+import app.atomofiron.common.util.extension.activity
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
@@ -21,6 +22,7 @@ import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMenuDelegate
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerItemActionListenerDelegate
+import app.atomofiron.searchboxapp.screens.delegates.StoragePermissionDelegate
 import javax.inject.Scope
 
 @Scope
@@ -86,6 +88,7 @@ class ExplorerModule {
         scope: CoroutineScope,
         viewState: ExplorerViewState,
         router: ExplorerRouter,
+        storagePermissionDelegate: StoragePermissionDelegate,
         explorerStore: ExplorerStore,
         explorerInteractor: ExplorerInteractor,
         itemListener: ExplorerItemActionListenerDelegate,
@@ -95,6 +98,7 @@ class ExplorerModule {
             scope,
             viewState,
             router,
+            storagePermissionDelegate,
             explorerStore,
             explorerInteractor,
             itemListener,
@@ -124,6 +128,12 @@ class ExplorerModule {
         preferenceChannel: PreferenceChannel,
     ): ExplorerViewState {
         return ExplorerViewState(scope, explorerStore, interactor, preferenceStore, preferenceChannel)
+    }
+
+    @Provides
+    @ExplorerScope
+    fun storagePermissionDelegate(fragment: WeakProperty<out Fragment>): StoragePermissionDelegate {
+        return StoragePermissionDelegate(fragment.activity())
     }
 }
 

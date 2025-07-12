@@ -47,8 +47,7 @@ class RootModule {
     @RootScope
     fun router(
         fragment: WeakProperty<out Fragment>,
-        initialDelegate: InitialDelegate,
-    ): RootRouter = RootRouter(fragment, initialDelegate)
+    ): RootRouter = RootRouter(fragment)
 
     @Provides
     @RootScope

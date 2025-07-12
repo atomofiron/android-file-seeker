@@ -8,6 +8,7 @@ class ExplorerStore {
     var currentItems = listOf<Node>()
         private set
     val current = MutableStateFlow<Node?>(null)
+    val storageRoot = MutableStateFlow<Node?>(null)
     val searchTargets = MutableStateFlow<List<Node>>(listOf())
     val alerts = EventFlow<NodeError>()
     val removed = EventFlow<Node>()
@@ -15,6 +16,10 @@ class ExplorerStore {
 
     fun setCurrentItems(items: List<Node>) {
         currentItems = items
+    }
+
+    fun setStorageRoot(item: Node) {
+        storageRoot.value = item
     }
 
     suspend fun emitUpdate(item: Node) = updated.emit(item)

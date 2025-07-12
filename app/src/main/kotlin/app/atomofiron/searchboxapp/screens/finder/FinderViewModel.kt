@@ -16,7 +16,7 @@ class FinderViewModel : BaseViewModel<FinderComponent, FinderFragment, FinderVie
 
     override fun setView(view: FinderFragment) {
         super.setView(view)
-        router.permissions.registerForActivityResult(view)
+        router.permissions.register(view)
     }
 
     override fun component(view: FinderFragment) = DaggerFinderComponent

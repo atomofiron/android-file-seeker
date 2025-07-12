@@ -25,7 +25,6 @@ class RootFragment : Fragment(R.layout.fragment_root),
 
         val binding = FragmentRootBinding.bind(view)
         binding.applyInsets()
-        presenter.onChildrenCreated()
     }
 
     private fun FragmentRootBinding.applyInsets() {

@@ -1,8 +1,10 @@
 package app.atomofiron.searchboxapp.screens.finder.presenter
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import app.atomofiron.searchboxapp.injectable.interactor.FinderInteractor
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.screens.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.finder.FinderRouter
 import app.atomofiron.searchboxapp.screens.finder.FinderViewState
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
@@ -19,6 +21,7 @@ import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 class FinderAdapterPresenterDelegate(
     private val viewState: FinderViewState,
     private val router: FinderRouter,
+    private val storagePermissionDelegate: StoragePermissionDelegate,
     private val interactor: FinderInteractor,
     private val preferences: PreferenceStore,
 ) :
@@ -73,8 +76,12 @@ class FinderAdapterPresenterDelegate(
             }
         if (targets.isNotEmpty()) {
             router.permissions
-                .request(android.Manifest.permission.POST_NOTIFICATIONS)
-                .any { startSearch(value, targets) }
+                .request(POST_NOTIFICATIONS)
+                .any {
+                    storagePermissionDelegate.request {
+                        startSearch(value, targets)
+                    }
+                }
         }
     }
 

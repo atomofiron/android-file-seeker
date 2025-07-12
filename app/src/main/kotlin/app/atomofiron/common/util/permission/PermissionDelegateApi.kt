@@ -1,10 +1,12 @@
 package app.atomofiron.common.util.permission
 
+import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultCallback
 import androidx.fragment.app.Fragment
 
 interface PermissionDelegateApi : ActivityResultCallback<Map<String, Boolean>> {
-    fun registerForActivityResult(fragment: Fragment)
+    fun register(fragment: Fragment)
+    fun register(activity: ComponentActivity)
     fun check(vararg permissions: String): PermissionDelegateApi
     fun request(vararg permissions: String): PermissionDelegateApi
     fun granted(callback: GrantedCallback): PermissionDelegateApi

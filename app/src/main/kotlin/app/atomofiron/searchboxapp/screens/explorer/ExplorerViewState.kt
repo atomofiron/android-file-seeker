@@ -43,6 +43,9 @@ class ExplorerViewState(
     val firstTabItems = explorerInteractor.getFlow(firstTab)
     val updates = explorerStore.updated
     //val secondTabItems = explorerInteractor.getFlow(secondTab)
+    val permissionRequiredWarning = ChannelFlow<Unit>()
+
+    fun showPermissionRequiredWarning() = permissionRequiredWarning(scope)
 
     fun scrollTo(item: Node) {
         scrollTo[scope] = item

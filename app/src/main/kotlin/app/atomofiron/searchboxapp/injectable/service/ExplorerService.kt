@@ -90,6 +90,7 @@ class ExplorerService(
         store.current.collect(appScope) {
             preferenceStore.setOpenedDirPath(it?.path)
         }
+        store.setStorageRoot(Node.asRoot(internalStoragePath, NodeRootType.InternalStorage()))
     }
 
     private fun Context.resolveToybox(embedded: ToyboxVariant) {

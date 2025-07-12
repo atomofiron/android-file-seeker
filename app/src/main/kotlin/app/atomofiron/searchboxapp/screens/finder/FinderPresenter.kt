@@ -1,22 +1,20 @@
 package app.atomofiron.searchboxapp.screens.finder
 
-import android.Manifest
-import android.os.Environment
 import app.atomofiron.common.arch.BasePresenter
-import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.OptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.OptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderTargetsPresenterDelegate
@@ -26,6 +24,7 @@ class FinderPresenter(
     scope: CoroutineScope,
     private val viewState: FinderViewState,
     router: FinderRouter,
+    private val storagePermissionDelegate: StoragePermissionDelegate,
     finderAdapterDelegate: FinderAdapterPresenterDelegate,
     targetsDelegate: FinderTargetsPresenterDelegate,
     private val preferenceStore: PreferenceStore,
@@ -59,23 +58,11 @@ class FinderPresenter(
 
     fun onDrawerGravityChange(gravity: Int) = preferenceStore { setDrawerGravity(gravity) }
 
-    fun onExplorerOptionSelected() {
-        when {
-            Android.Below.R -> {
-                router.permissions.request(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    .granted { router.showExplorer() }
-                    .denied { _, _ ->
-                        viewState.showPermissionRequiredWarning()
-                    }
-            }
-            Environment.isExternalStorageManager() -> router.showExplorer()
-            else -> router.showSystemPermissionsAppSettings()
-        }
-    }
+    fun onExplorerOptionSelected() = router.showExplorer()
 
     fun onSettingsOptionSelected() = router.showSettings()
 
     fun onHistoryItemClick(node: String) = viewState.replaceQuery(node)
 
-    fun onAllowStorageClick() = router.showSystemPermissionsAppSettings()
+    fun onAllowStorageClick() = storagePermissionDelegate.launchSettings()
 }

@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.finder
 
 import androidx.fragment.app.Fragment
+import app.atomofiron.common.util.extension.activity
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.interactor.FinderInteractor
@@ -8,6 +9,7 @@ import app.atomofiron.searchboxapp.injectable.service.FinderService
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderTargetsPresenterDelegate
 import dagger.BindsInstance
@@ -46,6 +48,7 @@ class FinderModule {
         scope: CoroutineScope,
         viewState: FinderViewState,
         router: FinderRouter,
+        storagePermissionDelegate: StoragePermissionDelegate,
         finderAdapterDelegate: FinderAdapterPresenterDelegate,
         targetsDelegate: FinderTargetsPresenterDelegate,
         preferenceStore: PreferenceStore,
@@ -55,6 +58,7 @@ class FinderModule {
             scope,
             viewState,
             router,
+            storagePermissionDelegate,
             finderAdapterDelegate,
             targetsDelegate,
             preferenceStore,
@@ -67,10 +71,11 @@ class FinderModule {
     fun finderAdapterOutput(
         viewState: FinderViewState,
         router: FinderRouter,
+        storagePermissionDelegate: StoragePermissionDelegate,
         interactor: FinderInteractor,
         preferenceStore: PreferenceStore,
     ): FinderAdapterPresenterDelegate {
-        return FinderAdapterPresenterDelegate(viewState, router, interactor, preferenceStore)
+        return FinderAdapterPresenterDelegate(viewState, router, storagePermissionDelegate, interactor, preferenceStore)
     }
 
     @Provides
@@ -101,6 +106,12 @@ class FinderModule {
         preferencesStore: PreferenceStore,
         finderStore: FinderStore,
     ): FinderViewState = FinderViewState(scope, preferenceChannel, preferencesStore, finderStore)
+
+    @Provides
+    @FinderScope
+    fun storagePermissionDelegate(fragment: WeakProperty<out Fragment>): StoragePermissionDelegate {
+        return StoragePermissionDelegate(fragment.activity())
+    }
 }
 
 interface FinderDependencies {

@@ -6,12 +6,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import androidx.navigation.*
+import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.dialog.DialogDelegateImpl
-import app.atomofiron.common.util.property.MutableWeakProperty
+import app.atomofiron.common.util.extension.activity
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.router.FileSharingDelegate
@@ -20,20 +21,12 @@ import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 
 abstract class BaseRouter(
     fragmentProperty: WeakProperty<out Fragment>,
-    protected val activityProperty: WeakProperty<out FragmentActivity> = activityProperty(fragmentProperty),
+    protected val activityProperty: WeakProperty<out FragmentActivity> = fragmentProperty.activity(),
 ) : FileSharingDelegate by FileSharingDelegateImpl(activityProperty)
     , DialogDelegate by DialogDelegateImpl(activityProperty)
 {
     companion object {
         const val RECIPIENT = "RECIPIENT"
-
-        private fun activityProperty(fragmentProperty: WeakProperty<out Fragment>): WeakProperty<out FragmentActivity> {
-            val activityProperty = MutableWeakProperty<FragmentActivity>()
-            fragmentProperty.observe { fragment ->
-                activityProperty.value = fragment?.activity
-            }
-            return activityProperty
-        }
 
         val navOptions: NavOptions = NavOptions.Builder()
             .setEnterAnim(R.anim.fragment_enter_scale)

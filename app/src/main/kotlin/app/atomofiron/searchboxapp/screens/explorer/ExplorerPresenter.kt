@@ -12,12 +12,14 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerItemActionListenerDelegate
+import app.atomofiron.searchboxapp.screens.delegates.StoragePermissionDelegate
 import kotlinx.coroutines.CoroutineScope
 
 class ExplorerPresenter(
     scope: CoroutineScope,
     private val viewState: ExplorerViewState,
     router: ExplorerRouter,
+    private val storagePermissionDelegate: StoragePermissionDelegate,
     private val explorerStore: ExplorerStore,
     private val explorerInteractor: ExplorerInteractor,
     itemListener: ExplorerItemActionListenerDelegate,
@@ -37,7 +39,14 @@ class ExplorerPresenter(
 
     override fun onSubscribeData() = Unit
 
-    override fun onRootClick(item: NodeRoot) = explorerInteractor.toggleRoot(currentTab, item)
+    override fun onRootClick(item: NodeRoot) {
+        storagePermissionDelegate.request(
+            granted = { explorerInteractor.toggleRoot(currentTab, item) },
+            denied = { viewState.showPermissionRequiredWarning() }
+        )
+    }
+
+    fun onAllowStorageClick() = storagePermissionDelegate.launchSettings()
 
     fun onSearchOptionSelected() = router.showFinder()
 

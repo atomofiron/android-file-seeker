@@ -1,19 +1,19 @@
 package app.atomofiron.common.util.permission
 
 import android.content.pm.PackageManager
+import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.property.WeakProperty
 
 class PermissionDelegate private constructor(
-    activityProperty: WeakProperty<out FragmentActivity>,
+    activityProperty: WeakProperty<out ComponentActivity>,
 ) : PermissionDelegateApi {
     companion object {
         private val contract = ActivityResultContracts.RequestMultiplePermissions()
 
-        fun create(activityProperty: WeakProperty<out FragmentActivity>): PermissionDelegateApi {
+        fun create(activityProperty: WeakProperty<out ComponentActivity>): PermissionDelegateApi {
             return PermissionDelegate(activityProperty)
         }
     }
@@ -33,8 +33,12 @@ class PermissionDelegate private constructor(
 
     private var contractLauncher: ActivityResultLauncher<Array<String>>? = null
 
-    override fun registerForActivityResult(fragment: Fragment) {
+    override fun register(fragment: Fragment) {
         contractLauncher = fragment.registerForActivityResult(contract, this)
+    }
+
+    override fun register(activity: ComponentActivity) {
+        contractLauncher = activity.registerForActivityResult(contract, this)
     }
 
     override fun check(vararg permissions: String): PermissionDelegateApi {
@@ -76,7 +80,7 @@ class PermissionDelegate private constructor(
         }
     }
 
-    private fun FragmentActivity.filterNotGranted(vararg permissions: String): List<String> {
+    private fun ComponentActivity.filterNotGranted(vararg permissions: String): List<String> {
         val notGranted = mutableListOf<String>()
         for (permission in permissions) {
             when {

@@ -114,6 +114,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
         viewCollect(currentTab) {
             binding.pager.currentItem = it.index
         }
+        viewCollect(permissionRequiredWarning, collector = ::showPermissionRequiredWarning)
     }
 
     override fun FragmentExplorerBinding.onApplyInsets() {
@@ -149,5 +150,11 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
                 }
             }
         }.show()
+    }
+
+    private fun showPermissionRequiredWarning(unit: Unit) {
+        binding.snackbarContainer.makeSnackbar(R.string.access_to_storage_forbidden, Snackbar.LENGTH_LONG)
+            .setAction(R.string.allow) { presenter.onAllowStorageClick() }
+            .show()
     }
 }
