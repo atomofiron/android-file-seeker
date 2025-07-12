@@ -102,10 +102,9 @@ class FinderModule {
     @FinderScope
     fun viewState(
         scope: CoroutineScope,
-        preferenceChannel: PreferenceChannel,
         preferencesStore: PreferenceStore,
         finderStore: FinderStore,
-    ): FinderViewState = FinderViewState(scope, preferenceChannel, preferencesStore, finderStore)
+    ): FinderViewState = FinderViewState(scope, preferencesStore, finderStore)
 
     @Provides
     @FinderScope

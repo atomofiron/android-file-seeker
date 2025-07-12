@@ -12,20 +12,17 @@ import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.recycler.FinderSpanSizeLookup
 import app.atomofiron.common.util.flow.viewCollect
-import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
-import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.history.adapter.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.state.FinderDock
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
-import app.atomofiron.searchboxapp.screens.finder.state.finderDockItems
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.makeSnackbar
-import app.atomofiron.searchboxapp.utils.set
+import com.google.android.material.snackbar.Snackbar
 
 class FinderFragment : Fragment(R.layout.fragment_finder),
     BaseFragment<FinderFragment, FinderViewState, FinderPresenter, FragmentFinderBinding> by BaseFragmentImpl()
@@ -70,9 +67,6 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
             spanSizeLookup.recyclerView = this
         }
 
-        binding.dockBar.submit(finderDockItems(NoticeableDrawable(requireContext(), R.drawable.ic_settings)))
-        binding.dockBar.setListener(::onNavigationItemSelected)
-
         binding.drawer.run {
             onGravityChangeListener = presenter::onDrawerGravityChange
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -111,13 +105,10 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         viewCollect(snackbar, collector = ::onShowSnackbar)
         viewCollect(showHistory) { binding.drawer.open() }
         viewCollect(permissionRequiredWarning, collector = ::showPermissionRequiredWarning)
-        viewCollect(settingsNotification) {
-            binding.dockBar[FinderDock.Settings] = it
-        }
     }
 
     override fun FragmentFinderBinding.onApplyInsets() {
-        root.apply(recyclerView = recyclerView, dockView = dockBar) {
+        root.apply(recyclerView = recyclerView) {
             spanSizeLookup.onMeasure(it)
         }
         insetsBackground.setAdditional(ExtType.dock)
