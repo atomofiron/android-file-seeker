@@ -22,7 +22,7 @@ class ResultItemActionDelegate(
         when {
             item.isDirectory -> Unit // todo open dir
             item.content is NodeContent.Text -> router.openFile(item.path, viewState.task.value.uuid)
-            item.content is NodeContent.AndroidApp -> operations.askForApk(item.content)
+            item.content is NodeContent.AndroidApp -> operations.askForAndroidApp(item.content)
             else -> router.openWith(item)
         }
     }

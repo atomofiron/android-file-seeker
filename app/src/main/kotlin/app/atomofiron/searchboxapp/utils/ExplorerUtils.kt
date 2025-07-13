@@ -440,7 +440,7 @@ object ExplorerUtils {
                     .tryGetApksContent(path)
                     .contentOrNodeError(this) { return it }
                 else -> content
-                    .tryGetApkContent(path)
+                    .getApkContent(path)
                     .contentOrNodeError(this) { return it }
             }
             else -> return this

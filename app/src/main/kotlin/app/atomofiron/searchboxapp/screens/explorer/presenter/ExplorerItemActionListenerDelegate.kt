@@ -37,7 +37,7 @@ class ExplorerItemActionListenerDelegate(
     private fun openItem(item: Node) {
         when {
             item.isDirectory -> explorerInteractor.toggleDir(currentTab, item)
-            item.content is AndroidApp -> operations.askForApk(item.content, currentTab)
+            item.content is AndroidApp -> operations.askForAndroidApp(item.content, currentTab)
             else -> router.showFile(item)
         }
     }

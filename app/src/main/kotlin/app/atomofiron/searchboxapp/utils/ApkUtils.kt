@@ -27,10 +27,10 @@ import kotlin.random.nextUInt
 const val BASE_APK = "base.apk"
 const val TEMP_APKS_DIR = "apks"
 @Suppress("DEPRECATION") @SuppressLint("InlinedApi")
-private const val flags = PackageManager.GET_SIGNATURES or PackageManager.GET_SIGNING_CERTIFICATES
+private const val WITH_SIGNATURE = PackageManager.GET_SIGNATURES or PackageManager.GET_SIGNING_CERTIFICATES
 
-fun PackageManager.apkInfo(path: String, icon: Boolean = true): ApkInfo? {
-    val packageInfo = getPackageArchiveInfo(path, flags)
+fun PackageManager.apkInfo(path: String, icon: Boolean = true, signature: Boolean = false): ApkInfo? {
+    val packageInfo = getPackageArchiveInfo(path, if (signature) WITH_SIGNATURE else 0)
     val info = packageInfo?.applicationInfo
     info ?: return null
     info.sourceDir = path
@@ -60,12 +60,12 @@ fun Context.launch(packageName: String): Boolean {
 }
 
 @Throws(IOException::class)
-fun AndroidApp.getApksContent(zipPath: String): Rslt<AndroidApp> {
-    return getApksContent(FileInputStream(zipPath))
+fun AndroidApp.getApksContent(zipPath: String, signature: Boolean = false): Rslt<AndroidApp> {
+    return getApksContent(FileInputStream(zipPath), signature)
 }
 
 @Throws(IOException::class)
-fun AndroidApp.getApksContent(input: InputStream?): Rslt<AndroidApp> {
+fun AndroidApp.getApksContent(input: InputStream?, signature: Boolean = false): Rslt<AndroidApp> {
     val tempDir = System.getProperty("java.io.tmpdir")
         ?: return Rslt.Err("No temp dir")
     val tmp = File("$tempDir/$TEMP_APKS_DIR/${Random.nextUInt()}")
@@ -75,29 +75,33 @@ fun AndroidApp.getApksContent(input: InputStream?): Rslt<AndroidApp> {
         ?.takeIf { tmp.createNewFile() }
         ?: return Rslt.Err("Can't create temp file")
     var containsBaseApk = false
-    ZipInputStream(BufferedInputStream(input)).use { stream ->
-        var entry: ZipEntry? = stream.nextEntry
-        while (entry != null) {
-            if (entry.name == BASE_APK) {
-                FileOutputStream(tmp).use {
-                    stream.copyTo(it)
+    try {
+        ZipInputStream(BufferedInputStream(input)).use { stream ->
+            var entry: ZipEntry? = stream.nextEntry
+            while (entry != null) {
+                if (entry.name == BASE_APK) {
+                    FileOutputStream(tmp).use {
+                        stream.copyTo(it)
+                    }
+                    containsBaseApk = true
+                    break
                 }
-                containsBaseApk = true
-                break
+                entry = stream.nextEntry
             }
-            entry = stream.nextEntry
         }
+    } catch (e: Exception) {
+        return e.toRslt()
     }
     return when {
         !containsBaseApk -> Rslt.Err("$BASE_APK not found")
         tmp.length() == 0L -> Rslt.Err("Temp file is empty")
-        else -> tryGetApkContent(tmp.absolutePath)
+        else -> getApkContent(tmp.absolutePath, signature)
     }.also { tmp.delete() }
 }
 
-fun AndroidApp.tryGetApkContent(apkPath: String): Rslt<AndroidApp> {
+fun AndroidApp.getApkContent(apkPath: String, signature: Boolean = false): Rslt<AndroidApp> {
     val packageManager = packageManager.value
         ?: return Rslt.Err("No package manager")
-    val info = packageManager.apkInfo(apkPath)
+    val info = packageManager.apkInfo(apkPath, icon = true, signature)
     return copy(info = info).toRslt()
 }
