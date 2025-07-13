@@ -215,14 +215,13 @@ class ExplorerService(
         appScope.launch {
             withGarden {
                 withCachingState(root.stableId) {
-                    var updated = root.item.update(config).run {
-                        copy(children = children?.copy(isOpened = true))
-                    }
+                    var updated = root.item.update(config)
                     updated = when (updated.error) {
                         !is NodeError.NoSuchFile -> updated
                         else -> tryAlternative(root, updated)
                     }
                     // todo async updated.resolveDirChildren(config.useSu)
+                    updated = updated.copy(children = updated.children?.copy(isOpened = true))
                     updateRootSync(updated, key, root)
                 }
             }
