@@ -67,7 +67,7 @@ class FinderItemsStateDelegate(
             buildList {
                 add(Query(query, useRegex = config.useRegex))
                 add(SpecialCharacters(chars))
-                add(Buttons)
+                if (!isLocal) add(Buttons)
                 add(TestField(value = test, query = query, useRegex = config.useRegex, ignoreCase = config.ignoreCase))
                 addAll(options)
             }
@@ -78,8 +78,9 @@ class FinderItemsStateDelegate(
         buildList {
             addAll(items)
             if (!isLocal && targets.isNotEmpty()) {
-                add(4, Title(R.string.search_here))
-                add(4, Targets(targets.toList()))
+                val index = items.indexOfFirst { it is TestField }.inc()
+                add(index, Title(R.string.search_here))
+                add(index, Targets(targets.toList()))
             }
             if (SDK_INT >= S && !isLocal && tasks.any { it.task.withRetries }) {
                 add(Disclaimer)
