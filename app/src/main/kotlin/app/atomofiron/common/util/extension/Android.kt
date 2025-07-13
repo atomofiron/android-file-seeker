@@ -13,8 +13,11 @@ import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.other.ApkSignature
+import java.security.MessageDigest
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
+
+const val HASH_ALG = "SHA-256"
 
 // fun Context.copy() no-no-no-no
 
@@ -40,9 +43,13 @@ fun PackageInfo.signature(): ApkSignature? {
         else -> @Suppress("DEPRECATION") signatures
     }?.firstOrNull()
     signature ?: return null
-    return ApkSignature.invoke {
+    val bytes = signature.toByteArray()
+    return ApkSignature.invoke(bytes.size) {
         val factory = CertificateFactory.getInstance("X.509")
         val cert = factory.generateCertificate(signature.toByteArray().inputStream()) as X509Certificate
+        val digest = MessageDigest.getInstance(HASH_ALG)
+        val hashBytes = digest.digest(bytes)
+        val hash = hashBytes.joinToString("") { "%02x".format(it) }
         object : ApkSignature {
             override val algName = cert.sigAlgName
             override val algOID = cert.sigAlgOID
@@ -50,6 +57,9 @@ fun PackageInfo.signature(): ApkSignature? {
             override val since = cert.notBefore.toString()
             override val until = cert.notAfter.toString()
             override val version = cert.version
+            override val hashAlg = HASH_ALG
+            override val hash = hash
+            override val bytes = bytes.size
         }
     }
 }

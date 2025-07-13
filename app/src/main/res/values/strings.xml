@@ -174,7 +174,7 @@
     <string name="install">Install</string>
     <string name="install_succeeded">Install succeeded</string>
     <string name="launch">Launch</string>
-    <string name="apk_info">Package: %s\nVersion: %s\nMin SDK: %s\nTarget SDK: %s\nCompile SDK: %s\nSigner: %s</string>
+    <string name="apk_info">Package: %s\nVersion: %s\nMin SDK: %s\nTarget SDK: %s\nCompile SDK: %s\nSignature: %s</string>
     <string name="update">Update</string>
     <string name="channel_name_updates">Updates</string>
     <string name="search_here">Search here:</string>

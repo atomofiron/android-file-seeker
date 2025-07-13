@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.model.explorer.other
 
-class ApkInfo(
+data class ApkInfo(
     val icon: Thumbnail?,
     val appName: String,
     val versionName: String,
