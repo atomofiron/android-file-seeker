@@ -33,8 +33,8 @@ data class Node(
 
     val isCached: Boolean get() = children != null || !isDirectory && content.isCached
     val isEmpty: Boolean get() = children?.isEmpty() == true
-    val hasChildren: Boolean get() = children?.isNotEmpty() == true
     val isOpened: Boolean get() = children?.isOpened == true
+    val hasChildren: Boolean get() = children != null
     val childCount: Int get() = children?.size ?: 0
 
     fun areContentsTheSame(other: Node?): Boolean = when {
@@ -53,6 +53,7 @@ data class Node(
         other.isChecked != isChecked -> false
         other.isCurrent != isCurrent -> false
         other.hasChildren != hasChildren -> false
+        other.childCount != childCount -> false
         other.content != content -> false
         else -> true
     }
