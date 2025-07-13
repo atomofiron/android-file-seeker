@@ -6,7 +6,10 @@ import kotlinx.coroutines.withContext
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-suspend fun withMain(action: suspend CoroutineScope.() -> Unit) = withContext(Dispatchers.Main, action)
+suspend fun withMain(
+    now: Boolean = false,
+    action: suspend CoroutineScope.() -> Unit,
+) = withContext(if (now) Dispatchers.Main.immediate else Dispatchers.Main, action)
 
 inline infix fun <T> Boolean.then(action: () -> T): T? {
     return if (this) action() else null
