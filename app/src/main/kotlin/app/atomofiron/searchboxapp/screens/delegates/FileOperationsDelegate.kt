@@ -148,7 +148,7 @@ class FileOperationsDelegate(
                     ?.let { "$it (${Android[it] ?: unavailable})" }
                     ?: unavailable,
                 signature
-                    ?.let { "(v${it.version})\n${it.issuerName}\n${it.hashAlg}: ${it.hash}" }
+                    ?.let { "v${it.version}\n${it.issuerName}\n${it.hashAlg}: ${it.hash}" }
                     ?: unavailable.takeIf { withSignature }
                     ?: dialogs[UniText(R.string.ellipsis)],
             )
