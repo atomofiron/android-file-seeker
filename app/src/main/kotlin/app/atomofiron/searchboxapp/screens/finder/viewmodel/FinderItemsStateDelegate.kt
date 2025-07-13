@@ -25,7 +25,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 class FinderItemsStateDelegate(
-    isLocal: Boolean,
+    private val isLocal: Boolean,
     preferences: PreferenceStore,
     tasks: Flow<List<SearchTask>>,
 ) : FinderItemsState {
@@ -33,10 +33,7 @@ class FinderItemsStateDelegate(
     private val query = MutableStateFlow("")
     override val targets = MutableStateFlow<List<Node>>(mutableListOf())
     private val mutableToggles = MutableStateFlow(Options(isLocal = true))
-    override val toggles = when {
-        isLocal -> mutableToggles
-        else -> preferences.searchOptions.mapState(::Options)
-    }
+    override val toggles = if (isLocal) mutableToggles else preferences.searchOptions.mapState(::Options)
     private val localOptions = toggles.map { listOf(it) }
     private val globalOptions = combine(
         toggles,
@@ -44,48 +41,52 @@ class FinderItemsStateDelegate(
         preferences.maxDepthForSearch,
         preferences.maxFileSizeForSearch,
         preferences.showSearchOptions,
-    ) { config, chars, depth, size, show ->
-        when {
-            show -> listOf(
-                config,
-                MaxSize(size),
-                MaxDepth(depth),
-                EditCharacters(chars.toList()),
-                Title(R.string.options_title),
-            )
-            else -> emptyList()
+        ::composeOptions,
+    )
+    private val uniqueItems = combine(
+        query,
+        preferences.testField,
+        preferences.specialCharacters,
+        if (isLocal) localOptions else globalOptions,
+        toggles,
+        ::composeUniqueItems,
+    )
+    override val items = combine(uniqueItems, targets, tasks, ::composeAllItems)
+
+    private fun composeOptions(config: Options, chars: Array<String>, depth: Int, size: Int, show: Boolean) = when {
+        show -> listOf(
+            config,
+            MaxSize(size),
+            MaxDepth(depth),
+            EditCharacters(chars.toList()),
+            Title(R.string.options_title),
+        )
+        else -> emptyList()
+    }
+
+    private fun composeUniqueItems(query: String, test: String?, chars: Array<String>, options: List<FinderStateItem>, config: Options): List<FinderStateItem> {
+        return buildList {
+            add(Query(query, useRegex = config.useRegex))
+            add(SpecialCharacters(chars))
+            if (!isLocal) add(Buttons)
+            add(TestField(value = test, query = query, useRegex = config.useRegex, ignoreCase = config.ignoreCase))
+            addAll(options)
         }
     }
-    override val items = combine(
-        combine(
-            query,
-            preferences.testField,
-            preferences.specialCharacters,
-            if (isLocal) localOptions else globalOptions,
-            toggles,
-        ) { query, test, chars, options, config ->
-            buildList {
-                add(Query(query, useRegex = config.useRegex))
-                add(SpecialCharacters(chars))
-                if (!isLocal) add(Buttons)
-                add(TestField(value = test, query = query, useRegex = config.useRegex, ignoreCase = config.ignoreCase))
-                addAll(options)
-            }
-        },
-        targets,
-        tasks.map { it.map(FinderStateItem::Task).reversed() },
-    ) { items, targets, tasks ->
-        buildList {
+
+    private fun composeAllItems(items: List<FinderStateItem>, targets: List<Node>, tasks: List<SearchTask>): List<FinderStateItem> {
+        return buildList {
             addAll(items)
             if (!isLocal && targets.isNotEmpty()) {
                 val index = items.indexOfFirst { it is TestField }.inc()
                 add(index, Title(R.string.search_here))
                 add(index, Targets(targets.toList()))
             }
-            if (SDK_INT >= S && !isLocal && tasks.any { it.task.withRetries }) {
-                add(Disclaimer)
+            val index = tasks.indexOfLast { it.withRetries }
+            addAll(tasks.map(FinderStateItem::Task).reversed())
+            if (SDK_INT >= S && !isLocal && index >= 0) {
+                add(tasks.lastIndex - index, Disclaimer)
             }
-            addAll(tasks)
         }
     }
 
