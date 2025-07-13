@@ -146,16 +146,17 @@ class ExplorerService(
         tryToggleRoot(key, root)
     }
 
-    suspend fun tryToggleRoot(key: NodeTabKey, root: NodeRoot) = tryToggleRoot(key, root.type, root.item)
-
-    private suspend fun tryToggleRoot(key: NodeTabKey, type: NodeRootType, item: Node) {
+    suspend fun tryToggleRoot(key: NodeTabKey, root: NodeRoot) {
         renderTab(key) {
-            selectedRootId = when (val typeId = type.stableId) {
+            roots.indexOfFirst { it.type.stableId == selectedRootId }
+                .takeIf { it >= 0 }
+                ?.let { roots[it] = roots[it].copy(item = tree.first()) }
+            selectedRootId = when (root.type.stableId) {
                 selectedRootId -> 0
-                else -> typeId
+                else -> root.type.stableId
             }
         }
-        tryCache(key, item)
+        tryCache(key, root.item)
     }
 
     suspend fun tryToggle(key: NodeTabKey, it: Node) {
@@ -214,7 +215,9 @@ class ExplorerService(
         appScope.launch {
             withGarden {
                 withCachingState(root.stableId) {
-                    var updated = root.item.update(config)
+                    var updated = root.item.update(config).run {
+                        copy(children = children?.copy(isOpened = true))
+                    }
                     updated = when (updated.error) {
                         !is NodeError.NoSuchFile -> updated
                         else -> tryAlternative(root, updated)
@@ -608,49 +611,51 @@ class ExplorerService(
             // todo NullPointerException
             if (it.withoutState) null else it
         }
-        syncSelectedRoot()
+        syncSelectedRootWithTree()
         updateDirectoryTypes()
-        val currentDir = tree.lastOrNull()
-            ?.takeIf { it.isOpened }
-            ?.run { if (checked.contains(uniqueId)) copy(isChecked = true) else this }
+        val roots = renderRoots()
+        val deepest = findDeepest()
         val items = renderNodes()
-        val tabItems = NodeTabItems(roots.toMutableList(), items, currentDir)
+        val tabItems = NodeTabItems(roots, items, deepest)
         flow.emit(tabItems)
 
         updateStates(items)
         updateChecked(items)
         val checked = items.filter { it.isChecked }
         store.searchTargets.set(checked)
-        store.current.value = currentDir
+        store.current.value = deepest
         store.setCurrentItems(items)
+
+        require(this.roots.all { !it.isSelected })
     }
 
-    private fun NodeTab.syncSelectedRoot() {
-        roots.forEachIndexed { index, root ->
-            if ((root.type.stableId == selectedRootId) != root.isSelected) {
-                roots[index] = root.copy(
-                    isSelected = root.type.stableId == selectedRootId,
-                    item = root.item.copy(children = root.item.children?.copy(isOpened = true)),
-                )
+    private fun NodeTab.renderRoots(): List<NodeRoot> {
+        return roots.mutate {
+            replaceEach {
+                when (it.type.stableId) {
+                    selectedRootId -> it.copy(isSelected = true)
+                    else -> it
+                }
             }
         }
-        syncSelectedRootWithTree()
     }
 
     private fun NodeTab.syncSelectedRootWithTree() {
-        roots.find { it.isSelected }.let { selected ->
+        roots.find { it.type.stableId == selectedRootId }.let { selected ->
             if (selected?.item?.rootId != tree.firstOrNull()?.rootId) {
                 tree.clear()
-                selected?.placeOpened(tree)
+                var opened = selected?.item
+                while (opened != null) {
+                    tree.add(opened)
+                    opened = opened.children?.find { it.isOpened }
+                }
             }
         }
     }
 
-    private fun NodeRoot.placeOpened(tree: MutableList<Node>) {
-        var opened: Node? = item
-        while (opened != null) {
-            tree.add(opened)
-            opened = opened.children?.find { it.isOpened }
+    private fun NodeTab.findDeepest(): Node? {
+        return tree.lastOrNull()?.run {
+            if (checked.contains(uniqueId)) copy(isChecked = true) else this
         }
     }
 

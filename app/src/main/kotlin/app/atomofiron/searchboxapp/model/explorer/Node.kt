@@ -5,7 +5,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.name
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.parent
 
 
-data class Node constructor(
+data class Node(
     val path: String,
     val parentPath: String = path.parent(),
     val uniqueId: Int = path.toUniqueId(),
@@ -15,11 +15,11 @@ data class Node constructor(
     val properties: NodeProperties = NodeProperties(name = path.name()),
     val content: NodeContent,
     val error: NodeError? = null,
-    // в дереве всегда state = stateStub
+    // state is always stateStub in the garden
     val state: NodeState = stateStub,
-    // в дереве всегда isChecked = false
+    // isChecked is always false in the garden
     val isChecked: Boolean = false,
-    // в дереве всегда isCurrent = false
+    // isCurrent is always false in the garden
     val isCurrent: Boolean = false,
 ) : INodeProperties by properties, INodeState by state {
     companion object {

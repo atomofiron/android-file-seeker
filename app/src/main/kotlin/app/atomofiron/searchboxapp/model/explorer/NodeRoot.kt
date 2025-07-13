@@ -11,7 +11,7 @@ data class NodeRoot(
     val sorting: NodeSorting,
     val thumbnail: Thumbnail.FilePath? = null,
     val thumbnailPath: String = "",
-    // todo make true due rendering only
+    // isSelected is always false in the garden
     val isSelected: Boolean = false,
     val pathVariants: Array<out String>? = null,
 ) {
@@ -26,6 +26,10 @@ data class NodeRoot(
         is NodeRootType.Camera,
         is NodeRootType.Screenshots -> true
         else -> false
+    }
+
+    init {
+        require(item.children?.isOpened != false)
     }
 
     sealed class NodeRootType(val editable: Boolean = false) {

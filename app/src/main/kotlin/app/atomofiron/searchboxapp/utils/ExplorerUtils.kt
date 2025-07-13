@@ -755,7 +755,7 @@ object ExplorerUtils {
                 }
             }
         }
-        if (children != null && children.isOpened != isOpened) {
+        if (children != null && this.children != null && children.isOpened != this.children.isOpened) {
             children = children.copy(isOpened = isOpened)
         }
         val content = when (true) {

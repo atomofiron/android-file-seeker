@@ -124,10 +124,9 @@ inline fun <T> List<T>.mutate(action: MutableList<T>.() -> Unit): MutableList<T>
     return toMutableList().apply(action)
 }
 
-inline fun <T, reified I : T> MutableList<T>.replace(action: (I) -> T) {
-    val index = indexOfFirst { it is I }
-    if (index >= 0) {
-        set(index, action(get(index) as I))
+inline fun <I> MutableList<I>.replaceEach(action: (I) -> I) {
+    for (i in indices) {
+        set(i, action(get(i)))
     }
 }
 
