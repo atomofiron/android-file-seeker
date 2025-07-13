@@ -49,7 +49,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="open">Открыть</string>
-    <string name="done">Завершено</string>
+    <string name="done">Готово</string>
     <string name="submit">Подтвердить</string>
     <string name="started">Запущен</string>
     <string name="stopping">Остановка</string>

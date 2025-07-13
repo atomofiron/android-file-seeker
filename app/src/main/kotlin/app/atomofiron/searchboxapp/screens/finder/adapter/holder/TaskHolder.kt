@@ -60,7 +60,7 @@ class TaskHolder(parent: ViewGroup, listener: OnActionListener) : CardViewHolder
             is SearchState.Progress -> R.string.started
             is SearchState.Stopping -> R.string.stopping
             is SearchState.Stopped -> R.string.stopped
-            is SearchState.Ended -> R.string.done
+            is SearchState.Ended -> R.string.completed
         }
         val colorLabel = when {
             task.isError -> context.findColorByAttr(MaterialAttr.colorError)
