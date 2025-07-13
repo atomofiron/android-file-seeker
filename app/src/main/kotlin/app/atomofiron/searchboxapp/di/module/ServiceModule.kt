@@ -62,8 +62,9 @@ open class ServiceModule {
         scope: CoroutineScope,
         preferenceStore: PreferenceStore,
         textViewerStore: TextViewerStore,
+        explorerStore: ExplorerStore,
         finderStore: FinderStore,
-    ): TextViewerService = TextViewerService(scope, preferenceStore, textViewerStore, finderStore)
+    ): TextViewerService = TextViewerService(scope, preferenceStore, textViewerStore, explorerStore, finderStore)
 
     @Provides
     @Singleton

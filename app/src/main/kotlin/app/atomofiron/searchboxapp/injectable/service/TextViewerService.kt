@@ -24,7 +24,8 @@ import kotlin.collections.ArrayList
 class TextViewerService(
     private val scope: CoroutineScope,
     private val preferenceStore: PreferenceStore,
-    private val textViewerStore: TextViewerStore,
+    private val store: TextViewerStore,
+    private val explorerStore: ExplorerStore,
     private val finderStore: FinderStore,
 ) {
     companion object {
@@ -65,11 +66,12 @@ class TextViewerService(
     private val useSu: Boolean get() = preferenceStore.useSu.value
 
     fun getFileSession(path: String): TextViewerSession {
-        val item = Node(path, content = NodeContent.Undefined)
+        val item = explorerStore.currentItems.find { it.path == path }
+            ?: Node(path, content = NodeContent.Undefined)
         var session = findSession(item)
         if (session == null) {
             session = TextViewerSession(item)
-            textViewerStore.sessions[item.uniqueId] = session
+            store.sessions[item.uniqueId] = session
             scope.launch(Dispatchers.IO) { readFile(item) }
         }
         if (!item.isCached) {
@@ -121,7 +123,7 @@ class TextViewerService(
     }
 
     fun closeSession(item: Node) {
-        val session = textViewerStore.sessions.remove(item.uniqueId)
+        val session = store.sessions.remove(item.uniqueId)
         session?.reader?.close()
     }
 
@@ -142,7 +144,7 @@ class TextViewerService(
         session.finishTask(taskDone)
     }
 
-    private fun findSession(item: Node): TextViewerSession? = textViewerStore.sessions[item.uniqueId]
+    private fun findSession(item: Node): TextViewerSession? = store.sessions[item.uniqueId]
 
     private suspend fun TextViewerSession.readNextLines() {
         val reader = reader ?: return
