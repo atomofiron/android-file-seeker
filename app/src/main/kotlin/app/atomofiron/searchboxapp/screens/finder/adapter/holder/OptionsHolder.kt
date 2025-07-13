@@ -14,7 +14,10 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemSearchOptionsBinding
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.toInt
 import com.google.android.flexbox.FlexboxLayout
+import kotlin.math.max
+import kotlin.math.min
 
 class OptionsHolder(
     parent: ViewGroup,
@@ -83,9 +86,17 @@ class OptionsHolder(
             center -> for (line in flexLines) {
                 val firstIndex = line.firstIndex
                 val lastIndex = firstIndex + line.itemCount.dec()
-                val firstLeft = getPresentedChildAt(firstIndex, 1).run { left - marginLeft }
-                val lastRight = getPresentedChildAt(lastIndex, -1).run { right + marginRight }
-                val space = firstLeft - paddingLeft + (width - lastRight - paddingRight)
+                var minLeft = 0
+                var maxRight = 0
+                getPresentedChildAt(firstIndex, lastIndex)?.let {
+                    minLeft = it.left - it.marginLeft
+                    maxRight = it.right + it.marginRight
+                } ?: continue
+                getPresentedChildAt(lastIndex, firstIndex)?.let {
+                    minLeft = min(minLeft, it.left - it.marginLeft)
+                    maxRight = max(maxRight, it.right + it.marginRight)
+                }
+                val space = minLeft - paddingLeft + (width - maxRight - paddingRight)
                 for (i in firstIndex..lastIndex) {
                     getChildAt(i).translationX = space / 2f
                 }
@@ -96,14 +107,19 @@ class OptionsHolder(
         }
     }
 
-    private fun ViewGroup.getPresentedChildAt(index: Int, inc: Int): View {
-        var index = index
+    private fun ViewGroup.getPresentedChildAt(from: Int, to: Int): View? {
+        var index = from
+        val step = (to > from).toInt()
         while (true) {
-            return getChildAt(index)
-                .takeIf { !it.isGone }
-                .also { index += inc }
-                .also { require(index >= 0) }
-                ?: continue
+            val view = getChildAt(index)
+            when (view?.isGone) {
+                null -> return null
+                false -> return view
+                true -> when (index) {
+                    to -> return null
+                    else -> index += step
+                }
+            }
         }
     }
 
