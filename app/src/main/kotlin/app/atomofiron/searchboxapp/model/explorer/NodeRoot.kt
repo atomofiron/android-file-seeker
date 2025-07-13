@@ -4,8 +4,7 @@ import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import java.util.Objects
 
-
-data class NodeRoot(
+data class NodeRoot private constructor(
     val type: NodeRootType,
     val item: Node,
     val sorting: NodeSorting,

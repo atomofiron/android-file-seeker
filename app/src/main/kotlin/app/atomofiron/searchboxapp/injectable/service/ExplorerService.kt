@@ -141,7 +141,7 @@ class ExplorerService(
     }
 
     private suspend fun tryUnselectRoot(key: NodeTabKey, item: Node) {
-        val root = garden.trees[key]?.roots?.find { it.isSelected && it.item.uniqueId == item.uniqueId }
+        val root = garden[key]?.getSelectedRoot()?.takeIf { it.item.uniqueId == item.uniqueId }
         root ?: return
         tryToggleRoot(key, root)
     }
@@ -305,7 +305,7 @@ class ExplorerService(
                 tab.roots.replace { root ->
                     when (root.stableId) {
                         targetRoot.stableId -> {
-                            if (root.isSelected && !updatedRoot.item.isCached) {
+                            if (tab.selected(root) && !updatedRoot.item.isCached) {
                                 tab.tree.clear()
                             }
                             val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sorting)
@@ -318,7 +318,7 @@ class ExplorerService(
                         }
                         else -> root
                     }.also { updated ->
-                        if (!updated.isSelected) return@also
+                        if (!tab.selected(updated)) return@also
                         val treeRoot = tab.tree.firstOrNull()
                         treeRoot ?: return@also
                         tab.tree[0] = updated.item
@@ -526,7 +526,7 @@ class ExplorerService(
         var mediaRootAffected: NodeRoot? = null
         val items = mutableListOf<Node>()
         renderTab(key) {
-            mediaRootAffected = roots.find { it.isSelected && it.withPreview }
+            mediaRootAffected = roots.find { it.isSelected() && it.withPreview }
             its.mapNotNull { item ->
                 tree.findNode(item.uniqueId)?.takeIf {
                     val state = states.updateState(item.uniqueId) {

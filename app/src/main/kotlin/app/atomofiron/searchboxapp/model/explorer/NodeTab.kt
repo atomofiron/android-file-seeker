@@ -12,4 +12,10 @@ class NodeTab(
     val tree = mutableListOf<Node>()
     val checked: MutableList<Int> = LinkedList()
     val flow = DataFlow<NodeTabItems>()
+
+    fun NodeRoot.isSelected(): Boolean = stableId == selectedRootId
+
+    fun getSelectedRoot(): NodeRoot? = roots.find { it.isSelected() }
+
+    fun selected(root: NodeRoot): Boolean = root.isSelected()
 }
