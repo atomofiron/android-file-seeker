@@ -1,13 +1,11 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.annotation.SuppressLint
-import android.app.NotificationChannel
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Resources
-import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -17,7 +15,6 @@ import android.os.Build.VERSION_CODES.TIRAMISU
 import android.os.Bundle
 import android.os.Parcelable
 import android.provider.OpenableColumns
-import android.util.AttributeSet
 import android.util.LayoutDirection
 import android.util.TypedValue
 import android.view.Display
@@ -29,14 +26,10 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.annotation.StyleRes
-import androidx.annotation.StyleableRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ScrollingView
 import androidx.core.view.isEmpty
-import androidx.core.view.updatePadding
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -50,11 +43,6 @@ import app.atomofiron.searchboxapp.model.explorer.NodeError
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.Serializable
-import java.util.Locale
-import kotlin.math.max
-import kotlin.math.roundToInt
-
-fun Resources.getLocale(): Locale = configuration.locales.get(0)
 
 fun Context.findResIdByAttr(@AttrRes attr: Int): Int = findResIdsByAttr(attr)[0]
 
@@ -82,22 +70,6 @@ fun Context.getAttr(attr: Int, fallbackAttr: Int): Int {
     }
 }
 
-fun Context.getPackageUri(): Uri = Uri.parse("package:$packageName")
-
-fun Context.getMarketUrl(): String = "https://play.google.com/store/apps/details?id=$packageName"
-
-fun <T> List<T>.subListLastReversedWhile(predicate: (T) -> Boolean): List<T> {
-    val list = ArrayList<T>()
-    loop@ for (i in 0 until size) {
-        val item = this[i]
-        when {
-            predicate(item) -> list.add(item)
-            else -> break@loop
-        }
-    }
-    return list
-}
-
 fun <I> ActivityResultLauncher<I>.resolve(context: Context, input: I): Boolean {
     val intent = contract.createIntent(context, input)
     val info = intent.resolveActivity(context.packageManager)
@@ -109,17 +81,6 @@ fun Context.resolve(intent: Intent): Boolean {
 }
 
 fun Context.getMarketIntent() = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName"))
-
-fun Context.fixChannel(id: String, name: String, importance: Int) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val manager = NotificationManagerCompat.from(this)
-        var channel = manager.getNotificationChannel(id)
-        if (channel == null) {
-            channel = NotificationChannel(id, name, importance)
-            manager.createNotificationChannel(channel)
-        }
-    }
-}
 
 fun Resources.getString(error: NodeError, content: NodeContent? = null): String {
     return when (error) {
@@ -181,40 +142,11 @@ fun CoordinatorLayout.makeSnackbar(message: CharSequence, duration: Int): Snackb
     return Snackbar.make(this, message, duration)
 }
 
-fun View.setContentMaxWidthRes(resId: Int) = setContentMaxWidth(resources.getDimensionPixelSize(resId))
-
-fun View.setContentMaxWidth(value: Int) {
-    var currentInset = 0
-    addOnLayoutChangeListener { view, left, _, right, _, _, _, _, _ ->
-        val width = right - left
-        val inset = max(0, width - value) / 2
-        val paddingLeft = paddingLeft - currentInset + inset
-        val paddingRight = paddingRight - currentInset + inset
-        currentInset = inset
-        if (this.paddingLeft != paddingLeft || this.paddingRight != paddingRight) {
-            view.updatePadding(left = paddingLeft, right = paddingRight)
-        }
-    }
-}
-
-inline fun Context.obtainStyledAttributes(
-    attrs: AttributeSet?,
-    @StyleableRes styleable: IntArray,
-    @AttrRes defStyleAttr: Int = 0,
-    @StyleRes defStyleRes: Int = 0,
-    action: TypedArray.() -> Unit,
-) {
-    val styled = obtainStyledAttributes(attrs, styleable, defStyleAttr, defStyleRes)
-    action(styled)
-    styled.recycle()
-}
-
 val View.isLayoutRtl: Boolean get() = layoutDirection == View.LAYOUT_DIRECTION_RTL
 
 fun View.isRtl(): Boolean = resources.isRtl()
 
 fun Resources.isRtl(): Boolean = configuration.layoutDirection == LayoutDirection.RTL
-
 
 fun RecyclerView.scrollToTop(): Boolean {
     if (isEmpty()) return false
@@ -289,10 +221,6 @@ fun Data.Builder.putStringArray(key: String, value: Array<out String?>): Data.Bu
 }
 
 fun Context.document(uri: Uri) = DocumentFile.fromSingleUri(this, uri)!!
-
-fun View.dpf(value: Int) = (resources.displayMetrics.density * value)
-
-fun View.dp(value: Int) = dpf(value).roundToInt()
 
 fun Uri.name(context: Context): String? {
     val path = path ?: return null

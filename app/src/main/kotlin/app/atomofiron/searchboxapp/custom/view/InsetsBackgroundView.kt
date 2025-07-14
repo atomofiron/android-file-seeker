@@ -5,11 +5,11 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.View
+import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.getColorByAttr
-import app.atomofiron.searchboxapp.utils.obtainStyledAttributes
 import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.ExtendedWindowInsets.Type
 import lib.atomofiron.insets.InsetsListener
@@ -54,7 +54,7 @@ class InsetsBackgroundView : View, InsetsListener {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
         paint.color = context.getSystemBarsColor()
 
-        context.obtainStyledAttributes(attrs, R.styleable.SystemUiBackgroundView, defStyleAttr) {
+        context.withStyledAttributes(attrs, R.styleable.SystemUiBackgroundView, defStyleAttr) {
             statusBar = getBoolean(R.styleable.SystemUiBackgroundView_statusBar, statusBar)
             sides = getInt(R.styleable.SystemUiBackgroundView_navigationBar, sides.value).let {
                 Sides(it)
