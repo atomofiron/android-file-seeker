@@ -17,7 +17,7 @@ class ExplorerHeaderDelegate(
     private val adapter: ExplorerAdapter,
 ) : RecyclerView.OnScrollListener(), View.OnLayoutChangeListener {
 
-    private var currentDir: Node? = null
+    private var deepestDir: Node? = null
 
     private var composition: ExplorerItemComposition? = null
     private var updateOnDecoratorDraw = true
@@ -41,9 +41,9 @@ class ExplorerHeaderDelegate(
         tryBind()
     }
 
-    fun setCurrentDir(item: Node?) {
-        bindingRequired = bindingRequired || currentDir?.areContentsTheSame(item) != true
-        currentDir = item
+    fun setDeepestDir(item: Node?) {
+        bindingRequired = bindingRequired || deepestDir?.areContentsTheSame(item) != true
+        deepestDir = item
     }
 
     fun onDecoratorDraw() {
@@ -54,15 +54,15 @@ class ExplorerHeaderDelegate(
 
     private fun tryBind() {
         val composition = composition ?: return
-        val currentDir = currentDir ?: return
+        val deepestDir = deepestDir ?: return
 
         headerView.setComposition(composition)
-        headerView.bind(currentDir)
+        headerView.bind(deepestDir)
         bindingRequired = false
     }
 
     private fun updateOffset() {
-        val bottom = when (currentDir) {
+        val bottom = when (deepestDir) {
             null -> 0
             else -> getHeaderBottom()
         }
@@ -71,8 +71,8 @@ class ExplorerHeaderDelegate(
 
     private fun getHeaderBottom(): Int {
         val headerHeight = headerView.height
-        val currentDir = currentDir ?: return 0
-        if (currentDir.isEmpty) return 0
+        val deepestDir = deepestDir ?: return 0
+        if (deepestDir.isEmpty) return 0
         val topChildren = LinkedList<View>()
         for (i in 0 until recyclerView.childCount) {
             val child = recyclerView.getChildAt(i)
@@ -89,8 +89,8 @@ class ExplorerHeaderDelegate(
         topItems.forEachIndexed { i, it ->
             val view = topChildren[i]
             when {
-                it.parentPath == currentDir.path -> bottom = view.bottom
-                it.path != currentDir.path -> Unit
+                it.parentPath == deepestDir.path -> bottom = view.bottom
+                it.path != deepestDir.path -> Unit
                 view.bottom <= headerHeight -> bottom = max(headerHeight, view.bottom)
             }
         }

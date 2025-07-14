@@ -35,7 +35,7 @@ class OnScrollIdleSubmitter(
             ?: return
         val new = when (true) {
             (item.isOpened != old.isOpened),
-            (item.isCurrent != old.isCurrent) -> item.copy(isCurrent = old.isCurrent, children = item.children?.copy(isOpened = old.isOpened))
+            (item.isDeepest != old.isDeepest) -> item.copy(isDeepest = old.isDeepest, children = item.children?.copy(isOpened = old.isOpened))
             else -> item
         }
         if (new.areContentsTheSame(old)) {

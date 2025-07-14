@@ -19,8 +19,8 @@ data class Node(
     val state: NodeState = stateStub,
     // isChecked is always false in the garden
     val isChecked: Boolean = false,
-    // isCurrent is always false in the garden
-    val isCurrent: Boolean = false,
+    // isDeepest is always false in the garden
+    val isDeepest: Boolean = false,
 ) : INodeProperties by properties, INodeState by state {
     companion object {
         private val stateStub = NodeState(0)
@@ -51,7 +51,7 @@ data class Node(
         other.isDirectory != isDirectory -> false
         other.isFile != isFile -> false
         other.isChecked != isChecked -> false
-        other.isCurrent != isCurrent -> false
+        other.isDeepest != isDeepest -> false
         other.hasChildren != hasChildren -> false
         other.childCount != childCount -> false
         other.content != content -> false

@@ -53,7 +53,7 @@ class ExplorerViewState(
 
     fun getCurrentDir(): Node? {
         return when (currentTab.value) {
-            firstTab -> firstTabItems.valueOrNull?.current
+            firstTab -> firstTabItems.valueOrNull?.deepest
             else -> null//secondTabItems.valueOrNull?.current
         }
     }

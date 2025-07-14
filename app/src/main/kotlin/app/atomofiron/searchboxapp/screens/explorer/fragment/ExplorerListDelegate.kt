@@ -28,7 +28,7 @@ class ExplorerListDelegate(
 ) : RecyclerView.AdapterDataObserver() {
 
     private var items = emptyList<Node>()
-    private var currentDir: Node? = null
+    private var deepestDir: Node? = null
 
     private val headerDelegate = ExplorerHeaderDelegate(recyclerView, headerView, nodeAdapter)
     private val rootMarginDecorator = RootItemMarginDecorator(recyclerView.resources)
@@ -47,40 +47,40 @@ class ExplorerListDelegate(
     fun set(items: List<Node>) {
         val wasEmpty = this.items.isEmpty()
         this.items = items
-        currentDir?.takeIf { wasEmpty }?.let {
+        deepestDir?.takeIf { wasEmpty }?.let {
             recyclerView.postDelayed({ scrollTo(it) }, Const.COMMON_DELAY)
         }
     }
 
-    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = checkCurrentIn(positionStart..<(positionStart + itemCount))
+    override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = checkDeepestIn(positionStart..<(positionStart + itemCount))
 
-    override fun onItemRangeChanged(positionStart: Int, itemCount: Int) = checkCurrentIn(positionStart..<(positionStart + itemCount))
+    override fun onItemRangeChanged(positionStart: Int, itemCount: Int) = checkDeepestIn(positionStart..<(positionStart + itemCount))
 
-    override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) = checkCurrentIn(positionStart..<(positionStart + itemCount))
+    override fun onItemRangeChanged(positionStart: Int, itemCount: Int, payload: Any?) = checkDeepestIn(positionStart..<(positionStart + itemCount))
 
-    private fun checkCurrentIn(range: IntRange) {
+    private fun checkDeepestIn(range: IntRange) {
         var current: Node? = null
         for (i in range) {
             items.getOrNull(i)
-                ?.takeIf { it.isCurrent }
+                ?.takeIf { it.isDeepest }
                 ?.let { current = it }
         }
-        current = current ?: items.find { it.isCurrent }
-        val currentDir = currentDir
+        current = current ?: items.find { it.isDeepest }
+        val deepestDir = deepestDir
         when {
-            currentDir == null && current == null -> return
-            currentDir == null && current != null -> Unit
-            currentDir != null && current == null -> Unit
-            currentDir?.areContentsTheSame(current) == true -> return
+            deepestDir == null && current == null -> return
+            deepestDir == null && current != null -> Unit
+            deepestDir != null && current == null -> Unit
+            deepestDir?.areContentsTheSame(current) == true -> return
         }
-        setCurrentDir(current)
+        setDeepestDir(current)
     }
 
     private fun getFirstChild(offset: Int = 0): View? = recyclerView.getChildAt(offset)
 
     private fun getLastChild(offset: Int = 0): View? = recyclerView.getChildAt(recyclerView.childCount.dec() + offset)
 
-    fun isCurrentDirVisible(): Boolean? = currentDir?.let { isVisible(it) }?.takeIf { !it || currentDir?.isRoot == false }
+    fun isDeepestDirVisible(): Boolean? = deepestDir?.let { isVisible(it) }?.takeIf { !it || deepestDir?.isRoot == false }
 
     fun isVisible(item: Node): Boolean {
         val path = item.withoutDot()
@@ -105,17 +105,17 @@ class ExplorerListDelegate(
         return position in topItemPosition..bottomItemPosition
     }
 
-    private fun setCurrentDir(item: Node?) {
-        if (currentDir?.areContentsTheSame(item) == true) {
+    private fun setDeepestDir(item: Node?) {
+        if (deepestDir?.areContentsTheSame(item) == true) {
             return
         }
         item?.takeIf { !it.isRoot }
-            ?.takeIf { it.path != currentDir?.path }
-            ?.takeIf { currentDir?.parentPath?.startsWith(it.path) == false }
+            ?.takeIf { it.path != deepestDir?.path }
+            ?.takeIf { deepestDir?.parentPath?.startsWith(it.path) == false }
             ?.let { recyclerView.post { scrollTo(it) } }
-        currentDir = item
-        borderDecorator.setCurrentDir(item)
-        headerDelegate.setCurrentDir(item)
+        deepestDir = item
+        borderDecorator.setDeepestDir(item)
+        headerDelegate.setDeepestDir(item)
     }
 
     fun setComposition(composition: ExplorerItemComposition) {
@@ -177,7 +177,7 @@ class ExplorerListDelegate(
 
         override fun onItemCheck(item: Node, isChecked: Boolean) = output.onItemCheck(item, isChecked)
 
-        override fun onItemClick(item: Node) = when (isCurrentDirVisible()) {
+        override fun onItemClick(item: Node) = when (isDeepestDirVisible()) {
             true -> output.onItemClick(item)
             false -> scrollTo(item)
             null -> Unit

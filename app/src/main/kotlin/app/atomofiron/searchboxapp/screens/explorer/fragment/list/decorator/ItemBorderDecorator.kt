@@ -41,7 +41,7 @@ class ItemBorderDecorator(
     // а так же минимальное расстояние между низом открытой директории и нижним краем рамки
     private val frameBottomOffset = doubleSpace / 2 + borderWidth / 2
 
-    private var currentDir: Node? = null
+    private var deepestDir: Node? = null
     private val paint = Paint()
     private val rect = RectF()
     private val framePath = Path()
@@ -54,8 +54,8 @@ class ItemBorderDecorator(
         paint.color = headerView.context.findColorByAttr(MaterialAttr.colorSecondary)
     }
 
-    fun setCurrentDir(item: Node?) {
-        currentDir = item
+    fun setDeepestDir(item: Node?) {
+        deepestDir = item
     }
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
@@ -69,7 +69,7 @@ class ItemBorderDecorator(
             item.isOpened && item.isEmpty -> tripleSpace
             item.isOpened -> space
             next == null -> space
-            item.parentPath != next.parentPath && item.parentPath == currentDir?.path -> doubleSpace
+            item.parentPath != next.parentPath && item.parentPath == deepestDir?.path -> doubleSpace
             item.parentPath != next.parentPath -> space
             else -> return
         }.toInt()
@@ -107,12 +107,12 @@ class ItemBorderDecorator(
                 }
                 // под глубочайшей открытой директорией задаём с рассчётом на то,
                 // что дочерние айтемы может быть не видно
-                item.isOpened && item.path == currentDir?.path -> {
+                item.isOpened && item.path == deepestDir?.path -> {
                     frameRect = rect
                     rect.top = child.bottom.toFloat()
                     rect.bottom = child.bottom + frameBottomOffset
                 }
-                item.parentPath == currentDir?.path -> {
+                item.parentPath == deepestDir?.path -> {
                     frameRect = rect
                     // верхняя граница рамки или у низа хедера текущей директории,
                     // или у низа айтема текущей директории

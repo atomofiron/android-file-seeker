@@ -160,7 +160,7 @@ class ExplorerService(
     }
 
     suspend fun tryToggle(key: NodeTabKey, it: Node) {
-        if (it.isRoot && it.isCurrent) {
+        if (it.isRoot && it.isDeepest) {
             return tryUnselectRoot(key, it)
         }
         renderTab(key) {
@@ -622,7 +622,6 @@ class ExplorerService(
         updateChecked(items)
         val checked = items.filter { it.isChecked }
         store.searchTargets.set(checked)
-        store.current.value = deepest
         store.setCurrentItems(items)
 
         require(this.roots.all { !it.isSelected })
@@ -694,7 +693,7 @@ class ExplorerService(
         }
         val items = ArrayList<Node>(count)
         tree.firstOrNull()
-            ?.let { if (it.isOpened && !it.hasOpened()) it.copy(isCurrent = true) else it }
+            ?.let { if (it.isOpened && !it.hasOpened()) it.copy(isDeepest = true) else it }
             ?.also { items.add(updateStateFor(it)) }
             .let { if (it?.isOpened != true) return items }
 
@@ -704,7 +703,7 @@ class ExplorerService(
                 var item = updateStateFor(level.children!![j])
                 if (item.isOpened) {
                     val isDeepest = i == tree.lastIndex.dec()
-                    item = item.copy(isCurrent = isDeepest, children = item.children?.fetch())
+                    item = item.copy(isDeepest = isDeepest, children = item.children?.fetch())
                     if (isDeepest) {
                         isEmpty = item.isEmpty
                     }

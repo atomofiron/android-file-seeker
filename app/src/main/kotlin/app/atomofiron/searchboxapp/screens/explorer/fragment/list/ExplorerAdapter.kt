@@ -57,7 +57,7 @@ class ExplorerAdapter(
         val item = items[position]
         return when {
             item.isDot() -> SeparatorNodeItem
-            item.isCurrent -> CurrentOpenedNodeItem
+            item.isDeepest -> CurrentOpenedNodeItem
             item.isOpened -> OpenedNodeItem
             else -> NodeItem
         }.viewType

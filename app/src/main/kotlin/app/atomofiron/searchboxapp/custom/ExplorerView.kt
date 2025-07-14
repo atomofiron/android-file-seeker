@@ -91,13 +91,13 @@ class ExplorerView(
 
     fun scrollToTop(): Boolean = binding.recyclerView.scrollToTop()
 
-    fun isCurrentDirVisible(): Boolean? = listDelegate.isCurrentDirVisible()
+    fun isCurrentDirVisible(): Boolean? = listDelegate.isDeepestDirVisible()
 
     fun submit(items: NodeTabItems) {
         rootAdapter.submitList(items.roots)
-        submitter.submitOnIdle(items.items, items.current?.path)
+        submitter.submitOnIdle(items.items, marker = items.deepest?.path)
         listDelegate.set(items.items)
-        title = items.current?.getTitle(resources)
+        title = items.deepest?.getTitle(resources)
     }
 
     fun submit(item: Node) = submitter.submit(item)
