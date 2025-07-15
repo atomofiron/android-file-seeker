@@ -12,6 +12,7 @@ import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.recycler.FinderSpanSizeLookup
 import app.atomofiron.common.util.flow.viewCollect
+import app.atomofiron.common.util.showKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
@@ -110,8 +111,10 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
     private fun onStateChange(items: List<FinderStateItem>) = finderAdapter.submitList(items)
 
+    private fun findQueryField(): EditText? = view?.findViewById(R.id.item_find_rt_find)
+
     private fun onReplaceQuery(value: String) {
-        view?.findViewById<EditText>(R.id.item_find_rt_find)?.setText(value)
+        findQueryField()?.setText(value)
     }
 
     private fun onShowSnackbar(value: String) {
@@ -119,11 +122,10 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     }
 
     private fun onInsertInQuery(value: String) {
-        view?.findViewById<EditText>(R.id.item_find_rt_find)
-                ?.takeIf { it.isFocused }
-                ?.apply {
-                    text.replace(selectionStart, selectionEnd, value)
-                }
+        findQueryField()?.run {
+            showKeyboard()
+            text.replace(selectionStart, selectionEnd, value)
+        }
     }
 
     private fun showPermissionRequiredWarning(unit: Unit) {
