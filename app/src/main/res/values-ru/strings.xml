@@ -66,8 +66,8 @@
     <string name="fucking_provider">Не удалось открыть файл из-за системных ограничений, попробуйте скопировать абсолютный путь к файлу и открыть его в другом приложении</string>
     <string name="pref_theme">Тема оформления</string>
     <string name="pref_deep_black">Глубокий чёрный</string>
-    <string name="pref_max_depth">Максимальная глубина</string>
-    <string name="pref_max_size">Максимальный размер файла</string>
+    <string name="pref_max_depth">Макс. глубина</string>
+    <string name="pref_max_size">Макс. размер файла</string>
     <string name="max_size_sum">При поиске по содержимому</string>
     <string name="pref_exclude_dirs">Исключить директории</string>
     <string name="exclude_dirs_summary">Из результатов поиска</string>
