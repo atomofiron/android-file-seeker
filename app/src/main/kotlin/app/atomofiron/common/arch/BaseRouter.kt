@@ -12,7 +12,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.dialog.DialogDelegateImpl
-import app.atomofiron.common.util.extension.activity
+import app.atomofiron.common.util.property.RoProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.router.FileSharingDelegate
@@ -20,8 +20,8 @@ import app.atomofiron.searchboxapp.injectable.router.FileSharingDelegateImpl
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 
 abstract class BaseRouter(
-    fragmentProperty: WeakProperty<out Fragment>,
-    protected val activityProperty: WeakProperty<out FragmentActivity> = fragmentProperty.activity(),
+    fragmentProperty: RoProperty<out Fragment?>,
+    protected val activityProperty: RoProperty<out FragmentActivity?> = fragmentProperty.map { it?.requireActivity() },
 ) : FileSharingDelegate by FileSharingDelegateImpl(activityProperty)
     , DialogDelegate by DialogDelegateImpl(activityProperty)
 {

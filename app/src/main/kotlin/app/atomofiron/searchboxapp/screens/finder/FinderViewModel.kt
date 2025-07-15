@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.finder
 
 import androidx.lifecycle.viewModelScope
 import app.atomofiron.common.arch.BaseViewModel
+import app.atomofiron.common.arch.Registerable
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import javax.inject.Inject
 
@@ -12,12 +13,7 @@ class FinderViewModel : BaseViewModel<FinderComponent, FinderFragment, FinderVie
     @Inject
     override lateinit var viewState: FinderViewState
     @Inject
-    lateinit var router: FinderRouter
-
-    override fun setView(view: FinderFragment) {
-        super.setView(view)
-        router.permissions.register(view)
-    }
+    override lateinit var registerable: Registerable
 
     override fun component(view: FinderFragment) = DaggerFinderComponent
         .builder()

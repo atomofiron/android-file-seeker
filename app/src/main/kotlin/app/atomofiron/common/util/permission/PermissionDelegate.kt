@@ -5,15 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
-import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.common.util.property.RoProperty
 
 class PermissionDelegate private constructor(
-    activityProperty: WeakProperty<out ComponentActivity>,
+    activityProperty: RoProperty<out ComponentActivity?>,
 ) : PermissionDelegateApi {
     companion object {
         private val contract = ActivityResultContracts.RequestMultiplePermissions()
 
-        fun create(activityProperty: WeakProperty<out ComponentActivity>): PermissionDelegateApi {
+        fun create(activityProperty: RoProperty<out ComponentActivity?>): PermissionDelegateApi {
             return PermissionDelegate(activityProperty)
         }
     }

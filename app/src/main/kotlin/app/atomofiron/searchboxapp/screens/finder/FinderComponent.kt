@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.finder
 
 import androidx.fragment.app.Fragment
-import app.atomofiron.common.util.extension.activity
+import app.atomofiron.common.arch.Registerable
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.interactor.FinderInteractor
@@ -109,8 +109,15 @@ class FinderModule {
     @Provides
     @FinderScope
     fun storagePermissionDelegate(fragment: WeakProperty<out Fragment>): StoragePermissionDelegate {
-        return StoragePermissionDelegate(fragment.activity())
+        return StoragePermissionDelegate(fragment)
     }
+
+    @Provides
+    @FinderScope
+    fun registerable(
+        router: FinderRouter,
+        storagePermissionDelegate: StoragePermissionDelegate,
+    ) = Registerable(router, storagePermissionDelegate)
 }
 
 interface FinderDependencies {

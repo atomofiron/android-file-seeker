@@ -6,11 +6,7 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.res.Resources
 import android.widget.Toast
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.Android
-import app.atomofiron.common.util.property.MutableWeakProperty
-import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.other.ApkSignature
 import java.security.MessageDigest
@@ -62,12 +58,4 @@ fun PackageInfo.signature(): ApkSignature? {
             override val bytes = bytes.size
         }
     }
-}
-
-fun WeakProperty<out Fragment>.activity(): WeakProperty<out FragmentActivity> {
-    val activityProperty = MutableWeakProperty<FragmentActivity>()
-    observe { fragment ->
-        activityProperty.value = fragment?.activity
-    }
-    return activityProperty
 }

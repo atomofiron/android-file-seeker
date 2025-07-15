@@ -6,14 +6,14 @@ import android.net.Uri
 import android.webkit.MimeTypeMap
 import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentActivity
-import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.common.util.property.RoProperty
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import java.io.File
 
 
-class FileSharingDelegateImpl(activityProperty: WeakProperty<out FragmentActivity>) : FileSharingDelegate {
+class FileSharingDelegateImpl(activityProperty: RoProperty<out FragmentActivity?>) : FileSharingDelegate {
 
     private val activity by activityProperty
 

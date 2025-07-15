@@ -11,12 +11,14 @@ abstract class BaseViewModel<D : Any, V : Any, S : Any, P : BasePresenter<*,*>> 
     abstract val presenter: P
     abstract val viewState: S
     private lateinit var componentRef: D
+    open val registerable: Registerable? = null
 
     open fun setView(view: V) {
         viewProperty.value = view
         if (!::componentRef.isInitialized) {
             componentRef = component(view)
         }
+        registerable?.register()
     }
 
     abstract fun component(view: V): D

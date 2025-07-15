@@ -10,7 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.extension.copy
-import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.common.util.property.RoProperty
 import app.atomofiron.common.util.withNotNull
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.DialogCheckboxBinding
@@ -25,7 +25,7 @@ import kotlin.LazyThreadSafetyMode.NONE
 
 private const val STUB = "stub"
 
-class DialogDelegateImpl(activity: WeakProperty<out FragmentActivity>) : DialogDelegate {
+class DialogDelegateImpl(activity: RoProperty<out FragmentActivity?>) : DialogDelegate {
 
     private val activity by activity
     private val resources get() = activity?.resources

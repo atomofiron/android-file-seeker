@@ -11,7 +11,5 @@ open class WeakProperty<T : Any>(value: T? = null) : RoProperty<T?> {
 
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T? = value
 
-    open fun observe(observer: (T?) -> Unit) = observer(value)
-
     inline operator fun <R> invoke(action: T.() -> R?) = value?.action()
 }

@@ -3,26 +3,26 @@ package app.atomofiron.searchboxapp.screens.explorer
 import android.content.Context
 import android.content.res.AssetManager
 import androidx.fragment.app.Fragment
-import app.atomofiron.common.util.extension.activity
+import app.atomofiron.common.arch.Registerable
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
-import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
-import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.delegates.FileOperationsDelegate
+import app.atomofiron.searchboxapp.screens.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMenuDelegate
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerItemActionListenerDelegate
-import app.atomofiron.searchboxapp.screens.delegates.StoragePermissionDelegate
+import dagger.BindsInstance
+import dagger.Component
+import dagger.Module
+import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
 @Scope
@@ -133,8 +133,14 @@ class ExplorerModule {
     @Provides
     @ExplorerScope
     fun storagePermissionDelegate(fragment: WeakProperty<out Fragment>): StoragePermissionDelegate {
-        return StoragePermissionDelegate(fragment.activity())
+        return StoragePermissionDelegate(fragment)
     }
+
+    @Provides
+    @ExplorerScope
+    fun registerable(
+        storagePermissionDelegate: StoragePermissionDelegate,
+    ) = Registerable(storagePermissionDelegate)
 }
 
 interface ExplorerDependencies {
