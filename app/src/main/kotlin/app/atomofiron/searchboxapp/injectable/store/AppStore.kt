@@ -35,9 +35,10 @@ class AndroidStore(
     override val appScope: CoroutineScope,
     override val resourcesProperty: AppResources,
 ) : AppStore, AppStoreConsumer {
-    override val activityProperty = MutableWeakProperty<AppCompatActivity>(null)
-    override val windowProperty = MutableWeakProperty<Window>(null)
-    override val insetsControllerProperty = MutableStrongProperty<WindowInsetsControllerCompat?>()
+
+    override val activityProperty = MutableWeakProperty<AppCompatActivity>()
+    override val windowProperty = MutableWeakProperty<Window>()
+    override val insetsControllerProperty = MutableStrongProperty<WindowInsetsControllerCompat?>(null)
 
     override val activity by activityProperty
     override val resources by resourcesProperty
