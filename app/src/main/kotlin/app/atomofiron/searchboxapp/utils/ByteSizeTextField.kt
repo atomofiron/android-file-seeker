@@ -14,20 +14,19 @@ import kotlin.math.min
 
 private val startingZeros = Regex("^0+(?=\\d)")
 
+fun TextField.makeByteSize(listener: (Int) -> Unit) {
+    val delegate = ByteSizeDelegate(this, listener)
+    filters += arrayOf<InputFilter>(delegate)
+    inputType = inputType and InputType.TYPE_NUMBER_FLAG_DECIMAL.inv()
+    onFocusChangeListener = delegate
+    addOnSubmitListener(delegate)
+    addTextChangedListener(delegate)
+}
+
 class ByteSizeDelegate(
     private val textField: EditText,
     private val listener: (Int) -> Unit,
 ) : TextWatcher, InputFilter, TextField.OnSubmitListener, View.OnFocusChangeListener {
-    companion object {
-        fun TextField.makeByteSize(listener: (Int) -> Unit) {
-            val delegate = ByteSizeDelegate(this, listener)
-            filters += arrayOf<InputFilter>(delegate)
-            inputType = inputType and InputType.TYPE_NUMBER_FLAG_DECIMAL.inv()
-            onFocusChangeListener = delegate
-            addOnSubmitListener(delegate)
-            addTextChangedListener(delegate)
-        }
-    }
 
     private val layout = textField.parent.parent as? TextInputLayout
 

@@ -5,7 +5,7 @@ import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemTextFieldBinding
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
-import app.atomofiron.searchboxapp.utils.ByteSizeDelegate.Companion.makeByteSize
+import app.atomofiron.searchboxapp.utils.makeByteSize
 
 class EditMaxSizeHolder(
     parent: ViewGroup,
