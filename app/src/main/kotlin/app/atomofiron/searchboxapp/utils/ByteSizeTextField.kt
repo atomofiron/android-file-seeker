@@ -5,31 +5,35 @@ import android.text.InputFilter
 import android.text.InputType
 import android.text.Spanned
 import android.text.TextWatcher
+import android.view.View
 import android.widget.EditText
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.TextField
+import com.google.android.material.textfield.TextInputLayout
 import kotlin.math.min
 
 private val startingZeros = Regex("^0+(?=\\d)")
 
 class ByteSizeDelegate(
-    private val editText: EditText,
+    private val textField: EditText,
     private val listener: (Int) -> Unit,
-) : TextWatcher, InputFilter, TextField.OnSubmitListener {
+) : TextWatcher, InputFilter, TextField.OnSubmitListener, View.OnFocusChangeListener {
     companion object {
         fun TextField.makeByteSize(listener: (Int) -> Unit) {
             val delegate = ByteSizeDelegate(this, listener)
-            filters = arrayOf<InputFilter>(delegate)
-            hint = "_____"
+            filters += arrayOf<InputFilter>(delegate)
             inputType = inputType and InputType.TYPE_NUMBER_FLAG_DECIMAL.inv()
+            onFocusChangeListener = delegate
             addOnSubmitListener(delegate)
             addTextChangedListener(delegate)
         }
     }
 
-    private val suffixes = editText.resources.getStringArray(R.array.size_suffix_arr)
+    private val layout = textField.parent.parent as? TextInputLayout
+
+    private val suffixes = textField.resources.getStringArray(R.array.size_suffix_arr)
     private val regex = Regex("(\\d+|0)([gGгГ]|[mMмМ]|[kKкК])?[bBбБ]?")
-    private var submitted = -1
+    private var valid = 0
 
     override fun filter(
         source: CharSequence?,
@@ -53,7 +57,7 @@ class ByteSizeDelegate(
 
     override fun onTextChanged(value: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
-    override fun afterTextChanged(editable: Editable) = editText.run {
+    override fun afterTextChanged(editable: Editable) = textField.run {
         val string = editable.toString()
         val selection = selectionStart
         val withoutStartingZero = string.replace(startingZeros, "")
@@ -62,14 +66,38 @@ class ByteSizeDelegate(
             setSelection(min(selection, withoutStartingZero.length))
         }
         if (!isFocused) try {
-            submitted = string.convert()
-            val converted = submitted.convert(suffixes)
+            valid = string.convert()
+            val converted = valid.convert(suffixes)
             if (converted != string) {
                 setText(converted)
             }
         } catch (e: NumberFormatException) {
+        } else {
+            showError(string.convertOrNull() == null)
         }
     }
 
-    override fun onSubmit(value: String) = listener(value.convert())
+    override fun onSubmit(value: String) {
+        val converted = value.convertOrNull()
+        if (converted != null) {
+            valid = converted
+            listener(converted)
+        }
+    }
+
+    override fun onFocusChange(view: View, hasFocus: Boolean) {
+        if (!hasFocus) {
+            textField.setText(valid.convert(suffixes))
+            showError(false)
+        }
+    }
+
+    private fun showError(show: Boolean) {
+        layout?.run {
+            errorIconDrawable = null
+            error = resources.takeIf { show }?.getString(R.string.wrong_value)
+            isErrorEnabled = error != null
+            isHelperTextEnabled = error != null
+        }
+    }
 }

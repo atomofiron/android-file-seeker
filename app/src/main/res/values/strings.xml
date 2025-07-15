@@ -15,6 +15,7 @@
     <string name="search_for_names_result">Files: %d, total files: %d</string>
     <string name="search_error">Error: %s</string>
     <string name="error">Error</string>
+    <string name="wrong_value">Wrong value</string>
     <string name="nothing">Nothing found</string>
     <string name="warning">You have not selected any directory. The search will be made around the root section</string>
     <string name="ok">OK</string>

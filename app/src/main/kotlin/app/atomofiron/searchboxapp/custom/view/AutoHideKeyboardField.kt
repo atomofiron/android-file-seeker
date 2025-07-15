@@ -12,7 +12,8 @@ import com.google.android.material.textfield.TextInputEditText
 import androidx.core.content.withStyledAttributes
 
 open class AutoHideKeyboardField : TextInputEditText {
-    private val inputMethodManager: InputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+
+    private val inputMethodManager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
 
     protected var hideKeyboardOnFocusLost: Boolean = true
     protected var hideKeyboardOnDetached: Boolean = true
