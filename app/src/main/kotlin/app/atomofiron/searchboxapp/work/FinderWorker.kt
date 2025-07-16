@@ -9,17 +9,22 @@ import android.content.pm.ServiceInfo
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
-import androidx.work.*
+import androidx.work.CoroutineWorker
+import androidx.work.Data
+import androidx.work.ForegroundInfo
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import app.atomofiron.fileseeker.BuildConfig
-import app.atomofiron.searchboxapp.*
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Notifications
 import app.atomofiron.searchboxapp.android.tryShow
-import app.atomofiron.searchboxapp.android.updateNotificationChannel
+import app.atomofiron.searchboxapp.android.updateChannel
+import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.injectable.service.TextViewerService
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -27,14 +32,25 @@ import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult.FinderResult
-import app.atomofiron.searchboxapp.model.finder.toItemMatchMultiply
 import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.finder.toItemMatchMultiply
 import app.atomofiron.searchboxapp.screens.main.MainActivity
-import app.atomofiron.searchboxapp.utils.*
+import app.atomofiron.searchboxapp.utils.Codes
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.name
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
-import kotlinx.coroutines.*
+import app.atomofiron.searchboxapp.utils.Rslt
+import app.atomofiron.searchboxapp.utils.Shell
+import app.atomofiron.searchboxapp.utils.canForegroundService
+import app.atomofiron.searchboxapp.utils.escapeQuotes
+import app.atomofiron.searchboxapp.utils.ifCanNotice
+import app.atomofiron.searchboxapp.utils.putStringArray
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.regex.Pattern
@@ -99,7 +115,7 @@ class FinderWorker(
     @Inject
     lateinit var finderStore: FinderStore
     @Inject
-    lateinit var notificationManager: NotificationManagerCompat
+    lateinit var notifications: NotificationManagerCompat
     @Inject
     lateinit var appScope: CoroutineScope
     @Inject
@@ -239,7 +255,7 @@ class FinderWorker(
             return Result.success()
         }
         if (context.canForegroundService()) {
-            context.updateNotificationChannel(
+            notifications.updateChannel(
                 Notifications.CHANNEL_ID_FOREGROUND,
                 context.getString(R.string.foreground_notification_name),
             )
@@ -250,7 +266,7 @@ class FinderWorker(
 
     private suspend fun <R> handleCancellation(action: suspend () -> R): R {
         return coroutineScope {
-            launch {
+            val hook = launch {
                 try {
                     while (true) delay(1000)
                 } catch (e: CancellationException) {
@@ -258,6 +274,7 @@ class FinderWorker(
                 }
             }
             action()
+                .also { hook.cancel() }
         }
     }
 
@@ -346,7 +363,7 @@ class FinderWorker(
 
             notification.flags = notification.flags or NotificationCompat.FLAG_AUTO_CANCEL
 
-            context.updateNotificationChannel(
+            notifications.updateChannel(
                 Notifications.CHANNEL_ID_RESULT,
                 context.getString(R.string.result_notification_name),
                 NotificationManagerCompat.IMPORTANCE_DEFAULT,
@@ -358,7 +375,7 @@ class FinderWorker(
     private fun foregroundNotification(): Notification {
         val intent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(context, Codes.FOREGROUND, intent, UPDATING_FLAG)
-        context.updateNotificationChannel(
+        notifications.updateChannel(
             Notifications.CHANNEL_ID_FOREGROUND,
             context.getString(R.string.foreground_notification_name),
             NotificationManagerCompat.IMPORTANCE_DEFAULT,

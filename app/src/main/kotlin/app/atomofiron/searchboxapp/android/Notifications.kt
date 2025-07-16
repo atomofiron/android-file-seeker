@@ -10,6 +10,7 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.app.NotificationManagerCompat.IMPORTANCE_DEFAULT
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.materialColor
 import app.atomofiron.common.util.MaterialAttr
@@ -33,7 +34,7 @@ fun Context.dismissUpdateNotification() = dismiss(Notifications.ID_UPDATE)
 
 fun Context.showUpdateNotification(type: UpdateNotification) = tryShow { context ->
     if (Android.O) {
-        updateNotificationChannel(
+        updateChannel(
             Notifications.CHANNEL_ID_UPDATE,
             resources.getString(R.string.channel_name_updates),
             NotificationManager.IMPORTANCE_HIGH,
@@ -54,7 +55,7 @@ fun Context.showUpdateNotification(type: UpdateNotification) = tryShow { context
 
 fun Context.showAppUpdatedNotification() = tryShow { context ->
     if (Android.O) {
-        updateNotificationChannel(
+        updateChannel(
             Notifications.CHANNEL_ID_UPDATE,
             resources.getString(R.string.channel_name_updates),
             NotificationManager.IMPORTANCE_HIGH,
@@ -70,17 +71,12 @@ fun Context.showAppUpdatedNotification() = tryShow { context ->
         .build() to Notifications.ID_UPDATE
 }
 
-fun Context.updateNotificationChannel(
-    id: String,
-    name: String,
-    importance: Int = NotificationManagerCompat.IMPORTANCE_DEFAULT,
-) {
+fun NotificationManagerCompat.updateChannel(id: String, name: String, importance: Int = IMPORTANCE_DEFAULT) {
     if (Android.O) {
-        val manager = NotificationManagerCompat.from(this)
-        var channel = manager.getNotificationChannelCompat(id)
+        var channel = getNotificationChannelCompat(id)
         if (channel == null || channel.name != name) {
             channel = NotificationChannelCompat.Builder(id, importance).setName(name).build()
-            manager.createNotificationChannel(channel)
+            createNotificationChannel(channel)
         }
     }
 }
