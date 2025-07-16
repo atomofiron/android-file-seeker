@@ -5,10 +5,10 @@ import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
+import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
@@ -253,7 +253,7 @@ object ExplorerUtils {
     private fun parse(parentPath: String, root: Int, properties: NodeProperties): Node {
         val incompletePath = parentPath + properties.name
         val content = when (properties.access[0]) {
-            DIR_CHAR -> NodeContent.Directory(Type.Ordinary)
+            DIR_CHAR -> NodeContent.Directory(DirectoryKind.Ordinary)
             LINK_CHAR -> NodeContent.Link
             else -> resolveFileType(incompletePath)
         }
@@ -267,15 +267,17 @@ object ExplorerUtils {
         )
     }
 
-    fun getDirectoryType(name: String): Type {
+    fun getDirectoryType(name: String): DirectoryKind {
         return when (name) {
-            "Android" -> Type.Android
-            "DCIM" -> Type.Camera
-            "Download" -> Type.Download
-            "Movies" -> Type.Movies
-            "Music" -> Type.Music
-            "Pictures" -> Type.Pictures
-            else -> Type.Ordinary
+            "Alarms" -> DirectoryKind.Alarms
+            "Android" -> DirectoryKind.Android
+            "DCIM" -> DirectoryKind.Camera
+            "Download" -> DirectoryKind.Download
+            "Movies" -> DirectoryKind.Movies
+            "Music" -> DirectoryKind.Music
+            "Pictures" -> DirectoryKind.Pictures
+            "Ringtones" -> DirectoryKind.Ringtones
+            else -> DirectoryKind.Ordinary
         }
     }
 
@@ -557,13 +559,13 @@ object ExplorerUtils {
             }
         }
         items.addAll(files)
-        val directoryType = when (content) {
-            is NodeContent.Directory -> content.type
-            else -> Type.Ordinary
+        val directoryKind = when (content) {
+            is NodeContent.Directory -> content.kind
+            else -> DirectoryKind.Ordinary
         }
         return copy(
             children = NodeChildren(items, isOpened = children?.isOpened == true),
-            content = NodeContent.Directory(directoryType, content.rootType),
+            content = NodeContent.Directory(directoryKind, content.rootType),
             error = null,
         )
     }

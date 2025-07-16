@@ -15,7 +15,6 @@ import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.*
-import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory.Type
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
@@ -390,7 +389,7 @@ class ExplorerService(
                     val old = items[index]
                     items[index] = updated
                     if (item.isOpened && !updated.areContentsTheSame(old)) {
-                        store.emitUpdate(updated)
+                        emitUpdate(updated)
                     }
                 }
             }
@@ -611,7 +610,6 @@ class ExplorerService(
             if (it.withoutState) null else it
         }
         syncSelectedRootWithTree()
-        updateDirectoryTypes()
         val roots = renderRoots()
         val deepest = findDeepest()
         val items = renderNodes()
@@ -687,20 +685,18 @@ class ExplorerService(
 
     private fun NodeTab.renderNodes(): List<Node> {
         var isEmpty = false
-        var count = min(1, tree.size)
-        count += tree.sumOf {
-            if (it.isOpened) it.childCount else 0
-        }
+        val count = min(1, tree.size) + tree.sumOf { it.childCount }
         val items = ArrayList<Node>(count)
         tree.firstOrNull()
             ?.let { if (it.isOpened && !it.hasOpened()) it.copy(isDeepest = true) else it }
-            ?.also { items.add(updateStateFor(it)) }
+            ?.also { items.add(updateStateFor(it).defineDirKind()) }
             .let { if (it?.isOpened != true) return items }
 
         for (i in tree.indices) {
             val level = tree[i]
             for (j in 0..level.getOpenedIndex()) {
                 var item = updateStateFor(level.children!![j])
+                    .defineDirKind(i)
                 if (item.isOpened) {
                     val isDeepest = i == tree.lastIndex.dec()
                     item = item.copy(isDeepest = isDeepest, children = item.children?.fetch())
@@ -725,10 +721,18 @@ class ExplorerService(
                 }
             }
             for (j in level.getOpenedIndex().inc() until level.childCount) {
-                items.add(updateStateFor(level.children!![j]))
+                updateStateFor(level.children!![j])
+                    .defineDirKind(i)
+                    .let { items.add(it) }
             }
         }
         return items
+    }
+
+    private suspend fun NodeTab.emitUpdate(node: Node) {
+        updateStateFor(node)
+            .defineDirKind()
+            .let { store.emitUpdate(it) }
     }
 
     private fun NodeTab.updateStateFor(item: Node, children: NodeChildren? = item.children): Node {
@@ -743,19 +747,14 @@ class ExplorerService(
         return item.copy(isChecked = isChecked, state = state ?: item.state, children = children)
     }
 
-    private fun NodeTab.updateDirectoryTypes() {
-        val defaultStoragePath = internalStoragePath
-        val (_, level) = tree.findIndexed { it.parentPath == defaultStoragePath }
-        level?.children ?: return
-        for (i in level.children.indices) {
-            val item = level.children[i]
-            val content = item.content as? NodeContent.Directory
-            content ?: continue
-            if (content.type != Type.Ordinary) continue
-            val type = ExplorerUtils.getDirectoryType(item.name)
-            if (type == Type.Ordinary) continue
-            level.children.items[i] = item.copy(content = content.copy(type = type))
-        }
+    private fun Node.defineDirKind(index: Int = 0): Node = when {
+        index != 0 -> this
+        parentPath != internalStoragePath -> this
+        content !is NodeContent.Directory -> this
+        else -> ExplorerUtils.getDirectoryType(name)
+            .takeIf { it != DirectoryKind.Ordinary }
+            ?.let { copy(content = content.copy(kind = it)) }
+            ?: this
     }
 
     /** @return already existing caching job */
@@ -792,7 +791,7 @@ class ExplorerService(
             }
             updated = updateStateFor(updated, children = updated.children?.fetch(isOpened = current.isOpened))
             if (!updated.areContentsTheSame(item)) {
-                store.emitUpdate(updated)
+                emitUpdate(updated)
             }
         }
     }
@@ -809,7 +808,7 @@ class ExplorerService(
                 val updated = current.copy(properties = item.properties.copy(size = size))
                 val replaced = tree.replaceItem(updated)
                 if (replaced && !updated.areContentsTheSame(item)) {
-                    store.emitUpdate(updated)
+                    emitUpdate(updated)
                 }
             }
         }

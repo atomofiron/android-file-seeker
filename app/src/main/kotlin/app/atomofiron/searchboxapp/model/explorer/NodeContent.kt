@@ -23,12 +23,9 @@ sealed class NodeContent(
     data object Link : NodeContent()
 
     data class Directory(
-        val type: Type = Type.Ordinary,
+        val kind: DirectoryKind = DirectoryKind.Ordinary,
         override val rootType: NodeRoot.NodeRootType? = null,
     ) : NodeContent() {
-        enum class Type {
-            Ordinary, Android, Camera, Download, Movies, Music, Pictures,
-        }
         override val isCached = rootType != null
     }
 

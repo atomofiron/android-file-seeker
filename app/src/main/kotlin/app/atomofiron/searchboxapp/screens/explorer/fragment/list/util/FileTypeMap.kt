@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.util
 
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 
@@ -49,32 +50,40 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.Unknown -> R.drawable.ic_explorer_unknown
 }
 
-fun NodeContent.Directory.getIcon(isEmpty: Boolean): Int = when (type) {
-    NodeContent.Directory.Type.Android -> when {
+fun NodeContent.Directory.getIcon(isEmpty: Boolean): Int = when (kind) {
+    DirectoryKind.Alarms -> when {
+        isEmpty -> R.drawable.ic_explorer_folder_alarms
+        else -> R.drawable.ic_explorer_folder_alarms_empty
+    }
+    DirectoryKind.Android -> when {
         isEmpty -> R.drawable.ic_explorer_folder_android_empty
         else -> R.drawable.ic_explorer_folder_android
     }
-    NodeContent.Directory.Type.Camera -> when {
+    DirectoryKind.Camera -> when {
         isEmpty -> R.drawable.ic_explorer_folder_camera_empty
         else -> R.drawable.ic_explorer_folder_camera
     }
-    NodeContent.Directory.Type.Download -> when {
+    DirectoryKind.Download -> when {
         isEmpty -> R.drawable.ic_explorer_folder_download_empty
         else -> R.drawable.ic_explorer_folder_download
     }
-    NodeContent.Directory.Type.Movies -> when {
+    DirectoryKind.Movies -> when {
         isEmpty -> R.drawable.ic_explorer_folder_movies_empty
         else -> R.drawable.ic_explorer_folder_movies
     }
-    NodeContent.Directory.Type.Music -> when {
+    DirectoryKind.Music -> when {
         isEmpty -> R.drawable.ic_explorer_folder_music_empty
         else -> R.drawable.ic_explorer_folder_music
     }
-    NodeContent.Directory.Type.Pictures -> when {
+    DirectoryKind.Pictures -> when {
         isEmpty -> R.drawable.ic_explorer_folder_pictures_empty
         else -> R.drawable.ic_explorer_folder_pictures
     }
-    else -> when {
+    DirectoryKind.Ringtones -> when {
+        isEmpty -> R.drawable.ic_explorer_folder_bell
+        else -> R.drawable.ic_explorer_folder_bell_empty
+    }
+    DirectoryKind.Ordinary -> when {
         isEmpty -> R.drawable.ic_explorer_folder_empty
         else -> R.drawable.ic_explorer_folder
     }
