@@ -54,9 +54,9 @@ class InsetsBackgroundView : View, InsetsListener {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
         paint.color = context.getSystemBarsColor()
 
-        context.withStyledAttributes(attrs, R.styleable.SystemUiBackgroundView, defStyleAttr) {
-            statusBar = getBoolean(R.styleable.SystemUiBackgroundView_statusBar, statusBar)
-            sides = getInt(R.styleable.SystemUiBackgroundView_navigationBar, sides.value).let {
+        context.withStyledAttributes(attrs, R.styleable.InsetsBackgroundView, defStyleAttr) {
+            statusBar = getBoolean(R.styleable.InsetsBackgroundView_statusBar, statusBar)
+            sides = getInt(R.styleable.InsetsBackgroundView_navigationBar, sides.value).let {
                 Sides(it)
             }
         }

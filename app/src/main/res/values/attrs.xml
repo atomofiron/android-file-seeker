@@ -28,7 +28,7 @@
         <attr name="fillCenter" format="boolean" />
     </declare-styleable>
 
-    <declare-styleable name="SystemUiBackgroundView">
+    <declare-styleable name="InsetsBackgroundView">
         <attr name="statusBar" format="boolean" />
         <attr name="navigationBar">
             <flag name="none" value="0x0" />
