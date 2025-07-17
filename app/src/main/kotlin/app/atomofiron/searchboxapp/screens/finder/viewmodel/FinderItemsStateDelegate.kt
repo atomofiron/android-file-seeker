@@ -98,7 +98,7 @@ class FinderItemsStateDelegate(
         mutableToggles.value = item
     }
 
-    override fun updateTargets(targets: List<Node>) {
-        this.targets.value = targets
+    override fun updateTargets(nodes: List<Node>) {
+        targets.value = nodes
     }
 }

@@ -56,7 +56,7 @@ class ExplorerPresenter(
             else -> viewState.secondTab
         }
         explorerInteractor.updateRoots(currentTab)
-        explorerStore.current.value = viewState.getCurrentDir()
+        explorerInteractor.updateCurrentTab(currentTab)
     }
 
     fun onSettingsOptionSelected() = router.showSettings()

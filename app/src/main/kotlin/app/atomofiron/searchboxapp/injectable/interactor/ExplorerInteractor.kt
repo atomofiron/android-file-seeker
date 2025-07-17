@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.injectable.interactor
 
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.injectable.service.UtilService
+import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -48,6 +49,7 @@ class Chain<T : Any> {
 class ExplorerInteractor(
     private val scope: CoroutineScope,
     private val service: ExplorerService,
+    private val store: ExplorerStore,
     private val utils: UtilService,
 ) {
     private val context = Dispatchers.IO
@@ -87,6 +89,12 @@ class ExplorerInteractor(
     fun updateRoots(tab: NodeTabKey) {
         scope.launch(context) {
             service.updateRootsAsync(tab)
+        }
+    }
+
+    fun updateCurrentTab(tab: NodeTabKey) {
+        scope.launch(Dispatchers.Default) {
+            store.setCurrentTab(tab)
         }
     }
 

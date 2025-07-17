@@ -108,8 +108,13 @@ class ExplorerModule {
 
     @Provides
     @ExplorerScope
-    fun interactor(scope: CoroutineScope, explorerService: ExplorerService, utils: UtilService): ExplorerInteractor {
-        return ExplorerInteractor(scope, explorerService, utils)
+    fun interactor(
+        scope: CoroutineScope,
+        explorerService: ExplorerService,
+        store: ExplorerStore,
+        utils: UtilService,
+    ): ExplorerInteractor {
+        return ExplorerInteractor(scope, explorerService, store, utils)
     }
 
     @Provides

@@ -86,7 +86,7 @@ class ExplorerService(
             toyboxDefined.complete()
             context.resolveToybox(it)
         }
-        store.current.collect(appScope) {
+        store.currentNode.collect(appScope) {
             preferenceStore.setOpenedDirPath(it?.path)
         }
         store.setStorageRoot(Node.asRoot(internalStoragePath, NodeRootType.InternalStorage()))
@@ -615,6 +615,7 @@ class ExplorerService(
         val items = renderNodes()
         val tabItems = NodeTabItems(roots, items, deepest)
         flow.emit(tabItems)
+        store.setDeepestNode(key, deepest)
 
         updateStates(items)
         updateChecked(items)

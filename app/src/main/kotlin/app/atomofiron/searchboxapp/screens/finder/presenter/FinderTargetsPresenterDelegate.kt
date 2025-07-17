@@ -18,7 +18,7 @@ class FinderTargetsPresenterDelegate(
 ) : TargetsHolder.FinderTargetsOutput {
 
     init {
-        val merged = combine(explorerStore.current, explorerStore.searchTargets, explorerStore.storageRoot) { current, targets, storage ->
+        val merged = combine(explorerStore.currentNode, explorerStore.searchTargets, explorerStore.storageRoot) { current, targets, storage ->
             when {
                 current != null -> targets.mutate {
                     removeOneIf { it.uniqueId == current.uniqueId }
