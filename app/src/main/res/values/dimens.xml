@@ -1,6 +1,8 @@
 <resources>
 	<dimen name="infinity">999dp</dimen>
 	<dimen name="fab_margin">16dp</dimen>
+	<dimen name="status_bar_max">26dp</dimen>
+	<dimen name="status_bar_min_padding">4dp</dimen>
 	<dimen name="corner_radius">16dp</dimen>
 	<dimen name="text_field_corner">8dp</dimen>
 	<dimen name="common_margin_extra">32dp</dimen>

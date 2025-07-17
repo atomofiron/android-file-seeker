@@ -7,13 +7,13 @@ import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.Insets
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.ExtendedWindowInsets.Type
 import lib.atomofiron.insets.InsetsListener
-import lib.atomofiron.insets.TypeSet
 import lib.atomofiron.insets.attachInsetsListener
 import kotlin.math.max
 
@@ -36,6 +36,7 @@ class InsetsBackgroundView : View, InsetsListener {
     }
 
     override val types get() = common + Type.navigationBars
+    private var common = Type.statusBars
 
     private var leftInset = 0
     private var topInset = 0
@@ -44,10 +45,14 @@ class InsetsBackgroundView : View, InsetsListener {
 
     private val paint = Paint()
 
-    private var common = Type.statusBars
-        set(value) { field = value + Type.statusBars }
     private var statusBar = true
     private var sides = Sides(ALL)
+
+    private val maxStatusBar: Float
+    private val statusBarMinPadding: Float
+    private val commonMargin: Float
+    private var systemBars = Insets.NONE
+    private var cutout = Insets.NONE
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -56,10 +61,12 @@ class InsetsBackgroundView : View, InsetsListener {
 
         context.withStyledAttributes(attrs, R.styleable.InsetsBackgroundView, defStyleAttr) {
             statusBar = getBoolean(R.styleable.InsetsBackgroundView_statusBar, statusBar)
-            sides = getInt(R.styleable.InsetsBackgroundView_navigationBar, sides.value).let {
-                Sides(it)
-            }
+            sides = getInt(R.styleable.InsetsBackgroundView_navigationBar, sides.value)
+                .let { Sides(it) }
         }
+        maxStatusBar = resources.getDimension(R.dimen.status_bar_max)
+        statusBarMinPadding = resources.getDimension(R.dimen.status_bar_min_padding)
+        commonMargin = resources.getDimension(R.dimen.common_margin)
         attachInsetsListener(this)
     }
 
@@ -67,11 +74,9 @@ class InsetsBackgroundView : View, InsetsListener {
         paint.color = ColorUtils.setAlphaComponent(color, alpha)
     }
 
-    fun setAdditional(types: TypeSet) {
-        common = types
-    }
-
     override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
+        systemBars = windowInsets[Type.systemBars]
+        cutout = windowInsets[Type.displayCutout]
         val common = windowInsets[common]
         val navigationBars = windowInsets[Type.navigationBars]
         val tappableElement = windowInsets[Type.tappableElement]
@@ -95,7 +100,20 @@ class InsetsBackgroundView : View, InsetsListener {
         val width = width.toFloat()
         val height = height.toFloat()
 
-        if (statusBar) canvas.drawRect(0f, 0f, width, topInset, paint)
+        if (statusBar) {
+            val padding = (topInset - maxStatusBar) / 2
+            if (padding > statusBarMinPadding) {
+                val cutout = max(cutout.left, cutout.right)
+                val margin = max(commonMargin - cutout, 0f)
+                val rawLeft = max(systemBars.left, cutout)
+                val rawRight = max(systemBars.right, cutout)
+                val left = rawLeft + margin + padding
+                val right = width - padding - margin - rawRight
+                canvas.drawRoundRect(left, padding, right, topInset - padding, maxStatusBar, maxStatusBar, paint)
+            } else {
+                canvas.drawRect(0f, 0f, width, topInset, paint)
+            }
+        }
 
         sides.takeIf { !it.empty }?.run {
             val navigationTop = if (statusBar) topInset else 0f
