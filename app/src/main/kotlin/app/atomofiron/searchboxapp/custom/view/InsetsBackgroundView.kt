@@ -51,7 +51,7 @@ class InsetsBackgroundView : View, InsetsListener {
     private val maxStatusBar: Float
     private val statusBarMinPadding: Float
     private val commonMargin: Float
-    private var systemBars = Insets.NONE
+    private var navigationBar = Insets.NONE
     private var cutout = Insets.NONE
 
     constructor(context: Context) : this(context, null)
@@ -75,7 +75,7 @@ class InsetsBackgroundView : View, InsetsListener {
     }
 
     override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
-        systemBars = windowInsets[Type.systemBars]
+        navigationBar = windowInsets[Type.navigationBars]
         cutout = windowInsets[Type.displayCutout]
         val common = windowInsets[common]
         val navigationBars = windowInsets[Type.navigationBars]
@@ -100,26 +100,27 @@ class InsetsBackgroundView : View, InsetsListener {
         val width = width.toFloat()
         val height = height.toFloat()
 
+        var navigationHorizontalTop = 0f
         if (statusBar) {
             val padding = (topInset - maxStatusBar) / 2
             if (padding > statusBarMinPadding) {
                 val cutout = max(cutout.left, cutout.right)
                 val margin = max(commonMargin - cutout, 0f)
-                val rawLeft = max(systemBars.left, cutout)
-                val rawRight = max(systemBars.right, cutout)
+                val rawLeft = max(navigationBar.left, cutout)
+                val rawRight = max(navigationBar.right, cutout)
                 val left = rawLeft + margin + padding
                 val right = width - padding - margin - rawRight
                 canvas.drawRoundRect(left, padding, right, topInset - padding, maxStatusBar, maxStatusBar, paint)
             } else {
                 canvas.drawRect(0f, 0f, width, topInset, paint)
+                navigationHorizontalTop = topInset
             }
         }
 
         sides.takeIf { !it.empty }?.run {
-            val navigationTop = if (statusBar) topInset else 0f
             if (horizontal) {
-                canvas.drawRect(0f, navigationTop, leftInset, height - bottomInset, paint)
-                canvas.drawRect(width - rightInset, navigationTop, width, height - bottomInset, paint)
+                canvas.drawRect(0f, navigationHorizontalTop, leftInset, height - bottomInset, paint)
+                canvas.drawRect(width - rightInset, navigationHorizontalTop, width, height - bottomInset, paint)
             }
             if (bottom) canvas.drawRect(0f, height - bottomInset, width, height, paint)
         }
