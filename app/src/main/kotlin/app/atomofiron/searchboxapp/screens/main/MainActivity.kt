@@ -4,6 +4,7 @@ import android.app.Service
 import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         // UPD 29.04.2025: WindowCompat.setDecorFitsSystemWindows() is not enough
         // UPD 21.05.2025: LOL enableEdgeToEdge() breaks the delivery of inserts!
         window.reallyDisableFitsSystemWindows()
+        window.setFlags(FLAG_LAYOUT_NO_LIMITS, FLAG_LAYOUT_NO_LIMITS)
 
         val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.setView(this)
