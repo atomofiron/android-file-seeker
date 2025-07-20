@@ -52,8 +52,8 @@ fun NodeContent.File.getIcon(): Int = when (this) {
 
 fun NodeContent.Directory.getIcon(isEmpty: Boolean): Int = when (kind) {
     DirectoryKind.Alarms -> when {
-        isEmpty -> R.drawable.ic_explorer_folder_alarms
-        else -> R.drawable.ic_explorer_folder_alarms_empty
+        isEmpty -> R.drawable.ic_explorer_folder_alarms_empty
+        else -> R.drawable.ic_explorer_folder_alarms
     }
     DirectoryKind.Android -> when {
         isEmpty -> R.drawable.ic_explorer_folder_android_empty
@@ -80,8 +80,8 @@ fun NodeContent.Directory.getIcon(isEmpty: Boolean): Int = when (kind) {
         else -> R.drawable.ic_explorer_folder_pictures
     }
     DirectoryKind.Ringtones -> when {
-        isEmpty -> R.drawable.ic_explorer_folder_bell
-        else -> R.drawable.ic_explorer_folder_bell_empty
+        isEmpty -> R.drawable.ic_explorer_folder_bell_empty
+        else -> R.drawable.ic_explorer_folder_bell
     }
     DirectoryKind.Ordinary -> when {
         isEmpty -> R.drawable.ic_explorer_folder_empty
