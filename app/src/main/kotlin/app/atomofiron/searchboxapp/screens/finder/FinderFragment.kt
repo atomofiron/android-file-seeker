@@ -44,7 +44,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         super.onCreate(savedInstanceState)
         initViewModel(this, FinderViewModel::class, savedInstanceState)
 
-        finderAdapter = FinderAdapter(output = presenter)
+        finderAdapter = FinderAdapter(output = presenter, requireActivity().window)
         layoutManager = GridLayoutManager(context, 1)
         spanSizeLookup = FinderSpanSizeLookup(null, finderAdapter, layoutManager, resources)
         finderAdapter.holderListener = spanSizeLookup
@@ -63,7 +63,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
             adapter = finderAdapter
             spanSizeLookup.recycler = this
         }
-
+        binding.root.setWindow(requireActivity().window)
         binding.drawer.run {
             onGravityChangeListener = presenter::onDrawerGravityChange
             recyclerView.layoutManager = LinearLayoutManager(requireContext())

@@ -6,8 +6,8 @@ import androidx.drawerlayout.widget.DrawerLayout
 import lib.atomofiron.insets.InsetsProvider
 import lib.atomofiron.insets.InsetsProviderImpl
 
-@Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE")
-class RootDrawerLayout @JvmOverloads constructor(
+@Suppress("DELEGATED_MEMBER_HIDES_SUPERTYPE_OVERRIDE", "LeakingThis")
+open class RootDrawerLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,

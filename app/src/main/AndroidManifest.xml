@@ -22,7 +22,6 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/CompatTheme"
-        android:windowSoftInputMode="adjustPan"
         android:requestLegacyExternalStorage="true"
         tools:remove="android:appComponentFactory"
         tools:ignore="AllowBackup,GoogleAppIndexingWarning">
@@ -33,6 +32,7 @@
             android:screenOrientation="unspecified"
             android:exported="true"
             android:theme="@style/CompatTheme"
+            android:windowSoftInputMode="adjustNothing"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
