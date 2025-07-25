@@ -27,7 +27,10 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : RootDrawerLayout(context, attrs, defStyleAttr), RecyclerView.OnChildAttachStateChangeListener, KeyboardInsetListener, View.OnFocusChangeListener {
+) : RootDrawerLayout(context, attrs, defStyleAttr),
+    RecyclerView.OnChildAttachStateChangeListener,
+    View.OnFocusChangeListener,
+    KeyboardInsetListener {
 
     private var tracker = VelocityTracker.obtain()
     private var tracking = false
@@ -39,6 +42,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private lateinit var controller: WindowInsetsControllerCompat
     private val delegate = InsetsAnimator()
     private val callback = KeyboardInsetCallback(this, delegate)
+
     private var recyclerView: RecyclerView? = null
     private var itemView: View? = null
     private var editText: EditText? = null
@@ -66,7 +70,6 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams?) {
         super.addView(child, index, params)
-
         if (recyclerView == null) {
             recyclerView = child.findViewById(R.id.recycler_view)
             recyclerView?.addOnChildAttachStateChangeListener(this)
@@ -85,7 +88,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     override fun onChildViewDetachedFromWindow(view: View) = Unit // LIER!
 
     override fun onFocusChange(view: View, hasFocus: Boolean) {
-        if (hasFocus && !callback.visible) {
+        if (!delegate.isControlling) {
             controller.controlWindowInsetsAnimation(Type.ime(), -1, null, null, delegate)
         }
     }

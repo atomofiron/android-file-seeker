@@ -55,10 +55,7 @@ class InsetsAnimator : WindowInsetsAnimationControlListenerCompat,
         this.controller = null
     }
 
-    fun reset() {
-        animator?.cancel()
-        reset(cancel = true)
-    }
+    fun reset() = reset(cancel = true)
 
     private fun reset(cancel: Boolean) {
         if (cancel) animator?.cancel()
