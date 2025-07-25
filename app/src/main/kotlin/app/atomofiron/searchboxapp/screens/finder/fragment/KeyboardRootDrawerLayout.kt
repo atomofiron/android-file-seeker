@@ -27,7 +27,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : RootDrawerLayout(context, attrs, defStyleAttr), RecyclerView.OnChildAttachStateChangeListener {
+) : RootDrawerLayout(context, attrs, defStyleAttr), RecyclerView.OnChildAttachStateChangeListener, ImeListener, View.OnFocusChangeListener {
 
     private var tracker = VelocityTracker.obtain()
     private var tracking = false
@@ -37,12 +37,12 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private val manager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     private lateinit var controller: WindowInsetsControllerCompat
-    private val delegate = InsetsDelegate(::onIme)
+    private val delegate = InsetsDelegate(this)
     private var recyclerView: RecyclerView? = null
     private var itemView: View? = null
     private var editText: EditText? = null
-    private var bottomInset = 0
     private val bottomTypes = ExtType { navigationBars + displayCutout + joystickBottom }
+    private var bottomInset = 0
     private var imeIsVisible = false
 
     init {
@@ -79,6 +79,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         holder ?: return
         itemView = holder.itemView
         editText = holder.itemView.findViewById(R.id.item_find_rt_find)
+        editText?.onFocusChangeListener = this
     }
 
     override fun onChildViewDetachedFromWindow(view: View) = Unit // LIER!
@@ -113,7 +114,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                     tracker.yVelocity > 10 -> false
                     else -> null
                 }
-                delegate.stop(shown)
+                delegate.start(shown)
                 tracker.clear()
             }
         }
@@ -128,31 +129,44 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         val editText = editText ?: return false
         when {
             editText.isFocused -> Unit
-            recyclerView.findFocus() != null -> return false
+            recyclerView.findFocus() != null -> Unit
             else -> editText.requestFocus()
+        }
+        if (!delegate.isControlling) {
+            controller.controlWindowInsetsAnimation(Type.ime(), -1, null, null, delegate)
         }
         if (!imeIsVisible) {
             manager.showSoftInput(editText, 0)
         }
         delegate.reset()
         tracking = true
-        controller.controlWindowInsetsAnimation(Type.ime(), -1, null, null, delegate)
         return true
     }
 
     private fun move(event: MotionEvent) {
         val dy = event.y - prevY
-        prevY = event.y
         delegate.move(dy.roundToInt())
     }
 
-    private fun onIme(ime: Int, end: Boolean) {
-        imeIsVisible = ime > 0
-        if (editText?.isFocused == true) {
-            recyclerView?.translationY = -max(0, ime - bottomInset).toFloat()
+    override fun onImeStart(max: Int) {
+    }
+
+    override fun onImeMove(inset: Int) {
+        imeIsVisible = inset > 0
+        if (editText?.isFocused == true || inset == 0) {
+            recyclerView?.translationY = -max(0, inset - bottomInset).toFloat()
         }
-        if (end && !imeIsVisible) {
+    }
+
+    override fun onImeEnd() {
+        if (!imeIsVisible) {
             recyclerView?.findFocus()?.clearFocus()
+        }
+    }
+
+    override fun onFocusChange(view: View, hasFocus: Boolean) {
+        if (hasFocus && !imeIsVisible) {
+            controller.controlWindowInsetsAnimation(Type.ime(), -1, null, null, delegate)
         }
     }
 }

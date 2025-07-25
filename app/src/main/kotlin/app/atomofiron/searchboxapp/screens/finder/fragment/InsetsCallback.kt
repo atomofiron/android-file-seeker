@@ -9,12 +9,10 @@ class InsetsCallback(
     private val listener: ImeListener,
 ) : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
 
-    private var imeHeight = 0
-    var toShown: Boolean? = null
-
     override fun onStart(animation: WindowInsetsAnimationCompat, bounds: BoundsCompat): BoundsCompat {
-        imeHeight = bounds.upperBound.bottom
-        toShown = null
+        val anim = animation.takeIf { it.typeMask == Type.ime() }
+        anim ?: return bounds
+        listener.onImeStart(bounds.upperBound.bottom)
         return bounds
     }
 
@@ -25,19 +23,12 @@ class InsetsCallback(
         val anim = runningAnimations.find { it.typeMask == Type.ime() }
         anim ?: return insets
         val ime = insets.getInsets(Type.ime())
-        if (toShown == null) {
-            toShown = ime.bottom < imeHeight / 2
-        }
-        listener(ime.bottom, end = false)
+        listener.onImeMove(ime.bottom)
         return insets
     }
 
     override fun onEnd(animation: WindowInsetsAnimationCompat) {
         // when app was minimized
-        when (toShown) {
-            true -> listener(imeHeight, end = true)
-            false -> listener(0, end = true)
-            null -> Unit
-        }
+        listener.onImeEnd()
     }
 }
