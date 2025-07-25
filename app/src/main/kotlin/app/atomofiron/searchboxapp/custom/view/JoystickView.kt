@@ -41,7 +41,7 @@ class JoystickView @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : View(context, attrs, defStyleAttr) {
     private val icon = ContextCompat.getDrawable(context, R.drawable.ic_esc)!!
-    private val padding = resources.getDimension(R.dimen.joystick_padding)
+    private val padding = resources.getDimensionPixelSize(R.dimen.joystick_padding)
 
     private val paintBlur = Paint()
     private val glowingPaint = Paint()
@@ -54,7 +54,7 @@ class JoystickView @JvmOverloads constructor(
     private val glowRadius = shadowRadius * 2
     private var trackTouches = false
     private var pressure = 0f
-    private val maxRadius get() = min(width, height) / 2 - padding
+    private val maxRadius get() = min(width, height) / 2f - padding
     private val minRadius get() = maxRadius - shadowRadius / 2
 
     private var composition = JoystickComposition.Default
@@ -74,6 +74,7 @@ class JoystickView @JvmOverloads constructor(
         val hv = icon.intrinsicHeight / 2
         icon.setBounds(-hw, -hv, hw, hv)
         paintBlur.maskFilter = BlurMaskFilter(shadowRadius, BlurMaskFilter.Blur.NORMAL)
+        setPaddingRelative(padding, padding, padding, padding)
     }
 
     @SuppressLint("DrawAllocation")

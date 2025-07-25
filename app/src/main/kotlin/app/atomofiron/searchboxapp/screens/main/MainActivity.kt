@@ -130,13 +130,13 @@ class MainActivity : AppCompatActivity() {
             val layout = parent.getLayout()
             when (layout.ground) {
                 Ground.Bottom -> InsetsSource
-                    .submit(ExtType.joystickBottom, Insets.of(0, 0, 0, parent.height - view.top))
+                    .submit(ExtType.joystickBottom, Insets.of(0, 0, 0, parent.height - view.top - view.paddingTop))
                 Ground.Left -> InsetsSource
                     .submit(ExtType.joystickTop, Insets.of(0, view.bottom, 0, 0))
-                    .submit(ExtType.joystickFlank, Insets.of(view.right, 0, 0, 0))
+                    .submit(ExtType.joystickFlank, Insets.of(view.right - view.paddingRight, 0, 0, 0))
                 Ground.Right -> InsetsSource
                     .submit(ExtType.joystickTop, Insets.of(0, view.bottom, 0, 0))
-                    .submit(ExtType.joystickFlank, Insets.of(0, 0, parent.width - view.left, 0))
+                    .submit(ExtType.joystickFlank, Insets.of(0, 0, parent.width - view.left - view.paddingLeft, 0))
             }
         }
     }
