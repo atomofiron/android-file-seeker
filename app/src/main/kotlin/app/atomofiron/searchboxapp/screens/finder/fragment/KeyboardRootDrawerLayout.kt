@@ -27,7 +27,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : RootDrawerLayout(context, attrs, defStyleAttr), RecyclerView.OnChildAttachStateChangeListener, ImeListener, View.OnFocusChangeListener {
+) : RootDrawerLayout(context, attrs, defStyleAttr), RecyclerView.OnChildAttachStateChangeListener, KeyboardInsetListener, View.OnFocusChangeListener {
 
     private var tracker = VelocityTracker.obtain()
     private var tracking = false
@@ -37,13 +37,13 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private val manager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     private lateinit var controller: WindowInsetsControllerCompat
-    private val delegate = InsetsDelegate(this)
+    private val delegate = InsetsAnimator()
+    private val callback = KeyboardInsetCallback(this, delegate)
     private var recyclerView: RecyclerView? = null
     private var itemView: View? = null
     private var editText: EditText? = null
     private val bottomTypes = ExtType { navigationBars + displayCutout + joystickBottom }
     private var bottomInset = 0
-    private var imeIsVisible = false
 
     init {
         setInsetsModifier { _, insets ->
@@ -52,7 +52,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 .consume(ExtType.ime)
                 .build()
         }
-        ViewCompat.setWindowInsetsAnimationCallback(this, delegate.callback)
+        ViewCompat.setWindowInsetsAnimationCallback(this, callback)
     }
 
     fun setWindow(window: Window) {
@@ -83,6 +83,12 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     }
 
     override fun onChildViewDetachedFromWindow(view: View) = Unit // LIER!
+
+    override fun onFocusChange(view: View, hasFocus: Boolean) {
+        if (hasFocus && !callback.visible) {
+            controller.controlWindowInsetsAnimation(Type.ime(), -1, null, null, delegate)
+        }
+    }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         when (event.action) {
@@ -135,7 +141,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         if (!delegate.isControlling) {
             controller.controlWindowInsetsAnimation(Type.ime(), -1, null, null, delegate)
         }
-        if (!imeIsVisible) {
+        if (!callback.visible) {
             manager.showSoftInput(editText, 0)
         }
         delegate.reset()
@@ -148,25 +154,18 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         delegate.move(dy.roundToInt())
     }
 
-    override fun onImeStart(max: Int) {
-    }
-
-    override fun onImeMove(inset: Int) {
-        imeIsVisible = inset > 0
-        if (editText?.isFocused == true || inset == 0) {
-            recyclerView?.translationY = -max(0, inset - bottomInset).toFloat()
+    override fun onImeMove(current: Int) {
+        recyclerView?.run {
+            val translation = -max(0, current - bottomInset).toFloat()
+            if (editText?.isFocused == true || translation > translationY) {
+                translationY = translation
+            }
         }
     }
 
-    override fun onImeEnd() {
-        if (!imeIsVisible) {
+    override fun onImeEnd(visible: Boolean) {
+        if (!visible) {
             recyclerView?.findFocus()?.clearFocus()
-        }
-    }
-
-    override fun onFocusChange(view: View, hasFocus: Boolean) {
-        if (hasFocus && !imeIsVisible) {
-            controller.controlWindowInsetsAnimation(Type.ime(), -1, null, null, delegate)
         }
     }
 }

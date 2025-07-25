@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.animation.ValueAnimator
 import android.view.animation.LinearInterpolator
 import androidx.core.graphics.Insets
-import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsAnimationControlListenerCompat
 import androidx.core.view.WindowInsetsAnimationControllerCompat
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -21,24 +20,21 @@ private const val HalfPi = Pi / 2
 private const val DURATION = 256L
 private val LinearInterpolator = LinearInterpolator()
 
-class InsetsDelegate(
-    listener: ImeListener,
-) : WindowInsetsAnimationControlListenerCompat,
+class InsetsAnimator : WindowInsetsAnimationControlListenerCompat,
     ValueAnimator.AnimatorUpdateListener,
-    Animator.AnimatorListener {
+    Animator.AnimatorListener,
+    KeyboardInsetListener {
 
-    private val _callback = InsetsCallback(listener)
-    val callback: WindowInsetsAnimationCompat.Callback = _callback
     val isControlling get() = controller != null
     private var controller: WindowInsetsAnimationControllerCompat? = null
     private var animator: ValueAnimator? = null
 
-    private var toShown = false
-    private var maxInterpolated = 0 // max ime, 769
-    private var minInterpolated = 0 // min ime, 0
-    private var interpolated = 0 // ime
-    private val interpolatedFraction get() = interpolated / maxInterpolated.toFloat()
-    private val radian get() = when (toShown) { // 0..HalfPi
+    private var toVisible = false
+    private var maxInterpolated = 0 // max ime, e.g. 769
+    private var minInterpolated = 0 // min ime, 0?
+    private var interpolated = 0 // ime e.g. 0..769
+    private val interpolatedFraction get() = /* 0..1 */ interpolated / maxInterpolated.toFloat()
+    private val radian get() = /* 0..HalfPi */ when (toVisible) {
         true -> asin(interpolatedFraction)
         false -> acos(1 - interpolatedFraction)
     }
@@ -47,8 +43,8 @@ class InsetsDelegate(
         this.controller = controller
         maxInterpolated = controller.shownStateInsets.bottom
         minInterpolated = controller.hiddenStateInsets.bottom
-        toShown = controller.currentInsets.bottom == 0
-        start(toShown)
+        toVisible = controller.currentInsets.bottom == 0
+        start(toVisible)
     }
 
     override fun onFinished(controller: WindowInsetsAnimationControllerCompat) {
@@ -73,10 +69,10 @@ class InsetsDelegate(
 
     fun move(dy: Int) {
         val controller = controller ?: return
-        interpolated = (interpolated - dy).coerceIn(0..maxInterpolated)
-        val new = Insets.of(0, 0, 0, interpolated)
-        val fraction = interpolated / maxInterpolated.toFloat()
-        controller.setInsetsAndAlpha(new, 1f, fraction)
+        val new = (interpolated - dy).coerceIn(0..maxInterpolated)
+        val insets = Insets.of(0, 0, 0, new)
+        val fraction = new / maxInterpolated.toFloat()
+        controller.setInsetsAndAlpha(insets, 1f, fraction)
         reset()
     }
 
@@ -86,12 +82,12 @@ class InsetsDelegate(
             shown == true && maxInterpolated - interpolated <= 2 -> return finish(true)
             shown == false && interpolated - minInterpolated <= 2 -> return finish(false)
         }
-        toShown = shown ?: (interpolated > maxInterpolated / 2)
-        val target = if (toShown) HalfPi else ZeroPi
+        toVisible = shown ?: (interpolated > maxInterpolated / 2)
+        val target = if (toVisible) HalfPi else ZeroPi
         val radian = radian
         animator = ValueAnimator.ofFloat(radian, target).apply {
-            addUpdateListener(this@InsetsDelegate)
-            addListener(this@InsetsDelegate)
+            addUpdateListener(this@InsetsAnimator)
+            addListener(this@InsetsAnimator)
             duration = (DURATION * abs(target - radian) / HalfPi).toLong()
             interpolator = LinearInterpolator
             start()
@@ -101,7 +97,7 @@ class InsetsDelegate(
     override fun onAnimationUpdate(animation: ValueAnimator) {
         val controller = controller ?: return
         var value = animation.animatedValue as Float
-        value = when (toShown) {
+        value = when (toVisible) {
             true -> sin(value)
             false -> 1 - cos(value)
         }
@@ -124,7 +120,20 @@ class InsetsDelegate(
     override fun onAnimationRepeat(animation: Animator) = Unit
 
     private fun finish(show: Boolean = interpolated > 0) {
-        toShown = show
+        toVisible = show
         controller?.finish(show)
+    }
+
+    override fun onImeStart(max: Int) { // this one is called before the onReady
+        maxInterpolated = max
+    }
+
+    override fun onImeMove(current: Int) {
+        interpolated = current
+    }
+
+    override fun onImeEnd(visible: Boolean) {
+        toVisible = visible
+        interpolated = if (visible) maxInterpolated else minInterpolated
     }
 }
