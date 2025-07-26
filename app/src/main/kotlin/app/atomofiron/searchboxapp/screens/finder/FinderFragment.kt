@@ -1,9 +1,7 @@
 package app.atomofiron.searchboxapp.screens.finder
 
-import android.content.Context
 import android.os.Bundle
 import android.view.View
-import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
@@ -12,6 +10,7 @@ import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.recycler.FinderSpanSizeLookup
 import app.atomofiron.common.util.flow.viewCollect
+import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.common.util.showKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
@@ -76,13 +75,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-
-        if (hidden) {
-            view?.let {
-                val inputMethodManager = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?
-                inputMethodManager?.hideSoftInputFromWindow(it.windowToken, 0)
-            }
-        }
+        if (hidden) view?.hideKeyboard()
     }
 
     override fun FinderViewState.onViewCollect() {
