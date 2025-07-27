@@ -20,9 +20,12 @@ class TextFieldHolderDelegate(
         // TextAppearance.Material3.BodySmall
         hintPaint.textSize = binding.root.resources.getDimension(R.dimen.collapsed_hint)
         binding.root.addOnLayoutChangeListener { view, _, _, _, _, _, _, _, _ ->
-            binding.field.gravity = when {
+            when {
                 view.width > minWidth -> Gravity.START
                 else -> Gravity.CENTER_HORIZONTAL
+            }.also {
+                binding.box.gravity = it
+                binding.field.gravity = it
             }
         }
     }
