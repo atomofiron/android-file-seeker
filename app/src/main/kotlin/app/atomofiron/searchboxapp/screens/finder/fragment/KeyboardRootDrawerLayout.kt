@@ -53,7 +53,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private val manager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     private lateinit var controller: WindowInsetsControllerCompat
-    private val delegate = InsetsAnimator()
+    private val delegate = InsetsAnimator { recyclerView?.findFocus() != null }
     private val callback = KeyboardInsetCallback(this, delegate)
     private var isControlling = false // onReady is too slow
 
@@ -105,18 +105,13 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     override fun onChildViewDetachedFromWindow(view: View) = Unit // LIER!
 
     override fun onFocusChange(view: View, hasFocus: Boolean) {
-        val focusedView = recyclerView?.findFocus()
-        focusedView?.let { updateAnyFocused(it) }
-        if (hasFocus && !isKeyboardVisibly) controlAnimation()
-        if (focusedView == null) {
-            post {
-                updateAnyFocused()
-            }
-        }
+        view.takeIf { hasFocus }
+            .let { it ?: recyclerView?.findFocus() }
+            ?.let { updateAnyFocused(it) }
+            ?: post { updateAnyFocused() }
     }
 
     private fun updateAnyFocused(focusedView: View? = recyclerView?.findFocus()) {
-        delegate.anyFocused = focusedView != null
         updateFocused(focusedView)
         focusedView?.onFocusChangeListener = this
     }
@@ -226,7 +221,6 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             recyclerView?.findFocus()?.clearFocus()
         }
         isControlling = false
-        delegate.reset()
     }
 
     private fun updateTranslation() {

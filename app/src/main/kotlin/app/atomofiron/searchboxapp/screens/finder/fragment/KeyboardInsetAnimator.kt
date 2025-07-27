@@ -20,7 +20,9 @@ private const val HalfPi = Pi / 2
 const val DURATION = 256L
 private val LinearInterpolator = LinearInterpolator()
 
-class InsetsAnimator : WindowInsetsAnimationControlListenerCompat,
+class InsetsAnimator(
+    private val anyFocused: () -> Boolean,
+) : WindowInsetsAnimationControlListenerCompat,
     ValueAnimator.AnimatorUpdateListener,
     Animator.AnimatorListener,
     KeyboardInsetListener {
@@ -28,7 +30,6 @@ class InsetsAnimator : WindowInsetsAnimationControlListenerCompat,
     private var controller: WindowInsetsAnimationControllerCompat? = null
     private var animator: ValueAnimator? = null
 
-    var anyFocused = false
     private var toVisible = false
     private var maxInterpolated = 0 // max ime, e.g. 769
     private var minInterpolated = 0 // min ime, 0?
@@ -43,8 +44,8 @@ class InsetsAnimator : WindowInsetsAnimationControlListenerCompat,
         this.controller = controller
         maxInterpolated = controller.shownStateInsets.bottom
         minInterpolated = controller.hiddenStateInsets.bottom
-        toVisible = anyFocused
-        if (anyFocused != controller.currentInsets.bottom > 0) {
+        toVisible = anyFocused()
+        if (anyFocused() != controller.currentInsets.bottom > 0) {
             start(toVisible)
         }
     }
@@ -84,12 +85,15 @@ class InsetsAnimator : WindowInsetsAnimationControlListenerCompat,
         toVisible = shown ?: (interpolated > maxInterpolated / 2)
         val target = if (toVisible) HalfPi else ZeroPi
         val radian = radian
-        if (radian != target) animator = ValueAnimator.ofFloat(radian, target).apply {
-            addUpdateListener(this@InsetsAnimator)
-            addListener(this@InsetsAnimator)
-            duration = (DURATION * abs(target - radian) / HalfPi).toLong()
-            interpolator = LinearInterpolator
-            start()
+        if (radian != target) {
+            reset()
+            animator = ValueAnimator.ofFloat(radian, target).apply {
+                addUpdateListener(this@InsetsAnimator)
+                addListener(this@InsetsAnimator)
+                duration = (DURATION * abs(target - radian) / HalfPi).toLong()
+                interpolator = LinearInterpolator
+                start()
+            }
         }
     }
 
@@ -134,5 +138,6 @@ class InsetsAnimator : WindowInsetsAnimationControlListenerCompat,
     override fun onImeEnd(visible: Boolean) {
         toVisible = visible
         interpolated = if (visible) maxInterpolated else minInterpolated
+        reset()
     }
 }
