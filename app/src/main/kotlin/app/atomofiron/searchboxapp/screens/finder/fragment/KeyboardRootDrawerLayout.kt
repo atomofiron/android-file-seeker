@@ -67,7 +67,13 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private var keyboardNow = 0
     private val keyboardMin = 0
     private var keyboardMax = resources.displayMetrics.heightPixels
-    private var focusedBottom = 0
+    private var barrierBottom = 0
+        set(value) {
+            if (value > keyboardMax) throw IllegalArgumentException(value.toString())
+            field = value
+        }
+    private var focusedView: View? = null
+        get() = field?.takeIf { it.isAttachedToWindow && it.isFocused }
 
     init {
         setInsetsModifier { _, insets ->
@@ -97,21 +103,29 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         }
     }
 
-    private fun updateAnyFocused(focusedView: View? = recyclerView.findFocus()) {
-        focusedView?.onFocusChangeListener = focusListener
-        val itemBottom = focusedView?.calcBottom() ?: return
-        val newFocusedBottom = min(keyboardMax, itemBottom)
+    private fun updateAnyFocused() {
+        recyclerView.findFocus()?.let { updateAnyFocused(it) }
+    }
+
+    private fun updateAnyFocused(focusedView: View) {
+        this.focusedView = focusedView
+        focusedView.onFocusChangeListener = focusListener
+        if (tracking) {
+            return
+        }
+        val itemBottom = focusedView.calcBottom() ?: return
+        val newBarrierBottom = min(keyboardMax, itemBottom)
         anim?.cancel()
-        if (keyboardNow <= min(focusedBottom, newFocusedBottom)) {
+        if (keyboardNow <= min(barrierBottom, newBarrierBottom)) {
             // animation is unnecessary when new and old focused views are above the keyboard
-            focusedBottom = newFocusedBottom
+            barrierBottom = newBarrierBottom
             return
         }
-        if (newFocusedBottom == focusedBottom) {
+        if (newBarrierBottom == barrierBottom) {
             return
         }
-        anim = ValueAnimator.ofInt(focusedBottom, newFocusedBottom).apply {
-            duration = abs(newFocusedBottom - focusedBottom).toFloat()
+        anim = ValueAnimator.ofInt(barrierBottom, newBarrierBottom).apply {
+            duration = abs(newBarrierBottom - barrierBottom).toFloat()
                 .let { DURATION * (it / keyboardMax) }.toLong()
             interpolator = sinusoid
             addUpdateListener(valueListener)
@@ -133,21 +147,26 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 val dy = event.y - prevY
                 when {
                     ignoring -> Unit
-                    tracking -> move(event)
+                    tracking -> move(dy)
                     dx == 0f && dy == 0f -> Unit
                     abs(dx) > abs(dy) -> ignoring = true
-                    dy < 0 && keyboardNow == keyboardMax -> ignoring = true // todo translate like a scroll
                     dy > 0 && keyboardNow == keyboardMin -> ignoring = true
+                    dy < 0 && keyboardNow == keyboardMax -> {
+                        tracking = true
+                        move(dy)
+                    }
                     start() -> {
                         tracking = true
                         event.action = MotionEvent.ACTION_CANCEL
                         super.dispatchTouchEvent(event)
-                        move(event)
+                        move(dy)
                     }
                     else -> ignoring = !tracking
                 }
             }
             MotionEvent.ACTION_UP -> {
+                tracking = false
+                ignoring = false
                 tracker.addMovement(event)
                 tracker.computeCurrentVelocity(100)
                 val shown = when {
@@ -170,7 +189,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         when {
             editText.isFocused -> Unit
             recyclerView.findFocus() != null -> Unit
-            !editText.isFullyVisible() -> return false
+            !editText.isFullyAboveBottom() -> return false
             else -> editText.requestFocus()
         }
         if (!callback.visible) manager.showSoftInput(editText, 0)
@@ -179,12 +198,27 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         return true
     }
 
-    private fun move(event: MotionEvent) {
-        val dy = event.y - prevY
-        delegate.move(dy.roundToInt())
+    private fun move(dy: Float) {
+        var offset = dy.roundToInt()
+        if (offset == 0) {
+            return
+        }
+        offset -= if (keyboardNow == keyboardMax && focusedView != null) {
+            val min = recyclerView.run { height - getChildAt(0).let { it.bottom + it.marginBottom } }
+            val max = focusedView?.calcBottom() ?: keyboardMax
+            var newBarrier = max(barrierBottom + offset, min)
+            newBarrier = min(newBarrier, max)
+            updateTranslation(barrierBottom = newBarrier)
+        } else {
+            0
+        }
+        if (offset != 0) {
+            controlAnimation()
+            delegate.move(offset)
+        }
     }
 
-    private fun EditText?.isFullyVisible(): Boolean {
+    private fun View?.isFullyAboveBottom(): Boolean {
         this ?: return false
         val bottom = calcBottom() ?: return false
         return bottom >= recyclerView.paddingBottom
@@ -199,8 +233,16 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         return recyclerView.height - itemView.run { bottom + marginBottom }
     }
 
-    private fun updateTranslation() {
-        recyclerView.translationY = -max(0, keyboardNow - focusedBottom).toFloat()
+    private fun updateTranslation(
+        keyboardNow: Int = this.keyboardNow,
+        barrierBottom: Int = this.barrierBottom,
+    ): Int {
+        this.keyboardNow = keyboardNow
+        this.barrierBottom = barrierBottom.coerceIn(0, keyboardMax)
+        val new = -max(0, keyboardNow - this.barrierBottom)
+        val moved = new - recyclerView.translationY.toInt()
+        recyclerView.translationY = new.toFloat()
+        return moved
     }
 
     private fun controlAnimation() {
@@ -228,16 +270,18 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
         override fun onFocusChange(view: View, hasFocus: Boolean) {
             view.takeIf { hasFocus }
-                .let { it ?: recyclerView.findFocus() }
                 ?.let { updateAnyFocused(it) }
-                ?: post { updateAnyFocused() }
+                ?: run {
+                    updateAnyFocused()
+                    post { updateAnyFocused() }
+                }
         }
     }
 
     private inner class ScrollListener : RecyclerView.OnScrollListener() {
 
         override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-            if (newState != RecyclerView.SCROLL_STATE_SETTLING) {
+            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
                 updateAnyFocused()
             }
         }
@@ -246,8 +290,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private inner class ValueListener : ValueAnimator.AnimatorUpdateListener {
 
         override fun onAnimationUpdate(animation: ValueAnimator) {
-            focusedBottom = animation.animatedValue as Int
-            updateTranslation()
+            updateTranslation(barrierBottom = animation.animatedValue as Int)
         }
     }
 
@@ -259,8 +302,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         }
 
         override fun onImeMove(current: Int) {
-            keyboardNow = current
-            updateTranslation()
+            updateTranslation(keyboardNow = current)
         }
 
         override fun onImeEnd(visible: Boolean) {

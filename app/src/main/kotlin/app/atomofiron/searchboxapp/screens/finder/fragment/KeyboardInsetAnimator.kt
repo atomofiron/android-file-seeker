@@ -45,10 +45,7 @@ class InsetsAnimator(
         this.controller = controller
         maxInterpolated = controller.shownStateInsets.bottom
         minInterpolated = controller.hiddenStateInsets.bottom
-        toVisible = anyFocused()
-        if (anyFocused() != controller.currentInsets.bottom > 0) {
-            start(toVisible)
-        }
+        toVisible = anyFocused() // this is valid because the onReady is called quite late
     }
 
     override fun onFinished(controller: WindowInsetsAnimationControllerCompat) {
@@ -70,11 +67,11 @@ class InsetsAnimator(
 
     fun move(dy: Int) {
         val controller = controller ?: return
+        resetAnimation()
         val new = (interpolated - dy).coerceIn(0..maxInterpolated)
         val insets = Insets.of(0, 0, 0, new)
         val fraction = new / maxInterpolated.toFloat()
         controller.setInsetsAndAlpha(insets, 1f, fraction)
-        resetAnimation()
     }
 
     fun start(shown: Boolean?) {
