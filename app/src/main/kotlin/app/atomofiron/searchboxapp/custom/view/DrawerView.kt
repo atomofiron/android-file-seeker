@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.core.content.withStyledAttributes
 import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.recyclerview.widget.RecyclerView
@@ -44,10 +45,9 @@ class DrawerView @JvmOverloads constructor(
             onGravityChangeListener?.invoke(gravity)
         }
         val tvTitle = findViewById<TextView>(R.id.drawer_title)
-        val styled = context.obtainStyledAttributes(attrs, R.styleable.DrawerView, defStyleAttr, 0)
-        tvTitle.text = styled.getString(R.styleable.DrawerView_title)
-        styled.recycle()
-
+        context.withStyledAttributes(attrs, R.styleable.DrawerView, defStyleAttr, 0) {
+            tvTitle.text = getString(R.styleable.DrawerView_title)
+        }
         binding.drawerTitleContainer.run {
             val color = (this@DrawerView.background as MaterialShapeDrawable).resolvedTintColor
             setBackgroundColor(color)

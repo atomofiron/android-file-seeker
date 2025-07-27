@@ -34,6 +34,7 @@ import com.google.android.material.color.MaterialColors
 import com.google.android.material.textview.MaterialTextView
 import kotlin.math.PI
 import kotlin.math.sin
+import androidx.core.content.withStyledAttributes
 
 private const val OFFSET_DURATION = 512L
 private const val TIP_DURATION = 3072L
@@ -101,12 +102,12 @@ class DangerousSliderView @JvmOverloads constructor(
         border.setStroke(strokeWidth, thumbColor)
         done.setTint(textColor)
 
-        val styled = context.obtainStyledAttributes(attrs, R.styleable.DangerousSliderView, defStyleAttr, 0)
-        tip.text = styled.getString(R.styleable.DangerousSliderView_tip)?.withSpan(tipSpan)
-        button.text = styled.getString(R.styleable.DangerousSliderView_text)?.withSpan(thumbSpan)
-        val textSize = styled.getDimension(R.styleable.DangerousSliderView_textSize, button.textSize)
-        setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
-        styled.recycle()
+        context.withStyledAttributes(attrs, R.styleable.DangerousSliderView, defStyleAttr, 0) {
+            tip.text = getString(R.styleable.DangerousSliderView_tip)?.withSpan(tipSpan)
+            button.text = getString(R.styleable.DangerousSliderView_text)?.withSpan(thumbSpan)
+            val textSize = getDimension(R.styleable.DangerousSliderView_textSize, button.textSize)
+            setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
+        }
 
         tip.setTextColor(tipColor)
         tip.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { gravity = Gravity.CENTER }

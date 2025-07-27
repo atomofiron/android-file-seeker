@@ -82,7 +82,7 @@ fun Context.findDimenByAttr(@AttrRes attr: Int): Int = findDimensByAttr(attr)[0]
 
 fun Context.findDimensByAttr(@AttrRes vararg attrs: Int): IntArray {
     @SuppressLint("ResourceType")
-    val array = this.obtainStyledAttributes(attrs)
+    val array = obtainStyledAttributes(attrs)
 
     val values = IntArray(attrs.size)
     for (i in attrs.indices) {
