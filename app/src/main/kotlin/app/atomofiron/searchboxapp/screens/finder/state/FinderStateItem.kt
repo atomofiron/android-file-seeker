@@ -20,6 +20,7 @@ sealed class FinderStateItem(
         val query: String = "",
         val useRegex: Boolean = false,
         val replaceEnabled: Boolean = false,
+        val available: Boolean = false,
     ) : FinderStateItem(FinderItemType.FIND)
 
     data class SpecialCharacters(

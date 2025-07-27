@@ -13,6 +13,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.RegexInputField
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Query
+import app.atomofiron.searchboxapp.utils.Alpha
 import java.util.regex.Pattern
 
 class QueryFieldHolder(
@@ -50,6 +51,8 @@ class QueryFieldHolder(
             etFind.setSelection(item.query.length)
         }
         updateWarning(etFind.text.toString())
+        btnFind.isEnabled = item.available
+        btnFind.alpha = Alpha.enabled(item.available)
     }
 
     private fun onEditorAction(view: View, actionId: Int, /* indeed nullable */ event: KeyEvent?): Boolean {
@@ -74,8 +77,6 @@ class QueryFieldHolder(
             }
         }
         etFind.isActivated = false
-        btnFind.isVisible = true
-        btnFind.isEnabled = query.isNotEmpty()
     }
 
     interface OnActionListener {

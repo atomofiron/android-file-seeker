@@ -19,6 +19,7 @@ import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.SpecialC
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Targets
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.TestField
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Title
+import app.atomofiron.searchboxapp.utils.replaceOne
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -77,6 +78,7 @@ class FinderItemsStateDelegate(
     private fun composeAllItems(items: List<FinderStateItem>, targets: List<Node>, tasks: List<SearchTask>): List<FinderStateItem> {
         return buildList {
             addAll(items)
+            replaceOne<Query, _> { copy(available = query.isNotEmpty() && targets.any { it.isChecked }) }
             if (!isLocal && targets.isNotEmpty()) {
                 val index = items.indexOfFirst { it is TestField }.inc()
                 add(index, Title(R.string.search_here))
