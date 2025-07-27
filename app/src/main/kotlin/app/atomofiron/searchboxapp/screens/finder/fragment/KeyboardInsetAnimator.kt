@@ -17,7 +17,7 @@ import kotlin.math.sin
 private const val Pi = PI.toFloat()
 private const val ZeroPi = 0f
 private const val HalfPi = Pi / 2
-private const val DURATION = 256L
+const val DURATION = 256L
 private val LinearInterpolator = LinearInterpolator()
 
 class InsetsAnimator : WindowInsetsAnimationControlListenerCompat,
@@ -25,10 +25,10 @@ class InsetsAnimator : WindowInsetsAnimationControlListenerCompat,
     Animator.AnimatorListener,
     KeyboardInsetListener {
 
-    val isControlling get() = controller != null
     private var controller: WindowInsetsAnimationControllerCompat? = null
     private var animator: ValueAnimator? = null
 
+    var anyFocused = false
     private var toVisible = false
     private var maxInterpolated = 0 // max ime, e.g. 769
     private var minInterpolated = 0 // min ime, 0?
@@ -43,8 +43,10 @@ class InsetsAnimator : WindowInsetsAnimationControlListenerCompat,
         this.controller = controller
         maxInterpolated = controller.shownStateInsets.bottom
         minInterpolated = controller.hiddenStateInsets.bottom
-        toVisible = controller.currentInsets.bottom == 0
-        start(toVisible)
+        toVisible = anyFocused
+        if (anyFocused != controller.currentInsets.bottom > 0) {
+            start(toVisible)
+        }
     }
 
     override fun onFinished(controller: WindowInsetsAnimationControllerCompat) {
@@ -82,7 +84,7 @@ class InsetsAnimator : WindowInsetsAnimationControlListenerCompat,
         toVisible = shown ?: (interpolated > maxInterpolated / 2)
         val target = if (toVisible) HalfPi else ZeroPi
         val radian = radian
-        animator = ValueAnimator.ofFloat(radian, target).apply {
+        if (radian != target) animator = ValueAnimator.ofFloat(radian, target).apply {
             addUpdateListener(this@InsetsAnimator)
             addListener(this@InsetsAnimator)
             duration = (DURATION * abs(target - radian) / HalfPi).toLong()
