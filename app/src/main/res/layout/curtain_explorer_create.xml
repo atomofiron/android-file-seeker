@@ -47,6 +47,7 @@
         app:cornerRadius="@dimen/infinity"
         app:layout_constraintTop_toBottomOf="@+id/explorer_create_til"
         app:layout_constraintEnd_toStartOf="@+id/explorer_create_dir_btn"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
     <com.google.android.material.button.MaterialButton
         android:id="@+id/explorer_create_dir_btn"
@@ -59,5 +60,6 @@
         app:cornerRadius="@dimen/infinity"
         app:layout_constraintTop_toBottomOf="@+id/explorer_create_til"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

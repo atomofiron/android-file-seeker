@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/common_margin_half"
-        android:layout_margin="@dimen/common_margin"
+        android:layout_marginHorizontal="@dimen/common_margin"
         android:hint="@string/a_name"
         >
         <app.atomofiron.searchboxapp.custom.view.AutoHideKeyboardField
@@ -31,7 +31,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:layout_marginEnd="@dimen/common_margin"
+        android:layout_margin="@dimen/common_margin"
         android:text="@string/rename"
         app:cornerRadius="@dimen/infinity"
         />
