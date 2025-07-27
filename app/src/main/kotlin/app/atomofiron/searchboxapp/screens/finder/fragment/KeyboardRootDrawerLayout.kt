@@ -31,19 +31,17 @@ import kotlin.math.sin
 
 private const val HalfPi = PI.toFloat() / 2
 
-private object Interpol : Interpolator {
-    override fun getInterpolation(input: Float): Float = sin(HalfPi * input)
-}
-
 class KeyboardRootDrawerLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : RootDrawerLayout(context, attrs, defStyleAttr),
-    RecyclerView.OnChildAttachStateChangeListener,
-    View.OnFocusChangeListener,
-    ValueAnimator.AnimatorUpdateListener,
-    KeyboardInsetListener {
+) : RootDrawerLayout(context, attrs, defStyleAttr) {
+
+    private val focusListener = FocusChangeListener()
+    private val childListener = ChildStateListener()
+    private val valueListener = ValueListener()
+    private val keyboardListener = KeyboardListener()
+    private val sinusoid = Interpolator { input -> sin(HalfPi * input) }
 
     private var tracker = VelocityTracker.obtain()
     private var tracking = false
@@ -53,19 +51,19 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private val manager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     private lateinit var controller: WindowInsetsControllerCompat
-    private val delegate = InsetsAnimator { recyclerView?.findFocus() != null }
-    private val callback = KeyboardInsetCallback(this, delegate)
+    private val delegate = InsetsAnimator { recyclerView.findFocus() != null }
+    private val callback = KeyboardInsetCallback(keyboardListener, delegate.keyboardListener)
     private var isControlling = false // onReady is too slow
 
-    private var recyclerView: RecyclerView? = null
+    private lateinit var recyclerView: RecyclerView
     private var itemView: View? = null
     private var editText: EditText? = null
 
     private var anim: ValueAnimator? = null
-    private val isKeyboardVisibly get() = keyboardNow > 0
-    private var keyboardNow = 0 // from the bottom
-    private var keyboardMax = 1000 // from the bottom
-    private var focusedBottom = 0 // from the bottom
+    // from the bottom
+    private var keyboardNow = 0
+    private var keyboardMax = resources.displayMetrics.heightPixels
+    private var focusedBottom = 0
 
     init {
         setInsetsModifier { _, insets ->
@@ -87,38 +85,15 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams?) {
         super.addView(child, index, params)
-        if (recyclerView == null) {
+        if (!::recyclerView.isInitialized) {
             recyclerView = child.findViewById(R.id.recycler_view)
-            recyclerView?.addOnChildAttachStateChangeListener(this)
+            recyclerView.addOnChildAttachStateChangeListener(childListener)
         }
     }
 
-    override fun onChildViewAttachedToWindow(view: View) {
-        val recyclerView = view.parent as RecyclerView
-        val holder = recyclerView.getChildViewHolder(view) as? QueryFieldHolder
-        holder ?: return
-        itemView = holder.itemView
-        editText = holder.itemView.findViewById(R.id.item_find_rt_find)
-        editText?.onFocusChangeListener = this
-    }
-
-    override fun onChildViewDetachedFromWindow(view: View) = Unit // LIER!
-
-    override fun onFocusChange(view: View, hasFocus: Boolean) {
-        view.takeIf { hasFocus }
-            .let { it ?: recyclerView?.findFocus() }
-            ?.let { updateAnyFocused(it) }
-            ?: post { updateAnyFocused() }
-    }
-
-    private fun updateAnyFocused(focusedView: View? = recyclerView?.findFocus()) {
-        updateFocused(focusedView)
-        focusedView?.onFocusChangeListener = this
-    }
-
-    private fun updateFocused(editText: View?) {
-        val recyclerView = recyclerView ?: return
-        var itemView = editText ?: return
+    private fun updateAnyFocused(focusedView: View? = recyclerView.findFocus()) {
+        focusedView?.onFocusChangeListener = focusListener
+        var itemView = focusedView ?: return
         while (itemView.parent !is RecyclerView) {
             itemView = itemView.parent as View
         }
@@ -126,6 +101,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         val newFocusedBottom = min(keyboardMax, recyclerView.height - itemBottom)
         anim?.cancel()
         if (keyboardNow <= min(focusedBottom, newFocusedBottom)) {
+            // animation is unnecessary when new and old focused views are above the keyboard
             focusedBottom = newFocusedBottom
             return
         }
@@ -135,15 +111,10 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         anim = ValueAnimator.ofInt(focusedBottom, newFocusedBottom).apply {
             duration = abs(newFocusedBottom - focusedBottom).toFloat()
                 .let { DURATION * (it / keyboardMax) }.toLong()
-            interpolator = Interpol
-            addUpdateListener(this@KeyboardRootDrawerLayout)
+            interpolator = sinusoid
+            addUpdateListener(valueListener)
             start()
         }
-    }
-
-    override fun onAnimationUpdate(animation: ValueAnimator) {
-        focusedBottom = animation.animatedValue as Int
-        updateTranslation()
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -187,16 +158,16 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     }
 
     private fun start(): Boolean {
-        val recyclerView = recyclerView ?: return false
+        val recyclerView = recyclerView
         val editText = editText ?: return false
         when {
             editText.isFocused -> Unit
             recyclerView.findFocus() != null -> Unit
             else -> editText.requestFocus()
         }
-        controlAnimation()
         if (!callback.visible) manager.showSoftInput(editText, 0)
-        delegate.reset()
+        controlAnimation()
+        delegate.resetAnimation()
         tracking = true
         return true
     }
@@ -206,31 +177,66 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         delegate.move(dy.roundToInt())
     }
 
-    override fun onImeStart(max: Int) {
-        keyboardMax = max
-        updateAnyFocused()
-    }
-
-    override fun onImeMove(current: Int) {
-        keyboardNow = current
-        updateTranslation()
-    }
-
-    override fun onImeEnd(visible: Boolean) {
-        if (!visible) {
-            recyclerView?.findFocus()?.clearFocus()
-        }
-        isControlling = false
-    }
-
     private fun updateTranslation() {
-        recyclerView?.translationY = -max(0, keyboardNow - focusedBottom).toFloat()
+        recyclerView.translationY = -max(0, keyboardNow - focusedBottom).toFloat()
     }
 
     private fun controlAnimation() {
         if (!isControlling) {
             isControlling = true
             controller.controlWindowInsetsAnimation(Type.ime(), -1, null, null, delegate)
+        }
+    }
+
+    private inner class ChildStateListener : RecyclerView.OnChildAttachStateChangeListener {
+
+        override fun onChildViewAttachedToWindow(view: View) {
+            val recyclerView = view.parent as RecyclerView
+            val holder = recyclerView.getChildViewHolder(view) as? QueryFieldHolder
+            holder ?: return
+            itemView = holder.itemView
+            editText = holder.itemView.findViewById(R.id.item_find_rt_find)
+            editText?.onFocusChangeListener = focusListener
+        }
+
+        override fun onChildViewDetachedFromWindow(view: View) = Unit // LIER!
+    }
+
+    private inner class FocusChangeListener : OnFocusChangeListener {
+
+        override fun onFocusChange(view: View, hasFocus: Boolean) {
+            view.takeIf { hasFocus }
+                .let { it ?: recyclerView.findFocus() }
+                ?.let { updateAnyFocused(it) }
+                ?: post { updateAnyFocused() }
+        }
+    }
+
+    private inner class ValueListener : ValueAnimator.AnimatorUpdateListener {
+
+        override fun onAnimationUpdate(animation: ValueAnimator) {
+            focusedBottom = animation.animatedValue as Int
+            updateTranslation()
+        }
+    }
+
+    private inner class KeyboardListener : KeyboardInsetListener {
+
+        override fun onImeStart(max: Int) {
+            keyboardMax = max
+            updateAnyFocused()
+        }
+
+        override fun onImeMove(current: Int) {
+            keyboardNow = current
+            updateTranslation()
+        }
+
+        override fun onImeEnd(visible: Boolean) {
+            if (!visible) {
+                recyclerView.findFocus()?.clearFocus()
+            }
+            isControlling = false
         }
     }
 }

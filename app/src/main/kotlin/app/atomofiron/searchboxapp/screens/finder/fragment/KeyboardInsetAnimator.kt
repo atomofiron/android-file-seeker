@@ -15,17 +15,18 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 private const val Pi = PI.toFloat()
-private const val ZeroPi = 0f
 private const val HalfPi = Pi / 2
+private const val ZeroPi = 0f
 const val DURATION = 256L
 private val LinearInterpolator = LinearInterpolator()
 
 class InsetsAnimator(
     private val anyFocused: () -> Boolean,
-) : WindowInsetsAnimationControlListenerCompat,
-    ValueAnimator.AnimatorUpdateListener,
-    Animator.AnimatorListener,
-    KeyboardInsetListener {
+) : WindowInsetsAnimationControlListenerCompat {
+
+    private val valueListener = AnimatorUpdateListener()
+    private val animationListener = AnimationListener()
+    val keyboardListener: KeyboardInsetListener = KeyboardListener()
 
     private var controller: WindowInsetsAnimationControllerCompat? = null
     private var animator: ValueAnimator? = null
@@ -58,9 +59,9 @@ class InsetsAnimator(
         this.controller = null
     }
 
-    fun reset() = reset(cancel = true)
+    fun resetAnimation() = resetAnimation(cancel = true)
 
-    private fun reset(cancel: Boolean) {
+    private fun resetAnimation(cancel: Boolean) {
         if (cancel) animator?.cancel()
         animator?.removeAllUpdateListeners()
         animator?.removeAllListeners()
@@ -73,7 +74,7 @@ class InsetsAnimator(
         val insets = Insets.of(0, 0, 0, new)
         val fraction = new / maxInterpolated.toFloat()
         controller.setInsetsAndAlpha(insets, 1f, fraction)
-        reset()
+        resetAnimation()
     }
 
     fun start(shown: Boolean?) {
@@ -86,10 +87,10 @@ class InsetsAnimator(
         val target = if (toVisible) HalfPi else ZeroPi
         val radian = radian
         if (radian != target) {
-            reset()
+            resetAnimation()
             animator = ValueAnimator.ofFloat(radian, target).apply {
-                addUpdateListener(this@InsetsAnimator)
-                addListener(this@InsetsAnimator)
+                addUpdateListener(valueListener)
+                addListener(animationListener)
                 duration = (DURATION * abs(target - radian) / HalfPi).toLong()
                 interpolator = LinearInterpolator
                 start()
@@ -97,47 +98,56 @@ class InsetsAnimator(
         }
     }
 
-    override fun onAnimationUpdate(animation: ValueAnimator) {
-        val controller = controller ?: return
-        var value = animation.animatedValue as Float
-        value = when (toVisible) {
-            true -> sin(value)
-            false -> 1 - cos(value)
-        }
-        val bottom = value * maxInterpolated
-        interpolated = bottom.toInt()
-        val fraction = bottom / maxInterpolated
-        val new = Insets.of(0, 0, 0, interpolated)
-        controller.setInsetsAndAlpha(new, Alpha.VISIBLE, fraction)
-    }
-
-    override fun onAnimationEnd(animation: Animator) {
-        reset(cancel = false)
-        finish()
-    }
-
-    override fun onAnimationCancel(animation: Animator) = reset(cancel = false)
-
-    override fun onAnimationStart(animation: Animator) = Unit
-
-    override fun onAnimationRepeat(animation: Animator) = Unit
-
     private fun finish(show: Boolean = interpolated > 0) {
         toVisible = show
         controller?.finish(show)
     }
 
-    override fun onImeStart(max: Int) { // this one is called before the onReady
-        maxInterpolated = max
+    private inner class AnimatorUpdateListener : ValueAnimator.AnimatorUpdateListener {
+
+        override fun onAnimationUpdate(animation: ValueAnimator) {
+            val controller = controller ?: return
+            var value = animation.animatedValue as Float
+            value = when (toVisible) {
+                true -> sin(value)
+                false -> 1 - cos(value)
+            }
+            val bottom = value * maxInterpolated
+            interpolated = bottom.toInt()
+            val fraction = bottom / maxInterpolated
+            val new = Insets.of(0, 0, 0, interpolated)
+            controller.setInsetsAndAlpha(new, Alpha.VISIBLE, fraction)
+        }
     }
 
-    override fun onImeMove(current: Int) {
-        interpolated = current
+    private inner class AnimationListener : Animator.AnimatorListener {
+
+        override fun onAnimationEnd(animation: Animator) {
+            resetAnimation(cancel = false)
+            finish()
+        }
+
+        override fun onAnimationCancel(animation: Animator) = resetAnimation(cancel = false)
+
+        override fun onAnimationStart(animation: Animator) = Unit
+
+        override fun onAnimationRepeat(animation: Animator) = Unit
     }
 
-    override fun onImeEnd(visible: Boolean) {
-        toVisible = visible
-        interpolated = if (visible) maxInterpolated else minInterpolated
-        reset()
+    private inner class KeyboardListener : KeyboardInsetListener {
+
+        override fun onImeStart(max: Int) { // this one is called before the onReady
+            maxInterpolated = max
+        }
+
+        override fun onImeMove(current: Int) {
+            interpolated = current
+        }
+
+        override fun onImeEnd(visible: Boolean) {
+            toVisible = visible
+            interpolated = if (visible) maxInterpolated else minInterpolated
+            resetAnimation()
+        }
     }
 }
