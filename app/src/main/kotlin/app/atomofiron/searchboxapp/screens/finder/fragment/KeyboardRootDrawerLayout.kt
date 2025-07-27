@@ -19,8 +19,8 @@ import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.DrawerStateListenerImpl
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.view.DrawerView
 import app.atomofiron.searchboxapp.custom.view.layout.RootDrawerLayout
+import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.builder
@@ -41,6 +41,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private val drawerListener = DrawerStateListenerImpl()
     private val focusListener = FocusChangeListener()
+    private val scrollListener = ScrollListener()
     private val childListener = ChildStateListener()
     private val valueListener = ValueListener()
     private val keyboardListener = KeyboardListener()
@@ -65,6 +66,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private var anim: ValueAnimator? = null
     // from the bottom
     private var keyboardNow = 0
+    private val keyboardMin = 0
     private var keyboardMax = resources.displayMetrics.heightPixels
     private var focusedBottom = 0
 
@@ -92,19 +94,17 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         if (!::recyclerView.isInitialized) {
             recyclerView = child.findViewById(R.id.recycler_view)
             recyclerView.addOnChildAttachStateChangeListener(childListener)
+            recyclerView.addOnScrollListener(scrollListener)
         }
     }
 
     private fun updateAnyFocused(focusedView: View? = recyclerView.findFocus()) {
         focusedView?.onFocusChangeListener = focusListener
-        var itemView = focusedView ?: return
-        while (itemView.parent !is RecyclerView) {
-            itemView = itemView.parent as View
-        }
-        val itemBottom = itemView.run { bottom + marginBottom }
-        val newFocusedBottom = min(keyboardMax, recyclerView.height - itemBottom)
+        val itemBottom = focusedView?.calcBottom() ?: return
+        val newFocusedBottom = min(keyboardMax, itemBottom)
         anim?.cancel()
         if (keyboardNow <= min(focusedBottom, newFocusedBottom)) {
+            poop("updateAnyFocused $focusedBottom = $newFocusedBottom")
             // animation is unnecessary when new and old focused views are above the keyboard
             focusedBottom = newFocusedBottom
             return
@@ -112,6 +112,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         if (newFocusedBottom == focusedBottom) {
             return
         }
+        poop("updateAnyFocused $focusedBottom -> $newFocusedBottom")
         anim = ValueAnimator.ofInt(focusedBottom, newFocusedBottom).apply {
             duration = abs(newFocusedBottom - focusedBottom).toFloat()
                 .let { DURATION * (it / keyboardMax) }.toLong()
@@ -131,12 +132,17 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             }
             MotionEvent.ACTION_MOVE -> {
                 tracker.addMovement(event)
+                val dx = event.x - prevX
+                val dy = event.y - prevY
                 when {
                     ignoring -> Unit
                     tracking -> move(event)
-                    event.x == prevX && event.y == prevY -> Unit
-                    abs(event.x - prevX) >= abs(event.y - prevY) -> ignoring = true
+                    dx == 0f && dy == 0f -> Unit
+                    abs(dx) > abs(dy) -> ignoring = true
+                    dy < 0 && keyboardNow == keyboardMax -> ignoring = true // todo translate like a scroll
+                    dy > 0 && keyboardNow == keyboardMin -> ignoring = true
                     start() -> {
+                        tracking = true
                         event.action = MotionEvent.ACTION_CANCEL
                         super.dispatchTouchEvent(event)
                         move(event)
@@ -163,23 +169,37 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     }
 
     private fun start(): Boolean {
-        val recyclerView = recyclerView
         val editText = editText ?: return false
         when {
             editText.isFocused -> Unit
             recyclerView.findFocus() != null -> Unit
+            !editText.isFullyVisible() -> return false
             else -> editText.requestFocus()
         }
         if (!callback.visible) manager.showSoftInput(editText, 0)
         controlAnimation()
         delegate.resetAnimation()
-        tracking = true
         return true
     }
 
     private fun move(event: MotionEvent) {
         val dy = event.y - prevY
         delegate.move(dy.roundToInt())
+    }
+
+    private fun EditText?.isFullyVisible(): Boolean {
+        this ?: return false
+        val bottom = calcBottom() ?: return false
+        return bottom >= recyclerView.paddingBottom
+    }
+
+    private fun View.calcBottom(): Int? {
+        var itemView = this
+        while (itemView.parent !is RecyclerView) {
+            itemView = itemView.parent as? View
+                ?: return null
+        }
+        return recyclerView.height - itemView.run { bottom + marginBottom }
     }
 
     private fun updateTranslation() {
@@ -214,6 +234,15 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 .let { it ?: recyclerView.findFocus() }
                 ?.let { updateAnyFocused(it) }
                 ?: post { updateAnyFocused() }
+        }
+    }
+
+    private inner class ScrollListener : RecyclerView.OnScrollListener() {
+
+        override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+            if (newState != RecyclerView.SCROLL_STATE_SETTLING) {
+                updateAnyFocused()
+            }
         }
     }
 
