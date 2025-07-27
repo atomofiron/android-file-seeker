@@ -17,7 +17,9 @@ import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.common.util.DrawerStateListenerImpl
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.view.DrawerView
 import app.atomofiron.searchboxapp.custom.view.layout.RootDrawerLayout
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -37,6 +39,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     defStyleAttr: Int = 0,
 ) : RootDrawerLayout(context, attrs, defStyleAttr) {
 
+    private val drawerListener = DrawerStateListenerImpl()
     private val focusListener = FocusChangeListener()
     private val childListener = ChildStateListener()
     private val valueListener = ValueListener()
@@ -72,6 +75,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 .build()
         }
         ViewCompat.setWindowInsetsAnimationCallback(this, callback)
+        addDrawerListener(drawerListener)
     }
 
     fun setWindow(window: Window) {
@@ -121,7 +125,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 tracker.addMovement(event)
-                ignoring = false
+                ignoring = drawerListener.isOpened
                 tracking = false
                 delegate.resetAnimation()
             }
