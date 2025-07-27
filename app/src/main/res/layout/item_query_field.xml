@@ -7,6 +7,7 @@
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/common_margin_half"
     android:layout_marginHorizontal="@dimen/common_margin_half"
+    android:layout_marginBottom="@dimen/common_margin"
     app:cardCornerRadius="@dimen/common_half_size"
     app:cardElevation="4dp"
     >
