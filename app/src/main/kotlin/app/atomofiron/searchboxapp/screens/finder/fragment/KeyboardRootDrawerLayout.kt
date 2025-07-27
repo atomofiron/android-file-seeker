@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.DrawerStateListenerImpl
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.layout.RootDrawerLayout
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.builder
@@ -104,7 +103,6 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         val newFocusedBottom = min(keyboardMax, itemBottom)
         anim?.cancel()
         if (keyboardNow <= min(focusedBottom, newFocusedBottom)) {
-            poop("updateAnyFocused $focusedBottom = $newFocusedBottom")
             // animation is unnecessary when new and old focused views are above the keyboard
             focusedBottom = newFocusedBottom
             return
@@ -112,7 +110,6 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         if (newFocusedBottom == focusedBottom) {
             return
         }
-        poop("updateAnyFocused $focusedBottom -> $newFocusedBottom")
         anim = ValueAnimator.ofInt(focusedBottom, newFocusedBottom).apply {
             duration = abs(newFocusedBottom - focusedBottom).toFloat()
                 .let { DURATION * (it / keyboardMax) }.toLong()
