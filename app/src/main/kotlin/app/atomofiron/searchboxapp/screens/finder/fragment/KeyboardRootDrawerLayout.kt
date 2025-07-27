@@ -123,6 +123,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 tracker.addMovement(event)
                 ignoring = false
                 tracking = false
+                delegate.resetAnimation()
             }
             MotionEvent.ACTION_MOVE -> {
                 tracker.addMovement(event)
