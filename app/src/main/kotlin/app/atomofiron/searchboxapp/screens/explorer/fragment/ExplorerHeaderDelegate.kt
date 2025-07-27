@@ -7,7 +7,6 @@ import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
-import java.util.LinkedList
 import kotlin.math.max
 import kotlin.math.min
 
@@ -73,7 +72,7 @@ class ExplorerHeaderDelegate(
         val headerHeight = headerView.height
         val deepestDir = deepestDir ?: return 0
         if (deepestDir.isEmpty) return 0
-        val topChildren = LinkedList<View>()
+        val topChildren = mutableListOf<View>()
         for (i in 0 until recyclerView.childCount) {
             val child = recyclerView.getChildAt(i)
             if (child.id != R.id.item_explorer) continue

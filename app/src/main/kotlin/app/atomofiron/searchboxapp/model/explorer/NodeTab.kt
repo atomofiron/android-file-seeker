@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.flow.DataFlow
-import java.util.*
 
 class NodeTab(
     val key: NodeTabKey,
@@ -10,7 +9,7 @@ class NodeTab(
     val roots = mutableListOf<NodeRoot>()
     var selectedRootId = 0
     val tree = mutableListOf<Node>()
-    val checked: MutableList<Int> = LinkedList()
+    val checked = mutableListOf<Int>()
     val flow = DataFlow<NodeTabItems>()
 
     fun NodeRoot.isSelected(): Boolean = stableId == selectedRootId

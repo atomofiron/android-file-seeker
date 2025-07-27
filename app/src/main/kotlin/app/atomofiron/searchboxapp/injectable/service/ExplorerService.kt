@@ -847,8 +847,6 @@ class ExplorerService(
         val new = state.block()
         when {
             state == null && new != null -> add(new)
-            // todo IndexOutOfBoundsException: Index: 1, Size: 1
-            // todo NullPointerException: Attempt to read from field 'java.lang.Object java.util.LinkedList$Node.item' on a null object reference in method 'java.lang.Object java.util.LinkedList.unlink(java.util.LinkedList$Node)'
             state != null && new == null -> removeAt(index)
             state != null && new != null -> set(index, new)
         }

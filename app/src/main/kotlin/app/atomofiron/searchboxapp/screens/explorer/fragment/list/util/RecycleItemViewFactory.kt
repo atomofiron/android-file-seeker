@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.asynclayoutinflater.view.AsyncLayoutInflater
-import java.util.LinkedList
 
 class RecycleItemViewFactory(
     context: Context,
@@ -13,7 +12,7 @@ class RecycleItemViewFactory(
 ) : AsyncLayoutInflater.OnInflateFinishedListener {
     private val asyncInflater = AsyncLayoutInflater(context)
     private val inflater = LayoutInflater.from(context)
-    private val views = LinkedList<View>()
+    private val views = mutableListOf<View>()
 
     private var inProgress = 0
     private var limit = 8

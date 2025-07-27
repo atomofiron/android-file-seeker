@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.extension.ceilToInt
 import app.atomofiron.common.util.extension.clear
 import app.atomofiron.fileseeker.R
-import java.util.LinkedList
 
 private const val COLUMNS = 144u
 private const val COLUMNS_INT = 144
@@ -43,7 +42,7 @@ class FinderSpanSizeLookup(
     lateinit var recycler: RecyclerView
     private val portraitWidth = resources.getDimension(R.dimen.screen_compact)
     private val itemCount get() = adapter.itemCount
-    private val holders = LinkedList<Holder>()
+    private val holders = mutableListOf<Holder>()
     private val cache = hashMapOf<Long,Cell>()
     private val cells = mutableListOf<Cell>()
 

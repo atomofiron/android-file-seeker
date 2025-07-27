@@ -2,12 +2,10 @@ package app.atomofiron.searchboxapp.model.explorer
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.*
-import kotlin.collections.HashMap
 
 class NodeGarden {
 
-    val states = LinkedList<NodeState>()
+    val states = mutableListOf<NodeState>()
     val mutex = Mutex()
     val trees = HashMap<NodeTabKey, NodeTab>()
 
