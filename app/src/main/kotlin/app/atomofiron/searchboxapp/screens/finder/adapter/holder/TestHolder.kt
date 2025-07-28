@@ -25,7 +25,7 @@ class TestHolder(
     override val hungry = true
 
     private val binding = ItemTextFieldBinding.bind(itemView)
-    override val item get() = super.item as TestField
+    override val itemOrNull get() = super.itemOrNull as TestField?
     private val default = parent.resources.getString(R.string.try_find_this_text)
     private val span get() = RoundedBackgroundSpan(
         backgroundColor = context.findColorByAttr(MaterialAttr.colorSurfaceVariant),
