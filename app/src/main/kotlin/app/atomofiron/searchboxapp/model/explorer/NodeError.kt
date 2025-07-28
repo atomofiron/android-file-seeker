@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.model.explorer
 
-import app.atomofiron.common.util.debugRequire
+import app.atomofiron.common.util.extension.debugRequire
 
 sealed class NodeError {
     data object NoSuchFile : NodeError()
