@@ -25,7 +25,7 @@ class QueryFieldHolder(
 
     private val params: Query get() = item as Query
 
-    private val etFind = itemView.findViewById<RegexInputField>(R.id.item_find_rt_find)
+    val etFind = itemView.findViewById<RegexInputField>(R.id.item_find_rt_find)
     private val btnFind = itemView.findViewById<View>(R.id.item_find_ib_find)
     private val viewReplace = itemView.findViewById<View>(R.id.item_find_i_replace)
 

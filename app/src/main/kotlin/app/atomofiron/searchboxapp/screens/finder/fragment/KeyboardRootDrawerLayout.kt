@@ -18,7 +18,6 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.DrawerStateListenerImpl
-import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.layout.RootDrawerLayout
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -59,7 +58,6 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private var isControlling = false // onReady is too slow
 
     private lateinit var recyclerView: RecyclerView
-    private var itemView: View? = null
     private var editText: EditText? = null
 
     private var anim: ValueAnimator? = null
@@ -96,8 +94,8 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams?) {
         super.addView(child, index, params)
-        if (!::recyclerView.isInitialized) {
-            recyclerView = child.findViewById(R.id.recycler_view)
+        if (child is RecyclerView) {
+            recyclerView = child
             recyclerView.addOnChildAttachStateChangeListener(childListener)
             recyclerView.addOnScrollListener(scrollListener)
         }
@@ -258,8 +256,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             val recyclerView = view.parent as RecyclerView
             val holder = recyclerView.getChildViewHolder(view) as? QueryFieldHolder
             holder ?: return
-            itemView = holder.itemView
-            editText = holder.itemView.findViewById(R.id.item_find_rt_find)
+            editText = holder.etFind
             editText?.onFocusChangeListener = focusListener
         }
 
