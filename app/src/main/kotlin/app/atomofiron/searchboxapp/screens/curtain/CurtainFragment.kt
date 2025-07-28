@@ -14,12 +14,12 @@ import androidx.fragment.app.DialogFragment
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.arch.TranslucentFragment
+import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.fileseeker.BuildConfig
-import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentCurtainBinding
 import app.atomofiron.searchboxapp.screens.curtain.fragment.CurtainContentDelegate
@@ -33,6 +33,7 @@ import app.atomofiron.searchboxapp.utils.getColorByAttr
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
+import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.builder
 import lib.atomofiron.insets.insetsPadding
 import java.lang.ref.WeakReference
@@ -113,21 +114,16 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     override fun FragmentCurtainBinding.onApplyInsets() {
         root.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
         val verticalPadding = resources.getDimensionPixelSize(R.dimen.curtain_padding)
-        val half = resources.getDimensionPixelSize(R.dimen.content_margin_half)
-        val joystickPadding = resources.getDimensionPixelSize(R.dimen.joystick_padding)
         root.setInsetsModifier { _, windowInsets ->
             val ime = windowInsets[ExtType.ime]
             curtainSheet.updatePaddingRelative(bottom = ime.bottom)
-            val navigationBars = max(0, windowInsets[ExtType.navigationBars].bottom - ime.bottom)
-            val joystick = max(0, windowInsets[ExtType.joystickBottom].bottom - joystickPadding - ime.bottom)
-            val bottomPadding = when {
-                joystick > 0 -> joystick + half
-                else -> navigationBars + max(0, verticalPadding - ime.bottom)
-            }
-            windowInsets.builder().run {
-                set(ExtType.curtain, Insets.of(0, verticalPadding, 0, bottomPadding))
-                build()
-            }
+            val bars = windowInsets[ExtType.barsWithCutout].bottom
+            val joystick = windowInsets[ExtType.joystickBottom].bottom
+            var bottomPadding = max(joystick, bars + verticalPadding)
+            bottomPadding = max(0, bottomPadding - ime.bottom)
+            ExtendedWindowInsets.Builder()
+                .set(ExtType.curtain, Insets.of(0, verticalPadding, 0, bottomPadding))
+                .build()
         }
     }
 

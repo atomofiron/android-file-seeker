@@ -9,12 +9,14 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:gravity="center_horizontal"
+        android:paddingBottom="@dimen/common_margin_half"
         >
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:src="@mipmap/ic_launcher"
-            android:layout_margin="@dimen/content_margin"
+            android:layout_marginHorizontal="@dimen/content_margin"
+            android:layout_marginBottom="@dimen/content_margin"
             />
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"
@@ -29,7 +31,7 @@
             android:layout_height="wrap_content"
             android:text="@string/version_name"
             android:textColor="?colorSecondary"
-            android:layout_marginBottom="@dimen/common_margin"
+            android:layout_marginBottom="@dimen/common_margin_half"
             android:drawableStart="@drawable/ic_info"
             android:gravity="center_vertical"
             android:drawablePadding="4dp"

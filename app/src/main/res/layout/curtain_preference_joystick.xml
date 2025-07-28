@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingBottom="@dimen/common_margin"
         >
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/preference_joystick_tv_title"

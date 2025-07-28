@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:paddingBottom="@dimen/common_margin"
     >
-
     <include
         android:id="@+id/preference_explorer_dir"
         layout="@layout/item_explorer"
