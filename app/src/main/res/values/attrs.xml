@@ -6,7 +6,6 @@
     <attr name="colorContent" format="color" />
     <attr name="colorFieldBackground" format="color" />
     <attr name="colorFieldDivider" format="color" />
-    <attr name="colorBone" format="color" />
     <attr name="colorOverlay" format="color" />
     <attr name="topRadioGroupBackground" format="color" />
 

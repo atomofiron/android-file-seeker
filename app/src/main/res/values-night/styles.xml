@@ -24,6 +24,7 @@
         <item name="colorSurfaceVariant">@color/md_theme_dark_surfaceVariant</item>
         <item name="colorOnSurfaceVariant">@color/md_theme_dark_onSurfaceVariant</item>
         <item name="colorOutline">@color/md_theme_dark_outline</item>
+        <item name="colorOutlineVariant">@color/md_theme_dark_outlineVariant</item>
         <item name="colorOnSurfaceInverse">@color/md_theme_dark_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_inversePrimary</item>
@@ -33,7 +34,7 @@
 
     <style name="CardViewStyle.Amoled" parent="@style/Widget.Material3.CardView.Outlined">
         <item name="cardBackgroundColor">?colorBackground</item>
-        <item name="strokeColor">?colorSurfaceVariant</item>
+        <item name="strokeColor">@color/stroke</item>
     </style>
 
     <style name="AppBarLayoutStyle.Amoled" parent="@style/Widget.Material3.AppBarLayout">
@@ -45,7 +46,12 @@
     </style>
 
     <style name="OutlinedButtonStyle" parent="@style/Widget.Material3.Button.OutlinedButton">
-        <item name="strokeColor">?colorSurfaceVariant</item>
+        <item name="strokeColor">@color/stroke</item>
+    </style>
+
+    <style name="ChipStyle" parent="@style/Widget.Material3.Chip.Assist">
+        <item name="chipStrokeColor">@color/stroke</item>
+        <item name="chipIconTint">@color/m3_chip_text_color</item>
     </style>
 
     <style name="TextInputLayoutOutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
@@ -53,7 +59,6 @@
         <item name="shapeAppearance">@style/ShapeAppearance.Corners</item>
     </style>
 
-    <style name="TextInputLayoutOutlinedBox.Dense" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense">
-    </style>
+    <style name="TextInputLayoutOutlinedBox.Dense" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense" />
 
 </resources>

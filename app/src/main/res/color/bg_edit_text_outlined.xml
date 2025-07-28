@@ -17,6 +17,6 @@
         android:color="@color/m3_textfield_stroke_color"
         />
     <item
-        android:color="?colorSurfaceVariant"
+        android:color="@color/stroke"
         />
 </selector>

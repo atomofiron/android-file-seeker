@@ -15,7 +15,6 @@
 		<item name="colorBackground">?android:attr/colorBackground</item>
 		<item name="colorFieldBackground">@color/day_night_background</item>
 		<item name="colorFieldDivider">@color/day_night_field_divider</item>
-		<item name="colorBone">@color/day_night_bone</item>
 		<item name="colorOverlay">@color/overlay_black</item>
 		<item name="topRadioGroupBackground">@color/surface_variant_lite</item>
 		<item name="isBlackDeep">false</item>
@@ -62,6 +61,7 @@
 		<item name="colorSurfaceVariant">@color/md_theme_light_surfaceVariant</item>
 		<item name="colorOnSurfaceVariant">@color/md_theme_light_onSurfaceVariant</item>
 		<item name="colorOutline">@color/md_theme_light_outline</item>
+		<item name="colorOutlineVariant">@color/md_theme_light_outlineVariant</item>
 		<item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
 		<item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
 		<item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
@@ -107,19 +107,21 @@
 
 	<style name="CollapsingToolbarLayoutStyle.Amoled" parent="@style/Widget.Material3.CollapsingToolbar.Large" />
 
-	<style name="OutlinedButtonStyle" parent="@style/Widget.Material3.Button.OutlinedButton" />
+	<style name="OutlinedButtonStyle" parent="@style/Widget.Material3.Button.OutlinedButton">
+		<item name="strokeColor">@color/stroke</item>
+	</style>
 
 	<style name="ChipStyle" parent="@style/Widget.Material3.Chip.Assist">
-		<item name="chipStrokeColor">?colorSurfaceVariant</item>
+		<item name="chipStrokeColor">@color/stroke</item>
 		<item name="chipIconTint">@color/m3_chip_text_color</item>
 	</style>
 
 	<style name="TextInputLayoutOutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+		<item name="boxStrokeColor">@color/bg_edit_text_outlined</item>
 		<item name="shapeAppearance">@style/ShapeAppearance.Corners</item>
 	</style>
 
-	<style name="TextInputLayoutOutlinedBox.Dense" parent="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
-	</style>
+	<style name="TextInputLayoutOutlinedBox.Dense" parent="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense" />
 
 	<style name="ShapeAppearance.Corners" parent="ShapeAppearance.MaterialComponents.SmallComponent">
 		<item name="cornerFamily">rounded</item>
