@@ -6,6 +6,8 @@ import kotlinx.coroutines.withContext
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
+inline fun <T> T.ctx(action: T.() -> Unit) = action()
+
 suspend fun withMain(
     now: Boolean = false,
     action: suspend CoroutineScope.() -> Unit,

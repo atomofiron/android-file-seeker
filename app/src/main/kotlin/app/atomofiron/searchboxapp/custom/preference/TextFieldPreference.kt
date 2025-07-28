@@ -16,7 +16,7 @@ import androidx.preference.PreferenceViewHolder
 import app.atomofiron.searchboxapp.custom.view.TextField
 import app.atomofiron.searchboxapp.utils.Alpha
 
-class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(context, attrs) {
+class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(context, attrs), TextField.OnSubmitListener {
 
     private val editText = TextField(context)
     private var value = ""
@@ -54,14 +54,14 @@ class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(co
         editText.layoutParams = LayoutParams(MATCH_PARENT, WRAP_CONTENT).apply {
             addRule(RelativeLayout.BELOW, android.R.id.title)
         }
-        editText.addOnSubmitListener(::onSubmit)
+        editText.addOnSubmitListener(this)
         editText.setOnFocusChangeListener { _, hasFocus ->
             summary.alpha = if (hasFocus) Alpha.INVISIBLE else Alpha.VISIBLE
             editText.isGone = !hasFocus
         }
     }
 
-    private fun onSubmit(value: String) {
+    override fun onSubmit(value: String) {
         val filtered = filter?.invoke(value) ?: value
         if (callChangeListener(filtered)) {
             persistString(filtered)

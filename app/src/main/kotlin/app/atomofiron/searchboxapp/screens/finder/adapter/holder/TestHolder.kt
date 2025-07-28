@@ -109,6 +109,7 @@ class TestHolder(
     override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
 
     override fun afterTextChanged(s: Editable?) {
+        val item = itemOrNull ?: return
         val string = s?.toString()
         when (string) {
             null, item.value -> Unit

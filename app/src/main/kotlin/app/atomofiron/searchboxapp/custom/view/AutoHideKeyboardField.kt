@@ -18,6 +18,8 @@ open class AutoHideKeyboardField : TextInputEditText {
     protected var hideKeyboardOnFocusLost: Boolean = true
     protected var hideKeyboardOnDetached: Boolean = true
 
+    private var listeners = mutableListOf<OnFocusChangeListener>()
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet? = null) : super(context, attrs) {
         attrs?.obtain()
@@ -39,6 +41,13 @@ open class AutoHideKeyboardField : TextInputEditText {
     fun hideKeyboardOnFocusLost(value: Boolean = true) {
         hideKeyboardOnFocusLost = value
     }
+
+    fun addOnFocusChangeListener(listener: OnFocusChangeListener): Boolean {
+        return listeners.all { it !== listener }
+            .also { if (it) listeners.add(listener) }
+    }
+
+    fun removeOnFocusChangeListener(listener: OnFocusChangeListener): Boolean = listeners.remove(listener)
 
     override fun onKeyPreIme(keyCode: Int, event: KeyEvent): Boolean {
         val result = super.onKeyPreIme(keyCode, event)
@@ -63,6 +72,7 @@ open class AutoHideKeyboardField : TextInputEditText {
                 setSelection(length())
             }
         }
+        listeners.forEach { it.onFocusChange(this, focused) }
     }
 
     override fun onDetachedFromWindow() {

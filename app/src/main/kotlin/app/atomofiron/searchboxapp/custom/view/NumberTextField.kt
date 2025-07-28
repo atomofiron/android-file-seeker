@@ -30,6 +30,8 @@ class NumberTextField @JvmOverloads constructor(
         submitListener = listener
     }
 
+    override fun onCheck(value: String): Boolean { return true } //
+
     override fun onSubmit(value: String) {
         submitListener?.onSubmit(value.toInt())
     }
