@@ -18,6 +18,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.DrawerStateListenerImpl
+import app.atomofiron.common.util.debugRequire
 import app.atomofiron.searchboxapp.custom.view.layout.RootDrawerLayout
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -67,7 +68,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private var keyboardMax = resources.displayMetrics.heightPixels
     private var barrierBottom = 0
         set(value) {
-            if (value > keyboardMax) throw IllegalArgumentException(value.toString())
+            debugRequire(value <= keyboardMax)
             field = value
         }
     private var focusedView: View? = null
