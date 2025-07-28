@@ -180,10 +180,10 @@ class FinderSpanSizeLookup(
             row.size == 1 -> return calcFree(prevRowCell!!.rowId, prevRowPosition)
             else -> row.size.toUInt()
         }
-        val free = COLUMNS - row.sumOf { it.columns }
+        val free = COLUMNS - row.sumOf { it.columns }.coerceAtMost(COLUMNS)
         val supplement = free / hungry
         return when {
-            index.toUInt() < free % hungry -> supplement.inc()
+            index.toUInt() < (free % hungry) -> supplement.inc()
             else -> supplement
         }
     }
