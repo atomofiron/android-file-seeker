@@ -58,10 +58,6 @@ class FinderPresenter(
 
     fun onDrawerGravityChange(gravity: Int) = preferenceStore { setDrawerGravity(gravity) }
 
-    fun onExplorerOptionSelected() = router.showExplorer()
-
-    fun onSettingsOptionSelected() = router.showSettings()
-
     fun onHistoryItemClick(node: String) = viewState.replaceQuery(node)
 
     fun onAllowStorageClick() = storagePermissionDelegate.launchSettings()

@@ -6,7 +6,6 @@ import app.atomofiron.common.arch.Registerable
 import app.atomofiron.common.util.permission.PermissionDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.screens.explorer.ExplorerFragment
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 
 class FinderRouter(fragment: WeakProperty<out Fragment>) : BaseRouter(fragment), Registerable {
@@ -20,14 +19,6 @@ class FinderRouter(fragment: WeakProperty<out Fragment>) : BaseRouter(fragment),
             permissions.register(this)
         }
     }
-
-    fun showExplorer() {
-        fragment {
-            parentFragmentManager.switchScreen { it is ExplorerFragment }
-        }
-    }
-
-    fun showSettings() = navigate(R.id.preferenceFragment)
 
     fun showResult(taskId: Int) = navigate(R.id.resultFragment, ResultPresenterParams.arguments(taskId))
 }

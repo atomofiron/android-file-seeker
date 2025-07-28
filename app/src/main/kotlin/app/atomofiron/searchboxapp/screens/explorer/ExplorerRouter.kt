@@ -17,7 +17,13 @@ class ExplorerRouter(
 
     fun showFinder() {
         fragment {
-            parentFragmentManager.switchScreen { it is FinderFragment }
+            val finderFragment = parentFragmentManager.fragments
+                .find { it is FinderFragment }
+                ?: return
+            parentFragmentManager.beginTransaction()
+                .addToBackStack(null)
+                .show(finderFragment)
+                .commit()
         }
     }
 

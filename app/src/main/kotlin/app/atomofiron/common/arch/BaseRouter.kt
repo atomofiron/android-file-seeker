@@ -4,8 +4,6 @@ import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import androidx.navigation.NavController
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.NavHostFragment
@@ -63,13 +61,13 @@ abstract class BaseRouter(
 
     val context: Context? get() = fragment?.context ?: activity
 
-    fun <R> fragment(action: Fragment.() -> R): R? = fragment?.run(action)
+    inline fun <R> fragment(action: Fragment.() -> R): R? = fragment?.run(action)
 
-    fun <R> activity(action: FragmentActivity.() -> R): R? = activity?.run(action)
+    inline fun <R> activity(action: FragmentActivity.() -> R): R? = activity?.run(action)
 
-    fun <R> context(action: Context.() -> R): R? = context?.run(action)
+    inline fun <R> context(action: Context.() -> R): R? = context?.run(action)
 
-    fun <T> navigation(action: NavController.() -> T): T? {
+    inline fun <T> navigation(action: NavController.() -> T): T? {
         return activity?.run {
             val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
             navHostFragment.findNavController().run(action)
@@ -96,18 +94,6 @@ abstract class BaseRouter(
                 navigate(actionId, args, navOptions)
             }
         }
-    }
-
-    protected fun FragmentManager.switchScreen(predicate: (Fragment) -> Boolean) {
-        val lastVisible = fragments.findLastVisibleFragment()
-        val target = fragments.find(predicate)
-        target ?: return
-        if (lastVisible === target) return
-        beginTransaction()
-            .apply { lastVisible?.let { hide(it as Fragment) } }
-            .show(target)
-            .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-            .commit()
     }
 
     fun showCurtain(recipient: String, layoutId: Int) {

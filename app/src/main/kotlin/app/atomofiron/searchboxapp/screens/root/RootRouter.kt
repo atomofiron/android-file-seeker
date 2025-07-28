@@ -16,14 +16,19 @@ class RootRouter(property: WeakProperty<out Fragment>) : BaseRouter(property) {
     }
 
     fun onBack(soft: Boolean): Boolean {
-        val consumed = fragment {
-            val lastVisibleFragment = childFragmentManager.fragments.findLastVisibleFragment()
-            val consumed = lastVisibleFragment?.onBack(soft) ?: false
-            consumed || (lastVisibleFragment !is ExplorerFragment).also { explorer ->
-                if (explorer) childFragmentManager.switchScreen { it is ExplorerFragment }
+        fragment {
+            childFragmentManager?.run {
+                fragments.findLastVisibleFragment()
+                    ?.onBack(soft)
+                    ?.takeIf { it }
+                    ?.let { return true }
+                if (backStackEntryCount > 0) {
+                    popBackStack()
+                    return true
+                }
             }
         }
-        return consumed ?: false
+        return false
     }
 
     private fun addFragments() {
