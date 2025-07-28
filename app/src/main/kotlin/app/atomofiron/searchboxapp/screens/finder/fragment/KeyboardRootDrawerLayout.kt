@@ -138,6 +138,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 ignoring = drawerListener.isOpened
                 tracking = false
                 delegate.resetAnimation()
+                anim?.cancel()
             }
             MotionEvent.ACTION_MOVE -> {
                 tracker.addMovement(event)
@@ -191,7 +192,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             else -> editText.requestFocus()
         }
         if (!callback.visible) manager.showSoftInput(editText, 0)
-        controlAnimation()
+        ensureControlKeyboard()
         delegate.resetAnimation()
         return true
     }
@@ -201,17 +202,14 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         if (offset == 0) {
             return
         }
-        offset -= if (keyboardNow == keyboardMax && focusedView != null) {
-            val min = recyclerView.run { height - getChildAt(0).let { it.bottom + it.marginBottom } }
-            val max = focusedView?.calcBottom() ?: keyboardMax
-            var newBarrier = max(barrierBottom + offset, min)
-            newBarrier = min(newBarrier, max)
-            updateTranslation(barrierBottom = newBarrier)
-        } else {
-            0
+        if (keyboardNow == keyboardMax && focusedView != null) {
+            var newBarrier = barrierBottom + offset
+            focusedView?.calcBottom()
+                ?.let { newBarrier = min(newBarrier, it) }
+            offset -= updateOffset(barrierBottom = newBarrier)
         }
         if (offset != 0) {
-            controlAnimation()
+            ensureControlKeyboard()
             delegate.move(offset)
         }
     }
@@ -231,19 +229,24 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         return recyclerView.height - itemView.run { bottom + marginBottom }
     }
 
-    private fun updateTranslation(
+    private fun updateOffset(
         keyboardNow: Int = this.keyboardNow,
         barrierBottom: Int = this.barrierBottom,
     ): Int {
         this.keyboardNow = keyboardNow
         this.barrierBottom = barrierBottom.coerceIn(0, keyboardMax)
-        val new = -max(0, keyboardNow - this.barrierBottom)
-        val moved = new - recyclerView.translationY.toInt()
-        recyclerView.translationY = new.toFloat()
-        return moved
+        val scrollNeeded = max(0, keyboardNow - this.barrierBottom)
+        val scrollLeft = max(0, recyclerView.paddingBottom - this.barrierBottom)
+        val scrolled = min(scrollNeeded, scrollLeft)
+        recyclerView.scrollBy(0, scrolled)
+        this.barrierBottom += scrolled
+        val moveNeeded = -max(0, keyboardNow - this.barrierBottom)
+        val moved = moveNeeded - recyclerView.translationY.toInt()
+        recyclerView.translationY = moveNeeded.toFloat()
+        return scrolled + moved
     }
 
-    private fun controlAnimation() {
+    private fun ensureControlKeyboard() {
         if (!isControlling) {
             isControlling = true
             controller.controlWindowInsetsAnimation(Type.ime(), -1, null, null, delegate)
@@ -287,7 +290,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private inner class ValueListener : ValueAnimator.AnimatorUpdateListener {
 
         override fun onAnimationUpdate(animation: ValueAnimator) {
-            updateTranslation(barrierBottom = animation.animatedValue as Int)
+            updateOffset(barrierBottom = animation.animatedValue as Int)
         }
     }
 
@@ -299,7 +302,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         }
 
         override fun onImeMove(current: Int) {
-            updateTranslation(keyboardNow = current)
+            updateOffset(keyboardNow = current)
         }
 
         override fun onImeEnd(visible: Boolean) {
