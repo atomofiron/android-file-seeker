@@ -54,7 +54,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private val manager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     private lateinit var controller: WindowInsetsControllerCompat
-    private val delegate = InsetsAnimator { recyclerView.findFocus() != null }
+    private val delegate = InsetsAnimator { focusedView != null }
     private val callback = KeyboardInsetCallback(keyboardListener, delegate.keyboardListener)
     private var isControlling = false // onReady is too slow
 
@@ -72,7 +72,13 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             field = value
         }
     private var focusedView: View? = null
-        get() = field?.takeIf { it.isAttachedToWindow && it.isFocused }
+        get() {
+            field = field
+                ?.takeIf { it.isAttachedToWindow && it.isFocused }
+                ?: recyclerView.findFocus()
+            return field
+        }
+        set(value) = debugRequire(field == null || value === field)
 
     init {
         setInsetsModifier { _, insets ->
@@ -103,7 +109,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     }
 
     private fun updateAnyFocused() {
-        recyclerView.findFocus()?.let { updateAnyFocused(it) }
+        focusedView?.let { updateAnyFocused(it) }
     }
 
     private fun updateAnyFocused(focusedView: View) {
@@ -188,7 +194,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         val editText = editText ?: return false
         when {
             editText.isFocused -> Unit
-            recyclerView.findFocus() != null -> Unit
+            focusedView != null -> Unit
             !editText.isFullyAboveBottom() -> return false
             else -> editText.requestFocus()
         }
@@ -239,7 +245,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         val scrollNeeded = max(0, keyboardNow - this.barrierBottom)
         val scrollLeft = max(0, recyclerView.paddingBottom - this.barrierBottom)
         val scrolled = min(scrollNeeded, scrollLeft)
-        recyclerView.scrollBy(0, scrolled)
+        if (scrolled != 0) recyclerView.scrollBy(0, scrolled)
         this.barrierBottom += scrolled
         val moveNeeded = -max(0, keyboardNow - this.barrierBottom)
         val moved = moveNeeded - recyclerView.translationY.toInt()
@@ -307,9 +313,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         }
 
         override fun onImeEnd(visible: Boolean) {
-            if (!visible) {
-                recyclerView.findFocus()?.clearFocus()
-            }
+            if (!visible) focusedView?.clearFocus()
             isControlling = false
         }
     }
