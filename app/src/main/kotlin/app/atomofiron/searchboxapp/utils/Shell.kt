@@ -32,10 +32,10 @@ object Shell {
     const val CD_FILE_CHILDREN = "cd '%s' && {toybox} file $DOT_SLASH* && {toybox} file $DOT_SLASH.*"
 
     // grep: No 'E' with 'F'
-    const val FIND_GREP_HCS = "{toybox} find '%s' -type f -maxdepth %d | xargs -r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: '{print \$1}' | xargs -r {toybox} grep -Hcs -e '%s'"
-    const val FIND_GREP_HCS_I = "{toybox} find '%s' -type f -maxdepth %d | xargs -r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: '{print \$1}' | xargs -r {toybox} grep -Hcs -ie '%s'"
-    const val FIND_GREP_HCS_E = "{toybox} find '%s' -type f -maxdepth %d | xargs -r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: '{print \$1}' | xargs -r {toybox} grep -Hcs -E '%s'"
-    const val FIND_GREP_HCS_IE = "{toybox} find '%s' -type f -maxdepth %d | xargs -r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: '{print \$1}' | xargs -r {toybox} grep -Hcs -iE '%s'"
+    const val FIND_GREP_HCS = "{toybox} find '%s' -type f -maxdepth %d -print0 | xargs -0r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: -v ORS='\\0' '{print \$1}' | xargs -0r {toybox} grep -Hcs -e '%s'"
+    const val FIND_GREP_HCS_I = "{toybox} find '%s' -type f -maxdepth %d -print0 | xargs -0r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: -v ORS='\\0' '{print \$1}' | xargs -0r {toybox} grep -Hcs -ie '%s'"
+    const val FIND_GREP_HCS_E = "{toybox} find '%s' -type f -maxdepth %d -print0 | xargs -0r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: -v ORS='\\0' '{print \$1}' | xargs -0r {toybox} grep -Hcs -E '%s'"
+    const val FIND_GREP_HCS_IE = "{toybox} find '%s' -type f -maxdepth %d -print0 | xargs -0r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: -v ORS='\\0' '{print \$1}' | xargs -0r {toybox} grep -Hcs -iE '%s'"
     // /storage/emulated/0/fadb/sba.txt:15
 
     // -H is necessary
