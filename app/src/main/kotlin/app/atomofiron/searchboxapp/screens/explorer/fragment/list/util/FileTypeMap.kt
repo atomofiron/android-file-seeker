@@ -43,6 +43,7 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.ElfSo -> R.drawable.ic_tux
     is NodeContent.ExeMs -> R.drawable.ic_microsoft
     is NodeContent.Cert -> R.drawable.ic_certificate
+    is NodeContent.Java -> R.drawable.ic_explorer_binary
     is NodeContent.Xz,
     is NodeContent.Other,
     is NodeContent.Flash,

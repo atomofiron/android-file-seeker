@@ -50,6 +50,7 @@ object ExplorerUtils {
     private const val FILE_GIF = "GIF image data"
     private const val FILE_ZIP = "Zip archive data"
     private const val FILE_GZIP = "gzip compressed data"
+    private const val FILE_JAVA = "Java class file"
     private const val FILE_XZ = "xz compressed data"
     private const val FILE_BZIP2 = "bzip2 compressed data"
     private const val FILE_TAR = "POSIX tar archive" // (GNU)
@@ -80,7 +81,9 @@ object ExplorerUtils {
     private const val EXT_SVG = ".svg"
     private const val EXT_APK = ".apk"
     private const val EXT_ZIP = ".zip"
+    private const val EXT_XAPK = ".xapk"
     private const val EXT_APKS = ".apks"
+    private const val EXT_APKM = ".apkm"
     private const val EXT_TAR = ".tar"
     private const val EXT_BZ2 = ".bz2"
     private const val EXT_DMG = ".dmg"
@@ -90,6 +93,7 @@ object ExplorerUtils {
     private const val EXT_INI = ".ini"
     private const val EXT_CPP = ".cpp"
     private const val EXT_INO = ".ino"
+    private const val EXT_JAVA = ".java"
     private const val EXT_KT = ".kt"
     private const val EXT_KTS = ".kts"
     private const val EXT_SWIFT = ".swift"
@@ -370,10 +374,11 @@ object ExplorerUtils {
             type.startsWith(FILE_PNG) -> content.ifNotCached { NodeContent.Picture.run { if (path.endsWith(EXT_APNG)) apng(path, type) else png(path, type) } }
             type.startsWith(FILE_JPEG) -> content.ifNotCached { NodeContent.Picture.jpeg(path, type) }
             type.startsWith(FILE_GIF) -> content.ifNotCached { NodeContent.Picture.gif(path, type) }
-            type.startsWith(FILE_ZIP) -> when {
+            type.startsWith(FILE_ZIP) -> when (true) {
                 path.endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { AndroidApp.apk(path) }
-                path.endsWith(EXT_APKS, ignoreCase = true) -> content.ifNotCached { AndroidApp.apks(path) }
-                content is AndroidApp -> return this
+                path.endsWith(EXT_APKS, ignoreCase = true),
+                path.endsWith(EXT_APKM, ignoreCase = true) -> content.ifNotCached { AndroidApp.apks(path) }
+                (content is AndroidApp) -> return this
                 path.endsWith(EXT_OSZ, ignoreCase = true) -> content.ifNotCached { NodeContent.Osu.Map() }
                 path.endsWith(EXT_OSK, ignoreCase = true) -> content.ifNotCached { NodeContent.Osu.Skin() }
                 path.endsWith(EXT_OLZ, ignoreCase = true) -> content.ifNotCached { NodeContent.Osu.LazerMap() }
@@ -411,6 +416,7 @@ object ExplorerUtils {
             type.startsWith(FILE_MS_EXE) -> content.ifNotCached { NodeContent.ExeMs }
             type.startsWith(FILE_APLS_EXE) -> content.ifNotCached { NodeContent.ExeApls }
             type.startsWith(FILE_APL_EXE) -> content.ifNotCached { NodeContent.ExeApl }
+            type.startsWith(FILE_JAVA) -> content.ifNotCached { NodeContent.Java }
             type.matches(FILE_SH_SCRIPT) -> NodeContent.Text.ShellScript
             else -> {
                 val ext = name.lastIndexOf(Const.DOT).inc()
@@ -682,8 +688,10 @@ object ExplorerUtils {
         path.endsWith(EXT_WEBP, ignoreCase = true) -> ifNotCached { NodeContent.Picture.webp(path) }
         path.endsWith(EXT_AVIF, ignoreCase = true) -> ifNotCached { NodeContent.Picture.avif(path) }
         path.endsWith(EXT_APK, ignoreCase = true) -> ifNotCached { AndroidApp.apk(path) }
-        path.endsWith(EXT_APKS, ignoreCase = true) -> ifNotCached { AndroidApp.apks(path) }
-        path.endsWith(EXT_ZIP, ignoreCase = true) -> ifNotCached { NodeContent.Zip() }
+        path.endsWith(EXT_APKS, ignoreCase = true),
+        path.endsWith(EXT_APKM, ignoreCase = true) -> ifNotCached { AndroidApp.apks(path) }
+        path.endsWith(EXT_ZIP, ignoreCase = true),
+        path.endsWith(EXT_XAPK, ignoreCase = true) -> ifNotCached { NodeContent.Zip() }
         path.endsWith(EXT_TAR, ignoreCase = true) -> ifNotCached { NodeContent.Tar() }
         path.endsWith(EXT_BZ2, ignoreCase = true) -> ifNotCached { NodeContent.Bzip2() }
         path.endsWith(EXT_GZ, ignoreCase = true) -> ifNotCached { NodeContent.Gz() }
@@ -691,6 +699,7 @@ object ExplorerUtils {
         path.endsWith(EXT_SH, ignoreCase = true) -> NodeContent.Text.ShellScript
         path.endsWith(EXT_TXT, ignoreCase = true),
         path.endsWith(EXT_INI, ignoreCase = true),
+        path.endsWith(EXT_JAVA, ignoreCase = true),
         path.endsWith(EXT_KT, ignoreCase = true),
         path.endsWith(EXT_KTS, ignoreCase = true),
         path.endsWith(EXT_SWIFT, ignoreCase = true),

@@ -139,6 +139,7 @@ sealed class NodeContent(
     data object ExeMs : File()
     data object ExeApl : File()
     data object ExeApls : File()
+    data object Java : File()
     data object Flash : File()
     data object Cert : File()
     data object Dmg : File()
