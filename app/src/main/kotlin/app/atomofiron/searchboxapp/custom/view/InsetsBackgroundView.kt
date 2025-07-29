@@ -50,7 +50,7 @@ class InsetsBackgroundView : View, InsetsListener {
 
     private val maxStatusBar: Float
     private val statusBarMinPadding: Float
-    private val commonMargin: Float
+    private val commonSemi: Float
     private var navigationBar = Insets.NONE
     private var cutout = Insets.NONE
 
@@ -66,7 +66,7 @@ class InsetsBackgroundView : View, InsetsListener {
         }
         maxStatusBar = resources.getDimension(R.dimen.status_bar_max)
         statusBarMinPadding = resources.getDimension(R.dimen.status_bar_min_padding)
-        commonMargin = resources.getDimension(R.dimen.common_margin)
+        commonSemi = resources.getDimension(R.dimen.padding_semi)
         attachInsetsListener(this)
     }
 
@@ -105,7 +105,7 @@ class InsetsBackgroundView : View, InsetsListener {
             val padding = (topInset - maxStatusBar) / 2
             if (padding > statusBarMinPadding) {
                 val cutout = max(cutout.left, cutout.right)
-                val margin = max(commonMargin - cutout, 0f)
+                val margin = max(commonSemi - cutout, 0f)
                 val rawLeft = max(navigationBar.left, cutout)
                 val rawRight = max(navigationBar.right, cutout)
                 val left = rawLeft + margin + padding

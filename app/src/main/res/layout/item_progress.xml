@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingVertical="@dimen/common_margin_three_quarter"
+    android:paddingVertical="@dimen/padding_semi"
     android:paddingHorizontal="@dimen/common_margin_extra"
     >
     <app.atomofiron.searchboxapp.custom.view.MuonsView

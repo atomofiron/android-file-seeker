@@ -8,7 +8,7 @@
 	<dimen name="common_margin_extra">32dp</dimen>
 	<dimen name="common_margin_large">24dp</dimen>
 	<dimen name="common_margin">16dp</dimen>
-	<dimen name="common_margin_three_quarter">12dp</dimen>
+	<dimen name="padding_semi">12dp</dimen>
 	<dimen name="common_margin_half">8dp</dimen>
 	<dimen name="common_margin_nano">4dp</dimen>
 	<dimen name="common_margin_pico">2dp</dimen>

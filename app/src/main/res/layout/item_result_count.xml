@@ -10,7 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
-        android:layout_marginEnd="@dimen/common_margin_three_quarter"
+        android:layout_marginEnd="@dimen/padding_semi"
         app:layout_constraintEnd_toEndOf="@+id/item_explorer_iv_icon"
         app:layout_constraintBottom_toBottomOf="parent"
         />
