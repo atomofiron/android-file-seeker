@@ -14,10 +14,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:tint="?attr/colorContent"
-        android:paddingStart="@dimen/padding_large"
-        android:paddingTop="@dimen/padding_large"
-        android:paddingEnd="@dimen/padding_large"
-        android:paddingBottom="@dimen/padding_large"
+        android:paddingStart="@dimen/padding_semi"
+        android:paddingTop="@dimen/padding_semi"
+        android:paddingEnd="@dimen/padding_semi"
+        android:paddingBottom="@dimen/padding_semi"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/place_mtv_title"
@@ -34,8 +34,8 @@
         android:src="@drawable/ic_cross"
         android:tint="?attr/colorContent"
         android:paddingStart="@dimen/padding_micro"
-        android:paddingTop="@dimen/padding_large"
-        android:paddingEnd="@dimen/padding_large"
-        android:paddingBottom="@dimen/padding_large"
+        android:paddingTop="@dimen/padding_semi"
+        android:paddingEnd="@dimen/padding_semi"
+        android:paddingBottom="@dimen/padding_semi"
         />
 </LinearLayout>

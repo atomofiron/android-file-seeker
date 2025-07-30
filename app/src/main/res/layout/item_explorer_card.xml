@@ -6,7 +6,7 @@
     android:id="@+id/item_explorer_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/common_margin"
+    android:layout_marginBottom="@dimen/padding_common"
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/card_content"
@@ -42,7 +42,7 @@
             android:id="@+id/card_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/common_margin_half"
+            android:layout_marginVertical="@dimen/padding_half"
             android:layout_marginHorizontal="5dp"
             android:textStyle="bold"
             android:textSize="@dimen/item_root_title"

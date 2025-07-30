@@ -56,7 +56,7 @@ class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, inflater: LayoutInflater): TextViewerHolder {
         val textView = TextView(parent.context)
-        val padding = textView.resources.getDimensionPixelSize(R.dimen.common_margin)
+        val padding = textView.resources.getDimensionPixelSize(R.dimen.padding_common)
         textView.updatePadding(left = padding, right = padding)
         textView.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
         return TextViewerHolder(textView)

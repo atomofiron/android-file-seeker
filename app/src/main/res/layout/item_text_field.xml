@@ -5,7 +5,7 @@
     android:id="@+id/box"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/common_margin_half"
+    android:layout_margin="@dimen/padding_half"
     android:clipToPadding="false"
     android:clipChildren="false"
     android:clickable="false"

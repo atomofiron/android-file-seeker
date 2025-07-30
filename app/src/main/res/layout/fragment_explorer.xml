@@ -18,7 +18,7 @@
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
             android:background="@drawable/top_radio_group_background"
-            android:paddingHorizontal="@dimen/common_margin"
+            android:paddingHorizontal="@dimen/padding_common"
             android:visibility="gone"
             app:singleSelection="true"
             tools:background="@null"

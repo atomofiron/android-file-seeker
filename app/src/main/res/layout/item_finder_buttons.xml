@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/common_margin_nano"
+    android:layout_margin="@dimen/padding_mini"
     android:orientation="horizontal"
     android:gravity="center_vertical"
     >
@@ -12,7 +12,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginEnd="@dimen/common_margin"
+        android:layout_marginEnd="@dimen/padding_common"
         android:text="@string/history"
         style="?materialButtonOutlinedStyle"
         />

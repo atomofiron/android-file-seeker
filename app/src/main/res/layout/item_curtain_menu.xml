@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="@dimen/common_margin"
+    android:padding="@dimen/padding_common"
     android:gravity="center_vertical"
     android:background="@drawable/item_menu"
     android:clickable="true"
@@ -14,7 +14,7 @@
         android:id="@+id/item_menu_iv_icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/common_margin"
+        android:layout_marginEnd="@dimen/padding_common"
         android:tint="?attr/colorContent"
         />
     <com.google.android.material.textview.MaterialTextView

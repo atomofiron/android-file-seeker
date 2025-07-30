@@ -5,7 +5,7 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginStart="@dimen/edge_size"
-    android:layout_marginBottom="@dimen/common_margin"
+    android:layout_marginBottom="@dimen/padding_common"
     android:textSize="@dimen/curtain_title_size"
     android:textColor="?attr/colorContent"
     android:textStyle="bold"

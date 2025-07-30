@@ -10,8 +10,8 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingStart="@dimen/common_margin"
-        android:paddingEnd="@dimen/common_margin"
+        android:paddingStart="@dimen/padding_common"
+        android:paddingEnd="@dimen/padding_common"
         >
         <com.google.android.material.textview.MaterialTextView
             android:layout_width="wrap_content"

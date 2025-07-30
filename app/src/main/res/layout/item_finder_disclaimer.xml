@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/common_margin_half"
+    android:padding="@dimen/padding_half"
     >
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="48dp"
@@ -15,7 +15,7 @@
         android:id="@+id/finder_tv_disclaimer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/common_margin_half"
+        android:layout_marginStart="@dimen/padding_half"
         android:textColor="?attr/colorContent"
         android:text="@string/fix_android_12"
         android:textSize="16sp"

@@ -13,8 +13,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         tools:text="/storage/0/emulated/Android/data/app.atomofiron.searchboxapp/files/"
-        android:paddingStart="@dimen/common_margin"
-        android:paddingEnd="@dimen/common_margin"
+        android:paddingStart="@dimen/padding_common"
+        android:paddingEnd="@dimen/padding_common"
         android:gravity="center_horizontal"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -37,14 +37,14 @@
             android:layout_height="wrap_content"
             android:text="@string/preferences"
             android:checked="true"
-            android:padding="@dimen/common_margin_half"
+            android:padding="@dimen/padding_half"
             />
         <com.google.android.material.radiobutton.MaterialRadioButton
             android:id="@+id/lei_rb_history"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/history"
-            android:padding="@dimen/common_margin_half"
+            android:padding="@dimen/padding_half"
             />
     </RadioGroup>
     <RadioGroup
@@ -61,7 +61,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/export_btn"
-            android:padding="@dimen/common_margin_half"
+            android:padding="@dimen/padding_half"
             android:checked="true"
             />
         <com.google.android.material.radiobutton.MaterialRadioButton
@@ -69,7 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/import_btn"
-            android:padding="@dimen/common_margin_half"
+            android:padding="@dimen/padding_half"
             />
     </RadioGroup>
     <com.google.android.material.button.MaterialButton
@@ -78,7 +78,7 @@
         android:layout_height="wrap_content"
         android:text="@string/export_btn"
         android:checked="true"
-        android:layout_margin="@dimen/common_margin_half"
+        android:layout_margin="@dimen/padding_half"
         app:cornerRadius="@dimen/infinity"
         app:backgroundTint="?attr/colorAccent"
         app:layout_constraintLeft_toLeftOf="parent"

@@ -23,16 +23,16 @@
         android:id="@+id/explorer_menu_tv_description"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/common_margin"
-        android:layout_marginTop="@dimen/common_margin_half"
-        android:layout_marginEnd="@dimen/common_margin"
+        android:layout_marginStart="@dimen/padding_common"
+        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginEnd="@dimen/padding_common"
         android:visibility="gone"
         />
     <app.atomofiron.searchboxapp.custom.view.MenuView
         android:id="@+id/menu_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/common_margin_half"
+        android:layout_marginTop="@dimen/padding_half"
         android:scrollbars="none"
         />
 </LinearLayout>

@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:tint="?attr/colorContent"
-        android:padding="@dimen/padding_large"
+        android:padding="@dimen/padding_semi"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/task_mtv_title"
@@ -26,8 +26,8 @@
         android:id="@+id/task_btn_confirm"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/padding_large"
-        android:layout_marginEnd="@dimen/padding_large"
+        android:layout_marginStart="@dimen/padding_semi"
+        android:layout_marginEnd="@dimen/padding_semi"
         android:textColor="?attr/colorSurface"
         android:text="@string/confirm"
         android:lines="1"
@@ -42,6 +42,6 @@
         android:background="?attr/selectableItemBackgroundBorderless"
         android:src="@drawable/ic_cross"
         android:tint="?attr/colorContent"
-        android:padding="@dimen/padding_large"
+        android:padding="@dimen/padding_semi"
         />
 </LinearLayout>

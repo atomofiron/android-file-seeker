@@ -16,7 +16,7 @@
         android:singleLine="true"
         android:imeOptions="actionDone"
         android:inputType="textNoSuggestions"
-        android:paddingStart="@dimen/common_margin"
+        android:paddingStart="@dimen/padding_common"
         android:paddingEnd="64dp"
         android:hint="@string/replace"
         android:background="@color/transparent"

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingBottom="@dimen/common_margin"
+    android:paddingBottom="@dimen/padding_common"
     >
     <include
         android:id="@+id/preference_explorer_dir"
@@ -29,7 +29,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingTop="@dimen/common_margin_half"
+        android:paddingTop="@dimen/padding_half"
         app:flexWrap="wrap"
         app:flexDirection="row"
         app:layout_constraintStart_toStartOf="parent"
@@ -41,63 +41,63 @@
             android:id="@+id/preference_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_semi"
             android:text="@string/date"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_semi"
             android:text="@string/time"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_access"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_semi"
             android:text="drwxrwx---"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_owner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_semi"
             android:text="@string/owner"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_semi"
             android:text="@string/group"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_semi"
             android:text="@string/item_explorer_details"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_semi"
             android:text="@string/size"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_semi"
             android:text="@string/empty_check_box"
             />
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/preference_bg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_large"
+            android:paddingEnd="@dimen/padding_semi"
             android:text="@string/item_explorer_background"
             />
     </com.google.android.flexbox.FlexboxLayout>

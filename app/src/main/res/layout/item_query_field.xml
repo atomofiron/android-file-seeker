@@ -5,10 +5,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/common_margin_half"
-    android:layout_marginHorizontal="@dimen/common_margin_half"
-    android:layout_marginBottom="@dimen/common_margin"
-    app:cardCornerRadius="@dimen/common_half_size"
+    android:layout_marginTop="@dimen/padding_half"
+    android:layout_marginHorizontal="@dimen/padding_half"
+    android:layout_marginBottom="@dimen/padding_common"
+    app:cardCornerRadius="@dimen/common_size_half"
     app:cardElevation="4dp"
     >
     <app.atomofiron.searchboxapp.custom.view.RegexInputField
@@ -19,7 +19,7 @@
         android:singleLine="true"
         android:imeOptions="actionNext"
         android:inputType="textNoSuggestions"
-        android:paddingStart="@dimen/common_margin"
+        android:paddingStart="@dimen/padding_common"
         android:paddingEnd="64dp"
         android:hint="@string/find"
         android:background="@drawable/bg_search_field"

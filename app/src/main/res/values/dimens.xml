@@ -1,45 +1,31 @@
 <resources>
+
+	<dimen name="padding_nano">1dp</dimen>
+	<dimen name="padding_micro">2dp</dimen>
+	<dimen name="padding_mini">4dp</dimen>
+	<dimen name="padding_half">8dp</dimen>
+	<dimen name="padding_semi">12dp</dimen>
+	<dimen name="padding_common">16dp</dimen>
+	<dimen name="padding_double">32dp</dimen>
+
 	<dimen name="infinity">999dp</dimen>
-	<dimen name="fab_margin">16dp</dimen>
 	<dimen name="status_bar_max">26dp</dimen>
 	<dimen name="status_bar_min_padding">4dp</dimen>
 	<dimen name="corner_radius">16dp</dimen>
-	<dimen name="text_field_corner">8dp</dimen>
-	<dimen name="common_margin_extra">32dp</dimen>
-	<dimen name="common_margin_large">24dp</dimen>
-	<dimen name="common_margin">16dp</dimen>
-	<dimen name="padding_semi">12dp</dimen>
-	<dimen name="common_margin_half">8dp</dimen>
-	<dimen name="common_margin_nano">4dp</dimen>
-	<dimen name="common_margin_pico">2dp</dimen>
-	<dimen name="edit_text_padding">8dp</dimen>
-	<dimen name="search_button_padding">16dp</dimen>
 	<dimen name="icon_size">24dp</dimen>
 	<dimen name="item_icon_padding">4dp</dimen>
-	<dimen name="nav_header_vertical_spacing">16dp</dimen>
-	<dimen name="nav_header_height">160dp</dimen>
 
 	<dimen name="common_size">48dp</dimen>
-	<dimen name="common_half_size">24dp</dimen>
+	<dimen name="common_size_half">24dp</dimen>
 
-	<dimen name="padding_micro">2dp</dimen>
-	<dimen name="padding_mini">4dp</dimen>
-	<dimen name="padding_middle">8dp</dimen>
-	<dimen name="padding_large">12dp</dimen>
-	<dimen name="padding_xlarge">16dp</dimen>
-	<dimen name="padding_xxlarge">32dp</dimen>
     <dimen name="card_corner_radius">12dp</dimen>
     <dimen name="card_max_width">512dp</dimen>
     <dimen name="joystick_size">88dp</dimen>
     <dimen name="joystick_padding">16dp</dimen>
 	<dimen name="joystick_elevation">@dimen/dock_elevation</dimen>
-    <dimen name="item_explorer_file_size">36dp</dimen>
     <dimen name="edge_size">48dp</dimen>
-    <dimen name="item_explorer_min_height">40dp</dimen>
     <dimen name="thumbnail_size">48dp</dimen>
     <dimen name="preview_size">192dp</dimen>
-    <dimen name="item_dir_shadow_size">6dp</dimen>
-	<dimen name="item_dir_separation_size">3.5dp</dimen>
 	<dimen name="title_size">20sp</dimen>
 	<dimen name="title_margin">40dp</dimen>
 	<dimen name="curtain_title_margin">52dp</dimen>

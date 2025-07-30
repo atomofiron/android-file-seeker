@@ -17,17 +17,17 @@
         android:layout_weight="0"
         android:src="@drawable/ic_history_pin"
         android:background="?selectableItemBackgroundBorderless"
-        android:paddingStart="@dimen/padding_large"
-        android:paddingTop="@dimen/padding_large"
-        android:paddingBottom="@dimen/padding_large"
+        android:paddingStart="@dimen/padding_semi"
+        android:paddingTop="@dimen/padding_semi"
+        android:paddingBottom="@dimen/padding_semi"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/item_history_tv_title"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:paddingStart="@dimen/padding_large"
-        android:paddingEnd="@dimen/padding_large"
+        android:paddingStart="@dimen/padding_semi"
+        android:paddingEnd="@dimen/padding_semi"
         />
     <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/item_history_btn_remove"
@@ -36,8 +36,8 @@
         android:layout_weight="0"
         android:src="@drawable/ic_history_del"
         android:background="?selectableItemBackgroundBorderless"
-        android:paddingTop="@dimen/padding_large"
-        android:paddingEnd="@dimen/padding_large"
-        android:paddingBottom="@dimen/padding_large"
+        android:paddingTop="@dimen/padding_semi"
+        android:paddingEnd="@dimen/padding_semi"
+        android:paddingBottom="@dimen/padding_semi"
         />
 </LinearLayout>

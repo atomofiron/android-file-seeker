@@ -8,14 +8,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingBottom="@dimen/common_margin"
+        android:paddingBottom="@dimen/padding_common"
         >
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/preference_joystick_tv_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/curtain_title_margin"
-            android:layout_marginBottom="@dimen/common_margin_half"
+            android:layout_marginBottom="@dimen/padding_half"
             android:textSize="@dimen/curtain_title_size"
             android:textColor="?attr/colorContent"
             android:textStyle="bold"
@@ -26,7 +26,7 @@
             android:id="@+id/sb_red"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/padding_large"
+            android:padding="@dimen/padding_semi"
             android:max="255"
             android:background="@color/item_explorer_background"
             />
@@ -34,14 +34,14 @@
             android:id="@+id/sb_green"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/padding_large"
+            android:padding="@dimen/padding_semi"
             android:max="255"
             />
         <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/sb_blue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="@dimen/padding_large"
+            android:padding="@dimen/padding_semi"
             android:max="255"
             android:background="@color/item_explorer_background"
             />
