@@ -100,6 +100,8 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 ?: recyclerView.findFocus()
             return field
         }
+    private val horizontalMax get() = recyclerView.width.toFloat()
+    private var rightToHide = true
     var exitCallback: (() -> Unit)? = null
 
     init {
@@ -116,7 +118,11 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         controller = WindowCompat.getInsetsController(window, window.decorView)
     }
 
-    fun animAppearing() = animHorizontally(recyclerView.width.dec().toFloat(), HorizontalStart)
+    fun animAppearing() {
+        var from = horizontalMax.dec()
+        if (!rightToHide) from *= -1
+        animHorizontally(from, HorizontalStart)
+    }
 
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
@@ -296,6 +302,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         alpha = (width - new.absoluteValue) / width + AlphaThreshold
         if (new.absoluteValue == width) {
             exitCallback?.invoke()
+            rightToHide = new > 0
             post { updateHorizontally(HorizontalStart) }
         }
     }
@@ -324,7 +331,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private fun animHorizontally(from: Float, to: Float) {
         animHorizontal = ValueAnimator.ofFloat(from, to).apply {
-            duration = (DURATION * abs(from - to) / width).toLong()
+            duration = (DURATION * abs(from - to) / horizontalMax).toLong()
             interpolator = sinusoid
             addUpdateListener(horizontalListener)
             start()
