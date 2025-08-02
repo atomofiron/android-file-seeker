@@ -61,4 +61,6 @@ class FinderPresenter(
     fun onHistoryItemClick(node: String) = viewState.replaceQuery(node)
 
     fun onAllowStorageClick() = storagePermissionDelegate.launchSettings()
+
+    fun onExitAnimationEnd() = router.hide()
 }

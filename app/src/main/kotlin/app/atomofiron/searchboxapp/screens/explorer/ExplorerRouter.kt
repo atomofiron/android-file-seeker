@@ -15,17 +15,7 @@ class ExplorerRouter(
 
     override val currentDestinationId = R.id.rootFragment
 
-    fun showFinder() {
-        fragment {
-            val finderFragment = parentFragmentManager.fragments
-                .find { it is FinderFragment }
-                ?: return
-            parentFragmentManager.beginTransaction()
-                .addToBackStack(null)
-                .show(finderFragment)
-                .commit()
-        }
-    }
+    fun showFinder() = switchInParent<FinderFragment>(visible = true)
 
     fun showSettings() = navigate(R.id.preferenceFragment)
 

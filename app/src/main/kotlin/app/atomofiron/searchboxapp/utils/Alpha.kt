@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.utils
 
 object Alpha {
     const val INVISIBLE = 0f
+    const val SMALL = 0.1f
     const val HALF = 0.5f
     const val VISIBLE = 1f
 

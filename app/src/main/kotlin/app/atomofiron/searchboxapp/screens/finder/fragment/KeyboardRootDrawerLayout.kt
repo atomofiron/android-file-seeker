@@ -18,19 +18,38 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.DrawerStateListenerImpl
+import app.atomofiron.common.util.UnreachableException
 import app.atomofiron.common.util.extension.debugRequire
+import app.atomofiron.common.util.hideKeyboard
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.layout.RootDrawerLayout
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.builder
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
 private const val HalfPi = PI.toFloat() / 2
+private const val AlphaThreshold = Alpha.SMALL
+private const val HorizontalStart = 0f
+private const val SpeedThreshold = 10
+private const val VelocityPeriod = 100
+
+sealed interface Tracking {
+    data object Undefined : Tracking
+    data class Horizontal(val positive: Boolean) : Tracking
+    data object Vertical : Tracking
+
+    val horizontal get() = this is Horizontal
+    val vertical get() = this == Vertical
+    operator fun invoke(): Boolean = this != Undefined
+}
 
 class KeyboardRootDrawerLayout @JvmOverloads constructor(
     context: Context,
@@ -42,12 +61,13 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private val focusListener = FocusChangeListener()
     private val scrollListener = ScrollListener()
     private val childListener = ChildStateListener()
-    private val valueListener = ValueListener()
+    private val verticalListener = VerticalListener()
+    private val horizontalListener = HorizontalListener()
     private val keyboardListener = KeyboardListener()
     private val sinusoid = Interpolator { input -> sin(HalfPi * input) }
 
     private var tracker = VelocityTracker.obtain()
-    private var tracking = false
+    private var tracking: Tracking = Tracking.Undefined
     private var ignoring = false
     private var prevX = 0f
     private var prevY = 0f
@@ -59,9 +79,11 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private var isControlling = false // onReady is too slow
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var contentView: ViewGroup
     private var editText: EditText? = null
 
-    private var anim: ValueAnimator? = null
+    private var animVertical: ValueAnimator? = null
+    private var animHorizontal: ValueAnimator? = null
     // from the bottom
     private var keyboardNow = 0
     private val keyboardMin = 0
@@ -78,7 +100,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 ?: recyclerView.findFocus()
             return field
         }
-        set(value) = debugRequire(field == null || value === field)
+    var exitCallback: (() -> Unit)? = null
 
     init {
         setInsetsModifier { _, insets ->
@@ -94,6 +116,8 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         controller = WindowCompat.getInsetsController(window, window.decorView)
     }
 
+    fun animAppearing() = animHorizontally(recyclerView.width.dec().toFloat(), HorizontalStart)
+
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         tracker.recycle()
@@ -101,8 +125,11 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams?) {
         super.addView(child, index, params)
-        if (child is RecyclerView) {
-            recyclerView = child
+        child.findViewById<ViewGroup>(R.id.content)?.let {
+            contentView = it
+        }
+        child.findViewById<RecyclerView>(R.id.recycler_view)?.let {
+            recyclerView = it
             recyclerView.addOnChildAttachStateChangeListener(childListener)
             recyclerView.addOnScrollListener(scrollListener)
         }
@@ -115,12 +142,12 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private fun updateAnyFocused(focusedView: View) {
         this.focusedView = focusedView
         focusedView.onFocusChangeListener = focusListener
-        if (tracking) {
+        if (tracking()) {
             return
         }
         val itemBottom = focusedView.calcBottom() ?: return
         val newBarrierBottom = min(keyboardMax, itemBottom)
-        anim?.cancel()
+        animVertical?.cancel()
         if (keyboardNow <= min(barrierBottom, newBarrierBottom)) {
             // animation is unnecessary when new and old focused views are above the keyboard
             barrierBottom = newBarrierBottom
@@ -129,11 +156,11 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         if (newBarrierBottom == barrierBottom) {
             return
         }
-        anim = ValueAnimator.ofInt(barrierBottom, newBarrierBottom).apply {
+        animVertical = ValueAnimator.ofInt(barrierBottom, newBarrierBottom).apply {
             duration = abs(newBarrierBottom - barrierBottom).toFloat()
                 .let { DURATION * (it / keyboardMax) }.toLong()
             interpolator = sinusoid
-            addUpdateListener(valueListener)
+            addUpdateListener(verticalListener)
             start()
         }
     }
@@ -143,9 +170,10 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 tracker.addMovement(event)
                 ignoring = drawerListener.isOpened
-                tracking = false
+                tracking = Tracking.Undefined
                 delegate.resetAnimation()
-                anim?.cancel()
+                animHorizontal?.cancel()
+                animVertical?.cancel()
             }
             MotionEvent.ACTION_MOVE -> {
                 tracker.addMovement(event)
@@ -153,44 +181,75 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 val dy = event.y - prevY
                 when {
                     ignoring -> Unit
-                    tracking -> move(dy)
+                    tracking == Tracking.Vertical -> moveVertically(dy)
+                    tracking is Tracking.Horizontal -> moveHorizontally(dx)
                     dx == 0f && dy == 0f -> Unit
-                    abs(dx) > abs(dy) -> ignoring = true
+                    abs(dx) > abs(dy) -> {
+                        val current = contentView.translationX
+                        val positive = when {
+                            current > HorizontalStart -> true
+                            current < HorizontalStart -> false
+                            else -> dx > 0
+                        }
+                        tracking = Tracking.Horizontal(positive)
+                        focusedView?.hideKeyboard()
+                        superCancelTouchEvents(event)
+                    }
                     dy > 0 && keyboardNow == keyboardMin -> ignoring = true
                     dy < 0 && keyboardNow == keyboardMax -> {
-                        tracking = true
-                        move(dy)
+                        tracking = Tracking.Vertical
+                        moveVertically(dy)
                     }
-                    start() -> {
-                        tracking = true
-                        event.action = MotionEvent.ACTION_CANCEL
-                        super.dispatchTouchEvent(event)
-                        move(dy)
+                    startVertically() -> {
+                        tracking = Tracking.Vertical
+                        superCancelTouchEvents(event)
+                        moveVertically(dy)
                     }
-                    else -> ignoring = !tracking
+                    else -> ignoring = !tracking()
                 }
             }
             MotionEvent.ACTION_UP -> {
-                tracking = false
                 ignoring = false
                 tracker.addMovement(event)
-                tracker.computeCurrentVelocity(100)
-                val shown = when {
-                    tracker.yVelocity < -10 -> true
-                    tracker.yVelocity > 10 -> false
+                tracker.computeCurrentVelocity(VelocityPeriod)
+                val toRight = when {
+                    tracking !is Tracking.Horizontal -> null
+                    tracker.xVelocity < -SpeedThreshold -> false
+                    tracker.xVelocity > SpeedThreshold -> true
                     else -> null
                 }
-                delegate.start(shown)
+                animHorizontally(toRight)
+                val toShown = when (tracking) {
+                    Tracking.Vertical -> when {
+                        tracker.yVelocity < -SpeedThreshold -> true
+                        tracker.yVelocity > SpeedThreshold -> false
+                        else -> null
+                    }
+                    else -> false
+                }
+                when (true) {
+                    (toShown == null),
+                    (toShown && keyboardNow < keyboardMax),
+                    (!toShown && keyboardNow != keyboardMin) -> delegate.start(toShown)
+                    else -> Unit
+                }
+                if (tracking()) superCancelTouchEvents(event)
+                tracking = Tracking.Undefined
                 tracker.clear()
             }
         }
         prevX = event.x
         prevY = event.y
-        if (!tracking) super.dispatchTouchEvent(event)
+        if (!tracking()) super.dispatchTouchEvent(event)
         return true
     }
 
-    private fun start(): Boolean {
+    private fun superCancelTouchEvents(event: MotionEvent) {
+        event.action = MotionEvent.ACTION_CANCEL
+        super.dispatchTouchEvent(event)
+    }
+
+    private fun startVertically(): Boolean {
         val editText = editText ?: return false
         when {
             editText.isFocused -> Unit
@@ -204,7 +263,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         return true
     }
 
-    private fun move(dy: Float) {
+    private fun moveVertically(dy: Float) {
         var offset = dy.roundToInt()
         if (offset == 0) {
             return
@@ -213,11 +272,62 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             var newBarrier = barrierBottom + offset
             focusedView?.calcBottom()
                 ?.let { newBarrier = min(newBarrier, it) }
-            offset -= updateOffset(barrierBottom = newBarrier)
+            offset -= updateVertically(barrierBottom = newBarrier)
         }
         if (offset != 0) {
             ensureControlKeyboard()
             delegate.move(offset)
+        }
+    }
+
+    private fun moveHorizontally(dx: Float) {
+        val tracking = tracking as? Tracking.Horizontal ?: return
+        val current = contentView.translationX
+        var new = current + dx
+        if (tracking.positive != (new > 0)) {
+            new = HorizontalStart
+        }
+        updateHorizontally(new)
+    }
+
+    private fun updateHorizontally(new: Float) {
+        contentView.translationX = new
+        val width = contentView.width.toFloat()
+        alpha = (width - new.absoluteValue) / width + AlphaThreshold
+        if (new.absoluteValue == width) {
+            exitCallback?.invoke()
+            post { updateHorizontally(HorizontalStart) }
+        }
+    }
+
+    private fun animHorizontally(right: Boolean? = null) {
+        val current = contentView.translationX
+        if (current == HorizontalStart) {
+            return
+        }
+        val width = contentView.width.toFloat()
+        val toRight = right ?: when {
+            current > width / 2 -> true
+            current > HorizontalStart -> false
+            current > -width / 2 -> true
+            else -> false
+        }
+        val target = when {
+            toRight && current > HorizontalStart -> width
+            toRight && current < HorizontalStart -> HorizontalStart
+            !toRight && current > HorizontalStart -> HorizontalStart
+            !toRight && current < HorizontalStart -> -width
+            else -> throw UnreachableException()
+        }
+        animHorizontally(current, target)
+    }
+
+    private fun animHorizontally(from: Float, to: Float) {
+        animHorizontal = ValueAnimator.ofFloat(from, to).apply {
+            duration = (DURATION * abs(from - to) / width).toLong()
+            interpolator = sinusoid
+            addUpdateListener(horizontalListener)
+            start()
         }
     }
 
@@ -236,7 +346,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         return recyclerView.height - itemView.run { bottom + marginBottom }
     }
 
-    private fun updateOffset(
+    private fun updateVertically(
         keyboardNow: Int = this.keyboardNow,
         barrierBottom: Int = this.barrierBottom,
     ): Int {
@@ -294,10 +404,17 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         }
     }
 
-    private inner class ValueListener : ValueAnimator.AnimatorUpdateListener {
+    private inner class VerticalListener : ValueAnimator.AnimatorUpdateListener {
 
         override fun onAnimationUpdate(animation: ValueAnimator) {
-            updateOffset(barrierBottom = animation.animatedValue as Int)
+            updateVertically(barrierBottom = animation.animatedValue as Int)
+        }
+    }
+
+    private inner class HorizontalListener : ValueAnimator.AnimatorUpdateListener {
+
+        override fun onAnimationUpdate(animation: ValueAnimator) {
+            updateHorizontally(animation.animatedValue as Float)
         }
     }
 
@@ -309,7 +426,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         }
 
         override fun onImeMove(current: Int) {
-            updateOffset(keyboardNow = current)
+            updateVertically(keyboardNow = current)
         }
 
         override fun onImeEnd(visible: Boolean) {

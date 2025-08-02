@@ -21,4 +21,6 @@ class FinderRouter(fragment: WeakProperty<out Fragment>) : BaseRouter(fragment),
     }
 
     fun showResult(taskId: Int) = navigate(R.id.resultFragment, ResultPresenterParams.arguments(taskId))
+
+    fun hide() = switchInParent<FinderFragment>(visible = false)
 }

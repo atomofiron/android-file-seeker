@@ -54,6 +54,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
         binding = FragmentFinderBinding.bind(view)
 
+        binding.root.exitCallback = presenter::onExitAnimationEnd
         layoutManager.reverseLayout = true
         binding.recyclerView.run {
             addOnLayoutChangeListener(spanSizeLookup)
@@ -76,6 +77,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (hidden) view?.hideKeyboard()
+        if (!hidden) binding.root.animAppearing()
     }
 
     override fun FinderViewState.onViewCollect() {
