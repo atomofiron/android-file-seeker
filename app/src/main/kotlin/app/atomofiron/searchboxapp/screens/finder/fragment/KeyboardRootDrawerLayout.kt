@@ -58,11 +58,6 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private val drawerListener = DrawerStateListenerImpl()
     private val focusListener = FocusChangeListener()
-    private val scrollListener = ScrollListener()
-    private val childListener = ChildStateListener()
-    private val verticalListener = VerticalListener()
-    private val horizontalListener = HorizontalListener()
-    private val keyboardListener = KeyboardListener()
 
     private var tracker = VelocityTracker.obtain()
     private var tracking: Tracking = Tracking.Undefined
@@ -73,7 +68,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private val manager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     private lateinit var controller: WindowInsetsControllerCompat
     private val delegate = InsetsAnimator { focusedView != null }
-    private val callback = KeyboardInsetCallback(keyboardListener, delegate.keyboardListener)
+    private val callback = KeyboardInsetCallback(KeyboardListener(), delegate.keyboardListener)
     private var isControlling = false // onReady is too slow
 
     private lateinit var recyclerView: RecyclerView
@@ -144,8 +139,8 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         }
         child.findViewById<RecyclerView>(R.id.recycler_view)?.let {
             recyclerView = it
-            recyclerView.addOnChildAttachStateChangeListener(childListener)
-            recyclerView.addOnScrollListener(scrollListener)
+            recyclerView.addOnChildAttachStateChangeListener(ChildStateListener())
+            recyclerView.addOnScrollListener(ScrollListener())
         }
     }
 
@@ -174,7 +169,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             duration = abs(newBarrierBottom - barrierBottom).toFloat()
                 .let { DURATION * (it / keyboardMax) }.toLong()
             interpolator = DecelerateInterpolator()
-            addUpdateListener(verticalListener)
+            addUpdateListener(VerticalListener())
             start()
         }
     }
@@ -339,7 +334,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         animHorizontal = ValueAnimator.ofFloat(from, to).apply {
             duration = (DURATION * abs(from - to) / horizontalMax).toLong()
             interpolator = DecelerateInterpolator()
-            addUpdateListener(horizontalListener)
+            addUpdateListener(HorizontalListener())
             start()
         }
     }
