@@ -2,47 +2,31 @@ package app.atomofiron.searchboxapp.screens.finder.fragment
 
 import android.animation.Animator
 import android.animation.ValueAnimator
-import android.view.animation.LinearInterpolator
+import android.view.animation.DecelerateInterpolator
 import androidx.core.graphics.Insets
 import androidx.core.view.WindowInsetsAnimationControlListenerCompat
 import androidx.core.view.WindowInsetsAnimationControllerCompat
 import app.atomofiron.searchboxapp.utils.Alpha
-import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.acos
-import kotlin.math.asin
-import kotlin.math.cos
-import kotlin.math.sin
-
-private const val Pi = PI.toFloat()
-private const val HalfPi = Pi / 2
-private const val ZeroPi = 0f
 
 class InsetsAnimator(
     private val anyFocused: () -> Boolean,
 ) : WindowInsetsAnimationControlListenerCompat {
 
-    private val valueListener = AnimatorUpdateListener()
-    private val animationListener = AnimationListener()
     val keyboardListener: KeyboardInsetListener = KeyboardListener()
 
     private var controller: WindowInsetsAnimationControllerCompat? = null
     private var animator: ValueAnimator? = null
 
     private var toVisible = false
-    private var maxInterpolated = 0 // max ime, e.g. 769
-    private var minInterpolated = 0 // min ime, 0?
-    private var interpolated = 0 // ime e.g. 0..769
-    private val interpolatedFraction get() = /* 0..1 */ interpolated / maxInterpolated.toFloat()
-    private val radian get() = /* 0..HalfPi */ when (toVisible) {
-        true -> asin(interpolatedFraction)
-        false -> acos(1 - interpolatedFraction)
-    }
+    private var keyboardNow = 0 // ime e.g. 0..769
+    private var keyboardMin = 0 // min ime, 0?
+    private var keyboardMax = 0 // max ime, e.g. 769
 
     override fun onReady(controller: WindowInsetsAnimationControllerCompat, types: Int) {
         this.controller = controller
-        maxInterpolated = controller.shownStateInsets.bottom
-        minInterpolated = controller.hiddenStateInsets.bottom
+        keyboardMax = controller.shownStateInsets.bottom
+        keyboardMin = controller.hiddenStateInsets.bottom
         toVisible = anyFocused() // this is valid because the onReady is called quite late
     }
 
@@ -66,34 +50,34 @@ class InsetsAnimator(
     fun move(dy: Int) {
         val controller = controller ?: return
         resetAnimation()
-        val new = (interpolated - dy).coerceIn(0..maxInterpolated)
+        val new = (keyboardNow - dy).coerceIn(0..keyboardMax)
         val insets = Insets.of(0, 0, 0, new)
-        val fraction = new / maxInterpolated.toFloat()
+        val fraction = new / keyboardMax.toFloat()
         controller.setInsetsAndAlpha(insets, 1f, fraction)
     }
 
     fun start(shown: Boolean?) {
         controller ?: return
         when {
-            shown == true && maxInterpolated - interpolated <= 2 -> return finish(true)
-            shown == false && interpolated - minInterpolated <= 2 -> return finish(false)
+            shown == true && keyboardMax - keyboardNow <= 2 -> return finish(true)
+            shown == false && keyboardNow - keyboardMin <= 2 -> return finish(false)
         }
-        toVisible = shown ?: (interpolated > maxInterpolated / 2)
-        val target = if (toVisible) HalfPi else ZeroPi
-        val radian = radian
-        if (radian != target) {
+        toVisible = shown ?: (keyboardNow > keyboardMax / 2)
+        val from = keyboardNow
+        val to = if (toVisible) keyboardMax else keyboardMin
+        if (from != to) {
             resetAnimation()
-            animator = ValueAnimator.ofFloat(radian, target).apply {
-                addUpdateListener(valueListener)
-                addListener(animationListener)
-                duration = (DURATION * abs(target - radian) / HalfPi).toLong()
-                interpolator = LinearInterpolator()
+            animator = ValueAnimator.ofInt(from, to).apply {
+                addUpdateListener(AnimatorUpdateListener())
+                addListener(AnimationListener())
+                duration = (DURATION * abs(to - from) / keyboardMax.toFloat()).toLong()
+                interpolator = DecelerateInterpolator()
                 start()
             }
         }
     }
 
-    private fun finish(show: Boolean = interpolated > 0) {
+    private fun finish(show: Boolean = keyboardNow > 0) {
         toVisible = show
         controller?.finish(show)
     }
@@ -102,16 +86,9 @@ class InsetsAnimator(
 
         override fun onAnimationUpdate(animation: ValueAnimator) {
             val controller = controller ?: return
-            var value = animation.animatedValue as Float
-            value = when (toVisible) {
-                true -> sin(value)
-                false -> 1 - cos(value)
-            }
-            val bottom = value * maxInterpolated
-            interpolated = bottom.toInt()
-            val fraction = bottom / maxInterpolated
-            val new = Insets.of(0, 0, 0, interpolated)
-            controller.setInsetsAndAlpha(new, Alpha.VISIBLE, fraction)
+            keyboardNow = animation.animatedValue as Int
+            val new = Insets.of(0, 0, 0, keyboardNow)
+            controller.setInsetsAndAlpha(new, Alpha.VISIBLE, 1f)
         }
     }
 
@@ -132,16 +109,16 @@ class InsetsAnimator(
     private inner class KeyboardListener : KeyboardInsetListener {
 
         override fun onImeStart(max: Int) { // this one is called before the onReady
-            maxInterpolated = max
+            keyboardMax = max
         }
 
         override fun onImeMove(current: Int) {
-            interpolated = current
+            keyboardNow = current
         }
 
         override fun onImeEnd(visible: Boolean) {
             toVisible = visible
-            interpolated = if (visible) maxInterpolated else minInterpolated
+            keyboardNow = if (visible) keyboardMax else keyboardMin
             resetAnimation()
         }
     }
