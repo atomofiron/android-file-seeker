@@ -17,8 +17,6 @@ import kotlin.math.sin
 private const val Pi = PI.toFloat()
 private const val HalfPi = Pi / 2
 private const val ZeroPi = 0f
-const val DURATION = 256L
-private val LinearInterpolator = LinearInterpolator()
 
 class InsetsAnimator(
     private val anyFocused: () -> Boolean,
@@ -89,7 +87,7 @@ class InsetsAnimator(
                 addUpdateListener(valueListener)
                 addListener(animationListener)
                 duration = (DURATION * abs(target - radian) / HalfPi).toLong()
-                interpolator = LinearInterpolator
+                interpolator = LinearInterpolator()
                 start()
             }
         }

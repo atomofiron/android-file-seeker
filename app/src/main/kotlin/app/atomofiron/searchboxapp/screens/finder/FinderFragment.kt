@@ -54,7 +54,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
         binding = FragmentFinderBinding.bind(view)
 
-        binding.root.exitCallback = presenter::onExitAnimationEnd
+        binding.root.setCallback(presenter::onExitAnimationEnd)
         layoutManager.reverseLayout = true
         binding.recyclerView.run {
             addOnLayoutChangeListener(spanSizeLookup)
@@ -101,7 +101,8 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     override fun onBack(soft: Boolean): Boolean {
         val consumed = binding.drawer.isOpened
         binding.drawer.close()
-        return consumed || super.onBack(soft)
+        if (!consumed) binding.root.animDisappearing()
+        return true
     }
 
     private fun onStateChange(items: List<FinderStateItem>) = finderAdapter.submitList(items)

@@ -8,7 +8,7 @@ import android.view.VelocityTracker
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
-import android.view.animation.Interpolator
+import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.core.view.ViewCompat
@@ -27,19 +27,18 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolde
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.builder
-import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-import kotlin.math.sin
 
-private const val HalfPi = PI.toFloat() / 2
 private const val AlphaThreshold = Alpha.SMALL
 private const val HorizontalStart = 0f
 private const val SpeedThreshold = 10
 private const val VelocityPeriod = 100
+
+const val DURATION = 256L
 
 sealed interface Tracking {
     data object Undefined : Tracking
@@ -64,7 +63,6 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private val verticalListener = VerticalListener()
     private val horizontalListener = HorizontalListener()
     private val keyboardListener = KeyboardListener()
-    private val sinusoid = Interpolator { input -> sin(HalfPi * input) }
 
     private var tracker = VelocityTracker.obtain()
     private var tracking: Tracking = Tracking.Undefined
@@ -100,9 +98,10 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 ?: recyclerView.findFocus()
             return field
         }
-    private val horizontalMax get() = recyclerView.width.toFloat()
+    private val horizontalCurrent get() = contentView.translationX
+    private val horizontalMax get() = contentView.width.toFloat()
     private var rightToHide = true
-    var exitCallback: (() -> Unit)? = null
+    private var exitCallback: (() -> Unit)? = null
 
     init {
         setInsetsModifier { _, insets ->
@@ -118,10 +117,19 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         controller = WindowCompat.getInsetsController(window, window.decorView)
     }
 
+    fun setCallback(onExit: () -> Unit) {
+        exitCallback = onExit
+    }
+
     fun animAppearing() {
         var from = horizontalMax.dec()
         if (!rightToHide) from *= -1
         animHorizontally(from, HorizontalStart)
+    }
+
+    fun animDisappearing() {
+        val to = if (rightToHide) horizontalMax else -horizontalMax
+        animHorizontally(horizontalCurrent, to)
     }
 
     override fun onDetachedFromWindow() {
@@ -165,7 +173,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         animVertical = ValueAnimator.ofInt(barrierBottom, newBarrierBottom).apply {
             duration = abs(newBarrierBottom - barrierBottom).toFloat()
                 .let { DURATION * (it / keyboardMax) }.toLong()
-            interpolator = sinusoid
+            interpolator = DecelerateInterpolator()
             addUpdateListener(verticalListener)
             start()
         }
@@ -191,10 +199,9 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                     tracking is Tracking.Horizontal -> moveHorizontally(dx)
                     dx == 0f && dy == 0f -> Unit
                     abs(dx) > abs(dy) -> {
-                        val current = contentView.translationX
                         val positive = when {
-                            current > HorizontalStart -> true
-                            current < HorizontalStart -> false
+                            horizontalCurrent > HorizontalStart -> true
+                            horizontalCurrent < HorizontalStart -> false
                             else -> dx > 0
                         }
                         tracking = Tracking.Horizontal(positive)
@@ -288,8 +295,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private fun moveHorizontally(dx: Float) {
         val tracking = tracking as? Tracking.Horizontal ?: return
-        val current = contentView.translationX
-        var new = current + dx
+        var new = horizontalCurrent + dx
         if (tracking.positive != (new > 0)) {
             new = HorizontalStart
         }
@@ -308,7 +314,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     }
 
     private fun animHorizontally(right: Boolean? = null) {
-        val current = contentView.translationX
+        val current = horizontalCurrent
         if (current == HorizontalStart) {
             return
         }
@@ -332,7 +338,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private fun animHorizontally(from: Float, to: Float) {
         animHorizontal = ValueAnimator.ofFloat(from, to).apply {
             duration = (DURATION * abs(from - to) / horizontalMax).toLong()
-            interpolator = sinusoid
+            interpolator = DecelerateInterpolator()
             addUpdateListener(horizontalListener)
             start()
         }
