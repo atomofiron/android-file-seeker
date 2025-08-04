@@ -114,13 +114,13 @@ abstract class BaseRouter(
         addToBackStack: Boolean = false,
     ) {
         fragment {
-            val finderFragment = parentFragmentManager.fragments
+            val fragment = parentFragmentManager.fragments
                 .find { it is F }
                 ?.takeIf { it.isVisible != visible }
                 ?: return
             parentFragmentManager.beginTransaction()
                 .run { if (addToBackStack) addToBackStack(null) else this }
-                .run { if (visible) show(finderFragment) else hide(finderFragment) }
+                .run { if (visible) show(fragment) else hide(fragment) }
                 .commit()
         }
     }
