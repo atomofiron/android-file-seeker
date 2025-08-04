@@ -318,7 +318,6 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         if (new.absoluteValue == horizontalMax) {
             exitCallback?.invoke()
             exitDirection = Direction.right(new >= 0)
-            post { updateHorizontally(HorizontalStart) }
         }
     }
 

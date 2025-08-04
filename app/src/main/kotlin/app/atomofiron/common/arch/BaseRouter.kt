@@ -109,14 +109,17 @@ abstract class BaseRouter(
         lastOrNull { it.isVisible } ?: lastOrNull { !it.isHidden }
     } as? BaseFragment<*,*,*,*>
 
-    protected inline fun <reified F : Fragment> switchInParent(visible: Boolean) {
+    protected inline fun <reified F : Fragment> switchInParent(
+        visible: Boolean,
+        addToBackStack: Boolean = false,
+    ) {
         fragment {
             val finderFragment = parentFragmentManager.fragments
                 .find { it is F }
                 ?.takeIf { it.isVisible != visible }
                 ?: return
             parentFragmentManager.beginTransaction()
-                .addToBackStack(null)
+                .run { if (addToBackStack) addToBackStack(null) else this }
                 .run { if (visible) show(finderFragment) else hide(finderFragment) }
                 .commit()
         }
