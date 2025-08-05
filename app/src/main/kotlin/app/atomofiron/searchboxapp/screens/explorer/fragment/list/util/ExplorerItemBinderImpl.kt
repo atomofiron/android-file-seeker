@@ -23,6 +23,7 @@ import app.atomofiron.searchboxapp.custom.view.MuonsView
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
+import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -115,9 +116,7 @@ class ExplorerItemBinderImpl(
         itemView.setOnLongClickListener(onLongClickListener)
         cbBox.setOnCheckedChangeListener(onCheckListener)
 
-        val thumbnail = (item.content as? NodeContent.File)
-            ?.takeIf { item.length > 0 }
-            ?.thumbnail
+        val thumbnail = (item.content as? NodeContent.File)?.thumbnail
         when (thumbnail) {
             is Thumbnail.FilePath -> Glide
                 .with(itemView.context)
@@ -127,7 +126,7 @@ class ExplorerItemBinderImpl(
                 .into(ivThumbnail)
             is Thumbnail.Bitmap -> ivThumbnail.setImageBitmap(thumbnail.value)
             is Thumbnail.Drawable -> ivThumbnail.setImageDrawable(thumbnail.value)
-            is Thumbnail.Res -> ivThumbnail.setImageResource(thumbnail.value)
+            is Thumbnail.Res -> ivThumbnail.setImageResource(thumbnail.value).also { poop("thumbnail.value ${thumbnail.value}") }
             is Thumbnail.Loading -> ivThumbnail.setImageDrawable(placeholder)
             null -> ivThumbnail.setImageDrawable(null)
         }
@@ -215,9 +214,9 @@ class ExplorerItemBinderImpl(
             builder.append("*")
             builder.setSpan(ImageSpan(dirIcon, ALIGN_BASELINE), builder.length.dec(), builder.length, SPAN_EXCLUSIVE_EXCLUSIVE)
             builder.append(Const.SPACE)
-        }
-        for (i in 0..<(3 - files.length)) {
-            builder.append(Const.SPACE)
+            for (i in 0..<(3 - files.length)) {
+                builder.append(Const.SPACE)
+            }
         }
         builder.append(files)
         builder.append("*")

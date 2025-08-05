@@ -35,7 +35,10 @@ class ExplorerItemDelegate(
         Node(path = "", properties = properties, content = dirContent, children = children)
     }
     private val file = run {
-        val name = "File Seeker ${resources.value.getString(R.string.version_name)}.apk"
+        val appName = resources.value.getString(R.string.app_name)
+        val versionName = resources.value.getString(R.string.version_name)
+            .split(' ').first()
+        val name = "$appName $versionName.apk".replace(' ', '_')
         val properties = NodeProperties("drwxrwx---", "owner", "group", "47K", "2038-01-19", "03:14", name)
         val apkInfo = ApkInfo(Thumbnail(R.mipmap.ic_launcher), "", VERSION_NAME, 0, "", 0, 0, null, null)
         val content = NodeContent.AndroidApp.apk(NodeRef(""), apkInfo)
