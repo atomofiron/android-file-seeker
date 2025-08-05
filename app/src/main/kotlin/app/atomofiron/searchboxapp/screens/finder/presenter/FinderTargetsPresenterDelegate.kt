@@ -6,7 +6,6 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.finder.FinderViewState
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
 import app.atomofiron.searchboxapp.utils.mutate
-import app.atomofiron.searchboxapp.utils.removeOneIf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
@@ -20,12 +19,8 @@ class FinderTargetsPresenterDelegate(
     init {
         val merged = combine(explorerStore.currentNode, explorerStore.searchTargets, explorerStore.storageRoot) { current, targets, storage ->
             when {
-                current != null -> targets.mutate {
-                    removeOneIf { it.uniqueId == current.uniqueId }
-                    add(0, current)
-                }
-                targets.isEmpty() -> listOfNotNull(storage)
-                else -> targets
+                targets.isNotEmpty() -> targets
+                else -> listOfNotNull(current ?: storage)
             }
         }
         // zip() ignores new values from 'current'

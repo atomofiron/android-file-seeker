@@ -13,5 +13,5 @@ interface FinderItemsState {
 
     fun updateSearchQuery(value: String)
     fun updateConfig(item: FinderStateItem.Options)
-    fun updateTargets(targets: List<Node>)
+    fun updateTargets(items: List<Node>)
 }
