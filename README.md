@@ -1,4 +1,4 @@
-# Search Box App
+# File Seeker
 
 [<img width=240 src=https://github.com/user-attachments/assets/fab927c8-bbc8-41b6-8a2d-099a8b95eaf1 style="margin: -40px 0px 0px -120px;" />](https://play.google.com/store/apps/details?id=app.atomofiron.searchboxapp)
 
