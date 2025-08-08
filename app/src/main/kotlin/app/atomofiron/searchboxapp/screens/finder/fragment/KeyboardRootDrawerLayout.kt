@@ -11,7 +11,9 @@ import android.view.Window
 import android.view.animation.DecelerateInterpolator
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import androidx.core.view.NestedScrollingParent
 import androidx.core.view.ViewCompat
+import androidx.core.view.ViewCompat.ScrollAxis
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
@@ -42,8 +44,15 @@ private const val VelocityPeriod = 100
 const val DURATION = 256L
 
 private sealed interface Tracking {
+    data object None : Tracking
     data object Vertical : Tracking
     data class Horizontal(val direction: Direction) : Tracking
+}
+
+private val Tracking?.consuming: Boolean get() = when (this) {
+    null, Tracking.None -> false
+    Tracking.Vertical,
+    is Tracking.Horizontal -> true
 }
 
 private enum class Direction(val right: Boolean) {
@@ -59,14 +68,13 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : RootDrawerLayout(context, attrs, defStyleAttr) {
+) : RootDrawerLayout(context, attrs, defStyleAttr), NestedScrollingParent {
 
     private val drawerListener = DrawerStateListenerImpl()
     private val focusListener = FocusChangeListener()
 
     private var tracker = VelocityTracker.obtain()
     private var tracking: Tracking? = null
-    private var ignoring = false
     private var prevX = 0f
     private var prevY = 0f
 
@@ -192,8 +200,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 tracker.addMovement(event)
-                ignoring = drawerListener.isOpened
-                tracking = null
+                tracking = Tracking.None.takeIf { drawerListener.isOpened }
                 delegate.resetAnimation()
                 animHorizontal?.cancel()
                 animVertical?.cancel()
@@ -203,7 +210,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 val dx = event.x - prevX
                 val dy = event.y - prevY
                 when {
-                    ignoring -> Unit
+                    tracking == Tracking.None -> Unit
                     tracking == Tracking.Vertical -> moveVertically(dy)
                     tracking is Tracking.Horizontal -> moveHorizontally(dx)
                     dx == 0f && dy == 0f -> Unit
@@ -215,24 +222,19 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                             else -> Direction.Left
                         }
                         tracking = Tracking.Horizontal(direction)
+                        superCancelTouchEvents(event)
                         focusedView?.hideKeyboard()
-                        superCancelTouchEvents(event)
                     }
-                    dy > 0 && keyboardNow == keyboardMin -> ignoring = true
-                    dy < 0 && keyboardNow == keyboardMax -> {
-                        tracking = Tracking.Vertical
-                        moveVertically(dy)
-                    }
-                    startVertically() -> {
+                    dy > 0 && keyboardNow == keyboardMin -> tracking = Tracking.None
+                    dy < 0 && keyboardNow == keyboardMax || startVertically() -> {
                         tracking = Tracking.Vertical
                         superCancelTouchEvents(event)
                         moveVertically(dy)
                     }
-                    else -> ignoring = tracking == null
+                    tracking == null -> tracking = Tracking.None
                 }
             }
             MotionEvent.ACTION_UP -> {
-                ignoring = false
                 tracker.addMovement(event)
                 tracker.computeCurrentVelocity(VelocityPeriod)
                 val toRight = when {
@@ -256,20 +258,26 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                     (!toShown && keyboardNow != keyboardMin) -> delegate.start(toShown)
                     else -> Unit
                 }
-                if (tracking != null) superCancelTouchEvents(event)
                 tracking = null
                 tracker.clear()
             }
         }
         prevX = event.x
         prevY = event.y
-        if (tracking == null) super.dispatchTouchEvent(event)
+        if (!tracking.consuming) super.dispatchTouchEvent(event)
         return true
     }
 
     private fun superCancelTouchEvents(event: MotionEvent) {
         event.action = MotionEvent.ACTION_CANCEL
         super.dispatchTouchEvent(event)
+    }
+
+    override fun onStartNestedScroll(child: View, target: View, @ScrollAxis axes: Int): Boolean {
+        if (axes == SCROLL_AXIS_HORIZONTAL) {
+            tracking = Tracking.None
+        }
+        return super.onStartNestedScroll(child, target, nestedScrollAxes)
     }
 
     private fun startVertically(): Boolean {

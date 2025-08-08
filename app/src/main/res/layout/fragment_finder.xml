@@ -9,6 +9,7 @@
 		android:id="@+id/content"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
+		android:background="?android:windowBackground"
 		>
 		<androidx.recyclerview.widget.RecyclerView
 			android:id="@+id/recycler_view"
@@ -18,7 +19,6 @@
 			android:paddingHorizontal="@dimen/padding_half"
 			android:maxWidth="@dimen/card_max_width"
 			android:scrollbarThumbVertical="@drawable/scroll_thumb"
-			android:background="?android:windowBackground"
 			/>
 		<app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
 			android:id="@+id/insets_background"
