@@ -130,7 +130,7 @@
     <string name="size">Размер</string>
     <string name="empty_check_box">Пустая метка</string>
     <string name="item_explorer_details">Детали</string>
-    <string name="item_explorer_background">Чередующийся фон</string>
+    <string name="item_explorer_background">Чередующийся фон строк</string>
     <string name="create_a_new">Создать новый(ую)</string>
     <string name="make_a_clone">Создать копию</string>
     <string name="clone">Клонировать</string>
@@ -139,7 +139,7 @@
     <string name="a_file">Файл</string>
     <string name="a_directory">Директорию</string>
     <string name="inverse_glowing">Инвертировать свечение</string>
-    <string name="with_haptic">С эффектом стука</string>
+    <string name="haptic_effect">Тактильный отклик</string>
     <string name="inverse_for_dark">Инвертировать при тёмной теме</string>
     <string name="pref_category_debug">Отладка</string>
     <string name="root">Корень</string>

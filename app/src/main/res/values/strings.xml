@@ -135,14 +135,14 @@
     <string name="size">Size</string>
     <string name="empty_check_box">Empty mark</string>
     <string name="item_explorer_details">Details</string>
-    <string name="item_explorer_background">Striped background</string>
+    <string name="item_explorer_background">Alternating row background</string>
     <string name="create_a_new">Create a new</string>
     <string name="make_a_clone">Make a clone</string>
     <string name="a_name">Name</string>
     <string name="a_file">File</string>
     <string name="a_directory">Directory</string>
     <string name="inverse_glowing">Inverse highlight</string>
-    <string name="with_haptic">With knock effect</string>
+    <string name="haptic_effect">Haptic feedback</string>
     <string name="inverse_for_dark">Inverse for Dark theme</string>
     <string name="pref_category_debug">Debug</string>
     <string name="pref_leak_canary" translatable="false">Leak Canary</string>

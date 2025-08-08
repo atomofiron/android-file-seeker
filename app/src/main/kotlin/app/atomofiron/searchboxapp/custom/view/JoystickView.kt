@@ -21,11 +21,14 @@ import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sin
 
+@SuppressLint("InlinedApi")
+private const val NO = HapticFeedbackConstants.NO_HAPTICS
 private const val PRESS = HapticFeedbackConstants.KEYBOARD_TAP
 private const val RELEASE = HapticFeedbackConstants.CLOCK_TICK
 
@@ -34,6 +37,13 @@ private const val PRESSED = (Math.PI / 2).toFloat()
 
 private const val FULL = 255
 private const val GLOW_DURATION = 256L
+
+fun JoystickHaptic.effect(press: Boolean) = when (this) {
+    JoystickHaptic.None -> NO
+    JoystickHaptic.Lite -> if (press) RELEASE else NO
+    JoystickHaptic.Double -> RELEASE
+    JoystickHaptic.Heavy -> PRESS
+}
 
 class JoystickView @JvmOverloads constructor(
     context: Context,
@@ -169,7 +179,7 @@ class JoystickView @JvmOverloads constructor(
 
     private fun press() {
         trackTouches = true
-        if (composition.withHaptic) performHapticFeedback(PRESS)
+        performHapticFeedback(composition.haptic.effect(press = true))
         play(RELEASED, PRESSED)
         pressure = 1f
         invalidate()
@@ -177,7 +187,7 @@ class JoystickView @JvmOverloads constructor(
 
     private fun release() {
         trackTouches = false
-        if (composition.withHaptic) performHapticFeedback(RELEASE)
+        performHapticFeedback(composition.haptic.effect(press = false))
         play(PRESSED, RELEASED)
     }
 
