@@ -8,6 +8,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.DialogFragment
@@ -28,25 +29,28 @@ import app.atomofiron.searchboxapp.screens.curtain.fragment.TransitionAnimator
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainBackground
+import app.atomofiron.searchboxapp.screens.finder.fragment.KeyboardInsetCallback
+import app.atomofiron.searchboxapp.screens.finder.fragment.KeyboardInsetListener
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.ExtendedWindowInsets
-import lib.atomofiron.insets.builder
 import lib.atomofiron.insets.insetsPadding
 import java.lang.ref.WeakReference
 import kotlin.math.max
 import kotlin.math.min
 
+private const val SAVED_STACK = "SAVED_STACK"
+private const val MAX_OVERLAY_SATURATION = 200
+
 class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     BaseFragment<CurtainFragment, CurtainViewState, CurtainPresenter, FragmentCurtainBinding> by BaseFragmentImpl(),
-    TranslucentFragment {
-    companion object {
-        private const val SAVED_STACK = "SAVED_STACK"
-        private const val MAX_OVERLAY_SATURATION = 200
-    }
+    TranslucentFragment,
+    KeyboardInsetListener
+{
+    private val keyboardCallback = KeyboardInsetCallback(this)
     private lateinit var binding: FragmentCurtainBinding
     private lateinit var behavior: BottomSheetBehavior<View>
     private val stack: MutableList<CurtainNode> = ArrayList()
@@ -54,6 +58,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     private lateinit var transitionAnimator: TransitionAnimator
     private var snackbarView = WeakReference<View>(null)
     private var overlayColor = 0
+    private var bottomPadding = 0
 
     override val isLightStatusBar: Boolean = false
 
@@ -75,6 +80,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        ViewCompat.setWindowInsetsAnimationCallback(view, keyboardCallback)
         binding = FragmentCurtainBinding.bind(view).apply {
             curtainSheet.clipToOutline = true
             curtainSheet.background = CurtainBackground(requireContext())
@@ -115,16 +121,18 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         root.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
         val verticalPadding = resources.getDimensionPixelSize(R.dimen.curtain_padding)
         root.setInsetsModifier { _, windowInsets ->
-            val ime = windowInsets[ExtType.ime]
-            curtainSheet.updatePaddingRelative(bottom = ime.bottom)
             val bars = windowInsets[ExtType.barsWithCutout].bottom
             val joystick = windowInsets[ExtType.joystickBottom].bottom
-            var bottomPadding = max(joystick, bars + verticalPadding)
-            bottomPadding = max(0, bottomPadding - ime.bottom)
+            bottomPadding = max(joystick, bars + verticalPadding)
             ExtendedWindowInsets.Builder()
                 .set(ExtType.curtain, Insets.of(0, verticalPadding, 0, bottomPadding))
                 .build()
         }
+    }
+
+    override fun onImeMove(current: Int) {
+        val offset = -max(0, current - bottomPadding)
+        binding.root.translationY = offset.toFloat()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
