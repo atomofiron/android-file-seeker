@@ -3,12 +3,13 @@ package app.atomofiron.searchboxapp.injectable.interactor
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.io.File
 
 sealed class Cell<T> {
     open val value: T get() = throw Exception()
@@ -121,6 +122,12 @@ class ExplorerInteractor(
             var to = target.rename(name)
             if (to.isDirectory) to = to.copy(children = null)
             service.tryCopy(tab, target, to, asMoving = false)
+        }
+    }
+
+    fun resetChecked(tab: NodeTabKey) {
+        scope.launch(context) {
+            service.resetChecked(tab)
         }
     }
 }

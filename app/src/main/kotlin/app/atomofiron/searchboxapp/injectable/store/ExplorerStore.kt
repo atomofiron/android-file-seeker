@@ -13,7 +13,7 @@ class ExplorerStore {
     private val deepestNodes = MutableStateFlow<Map<NodeTabKey,Node>>(emptyMap())
     val currentNode = combine(deepestNodes, currentTab) { nodes, tab -> nodes[tab] }
     val storageRoot = MutableStateFlow<Node?>(null)
-    val searchTargets = MutableStateFlow<List<Node>>(listOf())
+    val checked = MutableStateFlow<List<Node>>(listOf())
     val alerts = EventFlow<NodeError>()
     val removed = EventFlow<Node>()
     val updated = EventFlow<Node>()

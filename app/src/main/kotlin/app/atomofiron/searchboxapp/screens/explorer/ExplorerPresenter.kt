@@ -20,8 +20,8 @@ class ExplorerPresenter(
     private val viewState: ExplorerViewState,
     router: ExplorerRouter,
     private val storagePermissionDelegate: StoragePermissionDelegate,
-    private val explorerStore: ExplorerStore,
-    private val explorerInteractor: ExplorerInteractor,
+    private val interactor: ExplorerInteractor,
+    private val store: ExplorerStore,
     itemListener: ExplorerItemActionListenerDelegate,
     mainChannel: MainChannel,
 ) : BasePresenter<ExplorerViewModel, ExplorerRouter>(scope, router),
@@ -33,7 +33,7 @@ class ExplorerPresenter(
 
     init {
         mainChannel.maximized.collect(scope) {
-            explorerInteractor.updateRoots(currentTab)
+            interactor.updateRoots(currentTab)
         }
     }
 
@@ -41,7 +41,7 @@ class ExplorerPresenter(
 
     override fun onRootClick(item: NodeRoot) {
         storagePermissionDelegate.request(
-            granted = { explorerInteractor.toggleRoot(currentTab, item) },
+            granted = { interactor.toggleRoot(currentTab, item) },
             denied = { viewState.showPermissionRequiredWarning() }
         )
     }
@@ -55,8 +55,8 @@ class ExplorerPresenter(
             0 -> viewState.firstTab
             else -> viewState.secondTab
         }
-        explorerInteractor.updateRoots(currentTab)
-        explorerInteractor.updateCurrentTab(currentTab)
+        interactor.updateRoots(currentTab)
+        interactor.updateCurrentTab(currentTab)
     }
 
     fun onSettingsOptionSelected() = router.showSettings()
@@ -67,20 +67,27 @@ class ExplorerPresenter(
         scrollOrOpenParent(currentDir, isCurrentDirVisible)
     }
 
-    override fun onBack(soft: Boolean): Boolean {
-        if (soft) {
-            val selectedRoot = viewState.firstTabItems
-                .valueOrNull
-                ?.roots
-                ?.find { it.isSelected }
-            selectedRoot ?: return false
-            onRootClick(selectedRoot)
+    fun onBack(soft: Boolean, scrollToTop: () -> Boolean): Boolean = when {
+        !soft -> super.onBack(false)
+        else -> resetChecked() || scrollToTop() || unselectRoot()
+    }
+
+    private fun resetChecked(): Boolean {
+        return store.checked.value.isNotEmpty().also {
+            if (it) interactor.resetChecked(viewState.currentTab.value)
         }
-        return soft || super.onBack(false)
+    }
+
+    private fun unselectRoot(): Boolean {
+        return null != viewState.firstTabItems
+            .valueOrNull
+            ?.roots
+            ?.find { it.isSelected }
+            ?.let { interactor.toggleRoot(currentTab, it) }
     }
 
     private fun scrollOrOpenParent(item: Node, isTargetVisible: Boolean) = when {
-        isTargetVisible -> explorerInteractor.toggleDir(currentTab, item)
+        isTargetVisible -> interactor.toggleDir(currentTab, item)
         else -> viewState.scrollTo(item)
     }
 }

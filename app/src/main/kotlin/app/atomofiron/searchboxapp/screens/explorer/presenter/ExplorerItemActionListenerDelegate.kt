@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.screens.explorer.presenter
 
-import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -18,14 +17,14 @@ class ExplorerItemActionListenerDelegate(
     private val menuListenerDelegate: ExplorerCurtainMenuDelegate,
     private val explorerStore: ExplorerStore,
     private val router: ExplorerRouter,
-    private val explorerInteractor: ExplorerInteractor,
+    private val interactor: ExplorerInteractor,
 ) : ExplorerItemActionListener {
 
     private val currentTab get() = viewState.currentTab.value
 
     override fun onItemLongClick(item: Node) {
         val files: List<Node> = when {
-            item.isChecked -> explorerStore.searchTargets.value
+            item.isChecked -> explorerStore.checked.value
             else -> listOf(item)
         }
         val options = operations.operations(files, supportedOperations) ?: return
@@ -36,13 +35,13 @@ class ExplorerItemActionListenerDelegate(
 
     private fun openItem(item: Node) {
         when {
-            item.isDirectory -> explorerInteractor.toggleDir(currentTab, item)
+            item.isDirectory -> interactor.toggleDir(currentTab, item)
             item.content is AndroidApp -> operations.askForAndroidApp(item.content, currentTab)
             else -> router.showFile(item)
         }
     }
 
-    override fun onItemCheck(item: Node, isChecked: Boolean) = explorerInteractor.checkItem(currentTab, item, isChecked)
+    override fun onItemCheck(item: Node, isChecked: Boolean) = interactor.checkItem(currentTab, item, isChecked)
 
-    override fun onItemsBecomeVisible(items: List<Node>) = explorerInteractor.updateItems(currentTab, items)
+    override fun onItemsBecomeVisible(items: List<Node>) = interactor.updateItems(currentTab, items)
 }

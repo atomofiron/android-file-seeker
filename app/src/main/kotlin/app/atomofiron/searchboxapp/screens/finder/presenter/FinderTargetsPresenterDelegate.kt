@@ -17,7 +17,7 @@ class FinderTargetsPresenterDelegate(
 ) : TargetsHolder.FinderTargetsOutput {
 
     init {
-        val merged = combine(explorerStore.currentNode, explorerStore.searchTargets, explorerStore.storageRoot) { current, targets, storage ->
+        val merged = combine(explorerStore.currentNode, explorerStore.checked, explorerStore.storageRoot) { current, targets, storage ->
             when {
                 targets.isNotEmpty() -> targets
                 else -> listOfNotNull(current ?: storage)

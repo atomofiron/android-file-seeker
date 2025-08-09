@@ -573,6 +573,12 @@ class ExplorerService(
         outputStream.close()
     }
 
+    suspend fun resetChecked(key: NodeTabKey) {
+        renderTab(key) {
+            checked.clear()
+        }
+    }
+
     private suspend inline fun <R> withGarden(block: NodeGarden.() -> R): R = garden.withGarden(block)
 
     private suspend inline fun withGarden(key: NodeTabKey, block: NodeGarden.(NodeTab) -> Unit) {
@@ -620,7 +626,7 @@ class ExplorerService(
         updateStates(items)
         updateChecked(items)
         val checked = items.filter { it.isChecked }
-        store.searchTargets.set(checked)
+        store.checked.set(checked)
         store.setCurrentItems(items)
 
         require(this.roots.all { !it.isSelected })

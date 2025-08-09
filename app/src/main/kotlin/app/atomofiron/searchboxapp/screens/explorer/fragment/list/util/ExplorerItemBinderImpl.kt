@@ -23,7 +23,6 @@ import app.atomofiron.searchboxapp.custom.view.MuonsView
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -126,7 +125,7 @@ class ExplorerItemBinderImpl(
                 .into(ivThumbnail)
             is Thumbnail.Bitmap -> ivThumbnail.setImageBitmap(thumbnail.value)
             is Thumbnail.Drawable -> ivThumbnail.setImageDrawable(thumbnail.value)
-            is Thumbnail.Res -> ivThumbnail.setImageResource(thumbnail.value).also { poop("thumbnail.value ${thumbnail.value}") }
+            is Thumbnail.Res -> ivThumbnail.setImageResource(thumbnail.value)
             is Thumbnail.Loading -> ivThumbnail.setImageDrawable(placeholder)
             null -> ivThumbnail.setImageDrawable(null)
         }
