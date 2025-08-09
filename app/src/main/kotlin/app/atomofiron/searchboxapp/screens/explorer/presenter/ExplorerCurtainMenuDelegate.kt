@@ -8,8 +8,10 @@ import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
+import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
@@ -21,21 +23,21 @@ import app.atomofiron.searchboxapp.screens.explorer.curtain.RenameDelegate
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isParentOf
 import kotlinx.coroutines.CoroutineScope
 
+private const val OPTIONS = 111
+private const val CREATE = 222
+private const val RENAME = 333
+private const val CLONE = 444
+
 class ExplorerCurtainMenuDelegate(
     scope: CoroutineScope,
     private val viewState: ExplorerViewState,
     private val router: ExplorerRouter,
     private val explorerStore: ExplorerStore,
-    private val explorerInteractor: ExplorerInteractor,
+    private val interactor: ExplorerInteractor,
     private val apkInteractor: ApkInteractor,
+    private val utils: UtilService,
     curtainChannel: CurtainChannel,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>(), Recipient, MenuListener {
-    private companion object {
-        const val OPTIONS = 111
-        const val CREATE = 222
-        const val RENAME = 333
-        const val CLONE = 444
-    }
 
     private val optionsDelegate = OptionsDelegate(R.menu.item_options, output = this)
     private val createDelegate = CreateDelegate(output = this)
@@ -92,31 +94,32 @@ class ExplorerCurtainMenuDelegate(
             R.id.menu_install -> apkInteractor.install(items.first(), viewState.currentTab.value)
             R.id.menu_launch -> apkInteractor.launch(items.first())
             R.id.menu_copy_path -> {
-                explorerInteractor.copyToClipboard(items.first())
+                interactor.copyToClipboard(items.first())
                 viewState.showAlert(AlertMessage(R.string.copied))
                 controller?.close()
             }
+            R.id.menu_use_as -> utils.useAs(options.items.first())
         }
     }
 
     fun onCloneConfirm(target: Node, name: String) {
         controller?.close(irrevocably = true)
-        explorerInteractor.clone(currentTab, target, name)
+        interactor.clone(currentTab, target, name)
     }
 
     fun onCreateConfirm(dir: Node, name: String, directory: Boolean) {
         controller?.close(irrevocably = true)
-        explorerInteractor.create(currentTab, dir, name, directory)
+        interactor.create(currentTab, dir, name, directory)
     }
 
     fun onRenameConfirm(item: Node, name: String) {
         controller?.close(irrevocably = true)
-        explorerInteractor.rename(currentTab, item, name)
+        interactor.rename(currentTab, item, name)
     }
 
     private fun onRemoveConfirm(items: List<Node>) {
         controller?.close(irrevocably = true)
-        explorerInteractor.deleteItems(currentTab, items)
+        interactor.deleteItems(currentTab, items)
     }
 
     private fun getRenameData(): RenameDelegate.RenameData? {

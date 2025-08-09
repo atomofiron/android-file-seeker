@@ -317,5 +317,9 @@
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
         </intent>
+        <intent>
+            <action android:name="android.intent.action.ACTION_ATTACH_DATA" />
+            <data android:scheme="content" />
+        </intent>
     </queries>
 </manifest>

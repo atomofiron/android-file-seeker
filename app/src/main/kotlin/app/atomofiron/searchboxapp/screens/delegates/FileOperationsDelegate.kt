@@ -11,9 +11,10 @@ import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
+import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
@@ -30,48 +31,56 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.io.FileInputStream
+import kotlin.math.abs
 
 private val rootOptions = listOf(R.id.menu_create)
 private val directoryOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_create, R.id.menu_clone, R.id.menu_copy_path)
 private val oneFileOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_share, R.id.menu_open_with, R.id.menu_clone, R.id.menu_copy_path)
 private val manyFilesOptions = listOf(R.id.menu_delete)
+private val readWrite = listOf(R.id.menu_create, R.id.menu_rename, R.id.menu_clone)
 
 class FileOperationsDelegate(
     preferences: PreferenceStore,
     private val apks: ApkInteractor,
     private val dialogs: DialogDelegate,
+    private val utils: UtilService,
 ) {
     private val itemComposition by preferences.explorerItemComposition
 
-    fun operations(items: List<Node>, supported: List<Int>? = null): ExplorerItemOptions? {
+    fun operations(items: List<Node>, readOnly: Boolean = false): ExplorerItemOptions? {
         val merged = items.merge()
-        val disabled = mutableListOf<Int>()
         val first = merged.firstOrNull() ?: return null
         val ids = when {
             merged.size > 1 -> manyFilesOptions
             first.content.rootType?.editable == true -> rootOptions
             first.isRoot -> return null
             first.isDirectory -> directoryOptions
-            else -> oneFileOptions.mutate {
-                if (first.content is AndroidApp) {
-                    add(R.id.menu_apk)
-                    add(R.id.menu_launch)
-                    add(R.id.menu_install)
-                    if (!apks.launchable(first)) {
-                        disabled.add(R.id.menu_launch)
-                    }
-                }
-            }
-        }.filter { supported?.contains(it) != false }
-        return ExplorerItemOptions(ids, merged, itemComposition, disabled = disabled)
+            else -> oneFileOptions.buildOperations(first)
+        }.filter {
+            readWrite.takeIf { readOnly }?.contains(abs(it)) != true
+        }
+        return ExplorerItemOptions(ids, merged, itemComposition)
     }
 
-    fun askForAndroidApp(content: AndroidApp, tab: NodeTabKey? = null) = askForAndroidApp(content, contentResolver = null, tab)
+    fun askForAndroidApp(content: NodeContent.AndroidApp, tab: NodeTabKey? = null) = askForAndroidApp(content, contentResolver = null, tab)
 
-    fun askForApks(ref: NodeRef, contentResolver: ContentResolver) = askForAndroidApp(AndroidApp.apks(ref), contentResolver)
+    fun askForApks(ref: NodeRef, contentResolver: ContentResolver) = askForAndroidApp(NodeContent.AndroidApp.apks(ref), contentResolver)
+
+    private fun List<Int>.buildOperations(first: Node): List<Int> = mutate {
+        if (first.content is NodeContent.AndroidApp) {
+            add(R.id.menu_apk)
+            add(R.id.menu_install)
+            add(R.id.menu_launch)
+            if (!apks.launchable(first)) {
+                add(-R.id.menu_launch)
+            }
+        } else if (utils.canUseAs(first)) {
+            add(R.id.menu_use_as)
+        }
+    }
 
     private fun askForAndroidApp(
-        content: AndroidApp,
+        content: NodeContent.AndroidApp,
         contentResolver: ContentResolver?,
         tab: NodeTabKey? = null,
     ) {
@@ -115,7 +124,7 @@ class FileOperationsDelegate(
         }
     }
 
-    private fun AndroidApp.resolve(resolver: ContentResolver?, signature: Boolean): Rslt<AndroidApp> {
+    private fun NodeContent.AndroidApp.resolve(resolver: ContentResolver?, signature: Boolean): Rslt<NodeContent.AndroidApp> {
         val stream = when {
             !splitApk -> return getApkContent(ref.path, signature)
             !ref.isContent -> FileInputStream(ref.path)
@@ -125,7 +134,7 @@ class FileOperationsDelegate(
         return getApksContent(stream, signature)
     }
 
-    private fun DialogConfig.update(content: AndroidApp, withSignature: Boolean = false): DialogConfig = copy(
+    private fun DialogConfig.update(content: NodeContent.AndroidApp, withSignature: Boolean = false): DialogConfig = copy(
         cancelable = content.info != null,
         icon = if (content.info == null) dialogs.loadingIcon() else content.info.icon?.drawable,
         title = UniText(content.info?.appName) ?: UniText(R.string.fetching),

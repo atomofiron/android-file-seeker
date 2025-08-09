@@ -78,8 +78,18 @@ class ExplorerModule {
         explorerInteractor: ExplorerInteractor,
         apkInteractor: ApkInteractor,
         curtainChannel: CurtainChannel,
+        utils: UtilService,
     ): ExplorerCurtainMenuDelegate {
-        return ExplorerCurtainMenuDelegate(scope, viewState, router, explorerStore, explorerInteractor, apkInteractor, curtainChannel)
+        return ExplorerCurtainMenuDelegate(
+            scope,
+            viewState,
+            router,
+            explorerStore,
+            explorerInteractor,
+            apkInteractor,
+            utils,
+            curtainChannel,
+        )
     }
 
     @Provides
@@ -89,8 +99,8 @@ class ExplorerModule {
         viewState: ExplorerViewState,
         router: ExplorerRouter,
         storagePermissionDelegate: StoragePermissionDelegate,
-        explorerStore: ExplorerStore,
-        explorerInteractor: ExplorerInteractor,
+        interactor: ExplorerInteractor,
+        store: ExplorerStore,
         itemListener: ExplorerItemActionListenerDelegate,
         mainChannel: MainChannel,
     ): ExplorerPresenter {
@@ -99,8 +109,8 @@ class ExplorerModule {
             viewState,
             router,
             storagePermissionDelegate,
-            explorerStore,
-            explorerInteractor,
+            interactor,
+            store,
             itemListener,
             mainChannel,
         )

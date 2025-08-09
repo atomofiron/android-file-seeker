@@ -19,6 +19,11 @@
         </menu>
     </item>
     <item
+        android:id="@+id/menu_use_as"
+        android:title="@string/use_as"
+        android:icon="@drawable/ic_explorer_picture"
+        />
+    <item
         android:id="@+id/menu_clone"
         android:title="@string/clone"
         android:icon="@drawable/ic_clone"

@@ -85,7 +85,7 @@ class OptionsDelegate(
             return
         }
         item.isChecked = checked.contains(item.itemId)
-        item.isEnabled = !disabled.contains(item.itemId)
+        item.isEnabled = !ids.contains(-item.itemId)
         item.subMenu?.let { bind(it) }
     }
 }

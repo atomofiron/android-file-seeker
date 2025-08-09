@@ -10,8 +10,6 @@ import app.atomofiron.searchboxapp.screens.result.ResultViewState
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
 
-private val supportedOperations = listOf(R.id.menu_delete, R.id.menu_copy_path, R.id.menu_share, R.id.menu_open_with, R.id.menu_apk, R.id.menu_launch, R.id.menu_install)
-
 class ResultItemActionDelegate(
     private val viewState: ResultViewState,
     private val operations: FileOperationsDelegate,
@@ -33,7 +31,7 @@ class ResultItemActionDelegate(
             item.isChecked -> matches.mapNotNull { it.item.takeIf { checked.value.contains(it.uniqueId) } }
             else -> listOf(item)
         }
-        val options = operations.operations(items, supported = supportedOperations) ?: return
+        val options = operations.operations(items, readOnly = true) ?: return
         curtainDelegate.showOptions(options)
     }
 

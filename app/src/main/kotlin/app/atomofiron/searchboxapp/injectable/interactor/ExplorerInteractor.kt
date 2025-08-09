@@ -9,7 +9,6 @@ import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 
 sealed class Cell<T> {
     open val value: T get() = throw Exception()

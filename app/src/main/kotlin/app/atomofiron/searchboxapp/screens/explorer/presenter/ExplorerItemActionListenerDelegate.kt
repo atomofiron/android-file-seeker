@@ -9,8 +9,6 @@ import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerViewState
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 
-private val supportedOperations = listOf(R.id.menu_create, R.id.menu_rename, R.id.menu_clone, R.id.menu_delete, R.id.menu_copy_path, R.id.menu_share, R.id.menu_open_with, R.id.menu_apk, R.id.menu_launch, R.id.menu_install)
-
 class ExplorerItemActionListenerDelegate(
     private val viewState: ExplorerViewState,
     private val operations: FileOperationsDelegate,
@@ -27,7 +25,7 @@ class ExplorerItemActionListenerDelegate(
             item.isChecked -> explorerStore.checked.value
             else -> listOf(item)
         }
-        val options = operations.operations(files, supportedOperations) ?: return
+        val options = operations.operations(files) ?: return
         menuListenerDelegate.showOptions(options)
     }
 

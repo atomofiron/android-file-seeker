@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.di.module
 import app.atomofiron.common.util.dialog.DialogDelegateImpl
 import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
+import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.delegates.FileOperationsDelegate
@@ -23,7 +24,8 @@ open class DelegateModule {
         preferenceStore: PreferenceStore,
         apks: ApkInteractor,
         dialogs: DialogDelegate,
+        utils: UtilService,
     ): FileOperationsDelegate {
-        return FileOperationsDelegate(preferenceStore, apks, dialogs)
+        return FileOperationsDelegate(preferenceStore, apks, dialogs, utils)
     }
 }

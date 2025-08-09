@@ -122,6 +122,7 @@
     <string name="user_interface">Интерфейс</string>
     <string name="pref_explorer_item">Файл / Директория</string>
     <string name="pref_joystick">Настройки кнопки ESC</string>
+    <string name="use_as">Использовать как…</string>
     <string name="create">Создать</string>
     <string name="date">Дата</string>
     <string name="time">Время</string>

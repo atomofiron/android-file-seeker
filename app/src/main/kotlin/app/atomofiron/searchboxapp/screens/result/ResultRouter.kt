@@ -15,7 +15,7 @@ class ResultRouter(property: WeakProperty<out Fragment>) : BaseRouter(property) 
 
     fun shareFile(title: String, data: String): Boolean {
         val intent = Intent(Intent.ACTION_SEND)
-            .setType(Const.MIME_TYPE_TEXT)
+            .setType(Const.MIME_TEXT)
             .putExtra(Intent.EXTRA_SUBJECT, title)
             .putExtra(Intent.EXTRA_TITLE, title)
             .putExtra(Intent.EXTRA_TITLE, title)

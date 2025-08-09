@@ -20,7 +20,7 @@ sealed interface Thumbnail {
     @JvmInline
     value class Res(@DrawableRes val value: Int) : Thumbnail
 
-    val path: String? get() = (this as? FilePath)?.value
+    val filePath: String? get() = (this as? FilePath)?.value
 
     val drawable: AndroidDrawable? get() = (this as? Drawable)?.value
 

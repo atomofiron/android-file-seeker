@@ -9,6 +9,8 @@ import app.atomofiron.common.util.AndroidSdk
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Const
+import androidx.core.net.toUri
+import app.atomofiron.fileseeker.R
 
 object Intents {
     const val ACTION_UPDATE = "ACTION_UPDATE"
@@ -19,8 +21,8 @@ object Intents {
     private const val MAX_REQUEST_CODE = 65536
 
     //val telegramLink get() = Intent(Intent.ACTION_VIEW, Uri.parse(Const.TELEGRAM_LINK))
-    val github = Intent(Intent.ACTION_VIEW, Uri.parse(Const.GITHUB_URL))
-    val forPda = Intent(Intent.ACTION_VIEW, Uri.parse(Const.FORPDA_URL))
+    val github = Intent(Intent.ACTION_VIEW, Const.GITHUB_URL.toUri())
+    val forPda = Intent(Intent.ACTION_VIEW, Const.FORPDA_URL.toUri())
 
     fun mainActivity(context: Context, action: String? = null) = Intent(context, MainActivity::class.java).setAction(action)
 
@@ -36,7 +38,7 @@ object Intents {
 
     val settingsIntent: Intent
         get() {
-            val packageUri = Uri.parse(PACKAGE_SCHEME + BuildConfig.PACKAGE_NAME)
+            val packageUri = (PACKAGE_SCHEME + BuildConfig.PACKAGE_NAME).toUri()
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageUri)
             intent.addCategory(Intent.CATEGORY_DEFAULT)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -48,11 +50,21 @@ object Intents {
         get() {
             return Intent(
                 Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                Uri.parse(PACKAGE_SCHEME + BuildConfig.PACKAGE_NAME)
+                (PACKAGE_SCHEME + BuildConfig.PACKAGE_NAME).toUri()
             )
         }
 
     fun updating(context: Context) = mainActivity(context, ACTION_UPDATE)
 
     fun installing(context: Context) = Intent(context, InstallReceiver::class.java)
+
+    fun Context.useAs(uri: Uri, mimeType: String?): Intent? {
+        val intent = Intent(Intent.ACTION_ATTACH_DATA)
+            .setDataAndType(uri, mimeType)
+            .putExtra(Const.MIME_TYPE, mimeType)
+            .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        intent.resolveActivity(packageManager) ?: return null
+        return Intent.createChooser(intent, resources.getString(R.string.use_as))
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
 }
