@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.finder.fragment
+package app.atomofiron.searchboxapp.screens.finder.fragment.keyboard
 
 import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsAnimationCompat.BoundsCompat

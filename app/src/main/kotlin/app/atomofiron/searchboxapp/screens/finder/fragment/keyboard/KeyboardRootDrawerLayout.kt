@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.finder.fragment
+package app.atomofiron.searchboxapp.screens.finder.fragment.keyboard
 
 import android.animation.ValueAnimator
 import android.content.Context
@@ -26,6 +26,8 @@ import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.layout.RootDrawerLayout
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
+import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.GestureDirection as Direction
+import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.GestureTracking as Tracking
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.isLayoutRtl
@@ -42,27 +44,6 @@ private const val SpeedThreshold = 10
 private const val VelocityPeriod = 100
 
 const val DURATION = 256L
-
-private sealed interface Tracking {
-    data object None : Tracking
-    data object Vertical : Tracking
-    data class Horizontal(val direction: Direction) : Tracking
-}
-
-private val Tracking?.consuming: Boolean get() = when (this) {
-    null, Tracking.None -> false
-    Tracking.Vertical,
-    is Tracking.Horizontal -> true
-}
-
-private enum class Direction(val right: Boolean) {
-    Right(true),
-    Left(false),
-    ;
-    companion object {
-        fun right(right: Boolean) = if (right) Right else Left
-    }
-}
 
 class KeyboardRootDrawerLayout @JvmOverloads constructor(
     context: Context,

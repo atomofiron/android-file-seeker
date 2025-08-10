@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.finder.fragment
+package app.atomofiron.searchboxapp.screens.finder.fragment.keyboard
 
 interface KeyboardInsetListener {
     fun onImeStart(max: Int) = Unit

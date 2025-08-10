@@ -29,8 +29,8 @@ import app.atomofiron.searchboxapp.screens.curtain.fragment.TransitionAnimator
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainBackground
-import app.atomofiron.searchboxapp.screens.finder.fragment.KeyboardInsetCallback
-import app.atomofiron.searchboxapp.screens.finder.fragment.KeyboardInsetListener
+import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.KeyboardInsetCallback
+import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.KeyboardInsetListener
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 import com.google.android.material.bottomsheet.BottomSheetBehavior

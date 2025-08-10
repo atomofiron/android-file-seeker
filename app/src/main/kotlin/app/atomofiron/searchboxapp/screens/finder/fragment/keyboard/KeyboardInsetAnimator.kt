@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.finder.fragment
+package app.atomofiron.searchboxapp.screens.finder.fragment.keyboard
 
 import android.animation.Animator
 import android.animation.ValueAnimator
