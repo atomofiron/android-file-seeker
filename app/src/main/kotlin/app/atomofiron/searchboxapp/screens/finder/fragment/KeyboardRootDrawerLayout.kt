@@ -173,7 +173,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private fun updateAnyFocused(focusedView: View) {
         this.focusedView = focusedView
         focusedView.onFocusChangeListener = focusListener
-        if (tracking != null) {
+        if (tracking.consuming) {
             return
         }
         val itemBottom = focusedView.calcBottom() ?: return
@@ -244,14 +244,9 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                     else -> null
                 }
                 animHorizontally(toRight)
-                val toShown = when (tracking) {
-                    Tracking.Vertical -> when {
-                        tracker.yVelocity < -SpeedThreshold -> true
-                        tracker.yVelocity > SpeedThreshold -> false
-                        else -> null
-                    }
-                    else -> false
-                }
+                val toShown = tracker.takeIf { tracking == Tracking.Vertical }
+                    ?.takeIf { abs(it.yVelocity) > SpeedThreshold }
+                    ?.let { it.yVelocity < 0 }
                 when (true) {
                     (toShown == null),
                     (toShown && keyboardNow < keyboardMax),
@@ -275,7 +270,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     override fun onStartNestedScroll(child: View, target: View, @ScrollAxis axes: Int): Boolean {
         if (axes == SCROLL_AXIS_HORIZONTAL) {
-            tracking = Tracking.None
+            ignoreHorizontal = true
         }
         return super.onStartNestedScroll(child, target, nestedScrollAxes)
     }
