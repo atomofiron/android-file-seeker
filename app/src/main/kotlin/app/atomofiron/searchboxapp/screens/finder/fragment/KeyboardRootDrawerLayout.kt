@@ -73,6 +73,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private val drawerListener = DrawerStateListenerImpl()
     private val focusListener = FocusChangeListener()
 
+    private var ignoreHorizontal = false
     private var tracker = VelocityTracker.obtain()
     private var tracking: Tracking? = null
     private var prevX = 0f
@@ -201,6 +202,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 tracker.addMovement(event)
                 tracking = Tracking.None.takeIf { drawerListener.isOpened }
+                ignoreHorizontal = false
                 delegate.resetAnimation()
                 animHorizontal?.cancel()
                 animVertical?.cancel()
@@ -214,6 +216,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                     tracking == Tracking.Vertical -> moveVertically(dy)
                     tracking is Tracking.Horizontal -> moveHorizontally(dx)
                     dx == 0f && dy == 0f -> Unit
+                    abs(dx) > abs(dy) && ignoreHorizontal -> tracking = Tracking.None
                     abs(dx) > abs(dy) -> {
                         val direction = when {
                             horizontalCurrent > HorizontalStart -> Direction.Right
