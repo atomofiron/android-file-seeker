@@ -41,20 +41,19 @@ import java.io.FileOutputStream
 import java.util.*
 import kotlin.math.min
 
+private const val SUB_PATH_CAMERA = "DCIM/Camera/"
+private const val SUB_PATH_PIC_SCREENSHOTS = "Pictures/Screenshots/"
+private const val SUB_PATH_DCIM_SCREENSHOTS = "DCIM/Screenshots/"
+private const val SUB_PATH_DOWNLOAD = "Download/"
+private const val SUB_PATH_DOWNLOAD_BLUETOOTH = "Download/Bluetooth/"
+private const val SUB_PATH_BLUETOOTH = "Bluetooth/"
+
 class ExplorerService(
     context: Context,
     private val appStore: AppStore,
     private val store: ExplorerStore,
     private val preferenceStore: PreferenceStore,
 ) : AppStore by appStore {
-    companion object {
-        private const val SUB_PATH_CAMERA = "DCIM/Camera/"
-        private const val SUB_PATH_PIC_SCREENSHOTS = "Pictures/Screenshots/"
-        private const val SUB_PATH_DCIM_SCREENSHOTS = "DCIM/Screenshots/"
-        private const val SUB_PATH_DOWNLOAD = "Download/"
-        private const val SUB_PATH_DOWNLOAD_BLUETOOTH = "Download/Bluetooth/"
-        private const val SUB_PATH_BLUETOOTH = "Bluetooth/"
-    }
 
     private val previewSize = context.resources.getDimensionPixelSize(R.dimen.preview_size)
     private var delayedRender: Job? = null
@@ -691,7 +690,6 @@ class ExplorerService(
     }
 
     private fun NodeTab.renderNodes(): List<Node> {
-        var isEmpty = false
         val count = min(1, tree.size) + tree.sumOf { it.childCount }
         val items = ArrayList<Node>(count)
         tree.firstOrNull()
@@ -707,30 +705,19 @@ class ExplorerService(
                 if (item.isOpened) {
                     val isDeepest = i == tree.lastIndex.dec()
                     item = item.copy(isDeepest = isDeepest, children = item.children?.fetch())
-                    if (isDeepest) {
-                        isEmpty = item.isEmpty
-                    }
                 }
                 items.add(item)
             }
         }
-        var skip = true
         for (i in tree.indices.reversed()) {
             val level = tree[i]
-            when {
-                isEmpty -> isEmpty = false
-                skip -> skip = false
-                i >= tree.lastIndex.dec() -> Unit
-                else -> tree.getOrNull(i)?.getOpened()?.let {
-                    val path = it.path.endingDot()
-                    val item = Node(path, it.parentPath, rootId = it.rootId, children = it.children, properties = it.properties, content = it.content)
-                    items.add(item)
-                }
-            }
             for (j in level.getOpenedIndex().inc() until level.childCount) {
                 updateStateFor(level.children!![j])
                     .defineDirKind(i)
                     .let { items.add(it) }
+            }
+            if (i < tree.lastIndex) {
+                items.add(level.copy(path = level.path.endingDot()))
             }
         }
         return items
