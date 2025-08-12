@@ -717,7 +717,7 @@ class ExplorerService(
                     .let { items.add(it) }
             }
             if (i < tree.lastIndex) {
-                items.add(level.copy(path = level.path.endingDot()))
+                items.add(level.withPath(path = level.path.endingDot()))
             }
         }
         return items

@@ -66,6 +66,8 @@ data class Node(
         else -> other.children.areChildrenContentsTheSame(children)
     }
 
+    fun withPath(path: String) = copy(path = path, uniqueId = -uniqueId)
+
     // todo change uniqueId in state, create the new one state instance
     fun rename(name: String): Node {
         val path = "$parentPath$name${if (isDirectory) "/" else ""}"
