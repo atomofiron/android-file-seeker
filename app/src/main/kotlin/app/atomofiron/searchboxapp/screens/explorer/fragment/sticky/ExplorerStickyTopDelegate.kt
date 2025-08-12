@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.explorer.fragment
+package app.atomofiron.searchboxapp.screens.explorer.fragment.sticky
 
 import android.view.View
 import android.view.View.MeasureSpec
@@ -19,19 +19,6 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerI
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isDot
 import kotlin.math.max
-
-private data class HolderData(
-    val item: Node,
-    val holder: RecyclerView.ViewHolder,
-) {
-    val position get() = holder.bindingAdapterPosition
-}
-
-private data class StickyData(
-    val position: Int,
-    val item: Node,
-    val view: ExplorerStickyTopView,
-)
 
 class ExplorerStickyTopDelegate(
     private val recyclerView: RecyclerView,

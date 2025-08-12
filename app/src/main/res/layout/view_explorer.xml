@@ -15,7 +15,7 @@
         android:scrollbars="none"
         />
     <FrameLayout
-        android:id="@+id/explorer_sticky_top"
+        android:id="@+id/sticky_box"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />

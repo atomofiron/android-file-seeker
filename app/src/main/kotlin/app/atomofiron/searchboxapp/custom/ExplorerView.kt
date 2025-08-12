@@ -53,7 +53,7 @@ class ExplorerView(
         binding.recyclerView,
         rootAdapter,
         explorerAdapter,
-        binding.explorerStickyTop,
+        binding.stickyBox,
         output,
     )
 
@@ -79,7 +79,7 @@ class ExplorerView(
 
     private fun ViewExplorerBinding.applyInsets() {
         recyclerView.insetsPadding(ExtType { barsWithCutout + dock })
-        binding.explorerStickyTop.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
+        binding.stickyBox.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
         root.attachInsetsListener(binding.systemUiBackground)
     }
 
