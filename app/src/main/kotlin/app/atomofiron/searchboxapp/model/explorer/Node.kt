@@ -4,7 +4,6 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.areChildrenContentsTheSam
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.name
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.parent
 
-
 data class Node(
     val path: String,
     val parentPath: String = path.parent(),
@@ -54,6 +53,7 @@ data class Node(
         other.isDeepest != isDeepest -> false
         other.hasChildren != hasChildren -> false
         other.childCount != childCount -> false
+        isOpened && other.getOpenedIndex() != getOpenedIndex() -> false
         other.content != content -> false
         else -> true
     }
@@ -90,4 +90,8 @@ data class Node(
         }.toMutableList()
         return copy(items = items)
     }
+
+    fun getOpenedIndex(orElse: Int = -1): Int = children?.indexOfFirst { it.isOpened }
+        ?.takeIf { it >= 0 }
+        ?: orElse
 }

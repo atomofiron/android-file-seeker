@@ -29,8 +29,8 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>>(
 
     override fun onBindViewHolder(holder: H, position: Int) = holder.bind(mutableItems[position], position)
 
-    override fun onItemChanged(index: Int, item: D) {
-        mutableItems[index] = item
+    override fun onChanged(index: Int, new: D) {
+        mutableItems[index] = new
     }
 
     override fun onCurrentListChanged(current: List<D>) {

@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Path
@@ -7,32 +8,36 @@ import android.graphics.Path.Direction
 import android.graphics.Rect
 import android.graphics.RectF
 import android.view.View
+import android.view.View.MeasureSpec
 import androidx.core.view.iterator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
+import app.atomofiron.searchboxapp.custom.view.ExplorerStickyTopView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
 import kotlin.math.max
 import kotlin.math.min
 
 class ItemBorderDecorator(
+    context: Context,
     private val adapter: ExplorerAdapter,
-    private val headerView: ExplorerHeaderView,
     private val requestUpdateHeaderPosition: () -> Unit,
 ) : ItemDecoration() {
+
+    private val stickyView = ExplorerStickyTopView(context)
     // примерный размер жестового навбара, чтобы игнорировать равный ему паддинг снизу
-    private val gestureBar = headerView.resources.displayMetrics.density * 32 // 24
+    private val gestureBar = context.resources.displayMetrics.density * 32 // 24
 
     private val items get() = adapter.items
-    private val cornerRadius = headerView.resources.getDimension(R.dimen.explorer_border_corner_radius)
-    private val borderWidth = headerView.resources.getDimension(R.dimen.explorer_border_width)
+    private val cornerRadius = context.resources.getDimension(R.dimen.explorer_border_corner_radius)
+    private val borderWidth = context.resources.getDimension(R.dimen.explorer_border_width)
+    private val listPaddingTop = context.resources.getDimension(R.dimen.padding_half)
     // под открытой не пустой директорией
-    private val space = headerView.resources.getDimension(R.dimen.explorer_item_space)
+    private val space = context.resources.getDimension(R.dimen.explorer_item_space)
     // под последним айтемом глубочайшей директории
     private val doubleSpace = cornerRadius * 2
     // под открытой пустой директорией
@@ -51,11 +56,14 @@ class ItemBorderDecorator(
         paint.style = Paint.Style.FILL
         paint.strokeCap = Paint.Cap.ROUND
         paint.strokeWidth = borderWidth
-        paint.color = headerView.context.findColorByAttr(MaterialAttr.colorSecondary)
+        paint.color = context.findColorByAttr(MaterialAttr.colorSecondary)
     }
 
     fun setDeepestDir(item: Node?) {
         deepestDir = item
+        stickyView.bind(item)
+        val wrapContent = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
+        stickyView.measure(wrapContent, wrapContent)
     }
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
@@ -86,7 +94,7 @@ class ItemBorderDecorator(
         rect.right = parent.width - parent.paddingRight.toFloat()
 
         var frameRect: RectF? = null
-        val headerBottom = headerView.height.toFloat()
+        val headerBottom = stickyView.measuredHeight + parent.paddingTop - listPaddingTop
         val paddingBottom = parent.paddingBottom.let { if (it < gestureBar) 0 else it }
         val parentBottom = (parent.height - paddingBottom).toFloat()
 

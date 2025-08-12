@@ -14,12 +14,10 @@
         android:paddingTop="@dimen/padding_half"
         android:scrollbars="none"
         />
-    <app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
-        android:id="@+id/explorer_header"
+    <FrameLayout
+        android:id="@+id/explorer_sticky_top"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="invisible"
-        android:background="?colorBackground"
+        android:layout_height="match_parent"
         />
     <app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
         android:id="@+id/system_ui_background"

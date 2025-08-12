@@ -10,22 +10,13 @@ class OnScrollIdleSubmitter(
 ) : RecyclerView.OnScrollListener() {
 
     private var items: MutableList<Node>? = null
-    private var marker: String? = null
-    private var allowed = true
 
     init {
         recyclerView.addOnScrollListener(this)
         adapter.registerAdapterDataObserver(ChangeListener())
     }
 
-    fun submitOnIdle(items: List<Node>, marker: String? = null) {
-        if (allowed || marker != this.marker) {
-            this.marker = marker
-            adapter.submit(items)
-        } else {
-            this.items = items.toMutableList()
-        }
-    }
+    fun submit(items: List<Node>) = adapter.submit(items)
 
     fun submit(item: Node) {
         val oldIndexDelayed = items?.indexOfFirst { it.uniqueId == item.uniqueId } ?: -1
@@ -43,14 +34,6 @@ class OnScrollIdleSubmitter(
         }
         if (oldIndexDelayed >= 0) items?.set(oldIndexDelayed, new)
         if (oldIndex >= 0) adapter.submit(new, oldIndex)
-    }
-
-    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-        allowed = newState == RecyclerView.SCROLL_STATE_IDLE
-        if (allowed) {
-            adapter.submit(items ?: return)
-            items = null
-        }
     }
 
     private inner class ChangeListener : RecyclerView.AdapterDataObserver() {

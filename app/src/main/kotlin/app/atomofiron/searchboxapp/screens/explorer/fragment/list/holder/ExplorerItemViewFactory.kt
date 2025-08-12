@@ -25,7 +25,7 @@ enum class ExplorerItemViewFactory(
     },
     CurrentOpenedNodeItem(2, R.layout.item_explorer) {
         override fun createHolder(itemView: View): ExplorerHolder {
-            ItemExplorerBinding.bind(itemView).makeOpenedCurrent()
+            ItemExplorerBinding.bind(itemView).makeDeepest()
             return ExplorerHolder(itemView)
         }
     },

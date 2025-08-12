@@ -53,7 +53,7 @@ class ExplorerView(
         binding.recyclerView,
         rootAdapter,
         explorerAdapter,
-        binding.explorerHeader,
+        binding.explorerStickyTop,
         output,
     )
 
@@ -79,7 +79,7 @@ class ExplorerView(
 
     private fun ViewExplorerBinding.applyInsets() {
         recyclerView.insetsPadding(ExtType { barsWithCutout + dock })
-        explorerHeader.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
+        binding.explorerStickyTop.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
         root.attachInsetsListener(binding.systemUiBackground)
     }
 
@@ -91,12 +91,11 @@ class ExplorerView(
 
     fun scrollToTop(): Boolean = binding.recyclerView.scrollToTop()
 
-    fun isCurrentDirVisible(): Boolean? = listDelegate.isDeepestDirVisible()
+    fun isDeepestDirVisible(): Boolean? = listDelegate.isDeepestDirVisible()
 
     fun submit(items: NodeTabItems) {
         rootAdapter.submitList(items.roots)
-        submitter.submitOnIdle(items.items, marker = items.deepest?.path)
-        listDelegate.set(items.items)
+        submitter.submit(items.items)
         title = items.deepest?.getTitle(resources)
     }
 

@@ -18,7 +18,6 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.isBlackDeep
 import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.view.ExplorerHeaderView
 import app.atomofiron.searchboxapp.custom.view.JoystickView
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.DockMode
@@ -40,7 +39,6 @@ import lib.atomofiron.insets.findInsetsProvider
 import lib.atomofiron.insets.insetsPadding
 import lib.atomofiron.insets.insetsSource
 
-
 object LayoutDelegate {
 
     fun MeasureProvider.apply(
@@ -48,7 +46,6 @@ object LayoutDelegate {
         dockView: DockBarView? = null,
         tabLayout: MaterialButtonToggleGroup? = null,
         appBarLayout: AppBarLayout? = null,
-        headerView: ExplorerHeaderView? = null,
         snackbarContainer: CoordinatorLayout? = null,
         preMeasureCallback: ((width: Int) -> Unit)? = null,
     ) {
@@ -78,7 +75,6 @@ object LayoutDelegate {
         }
         snackbarContainer?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock })
         appBarLayout?.insetsPadding(ExtType.invoke { barsWithCutout + dock + joystickFlank }, start = true, top = true, end = true)
-        headerView?.insetsPadding(ExtType.invoke { barsWithCutout + dock }, start = true, top = true, end = true)
         dockView?.dockView?.insetsSource { view ->
             val layout = layoutWas
             val insets = when {

@@ -35,7 +35,7 @@ fun ItemExplorerBinding.makeOpened() {
     makeOpposite(background, content, buttonIcon, topRadius = true, bottomRadius = true)
 }
 
-fun ItemExplorerBinding.makeOpenedCurrent() {
+fun ItemExplorerBinding.makeDeepest() {
     val background = root.context.findColorByAttr(MaterialAttr.colorSecondary)
     val content = root.context.findColorByAttr(MaterialAttr.colorSurface)
     val buttonIcon = root.context.findColorByAttr(MaterialAttr.colorOnSurface)

@@ -53,3 +53,7 @@ fun <T> MutableList<T>.clear(from: Int, to: Int = size) {
     val toIndex = to.coerceAtMost(size)
     if (fromIndex <= toIndex) subList(fromIndex, toIndex).clear()
 }
+
+fun Int.rangePlus(over: Int): IntRange = this..<(this + over)
+
+fun IntRange.relative(absolute: Int) = absolute - first

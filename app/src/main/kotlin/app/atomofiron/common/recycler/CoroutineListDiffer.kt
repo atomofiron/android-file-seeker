@@ -1,14 +1,19 @@
 package app.atomofiron.common.recycler
 
 import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter.Companion.UNDEFINED
+import app.atomofiron.common.util.extension.debugRequire
+import app.atomofiron.common.util.extension.rangePlus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 // todo add and use 2-thread-safe mutable list for updates
+
+private const val DetectMoves = false
 
 class CoroutineListDiffer<I : Any>(
     private val adapter: RecyclerView.Adapter<*>,
@@ -27,18 +32,17 @@ class CoroutineListDiffer<I : Any>(
     }
 
     fun submit(current: List<I>, new: List<I>) {
-        updated.clear()
         isCalculating = true
-        val counter = ++counter
+        val currentCounter = ++counter
         val old = current.toMutableList()
-        actualList.clear()
-        actualList.addAll(new)
         scope.launch {
-            val result = DiffUtil.calculateDiff(DiffCallback(itemCallback, old, new))
+            val result = DiffUtil.calculateDiff(DiffCallback(itemCallback, old, new), DetectMoves)
             withContext(Dispatchers.Main) {
-                if (counter != this@CoroutineListDiffer.counter) {
+                if (currentCounter != counter) {
                     return@withContext
                 }
+                actualList.clear()
+                actualList.addAll(new)
                 isCalculating = false
                 result.dispatchUpdatesTo(adapter)
                 if (updated.isNotEmpty()) {
@@ -51,7 +55,10 @@ class CoroutineListDiffer<I : Any>(
                     }
                     updated.clear()
                 }
-                listeners.forEach { it.onCurrentListChanged(actualList) }
+                listeners.forEach {
+                    it.onCurrentListChanged(actualList)
+                    result.dispatchUpdatesTo(it.onItemsChanged(old = old, new = actualList))
+                }
             }
         }
     }
@@ -67,7 +74,7 @@ class CoroutineListDiffer<I : Any>(
         }
         actualList[itemIndex] = item
         adapter.notifyItemChanged(itemIndex)
-        listeners.forEach { it.onItemChanged(itemIndex, item) }
+        listeners.forEach { it.onChanged(itemIndex, item) }
     }
 
     fun addListener(listener: ListListener<I>): Boolean {
@@ -78,9 +85,22 @@ class CoroutineListDiffer<I : Any>(
 
     fun removeListener(listener: ListListener<I>): Boolean = listeners.remove(listener)
 
+    private fun ListListener<I>.onItemsChanged(old: List<I>, new: List<I>): ListUpdateCallback = object : ListUpdateCallback {
+        override fun onMoved(fromPosition: Int, toPosition: Int) = debugRequire(DetectMoves)
+        override fun onInserted(position: Int, count: Int) = position.rangePlus(count)
+            .let { onChanged(it, new.slice(it)) }
+        override fun onChanged(position: Int, count: Int, payload: Any?) = position.rangePlus(count)
+            .let { onChanged(it, new.slice(it)) }
+        override fun onRemoved(position: Int, count: Int) = position.rangePlus(count)
+            .let { onRemoved(it, old.slice(it)) }
+    }
+
     interface ListListener<I> {
-        fun onItemChanged(index: Int, item: I)
         fun onCurrentListChanged(current: List<I>)
+        fun onChanged(index: Int, new: I) = Unit
+        fun onChanged(range: IntRange, slice: List<I>) = Unit
+        fun onInserted(range: IntRange, slice: List<I>) = Unit
+        fun onRemoved(range: IntRange, slice: List<I>) = Unit
     }
 
     private class DiffCallback<I : Any>(
