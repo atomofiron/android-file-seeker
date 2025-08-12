@@ -894,18 +894,14 @@ class ExplorerService(
 
     private fun List<Node>.find(uniqueId: Int): Node? = find { it.uniqueId == uniqueId }
 
-    private fun List<Node>.findIndexed(uniqueId: Int): Pair<Int, Node?> = findIndexed { it.uniqueId == uniqueId }
+    private fun List<Node>.findIndexed(uniqueId: Int): Pair<Int, Node?> = findWithIndex { it.uniqueId == uniqueId }
 
     private fun List<Node>.find(path: String): Node? = find { it.path == path }
 
-    private fun List<Node>.findIndexed(path: String): Pair<Int, Node?> = findIndexed { it.path == path }
+    private fun List<Node>.findIndexed(path: String): Pair<Int, Node?> = findWithIndex { it.path == path }
 
     // todo WTF 'NodeState.getUniqueId()' on a null object reference
-    private fun List<NodeState>.findState(uniqueId: Int): Pair<Int, NodeState?> = findIndexed { it.uniqueId == uniqueId }
-
-    private fun Node.getOpenedIndex(): Int = children?.indexOfFirst { it.isOpened } ?: -1
-
-    private fun Node.getOpened(): Node? = getOpenedIndex().takeIf { it >= 0 }?.let { children?.get(it) }
+    private fun List<NodeState>.findState(uniqueId: Int): Pair<Int, NodeState?> = findWithIndex { it.uniqueId == uniqueId }
 
     private fun Node.hasOpened(): Boolean = getOpenedIndex() >= 0
 }
