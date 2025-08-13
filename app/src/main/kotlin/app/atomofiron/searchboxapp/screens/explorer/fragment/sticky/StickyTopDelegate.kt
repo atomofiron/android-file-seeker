@@ -5,6 +5,7 @@ import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
 import androidx.core.view.isVisible
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerStickyTopView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
@@ -13,6 +14,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderI
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.StickyInfo
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import kotlin.math.max
+import kotlin.math.roundToInt
 
 private typealias StickyTop = StickyInfo<ExplorerStickyTopView>
 
@@ -21,10 +23,12 @@ class StickyTopDelegate(
     private val stickyBox: FrameLayout,
     private var listener: ExplorerItemBinderActionListener,
 ) {
-
     private val stickies = HashMap<Int, StickyTop>()
     private val threshold get() = stickyBox.paddingTop
     private var composition: ExplorerItemComposition? = null
+    private val lastChildOffset = stickyBox.resources.run {
+        getDimension(R.dimen.explorer_item_space) + getDimension(R.dimen.explorer_border_width) / 2
+    }.roundToInt()
 
     fun setComposition(composition: ExplorerItemComposition) {
         this.composition = composition
@@ -84,33 +88,32 @@ class StickyTopDelegate(
         val stickies = stickies.values.sortedBy { -it.position }
         val last = holders.lastOrNull() ?: return
         for (sticky in stickies) {
-            val holder = holders.takeIf { sticky.position <= last.position }
-                ?.findHolder(sticky)
-                ?.takeIf { it.holder.itemView.top < threshold }
+            val holderTop = holders.takeIf { sticky.position <= last.position }
+                ?.findTop(sticky)
+                ?.takeIf { it < threshold }
                 .also { sticky.view.isVisible = it != null }
                 ?: continue
             require(sticky.view.measuredHeight > 0)
-            var top = holder.holder.itemView.top
-            top = max(top, threshold)
+            var top = max(holderTop, threshold)
             holders.findBarrier(sticky)?.let { barrier ->
                 val bottom = top + sticky.view.measuredHeight
                 top -= max(0, bottom - barrier)
             }
-            sticky.view.move(top, drawTop = (top - holder.holder.itemView.top).toFloat())
+            sticky.view.move(top, drawTop = (top - holderTop).toFloat())
         }
     }
 
     /** @return some holder to move sticky with, the same opened dir or some child above the next opened */
-    private fun List<HolderInfo>.findHolder(sticky: StickyTop): HolderInfo? {
+    private fun List<HolderInfo>.findTop(sticky: StickyTop): Int? {
         find { it.position == sticky.position }
-            ?.let { return it }
+            ?.let { return it.holder.itemView.top }
         val openedIndex = sticky.item.getOpenedIndex(sticky.item.childCount)
         for (holder in this) {
             return sticky.item.children
                 .takeIf { !holder.item.isSeparator() && holder.item.parentPath == sticky.item.path }
                 ?.indexOfFirst { it.uniqueId == holder.item.uniqueId }
                 ?.takeIf { it < openedIndex }
-                ?.let { return holder }
+                ?.let { return holder.holder.itemView.top }
         }
         return null
     }
@@ -129,7 +132,7 @@ class StickyTopDelegate(
                 // nothing above
                 i == 0 -> return null
                 // the last child
-                else -> get(i.dec()).holder.itemView.bottom
+                else -> get(i.dec()).holder.itemView.bottom + lastChildOffset
             }
         }
         return null
