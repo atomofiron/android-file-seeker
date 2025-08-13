@@ -9,7 +9,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent
 fun Node.getIcon(): Int {
     return when (val content = content) {
         is NodeContent.Undefined -> R.drawable.ic_explorer_unknown
-        is NodeContent.Directory -> content.getIcon(isEmpty)
+        is NodeContent.Directory -> content.getIcon(isEmpty == true)
         is NodeContent.File -> content.getIcon()
         is NodeContent.Link -> R.drawable.ic_explorer_link
     }

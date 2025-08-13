@@ -74,7 +74,7 @@ class ItemBorderDecorator(
         val item = items[holder.bindingAdapterPosition]
         val next = items.getOrNull(holder.bindingAdapterPosition.inc())
         outRect.bottom = when {
-            item.isOpened && item.isEmpty -> tripleSpace
+            item.isOpened && item.isEmpty == true -> tripleSpace
             item.isOpened -> space
             next == null -> space
             item.parentPath != next.parentPath && item.parentPath == deepestDir?.path -> doubleSpace
@@ -108,7 +108,7 @@ class ItemBorderDecorator(
             val next = if (currentIndex == lastIndex) null else items[currentIndex.inc()]
             when {
                 // под открытой пустой папкой всё просто
-                item.isOpened && item.isEmpty -> {
+                item.isOpened && item.isEmpty == true -> {
                     frameRect = rect
                     rect.top = child.bottom.toFloat()
                     rect.bottom = child.bottom + doubleSpace
