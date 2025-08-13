@@ -32,31 +32,25 @@ fun ItemExplorerBinding.makeOpened() {
     val background = root.context.findColorByAttr(MaterialAttr.colorOutline)
     val content = root.context.findColorByAttr(MaterialAttr.colorSurface)
     val buttonIcon = root.context.findColorByAttr(MaterialAttr.colorOnSurface)
-    makeOpposite(background, content, buttonIcon, topRadius = true, bottomRadius = true)
+    makeOpposite(background, content, buttonIcon)
 }
 
 fun ItemExplorerBinding.makeDeepest() {
     val background = root.context.findColorByAttr(MaterialAttr.colorSecondary)
     val content = root.context.findColorByAttr(MaterialAttr.colorSurface)
     val buttonIcon = root.context.findColorByAttr(MaterialAttr.colorOnSurface)
-    makeOpposite(background, content, buttonIcon, topRadius = true)
+    makeOpposite(background, content, buttonIcon)
 }
 
 private fun ItemExplorerBinding.makeOpposite(
     background: Int,
     content: Int,
     buttonIcon: Int,
-    topRadius: Boolean = false,
-    bottomRadius: Boolean = false,
 ) {
     val cornerRadius = root.resources.getDimension(R.dimen.explorer_border_corner_radius)
     val drawable = GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, intArrayOf(background, background))
     drawable.cornerRadii = FloatArray(8) {
-        when {
-            it < 5 && topRadius -> cornerRadius
-            it > 4 && bottomRadius -> cornerRadius
-            else -> 0f
-        }
+        if (it < 5) cornerRadius else cornerRadius
     }
     val rippleMask = GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, intArrayOf(Color.BLACK, Color.BLACK))
     rippleMask.cornerRadius = cornerRadius

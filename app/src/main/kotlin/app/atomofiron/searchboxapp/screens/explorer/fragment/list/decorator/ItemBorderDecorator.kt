@@ -42,8 +42,7 @@ class ItemBorderDecorator(
     private val doubleSpace = cornerRadius * 2
     // под открытой пустой директорией
     private val tripleSpace = cornerRadius * 2.5f
-    // расстояние между низом последнего айтема глубочайшей директории и нижним краем рамки,
-    // а так же минимальное расстояние между низом открытой директории и нижним краем рамки
+    // расстояние между низом последнего айтема глубочайшей директории и нижним краем рамки
     private val frameBottomOffset = doubleSpace / 2 + borderWidth / 2
 
     private var deepestDir: Node? = null
@@ -90,7 +89,7 @@ class ItemBorderDecorator(
         val firstItemViewHolder = first.first
         val itemChildCount = first.second
 
-        rect.left  = parent.paddingLeft.toFloat()
+        rect.left = parent.paddingLeft.toFloat()
         rect.right = parent.width - parent.paddingRight.toFloat()
 
         var frameRect: RectF? = null
@@ -134,10 +133,9 @@ class ItemBorderDecorator(
                     // но только если айтем текущей директории не оказывается слишком низко,
                     // чтобы игнорировать область видимости
                     if (item.parentPath != next?.parentPath) {
-                        rect.top = min(rect.top, child.bottom.toFloat())
+                        rect.top = min(rect.top, child.bottom + space)
                         rect.bottom = child.bottom + frameBottomOffset
                         rect.bottom = min(rect.bottom, parentBottom)
-                        rect.bottom = max(rect.bottom, rect.top + frameBottomOffset)
                     }
                 }
             }
@@ -167,10 +165,19 @@ class ItemBorderDecorator(
     private fun RectF.drawFrame(canvas: Canvas) {
         val stroke = borderWidth
         val innerRadius = cornerRadius - stroke
-        val radii = FloatArray(8) { if (it <= 3) 0f else cornerRadius }
+        val diameter = cornerRadius * 2
         framePath.reset()
-        framePath.addRoundRect(left, top, right, bottom, radii, Direction.CW)
-        framePath.addRoundRect(left + stroke, top, right - stroke, bottom - stroke, innerRadius, innerRadius, Direction.CCW)
+        framePath.moveTo(left + cornerRadius, top)
+        framePath.rLineTo(-cornerRadius, -cornerRadius)
+        framePath.arcTo(left, bottom - diameter, left + diameter, bottom, 180f, -90f, false)
+        framePath.arcTo(right - diameter, bottom - diameter, right, bottom, 90f, -90f, false)
+        framePath.lineTo(right, top - cornerRadius)
+        framePath.rLineTo(-cornerRadius, cornerRadius)
+        bottom -= stroke
+        val negative = min(0f, height() / 2 - innerRadius)
+        left += stroke - negative
+        right -= stroke - negative
+        framePath.addRoundRect(this, innerRadius, innerRadius, Direction.CW)
         canvas.drawPath(framePath, paint)
     }
 }
