@@ -19,6 +19,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerStickyTopView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import kotlin.math.max
 import kotlin.math.min
 
@@ -75,6 +76,7 @@ class ItemBorderDecorator(
         outRect.bottom = when {
             item.isOpened && item.isEmpty == true -> tripleSpace
             item.isOpened -> space
+            item.isSeparator() -> space
             next == null -> space
             item.parentPath != next.parentPath && item.parentPath == deepestDir?.path -> doubleSpace
             item.parentPath != next.parentPath -> space
