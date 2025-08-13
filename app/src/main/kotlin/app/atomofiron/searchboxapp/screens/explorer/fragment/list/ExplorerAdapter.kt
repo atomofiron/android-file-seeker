@@ -18,7 +18,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.Explore
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ItemVisibilityDelegate
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.NodeCallback
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.RecycleItemViewFactory
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.isDot
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 
 class ExplorerAdapter(
     private val itemActionListener: ExplorerItemActionListener,
@@ -56,7 +56,7 @@ class ExplorerAdapter(
     override fun getItemViewType(position: Int): Int {
         val item = items[position]
         return when {
-            item.isDot() -> SeparatorNodeItem
+            item.isSeparator() -> SeparatorNodeItem
             item.isDeepest -> CurrentOpenedNodeItem
             item.isOpened -> OpenedNodeItem
             else -> NodeItem

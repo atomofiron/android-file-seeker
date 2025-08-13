@@ -625,10 +625,15 @@ object ExplorerUtils {
     fun NodeProperties.isLink(): Boolean = access.firstOrNull() == LINK_CHAR
 
     // means this node the fake, may be is a visual separating item, isn't a dir
-    fun Node.isDot(): Boolean = path.endsWith("/.")
+    fun Node.isSeparator(): Boolean = path.endsWith("/.")
+
+    fun Node.asSeparator(): Node = when {
+        isSeparator() -> this
+        else -> copy(path = "$path.", uniqueId = -uniqueId, children = null)
+    }
 
     fun Node.withoutDot(): String = when {
-        isDot() -> path.substring(0, path.length.dec())
+        isSeparator() -> path.substring(0, path.length.dec())
         else -> path
     }
 

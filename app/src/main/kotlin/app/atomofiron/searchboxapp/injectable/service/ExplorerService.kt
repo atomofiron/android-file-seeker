@@ -20,9 +20,11 @@ import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.*
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.asSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.close
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.completePath
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.open
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
@@ -32,7 +34,6 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortByName
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateWith
-import app.atomofiron.searchboxapp.utils.endingDot
 import app.atomofiron.searchboxapp.utils.writeTo
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -717,7 +718,8 @@ class ExplorerService(
                     .let { items.add(it) }
             }
             if (i < tree.lastIndex) {
-                items.add(level.withPath(path = level.path.endingDot()))
+                level.isSeparator()
+                items.add(level.asSeparator())
             }
         }
         return items
