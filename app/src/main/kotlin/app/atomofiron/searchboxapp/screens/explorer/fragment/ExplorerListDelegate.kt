@@ -15,7 +15,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.Root
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
-import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.ExplorerStickyTopDelegate
+import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.ExplorerStickyDelegate
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.withoutDot
 import lib.atomofiron.insets.attachInsetsListener
@@ -32,7 +32,7 @@ class ExplorerListDelegate(
     private var items = mutableListOf<Node>()
     private var deepestDir: Node? = null
 
-    private val stickyTopDelegate = ExplorerStickyTopDelegate(recyclerView, stickyBox, rootAdapter, nodeAdapter, StickyListener())
+    private val stickyTopDelegate = ExplorerStickyDelegate(recyclerView, stickyBox, rootAdapter, nodeAdapter, StickyListener())
     private val rootMarginDecorator = RootItemMarginDecorator(recyclerView.resources)
     private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = true)
     private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter, stickyTopDelegate::onDecoratorDraw)

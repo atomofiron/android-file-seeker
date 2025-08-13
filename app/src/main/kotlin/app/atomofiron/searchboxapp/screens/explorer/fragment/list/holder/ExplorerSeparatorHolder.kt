@@ -18,7 +18,7 @@ class ExplorerSeparatorHolder(itemView: View) : GeneralHolder<Node>(itemView) {
     }
 
     override fun onBind(item: Node, position: Int) {
-        binding.itemExplorerTvTitle.text = item.getTitle(itemView.resources)
+        binding.title.text = item.getTitle(itemView.resources)
     }
 
     fun setOnClickListener(listener: (Node) -> Unit) {

@@ -24,8 +24,8 @@ fun ItemExplorerSeparatorBinding.makeSeparator() {
     drawable.cornerRadii = FloatArray(8) { cornerRadius }
     root.background = RippleDrawable(ColorStateList.valueOf(content), drawable, null)
     val filter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(content, BlendModeCompat.SRC_IN)
-    itemExplorerIvIcon.colorFilter = filter
-    itemExplorerTvTitle.setTextColor(content)
+    icon.colorFilter = filter
+    title.setTextColor(content)
 }
 
 fun ItemExplorerBinding.makeOpened() {

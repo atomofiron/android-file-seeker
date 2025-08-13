@@ -1,92 +1,30 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.sticky
 
-import android.view.View
 import android.view.View.MeasureSpec
 import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
-import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
-import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.recycler.CoroutineListDiffer
-import app.atomofiron.common.util.extension.debugRequire
-import app.atomofiron.common.util.noClip
 import app.atomofiron.searchboxapp.custom.view.ExplorerStickyTopView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
-import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.isDot
+import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderInfo
+import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.StickyInfo
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import kotlin.math.max
 
-class ExplorerStickyTopDelegate(
-    private val recyclerView: RecyclerView,
-    private val stickyBox: FrameLayout,
-    private val roots: RootAdapter,
-    private val adapter: ExplorerAdapter,
-    private var listener: ExplorerItemBinderActionListener,
-) : RecyclerView.OnScrollListener(), RecyclerView.OnChildAttachStateChangeListener, CoroutineListDiffer.ListListener<Node> {
+private typealias StickyTop = StickyInfo<ExplorerStickyTopView>
 
-    private val context = recyclerView.context
+class StickyTopDelegate(
+    private val holders: Set<Map.Entry<Int, HolderInfo>>,
+    private val stickyBox: FrameLayout,
+    private var listener: ExplorerItemBinderActionListener,
+) {
+
+    private val stickies = HashMap<Int, StickyTop>()
     private val threshold get() = stickyBox.paddingTop
     private var composition: ExplorerItemComposition? = null
-    private val holders = HashMap<Int, HolderData>()
-    private val stickies = HashMap<Int, StickyData>()
-
-    init {
-        recyclerView.addOnScrollListener(this)
-        recyclerView.addOnChildAttachStateChangeListener(this)
-        adapter.addListListener(this)
-        stickyBox.noClip()
-    }
-
-    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-        if (dy != 0) updateOffset()
-    }
-
-    override fun onCurrentListChanged(current: List<Node>) {
-        val opened = mutableListOf<Node>()
-        for (i in current.indices) {
-            val new = current[i]
-            syncStickies(new, i)
-            syncHolders(new, i)
-            if (new.isOpened) opened.add(new)
-        }
-        for (sticky in stickies.entries.toList()) {
-            if (!opened.any { it.uniqueId == sticky.value.item.uniqueId }) {
-                removeSticky(sticky.key)
-            }
-        }
-        recyclerView.doOnPreDraw { updateOffset() }
-    }
-
-    override fun onChanged(index: Int, new: Node) {
-        syncStickies(new, index)
-        syncHolders(new, index)
-        updateOffset()
-    }
-
-    override fun onChildViewAttachedToWindow(itemView: View) {
-        val holder = itemView.getHolder()
-        val item = holder?.let { adapter.items[it.bindingAdapterPosition] }
-        item ?: return
-        holders[item.uniqueId] = HolderData(item, holder)
-    }
-
-    override fun onChildViewDetachedFromWindow(itemView: View) {
-        holders.entries
-            .find { it.value.holder.itemView === itemView }
-            ?.key
-            ?.let { holders.remove(it) }
-    }
-
-    private fun View.getHolder(): RecyclerView.ViewHolder? {
-        return recyclerView.getChildViewHolder(this)
-            .takeIf { it.absoluteAdapterPosition >= roots.itemCount }
-    }
-
-    fun onDecoratorDraw() = updateOffset()
 
     fun setComposition(composition: ExplorerItemComposition) {
         this.composition = composition
@@ -95,21 +33,19 @@ class ExplorerStickyTopDelegate(
         }
     }
 
-    private fun syncHolders(new: Node, position: Int) {
-        val holder = holders[new.uniqueId]
-        if (holder?.item?.areContentsTheSame(new) == false) {
-            holders[new.uniqueId] = HolderData(new, holder.holder)
-        } else if (holder != null) {
-            debugRequire(position == holder.position)
+    fun sync(opened: List<Pair<Int,Node>>) {
+        for (sticky in stickies.entries.toList()) {
+            if (!opened.any { it.second.uniqueId == sticky.value.item.uniqueId }) {
+                removeSticky(sticky.key)
+            }
+        }
+        for ((position, item) in opened) {
+            sync(item, position)
         }
     }
 
-    private fun syncStickies(new: Node, position: Int) {
-        if (!new.isOpened || new.isEmpty) {
-            removeSticky(new.uniqueId)
-            return
-        }
-        if (new.isDot()) {
+    fun sync(new: Node, position: Int) {
+        if (!new.isOpened || new.isEmpty == true) {
             return
         }
         val sticky = stickies[new.uniqueId]
@@ -119,7 +55,7 @@ class ExplorerStickyTopDelegate(
                 ?: removeSticky(new.uniqueId)
                     .let { newSticky(new) }
             view.bind(new)
-            stickies[new.uniqueId] = StickyData(position, new, view)
+            stickies[new.uniqueId] = StickyInfo(position, new, view)
         }
     }
 
@@ -130,7 +66,7 @@ class ExplorerStickyTopDelegate(
     }
 
     private fun newSticky(new: Node): ExplorerStickyTopView {
-        val view = ExplorerStickyTopView(context, new.isDeepest, listener)
+        val view = ExplorerStickyTopView(stickyBox.context, new.isDeepest, listener)
         view.bind(new, composition)
         view.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
         stickyBox.addView(view)
@@ -143,8 +79,8 @@ class ExplorerStickyTopDelegate(
         return view
     }
 
-    private fun updateOffset() {
-        val holders = holders.values.sortedBy { it.position }
+    fun updateOffset() {
+        val holders = holders.map { it.value }.sortedBy { it.position }
         val stickies = stickies.values.sortedBy { -it.position }
         val last = holders.lastOrNull() ?: return
         for (sticky in stickies) {
@@ -165,13 +101,13 @@ class ExplorerStickyTopDelegate(
     }
 
     /** @return some holder to move sticky with, the same opened dir or some child above the next opened */
-    private fun List<HolderData>.findHolder(sticky: StickyData): HolderData? {
+    private fun List<HolderInfo>.findHolder(sticky: StickyTop): HolderInfo? {
         find { it.position == sticky.position }
             ?.let { return it }
         val openedIndex = sticky.item.getOpenedIndex(sticky.item.childCount)
         for (holder in this) {
             return sticky.item.children
-                .takeIf { !holder.item.isDot() && holder.item.parentPath == sticky.item.path }
+                .takeIf { !holder.item.isSeparator() && holder.item.parentPath == sticky.item.path }
                 ?.indexOfFirst { it.uniqueId == holder.item.uniqueId }
                 ?.takeIf { it < openedIndex }
                 ?.let { return holder }
@@ -180,7 +116,7 @@ class ExplorerStickyTopDelegate(
     }
 
     /** @return the top of the next opened dir or the bottom of the last child */
-    private fun List<HolderData>.findBarrier(sticky: StickyData): Int? {
+    private fun List<HolderInfo>.findBarrier(sticky: StickyTop): Int? {
         for (i in indices) {
             val data = get(i)
             return when {
