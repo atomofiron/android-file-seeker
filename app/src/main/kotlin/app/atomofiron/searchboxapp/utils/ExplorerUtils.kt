@@ -169,7 +169,7 @@ object ExplorerUtils {
 
     fun copy(from: Node, to: Node, useSu: Boolean): Node {
         val output = Shell.exec(Shell[Shell.COPY].format(from.path, to.path), useSu)
-        val new = to.updateProperties(CacheConfig(useSu))
+        val new = to.update(CacheConfig(useSu), ensureCached = false)
         return when {
             output.success -> new
             else -> from.copy(error = output.error.toNodeError(from.path))
@@ -247,8 +247,11 @@ object ExplorerUtils {
         }
         builder.append(tmp)
         if (builder.length == 1 && secondary >= 50) {
-            builder.append('.')
-            builder.append((secondary / 100f).roundToInt())
+            val dec = (secondary / 100f).roundToInt()
+            if (dec > 0) {
+                builder.append('.')
+                builder.append(dec)
+            }
         }
         builder.append("BKMGT"[dim])
         return builder.toString()
@@ -285,24 +288,13 @@ object ExplorerUtils {
         }
     }
 
-    private fun Node.updateProperties(config: CacheConfig): Node {
+    fun Node.update(config: CacheConfig, ensureCached: Boolean = true): Node {
         val output = Shell.exec(Shell[Shell.LS_LALD_FILE].format(path, path), config.useSu)
         val lines = output.output.trim().split(LF)
         return when {
             output.success && lines.size == 2 -> parseNode(lines.first())
                 .resolveType(type = lines.last(), path = path)
-            output.success -> copy(children = null, error = NodeError.Unknown)
-            else -> copy(error = output.error.toNodeError(path))
-        }
-    }
-
-    fun Node.update(config: CacheConfig): Node {
-        val output = Shell.exec(Shell[Shell.LS_LALD_FILE].format(path, path), config.useSu)
-        val lines = output.output.trim().split(LF)
-        return when {
-            output.success && lines.size == 2 -> parseNode(lines.first())
-                .resolveType(type = lines.last(), path = path)
-                .ensureCached(config, oldProps = properties)
+                .run { if (ensureCached) ensureCached(config, oldProps = properties) else this }
             output.success -> copy(children = null, error = null)
             else -> copy(error = output.error.toNodeError(path))
         }
@@ -353,12 +345,13 @@ object ExplorerUtils {
     }
 
     fun Node.resolveSize(useSu: Boolean): String = Shell.exec(Shell[Shell.DU_HD0].format(path), useSu)
-            .output
-            .trim()
-            .split(Const.TAB)
-            .takeIf { it.size == 2 }
-            ?.firstOrNull()
-            ?: ""
+        .output
+        .trim()
+        .split(Const.TAB)
+        .takeIf { it.size == 2 }
+        ?.firstOrNull()
+        ?.replace(".0", "")
+        ?: ""
 
     private fun Node.resolveType(type: String, path: String): Node {
         return resolveType(type.substring(path.length.inc()).trim())
