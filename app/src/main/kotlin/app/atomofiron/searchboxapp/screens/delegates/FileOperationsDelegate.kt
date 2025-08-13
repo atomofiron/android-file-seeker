@@ -33,7 +33,7 @@ import kotlinx.coroutines.launch
 import java.io.FileInputStream
 import kotlin.math.abs
 
-private val rootOptions = listOf(R.id.menu_create)
+private val rootOptions = listOf(R.id.menu_create, R.id.menu_copy_path)
 private val directoryOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_create, R.id.menu_clone, R.id.menu_copy_path)
 private val oneFileOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_share, R.id.menu_open_with, R.id.menu_clone, R.id.menu_copy_path)
 private val manyFilesOptions = listOf(R.id.menu_delete)
