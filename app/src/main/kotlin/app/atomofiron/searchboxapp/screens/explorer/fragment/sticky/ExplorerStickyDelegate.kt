@@ -13,11 +13,11 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerI
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderInfo
 
-class HolderDelegate(
+class ExplorerStickyDelegate(
     private val recyclerView: RecyclerView,
-    stickyBox: FrameLayout,
     private val roots: RootAdapter,
     private val adapter: ExplorerAdapter,
+    stickyBox: FrameLayout,
     listener: ExplorerItemBinderActionListener,
 ) : RecyclerView.OnScrollListener()
     , RecyclerView.OnChildAttachStateChangeListener
