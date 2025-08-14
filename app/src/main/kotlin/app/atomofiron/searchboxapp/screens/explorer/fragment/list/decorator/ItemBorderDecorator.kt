@@ -138,6 +138,7 @@ class ItemBorderDecorator(
                         rect.top = min(rect.top, child.bottom + space)
                         rect.bottom = child.bottom + frameBottomOffset
                         rect.bottom = min(rect.bottom, parentBottom)
+                        rect.bottom = max(rect.bottom, rect.top)
                     }
                 }
             }
