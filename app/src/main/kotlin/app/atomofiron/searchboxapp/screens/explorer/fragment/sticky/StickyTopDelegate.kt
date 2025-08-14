@@ -19,7 +19,7 @@ import kotlin.math.roundToInt
 private typealias StickyTop = StickyInfo<ExplorerStickyTopView>
 
 class StickyTopDelegate(
-    private val holders: Set<Map.Entry<Int, HolderInfo>>,
+    private val holders: Collection<HolderInfo>,
     private val stickyBox: FrameLayout,
     private var listener: ExplorerItemBinderActionListener,
 ) {
@@ -37,6 +37,8 @@ class StickyTopDelegate(
         }
     }
 
+    fun valid(item: Node) = item.isOpened && item.isEmpty == false && !item.isSeparator()
+
     fun sync(opened: List<Pair<Int,Node>>) {
         for (sticky in stickies.entries.toList()) {
             if (!opened.any { it.second.uniqueId == sticky.value.item.uniqueId }) {
@@ -49,18 +51,16 @@ class StickyTopDelegate(
     }
 
     fun sync(new: Node, position: Int) {
-        if (!new.isOpened || new.isEmpty == true) {
-            return
-        }
         val sticky = stickies[new.uniqueId]
-        if (sticky?.item?.areContentsTheSame(new) != true) {
-            val view = sticky?.view
-                ?.takeIf { sticky.item.isDeepest == new.isDeepest }
-                ?: removeSticky(new.uniqueId)
-                    .let { newSticky(new) }
-            view.bind(new)
-            stickies[new.uniqueId] = StickyInfo(position, new, view)
+        var view = when {
+            sticky == null -> null
+            sticky.position != position -> sticky.view
+            sticky.item.isDeepest != new.isDeepest -> null.also { removeSticky(new.uniqueId) }
+            !sticky.item.areContentsTheSame(new) -> return sticky.view.bind(new)
+            else -> return
         }
+        view = view ?: newSticky(new)
+        stickies[new.uniqueId] = StickyInfo(position, new, view)
     }
 
     private fun removeSticky(uniqueId: Int) {
@@ -84,7 +84,7 @@ class StickyTopDelegate(
     }
 
     fun updateOffset() {
-        val holders = holders.map { it.value }.sortedBy { it.position }
+        val holders = holders.sortedBy { it.position }
         val stickies = stickies.values.sortedBy { -it.position }
         val last = holders.lastOrNull() ?: return
         for (sticky in stickies) {
@@ -93,27 +93,26 @@ class StickyTopDelegate(
                 ?.takeIf { it < threshold }
                 .also { sticky.view.isVisible = it != null }
                 ?: continue
-            require(sticky.view.measuredHeight > 0)
             var top = max(holderTop, threshold)
             holders.findBarrier(sticky)?.let { barrier ->
                 val bottom = top + sticky.view.measuredHeight
                 top -= max(0, bottom - barrier)
             }
-            sticky.view.move(top, drawTop = (top - holderTop).toFloat())
+            sticky.view.move(top, drawTop = top - holderTop)
         }
     }
 
     /** @return some holder to move sticky with, the same opened dir or some child above the next opened */
     private fun List<HolderInfo>.findTop(sticky: StickyTop): Int? {
         find { it.position == sticky.position }
-            ?.let { return it.holder.itemView.top }
+            ?.let { return it.view.top }
         val openedIndex = sticky.item.getOpenedIndex(sticky.item.childCount)
         for (holder in this) {
-            return sticky.item.children
+            sticky.item.children
                 .takeIf { !holder.item.isSeparator() && holder.item.parentPath == sticky.item.path }
                 ?.indexOfFirst { it.uniqueId == holder.item.uniqueId }
                 ?.takeIf { it < openedIndex }
-                ?.let { return holder.holder.itemView.top }
+                ?.let { return holder.view.top }
         }
         return null
     }
@@ -121,18 +120,18 @@ class StickyTopDelegate(
     /** @return the top of the next opened dir or the bottom of the last child */
     private fun List<HolderInfo>.findBarrier(sticky: StickyTop): Int? {
         for (i in indices) {
-            val data = get(i)
+            val info = get(i)
             return when {
                 // skip above the target
-                data.position <= sticky.position -> continue
+                info.position <= sticky.position -> continue
                 // next opened dir below
-                !sticky.item.isDeepest && data.item.isOpened -> data.holder.itemView.top
+                !sticky.item.isDeepest && info.item.isOpened -> info.view.top
                 // skip children
-                data.item.parentPath == sticky.item.path -> continue
+                info.item.parentPath == sticky.item.path -> continue
                 // nothing above
                 i == 0 -> return null
                 // the last child
-                else -> get(i.dec()).holder.itemView.bottom + lastChildOffset
+                else -> get(i.dec()).view.bottom + lastChildOffset
             }
         }
         return null

@@ -4,7 +4,6 @@ import android.view.View
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
-import app.atomofiron.fileseeker.databinding.ItemExplorerSeparatorBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 
 enum class ExplorerItemViewFactory(
@@ -31,7 +30,6 @@ enum class ExplorerItemViewFactory(
     },
     SeparatorNodeItem(3, R.layout.item_explorer_separator) {
         override fun createHolder(itemView: View): ExplorerSeparatorHolder {
-            ItemExplorerSeparatorBinding.bind(itemView).makeSeparator()
             return ExplorerSeparatorHolder(itemView)
         }
     };

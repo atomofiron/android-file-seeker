@@ -5,14 +5,12 @@ import android.widget.FrameLayout
 import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.CoroutineListDiffer
-import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderInfo
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 
 class HolderDelegate(
     private val recyclerView: RecyclerView,
@@ -20,14 +18,15 @@ class HolderDelegate(
     private val roots: RootAdapter,
     private val adapter: ExplorerAdapter,
     listener: ExplorerItemBinderActionListener,
-) : RecyclerView.OnChildAttachStateChangeListener, CoroutineListDiffer.ListListener<Node> {
+) : RecyclerView.OnChildAttachStateChangeListener, CoroutineListDiffer.ListListener<Node>, View.OnLayoutChangeListener {
 
     private val holders = HashMap<Int, HolderInfo>()
-    private val top = StickyTopDelegate(holders.entries, stickyBox, listener)
-    private val bottom = StickyBottomDelegate(holders.entries, stickyBox, listener)
+    private val top = StickyTopDelegate(holders.values, stickyBox, listener)
+    private val bottom = StickyBottomDelegate(holders.values, stickyBox, listener)
 
     init {
         recyclerView.addOnChildAttachStateChangeListener(this)
+        recyclerView.addOnLayoutChangeListener(this)
         adapter.addListListener(this)
     }
 
@@ -42,14 +41,18 @@ class HolderDelegate(
         val holder = itemView.getHolder()
         val item = holder?.let { adapter.items[it.bindingAdapterPosition] }
         item ?: return
-        holders[item.uniqueId] = HolderInfo(item, holder)
+        holders[item.uniqueId] = HolderInfo(holder.bindingAdapterPosition, item, holder)
     }
 
     override fun onChildViewDetachedFromWindow(itemView: View) {
         holders.entries
-            .find { it.value.holder.itemView === itemView }
+            .find { it.value.view === itemView }
             ?.key
             ?.let { holders.remove(it) }
+    }
+
+    override fun onLayoutChange(v: View?, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
+        updateOffset()
     }
 
     override fun onCurrentListChanged(current: List<Node>) {
@@ -59,8 +62,8 @@ class HolderDelegate(
             val new = current[i]
             syncHolders(new, i)
             when {
-                new.isSeparator() -> separators.add(i to new)
-                new.isOpened && new.isEmpty == false -> opened.add(i to new)
+                top.valid(new) -> opened.add(i to new)
+                bottom.valid(new) -> separators.add(i to new)
             }
         }
         top.sync(opened)
@@ -73,15 +76,15 @@ class HolderDelegate(
 
     override fun onChanged(index: Int, new: Node) {
         syncHolders(new, index)
-        top.sync(new, index)
+        if (top.valid(new)) {
+            top.sync(new, index)
+        }
     }
 
     private fun syncHolders(new: Node, position: Int) {
-        val holder = holders[new.uniqueId]
-        if (holder?.item?.areContentsTheSame(new) == false) {
-            holders[new.uniqueId] = HolderInfo(new, holder.holder)
-        } else if (holder != null) {
-            debugRequire(position == holder.position)
+        val holder = holders[new.uniqueId] ?: return
+        if (holder.position != position || !holder.item.areContentsTheSame(new)) {
+            holders[new.uniqueId] = HolderInfo(position, new, holder.holder)
         }
     }
 

@@ -4,8 +4,9 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.searchboxapp.model.explorer.Node
 
 data class HolderInfo(
+    val position: Int,
     val item: Node,
     val holder: RecyclerView.ViewHolder,
 ) {
-    val position get() = holder.bindingAdapterPosition
+    val view get() = holder.itemView
 }

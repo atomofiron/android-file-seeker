@@ -79,7 +79,7 @@ class ExplorerView(
 
     private fun ViewExplorerBinding.applyInsets() {
         recyclerView.insetsPadding(ExtType { barsWithCutout + dock })
-        binding.stickyBox.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
+        binding.stickyBox.insetsPadding(ExtType { tappableElement + displayCutout + dock })
         root.attachInsetsListener(binding.systemUiBackground)
     }
 

@@ -38,7 +38,6 @@ class ExplorerStickyTopView(
 
     private var composition: ExplorerItemComposition? = null
     private var item: Node? = null
-    private var movedTop = 0
     private var drawTop = 0f
     private val paint = Paint()
 
@@ -62,31 +61,15 @@ class ExplorerStickyTopView(
         item: Node? = this.item,
         composition: ExplorerItemComposition? = this.composition,
     ) {
-        this.item = item ?: this.item
+        this.item = item
         this.composition = composition ?: this.composition
-        tryBind()
-    }
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        if (top != movedTop) {
-            val height = bottom - top
-            move(movedTop + height, drawTop)
-        }
-    }
-
-    fun move(top: Int, drawTop: Float) {
-        this.drawTop = drawTop
-        movedTop = top
-        val bottom = movedTop + height
-        this.top = movedTop
-        this.bottom = bottom
-        invalidate()
-    }
-
-    private fun tryBind() {
-        val item = item ?: return
-        binder.onBind(item)
+        item?.let { binder.onBind(it) }
         composition?.let { binder.bindComposition(it) }
+    }
+
+    fun move(top: Int, drawTop: Int) {
+        this.drawTop = drawTop.toFloat()
+        translationY = top - this.top.toFloat()
+        invalidate()
     }
 }

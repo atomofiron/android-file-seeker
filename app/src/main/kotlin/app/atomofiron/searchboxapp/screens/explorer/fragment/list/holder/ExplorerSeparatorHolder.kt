@@ -12,6 +12,7 @@ class ExplorerSeparatorHolder(itemView: View) : GeneralHolder<Node>(itemView) {
     private var clickListener: ((Node) -> Unit)? = null
 
     init {
+        binding.makeSeparator()
         itemView.setOnClickListener {
             clickListener?.invoke(item)
         }

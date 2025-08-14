@@ -12,6 +12,8 @@ import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerSeparatorBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeSeparator
+import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 
 @SuppressLint("ViewConstructor")
 class ExplorerStickyBottomView(
@@ -19,15 +21,14 @@ class ExplorerStickyBottomView(
     onclick: (Node) -> Unit,
 ) : FrameLayout(context) {
 
-    private val cornerRadius = resources.getDimension(R.dimen.explorer_border_corner_radius)
     private val binding = ItemExplorerSeparatorBinding.inflate(LayoutInflater.from(context), this, true)
     private lateinit var item: Node
 
-    private var movedTop = 0
-    private var drawBottom = 0f
+    private var drawRange: IntRange? = null
     private val paint = Paint()
 
     init {
+        binding.makeSeparator()
         binding.root.setOnClickListener { onclick(item) }
         paint.style = Paint.Style.FILL
         paint.color = context.findColorByAttr(R.attr.colorBackground)
@@ -36,31 +37,24 @@ class ExplorerStickyBottomView(
     }
 
     override fun draw(canvas: Canvas) {
-        val left = -left.toFloat()
-        val right = (parent as View).width + left
-        val bottom = height + drawBottom
-        canvas.drawRect(left, cornerRadius, right, bottom, paint)
+        drawRange?.let {
+            val left = -left.toFloat()
+            val top = it.first - translationY
+            val right = (parent as View).width + left
+            val bottom = it.last - translationY
+            canvas.drawRect(left, top, right, bottom, paint)
+        }
         super.draw(canvas)
     }
 
     fun bind(item: Node) {
-        binding.title.text = item.name
+        this.item = item
+        binding.title.text = item.getTitle(resources)
     }
 
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        if (top != movedTop) {
-            val height = bottom - top
-            move(movedTop + height, drawBottom)
-        }
-    }
-
-    fun move(top: Int, drawBottom: Float) {
-        this.drawBottom = drawBottom
-        movedTop = top
-        val bottom = movedTop + height
-        this.top = movedTop
-        this.bottom = bottom
+    fun move(offset: Int, drawRange: IntRange?) {
+        this.drawRange = drawRange
+        translationY = offset.toFloat()
         invalidate()
     }
 }

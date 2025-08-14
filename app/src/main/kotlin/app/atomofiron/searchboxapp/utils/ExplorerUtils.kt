@@ -622,7 +622,12 @@ object ExplorerUtils {
 
     fun Node.asSeparator(): Node = when {
         isSeparator() -> this
-        else -> copy(path = "$path.", uniqueId = -uniqueId, children = null)
+        else -> copy(path = "$path.", uniqueId = -uniqueId)
+    }
+
+    fun Node.originalPath(): String = when {
+        !isSeparator() -> throw UnsupportedOperationException()
+        else -> path.substring(0, path.length.dec())
     }
 
     fun Node.withoutDot(): String = when {
