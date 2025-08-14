@@ -56,7 +56,7 @@ class StickyTopDelegate(
             sticky == null -> null
             sticky.position != position -> sticky.view
             sticky.item.isDeepest != new.isDeepest -> null.also { removeSticky(new.uniqueId) }
-            !sticky.item.areContentsTheSame(new) -> return sticky.view.bind(new)
+            !sticky.item.areContentsTheSame(new) -> sticky.view.apply { bind(new) }
             else -> return
         }
         view = view ?: newSticky(new)
