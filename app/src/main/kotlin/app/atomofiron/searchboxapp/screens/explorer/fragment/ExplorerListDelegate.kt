@@ -35,7 +35,7 @@ class ExplorerListDelegate(
     private val stickyDelegate = ExplorerStickyDelegate(recyclerView, stickyBox, rootAdapter, nodeAdapter, StickyListener())
     private val rootMarginDecorator = RootItemMarginDecorator(recyclerView.resources)
     private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = true)
-    private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter, stickyTopDelegate::onDecoratorDraw)
+    private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter)
 
     init {
         recyclerView.attachInsetsListener(rootMarginDecorator)

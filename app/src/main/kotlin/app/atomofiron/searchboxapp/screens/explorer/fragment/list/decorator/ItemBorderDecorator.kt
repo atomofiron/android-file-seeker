@@ -26,7 +26,6 @@ import kotlin.math.min
 class ItemBorderDecorator(
     context: Context,
     private val adapter: ExplorerAdapter,
-    private val requestUpdateHeaderPosition: () -> Unit,
 ) : ItemDecoration() {
 
     private val stickyView = ExplorerStickyTopView(context)
@@ -145,7 +144,6 @@ class ItemBorderDecorator(
             currentIndex++
         }
         frameRect?.drawFrame(canvas)
-        requestUpdateHeaderPosition()
     }
 
     /** @return the first item view and node item count */

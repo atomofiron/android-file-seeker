@@ -5,6 +5,7 @@ import android.widget.FrameLayout
 import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.CoroutineListDiffer
+import app.atomofiron.common.util.noClip
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
@@ -18,16 +19,21 @@ class HolderDelegate(
     private val roots: RootAdapter,
     private val adapter: ExplorerAdapter,
     listener: ExplorerItemBinderActionListener,
-) : RecyclerView.OnChildAttachStateChangeListener, CoroutineListDiffer.ListListener<Node>, View.OnLayoutChangeListener {
-
+) : RecyclerView.OnScrollListener()
+    , RecyclerView.OnChildAttachStateChangeListener
+    , CoroutineListDiffer.ListListener<Node>
+    , View.OnLayoutChangeListener
+{
     private val holders = HashMap<Int, HolderInfo>()
     private val top = StickyTopDelegate(holders.values, stickyBox, listener)
     private val bottom = StickyBottomDelegate(holders.values, stickyBox, listener)
 
     init {
-        recyclerView.addOnChildAttachStateChangeListener(this)
-        recyclerView.addOnLayoutChangeListener(this)
+        stickyBox.noClip()
         adapter.addListListener(this)
+        recyclerView.addOnScrollListener(this)
+        recyclerView.addOnLayoutChangeListener(this)
+        recyclerView.addOnChildAttachStateChangeListener(this)
     }
 
     fun setComposition(composition: ExplorerItemComposition) = top.setComposition(composition)
@@ -78,6 +84,8 @@ class HolderDelegate(
             top.sync(new, index)
         }
     }
+
+    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) = updateOffset()
 
     private fun syncHolders(new: Node, position: Int) {
         val holder = holders[new.uniqueId] ?: return
