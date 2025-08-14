@@ -98,7 +98,8 @@ class StickyTopDelegate(
                 val bottom = top + sticky.view.measuredHeight
                 top -= max(0, bottom - barrier)
             }
-            sticky.view.move(top, drawTop = top - holderTop)
+            sticky.view.translationY = top - threshold.toFloat()
+            sticky.view.drawTop(top - holderTop)
         }
     }
 
