@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderInfo
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.StickyInfo
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.originalPath
 import kotlin.math.max
@@ -38,6 +39,17 @@ class StickyBottomDelegate(
         for ((position, item) in separators) {
             sync(item, position)
         }
+    }
+
+    fun onAttach(info: HolderInfo) {
+        stickies.values
+            .find { it.position == info.position }
+            ?.takeIf { it.view.isVisible }
+            ?.let { info.view.alpha = Alpha.INVISIBLE }
+    }
+
+    fun onDetach(info: HolderInfo) {
+        info.view.alpha = Alpha.VISIBLE
     }
 
     private fun sync(new: Node, position: Int) {
@@ -78,26 +90,22 @@ class StickyBottomDelegate(
                 ?.findBottom(sticky)
                 ?.let { stickyBox.height - it }
                 ?.takeIf { it < threshold }
-                .also { sticky.view.isVisible = it != null }
+                .syncWithHolder(sticky)
                 ?: continue
             var bottom = max(holderBottom, threshold)
             holders.findBarrier(sticky)?.let { barrier ->
                 val top = bottom + sticky.view.measuredHeight
                 bottom -= max(0, top - barrier)
             }
-            val offset = threshold - bottom
-            val drawRange = holders.calcDrawRange(sticky)
-            sticky.view.move(offset, drawRange)
+            sticky.view.translationY = (threshold - bottom).toFloat()
         }
     }
 
-    private fun List<HolderInfo>.calcDrawRange(sticky: StickyBottom): IntRange? {
-        val holder = find { it.position == sticky.position }
-        holder ?: return null
-        val offset = stickyBox.height - threshold
-        val top = holder.view.bottom - offset
-        val bottom = holder.view.bottom + holder.view.height - offset
-        return top..bottom
+    private fun <T> T?.syncWithHolder(sticky: StickyBottom): T? {
+        sticky.view.isVisible = this != null
+        val holder = holders.find { it.position == sticky.position }
+        holder?.view?.alpha = Alpha.visible(this == null)
+        return this
     }
 
     /** @return some holder to move sticky with, the same separator or some child below the child opened */

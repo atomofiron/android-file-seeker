@@ -41,7 +41,9 @@ class HolderDelegate(
         val holder = itemView.getHolder()
         val item = holder?.let { adapter.items[it.bindingAdapterPosition] }
         item ?: return
-        holders[item.uniqueId] = HolderInfo(holder.bindingAdapterPosition, item, holder)
+        val info = HolderInfo(holder.bindingAdapterPosition, item, holder)
+        holders[item.uniqueId] = info
+        bottom.onAttach(info)
     }
 
     override fun onChildViewDetachedFromWindow(itemView: View) {
@@ -49,6 +51,7 @@ class HolderDelegate(
             .find { it.value.view === itemView }
             ?.key
             ?.let { holders.remove(it) }
+            ?.let { bottom.onDetach(it) }
     }
 
     override fun onLayoutChange(v: View?, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
