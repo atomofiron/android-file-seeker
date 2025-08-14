@@ -2,18 +2,21 @@ package app.atomofiron.searchboxapp.screens.main
 
 import android.app.Service
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.CornerPathDebug
 import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.common.util.findColorByAttr
@@ -66,6 +69,7 @@ class MainActivity : AppCompatActivity() {
         updateTheme(viewState.setTheme.value)
         onCreateView(savedInstanceState)
         CornerPathDebug(resources.displayMetrics)
+        if (Android.R) unlockHighFrameRate()
     }
 
     private fun onCreateView(savedInstanceState: Bundle?) {
@@ -200,5 +204,14 @@ class MainActivity : AppCompatActivity() {
         if (requestedOrientation != orientation.constant) {
             requestedOrientation = orientation.constant
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.R)
+    private fun unlockHighFrameRate() {
+        window.attributes.preferredDisplayModeId = display.supportedModes
+            .maxByOrNull { it.refreshRate }
+            ?.modeId
+            ?: return
+        window.attributes = window.attributes
     }
 }
