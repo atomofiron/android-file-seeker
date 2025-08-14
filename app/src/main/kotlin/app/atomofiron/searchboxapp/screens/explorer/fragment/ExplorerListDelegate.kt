@@ -32,7 +32,7 @@ class ExplorerListDelegate(
     private var items = mutableListOf<Node>()
     private var deepestDir: Node? = null
 
-    private val stickyTopDelegate = ExplorerStickyDelegate(recyclerView, stickyBox, rootAdapter, nodeAdapter, StickyListener())
+    private val stickyDelegate = ExplorerStickyDelegate(recyclerView, stickyBox, rootAdapter, nodeAdapter, StickyListener())
     private val rootMarginDecorator = RootItemMarginDecorator(recyclerView.resources)
     private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = true)
     private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter, stickyTopDelegate::onDecoratorDraw)
@@ -123,7 +123,7 @@ class ExplorerListDelegate(
 
     fun setComposition(composition: ExplorerItemComposition) {
         backgroundDecorator.enabled = composition.visibleBg
-        stickyTopDelegate.setComposition(composition)
+        stickyDelegate.setComposition(composition)
     }
 
     fun scrollTo(item: Node) {

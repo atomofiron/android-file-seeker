@@ -11,7 +11,6 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderInfo
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.StickyInfo
-import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.originalPath
 import kotlin.math.max
@@ -42,14 +41,13 @@ class StickyBottomDelegate(
     }
 
     fun onAttach(info: HolderInfo) {
-        stickies.values
-            .find { it.position == info.position }
-            ?.takeIf { it.view.isVisible }
-            ?.let { info.view.alpha = Alpha.INVISIBLE }
+        if (info.item.isSeparator()) {
+            updateOffset()
+        }
     }
 
     fun onDetach(info: HolderInfo) {
-        info.view.alpha = Alpha.VISIBLE
+        info.view.translationX = 0f
     }
 
     private fun sync(new: Node, position: Int) {
@@ -86,14 +84,16 @@ class StickyBottomDelegate(
         val stickies = stickies.values.sortedBy { it.position }
         val first = holders.lastOrNull() ?: return
         for (sticky in stickies) {
-            val holderBottom = holders.takeIf { sticky.position >= first.position }
+            val holderBottom = holders
+                .takeIf { sticky.position >= first.position }
+                ?.takeIf { !it.moveOriginal(sticky.position) }
                 ?.findBottom(sticky)
                 ?.let { stickyBox.height - it }
                 ?.takeIf { it < threshold }
-                .syncWithHolder(sticky)
+                .also { sticky.view.isVisible = it != null }
                 ?: continue
             var bottom = max(holderBottom, threshold)
-            holders.findBarrier(sticky)?.let { barrier ->
+            holders.findBarrier(sticky.position, sticky.item)?.let { barrier ->
                 val top = bottom + sticky.view.measuredHeight
                 bottom -= max(0, top - barrier)
             }
@@ -101,17 +101,26 @@ class StickyBottomDelegate(
         }
     }
 
-    private fun <T> T?.syncWithHolder(sticky: StickyBottom): T? {
-        sticky.view.isVisible = this != null
-        val holder = holders.find { it.position == sticky.position }
-        holder?.view?.alpha = Alpha.visible(this == null)
-        return this
+    private fun List<HolderInfo>.moveOriginal(position: Int): Boolean {
+        val holder = find { it.position == position }
+        holder ?: return false
+        val stickyBottom = stickyBox.height - threshold
+        holder.view.translationY = when {
+            holder.view.bottom <= stickyBottom -> 0f
+            else -> {
+                var offset = stickyBottom - holder.view.bottom
+                findBarrier(position, holder.item)?.let { barrier ->
+                    val top = threshold + holder.view.height
+                    offset += max(0, top - barrier)
+                }
+                offset.toFloat()
+            }
+        }
+        return true
     }
 
-    /** @return some holder to move sticky with, the same separator or some child below the child opened */
+    /** @return some holder to move sticky with */
     private fun List<HolderInfo>.findBottom(sticky: StickyBottom): Int? {
-        find { it.position == sticky.position }
-            ?.let { return it.view.bottom }
         val openedIndex = sticky.item.getOpenedIndex()
         for (holder in this) {
             sticky.item.children
@@ -124,16 +133,16 @@ class StickyBottomDelegate(
     }
 
     /** @return the bottom space between of the bottom and other separator or the top of the first child */
-    private fun List<HolderInfo>.findBarrier(sticky: StickyBottom): Int? {
+    private fun List<HolderInfo>.findBarrier(position: Int, item: Node): Int? {
         for (i in indices) {
             val info = get(i)
             return when {
                 // skip below the target
-                info.position >= sticky.position -> continue
+                info.position >= position -> continue
                 // next separator above
                 info.item.isSeparator() -> info.view.bottom
                 // skip closed children
-                !info.item.isOpened && info.item.parentPath == sticky.item.originalPath() -> continue
+                !info.item.isOpened && info.item.parentPath == item.originalPath() -> continue
                 // nothing below
                 i == 0 -> return null
                 // the first child after children of other opened

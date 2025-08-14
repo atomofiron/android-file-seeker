@@ -32,11 +32,6 @@ class HolderDelegate(
 
     fun setComposition(composition: ExplorerItemComposition) = top.setComposition(composition)
 
-    fun updateOffset() {
-        top.updateOffset()
-        bottom.updateOffset()
-    }
-
     override fun onChildViewAttachedToWindow(itemView: View) {
         val holder = itemView.getHolder()
         val item = holder?.let { adapter.items[it.bindingAdapterPosition] }
@@ -94,5 +89,10 @@ class HolderDelegate(
     private fun View.getHolder(): RecyclerView.ViewHolder? {
         return recyclerView.getChildViewHolder(this)
             .takeIf { it.absoluteAdapterPosition >= roots.itemCount }
+    }
+
+    private fun updateOffset() {
+        top.updateOffset()
+        bottom.updateOffset()
     }
 }
