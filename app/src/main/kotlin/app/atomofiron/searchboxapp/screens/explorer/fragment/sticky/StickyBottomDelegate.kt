@@ -6,6 +6,7 @@ import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
 import androidx.core.view.isVisible
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerStickyBottomView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
@@ -26,6 +27,7 @@ class StickyBottomDelegate(
     private val wrapContent = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
     private val onClick: (Node) -> Unit = listener::onItemClick
     private val threshold get() = stickyBox.run { height - paddingBottom }
+    private val space = stickyBox.resources.getDimensionPixelSize(R.dimen.padding_nano)
 
     fun valid(item: Node) = item.isSeparator()
 
@@ -135,7 +137,7 @@ class StickyBottomDelegate(
                 // skip below the target
                 info.position >= position -> continue
                 // next separator above
-                info.item.isSeparator() -> info.view.bottom
+                info.item.isSeparator() -> info.view.bottom + space
                 // skip closed children
                 !info.item.isOpened && info.item.parentPath == item.originalPath() -> continue
                 // nothing below

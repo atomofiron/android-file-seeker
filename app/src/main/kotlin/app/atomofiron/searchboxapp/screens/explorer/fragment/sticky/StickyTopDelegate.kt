@@ -26,6 +26,7 @@ class StickyTopDelegate(
     private val stickies = HashMap<Int, StickyTop>()
     private val threshold get() = stickyBox.paddingTop
     private var composition: ExplorerItemComposition? = null
+    private val space = stickyBox.resources.getDimensionPixelSize(R.dimen.padding_nano)
     private val lastChildOffset = stickyBox.resources.run {
         getDimension(R.dimen.explorer_item_space) + getDimension(R.dimen.explorer_border_width) / 2
     }.roundToInt()
@@ -126,7 +127,7 @@ class StickyTopDelegate(
                 // skip above the target
                 info.position <= sticky.position -> continue
                 // next opened dir below
-                !sticky.item.isDeepest && info.item.isOpened -> info.view.top
+                !sticky.item.isDeepest && info.item.isOpened -> info.view.top - space
                 // skip children
                 info.item.parentPath == sticky.item.path -> continue
                 // nothing above
