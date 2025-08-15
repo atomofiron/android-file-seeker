@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
+import app.atomofiron.searchboxapp.screens.delegates.Operations
 import app.atomofiron.searchboxapp.screens.explorer.curtain.OptionsDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
 import app.atomofiron.searchboxapp.screens.result.ResultViewState
@@ -25,7 +26,7 @@ class ResultCurtainMenuDelegate(
     curtainChannel: CurtainChannel,
 ) : Recipient, CurtainApi.Adapter<CurtainApi.ViewHolder>(), MenuListener {
 
-    private val optionsDelegate = OptionsDelegate(R.menu.item_options, this)
+    private val optionsDelegate = OptionsDelegate(this)
     override var data: ExplorerItemOptions? = null
 
     init {
@@ -43,15 +44,15 @@ class ResultCurtainMenuDelegate(
         controller?.close(irrevocably = true)
         val items = data.items
         when (id) {
-            R.id.menu_copy_path -> {
+            Operations.CopyPath.id -> {
                 interactor.copyToClipboard(items.first())
                 viewState.showAlert(AlertMessage(R.string.copied))
             }
-            R.id.menu_open_with -> router.openWith(items.first())
-            R.id.menu_share -> router.shareWith(items.first())
-            R.id.menu_delete -> interactor.deleteItems(items)
-            R.id.menu_install -> apks.install(items.first())
-            R.id.menu_launch -> apks.launch(items.first())
+            Operations.OpenWith.id -> router.openWith(items.first())
+            Operations.Share.id -> router.shareWith(items.first())
+            Operations.Delete.id -> interactor.deleteItems(items)
+            Operations.InstallApp.id -> apks.install(items.first())
+            Operations.LaunchApp.id -> apks.launch(items.first())
         }
     }
 

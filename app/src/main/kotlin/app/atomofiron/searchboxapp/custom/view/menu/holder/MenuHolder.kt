@@ -1,9 +1,7 @@
 package app.atomofiron.searchboxapp.custom.view.menu.holder
 
-import android.view.MenuItem
 import android.view.View
-import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.common.recycler.GeneralHolder
+import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 
-sealed class MenuHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-    abstract fun bind(item: MenuItem)
-}
+open class MenuHolder(itemView: View) : GeneralHolder<MenuItem>(itemView)

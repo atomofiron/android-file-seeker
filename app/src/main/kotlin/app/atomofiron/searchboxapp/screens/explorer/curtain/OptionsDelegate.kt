@@ -1,8 +1,6 @@
 package app.atomofiron.searchboxapp.screens.explorer.curtain
 
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import androidx.core.view.*
 import app.atomofiron.fileseeker.R
@@ -14,18 +12,13 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerI
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 
-class OptionsDelegate(
-    private val menuId: Int,
-    private val output: MenuListener,
-) {
+class OptionsDelegate(private val output: MenuListener) {
 
     fun getView(options: ExplorerItemOptions, inflater: LayoutInflater): View {
         val binding = CurtainExplorerOptionsBinding.inflate(inflater, null, false)
         binding.menuView.run {
-            val menu = inflateMenu(menuId)
-            options.bind(menu)
+            submit(options)
             setMenuListener(output)
-            markAsDangerous(R.id.menu_delete)
         }
         binding.init(options)
         binding.root.insetsPadding(ExtType.curtain, top = true)
@@ -69,23 +62,5 @@ class OptionsDelegate(
                 explorerMenuTvTitle.text = string.toString()
             }
         }
-    }
-
-    private fun ExplorerItemOptions.bind(menu: Menu) {
-        val iter = menu.iterator()
-        while (iter.hasNext()) {
-            bind(iter)
-        }
-    }
-
-    private fun ExplorerItemOptions.bind(iterator: MutableIterator<MenuItem>) {
-        val item = iterator.next()
-        if (!ids.contains(item.itemId)) {
-            iterator.remove()
-            return
-        }
-        item.isChecked = checked.contains(item.itemId)
-        item.isEnabled = !ids.contains(-item.itemId)
-        item.subMenu?.let { bind(it) }
     }
 }

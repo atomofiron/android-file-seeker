@@ -1,21 +1,22 @@
 package app.atomofiron.searchboxapp.custom.view.menu.holder;
 
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
-import androidx.core.view.isVisible
 import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemCurtainMenuBinding
+import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
+import app.atomofiron.searchboxapp.custom.view.menu.MenuItemContent
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
+import app.atomofiron.searchboxapp.model.other.get
+import app.atomofiron.searchboxapp.utils.resources
 
 class MenuItemHolder private constructor(
     itemView: View,
     private val listener: MenuListener,
 ) : MenuHolder(itemView) {
-    val icon: ImageView = itemView.findViewById(R.id.item_menu_iv_icon)
-    val title: TextView = itemView.findViewById(R.id.item_menu_tv_label)
+
+    private val binding = ItemCurtainMenuBinding.bind(itemView)
 
     private var itemId = 0
 
@@ -30,11 +31,10 @@ class MenuItemHolder private constructor(
         }
     }
 
-    override fun bind(item: MenuItem) {
-        itemId = item.itemId
-        itemView.id = item.itemId
-        icon.setImageDrawable(item.icon)
-        icon.isVisible = item.icon != null
-        title.text = item.title
+    override fun onBind(item: MenuItem, position: Int) {
+        itemId = item.id
+        val content = item.content as MenuItemContent.Common
+        binding.icon.setImageResource(content.head)
+        binding.label.text = binding.resources[item.label]
     }
 }

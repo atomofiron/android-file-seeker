@@ -11,9 +11,9 @@ import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
+import app.atomofiron.searchboxapp.screens.delegates.Operations
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerViewState
 import app.atomofiron.searchboxapp.screens.explorer.curtain.CloneDelegate
@@ -39,7 +39,7 @@ class ExplorerCurtainMenuDelegate(
     curtainChannel: CurtainChannel,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>(), Recipient, MenuListener {
 
-    private val optionsDelegate = OptionsDelegate(R.menu.item_options, output = this)
+    private val optionsDelegate = OptionsDelegate(output = this)
     private val createDelegate = CreateDelegate(output = this)
     private val cloneDelegate = CloneDelegate(output = this)
     private val renameDelegate = RenameDelegate(output = this)
@@ -85,20 +85,20 @@ class ExplorerCurtainMenuDelegate(
         val options = data ?: return
         val items = options.items
         when (id) {
-            R.id.menu_clone -> controller?.showNext(CLONE)
-            R.id.menu_create -> controller?.showNext(CREATE)
-            R.id.menu_rename -> controller?.showNext(RENAME)
-            R.id.menu_delete -> onRemoveConfirm(items)
-            R.id.menu_share -> router.shareWith(items.first())
-            R.id.menu_open_with -> router.openWith(items.first())
-            R.id.menu_install -> apkInteractor.install(items.first(), viewState.currentTab.value)
-            R.id.menu_launch -> apkInteractor.launch(items.first())
-            R.id.menu_copy_path -> {
+            Operations.Clone.id -> controller?.showNext(CLONE)
+            Operations.Create.id -> controller?.showNext(CREATE)
+            Operations.Rename.id -> controller?.showNext(RENAME)
+            Operations.Delete.id -> onRemoveConfirm(items)
+            Operations.Share.id -> router.shareWith(items.first())
+            Operations.OpenWith.id -> router.openWith(items.first())
+            Operations.InstallApp.id -> apkInteractor.install(items.first(), viewState.currentTab.value)
+            Operations.LaunchApp.id -> apkInteractor.launch(items.first())
+            Operations.UseAs.id -> utils.useAs(options.items.first())
+            Operations.CopyPath.id -> {
                 interactor.copyToClipboard(items.first())
                 viewState.showAlert(AlertMessage(R.string.copied))
                 controller?.close()
             }
-            R.id.menu_use_as -> utils.useAs(options.items.first())
         }
     }
 

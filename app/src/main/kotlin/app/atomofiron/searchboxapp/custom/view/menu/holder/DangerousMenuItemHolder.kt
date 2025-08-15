@@ -1,11 +1,12 @@
 package app.atomofiron.searchboxapp.custom.view.menu.holder
 
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.ViewGroup
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dangerous.DangerousSliderView
+import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
+import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.utils.Const
 
 class DangerousMenuItemHolder private constructor(
@@ -27,12 +28,13 @@ class DangerousMenuItemHolder private constructor(
         }
     }
 
-    override fun bind(item: MenuItem) {
-        itemId = item.itemId
-        view.setText(item.title)
+    override fun onBind(item: MenuItem, position: Int) {
+        itemId = item.id
+        val title = view.resources[item.label]
+        view.setText(title)
         view.resources
             .getString(R.string.slide_to)
-            .replace(Const.PLACEHOLDER, item.title.toString().lowercase())
+            .replace(Const.PLACEHOLDER, title.lowercase())
             .let { view.setTip(it) }
     }
 }

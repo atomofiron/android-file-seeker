@@ -11,14 +11,14 @@
     android:focusable="true"
     >
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/item_menu_iv_icon"
+        android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/padding_common"
         android:tint="?attr/colorContent"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/item_menu_tv_label"
+        android:id="@+id/label"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"

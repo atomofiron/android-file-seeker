@@ -34,6 +34,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import androidx.viewbinding.ViewBinding
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Data
 import app.atomofiron.common.util.Android
@@ -43,6 +44,8 @@ import app.atomofiron.searchboxapp.model.explorer.NodeError
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.Serializable
+
+val ViewBinding.resources: Resources get() = root.resources
 
 fun Context.findResIdByAttr(@AttrRes attr: Int): Int = findResIdsByAttr(attr)[0]
 

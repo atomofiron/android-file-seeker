@@ -9,6 +9,7 @@ import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.extension.then
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.service.UtilService
@@ -31,13 +32,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.io.FileInputStream
-import kotlin.math.abs
 
-private val rootOptions = listOf(R.id.menu_create, R.id.menu_copy_path)
-private val directoryOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_create, R.id.menu_clone, R.id.menu_copy_path)
-private val oneFileOptions = listOf(R.id.menu_delete, R.id.menu_rename, R.id.menu_share, R.id.menu_open_with, R.id.menu_clone, R.id.menu_copy_path)
-private val manyFilesOptions = listOf(R.id.menu_delete)
-private val readWrite = listOf(R.id.menu_create, R.id.menu_rename, R.id.menu_clone)
+private val rootOptions = listOf(Operations.Create, Operations.CopyPath)
+private val directoryOptions = listOf(Operations.Create, Operations.Clone, Operations.Rename, Operations.CopyPath, Operations.Delete)
+private val oneFileOptions = listOf(Operations.OpenWith, Operations.Share, Operations.Clone, Operations.Rename, Operations.CopyPath, Operations.Delete)
+private val manyFilesOptions = listOf(Operations.Delete)
+private val readWrite = listOf(Operations.Create, Operations.Clone, Operations.Rename)
 
 class FileOperationsDelegate(
     preferences: PreferenceStore,
@@ -50,32 +50,28 @@ class FileOperationsDelegate(
     fun operations(items: List<Node>, readOnly: Boolean = false): ExplorerItemOptions? {
         val merged = items.merge()
         val first = merged.firstOrNull() ?: return null
-        val ids = when {
+        val operations = when {
             merged.size > 1 -> manyFilesOptions
             first.content.rootType?.editable == true -> rootOptions
             first.isRoot -> return null
             first.isDirectory -> directoryOptions
-            else -> oneFileOptions.buildOperations(first)
+            else -> oneFileOptions.complete(first)
         }.filter {
-            readWrite.takeIf { readOnly }?.contains(abs(it)) != true
+            readWrite.takeIf { readOnly }?.contains(it) != true
         }
-        return ExplorerItemOptions(ids, merged, itemComposition)
+        return ExplorerItemOptions(operations, merged, itemComposition)
     }
 
     fun askForAndroidApp(content: NodeContent.AndroidApp, tab: NodeTabKey? = null) = askForAndroidApp(content, contentResolver = null, tab)
 
     fun askForApks(ref: NodeRef, contentResolver: ContentResolver) = askForAndroidApp(NodeContent.AndroidApp.apks(ref), contentResolver)
 
-    private fun List<Int>.buildOperations(first: Node): List<Int> = mutate {
+    private fun List<MenuItem>.complete(first: Node): List<MenuItem> = mutate {
         if (first.content is NodeContent.AndroidApp) {
-            add(R.id.menu_apk)
-            add(R.id.menu_install)
-            add(R.id.menu_launch)
-            if (!apks.launchable(first)) {
-                add(-R.id.menu_launch)
-            }
+            add(Operations.InstallApp)
+            add(Operations.LaunchApp.copy(enabled = apks.launchable(first)))
         } else if (utils.canUseAs(first)) {
-            add(R.id.menu_use_as)
+            add(Operations.UseAs)
         }
     }
 
