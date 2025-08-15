@@ -12,14 +12,13 @@ sealed interface UniText {
     @JvmInline
     value class Str(val value: String) : UniText
 
-    @Suppress("ArrayInDataClass")
-    data class Fmt(@StringRes val res: Int, val args: Array<out Any>) : UniText
+    data class Fmt(@StringRes val res: Int, val args: List<Any>) : UniText
 
     companion object {
         operator fun invoke(text: String) = Str(text)
         operator fun invoke(text: String?) = text?.let { Str(text) }
         operator fun invoke(@StringRes text: Int) = Res(text)
-        operator fun invoke(@StringRes text: Int, vararg args: Any) = Fmt(text, args)
+        operator fun invoke(@StringRes text: Int, vararg args: Any) = Fmt(text, args.toList())
     }
 }
 
@@ -27,7 +26,7 @@ sealed interface UniText {
 operator fun Resources.get(text: UniText?) = text?.let { get(it) }
 
 operator fun Resources.get(text: UniText) = when (text) {
-    is Fmt -> getString(text.res, *text.args)
+    is Fmt -> getString(text.res, text.args)
     is Res -> getString(text.value)
     is Str -> text.value
 }

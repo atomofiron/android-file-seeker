@@ -145,10 +145,10 @@ class FileOperationsDelegate(
     private fun ApkInfo?.toMessage(withSignature: Boolean): UniText {
         val args = if (this == null) {
             val ellipsis = dialogs[UniText(R.string.ellipsis)]
-            Array(6) { ellipsis }
+            Array(6) { ellipsis }.toList()
         } else {
             val unavailable = dialogs[UniText(R.string.unavailable)]
-            arrayOf(
+            listOf(
                 packageName,
                 "$versionName ($versionCode)",
                 "$minSdkVersion (${Android[minSdkVersion] ?: unavailable})",
@@ -162,6 +162,6 @@ class FileOperationsDelegate(
                     ?: dialogs[UniText(R.string.ellipsis)],
             )
         }
-        return UniText(R.string.apk_info, *args)
+        return UniText(R.string.apk_info, args)
     }
 }

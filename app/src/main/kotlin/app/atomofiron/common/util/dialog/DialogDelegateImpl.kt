@@ -33,7 +33,7 @@ class DialogDelegateImpl(activity: RoProperty<out FragmentActivity?>) : DialogDe
     override fun loadingIcon(): Drawable? = activity?.let { MuonsDrawable(it) }
 
     override operator fun get(text: UniText) = when (text) {
-        is Fmt -> activity?.resources?.getString(text.res, *text.args).toString()
+        is Fmt -> activity?.resources?.getString(text.res, text.args).toString()
         is Res -> activity?.resources?.getString(text.value).toString()
         is Str -> text.value
     }
