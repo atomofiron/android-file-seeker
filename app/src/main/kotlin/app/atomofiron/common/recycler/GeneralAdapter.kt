@@ -16,7 +16,7 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>>(
     private val differ = itemCallback?.let { CoroutineListDiffer(mutableItems, this, it, itemUpdater) }
     val items: List<D> = mutableItems
 
-    override fun getItemCount(): Int = mutableItems.size
+    final override fun getItemCount(): Int = mutableItems.size
 
     operator fun get(position: Int) = mutableItems[position]
 
