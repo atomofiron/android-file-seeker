@@ -6,20 +6,36 @@ import android.os.Environment
 import android.os.StatFs
 import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.Unreachable
+import app.atomofiron.common.util.dropLast
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
-import app.atomofiron.common.util.dropLast
 import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.CacheConfig
-import app.atomofiron.searchboxapp.model.explorer.*
+import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
+import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeChildren
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
+import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.model.explorer.NodeGarden
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
+import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
+import app.atomofiron.searchboxapp.model.explorer.NodeSorting
+import app.atomofiron.searchboxapp.model.explorer.NodeState
+import app.atomofiron.searchboxapp.model.explorer.NodeTab
+import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
+import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
+import app.atomofiron.searchboxapp.model.explorer.Operation
+import app.atomofiron.searchboxapp.model.explorer.isMedia
+import app.atomofiron.searchboxapp.model.explorer.isMovie
+import app.atomofiron.searchboxapp.model.explorer.isPicture
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
-import app.atomofiron.searchboxapp.utils.*
+import app.atomofiron.searchboxapp.utils.ExplorerUtils
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.close
@@ -34,12 +50,22 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortByName
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateWith
+import app.atomofiron.searchboxapp.utils.Shell
+import app.atomofiron.searchboxapp.utils.findWithIndex
+import app.atomofiron.searchboxapp.utils.mutate
+import app.atomofiron.searchboxapp.utils.replaceEach
+import app.atomofiron.searchboxapp.utils.verify
 import app.atomofiron.searchboxapp.utils.writeTo
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
-import java.util.*
+import kotlin.collections.set
 import kotlin.math.min
 
 private const val SUB_PATH_CAMERA = "DCIM/Camera/"
@@ -606,7 +632,7 @@ class ExplorerService(
         }
     }
 
-    private suspend inline fun NodeTab.lazyRender() {
+    private fun NodeTab.lazyRender() {
         delayedRender = delayedRender ?: appScope.launch {
             delay(128)
             delayedRender = null
@@ -614,7 +640,7 @@ class ExplorerService(
         }
     }
 
-    private suspend inline fun NodeTab.render() {
+    private suspend fun NodeTab.render() {
         delayedRender?.cancel()
         delayedRender = null
         states.replace {
@@ -700,7 +726,7 @@ class ExplorerService(
         val count = min(1, tree.size) + tree.sumOf { it.childCount }
         val items = MutableList<Node>(count)
         tree.firstOrNull()
-            ?.let { if (it.isOpened && !it.hasOpened()) it.copy(isDeepest = true) else it }
+            ?.let { if (it.isOpened && !it.hasOpened()) it.copy(isDeepest = true, children = it.children?.fetch()) else it }
             ?.also { items.add(updateStateFor(it).defineDirKind()) }
             .let { if (it?.isOpened != true) return items }
 
