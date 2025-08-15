@@ -415,7 +415,7 @@ class ExplorerService(
                     val old = items[index]
                     items[index] = updated
                     if (item.isOpened && !updated.areContentsTheSame(old)) {
-                        emitUpdate(updated)
+                        renderUpdate(updated)
                     }
                 }
             }
@@ -491,10 +491,11 @@ class ExplorerService(
     }
 
     suspend fun tryCheckItem(key: NodeTabKey, item: Node, isChecked: Boolean) {
-        renderTab(key) {
+        withTab(key) {
             val (_, state) = states.findState(item.uniqueId)
             if (state?.withOperation == true) return
             if (!checked.tryUpdateCheck(item.uniqueId, isChecked)) return
+            renderUpdate(item)
         }
     }
 
@@ -756,8 +757,8 @@ class ExplorerService(
         return items
     }
 
-    private suspend fun NodeTab.emitUpdate(node: Node) {
-        updateStateFor(node)
+    private suspend fun NodeTab.renderUpdate(new: Node) {
+        updateStateFor(new, children = new.children?.fetch(isOpened = new.isOpened))
             .defineDirKind()
             .let { store.emitUpdate(it) }
     }
@@ -774,8 +775,8 @@ class ExplorerService(
         return item.copy(isChecked = isChecked, state = state ?: item.state, children = children)
     }
 
-    private fun Node.defineDirKind(index: Int = 0): Node = when {
-        index != 0 -> this
+    private fun Node.defineDirKind(levelIndex: Int = 0): Node = when {
+        levelIndex != 0 -> this
         parentPath != internalStoragePath -> this
         content !is NodeContent.Directory -> this
         else -> ExplorerUtils.getDirectoryType(name)
@@ -816,9 +817,8 @@ class ExplorerService(
                 !replaced -> return
                 updated.isDirectory -> garden.resolveDirChildren(key, updated)
             }
-            updated = updateStateFor(updated, children = updated.children?.fetch(isOpened = current.isOpened))
             if (!updated.areContentsTheSame(item)) {
-                emitUpdate(updated)
+                renderUpdate(updated)
             }
         }
     }
@@ -835,7 +835,7 @@ class ExplorerService(
                 val updated = current.copy(properties = item.properties.copy(size = size))
                 val replaced = tree.replaceItem(updated)
                 if (replaced && !updated.areContentsTheSame(item)) {
-                    emitUpdate(updated)
+                    renderUpdate(updated)
                 }
             }
         }
