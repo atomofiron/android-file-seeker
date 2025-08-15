@@ -16,6 +16,7 @@ class ExplorerStore {
     val checked = MutableStateFlow<List<Node>>(listOf())
     val alerts = EventFlow<NodeError>()
     val removed = EventFlow<Node>()
+    val deleted = EventFlow<List<Node>>()
     val updated = EventFlow<Node>()
 
     fun setCurrentItems(items: List<Node>) {
@@ -27,6 +28,10 @@ class ExplorerStore {
     }
 
     suspend fun emitUpdate(item: Node) = updated.emit(item)
+
+    suspend fun emitRemoved(item: Node) = removed.emit(item)
+
+    suspend fun emitDeleted(items: List<Node>) = deleted.emit(items)
 
     fun setDeepestNode(tab: NodeTabKey, node: Node?) {
         deepestNodes.value = deepestNodes.value.toMutableMap().apply {

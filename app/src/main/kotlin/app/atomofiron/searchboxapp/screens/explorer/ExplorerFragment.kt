@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.explorer
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
@@ -16,7 +17,9 @@ import app.atomofiron.fileseeker.databinding.FragmentExplorerBinding
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDockState
@@ -146,10 +149,24 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
                 is AlertMessage.Res -> makeSnackbar(message.message, Snackbar.LENGTH_LONG)
                 is AlertMessage.Other<*> -> when (message.message) {
                     is NodeError -> makeSnackbar(resources.getString(message.message), Snackbar.LENGTH_LONG)
+                    is ExplorerAlert.Deleted -> deletedSnackbar(message.message.items)
                     else -> return
                 }
             }
         }.show()
+    }
+
+    private fun CoordinatorLayout.deletedSnackbar(items: List<Node>): Snackbar {
+        val message = items.takeIf { it.isNotEmpty() }?.let {
+            val dirs = items.count { it.isDirectory }
+            val files = items.size - dirs
+            val what = listOfNotNull(
+                resources.takeIf { dirs > 0 }?.getQuantityString(R.plurals.x_dirs, dirs, dirs),
+                resources.takeIf { files > 0 }?.getQuantityString(R.plurals.x_files, files, files),
+            ).joinToString(separator = resources.getString(R.string.and))
+            resources.getQuantityString(R.plurals.x_deleted, items.size, what)
+        } ?: resources.getString(R.string.nothing_was_deleted)
+        return makeSnackbar(message, Snackbar.LENGTH_LONG)
     }
 
     private fun showPermissionRequiredWarning(unit: Unit) {

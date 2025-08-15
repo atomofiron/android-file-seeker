@@ -7,6 +7,7 @@ import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.*
+import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDockState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -29,7 +30,11 @@ class ExplorerViewState(
     val scrollTo = ChannelFlow<Node>()
     val itemComposition = preferenceStore.explorerItemComposition
     private val otherAlerts = ChannelFlow<AlertMessage>()
-    val alerts: Flow<AlertMessage> = merge(explorerStore.alerts.map { AlertMessage(it) }, otherAlerts)
+    val alerts: Flow<AlertMessage> = merge(
+        explorerStore.alerts.map { AlertMessage(it) },
+        explorerStore.deleted.map { AlertMessage(ExplorerAlert.Deleted(it)) },
+        otherAlerts,
+    )
     val dock = preferenceChannel.notification.map { notice ->
         ExplorerDockState.Default.run {
             copy(settings = settings.copy(notice = notice))

@@ -184,6 +184,8 @@
     <string name="dash" translatable="false">—</string>
     <string name="fix_android_12">Starting from Android 12, the search may be interrupted by the system, which will cause it to partially or fully restart</string>
     <string name="fetching">Fetching metadata…</string>
+    <string name="and">\u0020and\u0020</string>
+    <string name="nothing_was_deleted">Nothing was deleted</string>
     <plurals name="x_dirs">
         <item quantity="zero">%d directories</item>
         <item quantity="one">%d directory</item>
@@ -199,5 +201,13 @@
         <item quantity="few">%d files</item>
         <item quantity="many">%d files</item>
         <item quantity="other">%d files</item>
+    </plurals>
+    <plurals name="x_deleted">
+        <item quantity="zero">%s was deleted</item>
+        <item quantity="one">%s was deleted</item>
+        <item quantity="two">%s were deleted</item>
+        <item quantity="few">%s were deleted</item>
+        <item quantity="many">%s were deleted</item>
+        <item quantity="other">%s were deleted</item>
     </plurals>
 </resources>

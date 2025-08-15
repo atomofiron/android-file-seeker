@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
+import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.Unreachable
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.set
@@ -24,7 +25,6 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.asSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.close
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.completePath
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.open
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
@@ -513,11 +513,12 @@ class ExplorerService(
                 else -> it.delete()
             }
         }
+        store.emitDeleted(items)
     }
 
     private suspend fun Node.delete() {
         if (delete(config.useSu) == null) {
-            store.removed.emit(copy(children = null))
+            store.emitRemoved(copy(children = null))
         }
     }
 
@@ -527,22 +528,18 @@ class ExplorerService(
         renderTab(key) {
             mediaRootAffected = roots.find { it.isSelected() && it.withPreview }
             its.mapNotNull { item ->
-                tree.findNode(item.uniqueId)?.takeIf {
-                    val state = states.updateState(item.uniqueId) {
-                        when (this?.isDeleting) {
-                            true -> null
-                            else -> {
-                                this?.cachingJob?.cancel()
-                                checked.tryUpdateCheck(item.uniqueId, makeChecked = false)
-                                nextState(item.uniqueId, cachingJob = null, deleting = Operation.Deleting)
-                            }
-                        }
+                val state = states.updateState(item.uniqueId) {
+                    if (this?.isDeleting == true) {
+                        null
+                    } else {
+                        this?.cachingJob?.cancel()
+                        checked.tryUpdateCheck(item.uniqueId, makeChecked = false)
+                        nextState(item.uniqueId, cachingJob = null, deleting = Operation.Deleting)
                     }
-                    state?.isDeleting == true
                 }
-            }.let {
-                items.addAll(it)
-            }
+                tree.findNode(item.uniqueId)
+                    ?.takeIf { state?.isDeleting == true }
+            }.let { items.addAll(it) }
         }
         val jobs = items.map { item ->
             appScope.launch {
@@ -551,12 +548,13 @@ class ExplorerService(
                 withGarden(key) { tab ->
                     tab.tree.replaceItem(item.uniqueId, item.parentPath, result)
                     states.updateState(item.uniqueId) { null }
-                    store.removed.emit(item.copy(children = null))
-                    tab.render()
+                    store.emitRemoved(item.copy(children = null))
+                    tab.lazyRender()
                 }
             }
         }
         jobs.forEach { it.join() }
+        store.emitDeleted(items)
         mediaRootAffected?.let { mediaRoot ->
             withGarden {
                 updateRootAsync(key, mediaRoot)
@@ -605,6 +603,14 @@ class ExplorerService(
             val tab = get(key) ?: return
             tab.block()
             tab.render()
+        }
+    }
+
+    private suspend inline fun NodeTab.lazyRender() {
+        delayedRender = delayedRender ?: appScope.launch {
+            delay(128)
+            delayedRender = null
+            renderTab(key)
         }
     }
 
@@ -692,7 +698,7 @@ class ExplorerService(
 
     private fun NodeTab.renderNodes(): List<Node> {
         val count = min(1, tree.size) + tree.sumOf { it.childCount }
-        val items = ArrayList<Node>(count)
+        val items = MutableList<Node>(count)
         tree.firstOrNull()
             ?.let { if (it.isOpened && !it.hasOpened()) it.copy(isDeepest = true) else it }
             ?.also { items.add(updateStateFor(it).defineDirKind()) }
@@ -718,7 +724,6 @@ class ExplorerService(
                     .let { items.add(it) }
             }
             if (i < tree.lastIndex) {
-                level.isSeparator()
                 items.add(level.asSeparator())
             }
         }
