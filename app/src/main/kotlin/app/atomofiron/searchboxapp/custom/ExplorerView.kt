@@ -22,7 +22,6 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerSpanSizeLoo
 import app.atomofiron.searchboxapp.screens.explorer.fragment.SwipeMarkerDelegate
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.OnScrollIdleSubmitter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -46,7 +45,6 @@ class ExplorerView(
     private val explorerAdapter = ExplorerAdapter(output, ::onSeparatorClick)
     private val layoutManager = GridLayoutManager(context, 1)
     private val spanSizeLookup = ExplorerSpanSizeLookup(resources, layoutManager, rootAdapter)
-    private val submitter = OnScrollIdleSubmitter(binding.recyclerView, explorerAdapter)
     private val swipeMarker = SwipeMarkerDelegate(resources)
 
     private val listDelegate: ExplorerListDelegate = ExplorerListDelegate(
@@ -95,11 +93,11 @@ class ExplorerView(
 
     fun submit(items: NodeTabItems) {
         rootAdapter.submitList(items.roots)
-        submitter.submit(items.items)
+        explorerAdapter.submit(items.items)
         title = items.deepest?.getTitle(resources)
     }
 
-    fun submit(item: Node) = submitter.submit(item)
+    fun submit(item: Node) = explorerAdapter.submit(item)
 
     fun setComposition(composition: ExplorerItemComposition) {
         listDelegate.setComposition(composition)

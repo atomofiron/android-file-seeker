@@ -7,12 +7,13 @@ import androidx.recyclerview.widget.RecyclerView
 
 abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>>(
     itemCallback: DiffUtil.ItemCallback<D>? = null,
+    itemUpdater: (D.(new: D) -> D)? = null,
 ) : RecyclerView.Adapter<H>(), CoroutineListDiffer.ListListener<D> {
     companion object {
         const val UNDEFINED = -1
     }
 
-    private val differ = itemCallback?.let { CoroutineListDiffer(this, it, listener = this) }
+    private val differ = itemCallback?.let { CoroutineListDiffer(this, it, itemUpdater, listener = this) }
     private val mutableItems = mutableListOf<D>()
     val items: List<D> = mutableItems
 

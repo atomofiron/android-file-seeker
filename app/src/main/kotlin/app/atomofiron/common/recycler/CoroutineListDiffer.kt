@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter.Companion.UNDEFINED
+import app.atomofiron.common.util.extension.copy
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.rangePlus
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +19,7 @@ private const val DetectMoves = false
 class CoroutineListDiffer<I : Any>(
     private val adapter: RecyclerView.Adapter<*>,
     private val itemCallback: DiffUtil.ItemCallback<I>,
+    private val itemUpdater: (I.(new: I) -> I)? = null,
     listener: ListListener<I>? = null,
 ) {
     private val listeners = mutableListOf<ListListener<I>>()
@@ -41,15 +43,15 @@ class CoroutineListDiffer<I : Any>(
                 if (currentCounter != counter) {
                     return@withContext
                 }
+                isCalculating = false
                 actualList.clear()
                 actualList.addAll(new)
-                isCalculating = false
                 result.dispatchUpdatesTo(adapter)
                 if (updated.isNotEmpty()) {
                     for (newer in updated) {
                         val index = actualList.indexOfFirst { itemCallback.areItemsTheSame(it, newer) }
                         if (index >= 0) {
-                            actualList[index] = newer
+                            actualList[index] = itemUpdater?.invoke(actualList[index], newer) ?: newer
                             adapter.notifyItemChanged(index)
                         }
                     }

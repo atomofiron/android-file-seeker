@@ -23,7 +23,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 class ExplorerAdapter(
     private val itemActionListener: ExplorerItemActionListener,
     private val separatorClickListener: (Node) -> Unit,
-) : GeneralAdapter<Node, GeneralHolder<Node>>(NodeCallback) {
+) : GeneralAdapter<Node, GeneralHolder<Node>>(NodeCallback, Node::updater) {
 
     private lateinit var composition: ExplorerItemComposition
     private var viewCacheLimit = 5 // RecycledViewPool.DEFAULT_MAX_SCRAP
@@ -35,6 +35,7 @@ class ExplorerAdapter(
 
     init {
         setHasStableIds(true)
+        registerAdapterDataObserver(ChangeListener())
     }
 
     fun setComposition(composition: ExplorerItemComposition) {
@@ -92,4 +93,24 @@ class ExplorerAdapter(
     override fun onViewAttachedToWindow(holder: GeneralHolder<Node>) = itemVisibilityDelegate.onItemAttached(holder)
 
     override fun onViewDetachedFromWindow(holder: GeneralHolder<Node>) = itemVisibilityDelegate.onItemDetached(holder)
+
+    private inner class ChangeListener : RecyclerView.AdapterDataObserver() {
+        override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) = onEvent(positionStart)
+        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) = onEvent(positionStart)
+        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+            onEvent(fromPosition)
+            onEvent(toPosition)
+        }
+        private fun onEvent(position: Int) {
+            if (position > 0) {
+                // to update decoration offsets
+                notifyItemChanged(position.dec())
+            }
+        }
+    }
+}
+
+private fun Node.updater(new: Node): Node {
+    return new.takeIf { it.isOpened == isOpened && it.isDeepest == isDeepest }
+        ?: new.copy(isDeepest = isDeepest, children = new.children?.copy(isOpened = isOpened))
 }
