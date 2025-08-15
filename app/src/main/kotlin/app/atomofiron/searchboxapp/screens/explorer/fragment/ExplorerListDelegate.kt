@@ -56,17 +56,16 @@ class ExplorerListDelegate(
 
     override fun onChanged(index: Int, new: Node) {
         items[index] = new
-        checkDeepestIn(index..index)
+        checkDeepestIn(listOf(new))
     }
 
-    override fun onChanged(range: IntRange, slice: List<Node>) = checkDeepestIn(range)
+    override fun onChanged(range: IntRange, slice: List<Node>) = checkDeepestIn(slice)
 
-    override fun onInserted(range: IntRange, slice: List<Node>) = checkDeepestIn(range)
+    override fun onInserted(range: IntRange, slice: List<Node>) = checkDeepestIn(slice)
 
-    private fun checkDeepestIn(range: IntRange) {
+    private fun checkDeepestIn(slice: List<Node>) {
         var current: Node? = null
-        for (i in range) {
-            val item = items[i]
+        for (item in slice) {
             if (item.isDeepest) current = item
         }
         current = current ?: items.find { it.isDeepest }

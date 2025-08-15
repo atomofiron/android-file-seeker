@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter.Companion.UNDEFINED
 import app.atomofiron.common.util.extension.copy
-import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.rangePlus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -88,9 +87,9 @@ class CoroutineListDiffer<I : Any>(
     fun removeListener(listener: ListListener<I>): Boolean = listeners.remove(listener)
 
     private fun ListListener<I>.onItemsChanged(old: List<I>, new: List<I>): ListUpdateCallback = object : ListUpdateCallback {
-        override fun onMoved(fromPosition: Int, toPosition: Int) = debugRequire(DetectMoves)
+        override fun onMoved(fromPosition: Int, toPosition: Int) = onChanged(toPosition, new[toPosition])
         override fun onInserted(position: Int, count: Int) = position.rangePlus(count)
-            .let { onChanged(it, new.slice(it)) }
+            .let { onInserted(it, new.slice(it)) }
         override fun onChanged(position: Int, count: Int, payload: Any?) = position.rangePlus(count)
             .let { onChanged(it, new.slice(it)) }
         override fun onRemoved(position: Int, count: Int) = position.rangePlus(count)
