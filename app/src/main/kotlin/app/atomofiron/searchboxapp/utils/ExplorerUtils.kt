@@ -622,7 +622,7 @@ object ExplorerUtils {
 
     fun Node.asSeparator(): Node = when {
         isSeparator() -> this
-        else -> copy(path = "$path.", uniqueId = -uniqueId)
+        else -> copy(path = "$path.", uniqueId = -uniqueId, children = children?.fetch())
     }
 
     fun Node.originalPath(): String = when {
