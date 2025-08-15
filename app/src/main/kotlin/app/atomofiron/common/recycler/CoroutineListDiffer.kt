@@ -1,11 +1,8 @@
 package app.atomofiron.common.recycler
 
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.ListUpdateCallback
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.recycler.GeneralAdapter.Companion.UNDEFINED
 import app.atomofiron.common.util.extension.copy
-import app.atomofiron.common.util.extension.rangePlus
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,6 +13,7 @@ import kotlinx.coroutines.withContext
 private const val DetectMoves = false
 
 class CoroutineListDiffer<I : Any>(
+    private val actualList: MutableList<I>,
     private val adapter: RecyclerView.Adapter<*>,
     private val itemCallback: DiffUtil.ItemCallback<I>,
     private val itemUpdater: (I.(new: I) -> I)? = null,
@@ -25,7 +23,6 @@ class CoroutineListDiffer<I : Any>(
     private var updated = mutableListOf<I>()
     private val scope = CoroutineScope(Dispatchers.Default)
     private var counter = 0
-    private var actualList = mutableListOf<I>()
     private var isCalculating = false
 
     init {
@@ -56,10 +53,7 @@ class CoroutineListDiffer<I : Any>(
                     }
                     updated.clear()
                 }
-                listeners.forEach {
-                    it.onCurrentListChanged(actualList)
-                    result.dispatchUpdatesTo(it.onItemsChanged(old = old, new = actualList))
-                }
+                listeners.forEach { it.onCurrentListChanged(actualList) }
             }
         }
     }
@@ -86,22 +80,9 @@ class CoroutineListDiffer<I : Any>(
 
     fun removeListener(listener: ListListener<I>): Boolean = listeners.remove(listener)
 
-    private fun ListListener<I>.onItemsChanged(old: List<I>, new: List<I>): ListUpdateCallback = object : ListUpdateCallback {
-        override fun onMoved(fromPosition: Int, toPosition: Int) = onChanged(toPosition, new[toPosition])
-        override fun onInserted(position: Int, count: Int) = position.rangePlus(count)
-            .let { onInserted(it, new.slice(it)) }
-        override fun onChanged(position: Int, count: Int, payload: Any?) = position.rangePlus(count)
-            .let { onChanged(it, new.slice(it)) }
-        override fun onRemoved(position: Int, count: Int) = position.rangePlus(count)
-            .let { onRemoved(it, old.slice(it)) }
-    }
-
     interface ListListener<I> {
         fun onCurrentListChanged(current: List<I>)
         fun onChanged(index: Int, new: I) = Unit
-        fun onChanged(range: IntRange, slice: List<I>) = Unit
-        fun onInserted(range: IntRange, slice: List<I>) = Unit
-        fun onRemoved(range: IntRange, slice: List<I>) = Unit
     }
 
     private class DiffCallback<I : Any>(
@@ -115,3 +96,4 @@ class CoroutineListDiffer<I : Any>(
         override fun areContentsTheSame(oldPosition: Int, newPosition: Int) = callback.areContentsTheSame(old[oldPosition], new[newPosition])
     }
 }
+

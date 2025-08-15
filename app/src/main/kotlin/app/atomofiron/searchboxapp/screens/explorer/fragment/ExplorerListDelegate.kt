@@ -16,7 +16,6 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.Explore
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.ExplorerStickyDelegate
-import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.withoutDot
 import lib.atomofiron.insets.attachInsetsListener
 import kotlin.math.min
@@ -29,13 +28,13 @@ class ExplorerListDelegate(
     private val output: ExplorerItemActionListener,
 ) : CoroutineListDiffer.ListListener<Node> {
 
-    private var items = mutableListOf<Node>()
-    private var deepestDir: Node? = null
-
     private val stickyDelegate = ExplorerStickyDelegate(recyclerView, rootAdapter, nodeAdapter, stickyBox, StickyListener())
     private val rootMarginDecorator = RootItemMarginDecorator(recyclerView.resources)
     private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = true)
     private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter)
+
+    private var deepestDir: Node? = null
+    private val items get() = nodeAdapter.items
 
     init {
         recyclerView.attachInsetsListener(rootMarginDecorator)
@@ -46,37 +45,13 @@ class ExplorerListDelegate(
     }
 
     override fun onCurrentListChanged(current: List<Node>) {
-        val wasEmpty = items.isEmpty()
-        items.clear()
-        items.addAll(current)
-        deepestDir?.takeIf { wasEmpty }?.let {
-            recyclerView.postDelayed({ scrollTo(it) }, Const.COMMON_DELAY)
-        }
-    }
-
-    override fun onChanged(index: Int, new: Node) {
-        items[index] = new
-        checkDeepestIn(listOf(new))
-    }
-
-    override fun onChanged(range: IntRange, slice: List<Node>) = checkDeepestIn(slice)
-
-    override fun onInserted(range: IntRange, slice: List<Node>) = checkDeepestIn(slice)
-
-    private fun checkDeepestIn(slice: List<Node>) {
-        var current: Node? = null
-        for (item in slice) {
-            if (item.isDeepest) current = item
-        }
-        current = current ?: items.find { it.isDeepest }
-        val deepestDir = deepestDir
+        val old = deepestDir
+        val new = current.find { it.isDeepest }
         when {
-            deepestDir == null && current == null -> return
-            deepestDir == null && current != null -> Unit
-            deepestDir != null && current == null -> Unit
-            deepestDir?.areContentsTheSame(current) == true -> return
+            new == null && old == null -> Unit
+            new?.areContentsTheSame(old) == true -> Unit
+            else -> setDeepestDir(new)
         }
-        setDeepestDir(current)
     }
 
     private fun getFirstChild(offset: Int = 0): View? = recyclerView.getChildAt(offset)
@@ -87,7 +62,7 @@ class ExplorerListDelegate(
 
     fun isVisible(item: Node): Boolean {
         val path = item.withoutDot()
-        val index = nodeAdapter.items.indexOfFirst { it.path == path }
+        val index = items.indexOfFirst { it.path == path }
         return isVisible(index + rootAdapter.itemCount)
     }
 
@@ -109,13 +84,9 @@ class ExplorerListDelegate(
     }
 
     private fun setDeepestDir(item: Node?) {
-        if (deepestDir?.areContentsTheSame(item) == true) {
-            return
+        if (deepestDir == null && item?.isRoot == false) {
+            recyclerView.post { scrollTo(item) }
         }
-        item?.takeIf { !it.isRoot }
-            ?.takeIf { it.path != deepestDir?.path }
-            ?.takeIf { deepestDir?.parentPath?.startsWith(it.path) == false }
-            ?.let { recyclerView.post { scrollTo(it) } }
         deepestDir = item
         borderDecorator.setDeepestDir(item)
     }
@@ -127,7 +98,7 @@ class ExplorerListDelegate(
 
     fun scrollTo(item: Node) {
         val targetPath = item.withoutDot()
-        val nodePosition = nodeAdapter.items.indexOfFirst { it.path == targetPath }
+        val nodePosition = items.indexOfFirst { it.path == targetPath }
         val position = nodePosition + rootAdapter.itemCount
         recyclerView.findViewHolderForAdapterPosition(position)
             ?.takeIf { recyclerView.run { it.itemView.top > paddingTop && it.itemView.bottom < height - paddingBottom } }
@@ -162,7 +133,7 @@ class ExplorerListDelegate(
 
     fun highlight(item: Node) {
         val uniqueId = item.withoutDot().toUniqueId()
-        val dir = nodeAdapter.items.find { it.uniqueId == uniqueId }
+        val dir = items.find { it.uniqueId == uniqueId }
         dir ?: return
         val holder = recyclerView.findViewHolderForItemId(dir.uniqueId.toLong())
         if (holder !is ExplorerHolder) return
