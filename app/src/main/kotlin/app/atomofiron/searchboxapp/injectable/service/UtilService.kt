@@ -2,16 +2,13 @@ package app.atomofiron.searchboxapp.injectable.service
 
 import android.content.ClipboardManager
 import android.content.Intent
-import android.net.Uri
 import androidx.core.content.FileProvider
 import app.atomofiron.common.util.extension.copy
 import app.atomofiron.fileseeker.BuildConfig
-import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents.useAs
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.utils.Const
 import java.io.File
 
 class UtilService(

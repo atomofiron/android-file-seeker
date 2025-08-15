@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+import app.atomofiron.common.util.extension.mutableCopy
 import java.util.*
 
 data class NodeChildren(
@@ -38,5 +39,5 @@ data class NodeChildren(
         items.forEach { names.add(it.name) }
     }
 
-    fun fetch(isOpened: Boolean = this.isOpened) = NodeChildren(isOpened = isOpened, items = items.toMutableList())
+    fun fetch(isOpened: Boolean = this.isOpened) = NodeChildren(isOpened = isOpened, items = items.mutableCopy())
 }

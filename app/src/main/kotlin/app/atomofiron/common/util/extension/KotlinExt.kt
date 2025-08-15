@@ -48,6 +48,10 @@ fun Long.pow(exp: Long): Long {
 
 fun Float.fix(): Float = (this * 10000).roundToInt() / 10000f
 
+fun <T> List<T>.copy(): List<T> = mutableCopy()
+
+fun <T> List<T>.mutableCopy(): MutableList<T> = toMutableList()
+
 fun <T> MutableList<T>.clear(from: Int, to: Int = size) {
     val fromIndex = from.coerceAtMost(size)
     val toIndex = to.coerceAtMost(size)

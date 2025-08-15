@@ -38,6 +38,7 @@ data class Node(
 
     fun areContentsTheSame(other: Node?): Boolean = when {
         other == null -> false
+        other === this -> true
         other.uniqueId != uniqueId -> false
         other.path != path -> false
         other.rootId != rootId -> false

@@ -34,7 +34,7 @@ class CoroutineListDiffer<I : Any>(
     fun submit(current: List<I>, new: List<I>) {
         isCalculating = true
         val currentCounter = ++counter
-        val old = current.toMutableList()
+        val old = current.copy()
         scope.launch {
             val result = DiffUtil.calculateDiff(DiffCallback(itemCallback, old, new), DetectMoves)
             withContext(Dispatchers.Main) {
