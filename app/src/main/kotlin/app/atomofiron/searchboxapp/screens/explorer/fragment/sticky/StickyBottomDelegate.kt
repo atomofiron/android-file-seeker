@@ -13,7 +13,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderI
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.StickyInfo
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.originalPath
-import kotlin.math.max
+import kotlin.math.min
 
 private typealias StickyBottom = StickyInfo<ExplorerStickyBottomView>
 
@@ -25,7 +25,7 @@ class StickyBottomDelegate(
     private val stickies = HashMap<Int, StickyBottom>()
     private val wrapContent = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
     private val onClick: (Node) -> Unit = listener::onItemClick
-    private val threshold get() = stickyBox.paddingBottom
+    private val threshold get() = stickyBox.run { height - paddingBottom }
 
     fun valid(item: Node) = item.isSeparator()
 
@@ -88,14 +88,13 @@ class StickyBottomDelegate(
                 .takeIf { sticky.position >= first.position }
                 ?.takeIf { !it.moveOriginal(sticky.position) }
                 ?.findBottom(sticky)
-                ?.let { stickyBox.height - it }
-                ?.takeIf { it < threshold }
+                ?.takeIf { it > threshold }
                 .also { sticky.view.isVisible = it != null }
                 ?: continue
-            var bottom = max(holderBottom, threshold)
+            var bottom = min(holderBottom, threshold)
             holders.findBarrier(sticky.position, sticky.item)?.let { barrier ->
-                val top = bottom + sticky.view.measuredHeight
-                bottom -= max(0, top - barrier)
+                val top = bottom - sticky.view.measuredHeight
+                bottom += min(0, top - barrier)
             }
             sticky.view.translationY = (threshold - bottom).toFloat()
         }
@@ -104,18 +103,14 @@ class StickyBottomDelegate(
     private fun List<HolderInfo>.moveOriginal(position: Int): Boolean {
         val holder = find { it.position == position }
         holder ?: return false
-        val stickyBottom = stickyBox.height - threshold
-        holder.view.translationY = when {
-            holder.view.bottom <= stickyBottom -> 0f
-            else -> {
-                var offset = stickyBottom - holder.view.bottom
-                findBarrier(position, holder.item)?.let { barrier ->
-                    val top = threshold + holder.view.height
-                    offset += max(0, top - barrier)
-                }
-                offset.toFloat()
-            }
+        var offset = threshold - holder.view.bottom
+        if (offset >= 0) {
+            offset = 0
+        } else findBarrier(position, holder.item)?.let { barrier ->
+            val top = threshold - holder.view.height
+            offset -= min(0, top - barrier)
         }
+        holder.view.translationY = offset.toFloat()
         return true
     }
 
@@ -147,7 +142,7 @@ class StickyBottomDelegate(
                 i == 0 -> return null
                 // the first child after children of other opened
                 else -> get(i.dec()).view.top
-            }.let { stickyBox.height - it }
+            }
         }
         return null
     }
