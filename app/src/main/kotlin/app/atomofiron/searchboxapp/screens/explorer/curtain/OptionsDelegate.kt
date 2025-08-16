@@ -33,10 +33,9 @@ class OptionsDelegate(private val output: MenuListener) {
                 explorerMenuItem.root.isVisible = true
                 val holder = ExplorerHolder(explorerMenuItem.root)
                 holder.bind(options.items.first())
-                holder.bindComposition(options.composition.copy(visibleBg = true))
+                holder.bindComposition(options.composition)
 
                 val binder = ExplorerItemBinderImpl(explorerMenuItem.root)
-                binder.setGreyBackgroundColor()
                 binder.disableClicks()
                 explorerMenuItem.itemExplorerCb.isEnabled = false
             }

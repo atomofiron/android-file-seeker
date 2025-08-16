@@ -10,14 +10,12 @@ import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
-import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.utils.Alpha
-import app.atomofiron.searchboxapp.utils.asOverlayOn
 import app.atomofiron.searchboxapp.utils.getColorByAttr
-import app.atomofiron.searchboxapp.utils.setColorAlpha
 
 open class CurtainBackground(context: Context) : Drawable() {
 
@@ -30,10 +28,7 @@ open class CurtainBackground(context: Context) : Drawable() {
     private val dragHandleWidth = context.resources.getDimension(R.dimen.drag_handle_width)
     private val dragHandleMargin = context.resources.getDimension(R.dimen.drag_handle_margin)
     private val strokeColor = when {
-        isBlackDeep -> context
-            .getColorByAttr(MaterialAttr.strokeColor)
-            .setColorAlpha(Alpha.LEVEL_50)
-            .asOverlayOn(curtainColor)
+        isBlackDeep -> ContextCompat.getColor(context, R.color.stroke)
         else -> Color.TRANSPARENT
     }
     private val paint = Paint()

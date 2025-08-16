@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.custom.view.menu.holder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemCurtainMenuDangerousBinding
 import app.atomofiron.searchboxapp.custom.view.dangerous.DangerousSliderView
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
@@ -17,7 +18,7 @@ class DangerousMenuItemHolder private constructor(
     private var itemId = 0
 
     constructor(parent: ViewGroup, listener: MenuListener) : this(
-        LayoutInflater.from(parent.context).inflate(R.layout.item_curtain_menu_dangerous, parent, false) as DangerousSliderView,
+        ItemCurtainMenuDangerousBinding.inflate(LayoutInflater.from(parent.context), parent, false).root,
         listener,
     )
 

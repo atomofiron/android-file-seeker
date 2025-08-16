@@ -1,33 +1,39 @@
 package app.atomofiron.searchboxapp.custom.view.menu.holder;
 
+import android.graphics.drawable.RippleDrawable
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemCurtainMenuBinding
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItemContent
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.model.other.get
+import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.context
 import app.atomofiron.searchboxapp.utils.resources
 
 class MenuItemHolder private constructor(
-    itemView: View,
+    private val binding: ItemCurtainMenuBinding,
     private val listener: MenuListener,
-) : MenuHolder(itemView) {
-
-    private val binding = ItemCurtainMenuBinding.bind(itemView)
+) : MenuHolder(binding.root) {
 
     private var itemId = 0
 
     constructor(parent: ViewGroup, listener: MenuListener) : this(
-        LayoutInflater.from(parent.context).inflate(R.layout.item_curtain_menu, parent, false),
+        ItemCurtainMenuBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         listener,
     )
 
     init {
         itemView.setOnClickListener {
             listener.onMenuItemSelected(itemId)
+        }
+        (binding.root.background as RippleDrawable).run {
+            val deepBlack = binding.context.findBooleanByAttr(R.attr.isBlackDeep)
+            findDrawableByLayerId(R.id.fill).alpha = Alpha.visibleInt(!deepBlack)
+            findDrawableByLayerId(R.id.stroke).alpha = Alpha.visibleInt(deepBlack)
         }
     }
 

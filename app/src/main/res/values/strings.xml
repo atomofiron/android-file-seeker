@@ -128,7 +128,9 @@
     <string name="use_as">Use as…</string>
     <string name="create">Create</string>
     <string name="clone">Clone</string>
-    <string name="create_file_or_dir">Create a file or directory</string>
+    <string name="copy_move">Copy/Move</string>
+    <string name="create_file_or_dir">Create a new file or folder</string>
+    <string name="create_file_dir">New file/folder</string>
     <string name="date">Date</string>
     <string name="time">Time</string>
     <string name="owner">Owner</string>

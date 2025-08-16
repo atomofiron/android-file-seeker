@@ -22,6 +22,7 @@ object Alpha {
     const val RIPPLE_INT = HALF_INT
 
     fun visible(value: Boolean) = if (value) VISIBLE else INVISIBLE
+    fun visibleInt(value: Boolean) = if (value) VISIBLE_INT else INVISIBLE_INT
     fun enabled(value: Boolean) = if (value) VISIBLE else HALF
     fun enabledInt(value: Boolean) = if (value) VISIBLE_INT else HALF_INT
 }

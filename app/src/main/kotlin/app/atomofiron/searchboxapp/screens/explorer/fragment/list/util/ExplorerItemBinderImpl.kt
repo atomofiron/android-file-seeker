@@ -177,6 +177,7 @@ class ExplorerItemBinderImpl(
     }
 
     override fun disableClicks() {
+        itemView.background = null
         itemView.isFocusable = false
         itemView.isClickable = false
         itemView.isLongClickable = false

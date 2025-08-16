@@ -45,6 +45,8 @@ import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.Serializable
 
+val ViewBinding.context: Context get() = root.context
+
 val ViewBinding.resources: Resources get() = root.resources
 
 fun Context.findResIdByAttr(@AttrRes attr: Int): Int = findResIdsByAttr(attr)[0]

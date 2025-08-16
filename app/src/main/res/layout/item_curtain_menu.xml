@@ -3,8 +3,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_margin="@dimen/padding_half"
     android:orientation="horizontal"
-    android:padding="@dimen/padding_common"
+    android:paddingVertical="@dimen/padding_common"
+    android:paddingStart="@dimen/padding_common"
     android:gravity="center_vertical"
     android:background="@drawable/item_menu"
     android:clickable="true"
@@ -14,15 +16,16 @@
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/padding_common"
+        android:layout_marginEnd="@dimen/padding_semi"
         android:tint="?attr/colorContent"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:textColor="?attr/colorContent"
         android:textSize="18sp"
+        android:maxLines="1"
+        android:ellipsize="middle"
         />
 </LinearLayout>

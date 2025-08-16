@@ -18,6 +18,9 @@
     <include
         android:id="@+id/explorer_menu_item"
         layout="@layout/item_explorer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/padding_half"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/explorer_menu_tv_description"
@@ -32,7 +35,7 @@
         android:id="@+id/menu_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_half"
+        android:layout_margin="@dimen/padding_half"
         android:scrollbars="none"
         />
 </LinearLayout>
