@@ -19,10 +19,11 @@ const val TAG_EXPLORER_OPENED_ITEM = "TAG_EXPLORER_OPENED_ITEM"
 fun ItemExplorerSeparatorBinding.makeSeparator() {
     val background = root.context.findColorByAttr(MaterialAttr.colorOutline)
     val content = root.context.findColorByAttr(MaterialAttr.colorSurface)
+    val ripple = ColorUtils.setAlphaComponent(content, Alpha.RIPPLE_INT)
     val cornerRadius = root.resources.getDimension(R.dimen.explorer_border_corner_radius)
     val drawable = GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, intArrayOf(background, background))
     drawable.cornerRadii = FloatArray(8) { cornerRadius }
-    root.background = RippleDrawable(ColorStateList.valueOf(content), drawable, null)
+    root.background = RippleDrawable(ColorStateList.valueOf(ripple), drawable, null)
     val filter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(content, BlendModeCompat.SRC_IN)
     icon.colorFilter = filter
     title.setTextColor(content)

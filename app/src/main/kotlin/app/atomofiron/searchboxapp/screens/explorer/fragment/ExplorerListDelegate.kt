@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.Explore
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.ExplorerStickyDelegate
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.withoutDot
 import lib.atomofiron.insets.attachInsetsListener
 import kotlin.math.min
@@ -151,6 +152,7 @@ class ExplorerListDelegate(
         override fun onItemCheck(item: Node, isChecked: Boolean) = output.onItemCheck(item, isChecked)
 
         override fun onItemClick(item: Node) = when {
+            item.isSeparator() -> highlight(item)
             isVisible(item) -> output.onItemClick(item)
             else -> scrollTo(item)
         }
