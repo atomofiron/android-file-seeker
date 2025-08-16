@@ -10,6 +10,4 @@
     app:icon="@drawable/ic_trashbox"
     app:iconPadding="@dimen/padding_semi"
     app:cornerRadius="@dimen/corner_radius"
-    app:trackColor="?colorSurfaceContainer"
-    app:thumbBorder="false"
     />

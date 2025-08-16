@@ -1,7 +1,11 @@
 package app.atomofiron.searchboxapp.custom.view.menu.holder
 
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.findBooleanByAttr
+import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemCurtainMenuDangerousBinding
 import app.atomofiron.searchboxapp.custom.view.dangerous.DangerousSliderView
@@ -27,6 +31,14 @@ class DangerousMenuItemHolder private constructor(
             listener.onMenuItemSelected(itemId)
             true
         }
+        val deepBlack = view.context.findBooleanByAttr(R.attr.isBlackDeep)
+        val bordered = !view.resources.getBoolean(R.bool.isDayTheme) && deepBlack
+        view.setThumbBorder(bordered)
+        val thumbColor = when {
+            deepBlack -> Color.TRANSPARENT
+            else -> view.context.findColorByAttr(MaterialAttr.colorSurfaceContainer)
+        }
+        view.setThumbColor(thumbColor)
     }
 
     override fun onBind(item: MenuItem, position: Int) {
