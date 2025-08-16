@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 
 class ResultsItemHolder(itemView: View) : ResultsHolder(itemView) {
     private val binder = ExplorerItemBinderImpl(itemView)
@@ -17,14 +18,14 @@ class ResultsItemHolder(itemView: View) : ResultsHolder(itemView) {
         .inflate(R.layout.item_result_count, itemView as ViewGroup)
         .findViewById<TextView>(R.id.result_tv_count)
 
-    fun setOnItemActionListener(listener: ExplorerItemBinderImpl.ExplorerItemBinderActionListener?) {
-        binder.onItemActionListener = listener
+    fun setOnItemActionListener(listener: ExplorerItemBinderActionListener?) {
+        binder.setOnItemActionListener(listener)
     }
 
     override fun onBind(item: ResultItem, position: Int) {
         item as ResultItem.Item
         val result = item.item
-        binder.onBind(result.item)
+        binder.bind(result.item)
         tvCounter.isVisible = result.withCounter
         tvCounter.text = result.count.toString()
     }

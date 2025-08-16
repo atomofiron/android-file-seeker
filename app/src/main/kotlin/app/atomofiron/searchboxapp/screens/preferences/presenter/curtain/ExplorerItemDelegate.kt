@@ -8,6 +8,7 @@ import app.atomofiron.common.util.property.StrongProperty
 import app.atomofiron.fileseeker.BuildConfig.VERSION_NAME
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainPreferenceExplorerItemBinding
+import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
@@ -17,7 +18,8 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
@@ -65,9 +67,10 @@ class ExplorerItemDelegate(
         preferenceBox.isChecked = composition.visibleBox
         preferenceBg.isChecked = composition.visibleBg
 
-        val dirHolder = ExplorerHolder(preferenceExplorerDir.root)
-        val fileHolder = ExplorerHolder(preferenceExplorerFile.root)
-        val holders = arrayOf(dirHolder, fileHolder)
+        demoItems.setStrokedBackground(vertical = R.dimen.padding_half)
+        val dirBinder = ExplorerItemBinderImpl(preferenceExplorerDir.root)
+        val fileBinder = ExplorerItemBinderImpl(preferenceExplorerFile.root)
+        val holders = arrayOf(dirBinder, fileBinder)
         val onClickListener = Listener(*holders)
         preferenceDetails.setOnClickListener(onClickListener)
         preferenceAccess.setOnClickListener(onClickListener)
@@ -79,24 +82,24 @@ class ExplorerItemDelegate(
         preferenceBox.setOnClickListener(onClickListener)
         preferenceBg.setOnClickListener(onClickListener)
 
-        dirHolder.bind(dir)
-        fileHolder.bind(file)
+        dirBinder.bind(dir)
+        fileBinder.bind(file)
         holders.bind()
 
         preferenceExplorerDir.itemExplorerIvIcon.alpha = Alpha.VISIBLE
         preferenceExplorerDir.itemExplorerTvSize.text = dir.size
     }
 
-    private fun Array<out ExplorerHolder>.bind() {
+    private fun Array<out ExplorerItemBinder>.bind() {
         forEachIndexed { index, holder ->
             holder.disableClicks()
             holder.bindComposition(composition)
-            holder.setGreyBackgroundColor(composition.visibleBg && (index % 2 != size % 2))
+            holder.showAlternatingBackground(composition.visibleBg && (index % 2 != size % 2))
         }
     }
 
     private inner class Listener(
-        private vararg val holders: ExplorerHolder,
+        private vararg val binders: ExplorerItemBinder,
     ) : View.OnClickListener {
 
         override fun onClick(view: View) {
@@ -114,7 +117,7 @@ class ExplorerItemDelegate(
                 R.id.preference_bg -> composition.copy(visibleBg = isChecked)
                 else -> throw Exception()
             }
-            holders.bind()
+            binders.bind()
             preferenceStore { setExplorerItemComposition(composition) }
         }
     }

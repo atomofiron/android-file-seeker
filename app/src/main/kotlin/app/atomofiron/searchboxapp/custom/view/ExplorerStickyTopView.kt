@@ -42,7 +42,7 @@ class ExplorerStickyTopView(
     private val paint = Paint()
 
     init {
-        binder.onItemActionListener = listener
+        binder.setOnItemActionListener(listener)
         paint.style = Paint.Style.FILL
         paint.color = context.findColorByAttr(R.attr.colorBackground)
         setWillNotDraw(false)
@@ -63,7 +63,7 @@ class ExplorerStickyTopView(
     ) {
         this.item = item
         this.composition = composition ?: this.composition
-        item?.let { binder.onBind(it) }
+        item?.let { binder.bind(it) }
         composition?.let { binder.bindComposition(it) }
     }
 

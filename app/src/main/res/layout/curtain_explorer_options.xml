@@ -6,7 +6,7 @@
     android:orientation="vertical">
 
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/explorer_menu_tv_title"
+        android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/curtain_title_margin"
@@ -16,11 +16,11 @@
         android:textStyle="bold"
         />
     <include
-        android:id="@+id/explorer_menu_item"
+        android:id="@+id/item_view"
         layout="@layout/item_explorer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding_half"
+        android:layout_marginHorizontal="@dimen/padding_common"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/explorer_menu_tv_description"

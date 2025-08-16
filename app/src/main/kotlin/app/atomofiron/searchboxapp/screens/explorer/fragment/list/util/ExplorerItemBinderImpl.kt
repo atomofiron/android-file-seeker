@@ -14,22 +14,23 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import app.atomofiron.common.util.ifVisible
-import com.google.android.material.checkbox.MaterialCheckBox
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.LemonDrawable
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.drawable.translated
 import app.atomofiron.searchboxapp.custom.view.MuonsView
-import app.atomofiron.searchboxapp.model.explorer.*
+import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeChildren
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.isRtl
 import com.bumptech.glide.Glide
+import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.textview.MaterialTextView
 
 class ExplorerItemBinderImpl(
@@ -56,7 +57,7 @@ class ExplorerItemBinderImpl(
     private val tvError = itemView.findViewById<TextView>(R.id.item_explorer_error_tv)
     private val psProgress = itemView.findViewById<MuonsView>(R.id.item_explorer_ps)
 
-    var onItemActionListener: ExplorerItemBinderActionListener? = null
+    private var onItemActionListener: ExplorerItemBinderActionListener? = null
 
     private val defaultBoxTintList: ColorStateList by lazy(LazyThreadSafetyMode.NONE) { cbBox.buttonTintList!! }
     private val transparentBoxTintList: ColorStateList
@@ -108,7 +109,7 @@ class ExplorerItemBinderImpl(
         placeholder.setPadding(placeholder.intrinsicSize / 6)
     }
 
-    override fun onBind(item: Node) {
+    override fun bind(item: Node) {
         this.item = item
 
         itemView.setOnClickListener(onClickListener)
@@ -156,7 +157,7 @@ class ExplorerItemBinderImpl(
         tvName.setCompoundDrawablesRelativeWithIntrinsicBounds(if (withThumbnail) item.getIcon() else 0, 0, 0, 0)
     }
 
-    override fun setOnItemActionListener(listener: ExplorerItemActionListener?) {
+    override fun setOnItemActionListener(listener: ExplorerItemBinderActionListener?) {
         onItemActionListener = listener
     }
 
@@ -177,18 +178,20 @@ class ExplorerItemBinderImpl(
     }
 
     override fun disableClicks() {
+        cbBox.isEnabled = false
+        itemView.setOnClickListener(null)
+        itemView.setOnLongClickListener(null)
         itemView.background = null
         itemView.isFocusable = false
         itemView.isClickable = false
         itemView.isLongClickable = false
-        itemView.setOnClickListener(null)
     }
 
     override fun hideCheckBox() {
         cbBox.isVisible = false
     }
 
-    override fun setGreyBackgroundColor(visible: Boolean) {
+    override fun showAlternatingBackground(visible: Boolean) {
         val color = when {
             visible -> ContextCompat.getColor(itemView.context, R.color.item_explorer_background)
             else -> Color.TRANSPARENT

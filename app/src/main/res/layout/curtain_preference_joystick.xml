@@ -10,43 +10,53 @@
         android:paddingBottom="@dimen/padding_common"
         android:gravity="center_horizontal"
         >
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/preference_joystick_tv_title"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/color_picker"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/curtain_title_margin"
+            android:layout_marginHorizontal="@dimen/padding_common"
             android:layout_marginBottom="@dimen/padding_half"
-            android:layout_gravity="start"
-            android:textSize="@dimen/curtain_title_size"
-            android:textColor="?attr/colorContent"
-            android:textStyle="bold"
-            android:typeface="monospace"
-            tools:text="#ff5252"
-            />
+            android:orientation="vertical"
+            >
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/preference_joystick_tv_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/curtain_title_margin"
+                android:layout_marginBottom="@dimen/padding_half"
+                android:layout_gravity="start"
+                android:textSize="@dimen/curtain_title_size"
+                android:textColor="?attr/colorContent"
+                android:textStyle="bold"
+                android:typeface="monospace"
+                tools:text="#ff5252"
+                />
 
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/sb_red"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/padding_semi"
-            android:max="255"
-            android:background="@color/item_explorer_background"
-            />
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/sb_green"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/padding_semi"
-            android:max="255"
-            />
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/sb_blue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/padding_semi"
-            android:max="255"
-            android:background="@color/item_explorer_background"
-            />
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/sb_red"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_semi"
+                android:max="255"
+                android:background="#10ff0000"
+                />
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/sb_green"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_semi"
+                android:max="255"
+                android:background="#1000ff00"
+                />
+            <androidx.appcompat.widget.AppCompatSeekBar
+                android:id="@+id/sb_blue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/padding_semi"
+                android:max="255"
+                android:background="#100000ff"
+                />
+        </LinearLayout>
         <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/inv_for_theme"
             android:layout_width="wrap_content"

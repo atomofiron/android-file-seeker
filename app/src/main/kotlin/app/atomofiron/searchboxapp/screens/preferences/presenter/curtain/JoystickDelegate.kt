@@ -10,6 +10,7 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainPreferenceJoystickBinding
+import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.custom.view.effect
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
@@ -54,6 +55,7 @@ class JoystickDelegate(
         invHighlight.setOnCheckedChangeListener(listener)
         hapticScale.setOnSeekBarChangeListener(listener)
         btnDefault.setOnClickListener(listener)
+        colorPicker.setStrokedBackground(vertical = R.dimen.padding_half)
 
         bind(entity)
     }

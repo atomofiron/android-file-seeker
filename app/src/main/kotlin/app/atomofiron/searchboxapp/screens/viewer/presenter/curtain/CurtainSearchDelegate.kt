@@ -7,9 +7,11 @@ import app.atomofiron.common.recycler.FinderSpanSizeLookup
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainTextViewerSearchBinding
+import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState
@@ -36,12 +38,12 @@ class CurtainSearchDelegate(
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
         val binding = CurtainTextViewerSearchBinding.inflate(inflater, null, false)
 
-        val holder = ExplorerHolder(binding.itemExplorer.root)
+        val holder = ExplorerItemBinderImpl(binding.itemExplorer.root)
         holder.bind(node)
         holder.bindComposition(composition)
         holder.disableClicks()
         holder.hideCheckBox()
-        holder.setGreyBackgroundColor()
+        binding.itemExplorer.root.setStrokedBackground(vertical = R.dimen.padding_half)
 
         binding.recyclerView.run {
             val layoutManager = GridLayoutManager(binding.root.context, 1)

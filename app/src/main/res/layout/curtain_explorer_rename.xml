@@ -6,11 +6,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     >
-    <include
-        android:id="@+id/explorer_rename_item"
-        layout="@layout/item_explorer"
-        />
-
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/explorer_create_rename"
         android:layout_width="match_parent"
