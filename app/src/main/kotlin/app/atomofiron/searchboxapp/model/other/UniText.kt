@@ -19,6 +19,7 @@ sealed interface UniText {
         operator fun invoke(text: String?) = text?.let { Str(text) }
         operator fun invoke(@StringRes text: Int) = Res(text)
         operator fun invoke(@StringRes text: Int, vararg args: Any) = Fmt(text, args.toList())
+        operator fun invoke(@StringRes text: Int, args: List<String>) = Fmt(text, args)
     }
 }
 
@@ -26,7 +27,7 @@ sealed interface UniText {
 operator fun Resources.get(text: UniText?) = text?.let { get(it) }
 
 operator fun Resources.get(text: UniText) = when (text) {
-    is Fmt -> getString(text.res, text.args)
+    is Fmt -> getString(text.res, *text.args.toTypedArray())
     is Res -> getString(text.value)
     is Str -> text.value
 }
