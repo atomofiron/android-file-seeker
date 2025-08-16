@@ -18,10 +18,6 @@ class DangerousThumbSpan(
     private val colors = if (isRtl) intArrayOf(colorEnd, colorStart) else intArrayOf(colorStart, colorEnd)
     private val stops = floatArrayOf(0f, 1f)
     var progress = 0f
-        set(value) {
-            field = value
-            //view.invalidate()
-        }
 
     private var loop = false
     override fun updateDrawState(paint: TextPaint) {

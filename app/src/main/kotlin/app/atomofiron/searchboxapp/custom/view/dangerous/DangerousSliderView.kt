@@ -4,7 +4,9 @@ import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Outline
+import android.graphics.Paint
+import android.graphics.Path
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.text.Spannable
 import android.text.SpannableString
@@ -14,8 +16,6 @@ import android.util.TypedValue
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
-import android.view.View
-import android.view.ViewOutlineProvider
 import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
@@ -23,6 +23,7 @@ import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
+import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.MaterialDimen
@@ -33,8 +34,8 @@ import app.atomofiron.searchboxapp.utils.toIntAlpha
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.textview.MaterialTextView
 import kotlin.math.PI
+import kotlin.math.max
 import kotlin.math.sin
-import androidx.core.content.withStyledAttributes
 
 private const val OFFSET_DURATION = 512L
 private const val TIP_DURATION = 3072L
@@ -48,22 +49,28 @@ class DangerousSliderView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
-) : FrameLayout(context, attrs, defStyleAttr), ValueAnimator.AnimatorUpdateListener {
+    defStyleRes: Int = 0,
+) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), ValueAnimator.AnimatorUpdateListener {
 
+    private val defaultPadding = resources.getDimensionPixelSize(MaterialDimen.m3_btn_padding_left)
     private val strokeWidth = resources.getDimensionPixelSize(MaterialDimen.m3_comp_outlined_button_outline_width)
     private val textColor = MaterialColors.getColor(context, MaterialAttr.colorOnError, 0)
-    private val trackColor = MaterialColors.getColor(context, android.R.attr.colorBackground, 0)
+    private var trackColor = MaterialColors.getColor(context, android.R.attr.colorBackground, 0)
     private val thumbColor = MaterialColors.getColor(context, MaterialAttr.colorError, 0)
     private val tipColor = MaterialColors.getColor(context, MaterialAttr.colorOnErrorContainer, 0)
     private val done = ContextCompat.getDrawable(context, R.drawable.ic_done)!!
 
     private val thumb = GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, thumbColor.let { intArrayOf(it, it) })
     private val button = MaterialTextView(context)
+    private var icon: Drawable? = null
     private val tip = MaterialTextView(context)
     private val thumbSpan = DangerousThumbSpan(button, thumbColor, textColor)
     private val tipSpan = DangerousTipSpan(tip)
     private val arrows = DangerousArrows(thumbColor, strokeWidth.toFloat())
-    private var border = GradientDrawable()
+    private var borderPath = Path()
+    private var borderPaint = Paint()
+    private var cornerRadius = Float.MAX_VALUE
+    private var thumbBorder = true
 
     private val isRtl = isRtl()
     private var downX: Float? = null
@@ -84,34 +91,43 @@ class DangerousSliderView @JvmOverloads constructor(
     private val tipAnimator = ValueAnimator.ofFloat(START, END)
     private val bounceAnimator = ValueAnimator.ofFloat(0f)
     private val bounceInterpolator = BounceInterpolator()
-    private val clipping = object : ViewOutlineProvider() {
-        override fun getOutline(view: View, outline: Outline) = when {
-            isRtl -> outline.setRoundRect(0, 0, view.right - view.left + offset.toInt(), view.bottom - view.top, view.height / 2f)
-            else -> outline.setRoundRect(offset.toInt(), 0, view.right - view.left, view.bottom - view.top, view.height / 2f)
-        }
-    }
 
     init {
         setWillNotDraw(false)
-        val padding = resources.getDimensionPixelSize(MaterialDimen.m3_btn_padding_left)
-        setPadding(padding, padding / 2, padding, padding / 2)
-
-        thumb.cornerRadius = Float.MAX_VALUE
-        thumb.setStroke(strokeWidth, thumbColor)
-        border.cornerRadius = Float.MAX_VALUE
-        border.setStroke(strokeWidth, thumbColor)
-        done.setTint(textColor)
+        when (paddingStart + paddingTop + paddingEnd + paddingBottom) {
+            0 -> setPaddingRelative(defaultPadding, defaultPadding / 2, defaultPadding, defaultPadding / 2)
+            else -> setPaddingRelative(paddingStart, paddingTop, paddingEnd, paddingBottom)
+        }
+        super.setPaddingRelative(0, 0, 0, 0)
 
         context.withStyledAttributes(attrs, R.styleable.DangerousSliderView, defStyleAttr, 0) {
             tip.text = getString(R.styleable.DangerousSliderView_tip)?.withSpan(tipSpan)
             button.text = getString(R.styleable.DangerousSliderView_text)?.withSpan(thumbSpan)
             val textSize = getDimension(R.styleable.DangerousSliderView_textSize, button.textSize)
             setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize)
+            cornerRadius = getDimension(R.styleable.DangerousSliderView_cornerRadius, cornerRadius)
+            thumb.cornerRadius = cornerRadius
+            trackColor = getColor(R.styleable.DangerousSliderView_trackColor, trackColor)
+            thumbBorder = getBoolean(R.styleable.DangerousSliderView_thumbBorder, thumbBorder)
+            icon = getDrawable(R.styleable.DangerousSliderView_icon)
+            button.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
+            button.compoundDrawablePadding = getDimensionPixelSize(R.styleable.DangerousSliderView_iconPadding, button.paddingStart)
         }
+
+        thumb.setStroke(strokeWidth, if (thumbBorder) thumbColor else Color.TRANSPARENT)
+        done.setTint(textColor)
+        borderPaint.style = Paint.Style.STROKE
+        borderPaint.strokeWidth = strokeWidth.toFloat()
+        borderPaint.color = thumbColor
 
         tip.setTextColor(tipColor)
         tip.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply { gravity = Gravity.CENTER }
-        button.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT)
+        button.layoutParams = LayoutParams(WRAP_CONTENT, WRAP_CONTENT).apply {
+            marginStart = strokeWidth / 2
+            topMargin = strokeWidth / 2
+            marginEnd = strokeWidth / 2
+            bottomMargin = strokeWidth / 2
+        }
         button.background = thumb
         addView(tip)
         addView(button)
@@ -124,32 +140,27 @@ class DangerousSliderView @JvmOverloads constructor(
         bounceAnimator.addUpdateListener(this)
         bounceAnimator.interpolator = LinearInterpolator()
         bounceAnimator.duration = BOUNCE_DURATION
-        outlineProvider = clipping
-        clipToOutline = true
     }
 
     override fun setPadding(left: Int, top: Int, right: Int, bottom: Int) {
         button.setPadding(left, top, right, bottom)
-        tip.setPadding(left, top, right, bottom)
     }
 
     override fun setPaddingRelative(start: Int, top: Int, end: Int, bottom: Int) {
         button.setPaddingRelative(start, top, end, bottom)
-        tip.setPaddingRelative(start, top, end, bottom)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         arrows.setBounds(0, 0, width, height)
-        border.setBounds(0, 0, width, height)
         updateOffset(0f)
     }
 
     override fun draw(canvas: Canvas) {
         val arrowsAlpha = tipAnimator.animatedValue as Float * 2 - 1
         arrows.draw(canvas, flip = isRtl, progress = progress, alpha = arrowsAlpha, offset = tipOffset, arrowSize = tip.textSize / 2)
-        border.draw(canvas)
         super.draw(canvas)
+        canvas.drawPath(borderPath, borderPaint)
         if (isDone) done.draw(canvas)
     }
 
@@ -236,19 +247,29 @@ class DangerousSliderView @JvmOverloads constructor(
     private fun updateOffset(translation: Float) {
         offset = translation.inRange(0f, maxOffset)
         thumbSpan.progress = progress
+        icon?.run {
+            val alpha = (max(0f, progress - 0.5f) / 0.5f).toIntAlpha()
+            var color = ColorUtils.setAlphaComponent(textColor, alpha)
+            color = ColorUtils.compositeColors(color, thumbColor)
+            setTint(color)
+        }
         tip.translationX = tipOffset
         val alpha = progress.toIntAlpha()
         var thumbColor = ColorUtils.setAlphaComponent(thumbColor, alpha)
         thumbColor = ColorUtils.compositeColors(thumbColor, trackColor)
         thumb.setColor(thumbColor)
-        border.alpha = alpha
+        val inset = strokeWidth / 2f
+        borderPath.reset()
+        val borderInsetLeft = inset + if (isRtl) 0f else translation
+        val borderInsetRight = inset + if (isRtl) -translation else 0f
+        borderPath.addRoundRect(borderInsetLeft, inset, width - borderInsetRight, height - inset, cornerRadius, cornerRadius, Path.Direction.CW)
+        borderPaint.alpha = alpha
         if (hapticAllowed && (progress == END || progress == START)) {
             button.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
             hapticAllowed = false
         }
         hapticAllowed = hapticAllowed || (progress in HapticRange && !bounceAnimator.isRunning)
         invalidate()
-        invalidateOutline()
     }
 
     private fun CharSequence.withSpan(span: CharacterStyle): Spannable {

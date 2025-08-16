@@ -14,9 +14,14 @@
     </declare-styleable>
 
     <declare-styleable name="DangerousSliderView">
+        <attr name="icon" format="reference" />
         <attr name="text" format="string" />
         <attr name="tip" format="string" />
         <attr name="textSize" format="dimension" />
+        <attr name="iconPadding" format="dimension" />
+        <attr name="cornerRadius" format="dimension" />
+        <attr name="trackColor" format="color" />
+        <attr name="thumbBorder" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="AutoHideKeyboardField">
