@@ -81,6 +81,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         val view = super.onCreateView(inflater, container, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         (recyclerView.parent as ViewGroup).removeView(recyclerView)
+        recyclerView.removeItemDecorationAt(0)
         recyclerView.isVerticalScrollBarEnabled = false
         recyclerView.layoutParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
             behavior = AppBarLayout.ScrollingViewBehavior()
