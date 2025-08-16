@@ -3,9 +3,7 @@ package app.atomofiron.searchboxapp.custom.view.menu.holder
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findBooleanByAttr
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemCurtainMenuDangerousBinding
 import app.atomofiron.searchboxapp.custom.view.dangerous.DangerousSliderView
@@ -13,6 +11,7 @@ import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.color
 
 class DangerousMenuItemHolder private constructor(
     val view: DangerousSliderView,
@@ -32,13 +31,9 @@ class DangerousMenuItemHolder private constructor(
             true
         }
         val deepBlack = view.context.findBooleanByAttr(R.attr.isBlackDeep)
-        val bordered = !view.resources.getBoolean(R.bool.isDayTheme) && deepBlack
-        view.setThumbBorder(bordered)
-        val thumbColor = when {
-            deepBlack -> Color.TRANSPARENT
-            else -> view.context.findColorByAttr(MaterialAttr.colorSurfaceContainer)
-        }
-        view.setThumbColor(thumbColor)
+        if (deepBlack) view.setThumbColor(Color.TRANSPARENT)
+        if (deepBlack) view.setStartBorder(view.context.color(R.color.stroke))
+        view.setThumbBorder(visible = view.resources.getBoolean(R.bool.isNightTheme) && deepBlack)
     }
 
     override fun onBind(item: MenuItem, position: Int) {

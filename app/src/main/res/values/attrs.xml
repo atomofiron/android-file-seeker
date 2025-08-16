@@ -20,7 +20,8 @@
         <attr name="textSize" format="dimension" />
         <attr name="iconPadding" format="dimension" />
         <attr name="cornerRadius" format="dimension" />
-        <attr name="borderColor" format="color" />
+        <attr name="startBorderColor" format="color" />
+        <attr name="endBorderColor" format="color" />
         <attr name="thumbColor" format="color" />
         <attr name="thumbBorder" format="boolean" />
     </declare-styleable>
