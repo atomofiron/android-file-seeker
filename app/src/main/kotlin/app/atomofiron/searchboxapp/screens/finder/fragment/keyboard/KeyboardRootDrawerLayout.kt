@@ -218,7 +218,8 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                     tracking == null -> tracking = Tracking.None
                 }
             }
-            MotionEvent.ACTION_UP -> {
+            MotionEvent.ACTION_UP,
+            MotionEvent.ACTION_CANCEL -> {
                 tracker.addMovement(event)
                 tracker.computeCurrentVelocity(VelocityPeriod)
                 val toRight = when {
