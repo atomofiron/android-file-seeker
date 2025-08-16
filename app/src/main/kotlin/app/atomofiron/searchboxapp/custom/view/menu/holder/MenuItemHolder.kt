@@ -32,8 +32,9 @@ class MenuItemHolder private constructor(
         }
         (binding.root.background as RippleDrawable).run {
             val deepBlack = binding.context.findBooleanByAttr(R.attr.isBlackDeep)
-            findDrawableByLayerId(R.id.fill).alpha = Alpha.visibleInt(!deepBlack)
-            findDrawableByLayerId(R.id.stroke).alpha = Alpha.visibleInt(deepBlack)
+            val darkTheme = binding.resources.getBoolean(R.bool.isNightTheme)
+            findDrawableByLayerId(R.id.fill).alpha = Alpha.visibleInt(!darkTheme || !deepBlack)
+            findDrawableByLayerId(R.id.stroke).alpha = Alpha.visibleInt(darkTheme && deepBlack)
         }
     }
 
