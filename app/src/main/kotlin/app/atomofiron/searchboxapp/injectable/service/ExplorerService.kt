@@ -427,6 +427,7 @@ class ExplorerService(
             tree.findNode(it.uniqueId)
         }
         item ?: return
+        // todo change uniqueId in state, create the new one state instance
         val renamed = item.rename(name, config.useSu)
         renderTab(key) {
             val level = tree.find(item.parentPath)

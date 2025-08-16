@@ -7,6 +7,8 @@ import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.Node.Companion.stateStub
+import app.atomofiron.searchboxapp.model.explorer.Node.Companion.toUniqueId
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
@@ -133,15 +135,14 @@ object ExplorerUtils {
 
     private val spaces = Regex(" +")
     private val lastPart = Regex("(?<=/)/*[^/]+/*$|^/+\$")
-    private val endingSlashes = Regex("/*$")
     private val fileType = Regex(": +")
 
-    fun String.completePath(directory: Boolean): String {
-        return when {
-            this == ROOT -> ROOT
-            directory -> replace(endingSlashes, SLASH.toString())
-            else -> replace(endingSlashes, "")
-        }
+    fun String.completePath(directory: Boolean): String = when {
+        this == ROOT -> this
+        !directory -> this
+        lastOrNull() == SLASH -> this
+        isNotEmpty() -> "$this/"
+        else -> throw IllegalStateException(this)
     }
 
     fun String.parent(): String = replace(lastPart, "")
@@ -647,8 +648,21 @@ object ExplorerUtils {
         val targetPath = parentPath + name
         val output = Shell.exec(Shell[Shell.MV].format(path, targetPath), useSu)
         return when {
-            output.success -> rename(name).copy(error = null)
+            output.success -> move(name = name).copy(error = null)
             else -> copy(error = output.error.toNodeError(path))
+        }
+    }
+
+    fun Node.move(parent: String = parentPath, name: String = this.name): Node {
+        val path = "$parent$name".completePath(isDirectory)
+        val properties = if (name == this.name) properties else properties.copy(name = name)
+        children?.move(path)
+        return copy(path = path, parentPath = parent, uniqueId = path.toUniqueId(), properties = properties, state = stateStub)
+    }
+
+    private fun NodeChildren.move(parent: String) {
+        for (i in indices) {
+            items[i] = get(i).move(parent = parent.completePath(true))
         }
     }
 

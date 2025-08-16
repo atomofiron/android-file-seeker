@@ -6,6 +6,7 @@ import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.move
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -118,7 +119,7 @@ class ExplorerInteractor(
 
     fun clone(tab: NodeTabKey, target: Node, name: String) {
         scope.launch(context) {
-            var to = target.rename(name)
+            var to = target.move(name = name)
             if (to.isDirectory) to = to.copy(children = null)
             service.tryCopy(tab, target, to, asMoving = false)
         }

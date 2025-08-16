@@ -22,7 +22,7 @@ data class Node(
     val isDeepest: Boolean = false,
 ) : INodeProperties by properties, INodeState by state {
     companion object {
-        private val stateStub = NodeState(0)
+        val stateStub = NodeState(0)
         fun String.toUniqueId(): Int = hashCode()
     }
     val isRoot: Boolean = uniqueId == rootId
@@ -68,29 +68,6 @@ data class Node(
     }
 
     fun withPath(path: String) = copy(path = path, uniqueId = -uniqueId)
-
-    // todo change uniqueId in state, create the new one state instance
-    fun rename(name: String): Node {
-        val path = "$parentPath$name${if (isDirectory) "/" else ""}"
-        val properties = properties.copy(name = name)
-        var new = copy(path = path, uniqueId = path.toUniqueId(), properties = properties, state = stateStub)
-        children?.withNewParentPath(path)?.let {
-            new = new.copy(children = it)
-        }
-        return new
-    }
-
-    private fun NodeChildren.withNewParentPath(parent: String): NodeChildren {
-        val items = items.map { node ->
-            val path = "$parent${node.name}${if (isDirectory) "/" else ""}"
-            var new = node.copy(parentPath = parent, path = path)
-            new.children?.withNewParentPath(path)?.let {
-                new = new.copy(children = it)
-            }
-            new
-        }.toMutableList()
-        return copy(items = items)
-    }
 
     fun getOpenedIndex(orElse: Int = -1): Int = children?.indexOfFirst { it.isOpened }
         ?.takeIf { it >= 0 }
