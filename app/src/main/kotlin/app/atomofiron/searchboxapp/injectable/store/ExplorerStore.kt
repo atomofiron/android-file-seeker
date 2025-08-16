@@ -33,6 +33,8 @@ class ExplorerStore {
 
     suspend fun emitDeleted(items: List<Node>) = deleted.emit(items)
 
+    suspend fun emitChecked(items: List<Node>) = checked.emit(items)
+
     fun setDeepestNode(tab: NodeTabKey, node: Node?) {
         deepestNodes.value = deepestNodes.value.toMutableMap().apply {
             if (node == null) remove(tab) else set(tab, node)

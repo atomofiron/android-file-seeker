@@ -53,6 +53,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateWith
 import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.findWithIndex
 import app.atomofiron.searchboxapp.utils.mutate
+import app.atomofiron.searchboxapp.utils.removeOneIf
 import app.atomofiron.searchboxapp.utils.replaceEach
 import app.atomofiron.searchboxapp.utils.verify
 import app.atomofiron.searchboxapp.utils.writeTo
@@ -497,6 +498,7 @@ class ExplorerService(
             if (state?.withOperation == true) return
             if (!checked.tryUpdateCheck(item.uniqueId, isChecked)) return
             renderUpdate(item)
+            renderChecked(item, isChecked)
         }
     }
 
@@ -660,7 +662,7 @@ class ExplorerService(
         updateStates(items)
         updateChecked(items)
         val checked = items.filter { it.isChecked }
-        store.checked.set(checked)
+        store.emitChecked(checked)
         store.setCurrentItems(items)
 
         require(this.roots.all { !it.isSelected })
@@ -762,6 +764,16 @@ class ExplorerService(
         updateStateFor(new, children = new.children?.fetch(isOpened = new.isOpened))
             .defineDirKind()
             .let { store.emitUpdate(it) }
+    }
+
+    private suspend fun renderChecked(new: Node, isChecked: Boolean) {
+        store.checked.value.mutate {
+            when {
+                isChecked -> add(new.copy(isChecked = true))
+                else -> removeOneIf { it.uniqueId == new.uniqueId }
+            }
+            store.emitChecked(this)
+        }
     }
 
     private fun NodeTab.updateStateFor(item: Node, children: NodeChildren? = item.children): Node {
