@@ -9,6 +9,7 @@ import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.extension.then
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.view.menu.LongItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
@@ -55,7 +56,7 @@ class FileOperationsDelegate(
             first.content.rootType?.editable == true -> rootOptions
             first.isRoot -> return null
             first.isDirectory -> directoryOptions
-            else -> oneFileOptions.complete(first)
+            else -> oneFileOptions.completeForSingle(first)
         }.filter {
             readWrite.takeIf { readOnly }?.contains(it) != true
         }
@@ -66,12 +67,13 @@ class FileOperationsDelegate(
 
     fun askForApks(ref: NodeRef, contentResolver: ContentResolver) = askForAndroidApp(NodeContent.AndroidApp.apks(ref), contentResolver)
 
-    private fun List<MenuItem>.complete(first: Node): List<MenuItem> = mutate {
-        if (first.content is NodeContent.AndroidApp) {
-            add(Operations.InstallApp)
-            add(Operations.LaunchApp.copy(enabled = apks.launchable(first)))
-        } else if (utils.canUseAs(first)) {
-            add(Operations.UseAs)
+    private fun List<MenuItem>.completeForSingle(single: Node): List<MenuItem> = mutate {
+        if (single.content is NodeContent.AndroidApp) {
+            val index = sumOf { it.content.cells } % LongItem
+            add(index, Operations.LaunchApp.copy(enabled = apks.launchable(single)))
+            add(index, Operations.InstallApp)
+        } else if (utils.canUseAs(single)) {
+            add(0, Operations.UseAs)
         }
     }
 
