@@ -9,11 +9,13 @@ data class MenuItem(
     val label: UniText,
     val content: MenuItemContent,
     val enabled: Boolean = true,
+    val longLabel: UniText? = null,
 ) {
     constructor(
         id: Int,
         title: UniText,
         @DrawableRes icon: Int,
         outside: Boolean = false,
-    ) : this(id, title, MenuItemContent(icon, R.drawable.ic_outside.takeIf { outside }))
+        longLabel: UniText? = null,
+    ) : this(id, title, MenuItemContent(icon, R.drawable.ic_outside.takeIf { outside }), longLabel = longLabel)
 }

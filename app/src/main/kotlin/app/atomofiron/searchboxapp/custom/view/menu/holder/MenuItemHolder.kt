@@ -42,6 +42,7 @@ class MenuItemHolder private constructor(
         itemId = item.id
         val content = item.content as MenuItemContent.Common
         binding.icon.setImageResource(content.head)
-        binding.label.text = binding.resources[item.label]
+        val label = item.longLabel?.takeIf { isLong } ?: item.label
+        binding.label.text = binding.resources[label]
     }
 }
