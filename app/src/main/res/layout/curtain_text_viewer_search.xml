@@ -25,7 +25,5 @@
         android:paddingTop="@dimen/content_margin_half"
         android:paddingHorizontal="@dimen/content_margin_half"
         android:scrollbars="none"
-        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:reverseLayout="true"
         />
 </LinearLayout>

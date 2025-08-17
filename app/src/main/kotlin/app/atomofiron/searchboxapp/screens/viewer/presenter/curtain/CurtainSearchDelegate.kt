@@ -29,7 +29,7 @@ class CurtainSearchDelegate(
     private val finderAdapter = FinderAdapter(output)
 
     init {
-        viewState.items.collect(scope) { finderAdapter.submitList(it.reversed()) }
+        viewState.items.collect(scope) { finderAdapter.submitList(it) }
         viewState.insertInQuery.collect(scope, collector = viewState::updateSearchQuery)
     }
 
@@ -45,6 +45,7 @@ class CurtainSearchDelegate(
 
         binding.recyclerView.run {
             val layoutManager = GridLayoutManager(binding.root.context, 1)
+            layoutManager.reverseLayout = true
             adapter = finderAdapter
             itemAnimator = null
             this.layoutManager = layoutManager
