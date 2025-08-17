@@ -130,14 +130,16 @@ inline fun <I> MutableList<I>.replaceEach(action: (I) -> I) {
     }
 }
 
-inline fun <reified E : I, I> MutableList<I>.replaceOne(action: E.() -> E) {
+inline fun <reified E : I, I> MutableList<I>.replaceOne(action: E.() -> E): E? {
     for (i in indices) {
         val element = get(i)
         if (element is E) {
+            val new = action(element)
             set(i, action(element))
-            return
+            return new
         }
     }
+    return null
 }
 
 inline fun <T,R> Iterable<T>.findNotNull(predicate: (T) -> R?): R {

@@ -41,9 +41,9 @@ class QueryFieldHolder(
 
     override fun onBind(item: FinderStateItem, position: Int) {
         item as Query
-        viewReplace.isVisible = item.replaceEnabled
+        viewReplace.isVisible = item.withReplace
         etFind.imeOptions = when {
-            item.replaceEnabled -> (etFind.imeOptions and EditorInfo.IME_ACTION_SEARCH.inv()) or EditorInfo.IME_ACTION_NEXT
+            item.withReplace -> (etFind.imeOptions and EditorInfo.IME_ACTION_SEARCH.inv()) or EditorInfo.IME_ACTION_NEXT
             else -> (etFind.imeOptions and EditorInfo.IME_ACTION_NEXT.inv()) or EditorInfo.IME_ACTION_SEARCH
         }
         if (etFind.text.toString() != item.query) {
@@ -51,8 +51,8 @@ class QueryFieldHolder(
             etFind.setSelection(item.query.length)
         }
         updateWarning(etFind.text.toString())
-        btnFind.isEnabled = item.available
-        btnFind.alpha = Alpha.enabled(item.available)
+        btnFind.isEnabled = item.enabled
+        btnFind.alpha = Alpha.enabled(item.enabled)
     }
 
     private fun onEditorAction(view: View, actionId: Int, /* indeed nullable */ event: KeyEvent?): Boolean {

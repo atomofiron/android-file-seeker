@@ -78,7 +78,7 @@ class FinderItemsStateDelegate(
     private fun composeAllItems(items: List<FinderStateItem>, targets: List<Node>, tasks: List<SearchTask>): List<FinderStateItem> {
         return buildList {
             addAll(items)
-            replaceOne<Query, _> { copy(available = query.isNotEmpty() && targets.any { it.isChecked }) }
+            replaceOne<Query, _> { copy(enabled = query.isNotEmpty() && (isLocal || targets.any { it.isChecked })) }
             if (!isLocal && targets.isNotEmpty()) {
                 val index = items.indexOfFirst { it is TestField }.inc()
                 add(index, Title(R.string.search_here))

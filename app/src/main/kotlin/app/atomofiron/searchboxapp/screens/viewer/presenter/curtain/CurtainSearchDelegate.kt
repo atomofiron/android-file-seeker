@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.screens.viewer.presenter.curtain
 
 import android.view.LayoutInflater
-import android.widget.EditText
 import androidx.recyclerview.widget.GridLayoutManager
 import app.atomofiron.common.recycler.FlexSpanSizeLookup
 import app.atomofiron.common.util.flow.collect
@@ -31,7 +30,7 @@ class CurtainSearchDelegate(
 
     init {
         viewState.items.collect(scope) { finderAdapter.submitList(it.reversed()) }
-        viewState.insertInQuery.collect(scope, collector = ::insertInQuery)
+        viewState.insertInQuery.collect(scope, collector = viewState::updateSearchQuery)
     }
 
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
@@ -57,15 +56,5 @@ class CurtainSearchDelegate(
         binding.recyclerView.insetsPadding(ExtType.curtain, bottom = true)
 
         return CurtainApi.ViewHolder(binding.root)
-    }
-
-    private fun insertInQuery(value: String) {
-        holder<CurtainApi.ViewHolder> {
-            view.findViewById<EditText>(R.id.item_find_rt_find)
-                ?.takeIf { it.isFocused }
-                ?.apply {
-                    text.replace(selectionStart, selectionEnd, value)
-                }
-        }
     }
 }
