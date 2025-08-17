@@ -89,6 +89,7 @@ class DangerousSliderView @JvmOverloads constructor(
     private var hapticAllowed = false
     private val isDone get() = !done.bounds.isEmpty
     var listener: (() -> Boolean)? = null
+    private var initialized = false
 
     private val offsetAnimator = ValueAnimator.ofFloat(0f)
     private val tipAnimator = ValueAnimator.ofFloat(START, END)
@@ -139,6 +140,7 @@ class DangerousSliderView @JvmOverloads constructor(
         bounceAnimator.addUpdateListener(this)
         bounceAnimator.interpolator = LinearInterpolator()
         bounceAnimator.duration = BOUNCE_DURATION
+        initialized = true
     }
 
     fun setStartBorder(color: Int) {
@@ -158,13 +160,21 @@ class DangerousSliderView @JvmOverloads constructor(
         thumbColor = color
     }
 
-    override fun setPadding(left: Int, top: Int, right: Int, bottom: Int) {
-        button.setPadding(left, top, right, bottom)
-    }
+    override fun setPadding(left: Int, top: Int, right: Int, bottom: Int) = button.setPadding(left, top, right, bottom)
 
-    override fun setPaddingRelative(start: Int, top: Int, end: Int, bottom: Int) {
-        button.setPaddingRelative(start, top, end, bottom)
-    }
+    override fun setPaddingRelative(start: Int, top: Int, end: Int, bottom: Int) = button.setPaddingRelative(start, top, end, bottom)
+
+    override fun getPaddingStart(): Int = if (initialized) button.paddingStart else super.getPaddingStart()
+
+    override fun getPaddingTop(): Int = if (initialized) button.paddingTop else super.getPaddingTop()
+
+    override fun getPaddingEnd(): Int = if (initialized) button.paddingEnd else super.getPaddingEnd()
+
+    override fun getPaddingBottom(): Int = if (initialized) button.paddingBottom else super.getPaddingBottom()
+
+    override fun getPaddingLeft(): Int = if (initialized) button.paddingLeft else super.getPaddingLeft()
+
+    override fun getPaddingRight(): Int = if (initialized) button.paddingRight else super.getPaddingRight()
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
