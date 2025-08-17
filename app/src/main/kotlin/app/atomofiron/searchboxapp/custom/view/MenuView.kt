@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.custom.view
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
@@ -9,6 +10,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuAdapter
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
+import kotlin.math.max
 
 class MenuView : RecyclerView {
 
@@ -33,8 +35,12 @@ class MenuView : RecyclerView {
         adapter.menuListener = listener
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
-        adapter.spanLimit = width / minColumnWidth
+        max(1, width / minColumnWidth)
+            .takeIf { it != adapter.spanLimit }
+            ?.let { adapter.spanLimit = it }
+            ?.let { adapter.notifyDataSetChanged() }
     }
 }

@@ -10,7 +10,6 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.doOnNextLayout
-import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.DialogFragment
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
@@ -97,9 +96,6 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
                 true
             }
             root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateSnackbarTranslation() }
-            curtainParent.addOnLayoutChangeListener { parent, left, _, right, _, _, _, _, _ ->
-                onCurtainParentChange(parent, rootWidth = right - left)
-            }
             val layoutParams = curtainSheet.layoutParams as CoordinatorLayout.LayoutParams
             behavior = layoutParams.behavior as BottomSheetBehavior
             behavior.addBottomSheetCallback(BottomSheetCallbackImpl(curtainSheet))
@@ -159,17 +155,6 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     private fun tryHide() {
         if (viewState.cancelable.value) {
             hide()
-        }
-    }
-
-    private fun onCurtainParentChange(parentView: View, rootWidth: Int) {
-        val maxWidth = resources.getDimensionPixelSize(R.dimen.curtain_max_width)
-        val width = min(maxWidth, rootWidth)
-        val padding = (rootWidth - width) / 2
-        val curtainSheet = binding.curtainSheet
-        if (parentView.paddingStart != padding || parentView.paddingEnd != padding) {
-            parentView.updatePaddingRelative(start = padding, end = padding)
-            curtainSheet.requestLayout()
         }
     }
 

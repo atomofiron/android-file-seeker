@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<app.atomofiron.searchboxapp.custom.view.layout.RootCoordinatorLayout
+<app.atomofiron.searchboxapp.custom.view.layout.RootFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
+    <app.atomofiron.searchboxapp.custom.view.layout.LimitedWidthCoordinatorLayout
         android:id="@+id/curtain_parent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom"
+        android:layout_gravity="center_horizontal|bottom"
         android:clipToPadding="false"
         android:clipChildren="false"
+        app:maxWidth="@dimen/curtain_max_width"
         >
         <FrameLayout
             android:id="@+id/curtain_sheet"
@@ -24,5 +25,5 @@
             app:behavior_skipCollapsed="true"
             app:behavior_hideable="true"
             />
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
-</app.atomofiron.searchboxapp.custom.view.layout.RootCoordinatorLayout>
+    </app.atomofiron.searchboxapp.custom.view.layout.LimitedWidthCoordinatorLayout>
+</app.atomofiron.searchboxapp.custom.view.layout.RootFrameLayout>
