@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
-import app.atomofiron.common.recycler.FinderSpanSizeLookup
+import app.atomofiron.common.recycler.FlexSpanSizeLookup
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.common.util.showKeyboard
@@ -28,7 +28,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     private lateinit var binding: FragmentFinderBinding
     private lateinit var finderAdapter: FinderAdapter
     private lateinit var layoutManager: GridLayoutManager
-    private lateinit var spanSizeLookup: FinderSpanSizeLookup
+    private lateinit var spanSizeLookup: FlexSpanSizeLookup
 
     private val historyAdapter: HistoryAdapter by lazy {
         HistoryAdapter(requireContext(), object : HistoryAdapter.OnItemClickListener {
@@ -45,7 +45,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
         finderAdapter = FinderAdapter(output = presenter)
         layoutManager = GridLayoutManager(context, 1)
-        spanSizeLookup = FinderSpanSizeLookup(null, finderAdapter, layoutManager, resources)
+        spanSizeLookup = FlexSpanSizeLookup(null, finderAdapter, layoutManager, resources)
         finderAdapter.holderListener = spanSizeLookup
     }
 

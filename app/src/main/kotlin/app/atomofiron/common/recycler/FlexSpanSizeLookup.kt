@@ -29,7 +29,7 @@ interface AdapterHolderListener {
     fun onBind(holder: Holder, position: Int)
 }
 
-class FinderSpanSizeLookup(
+class FlexSpanSizeLookup(
     recyclerView: RecyclerView?,
     private val adapter: ListAdapter<out GeneralItem, *>,
     private val manager: GridLayoutManager,
@@ -49,7 +49,7 @@ class FinderSpanSizeLookup(
     private var availableArea = 0f
     private var columnWidth = 0f
     private var portraitColumns = 0u
-    private val repeatTrigger = RepeatTrigger()
+    private val repeatTrigger = this@FlexSpanSizeLookup.RepeatTrigger()
 
     init {
         if (recyclerView != null) {
@@ -59,7 +59,7 @@ class FinderSpanSizeLookup(
         }
         manager.spanCount = COLUMNS_INT
         manager.spanSizeLookup = this
-        adapter.registerAdapterDataObserver(ItemObserver())
+        adapter.registerAdapterDataObserver(this@FlexSpanSizeLookup.ItemObserver())
     }
 
     override fun onCreate(holder: Holder, viewType: Int) {

@@ -3,14 +3,13 @@ package app.atomofiron.searchboxapp.screens.viewer.presenter.curtain
 import android.view.LayoutInflater
 import android.widget.EditText
 import androidx.recyclerview.widget.GridLayoutManager
-import app.atomofiron.common.recycler.FinderSpanSizeLookup
+import app.atomofiron.common.recycler.FlexSpanSizeLookup
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainTextViewerSearchBinding
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
@@ -50,7 +49,7 @@ class CurtainSearchDelegate(
             adapter = finderAdapter
             itemAnimator = null
             this.layoutManager = layoutManager
-            val spanSizeLookup = FinderSpanSizeLookup(binding.recyclerView, finderAdapter, layoutManager, binding.root.resources)
+            val spanSizeLookup = FlexSpanSizeLookup(binding.recyclerView, finderAdapter, layoutManager, binding.root.resources)
             finderAdapter.holderListener = spanSizeLookup
         }
 
