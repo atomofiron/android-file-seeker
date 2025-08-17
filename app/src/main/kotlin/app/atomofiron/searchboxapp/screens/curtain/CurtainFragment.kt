@@ -79,7 +79,9 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        ViewCompat.setWindowInsetsAnimationCallback(view, keyboardCallback)
+        view.post { // Ime callback not found. Ignoring unregisterReceivedCallback. callbackId: 16662255
+            ViewCompat.setWindowInsetsAnimationCallback(view, keyboardCallback)
+        }
         binding = FragmentCurtainBinding.bind(view).apply {
             curtainSheet.clipToOutline = true
             curtainSheet.background = CurtainBackground(requireContext())
