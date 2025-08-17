@@ -193,10 +193,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onEscClick() {
-        val viewWithFocus = binding.root.findFocus() as? EditText
+        val keyboardShown = binding.root.current[ExtType.ime].bottom > 0
         when {
-            viewWithFocus?.hideKeyboard() == true -> Unit
-            presenter.onEscClick() -> Unit
+            !keyboardShown -> presenter.onEscClick()
+            else -> (binding.root.findFocus() as? EditText)?.hideKeyboard()
         }
     }
 
