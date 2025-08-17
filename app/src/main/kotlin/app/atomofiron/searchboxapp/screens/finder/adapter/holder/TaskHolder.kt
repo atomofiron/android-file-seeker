@@ -5,14 +5,13 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ImageSpan
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.TextView
 import androidx.core.view.isInvisible
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.fileseeker.R
 import app.atomofiron.common.util.Unreachable
-import app.atomofiron.searchboxapp.custom.view.MuonsView
+import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemProgressBinding
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchState
@@ -23,17 +22,13 @@ class TaskHolder(parent: ViewGroup, listener: OnActionListener) : CardViewHolder
 
     override val hungry = false
 
-    private val tvLabel = itemView.findViewById<TextView>(R.id.progress_tv_label)
-    private val tvParams = itemView.findViewById<TextView>(R.id.progress_tv_params)
-    private val tvStatus = itemView.findViewById<TextView>(R.id.progress_tv_status)
-    private val bView = itemView.findViewById<MuonsView>(R.id.item_explorer_ps)
-    private val btnAction = itemView.findViewById<Button>(R.id.progress_btn_action)
+    private val binding = ItemProgressBinding.bind(view)
 
     init {
         itemView.setOnClickListener {
             listener.onItemClick(item as FinderStateItem.Task)
         }
-        btnAction.setOnClickListener { view ->
+        binding.action.setOnClickListener { view ->
             view.isEnabled = false
             val item = item as FinderStateItem.Task
             when (item.task.state) {
@@ -43,18 +38,18 @@ class TaskHolder(parent: ViewGroup, listener: OnActionListener) : CardViewHolder
                 is SearchState.Ended -> listener.onProgressRemoveClick(item)
             }
         }
-        tvParams.setSingleLine()
+        binding.params.setSingleLine()
     }
 
     override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_task)
 
-    override fun onBind(item: FinderStateItem, position: Int) {
+    override fun onBind(item: FinderStateItem, position: Int) = binding.run {
         item as FinderStateItem.Task
         val task = item.task
-        tvParams.setParams(task.params)
-        tvStatus.setStatus(task.result)
-        btnAction.isActivated = !task.inProgress
-        bView.isInvisible = !task.state.running
+        params.setParams(task.params)
+        status.setStatus(task.result)
+        action.isActivated = !task.inProgress
+        progress.isInvisible = !task.state.running
 
         val idLabel = if (task.isError) R.string.error else when (task.state) {
             is SearchState.Progress -> R.string.started
@@ -66,15 +61,16 @@ class TaskHolder(parent: ViewGroup, listener: OnActionListener) : CardViewHolder
             task.isError -> context.findColorByAttr(MaterialAttr.colorError)
             else -> context.findColorByAttr(MaterialAttr.colorAccent)
         }
-        tvLabel.setText(idLabel)
-        tvLabel.setTextColor(colorLabel)
+        label.setText(idLabel)
+        label.setTextColor(colorLabel)
 
         val idAction = when {
             task.state.running -> R.string.stop
             else -> R.string.remove
         }
-        btnAction.setText(idAction)
-        btnAction.isEnabled = task.inProgress || task.state.removable
+        action.setText(idAction)
+        action.isEnabled = task.inProgress || task.state.removable
+        itemView.isEnabled = item.clickableIfEmpty || !task.result.isEmpty
     }
 
     private fun TextView.setParams(params: SearchParams) {

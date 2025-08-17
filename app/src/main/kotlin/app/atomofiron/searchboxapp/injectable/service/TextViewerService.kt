@@ -174,7 +174,7 @@ class TextViewerService(
         mutex.withLock {
             tasks.run {
                 val tasks = value.toMutableList()
-                tasks.add(0, task)
+                tasks.add(task)
                 value = tasks
             }
         }

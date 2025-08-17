@@ -9,17 +9,17 @@
     android:paddingHorizontal="@dimen/padding_double"
     >
     <app.atomofiron.searchboxapp.custom.view.MuonsView
-        android:id="@+id/item_explorer_ps"
+        android:id="@+id/progress"
         android:layout_width="@dimen/common_size"
         android:layout_height="@dimen/common_size"
         app:fillCenter="false"
-        app:layout_constraintStart_toStartOf="@+id/progress_tv_label"
+        app:layout_constraintStart_toStartOf="@+id/label"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/progress_tv_label"
+        app:layout_constraintEnd_toEndOf="@+id/label"
         app:layout_constraintBottom_toBottomOf="parent"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/progress_tv_params"
+        android:id="@+id/params"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/padding_common"
@@ -30,11 +30,11 @@
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/progress_tv_label"
-        app:layout_constraintBottom_toTopOf="@+id/progress_tv_status"
+        app:layout_constraintEnd_toStartOf="@+id/label"
+        app:layout_constraintBottom_toTopOf="@+id/status"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/progress_tv_status"
+        android:id="@+id/status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="?attr/colorContent"
@@ -42,7 +42,7 @@
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/progress_tv_params"
+        app:layout_constraintTop_toBottomOf="@+id/params"
         app:layout_constraintEnd_toStartOf="@+id/space"
         app:layout_constraintBottom_toBottomOf="parent"
         />
@@ -51,13 +51,13 @@
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintStart_toEndOf="@+id/progress_tv_status"
-        app:layout_constraintTop_toTopOf="@+id/progress_tv_status"
-        app:layout_constraintEnd_toStartOf="@+id/progress_tv_label"
-        app:layout_constraintBottom_toBottomOf="@+id/progress_tv_status"
+        app:layout_constraintStart_toEndOf="@+id/status"
+        app:layout_constraintTop_toTopOf="@+id/status"
+        app:layout_constraintEnd_toStartOf="@+id/label"
+        app:layout_constraintBottom_toBottomOf="@+id/status"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/progress_tv_label"
+        android:id="@+id/label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/padding_double"
@@ -69,11 +69,11 @@
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@+id/space"
-        app:layout_constraintEnd_toStartOf="@+id/progress_btn_action"
+        app:layout_constraintEnd_toStartOf="@+id/action"
         app:layout_constraintBottom_toBottomOf="parent"
         />
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/progress_btn_action"
+        android:id="@+id/action"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/stop"

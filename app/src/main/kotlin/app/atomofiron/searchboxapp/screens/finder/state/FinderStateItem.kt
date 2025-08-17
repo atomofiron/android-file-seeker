@@ -56,7 +56,10 @@ sealed class FinderStateItem(
         val ignoreCase: Boolean = true,
     ) : FinderStateItem(FinderItemType.TEST)
 
-    data class Task(val task: SearchTask) : FinderStateItem(FinderItemType.PROGRESS, task.uniqueId)
+    data class Task(
+        val task: SearchTask,
+        val clickableIfEmpty: Boolean,
+    ) : FinderStateItem(FinderItemType.PROGRESS, task.uniqueId)
 
     data class Targets(val targets: List<Node>) : FinderStateItem(FinderItemType.TARGETS)
 

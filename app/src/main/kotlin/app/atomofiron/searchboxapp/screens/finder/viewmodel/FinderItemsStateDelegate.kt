@@ -85,7 +85,7 @@ class FinderItemsStateDelegate(
                 add(index, Targets(targets.toList()))
             }
             val index = tasks.indexOfLast { it.withRetries }
-            addAll(tasks.map(FinderStateItem::Task).reversed())
+            addAll(tasks.reversed().map { FinderStateItem.Task(it, clickableIfEmpty = !isLocal) })
             if (SDK_INT >= S && !isLocal && index >= 0) {
                 add(tasks.lastIndex - index, Disclaimer)
             }

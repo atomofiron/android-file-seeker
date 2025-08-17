@@ -7,8 +7,10 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
-abstract class CardViewHolder(parent: ViewGroup, layoutId: Int)
-    : GeneralHolder<FinderStateItem>(wrapWithCard(parent, layoutId)) {
+abstract class CardViewHolder(
+    parent: ViewGroup,
+    layoutId: Int,
+) : GeneralHolder<FinderStateItem>(wrapWithCard(parent, layoutId)) {
     companion object {
         fun wrapWithCard(parent: ViewGroup, id: Int): View {
             val inflater = LayoutInflater.from(parent.context)
@@ -17,4 +19,6 @@ abstract class CardViewHolder(parent: ViewGroup, layoutId: Int)
             return cardView
         }
     }
+
+    protected val view: View = (itemView as ViewGroup).getChildAt(0)
 }
