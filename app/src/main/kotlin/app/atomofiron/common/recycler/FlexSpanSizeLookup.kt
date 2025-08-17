@@ -214,7 +214,7 @@ class FlexSpanSizeLookup(
                 if (cached != null) {
                     cells.add(i, cached)
                 } else {
-                    cells.clear(i)
+                    // don't clear from i
                     break
                 }
             }
