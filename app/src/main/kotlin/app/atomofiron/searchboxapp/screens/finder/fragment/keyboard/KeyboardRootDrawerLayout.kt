@@ -235,8 +235,8 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 when (true) {
                     (toShown == null),
                     (toShown && keyboardNow < keyboardMax),
-                    (!toShown && keyboardNow != keyboardMin) -> delegate.start(toShown)
-                    else -> Unit
+                    (!toShown && keyboardNow > keyboardMin) -> delegate.start(toShown)
+                    else -> delegate.finish(toShown)
                 }
                 tracking = null
                 tracker.clear()

@@ -77,7 +77,7 @@ class InsetsAnimator(
         }
     }
 
-    private fun finish(show: Boolean = keyboardNow > 0) {
+    fun finish(show: Boolean = keyboardNow > 0) {
         toVisible = show
         controller?.finish(show)
     }
