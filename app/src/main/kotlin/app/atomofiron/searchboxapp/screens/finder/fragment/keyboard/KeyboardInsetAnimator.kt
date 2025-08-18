@@ -9,6 +9,8 @@ import androidx.core.view.WindowInsetsAnimationControllerCompat
 import app.atomofiron.searchboxapp.utils.Alpha
 import kotlin.math.abs
 
+const val KEYBOARD_DURATION = 256L
+
 class InsetsAnimator(
     private val anyFocused: () -> Boolean,
 ) : WindowInsetsAnimationControlListenerCompat {
@@ -70,7 +72,7 @@ class InsetsAnimator(
             animator = ValueAnimator.ofInt(from, to).apply {
                 addUpdateListener(AnimatorUpdateListener())
                 addListener(AnimationListener())
-                duration = (DURATION * abs(to - from) / keyboardMax.toFloat()).toLong()
+                duration = (KEYBOARD_DURATION * abs(to - from) / keyboardMax.toFloat()).toLong()
                 interpolator = DecelerateInterpolator()
                 start()
             }

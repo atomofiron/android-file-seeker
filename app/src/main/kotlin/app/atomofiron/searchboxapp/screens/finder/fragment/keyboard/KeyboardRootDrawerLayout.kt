@@ -26,8 +26,6 @@ import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.layout.RootDrawerLayout
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
-import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.GestureDirection as Direction
-import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.GestureTracking as Tracking
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.isLayoutRtl
@@ -37,13 +35,15 @@ import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.GestureDirection as Direction
+import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.GestureTracking as Tracking
 
 private const val AlphaThreshold = Alpha.SMALL
 private const val HorizontalStart = 0
 private const val SpeedThreshold = 10
 private const val VelocityPeriod = 100
 
-const val DURATION = 256L
+private const val TRANSITION_DURATION = 512L
 
 class KeyboardRootDrawerLayout @JvmOverloads constructor(
     context: Context,
@@ -171,7 +171,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         }
         animVertical = ValueAnimator.ofInt(barrierBottom, newBarrierBottom).apply {
             duration = abs(newBarrierBottom - barrierBottom).toFloat()
-                .let { DURATION * (it / keyboardMax) }.toLong()
+                .let { KEYBOARD_DURATION * (it / keyboardMax) }.toLong()
             interpolator = DecelerateInterpolator()
             addUpdateListener(VerticalListener())
             start()
@@ -331,8 +331,8 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private fun animHorizontally(from: Int, to: Int) {
         animHorizontal = ValueAnimator.ofInt(from, to).apply {
-            duration = (DURATION * abs(from - to) / horizontalMax)
-            interpolator = DecelerateInterpolator()
+            duration = (TRANSITION_DURATION * abs(from - to) / horizontalMax)
+            interpolator = ViscousFluidInterpolator()
             addUpdateListener(HorizontalListener())
             start()
         }
