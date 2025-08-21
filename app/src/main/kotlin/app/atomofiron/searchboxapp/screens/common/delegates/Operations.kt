@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.delegates
+package app.atomofiron.searchboxapp.screens.common.delegates
 
 import app.atomofiron.common.util.Increment
 import app.atomofiron.fileseeker.R

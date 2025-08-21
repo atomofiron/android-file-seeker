@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.delegates
+package app.atomofiron.searchboxapp.screens.common.delegates
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.Intent

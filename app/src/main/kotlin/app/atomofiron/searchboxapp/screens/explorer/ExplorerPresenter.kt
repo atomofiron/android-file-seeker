@@ -12,7 +12,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerItemActionListenerDelegate
-import app.atomofiron.searchboxapp.screens.delegates.StoragePermissionDelegate
+import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
 import kotlinx.coroutines.CoroutineScope
 
 class ExplorerPresenter(

@@ -14,7 +14,7 @@ import dagger.Component
 import dagger.Module
 import dagger.Provides
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
-import app.atomofiron.searchboxapp.screens.delegates.FileOperationsDelegate
+import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegate
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope

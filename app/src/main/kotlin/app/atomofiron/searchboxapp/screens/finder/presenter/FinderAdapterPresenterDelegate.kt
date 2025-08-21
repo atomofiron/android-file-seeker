@@ -4,7 +4,7 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import app.atomofiron.searchboxapp.injectable.interactor.FinderInteractor
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.screens.delegates.StoragePermissionDelegate
+import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.finder.FinderRouter
 import app.atomofiron.searchboxapp.screens.finder.FinderViewState
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder

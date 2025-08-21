@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.delegates
+package app.atomofiron.searchboxapp.screens.common.delegates
 
 import android.content.ContentResolver
 import androidx.core.net.toUri
