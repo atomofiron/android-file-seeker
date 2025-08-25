@@ -8,6 +8,7 @@ import android.view.ViewOutlineProvider
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
@@ -41,6 +42,7 @@ class EditOptionsHolder(
         recyclerView.clipToOutline = true
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
+        recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
         recyclerView.addMeasureListener { width, _ ->
             val available = recyclerView.run { width - paddingStart - paddingEnd }
             layoutManager.spanCount = max(1, adapter.itemCount / max(1, available / optionMinWidth))
