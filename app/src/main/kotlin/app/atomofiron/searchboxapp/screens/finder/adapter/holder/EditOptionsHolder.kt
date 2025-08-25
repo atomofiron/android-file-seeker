@@ -12,6 +12,7 @@ import androidx.core.view.marginStart
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemSearchEditOptionsBinding
+import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.toInt
@@ -42,19 +43,19 @@ class EditOptionsHolder(
         }
         caseSense.setOnClickListener { view ->
             view as CompoundButton
-            update { it.copy(toggles = it.toggles.copy(ignoreCase = !it.toggles.ignoreCase)) }
+            update { it.copy(ignoreCase = !it.ignoreCase) }
         }
         useRegexp.setOnClickListener { view ->
             view as CompoundButton
-            update { it.copy(toggles = it.toggles.copy(useRegex = !it.toggles.useRegex)) }
+            update { it.copy(useRegex = !it.useRegex) }
         }
         contentSearch.setOnClickListener { view ->
             view as CompoundButton
-            update { it.copy(toggles = it.toggles.copy(contentSearch = !it.toggles.contentSearch)) }
+            update { it.copy(contentSearch = !it.contentSearch) }
         }
         excludeDirs.setOnClickListener { view ->
             view as CompoundButton
-            update { it.copy(toggles = it.toggles.copy(excludeDirs = !it.toggles.excludeDirs)) }
+            update { it.copy(excludeDirs = !it.excludeDirs) }
         }
     }
 
@@ -72,8 +73,8 @@ class EditOptionsHolder(
         excludeDirs.chipIcon?.alpha = Alpha.enabledInt(!item.excludeDirs || !item.contentSearch)
     }
 
-    private fun update(block: (FinderStateItem.EditOptions) -> FinderStateItem.EditOptions) {
-        listener.onConfigChange(block(item))
+    private fun update(block: (SearchOptions) -> SearchOptions) {
+        listener.onConfigChange(block(item.toggles))
     }
 
     private fun FlexboxLayout.onRootLayout(width: Int) {
@@ -124,6 +125,6 @@ class EditOptionsHolder(
     }
 
     interface FinderConfigListener {
-        fun onConfigChange(item: FinderStateItem.EditOptions)
+        fun onConfigChange(options: SearchOptions)
     }
 }

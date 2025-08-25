@@ -5,6 +5,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -32,7 +33,7 @@ class SearchAdapterPresenterDelegate(
 
     fun show() = router.showCurtain(recipient, R.layout.curtain_text_viewer_search)
 
-    override fun onConfigChange(item: FinderStateItem.EditOptions) = viewState.updateConfig(item)
+    override fun onConfigChange(options: SearchOptions) = viewState.updateConfig(options)
 
     override fun onConfigVisibilityClick() = Unit
 

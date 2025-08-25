@@ -4,6 +4,7 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import app.atomofiron.searchboxapp.injectable.interactor.FinderInteractor
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.finder.FinderRouter
 import app.atomofiron.searchboxapp.screens.finder.FinderViewState
@@ -35,8 +36,8 @@ class FinderAdapterPresenterDelegate(
     ButtonsHolder.FinderButtonsListener,
     TaskHolder.OnActionListener {
 
-    override fun onConfigChange(item: FinderStateItem.EditOptions) {
-        preferences { setSearchOptions(item.toggles) }
+    override fun onConfigChange(options: SearchOptions) {
+        preferences { setSearchOptions(options) }
     }
 
     override fun onConfigVisibilityClick() = preferences {
