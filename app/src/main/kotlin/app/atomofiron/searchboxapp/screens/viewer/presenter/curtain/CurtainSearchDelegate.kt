@@ -8,10 +8,12 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainTextViewerSearchBinding
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.screens.common.SectionBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState
 import app.atomofiron.searchboxapp.utils.ExtType
 import kotlinx.coroutines.CoroutineScope
@@ -51,6 +53,7 @@ class CurtainSearchDelegate(
             this.layoutManager = layoutManager
             val spanSizeLookup = FlexSpanSizeLookup(binding.recyclerView, finderAdapter, layoutManager, binding.root.resources)
             finderAdapter.holderListener = spanSizeLookup
+            addItemDecoration(SectionBackgroundDecorator(context, FinderStateItem.groups))
         }
 
         binding.root.insetsPadding(ExtType.curtain, top = true)
