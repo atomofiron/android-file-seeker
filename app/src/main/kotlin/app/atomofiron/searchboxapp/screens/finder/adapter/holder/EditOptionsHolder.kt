@@ -57,7 +57,9 @@ class EditOptionsHolder(
             right = max(right, last.left)
             right = max(right, last.right)
             var dx = (view.width - right - view.paddingRight - first.marginRight) - (left - view.paddingLeft - first.marginLeft)
-            if (dx > optionMinWidth) dx = 0
+            if (dx !in 0..optionMinWidth) {
+                dx = 0
+            }
             recyclerView.translationX = dx / 2f
         }
     }
