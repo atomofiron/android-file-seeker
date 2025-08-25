@@ -15,6 +15,7 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlin.math.sign
 import kotlin.reflect.KClass
 
@@ -75,16 +76,16 @@ class SectionBackgroundDecorator(
         val left = parent.paddingLeft.toFloat()
         val width = parent.run { width - paddingStart - paddingEnd }.toFloat()
         val halfSpace = internalSpace / 2
-        val from = if (reversed) last else first
-        val to = if (reversed) first else last
-        val halfOffset = edgeRadius * (to - from).sign
-        val firstHalf = (from + to) / 2 + halfOffset
-        val lastHalf = (from + to) / 2 - halfOffset
+        var from = if (reversed) last else first
+        if (hasPrev) from -= halfSpace.roundToInt()
+        var to = if (reversed) first else last
+        if (hasNext) to += halfSpace.roundToInt()
+        val offset = edgeRadius * 2 * (to - from).sign
         var radius = if (hasPrev) internalRadius else edgeRadius
-        var space = if (hasPrev) halfSpace else 0f
-        canvas.drawRoundRect(left, from - space, left + width, firstHalf, radius, radius, paint)
+        val bottom = if (hasPrev) from + offset else to.toFloat()
+        canvas.drawRoundRect(left, from.toFloat(), left + width, bottom, radius, radius, paint)
         radius = if (hasNext) internalRadius else edgeRadius
-        space = if (hasNext) halfSpace else 0f
-        canvas.drawRoundRect(left, lastHalf, left + width, to + space, radius, radius, paint)
+        val top = if (hasNext) to - offset else from.toFloat()
+        canvas.drawRoundRect(left, top, left + width, to.toFloat(), radius, radius, paint)
     }
 }
