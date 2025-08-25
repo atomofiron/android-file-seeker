@@ -17,9 +17,9 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.AttrRes
-import androidx.annotation.StringRes
 import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.Android
+import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.debugRequireNotNull
 import app.atomofiron.common.util.findColorByAttr
@@ -118,9 +118,9 @@ open class TextField @JvmOverloads constructor(
         super.setBackground(drawable)
     }
 
-    fun makeFilledOpposite(layout: TextInputLayout) = makeFilled(layout, android.R.attr.colorBackground)
+    fun makeHoled(layout: TextInputLayout) = makeFilled(layout, android.R.attr.colorBackground)
 
-    fun makeFilled(layout: TextInputLayout) = makeFilled(layout, 0)
+    fun makeToned(layout: TextInputLayout) = makeFilled(layout, MaterialAttr.colorSurfaceContainer)
 
     private fun makeFilled(layout: TextInputLayout, @AttrRes filledColorAttr: Int) {
         filledDelegate = FilledDelegate(

@@ -27,11 +27,12 @@ class CreateDelegate(
 
     private fun CurtainExplorerCreateBinding.init(dir: Node, dirFiles: List<String>) {
         root.insetsPadding(ExtType.curtain, vertical = true)
-        explorerCreateEt.text?.clear()
-        explorerCreateEt.inputType = EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+        textField.makeToned(textLayout)
+        textField.text?.clear()
+        textField.inputType = EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         val textListener = ButtonState(dirFiles, arrayOf(explorerCreateDirBtn, explorerCreateFileBtn))
-        explorerCreateEt.addTextChangedListener(textListener)
-        val clickListener = ButtonClick(dir, explorerCreateEt)
+        textField.addTextChangedListener(textListener)
+        val clickListener = ButtonClick(dir, textField)
         explorerCreateDirBtn.setOnClickListener(clickListener)
         explorerCreateFileBtn.setOnClickListener(clickListener)
     }

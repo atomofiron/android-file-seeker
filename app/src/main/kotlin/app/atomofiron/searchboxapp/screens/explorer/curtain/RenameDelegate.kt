@@ -27,17 +27,18 @@ class RenameDelegate(
 
     private fun CurtainExplorerRenameBinding.init(data: RenameData) {
         root.insetsPadding(ExtType.curtain, vertical = true)
-        explorerRenameEt.inputType = EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-        explorerRenameEt.setText(data.item.name)
-        explorerRenameEt.addTextChangedListener(ButtonClick(data, explorerRenameBtn))
+        textField.makeToned(textLayout)
+        textField.inputType = EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+        textField.setText(data.item.name)
+        textField.addTextChangedListener(ButtonClick(data, explorerRenameBtn))
         explorerRenameBtn.setOnClickListener {
-            output.onRenameConfirm(data.item, explorerRenameEt.text.toString())
+            output.onRenameConfirm(data.item, textField.text.toString())
         }
         explorerRenameBtn.isEnabled = false
 
         val dotIndex = data.item.name.lastIndexOf('.')
         if (dotIndex > 0) {
-            explorerRenameEt.setSelection(dotIndex)
+            textField.setSelection(dotIndex)
         }
     }
 

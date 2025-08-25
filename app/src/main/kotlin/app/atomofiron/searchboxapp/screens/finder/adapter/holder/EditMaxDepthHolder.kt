@@ -26,7 +26,7 @@ class EditMaxDepthHolder(
         binding.field.addOnSubmitListener(this)
         binding.field.addOnFocusChangeListener(this)
         binding.field.run { inputType = inputType or InputType.TYPE_CLASS_NUMBER }
-        binding.field.makeFilledOpposite(binding.box)
+        binding.field.makeHoled(binding.box)
     }
 
     override fun minWidth(): Float = delegate.minWidth()

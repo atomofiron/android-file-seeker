@@ -21,7 +21,7 @@ class EditMaxSizeHolder(
         binding.box.setHint(R.string.pref_max_size)
         binding.field.maxLines = 1
         binding.field.makeByteSize { output.onEditMaxSize(it) }
-        binding.field.makeFilledOpposite(binding.box)
+        binding.field.makeHoled(binding.box)
     }
 
     override fun minWidth(): Float = delegate.minWidth()

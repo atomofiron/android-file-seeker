@@ -45,7 +45,7 @@ class TestHolder(
             imeOptions = imeOptions and EditorInfo.IME_ACTION_DONE.inv()
             inputType = inputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE
         }
-        binding.field.makeFilledOpposite(binding.box)
+        binding.field.makeHoled(binding.box)
     }
 
     override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_test_field)

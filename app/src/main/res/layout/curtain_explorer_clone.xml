@@ -20,16 +20,17 @@
         app:layout_constraintTop_toTopOf="parent"
         />
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/input_layout"
+        android:id="@+id/text_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_margin="@dimen/padding_common"
         android:hint="@string/a_name"
         app:layout_constraintTop_toBottomOf="@+id/title"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         >
-        <app.atomofiron.searchboxapp.custom.view.AutoHideKeyboardField
-            android:id="@+id/input"
+        <app.atomofiron.searchboxapp.custom.view.TextField
+            android:id="@+id/text_field"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
@@ -44,7 +45,7 @@
         android:layout_margin="@dimen/padding_common"
         android:text="@string/submit"
         app:cornerRadius="@dimen/infinity"
-        app:layout_constraintTop_toBottomOf="@+id/input_layout"
+        app:layout_constraintTop_toBottomOf="@+id/text_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         />

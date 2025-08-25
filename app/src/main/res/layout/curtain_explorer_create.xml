@@ -20,16 +20,17 @@
         app:layout_constraintTop_toTopOf="parent"
         />
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/explorer_create_til"
+        android:id="@+id/text_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_half"
         android:layout_margin="@dimen/padding_common"
         android:hint="@string/a_name"
         app:layout_constraintTop_toBottomOf="@+id/explorer_create_tv"
+        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         >
-        <app.atomofiron.searchboxapp.custom.view.AutoHideKeyboardField
-            android:id="@+id/explorer_create_et"
+        <app.atomofiron.searchboxapp.custom.view.TextField
+            android:id="@+id/text_field"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:imeOptions="actionDone"
@@ -45,7 +46,7 @@
         android:text="@string/a_file"
         style="@style/Widget.Material3.Button.OutlinedButton"
         app:cornerRadius="@dimen/infinity"
-        app:layout_constraintTop_toBottomOf="@+id/explorer_create_til"
+        app:layout_constraintTop_toBottomOf="@+id/text_layout"
         app:layout_constraintEnd_toStartOf="@+id/explorer_create_dir_btn"
         app:layout_constraintBottom_toBottomOf="parent"
         />
@@ -58,7 +59,7 @@
         android:layout_marginVertical="@dimen/padding_common"
         android:text="@string/a_directory"
         app:cornerRadius="@dimen/infinity"
-        app:layout_constraintTop_toBottomOf="@+id/explorer_create_til"
+        app:layout_constraintTop_toBottomOf="@+id/text_layout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         />

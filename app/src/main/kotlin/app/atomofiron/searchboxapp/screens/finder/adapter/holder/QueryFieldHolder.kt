@@ -35,7 +35,7 @@ class QueryFieldHolder(
             imeOptions = (imeOptions and IME_ACTION_DONE.inv()) or IME_ACTION_SEARCH
             textLayout.hint = resources.getString(R.string.searching)
             makeRegex()
-            makeFilledOpposite(binding.queryField.box)
+            makeHoled(binding.queryField.box)
             addTextChangedListener(this@QueryFieldHolder.TextChangeListener())
             setOnEditorActionListener { _, actioId, _ ->
                 this@QueryFieldHolder.onEditorAction(actioId)

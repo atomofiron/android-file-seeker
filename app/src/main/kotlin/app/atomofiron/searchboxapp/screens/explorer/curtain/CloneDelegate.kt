@@ -24,11 +24,12 @@ class CloneDelegate(
 
     private fun CurtainExplorerCloneBinding.init(target: Node, dirFiles: List<String>) {
         root.insetsPadding(ExtType.curtain, vertical = true)
-        input.setText(target.name)
+        textField.makeToned(textLayout)
+        textField.setText(target.name)
         val textListener = ButtonState(dirFiles, submit)
-        input.addTextChangedListener(textListener)
+        textField.addTextChangedListener(textListener)
         submit.setOnClickListener {
-            output.onCloneConfirm(target, input.text.toString())
+            output.onCloneConfirm(target, textField.text.toString())
         }
     }
 
