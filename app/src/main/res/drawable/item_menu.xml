@@ -15,13 +15,4 @@
             <corners android:radius="@dimen/corner_radius" />
         </shape>
     </item>
-    <item android:id="@+id/stroke">
-        <shape android:shape="rectangle">
-            <stroke
-                android:color="@color/stroke"
-                android:width="@dimen/stroke_width"
-                />
-            <corners android:radius="@dimen/corner_radius" />
-        </shape>
-    </item>
 </ripple>

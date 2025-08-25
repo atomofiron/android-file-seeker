@@ -16,6 +16,7 @@
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"
 			android:paddingHorizontal="@dimen/padding_half"
+			android:paddingBottom="@dimen/padding_half"
 			android:maxWidth="@dimen/card_max_width"
 			android:scrollbarThumbVertical="@drawable/scroll_thumb"
 			/>

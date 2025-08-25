@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.utils
 object Alpha {
     const val INVISIBLE = 0f
     const val SMALL = 0.1f
+    const val VODKA = 0.4f
     const val HALF = 0.5f
     const val VISIBLE = 1f
 
@@ -16,6 +17,7 @@ object Alpha {
     const val LEVEL_90 = 225
 
     const val INVISIBLE_INT = 0
+    const val VODKA_INT = 0x66
     const val HALF_INT = 0x80
     const val VISIBLE_INT = 0xff
 
@@ -25,6 +27,7 @@ object Alpha {
     fun visibleInt(value: Boolean) = if (value) VISIBLE_INT else INVISIBLE_INT
     fun enabled(value: Boolean) = if (value) VISIBLE else HALF
     fun enabledInt(value: Boolean) = if (value) VISIBLE_INT else HALF_INT
+    fun vodkaInt(value: Boolean) = if (value) VODKA_INT else VISIBLE_INT
 }
 
 fun Float.toIntAlpha(): Int = (this * Alpha.VISIBLE_INT).toInt().coerceIn(Alpha.INVISIBLE_INT, Alpha.VISIBLE_INT)

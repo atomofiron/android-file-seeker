@@ -4,9 +4,9 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.view.View
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.TAG_EXPLORER_OPENED_ITEM
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.getSortedChildren
 
@@ -16,7 +16,7 @@ class ItemBackgroundDecorator(private val evenNumbered: Boolean) : RecyclerView.
     var enabled = false
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-        paint.color = ContextCompat.getColor(parent.context, R.color.item_explorer_background)
+        paint.color = parent.context.colorSurfaceContainer()
     }
 
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {

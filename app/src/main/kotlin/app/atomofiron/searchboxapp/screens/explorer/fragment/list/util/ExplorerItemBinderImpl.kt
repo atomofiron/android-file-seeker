@@ -17,6 +17,7 @@ import app.atomofiron.common.util.ifVisible
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.LemonDrawable
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
+import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.custom.drawable.translated
 import app.atomofiron.searchboxapp.custom.view.MuonsView
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -193,7 +194,7 @@ class ExplorerItemBinderImpl(
 
     override fun showAlternatingBackground(visible: Boolean) {
         val color = when {
-            visible -> ContextCompat.getColor(itemView.context, R.color.item_explorer_background)
+            visible -> itemView.context.colorSurfaceContainer()
             else -> Color.TRANSPARENT
         }
         itemView.setBackgroundColor(color)

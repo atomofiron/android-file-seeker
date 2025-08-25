@@ -7,6 +7,7 @@ import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemCurtainMenuDangerousBinding
+import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.custom.view.dangerous.DangerousSliderView
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
@@ -30,9 +31,8 @@ class DangerousMenuItemHolder private constructor(
             listener.onMenuItemSelected(itemId)
             true
         }
-        val deepBlack = view.context.findBooleanByAttr(R.attr.isBlackDeep)
-        if (deepBlack) view.setThumbColor(Color.TRANSPARENT)
-        view.setThumbBorder(visible = view.resources.getBoolean(R.bool.isNightTheme) && deepBlack)
+        view.setThumbColor(view.context.colorSurfaceContainer())
+        view.setStartBorder(view.context.colorSurfaceContainer())
         view.updatePaddingRelative(end = view.paddingEnd + view.resources.getDimensionPixelSize(R.dimen.padding_mini))
     }
 

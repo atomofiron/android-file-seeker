@@ -10,25 +10,25 @@ import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.findBooleanByAttr
+import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 
 open class CurtainBackground(context: Context) : Drawable() {
 
-    private val isBlackDeep = context.findBooleanByAttr(R.attr.isBlackDeep)
+    private val isDarkDeep = context.isDarkDeep()
     private val cornerRadius = context.resources.getDimension(R.dimen.corner_extra_large)
     private val curtainColor = context.getColorByAttr(R.attr.colorBackground)
-    private val strokeWidth = if (isBlackDeep) context.resources.getDimensionPixelSize(R.dimen.stroke_width) else 0
+    private val strokeWidth = if (isDarkDeep) context.resources.getDimensionPixelSize(R.dimen.stroke_width) else 0
     private val dragHandleColor = ColorUtils.setAlphaComponent(context.getColorByAttr(MaterialAttr.colorOnSurfaceVariant), 102)
     private val dragHandleRect = RectF()
     private val dragHandleWidth = context.resources.getDimension(R.dimen.drag_handle_width)
     private val dragHandleMargin = context.resources.getDimension(R.dimen.drag_handle_margin)
     private val strokeColor = when {
-        isBlackDeep -> ContextCompat.getColor(context, R.color.stroke)
+        isDarkDeep -> context.colorSurfaceContainer()
         else -> Color.TRANSPARENT
     }
     private val paint = Paint()
@@ -73,7 +73,7 @@ open class CurtainBackground(context: Context) : Drawable() {
         paint.style = Paint.Style.FILL
         canvas.drawRoundRect(boundsF, radius, radius, paint)
 
-        if (isBlackDeep) {
+        if (isDarkDeep) {
             paint.color = strokeColor
             paint.style = Paint.Style.STROKE
             paint.strokeWidth = strokeWidth * 2f

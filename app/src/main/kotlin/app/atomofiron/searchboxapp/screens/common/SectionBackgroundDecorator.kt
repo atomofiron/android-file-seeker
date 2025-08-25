@@ -10,10 +10,9 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugRequire
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -33,7 +32,7 @@ class SectionBackgroundDecorator(
 
     init {
         paint.style = Paint.Style.FILL
-        paint.color = context.findColorByAttr(MaterialAttr.colorSurfaceContainer)
+        paint.color = context.colorSurfaceContainer()
     }
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {

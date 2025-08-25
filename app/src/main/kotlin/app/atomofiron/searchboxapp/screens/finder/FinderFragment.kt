@@ -12,7 +12,6 @@ import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.recycler.FlexSpanSizeLookup
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.hideKeyboard
-import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.common.util.showKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
@@ -60,11 +59,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         binding.root.setCallback(presenter::onExitAnimationEnd)
         layoutManager.reverseLayout = true
         binding.recyclerView.run {
-            if (!context.isDarkDeep()) {
-                addItemDecoration(SectionBackgroundDecorator(context, FinderStateItem.groups))
-                val padding = resources.getDimensionPixelSize(R.dimen.padding_half)
-                updatePaddingRelative(bottom = padding)
-            }
+            addItemDecoration(SectionBackgroundDecorator(context, FinderStateItem.groups))
             addOnLayoutChangeListener(spanSizeLookup)
             layoutManager = this@FinderFragment.layoutManager
             itemAnimator = null

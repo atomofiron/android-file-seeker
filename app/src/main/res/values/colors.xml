@@ -59,8 +59,6 @@
 	<color name="shadow_transparent">#00909090</color>
 	<color name="red">#ffff0000</color>
 	<color name="red_transparent">#33ff0000</color>
-	<color name="item_explorer_background">#20a0a0a0</color>
-	<color name="item_explorer_background_intensive">#80a0a0a0</color>
 
 
 	<color name="day_night_primary">@color/md_theme_light_primary</color>

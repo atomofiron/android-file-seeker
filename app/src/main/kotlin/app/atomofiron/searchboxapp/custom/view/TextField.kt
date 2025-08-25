@@ -16,13 +16,11 @@ import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.Android
-import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.debugRequireNotNull
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.HybridTextLayoutDrawable
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -118,11 +116,11 @@ open class TextField @JvmOverloads constructor(
         super.setBackground(drawable)
     }
 
-    fun makeFilled(layout: TextInputLayout, @AttrRes filledColorAttr: Int) {
+    fun makeFilled(layout: TextInputLayout, @ColorInt filledColor: Int) {
         filledDelegate = FilledDelegate(
             textLayout = layout,
             textField = this,
-            filledColor = if (filledColorAttr == 0) Color.TRANSPARENT else context.findColorByAttr(filledColorAttr),
+            filledColor = filledColor,
             strokeWidth = layout.boxStrokeWidth,
             focusedStrokeColor = layout.boxStrokeColor,
             radius = resources.getDimension(R.dimen.corner_semi),
