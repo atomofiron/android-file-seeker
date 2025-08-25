@@ -21,6 +21,7 @@ import app.atomofiron.searchboxapp.screens.finder.state.FinderItemType
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
 class FinderAdapter(
+    private val isLocal: Boolean,
     private val output: FinderAdapterOutput,
 ) : ListAdapter<FinderStateItem, GeneralHolder<FinderStateItem>>(FinderDiffUtilCallback()) {
 
@@ -39,7 +40,7 @@ class FinderAdapter(
             FinderItemType.FIND -> QueryFieldHolder(parent, output)
             FinderItemType.CHARACTERS -> CharactersHolder(parent, output)
             FinderItemType.EDIT_OPTIONS_MINI -> MiniEditOptionsHolder(parent, output)
-            FinderItemType.EDIT_OPTIONS -> EditOptionsHolder(parent, output)
+            FinderItemType.EDIT_OPTIONS -> EditOptionsHolder(parent, output, isLocal)
             FinderItemType.TITLE -> TitleHolder(parent)
             FinderItemType.TEST -> TestHolder(parent, output)
             FinderItemType.BUTTONS -> ButtonsHolder(parent, output)

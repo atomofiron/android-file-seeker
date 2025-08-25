@@ -26,7 +26,7 @@ class CurtainSearchDelegate(
     private val node: Node get() = viewState.item.value
     private val composition = viewState.composition
 
-    private val finderAdapter = FinderAdapter(output)
+    private val finderAdapter = FinderAdapter(isLocal = viewState.isLocal, output)
 
     init {
         viewState.items.collect(scope) { finderAdapter.submitList(it) }

@@ -24,8 +24,8 @@ class SectionBackgroundDecorator(
 ) : RecyclerView.ItemDecoration() {
 
     private val paint = Paint()
-    private val internalRadius = context.resources.getDimension(R.dimen.corner_radius_nano)
-    private val edgeRadius = context.resources.getDimension(R.dimen.corner_radius) + internalRadius
+    private val internalRadius = context.resources.getDimension(R.dimen.corner_nano)
+    private val edgeRadius = context.resources.getDimension(R.dimen.corner_extra)
     private val internalSpace = internalRadius / 2
 
     init {

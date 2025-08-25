@@ -27,14 +27,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 class FinderItemsStateDelegate(
-    private val isLocal: Boolean,
+    override val isLocal: Boolean,
     preferences: PreferenceStore,
     tasks: Flow<List<SearchTask>>,
 ) : FinderItemsState {
 
     private val query = MutableStateFlow("")
     override val targets = MutableStateFlow<List<Node>>(mutableListOf())
-    private val localToggles = MutableStateFlow(EditOptions(SearchOptions(), isLocal = true))
+    private val localToggles = MutableStateFlow(EditOptions(SearchOptions()))
     override val toggles = if (isLocal) localToggles else preferences.searchOptions.mapState(::EditOptions)
     private val localOptions = toggles.map { listOf(it) }
     private val globalOptions = combine(
@@ -63,7 +63,7 @@ class FinderItemsStateDelegate(
             EditCharacters(chars.toList()),
             Title(R.string.options_title),
         )
-        else -> listOf(FinderStateItem.Options(config.toggles, isLocal))
+        else -> listOf(FinderStateItem.Options(config.toggles))
     }
 
     private fun composeUniqueItems(query: String, test: String?, chars: Array<String>, options: List<FinderStateItem>, config: EditOptions): List<FinderStateItem> {

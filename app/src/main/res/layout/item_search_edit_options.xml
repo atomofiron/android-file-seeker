@@ -1,47 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.flexbox.FlexboxLayout
+<app.atomofiron.searchboxapp.custom.view.layout.MeasuringRecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:layout_marginBottom="@dimen/padding_half"
-    app:flexWrap="wrap"
-    >
-    <com.google.android.material.chip.Chip
-        android:id="@+id/case_sense"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding_half"
-        android:text="@string/case_sens"
-        android:checkable="true"
-        app:chipIcon="@drawable/ic_config_case"
-        />
-    <com.google.android.material.chip.Chip
-        android:id="@+id/use_regexp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding_half"
-        android:text="@string/use_regular_expression"
-        android:checkable="true"
-        app:chipIcon="@drawable/ic_config_regex"
-        />
-    <com.google.android.material.chip.Chip
-        android:id="@+id/content_search"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding_half"
-        android:text="@string/search_in_the_content"
-        android:checkable="true"
-        app:chipIcon="@drawable/ic_config_text"
-        />
-    <com.google.android.material.chip.Chip
-        android:id="@+id/exclude_dirs"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/padding_half"
-        android:text="@string/pref_exclude_dirs"
-        android:checkable="true"
-        app:chipIcon="@drawable/ic_config_folder"
-        />
-</com.google.android.flexbox.FlexboxLayout>
+    android:padding="@dimen/padding_mini"
+    />

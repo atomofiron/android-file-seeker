@@ -36,15 +36,9 @@ sealed class FinderStateItem(
 
     data class Title(@StringRes val stringId: Int) : FinderStateItem(FinderItemType.TITLE, stringId)
 
-    data class Options(
-        val toggles: SearchOptions,
-        val isLocal: Boolean,
-    ) : FinderStateItem(FinderItemType.EDIT_OPTIONS_MINI), ISearchConfig by toggles
+    data class Options(val toggles: SearchOptions) : FinderStateItem(FinderItemType.EDIT_OPTIONS_MINI), ISearchConfig by toggles
 
-    data class EditOptions(
-        val toggles: SearchOptions,
-        val isLocal: Boolean = false,
-    ) : FinderStateItem(FinderItemType.EDIT_OPTIONS), ISearchConfig by toggles
+    data class EditOptions(val toggles: SearchOptions) : FinderStateItem(FinderItemType.EDIT_OPTIONS), ISearchConfig by toggles
 
     data class MaxDepth(val value: Int) : FinderStateItem(FinderItemType.MAX_DEPTH)
 

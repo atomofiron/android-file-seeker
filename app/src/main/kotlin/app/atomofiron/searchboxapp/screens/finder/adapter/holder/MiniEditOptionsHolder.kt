@@ -45,9 +45,6 @@ class MiniEditOptionsHolder(
     override fun onBind(item: FinderStateItem, position: Int) = binding.run {
         item as FinderStateItem.Options
 
-        contentSearch.isGone = item.isLocal
-        excludeDirs.isGone = item.isLocal
-
         caseSense.isChecked = !item.ignoreCase
         useRegexp.isChecked = item.useRegex
         contentSearch.isChecked = item.contentSearch
@@ -56,7 +53,5 @@ class MiniEditOptionsHolder(
         excludeDirs.chipIcon?.alpha = Alpha.enabledInt(!item.excludeDirs || !item.contentSearch)
     }
 
-    private fun update(block: (SearchOptions) -> SearchOptions) {
-        listener.onConfigChange(block(item.toggles))
-    }
+    private fun update(block: (SearchOptions) -> SearchOptions) = listener.onConfigChange(block(item.toggles))
 }

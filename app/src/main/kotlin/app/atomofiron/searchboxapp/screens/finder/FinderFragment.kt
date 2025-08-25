@@ -44,7 +44,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         super.onCreate(savedInstanceState)
         initViewModel(this, FinderViewModel::class, savedInstanceState)
 
-        finderAdapter = FinderAdapter(output = presenter)
+        finderAdapter = FinderAdapter(isLocal = viewState.isLocal, output = presenter)
         layoutManager = GridLayoutManager(context, 1)
         spanSizeLookup = FlexSpanSizeLookup(null, finderAdapter, layoutManager, resources)
         finderAdapter.holderListener = spanSizeLookup

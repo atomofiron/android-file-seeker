@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 interface FinderItemsState {
+    val isLocal: Boolean
     val targets: StateFlow<List<Node>>
     val toggles: StateFlow<FinderStateItem.EditOptions>
 

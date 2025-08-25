@@ -7,6 +7,7 @@ typealias MeasureListener = (width: Int, height: Int) -> Unit
 
 interface MeasureProvider {
     val view: ViewGroup
+    val availableWidth: Int
 
     fun addMeasureListener(listener: MeasureListener)
     fun removeMeasureListener(listener: MeasureListener): Boolean
@@ -17,7 +18,8 @@ class MeasureProviderImpl : MeasureProvider {
 
     override val view: ViewGroup get() = throw NotImplementedError()
 
-    private var availableWidth = 0
+    override var availableWidth = 0
+        private set
     private var availableHeight = 0
     private var listeners = mutableListOf<MeasureListener>()
 

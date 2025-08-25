@@ -11,10 +11,11 @@
 	<dimen name="infinity">999dp</dimen>
 	<dimen name="status_bar_max">26dp</dimen>
 	<dimen name="status_bar_min_padding">4dp</dimen>
+	<dimen name="corner_extra">20dp</dimen>
 	<dimen name="corner_radius">16dp</dimen>
 	<dimen name="corner_semi">12dp</dimen>
 	<dimen name="corner_half">8dp</dimen>
-	<dimen name="corner_radius_nano">4dp</dimen>
+	<dimen name="corner_nano">4dp</dimen>
 	<dimen name="icon_size">24dp</dimen>
 	<dimen name="item_icon_padding">4dp</dimen>
 
@@ -45,6 +46,7 @@
 	<dimen name="column_max_width">150dp</dimen>
 	<dimen name="compact_column_min_width">100dp</dimen>
 	<dimen name="min_portrait_screen_half">160dp</dimen>
+	<dimen name="option_width">160dp</dimen>
 	<dimen name="item_ripple_corner_radius">16dp</dimen>
 	<dimen name="content_padding_bottom">32dp</dimen>
 	<dimen name="min_space_with_joystick">420dp</dimen>
