@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
 import androidx.core.view.children
 import androidx.core.view.isGone
 import androidx.core.view.marginEnd
@@ -41,20 +40,16 @@ class EditOptionsHolder(
         root.addOnLayoutChangeListener { _, left, _, right, _, _, _, _, _ ->
             binding.root.onRootLayout(right - left)
         }
-        caseSense.setOnClickListener { view ->
-            view as CompoundButton
+        caseSense.setOnClickListener {
             update { it.copy(ignoreCase = !it.ignoreCase) }
         }
-        useRegexp.setOnClickListener { view ->
-            view as CompoundButton
+        useRegexp.setOnClickListener {
             update { it.copy(useRegex = !it.useRegex) }
         }
-        contentSearch.setOnClickListener { view ->
-            view as CompoundButton
+        contentSearch.setOnClickListener {
             update { it.copy(contentSearch = !it.contentSearch) }
         }
-        excludeDirs.setOnClickListener { view ->
-            view as CompoundButton
+        excludeDirs.setOnClickListener {
             update { it.copy(excludeDirs = !it.excludeDirs) }
         }
     }
