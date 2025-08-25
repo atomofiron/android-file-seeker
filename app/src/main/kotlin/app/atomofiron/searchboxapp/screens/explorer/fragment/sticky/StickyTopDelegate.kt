@@ -40,6 +40,8 @@ class StickyTopDelegate(
 
     fun valid(item: Node) = item.isOpened && item.isEmpty == false && !item.isSeparator()
 
+    fun getDeepest() = stickies.values.find { it.item.isDeepest }?.view
+
     fun sync(opened: List<Pair<Int,Node>>) {
         for (sticky in stickies.entries.toList()) {
             if (!opened.any { it.second.uniqueId == sticky.value.item.uniqueId }) {

@@ -38,6 +38,8 @@ class ExplorerStickyDelegate(
 
     fun setComposition(composition: ExplorerItemComposition) = top.setComposition(composition)
 
+    fun getDeepest() = top.getDeepest()
+
     override fun onChildViewAttachedToWindow(itemView: View) {
         val holder = itemView.getHolder()
         val item = holder?.let { adapter.items[it.bindingAdapterPosition] }

@@ -20,6 +20,8 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>>(
 
     operator fun get(position: Int) = mutableItems[position]
 
+    fun getOrNull(position: Int) = mutableItems.getOrNull(position)
+
     final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): H {
         val inflater = LayoutInflater.from(parent.context)
         return onCreateViewHolder(parent, viewType, inflater)

@@ -32,7 +32,7 @@ class ExplorerListDelegate(
     private val stickyDelegate = ExplorerStickyDelegate(recyclerView, rootAdapter, nodeAdapter, stickyBox, StickyListener())
     private val rootMarginDecorator = RootItemMarginDecorator(recyclerView.resources)
     private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = true)
-    private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter)
+    private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter, stickyDelegate::getDeepest)
 
     private var deepestDir: Node? = null
     private val items get() = nodeAdapter.items

@@ -8,7 +8,7 @@ import android.graphics.Path.Direction
 import android.graphics.Rect
 import android.graphics.RectF
 import android.view.View
-import android.view.View.MeasureSpec
+import androidx.core.view.children
 import androidx.core.view.iterator
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.view.ExplorerStickyTopView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
@@ -26,9 +25,10 @@ import kotlin.math.min
 class ItemBorderDecorator(
     context: Context,
     private val adapter: ExplorerAdapter,
+    private val deepestStickyProvider: () -> View?,
 ) : ItemDecoration() {
 
-    private val stickyView = ExplorerStickyTopView(context)
+    private var deepestStickyView: View? = null
     // примерный размер жестового навбара, чтобы игнорировать равный ему паддинг снизу
     private val gestureBar = context.resources.displayMetrics.density * 32 // 24
 
@@ -60,9 +60,7 @@ class ItemBorderDecorator(
 
     fun setDeepestDir(item: Node?) {
         deepestDir = item
-        stickyView.bind(item)
-        val wrapContent = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
-        stickyView.measure(wrapContent, wrapContent)
+        deepestStickyView = deepestStickyProvider()
     }
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
@@ -86,6 +84,12 @@ class ItemBorderDecorator(
     override fun onDrawOver(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         val first = parent.getFirstItemView()
         first ?: return
+        val stickyView = deepestStickyView ?: parent.children.find {
+            val holder = parent.findContainingViewHolder(it)
+            holder ?: return@find false
+            val item = adapter.getOrNull(holder.bindingAdapterPosition)
+            item?.isDeepest == true // stickyView is null because of deepest item is empty (without children) that never gets stick
+        } ?: return
 
         val firstItemViewHolder = first.first
         val itemChildCount = first.second
