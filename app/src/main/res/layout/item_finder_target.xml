@@ -7,7 +7,6 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="@dimen/padding_half"
-    android:layout_marginBottom="@dimen/padding_half"
     android:textColor="?attr/colorContent"
     android:textStyle="bold"
     android:gravity="bottom"

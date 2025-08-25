@@ -36,6 +36,7 @@
 	<dimen name="curtain_title_size">@dimen/title_size</dimen>
     <dimen name="background_span_corner_radius">4dp</dimen>
     <dimen name="background_span_border_thickness">1dp</dimen>
+    <dimen name="chip_area">40dp</dimen> <!-- 32 + 4 + 4-->
 
 	<!-- ShapeAppearance.M3.Sys.Shape.Corner.ExtraLarge -->
 	<dimen name="corner_extra_large">28dp</dimen>

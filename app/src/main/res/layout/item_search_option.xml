@@ -7,4 +7,5 @@
     android:layout_marginHorizontal="@dimen/padding_mini"
     android:checkable="true"
     app:chipIcon="@drawable/ic_config_case"
+    app:chipMinTouchTargetSize="@dimen/chip_area"
     />

@@ -117,6 +117,8 @@ fun Context.isDarkTheme(): Boolean = findBooleanByAttr(R.attr.isDarkTheme)
 
 fun Context.isBlackDeep(): Boolean = findBooleanByAttr(R.attr.isBlackDeep)
 
+fun Context.isDarkDeep(): Boolean = isDarkTheme() && isBlackDeep()
+
 fun Context.isGranted(permission: String): Boolean {
     return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 }

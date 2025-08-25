@@ -11,6 +11,7 @@ import androidx.core.view.marginTop
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import kotlin.math.max
@@ -25,6 +26,7 @@ class SectionBackgroundDecorator(
 ) : RecyclerView.ItemDecoration() {
 
     private val paint = Paint()
+    private val marginHalf = context.resources.getDimensionPixelSize(R.dimen.padding_half)
     private val internalRadius = context.resources.getDimension(R.dimen.corner_nano)
     private val edgeRadius = context.resources.getDimension(R.dimen.corner_extra)
     private val internalSpace = internalRadius / 2
@@ -34,11 +36,39 @@ class SectionBackgroundDecorator(
         paint.color = context.findColorByAttr(MaterialAttr.colorSurfaceContainer)
     }
 
-    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) = Unit
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+        val adapter = parent.adapter as? ListAdapter<*,*> ?: return
+        val reversed = parent.layoutManager?.isLayoutReversed ?: return
+        val holder = parent.findContainingViewHolder(view) ?: return
+        debugRequire(holder.bindingAdapterPosition >= 0)
+        if (holder.bindingAdapterPosition < 0) {
+            return
+        }
+        val item = adapter.currentList[holder.bindingAdapterPosition]
+        val nextItem = adapter.currentList.getOrNull(holder.bindingAdapterPosition.inc())
+        val prevItem = adapter.currentList.getOrNull(holder.bindingAdapterPosition.dec())
+        val current = groups.findGroup(item)
+        if (current != null) {
+            // we cant set top/bottom to the multiple items in a group, so we set to neighbours
+            return
+        }
+        val next = groups.findGroup(nextItem)
+        val prev = groups.findGroup(prevItem)
+        when {
+            next == null -> Unit
+            reversed -> outRect.top = marginHalf
+            else -> outRect.bottom = marginHalf
+        }
+        when {
+            prev == null -> Unit
+            reversed -> outRect.bottom = marginHalf
+            else -> outRect.top = marginHalf
+        }
+    }
 
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         val adapter = parent.adapter as? ListAdapter<*,*> ?: return
-        val layoutManager = parent.layoutManager ?: return
+        val reversed = parent.layoutManager?.isLayoutReversed ?: return
         var range: IntRange? = null
         var current: List<KClass<*>>? = null
         var prev: List<KClass<*>>? = null
@@ -48,9 +78,9 @@ class SectionBackgroundDecorator(
                 ?.currentList
                 ?.get(holder.bindingAdapterPosition)
                 ?: continue
-            val group = groups.find { it.contains(item::class) }
+            val group = groups.findGroup(item)
             if (group == null || current != null && group !== current) {
-                range?.draw(canvas, parent, hasPrev = prev != null, hasNext = group != null, layoutManager.isLayoutReversed)
+                range?.draw(canvas, parent, hasPrev = prev != null, hasNext = group != null, reversed)
                 range = null
                 prev = current
             }
@@ -63,7 +93,7 @@ class SectionBackgroundDecorator(
                 else -> min(range.first, top)..max(range.last, bottom)
             }
         }
-        range?.draw(canvas, parent, hasPrev = prev != null, hasNext = false, layoutManager.isLayoutReversed)
+        range?.draw(canvas, parent, hasPrev = prev != null, hasNext = false, reversed)
     }
 
     private fun IntRange.draw(
@@ -87,5 +117,10 @@ class SectionBackgroundDecorator(
         radius = if (hasNext) internalRadius else edgeRadius
         val top = if (hasNext) to - offset else from.toFloat()
         canvas.drawRoundRect(left, top, left + width, to.toFloat(), radius, radius, paint)
+    }
+
+    private fun List<List<KClass<*>>>.findGroup(item: Any?): List<KClass<*>>? {
+        item ?: return null
+        return find { it.contains(item::class) }
     }
 }

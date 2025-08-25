@@ -15,8 +15,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findColorByAttr
-import app.atomofiron.common.util.isBlackDeep
-import app.atomofiron.common.util.isDarkTheme
+import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.JoystickView
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
@@ -101,12 +100,12 @@ object LayoutDelegate {
             }
         }
         val transparent = !layout.ground.isBottom
-        val deepBlackDark = context.isDarkTheme() && context.isBlackDeep()
+        val deepDark = context.isDarkDeep()
         val fill = when {
-            deepBlackDark || transparent -> context.findColorByAttr(R.attr.colorBackground)
+            deepDark || transparent -> context.findColorByAttr(R.attr.colorBackground)
             else -> context.findColorByAttr(MaterialAttr.colorSurfaceContainer)
         }
-        val strokeWidth = if (deepBlackDark || !canDrawShadow) resources.getDimension(R.dimen.stroke_width) else 0f
+        val strokeWidth = if (deepDark || !canDrawShadow) resources.getDimension(R.dimen.stroke_width) else 0f
         setStyle(DockStyle(fill = fill, transparent = transparent, strokeWidth = strokeWidth))
         setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.run { ground.isBottom && withJoystick } }))
     }
