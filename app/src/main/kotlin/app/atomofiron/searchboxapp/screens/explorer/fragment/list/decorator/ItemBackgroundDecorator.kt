@@ -16,7 +16,7 @@ class ItemBackgroundDecorator(private val evenNumbered: Boolean) : RecyclerView.
     var enabled = false
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
-        paint.color = ContextCompat.getColor(parent.context, R.color.surface_variant_lite)
+        paint.color = ContextCompat.getColor(parent.context, R.color.item_explorer_background)
     }
 
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
