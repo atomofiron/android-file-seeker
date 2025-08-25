@@ -114,11 +114,11 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     fun animAppearing() {
         doOnPreDraw {
             var from = horizontalMax.dec()
-            updateHorizontally(from)
             when (exitDirection) {
                 Direction.Right -> Unit
                 Direction.Left -> from *= -1
             }
+            updateHorizontally(from)
             animHorizontally(from, HorizontalStart)
         }
     }
@@ -305,7 +305,10 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         alpha = AlphaThreshold + (horizontalMax - new.absoluteValue) / horizontalMax.toFloat()
         if (new.absoluteValue == horizontalMax) {
             exitCallback?.invoke()
-            exitDirection = Direction.right(new >= 0)
+        }
+        when {
+            new > 0 -> exitDirection = Direction.Right
+            new < 0 -> exitDirection = Direction.Left
         }
     }
 
