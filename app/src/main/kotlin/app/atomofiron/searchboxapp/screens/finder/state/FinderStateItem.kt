@@ -64,4 +64,13 @@ sealed class FinderStateItem(
     data class Targets(val targets: List<Node>) : FinderStateItem(FinderItemType.TARGETS)
 
     data object Disclaimer : FinderStateItem(FinderItemType.DISCLAIMER)
+
+    companion object {
+        val groups = listOf(
+            listOf(Query::class, SpecialCharacters::class),
+            listOf(TestField::class, Buttons::class),
+            listOf(Options::class),
+            listOf(MaxDepth::class, MaxSize::class, EditCharacters::class),
+        )
+    }
 }

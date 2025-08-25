@@ -10,6 +10,7 @@
     android:clipChildren="false"
     android:clickable="false"
     android:focusable="false"
+    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
     >
     <app.atomofiron.searchboxapp.custom.view.TextField
         android:id="@+id/field"
@@ -19,6 +20,5 @@
         android:imeOptions="flagNoFullscreen|flagNoExtractUi"
         android:clipToOutline="false"
         app:hideKeyboardOnFocusLost="false"
-        style="@style/Widget.Material3.TextInputEditText.OutlinedBox.Dense"
         />
 </com.google.android.material.textfield.TextInputLayout>

@@ -30,7 +30,7 @@ class TargetsHolder(parent: ViewGroup, output: FinderTargetsOutput) : GeneralHol
 
     private class TargetAdapter(private val output: FinderTargetsOutput): ListAdapter<Node, TargetHolder>(DiffUtilCallback()) {
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = TargetHolder(parent, R.layout.item_finder_target, output)
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = TargetHolder(parent, output)
 
         override fun onBindViewHolder(holder: TargetHolder, position: Int) {
             holder.bind(currentList[position], position)

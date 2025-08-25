@@ -15,6 +15,7 @@ import app.atomofiron.common.util.showKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
+import app.atomofiron.searchboxapp.screens.common.SectionBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.history.adapter.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -57,6 +58,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         binding.root.setCallback(presenter::onExitAnimationEnd)
         layoutManager.reverseLayout = true
         binding.recyclerView.run {
+            addItemDecoration(SectionBackgroundDecorator(context, FinderStateItem.groups))
             addOnLayoutChangeListener(spanSizeLookup)
             layoutManager = this@FinderFragment.layoutManager
             itemAnimator = null
@@ -107,7 +109,9 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
     private fun onStateChange(items: List<FinderStateItem>) = finderAdapter.submitList(items)
 
-    private fun findQueryField(): EditText? = view?.findViewById(R.id.item_find_rt_find)
+    private fun findQueryField(): EditText? = view
+        ?.findViewById<View>(R.id.query_field)
+        ?.findViewById(R.id.field)
 
     private fun onReplaceQuery(value: String) {
         findQueryField()?.setText(value)

@@ -25,6 +25,7 @@ class EditCharactersHolder(
             maxLines = 1
             addOnSubmitListener(this@EditCharactersHolder)
         }
+        binding.field.makeFilledOpposite(binding.box)
     }
 
     override fun minWidth(): Float = delegate.minWidth()

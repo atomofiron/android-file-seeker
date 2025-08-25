@@ -2,15 +2,14 @@ package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 
 import android.text.Editable
 import android.text.TextWatcher
-import android.view.KeyEvent
-import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
-import androidx.core.view.isGone
-import androidx.core.view.isVisible
+import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
+import android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.view.RegexInputField
+import app.atomofiron.fileseeker.databinding.ItemQueryFieldBinding
+import app.atomofiron.searchboxapp.custom.view.makeRegex
+import app.atomofiron.searchboxapp.custom.view.showError
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Query
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -22,42 +21,42 @@ class QueryFieldHolder(
 ) : GeneralHolder<FinderStateItem>(parent, R.layout.item_query_field) {
 
     override val hungry = true
+    override val item get() = super.item as Query
 
-    private val params: Query get() = item as Query
-
-    val etFind = itemView.findViewById<RegexInputField>(R.id.item_find_rt_find)
-    private val btnFind = itemView.findViewById<View>(R.id.item_find_ib_find)
-    private val viewReplace = itemView.findViewById<View>(R.id.item_find_i_replace)
+    private val binding = ItemQueryFieldBinding.bind(itemView)
+    private val textLayout = binding.queryField.box
+    val textField = binding.queryField.field
 
     init {
-        btnFind.setOnClickListener {
-            listener.onSearchClick(etFind.text.toString())
+        binding.button.setOnClickListener {
+            listener.onSearchClick(textField.text.toString())
         }
-        etFind.addTextChangedListener(this@QueryFieldHolder.TextChangeListener())
-        etFind.setOnEditorActionListener(::onEditorAction)
+        textField.run {
+            imeOptions = (imeOptions and IME_ACTION_DONE.inv()) or IME_ACTION_SEARCH
+            textLayout.hint = resources.getString(R.string.searching)
+            makeRegex()
+            makeFilledOpposite(binding.queryField.box)
+            addTextChangedListener(this@QueryFieldHolder.TextChangeListener())
+            setOnEditorActionListener { _, actioId, _ ->
+                this@QueryFieldHolder.onEditorAction(actioId)
+            }
+        }
     }
 
     override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_query_field)
 
     override fun onBind(item: FinderStateItem, position: Int) {
         item as Query
-        viewReplace.isVisible = item.withReplace
-        etFind.imeOptions = when {
-            item.withReplace -> (etFind.imeOptions and EditorInfo.IME_ACTION_SEARCH.inv()) or EditorInfo.IME_ACTION_NEXT
-            else -> (etFind.imeOptions and EditorInfo.IME_ACTION_NEXT.inv()) or EditorInfo.IME_ACTION_SEARCH
+        if (textField.text.toString() != item.query) {
+            textField.setText(item.query)
+            textField.setSelection(item.query.length)
         }
-        if (etFind.text.toString() != item.query) {
-            etFind.setText(item.query)
-            etFind.setSelection(item.query.length)
-        }
-        updateWarning(etFind.text.toString())
-        btnFind.isEnabled = item.enabled
-        btnFind.alpha = Alpha.enabled(item.enabled)
+        bindState(item.query)
     }
 
-    private fun onEditorAction(view: View, actionId: Int, /* indeed nullable */ event: KeyEvent?): Boolean {
-        if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-            val query = etFind.text.toString()
+    private fun onEditorAction(actionId: Int): Boolean {
+        if (actionId == IME_ACTION_SEARCH) {
+            val query = textField.text.toString()
             when {
                 query.isEmpty() -> return true
                 else -> listener.onSearchClick(query)
@@ -66,17 +65,17 @@ class QueryFieldHolder(
         return false
     }
 
-    private fun updateWarning(query: String) {
-        if (params.useRegex) {
-            try {
-                Pattern.compile(query)
-            } catch (e: Exception) {
-                etFind.isActivated = true
-                btnFind.isGone = true
-                return
-            }
+    private fun bindState(query: String) {
+        try {
+            if (item.useRegex) Pattern.compile(query)
+            textLayout.showError(false)
+        } catch (e: Exception) {
+            textLayout.showError(e.message?.lineSequence()?.first())
         }
-        etFind.isActivated = false
+        val error = textLayout.error != null
+        val enabled = !error && item.enabled
+        binding.button.isEnabled = enabled
+        binding.button.alpha = Alpha.enabled(enabled)
     }
 
     interface OnActionListener {
@@ -90,9 +89,6 @@ class QueryFieldHolder(
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
         override fun afterTextChanged(s: Editable) {
             val value = s.toString()
-            updateWarning(value)
-
-            val item = item as Query
             if (value != item.query) {
                 listener.onSearchChange(value)
             }

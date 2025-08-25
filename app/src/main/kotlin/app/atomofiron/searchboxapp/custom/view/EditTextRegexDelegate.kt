@@ -1,18 +1,15 @@
 package app.atomofiron.searchboxapp.custom.view
 
-import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.AttributeSet
+import android.widget.EditText
 
-class RegexInputField @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null
-) : AutoHideKeyboardField(context, attrs), TextWatcher {
-    companion object {
-        private const val UNKNOWN = -1
-        private const val ZERO_CHAR = 0.toChar()
-    }
+private const val UNKNOWN = -1
+private const val ZERO_CHAR = 0.toChar()
+
+fun EditText.makeRegex() = addTextChangedListener(EditTextRegexDelegate(this))
+
+private class EditTextRegexDelegate(private val editText: EditText) : TextWatcher {
 
     private var locked = false
     private var deleted = ZERO_CHAR
@@ -21,11 +18,6 @@ class RegexInputField @JvmOverloads constructor(
 
     private val openBrackets = charArrayOf('[', '{', '(')
     private val closeBrackets = charArrayOf(']', '}', ')')
-
-    init {
-        hideKeyboardOnFocusLost = false
-        addTextChangedListener(this)
-    }
 
     override fun beforeTextChanged(sequence: CharSequence, start: Int, count: Int, after: Int) {
         deleted = if (count == 1) sequence[start] else ZERO_CHAR
@@ -48,7 +40,7 @@ class RegexInputField @JvmOverloads constructor(
             val index = openBrackets.indexOf(char)
             if (index != UNKNOWN) {
                 editable.insert(position, closeBrackets[index].toString())
-                setSelection(start)
+                editText.setSelection(start)
             }
         }
         locked = false

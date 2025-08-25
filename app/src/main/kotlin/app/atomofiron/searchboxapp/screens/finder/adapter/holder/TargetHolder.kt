@@ -11,9 +11,8 @@ import com.google.android.material.chip.Chip
 
 class TargetHolder(
     parent: ViewGroup,
-    layoutId: Int,
     private val output: TargetsHolder.FinderTargetsOutput,
-) : GeneralHolder<Node>(parent, layoutId) {
+) : GeneralHolder<Node>(parent, R.layout.item_finder_target) {
 
     private val chipView = itemView.findViewById<Chip>(R.id.item_chip_target)
 
@@ -22,8 +21,6 @@ class TargetHolder(
         itemView.isFocusable = false
         chipView.setOnClickListener { output.onTargetClick(item, !chipView.isSelected) }
     }
-
-    override fun minWidth(): Float = throw UnsupportedOperationException()
 
     override fun onBind(item: Node, position: Int) {
         val icon = ContextCompat.getDrawable(context, item.getIcon())

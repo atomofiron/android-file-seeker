@@ -5,5 +5,5 @@
     android:layout_height="wrap_content"
     android:id="@+id/item_ll_characters"
     android:orientation="horizontal"
-    android:gravity="bottom"
+    android:gravity="center_vertical"
     />

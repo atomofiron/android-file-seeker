@@ -383,7 +383,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             val recyclerView = view.parent as RecyclerView
             val holder = recyclerView.getChildViewHolder(view) as? QueryFieldHolder
             holder ?: return
-            editText = holder.etFind
+            editText = holder.textField
             editText?.onFocusChangeListener = focusListener
         }
 

@@ -6,13 +6,13 @@
     <item android:id="@android:id/mask">
         <shape android:shape="rectangle">
             <solid android:color="@color/mask" />
-            <corners android:radius="@dimen/infinity" />
+            <corners android:radius="@dimen/corner_half" />
         </shape>
     </item>
     <item>
         <shape android:shape="rectangle">
             <solid android:color="@color/transparent" />
-            <corners android:radius="@dimen/infinity" />
+            <corners android:radius="@dimen/corner_half" />
         </shape>
     </item>
 </ripple>
