@@ -12,6 +12,7 @@ import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemTextFieldBinding
+import app.atomofiron.searchboxapp.custom.drawable.makeHoled
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.TestField

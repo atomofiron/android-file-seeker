@@ -8,6 +8,7 @@ import android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemQueryFieldBinding
+import app.atomofiron.searchboxapp.custom.drawable.makeHoled
 import app.atomofiron.searchboxapp.custom.view.makeRegex
 import app.atomofiron.searchboxapp.custom.view.showError
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem

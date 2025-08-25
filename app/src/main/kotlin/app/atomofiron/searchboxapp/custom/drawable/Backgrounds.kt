@@ -10,8 +10,10 @@ import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.view.TextField
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.drawable
+import com.google.android.material.textfield.TextInputLayout
 
 fun View.setMenuItemBackground() {
     val drawable = context.drawable(R.drawable.item_menu) as RippleDrawable
@@ -37,3 +39,8 @@ fun View.setStrokedBackground(
     if (vertical != 0) resources.getDimensionPixelSize(vertical)
         .also { updatePaddingRelative(top = it, bottom = it) }
 }
+
+fun TextField.makeHoled(layout: TextInputLayout) = makeFilled(layout, android.R.attr.colorBackground)
+
+fun TextField.makeToned(layout: TextInputLayout) = makeFilled(layout, MaterialAttr.colorSurfaceContainer)
+

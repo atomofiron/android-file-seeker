@@ -118,11 +118,7 @@ open class TextField @JvmOverloads constructor(
         super.setBackground(drawable)
     }
 
-    fun makeHoled(layout: TextInputLayout) = makeFilled(layout, android.R.attr.colorBackground)
-
-    fun makeToned(layout: TextInputLayout) = makeFilled(layout, MaterialAttr.colorSurfaceContainer)
-
-    private fun makeFilled(layout: TextInputLayout, @AttrRes filledColorAttr: Int) {
+    fun makeFilled(layout: TextInputLayout, @AttrRes filledColorAttr: Int) {
         filledDelegate = FilledDelegate(
             textLayout = layout,
             textField = this,
