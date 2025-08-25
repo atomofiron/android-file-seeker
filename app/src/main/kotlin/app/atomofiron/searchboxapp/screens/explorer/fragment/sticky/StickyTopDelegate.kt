@@ -5,6 +5,8 @@ import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
 import androidx.core.view.isVisible
+import app.atomofiron.common.recycler.GeneralAdapter
+import app.atomofiron.common.util.extension.indexOfFirst
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerStickyTopView
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -22,7 +24,9 @@ class StickyTopDelegate(
     private val holders: Collection<HolderInfo>,
     private val stickyBox: FrameLayout,
     private var listener: ExplorerItemBinderActionListener,
+    private val adapter: GeneralAdapter<Node, *>,
 ) {
+    private val items get() = adapter.items
     private val stickies = HashMap<Int, StickyTop>()
     private val threshold get() = stickyBox.paddingTop
     private var composition: ExplorerItemComposition? = null
@@ -110,12 +114,15 @@ class StickyTopDelegate(
     private fun List<HolderInfo>.findTop(sticky: StickyTop): Int? {
         find { it.position == sticky.position }
             ?.let { return it.view.top }
-        val openedIndex = sticky.item.getOpenedIndex(sticky.item.childCount)
+        // don't use item.children
+        val fromIndex = sticky.position.inc()
+        val limitIndex = items.indexOfFirst(fromIndex, orElse = items.size) {
+            it.isOpened || it.parentPath != sticky.item.path
+        }
         for (holder in this) {
-            sticky.item.children
-                .takeIf { !holder.item.isSeparator() && holder.item.parentPath == sticky.item.path }
-                ?.indexOfFirst { it.uniqueId == holder.item.uniqueId }
-                ?.takeIf { it < openedIndex }
+            items.takeIf { !holder.item.isSeparator() && holder.item.parentPath == sticky.item.path }
+                ?.indexOfFirst(fromIndex) { it.uniqueId == holder.item.uniqueId }
+                ?.takeIf { it in fromIndex..<limitIndex }
                 ?.let { return holder.view.top }
         }
         return null

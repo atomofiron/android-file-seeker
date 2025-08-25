@@ -61,3 +61,17 @@ fun <T> MutableList<T>.clear(from: Int, to: Int = size) {
 fun Int.rangePlus(over: Int): IntRange = this..<(this + over)
 
 fun IntRange.relative(absolute: Int) = absolute - first
+
+inline fun <T> List<T>.indexOfFirst(fromIndex: Int, orElse: Int = -1, predicate: (T) -> Boolean): Int {
+    if (fromIndex in indices) {
+        var index = fromIndex
+        for (item in listIterator(fromIndex)) {
+            if (predicate(item)) {
+                return index
+            }
+            index++
+        }
+    }
+    return orElse
+}
+

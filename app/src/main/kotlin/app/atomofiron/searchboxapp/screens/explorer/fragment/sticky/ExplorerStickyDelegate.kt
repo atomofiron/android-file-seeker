@@ -5,10 +5,10 @@ import android.widget.FrameLayout
 import androidx.core.view.doOnPreDraw
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.CoroutineListDiffer
+import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.common.util.noClip
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderInfo
@@ -16,7 +16,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderI
 class ExplorerStickyDelegate(
     private val recyclerView: RecyclerView,
     private val roots: RootAdapter,
-    private val adapter: ExplorerAdapter,
+    private val adapter: GeneralAdapter<Node,*>,
     stickyBox: FrameLayout,
     listener: ExplorerItemBinderActionListener,
 ) : RecyclerView.OnScrollListener()
@@ -25,7 +25,7 @@ class ExplorerStickyDelegate(
     , View.OnLayoutChangeListener
 {
     private val holders = HashMap<Int, HolderInfo>()
-    private val top = StickyTopDelegate(holders.values, stickyBox, listener)
+    private val top = StickyTopDelegate(holders.values, stickyBox, listener, adapter)
     private val bottom = StickyBottomDelegate(holders.values, stickyBox, listener)
 
     init {
