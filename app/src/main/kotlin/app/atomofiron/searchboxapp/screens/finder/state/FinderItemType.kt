@@ -9,7 +9,7 @@ enum class FinderItemType(val id: Int) {
     CHARACTERS(ids()),
     TEST(ids()),
     BUTTONS(ids()),
-    OPTIONS(ids()),
+    EDIT_OPTIONS(ids()),
     MAX_SIZE(ids()),
     MAX_DEPTH(ids()),
     EDIT_CHARS(ids()),

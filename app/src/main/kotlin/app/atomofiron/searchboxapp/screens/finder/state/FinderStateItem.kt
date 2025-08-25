@@ -36,10 +36,10 @@ sealed class FinderStateItem(
 
     data class Title(@StringRes val stringId: Int) : FinderStateItem(FinderItemType.TITLE, stringId)
 
-    data class Options(
+    data class EditOptions(
         val toggles: SearchOptions = SearchOptions(),
         val isLocal: Boolean = false,
-    ) : FinderStateItem(FinderItemType.OPTIONS), ISearchConfig by toggles
+    ) : FinderStateItem(FinderItemType.EDIT_OPTIONS), ISearchConfig by toggles
 
     data class MaxDepth(val value: Int) : FinderStateItem(FinderItemType.MAX_DEPTH)
 
@@ -69,7 +69,7 @@ sealed class FinderStateItem(
         val groups = listOf(
             listOf(Query::class, SpecialCharacters::class),
             listOf(TestField::class, Buttons::class),
-            listOf(Options::class),
+            listOf(EditOptions::class),
             listOf(MaxDepth::class, MaxSize::class, EditCharacters::class),
         )
     }

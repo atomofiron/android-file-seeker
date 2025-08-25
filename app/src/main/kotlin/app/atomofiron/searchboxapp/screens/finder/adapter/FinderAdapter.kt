@@ -10,7 +10,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.DisclaimerHolde
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.OptionsHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
@@ -37,7 +37,7 @@ class FinderAdapter(
         return when (FinderItemType[viewType]) {
             FinderItemType.FIND -> QueryFieldHolder(parent, output)
             FinderItemType.CHARACTERS -> CharactersHolder(parent, output)
-            FinderItemType.OPTIONS -> OptionsHolder(parent, output)
+            FinderItemType.EDIT_OPTIONS -> EditOptionsHolder(parent, output)
             FinderItemType.TITLE -> TitleHolder(parent)
             FinderItemType.TEST -> TestHolder(parent, output)
             FinderItemType.BUTTONS -> ButtonsHolder(parent, output)

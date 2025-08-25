@@ -5,7 +5,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.*
 interface FinderAdapterOutput :
         QueryFieldHolder.OnActionListener,
         CharactersHolder.OnActionListener,
-        OptionsHolder.FinderConfigListener,
+        EditOptionsHolder.FinderConfigListener,
         EditCharactersHolder.OnEditCharactersListener,
         EditMaxDepthHolder.OnEditMaxDepthListener,
         TestHolder.OnTestChangeListener,

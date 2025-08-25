@@ -11,7 +11,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolde
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.OptionsHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
@@ -37,7 +37,7 @@ class FinderPresenter(
     EditMaxDepthHolder.OnEditMaxDepthListener by finderAdapterDelegate,
     TestHolder.OnTestChangeListener by finderAdapterDelegate,
     EditMaxSizeHolder.OnEditMaxSizeListener by finderAdapterDelegate,
-    OptionsHolder.FinderConfigListener by finderAdapterDelegate,
+    EditOptionsHolder.FinderConfigListener by finderAdapterDelegate,
     ButtonsHolder.FinderButtonsListener by finderAdapterDelegate,
     TaskHolder.OnActionListener by finderAdapterDelegate,
     TargetsHolder.FinderTargetsOutput by targetsDelegate

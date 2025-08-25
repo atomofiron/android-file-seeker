@@ -9,7 +9,7 @@ import app.atomofiron.searchboxapp.screens.finder.FinderRouter
 import app.atomofiron.searchboxapp.screens.finder.FinderViewState
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.OptionsHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
@@ -27,7 +27,7 @@ class FinderAdapterPresenterDelegate(
 ) :
     QueryFieldHolder.OnActionListener,
     CharactersHolder.OnActionListener,
-    OptionsHolder.FinderConfigListener,
+    EditOptionsHolder.FinderConfigListener,
     EditCharactersHolder.OnEditCharactersListener,
     EditMaxDepthHolder.OnEditMaxDepthListener,
     EditMaxSizeHolder.OnEditMaxSizeListener,
@@ -35,7 +35,7 @@ class FinderAdapterPresenterDelegate(
     ButtonsHolder.FinderButtonsListener,
     TaskHolder.OnActionListener {
 
-    override fun onConfigChange(item: FinderStateItem.Options) {
+    override fun onConfigChange(item: FinderStateItem.EditOptions) {
         preferences { setSearchOptions(item.toggles) }
     }
 

@@ -11,7 +11,7 @@ import androidx.core.view.marginRight
 import androidx.core.view.marginStart
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
-import app.atomofiron.fileseeker.databinding.ItemSearchOptionsBinding
+import app.atomofiron.fileseeker.databinding.ItemSearchEditOptionsBinding
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.toInt
@@ -19,22 +19,22 @@ import com.google.android.flexbox.FlexboxLayout
 import kotlin.math.max
 import kotlin.math.min
 
-class OptionsHolder(
+class EditOptionsHolder(
     parent: ViewGroup,
     private val listener: FinderConfigListener,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_search_options) {
+) : GeneralHolder<FinderStateItem>(parent, R.layout.item_search_edit_options) {
 
     override val hungry = true
 
-    override val item get() = super.item as FinderStateItem.Options
+    override val item get() = super.item as FinderStateItem.EditOptions
 
-    private val binding = ItemSearchOptionsBinding.bind(itemView)
+    private val binding = ItemSearchEditOptionsBinding.bind(itemView)
 
     init {
         binding.init()
     }
 
-    private fun ItemSearchOptionsBinding.init() {
+    private fun ItemSearchEditOptionsBinding.init() {
         root.isFocusable = false
         root.isClickable = false
         root.addOnLayoutChangeListener { _, left, _, right, _, _, _, _, _ ->
@@ -59,7 +59,7 @@ class OptionsHolder(
     }
 
     override fun onBind(item: FinderStateItem, position: Int) = binding.run {
-        item as FinderStateItem.Options
+        item as FinderStateItem.EditOptions
 
         contentSearch.isGone = item.isLocal
         excludeDirs.isGone = item.isLocal
@@ -72,7 +72,7 @@ class OptionsHolder(
         excludeDirs.chipIcon?.alpha = Alpha.enabledInt(!item.excludeDirs || !item.contentSearch)
     }
 
-    private fun update(block: (FinderStateItem.Options) -> FinderStateItem.Options) {
+    private fun update(block: (FinderStateItem.EditOptions) -> FinderStateItem.EditOptions) {
         listener.onConfigChange(block(item))
     }
 
@@ -124,6 +124,6 @@ class OptionsHolder(
     }
 
     interface FinderConfigListener {
-        fun onConfigChange(item: FinderStateItem.Options)
+        fun onConfigChange(item: FinderStateItem.EditOptions)
     }
 }

@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface FinderItemsState {
     val targets: StateFlow<List<Node>>
-    val toggles: StateFlow<FinderStateItem.Options>
+    val toggles: StateFlow<FinderStateItem.EditOptions>
 
     val items: Flow<List<FinderStateItem>>
 
     fun updateSearchQuery(value: String)
-    fun updateConfig(item: FinderStateItem.Options)
+    fun updateConfig(item: FinderStateItem.EditOptions)
     fun updateTargets(items: List<Node>)
 }

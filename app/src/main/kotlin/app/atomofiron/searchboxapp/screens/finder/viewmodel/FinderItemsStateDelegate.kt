@@ -13,7 +13,7 @@ import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Disclaim
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.EditCharacters
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.MaxDepth
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.MaxSize
-import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Options
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.EditOptions
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Query
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.SpecialCharacters
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Targets
@@ -33,8 +33,8 @@ class FinderItemsStateDelegate(
 
     private val query = MutableStateFlow("")
     override val targets = MutableStateFlow<List<Node>>(mutableListOf())
-    private val mutableToggles = MutableStateFlow(Options(isLocal = true))
-    override val toggles = if (isLocal) mutableToggles else preferences.searchOptions.mapState(::Options)
+    private val mutableToggles = MutableStateFlow(EditOptions(isLocal = true))
+    override val toggles = if (isLocal) mutableToggles else preferences.searchOptions.mapState(::EditOptions)
     private val localOptions = toggles.map { listOf(it) }
     private val globalOptions = combine(
         toggles,
@@ -54,7 +54,7 @@ class FinderItemsStateDelegate(
     )
     override val items = combine(uniqueItems, targets, tasks, ::composeAllItems)
 
-    private fun composeOptions(config: Options, chars: Array<String>, depth: Int, size: Int, show: Boolean) = when {
+    private fun composeOptions(config: EditOptions, chars: Array<String>, depth: Int, size: Int, show: Boolean) = when {
         show -> listOf(
             config,
             MaxSize(size),
@@ -65,7 +65,7 @@ class FinderItemsStateDelegate(
         else -> emptyList()
     }
 
-    private fun composeUniqueItems(query: String, test: String?, chars: Array<String>, options: List<FinderStateItem>, config: Options): List<FinderStateItem> {
+    private fun composeUniqueItems(query: String, test: String?, chars: Array<String>, options: List<FinderStateItem>, config: EditOptions): List<FinderStateItem> {
         return buildList {
             add(Query(query, useRegex = config.useRegex))
             add(SpecialCharacters(chars))
@@ -96,7 +96,7 @@ class FinderItemsStateDelegate(
         query.value = value
     }
 
-    override fun updateConfig(item: Options) {
+    override fun updateConfig(item: EditOptions) {
         mutableToggles.value = item
     }
 

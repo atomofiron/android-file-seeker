@@ -32,7 +32,7 @@ class SearchAdapterPresenterDelegate(
 
     fun show() = router.showCurtain(recipient, R.layout.curtain_text_viewer_search)
 
-    override fun onConfigChange(item: FinderStateItem.Options) = viewState.updateConfig(item)
+    override fun onConfigChange(item: FinderStateItem.EditOptions) = viewState.updateConfig(item)
 
     override fun onConfigVisibilityClick() = Unit
 
