@@ -1,9 +1,12 @@
 package app.atomofiron.searchboxapp.screens.viewer.presenter.curtain
 
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.EditText
 import androidx.recyclerview.widget.GridLayoutManager
 import app.atomofiron.common.recycler.FlexSpanSizeLookup
 import app.atomofiron.common.util.flow.collect
+import app.atomofiron.common.util.showKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainTextViewerSearchBinding
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
@@ -32,7 +35,7 @@ class CurtainSearchDelegate(
 
     init {
         viewState.items.collect(scope) { finderAdapter.submitList(it) }
-        viewState.insertInQuery.collect(scope, collector = viewState::updateSearchQuery)
+        viewState.insertInQuery.collect(scope, collector = ::onInsertInQuery)
     }
 
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
@@ -61,4 +64,16 @@ class CurtainSearchDelegate(
 
         return CurtainApi.ViewHolder(binding.root)
     }
+
+    private fun onInsertInQuery(value: String) {
+        findQueryField()?.run {
+            showKeyboard()
+            text.replace(selectionStart, selectionEnd, value)
+        }
+    }
+
+    private fun findQueryField(): EditText? = getViewHolderOrNull(R.layout.curtain_text_viewer_search)
+        ?.view
+        ?.findViewById<View>(R.id.query_field)
+        ?.findViewById(R.id.field)
 }

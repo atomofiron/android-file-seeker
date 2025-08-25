@@ -73,6 +73,8 @@ object CurtainApi {
 
         protected abstract fun getHolder(inflater: LayoutInflater, layoutId: Int): H?
 
+        fun getViewHolderOrNull(layoutId: Int): ViewHolder? = holderList[layoutId]
+
         fun getViewHolder(context: Context, layoutId: Int): ViewHolder? {
             val inflater = LayoutInflater.from(context)
             val holder = holderList[layoutId] ?: getHolder(inflater, layoutId)?.apply {
