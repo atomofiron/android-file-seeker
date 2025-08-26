@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.screens.finder
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
-import androidx.core.view.updatePaddingRelative
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,6 +30,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     private lateinit var finderAdapter: FinderAdapter
     private lateinit var layoutManager: GridLayoutManager
     private lateinit var spanSizeLookup: FlexSpanSizeLookup
+    private var animNextShow = false
 
     private val historyAdapter: HistoryAdapter by lazy {
         HistoryAdapter(requireContext(), object : HistoryAdapter.OnItemClickListener {
@@ -79,8 +79,13 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        if (hidden) view?.hideKeyboard()
-        if (!hidden) binding.root.animAppearing()
+        if (hidden) {
+            view?.hideKeyboard()
+            animNextShow = parentFragment?.isHidden == false
+        } else if (animNextShow) {
+            animNextShow = false
+            binding.root.animAppearing()
+        }
     }
 
     override fun FinderViewState.onViewCollect() {
