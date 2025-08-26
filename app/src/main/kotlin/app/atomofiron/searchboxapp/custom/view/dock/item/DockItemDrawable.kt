@@ -25,9 +25,9 @@ class DockItemDrawable private constructor(
     mask: Drawable,
 ) : RippleDrawable(ripple, layers, mask) {
     companion object {
-        operator fun invoke(ripple: Int, corners: Float, stroke: Float): DockItemDrawable {
+        operator fun invoke(ripple: Int, corners: Float): DockItemDrawable {
             val content = ShapeDrawable(DockItemShape(corners))
-            val focused = ShapeDrawable(DockItemShape(corners, stroke))
+            val focused = ShapeDrawable(DockItemShape(corners))
             val hovered = ShapeDrawable(DockItemShape(corners))
             val layers = LayerDrawable(arrayOf(
                 StateListDrawable().apply { addState(intArrayOf(0), content) },
@@ -73,30 +73,22 @@ class DockItemDrawable private constructor(
     }
 }
 
-private class DockItemShape(
-    private val radius: Float,
-    private val strokeWidth: Float = 0f,
-) : RectShape() {
+private class DockItemShape(private val radius: Float) : RectShape() {
 
     private val path = Path()
 
     override fun onResize(width: Float, height: Float) {
         super.onResize(width, height)
-        val inset = strokeWidth / 2
         path.reset()
-        path.corner(inset, inset, left = true, top = true, clockWise = true, radius)
-        path.corner(width - inset, inset, left = false, top = true, clockWise = true, radius)
-        path.corner(width - inset, height - inset, left = false, top = false, clockWise = true, radius)
-        path.corner(inset, height - inset, left = true, top = false, clockWise = true, radius)
+        path.corner(0f, 0f, left = true, top = true, clockWise = true, radius)
+        path.corner(width, 0f, left = false, top = true, clockWise = true, radius)
+        path.corner(width, height, left = false, top = false, clockWise = true, radius)
+        path.corner(0f, height, left = true, top = false, clockWise = true, radius)
         path.close()
     }
 
     override fun draw(canvas: Canvas, paint: Paint) {
-        paint.strokeWidth = strokeWidth
-        paint.style = when (strokeWidth) {
-            0f -> Paint.Style.FILL
-            else -> Paint.Style.STROKE
-        }
+        paint.style = Paint.Style.FILL
         canvas.drawPath(path, paint)
     }
 

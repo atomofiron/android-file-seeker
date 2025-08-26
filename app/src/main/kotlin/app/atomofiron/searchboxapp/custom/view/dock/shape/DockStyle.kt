@@ -4,10 +4,9 @@ import android.graphics.Color
 
 data class DockStyle(
     val fill: Int,
-    val transparent: Boolean,
-    val strokeWidth: Float,
+    val translucent: Boolean,
 ) {
     companion object {
-        val Stub = DockStyle(Color.TRANSPARENT, true, 0f)
+        val Stub = DockStyle(Color.TRANSPARENT, true)
     }
 }

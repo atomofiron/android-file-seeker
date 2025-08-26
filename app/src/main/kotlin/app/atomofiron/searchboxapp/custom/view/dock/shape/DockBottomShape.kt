@@ -15,7 +15,6 @@ import app.atomofiron.common.util.extension.corner
 
 class DockBottomShape(
     private val corners: Float,
-    private val stroke: Int,
     private var style: DockStyle = DockStyle.Stub,
     private var notch: DockNotch? = null,
 ) : Drawable() {
@@ -47,18 +46,12 @@ class DockBottomShape(
     }
 
     override fun draw(canvas: Canvas) {
-        if (style.transparent) {
+        if (style.translucent) {
             return
         }
         if (style.fill != Color.TRANSPARENT) {
             paint.style = Paint.Style.FILL
             paint.color = style.fill
-            canvas.drawPath(path, paint)
-        }
-        if (stroke != Color.TRANSPARENT && style.strokeWidth > 0f) {
-            paint.style = Paint.Style.STROKE
-            paint.color = stroke
-            paint.strokeWidth = style.strokeWidth
             canvas.drawPath(path, paint)
         }
     }
@@ -67,7 +60,7 @@ class DockBottomShape(
 
     @Suppress("DEPRECATION")
     override fun getOutline(outline: Outline) = when {
-        style.transparent -> Unit
+        style.translucent -> Unit
         Android.R -> outline.setPath(path)
         else -> Unit
     }
@@ -84,16 +77,12 @@ class DockBottomShape(
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 
     private fun updatePath() = path.run {
-        val inset = when (stroke) {
-            Color.TRANSPARENT -> 0f
-            else -> style.strokeWidth / 2
-        }
         rect.set(bounds)
-        var x = rect.left + inset
+        var x = rect.left
         var y = rect.bottom
         reset()
         moveTo(x, y)
-        y = rect.top + inset
+        y = rect.top
         corner(x, y, top = true, left = true, clockWise = true, radius = corners)
         notch?.let { notch ->
             x = rect.left + rect.width() / 2 - notch.radius
@@ -105,7 +94,7 @@ class DockBottomShape(
             y -= notch.height
             corner(x, y, left = true, top = true, clockWise = true, corners)
         }
-        x = rect.right - inset
+        x = rect.right
         y = rect.top
         corner(x, y, left = false, top = true, clockWise = true, corners)
         y = rect.bottom

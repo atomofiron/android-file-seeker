@@ -62,10 +62,8 @@ class DockViewImpl(
     private val contentPadding = resources.getDimensionPixelSize(R.dimen.content_margin)
     private val notchInset = resources.getDimension(R.dimen.dock_notch_inset)
     private var layoutDecorator = LayoutDecoration(adapter, itemConfig)
-    private val strokeColor = context.findColorByAttr(MaterialAttr.strokeColor)
     private val shape = DockBottomShape(
         corners = resources.getDimension(R.dimen.dock_overlay_corner),
-        stroke = strokeColor,
         style = DockStyle.Stub,
     )
     private val mutableItems = mutableListOf<DockItem>()
@@ -121,7 +119,7 @@ class DockViewImpl(
                     mode.isBottom -> height -= measuredHeight
                     else -> width -= measuredWidth
                 }
-                submit(config = itemConfig.copy(popup = DockPopupConfig(mode.ground, width, height, strokeColor, animated = canDrawShadow, itemConfig.popup.style)))
+                submit(config = itemConfig.copy(popup = DockPopupConfig(mode.ground, width, height, animated = canDrawShadow, itemConfig.popup.style)))
             }
         }
         mode?.updateDecoration()
@@ -142,9 +140,9 @@ class DockViewImpl(
 
     override fun setStyle(style: DockStyle) {
         shape.setStyle(style)
-        val colors = colors.copy(default = if (style.transparent) style.fill else Color.TRANSPARENT)
+        val colors = colors.copy(default = if (style.translucent) style.fill else Color.TRANSPARENT)
         val insets = when {
-            style.transparent -> Insets.of(contentPadding - padding, padding, contentPadding - padding, padding)
+            style.translucent -> Insets.of(contentPadding - padding, padding, contentPadding - padding, padding)
             else -> Insets.of(padding, padding, padding, padding)
         }
         val new = itemConfig.copy(

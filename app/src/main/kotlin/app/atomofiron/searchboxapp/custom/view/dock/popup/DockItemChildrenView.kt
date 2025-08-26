@@ -6,7 +6,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Outline
 import android.graphics.Path
-import android.graphics.drawable.LayerDrawable
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.MotionEvent
@@ -83,7 +82,7 @@ class DockItemChildrenView(
         ghost.icon.setImageDrawable(ghostDrawable)
         ghost.icon.foreground = crossDrawable // LayerDrawable make alpha always 255, overriding of LayerDrawable doesn't help
         ghost.button.clipChildren = false
-        childrenView.outlineProvider = ChildrenOutlineProvider(corner, config.popup.ground, config.popup.style.strokeWidth.roundToInt())
+        childrenView.outlineProvider = ChildrenOutlineProvider(corner)
         childrenView.clipToOutline = true
         childrenView.elevation = 0f
         childrenView.setListener(::onSelect)
@@ -100,10 +99,7 @@ class DockItemChildrenView(
         animator.addUpdateListener(this)
         animator.interpolator = DecelerateInterpolator()
         val style = config.popup.style
-        background = LayerDrawable(arrayOf(
-            PathDrawable.stroke(combinedPath, config.popup.stroke, style.strokeWidth * 2),
-            PathDrawable.fill(combinedPath, style.fill),
-        ))
+        background = PathDrawable.fill(combinedPath, style.fill)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -249,42 +245,19 @@ class DockItemChildrenView(
 
     private fun updateBackgroundPath() = backgroundPath.run {
         val ground = config.popup.ground
-        val inset = config.popup.style.strokeWidth
-        var closeLeft = ghost.root.x - offset
-        var closeTop = ghost.root.y - offset
-        var closeRight = closeLeft + config.width + offset * 2
-        var closeBottom = closeTop + config.height + offset * 2
-        var popupLeft = childrenView.x
-        var popupTop = childrenView.y
-        var popupRight = popupLeft + childrenView.width
-        var popupBottom = popupTop + childrenView.height
+        val closeLeft = ghost.root.x - offset
+        val closeTop = ghost.root.y - offset
+        val closeRight = closeLeft + config.width + offset * 2
+        val closeBottom = closeTop + config.height + offset * 2
+        val popupLeft = childrenView.x
+        val popupTop = childrenView.y
+        val popupRight = popupLeft + childrenView.width
+        val popupBottom = popupTop + childrenView.height
         val distance = corner * 2
         val topLeft = !nearby(distance, popupLeft, popupTop, closeRight, closeTop)
         val topRight = !nearby(distance, popupRight, popupTop, closeLeft, closeTop)
         val bottomRight = !nearby(distance, popupRight, popupBottom, closeRight, closeTop, closeLeft, closeBottom)
         val bottomLeft = !nearby(distance, popupLeft, popupBottom, closeLeft, closeTop, closeRight, closeBottom)
-        closeBottom -= inset
-        popupTop += inset
-        when (ground) {
-            Ground.Bottom -> {
-                closeLeft += inset
-                closeRight -= inset
-                popupLeft += inset
-                popupRight -= inset
-            }
-            Ground.Right -> {
-                closeTop += inset
-                closeRight -= inset
-                popupLeft += inset
-                popupBottom -= inset
-            }
-            Ground.Left -> {
-                closeLeft += inset
-                closeTop += inset
-                popupRight -= inset
-                popupBottom -= inset
-            }
-        }
         reset()
         when (ground) {
             Ground.Bottom -> {
@@ -321,18 +294,9 @@ class DockItemChildrenView(
         close()
     }
 
-    private class ChildrenOutlineProvider(
-        private val corner: Float,
-        private val ground: Ground,
-        private val strokeWidth: Int,
-    ) : ViewOutlineProvider() {
+    private class ChildrenOutlineProvider(private val corner: Float) : ViewOutlineProvider() {
         override fun getOutline(view: View, outline: Outline) {
-            val (left, right, bottom) = when (ground) {
-                Ground.Left -> Triple(0, strokeWidth, strokeWidth)
-                Ground.Right -> Triple(strokeWidth, 0, strokeWidth)
-                Ground.Bottom -> Triple(strokeWidth, strokeWidth, 0)
-            }
-            outline.setRoundRect(left, strokeWidth, view.width - right, view.height - bottom, corner)
+            outline.setRoundRect(0, 0, view.width, view.height, corner)
         }
     }
 }

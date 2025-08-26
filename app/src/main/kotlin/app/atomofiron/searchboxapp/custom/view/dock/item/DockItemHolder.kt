@@ -28,7 +28,6 @@ class DockItemHolder(
     private val drawable = DockItemDrawable(
         ripple = binding.root.context.findColorByAttr(MaterialAttr.colorControlHighlight),
         corners = binding.root.resources.getDimension(R.dimen.dock_item_corner),
-        stroke = binding.root.resources.getDimension(R.dimen.dock_item_stroke),
     )
 
     init {
