@@ -62,7 +62,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private val manager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     private lateinit var controller: WindowInsetsControllerCompat
-    private val delegate = InsetsAnimator { focusedView != null }
+    private val delegate = InsetsAnimator(anyFocused = { focusedView != null }, gesture = { tracking.vertical })
     private val callback = KeyboardInsetCallback(KeyboardListener(), delegate.keyboardListener)
     private var isControlling = false // onReady is too slow
 

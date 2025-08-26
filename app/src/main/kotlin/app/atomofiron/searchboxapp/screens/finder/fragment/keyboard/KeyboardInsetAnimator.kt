@@ -13,6 +13,7 @@ const val KEYBOARD_DURATION = 256L
 
 class InsetsAnimator(
     private val anyFocused: () -> Boolean,
+    private val gesture: () -> Boolean,
 ) : WindowInsetsAnimationControlListenerCompat {
 
     val keyboardListener: KeyboardInsetListener = KeyboardListener()
@@ -30,6 +31,7 @@ class InsetsAnimator(
         keyboardMax = controller.shownStateInsets.bottom
         keyboardMin = controller.hiddenStateInsets.bottom
         toVisible = anyFocused() // this is valid because the onReady is called quite late
+        if (!gesture()) start(toVisible)
     }
 
     override fun onFinished(controller: WindowInsetsAnimationControllerCompat) {
