@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.utils.isRtl
 import kotlin.math.abs
 import app.atomofiron.common.util.progressionTo
 import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
+import app.atomofiron.searchboxapp.utils.performHapticLite
 
 private data class State(
     val toChecked: Boolean,
@@ -82,7 +83,7 @@ class SwipeMarkerDelegate(resources: Resources) {
             checkBox.isChecked = state.toChecked
         }
         this@SwipeMarkerDelegate.state = state.copy(prevIndex = index)
-        if (toggled) performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+        if (toggled) performHapticLite()
         return true
     }
 

@@ -8,6 +8,7 @@ import androidx.core.view.HapticFeedbackConstantsCompat.TOGGLE_OFF
 import androidx.core.view.HapticFeedbackConstantsCompat.TOGGLE_ON
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.SwitchPreferenceCompat
+import app.atomofiron.searchboxapp.utils.performHapticEffect
 import java.lang.ref.WeakReference
 
 class HapticSwitchPreference : SwitchPreferenceCompat {
@@ -33,7 +34,7 @@ class HapticSwitchPreference : SwitchPreferenceCompat {
                     !allowed -> REJECT
                     newValue -> TOGGLE_ON
                     else -> TOGGLE_OFF
-                }.let { view.get()?.performHapticFeedback(it) }
+                }.let { view.get()?.performHapticEffect(it) }
             }
     }
 }

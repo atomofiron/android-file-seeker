@@ -31,6 +31,7 @@ import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
 import app.atomofiron.searchboxapp.utils.isRtl
+import app.atomofiron.searchboxapp.utils.performHapticLite
 import app.atomofiron.searchboxapp.utils.toIntAlpha
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.textview.MaterialTextView
@@ -287,7 +288,7 @@ class DangerousSliderView @JvmOverloads constructor(
         borderPath.addRoundRect(borderInsetLeft, inset, width - borderInsetRight, height - inset, cornerRadius, cornerRadius, Path.Direction.CW)
         borderPaint.color = endBorderColor withAlpha alpha over startBorderColor
         if (hapticAllowed && (progress == END || progress == START)) {
-            button.performHapticFeedback(HapticFeedbackConstants.CLOCK_TICK)
+            button.performHapticLite()
             hapticAllowed = false
         }
         hapticAllowed = hapticAllowed || (progress in HapticRange && !bounceAnimator.isRunning)

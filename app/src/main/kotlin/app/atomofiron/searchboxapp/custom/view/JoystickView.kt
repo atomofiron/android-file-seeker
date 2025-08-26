@@ -23,6 +23,7 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
+import app.atomofiron.searchboxapp.utils.performHapticEffect
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sin
@@ -179,7 +180,7 @@ class JoystickView @JvmOverloads constructor(
 
     private fun press() {
         trackTouches = true
-        performHapticFeedback(composition.haptic.effect(press = true))
+        performHapticEffect(composition.haptic.effect(press = true))
         play(RELEASED, PRESSED)
         pressure = 1f
         invalidate()
@@ -187,7 +188,7 @@ class JoystickView @JvmOverloads constructor(
 
     private fun release() {
         trackTouches = false
-        performHapticFeedback(composition.haptic.effect(press = false))
+        performHapticEffect(composition.haptic.effect(press = false))
         play(PRESSED, RELEASED)
     }
 

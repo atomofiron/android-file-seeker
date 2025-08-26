@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.SeekBar
+import androidx.core.view.isVisible
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
@@ -18,6 +19,9 @@ import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.context
+import app.atomofiron.searchboxapp.utils.hasHaptic
+import app.atomofiron.searchboxapp.utils.performHapticEffect
 import lib.atomofiron.insets.insetsPadding
 
 class JoystickDelegate(
@@ -56,6 +60,9 @@ class JoystickDelegate(
         hapticScale.setOnSeekBarChangeListener(listener)
         btnDefault.setOnClickListener(listener)
         colorPicker.setStrokedBackground(vertical = R.dimen.padding_half)
+        val hasHaptic = context.hasHaptic()
+        hapticScaleTitle.isVisible = hasHaptic
+        hapticScale.isVisible = hasHaptic
 
         bind(entity)
     }
@@ -102,9 +109,9 @@ class JoystickDelegate(
             entity = entity.copy(haptic = haptic)
             preferenceStore { setJoystickComposition(entity) }
             isHapticFeedbackEnabled = true
-            performHapticFeedback(haptic.effect(press = true))
+            performHapticEffect(haptic.effect(press = true))
             postDelayed({
-                performHapticFeedback(haptic.effect(press = false))
+                performHapticEffect(haptic.effect(press = false))
             }, Const.SMALL_DELAY)
         }
 

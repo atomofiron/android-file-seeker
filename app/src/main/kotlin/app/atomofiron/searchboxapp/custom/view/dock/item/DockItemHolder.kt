@@ -17,6 +17,7 @@ import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Companion.setMu
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Icon
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Label
+import app.atomofiron.searchboxapp.utils.performHapticLite
 
 class DockItemHolder(
     private val binding: ItemDockBinding,
@@ -95,6 +96,6 @@ class DockItemHolder(
                 }
             })
         }
-        ViewCompat.performHapticFeedback(root, HapticFeedbackConstantsCompat.CLOCK_TICK)
+        root.performHapticLite()
     }
 }
