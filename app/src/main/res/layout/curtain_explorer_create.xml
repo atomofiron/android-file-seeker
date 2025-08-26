@@ -27,7 +27,6 @@
         android:layout_margin="@dimen/padding_common"
         android:hint="@string/a_name"
         app:layout_constraintTop_toBottomOf="@+id/explorer_create_tv"
-        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         >
         <app.atomofiron.searchboxapp.custom.view.TextField
             android:id="@+id/text_field"

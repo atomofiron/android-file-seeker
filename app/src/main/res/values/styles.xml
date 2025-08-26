@@ -29,9 +29,7 @@
 		<item name="isDarkTheme">@bool/isNightTheme</item>
 		<item name="materialCardViewStyle">@style/CardViewStyle</item>
 		<item name="chipStyle">@style/ChipStyle</item>
-		<item name="materialButtonOutlinedStyle">@style/OutlinedButtonStyle</item>
-		<item name="textInputStyle">@style/TextInputLayoutOutlinedBox</item>
-		<item name="textInputOutlinedDenseStyle">@style/TextInputLayoutOutlinedBox.Dense</item>
+		<item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.FilledBox</item>
 
 		<item name="colorControlHighlight" tools:ignore="PrivateResource">@color/mtrl_btn_text_btn_ripple_color</item>
 		<item name="strokeColor">?colorSurfaceVariant</item>
@@ -76,7 +74,6 @@
 		<item name="topRadioGroupBackground">@color/black</item>
 		<item name="isBlackDeep">true</item>
 
-		<item name="materialCardViewStyle">@style/CardViewStyle.Amoled</item>
 		<item name="appBarLayoutStyle">@style/AppBarLayoutStyle.Amoled</item>
 		<item name="collapsingToolbarLayoutStyle">@style/CollapsingToolbarLayoutStyle.Amoled</item>
 	</style>
@@ -90,7 +87,6 @@
 		<item name="topRadioGroupBackground">@color/black</item>
 		<item name="isBlackDeep">true</item>
 
-		<item name="materialCardViewStyle">@style/CardViewStyle.Amoled</item>
 		<item name="appBarLayoutStyle">@style/AppBarLayoutStyle.Amoled</item>
 		<item name="collapsingToolbarLayoutStyle">@style/CollapsingToolbarLayoutStyle.Amoled</item>
 	</style>
@@ -101,27 +97,14 @@
 
 	<style name="CardViewStyle" parent="@style/Widget.Material3.CardView.Elevated" />
 
-	<style name="CardViewStyle.Amoled" parent="@style/Widget.Material3.CardView.Elevated" />
-
 	<style name="AppBarLayoutStyle.Amoled" parent="@style/Widget.Material3.AppBarLayout" />
 
 	<style name="CollapsingToolbarLayoutStyle.Amoled" parent="@style/Widget.Material3.CollapsingToolbar.Large" />
 
-	<style name="OutlinedButtonStyle" parent="@style/Widget.Material3.Button.OutlinedButton">
-		<item name="strokeColor">@color/stroke</item>
-	</style>
-
 	<style name="ChipStyle" parent="@style/Widget.Material3.Chip.Assist">
-		<item name="chipStrokeColor">@color/stroke</item>
+		<item name="chipStrokeColor">?colorSurfaceVariant</item>
 		<item name="chipIconTint">@color/m3_chip_text_color</item>
 	</style>
-
-	<style name="TextInputLayoutOutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-		<item name="boxStrokeColor">@color/bg_edit_text_outlined</item>
-		<item name="shapeAppearance">@style/ShapeAppearance.Corners</item>
-	</style>
-
-	<style name="TextInputLayoutOutlinedBox.Dense" parent="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense" />
 
 	<style name="ShapeAppearance.Corners" parent="ShapeAppearance.MaterialComponents.SmallComponent">
 		<item name="cornerFamily">rounded</item>

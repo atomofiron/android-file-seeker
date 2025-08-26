@@ -13,7 +13,6 @@
         android:layout_marginTop="@dimen/padding_half"
         android:layout_marginHorizontal="@dimen/padding_common"
         android:hint="@string/a_name"
-        style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         >
         <app.atomofiron.searchboxapp.custom.view.TextField
             android:id="@+id/text_field"

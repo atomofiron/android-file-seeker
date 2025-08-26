@@ -8,8 +8,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerCardBinding
+import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
@@ -47,6 +49,9 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     init {
         binding.cardTitle.setTextColor(colors)
         binding.cardThumbnail.clipToOutline = true
+        if (context.isDarkDeep()) {
+            binding.root.setCardBackgroundColor(context.colorSurfaceContainer())
+        }
     }
 
     override fun onBind(item: NodeRoot, position: Int) = binding.run {

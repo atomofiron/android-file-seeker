@@ -10,7 +10,6 @@
     android:clipChildren="false"
     android:clickable="false"
     android:focusable="false"
-    style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
     >
     <app.atomofiron.searchboxapp.custom.view.TextField
         android:id="@+id/field"

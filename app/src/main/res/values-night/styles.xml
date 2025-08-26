@@ -32,11 +32,6 @@
 
     <style name="CardViewStyle" parent="@style/Widget.Material3.CardView.Filled" />
 
-    <style name="CardViewStyle.Amoled" parent="@style/Widget.Material3.CardView.Outlined">
-        <item name="cardBackgroundColor">?colorBackground</item>
-        <item name="strokeColor">@color/stroke</item>
-    </style>
-
     <style name="AppBarLayoutStyle.Amoled" parent="@style/Widget.Material3.AppBarLayout">
         <item name="android:background">@color/black</item>
     </style>
@@ -45,20 +40,9 @@
         <item name="contentScrim">@color/black</item>
     </style>
 
-    <style name="OutlinedButtonStyle" parent="@style/Widget.Material3.Button.OutlinedButton">
-        <item name="strokeColor">@color/stroke</item>
-    </style>
-
     <style name="ChipStyle" parent="@style/Widget.Material3.Chip.Assist">
-        <item name="chipStrokeColor">@color/stroke</item>
+        <item name="chipStrokeColor">?colorSurfaceVariant</item>
         <item name="chipIconTint">@color/m3_chip_text_color</item>
     </style>
-
-    <style name="TextInputLayoutOutlinedBox" parent="Widget.Material3.TextInputLayout.OutlinedBox">
-        <item name="boxStrokeColor">@color/bg_edit_text_outlined</item>
-        <item name="shapeAppearance">@style/ShapeAppearance.Corners</item>
-    </style>
-
-    <style name="TextInputLayoutOutlinedBox.Dense" parent="Widget.Material3.TextInputLayout.OutlinedBox.Dense" />
 
 </resources>
