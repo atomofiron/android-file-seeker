@@ -156,7 +156,7 @@ private fun TextInputLayout.showErrorIf(message: String?) {
 }
 
 private class FilledDelegate(
-    textLayout: TextInputLayout,
+    private val textLayout: TextInputLayout,
     private val textField: EditText,
     private val filledColor: Int,
     private val strokeWidth: Int,
@@ -177,9 +177,13 @@ private class FilledDelegate(
         if (filledColor != Color.TRANSPARENT) background.fillColor = ColorStateList.valueOf(filledColor)
         background.strokeColor = ColorStateList.valueOf(Color.TRANSPARENT)
         background.strokeWidth = 0f
-        return when {
-            textField.isFocused -> HybridTextLayoutDrawable(background, strokeWidth, focusedStrokeColor, radius)
-            else -> background
+        if (!textField.isFocused) {
+            return background
         }
+        val strokeColor = textLayout.boxStrokeErrorColor
+            ?.takeIf { textLayout.error != null }
+            ?.defaultColor
+            ?: focusedStrokeColor
+        return HybridTextLayoutDrawable(background, strokeWidth, strokeColor, radius)
     }
 }
