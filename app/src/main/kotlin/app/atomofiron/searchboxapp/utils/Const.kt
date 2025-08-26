@@ -27,7 +27,7 @@ object Const {
     const val MIME_TYPE = "mimeType"
     const val DATE_PATTERN = "yyyy-MM-dd_HH-mm-ss"
     const val MIME_TEXT = "text/plain"
-    const val GITHUB_URL = "https://github.com/Atomofiron/android-search-box-app"
+    const val GITHUB_URL = "https://github.com/atomofiron/android-file-seeker"
     const val FORPDA_URL = "https://4pda.to/forum/index.php?showtopic=1000070&view=findpost&p=98557921"
 
     const val TEXT_FILE_PAGINATION_STEP = 128
