@@ -16,23 +16,24 @@
         app:layout_constraintTop_toTopOf="parent"
         >
         <include
-            android:id="@+id/preference_explorer_dir"
+            android:id="@+id/explorer_dir"
             layout="@layout/item_explorer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />
         <include
-            android:id="@+id/preference_explorer_file"
+            android:id="@+id/explorer_file"
             layout="@layout/item_explorer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />
     </LinearLayout>
     <com.google.android.flexbox.FlexboxLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingTop="@dimen/padding_half"
+        android:paddingHorizontal="@dimen/padding_semi"
         app:flexWrap="wrap"
         app:flexDirection="row"
         app:layout_constraintStart_toStartOf="parent"
@@ -40,68 +41,95 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         >
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/preference_date"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_semi"
+            android:layout_marginHorizontal="@dimen/padding_mini"
+            android:checkable="true"
             android:text="@string/date"
+            app:chipIcon="@drawable/ic_calendar_range"
+            app:chipMinTouchTargetSize="@dimen/chip_area"
             />
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/preference_time"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_semi"
+            android:layout_marginHorizontal="@dimen/padding_mini"
+            android:checkable="true"
             android:text="@string/time"
+            app:chipIcon="@drawable/ic_clock"
+            app:chipMinTouchTargetSize="@dimen/chip_area"
             />
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/preference_access"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/access"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_semi"
+            android:layout_marginHorizontal="@dimen/padding_mini"
+            android:checkable="true"
             android:text="drwxrwx---"
+            app:chipIcon="@drawable/ic_security"
+            app:chipMinTouchTargetSize="@dimen/chip_area"
             />
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/preference_owner"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/owner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_semi"
+            android:layout_marginHorizontal="@dimen/padding_mini"
+            android:checkable="true"
             android:text="@string/owner"
+            app:chipIcon="@drawable/ic_account"
+            app:chipMinTouchTargetSize="@dimen/chip_area"
             />
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/preference_group"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_semi"
+            android:layout_marginHorizontal="@dimen/padding_mini"
+            android:checkable="true"
             android:text="@string/group"
+            app:chipIcon="@drawable/ic_account_group"
+            app:chipMinTouchTargetSize="@dimen/chip_area"
             />
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/preference_details"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_semi"
+            android:layout_marginHorizontal="@dimen/padding_mini"
+            android:checkable="true"
             android:text="@string/item_explorer_details"
+            app:chipIcon="@drawable/ic_info"
+            app:chipMinTouchTargetSize="@dimen/chip_area"
             />
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/preference_size"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_semi"
+            android:layout_marginHorizontal="@dimen/padding_mini"
+            android:checkable="true"
             android:text="@string/size"
+            app:chipIcon="@drawable/ic_weight"
+            app:chipMinTouchTargetSize="@dimen/chip_area"
             />
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/preference_box"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_semi"
+            android:layout_marginHorizontal="@dimen/padding_mini"
+            android:checkable="true"
             android:text="@string/empty_check_box"
+            app:chipIcon="@drawable/ic_checkbox_outline"
+            app:chipMinTouchTargetSize="@dimen/chip_area"
             />
-        <com.google.android.material.checkbox.MaterialCheckBox
-            android:id="@+id/preference_bg"
+        <com.google.android.material.chip.Chip
+            android:id="@+id/alternating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingEnd="@dimen/padding_semi"
+            android:layout_marginHorizontal="@dimen/padding_mini"
+            android:checkable="true"
             android:text="@string/item_explorer_background"
+            app:chipIcon="@drawable/ic_list"
+            app:chipMinTouchTargetSize="@dimen/chip_area"
             />
     </com.google.android.flexbox.FlexboxLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

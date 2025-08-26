@@ -57,37 +57,37 @@ class ExplorerItemDelegate(
     }
 
     private fun CurtainPreferenceExplorerItemBinding.init() {
-        preferenceDetails.isChecked = composition.visibleDetails
-        preferenceAccess.isChecked = composition.visibleAccess
-        preferenceOwner.isChecked = composition.visibleOwner
-        preferenceGroup.isChecked = composition.visibleGroup
-        preferenceDate.isChecked = composition.visibleDate
-        preferenceTime.isChecked = composition.visibleTime
-        preferenceSize.isChecked = composition.visibleSize
-        preferenceBox.isChecked = composition.visibleBox
-        preferenceBg.isChecked = composition.visibleBg
+        details.isChecked = composition.visibleDetails
+        access.isChecked = composition.visibleAccess
+        owner.isChecked = composition.visibleOwner
+        group.isChecked = composition.visibleGroup
+        date.isChecked = composition.visibleDate
+        time.isChecked = composition.visibleTime
+        size.isChecked = composition.visibleSize
+        box.isChecked = composition.visibleBox
+        alternating.isChecked = composition.visibleBg
 
         demoItems.setStrokedBackground(vertical = R.dimen.padding_half)
-        val dirBinder = ExplorerItemBinderImpl(preferenceExplorerDir.root)
-        val fileBinder = ExplorerItemBinderImpl(preferenceExplorerFile.root)
+        val dirBinder = ExplorerItemBinderImpl(explorerDir.root)
+        val fileBinder = ExplorerItemBinderImpl(explorerFile.root)
         val holders = arrayOf(dirBinder, fileBinder)
         val onClickListener = Listener(*holders)
-        preferenceDetails.setOnClickListener(onClickListener)
-        preferenceAccess.setOnClickListener(onClickListener)
-        preferenceOwner.setOnClickListener(onClickListener)
-        preferenceGroup.setOnClickListener(onClickListener)
-        preferenceDate.setOnClickListener(onClickListener)
-        preferenceTime.setOnClickListener(onClickListener)
-        preferenceSize.setOnClickListener(onClickListener)
-        preferenceBox.setOnClickListener(onClickListener)
-        preferenceBg.setOnClickListener(onClickListener)
+        details.setOnClickListener(onClickListener)
+        access.setOnClickListener(onClickListener)
+        owner.setOnClickListener(onClickListener)
+        group.setOnClickListener(onClickListener)
+        date.setOnClickListener(onClickListener)
+        time.setOnClickListener(onClickListener)
+        size.setOnClickListener(onClickListener)
+        box.setOnClickListener(onClickListener)
+        alternating.setOnClickListener(onClickListener)
 
         dirBinder.bind(dir)
         fileBinder.bind(file)
         holders.bind()
 
-        preferenceExplorerDir.itemExplorerIvIcon.alpha = Alpha.VISIBLE
-        preferenceExplorerDir.itemExplorerTvSize.text = dir.size
+        explorerDir.itemExplorerIvIcon.alpha = Alpha.VISIBLE
+        explorerDir.itemExplorerTvSize.text = dir.size
     }
 
     private fun Array<out ExplorerItemBinder>.bind() {
@@ -106,15 +106,15 @@ class ExplorerItemDelegate(
             view as CompoundButton
             val isChecked = view.isChecked
             composition = when (view.id) {
-                R.id.preference_details -> composition.copy(visibleDetails = isChecked)
-                R.id.preference_access -> composition.copy(visibleAccess = isChecked)
-                R.id.preference_owner -> composition.copy(visibleOwner = isChecked)
-                R.id.preference_group -> composition.copy(visibleGroup = isChecked)
-                R.id.preference_date -> composition.copy(visibleDate = isChecked)
-                R.id.preference_time -> composition.copy(visibleTime = isChecked)
-                R.id.preference_size -> composition.copy(visibleSize = isChecked)
-                R.id.preference_box -> composition.copy(visibleBox = isChecked)
-                R.id.preference_bg -> composition.copy(visibleBg = isChecked)
+                R.id.details -> composition.copy(visibleDetails = isChecked)
+                R.id.access -> composition.copy(visibleAccess = isChecked)
+                R.id.owner -> composition.copy(visibleOwner = isChecked)
+                R.id.group -> composition.copy(visibleGroup = isChecked)
+                R.id.date -> composition.copy(visibleDate = isChecked)
+                R.id.time -> composition.copy(visibleTime = isChecked)
+                R.id.size -> composition.copy(visibleSize = isChecked)
+                R.id.box -> composition.copy(visibleBox = isChecked)
+                R.id.alternating -> composition.copy(visibleBg = isChecked)
                 else -> throw Exception()
             }
             binders.bind()

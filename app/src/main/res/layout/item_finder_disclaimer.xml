@@ -8,7 +8,7 @@
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/ic_info_outline"
+        android:src="@drawable/ic_info"
         android:tint="?attr/colorContent"
         />
     <com.google.android.material.textview.MaterialTextView
