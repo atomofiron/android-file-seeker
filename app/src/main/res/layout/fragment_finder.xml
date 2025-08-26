@@ -11,7 +11,7 @@
 		android:layout_height="match_parent"
 		android:background="?android:windowBackground"
 		>
-		<androidx.recyclerview.widget.RecyclerView
+		<app.atomofiron.searchboxapp.custom.view.layout.MeasuringRecyclerView
 			android:id="@+id/recycler_view"
 			android:layout_width="match_parent"
 			android:layout_height="match_parent"

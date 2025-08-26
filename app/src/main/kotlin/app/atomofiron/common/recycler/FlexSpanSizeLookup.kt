@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.extension.ceilToInt
 import app.atomofiron.common.util.extension.clear
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.view.layout.MeasuringRecyclerView
 
 private const val COLUMNS = 144u
 private const val COLUMNS_INT = 144
@@ -30,16 +31,13 @@ interface AdapterHolderListener {
 }
 
 class FlexSpanSizeLookup(
-    recyclerView: RecyclerView?,
+    recyclerView: MeasuringRecyclerView?,
     private val adapter: ListAdapter<out GeneralItem, *>,
     private val manager: GridLayoutManager,
     resources: Resources,
-)  : GridLayoutManager.SpanSizeLookup()
-    , AdapterHolderListener
-    , View.OnLayoutChangeListener
-{
+)  : GridLayoutManager.SpanSizeLookup(), AdapterHolderListener {
 
-    lateinit var recycler: RecyclerView
+    private lateinit var recycler: MeasuringRecyclerView
     private val portraitWidth = resources.getDimension(R.dimen.screen_compact)
     private val itemCount get() = adapter.itemCount
     private val holders = mutableListOf<Holder>()
@@ -52,14 +50,16 @@ class FlexSpanSizeLookup(
     private val repeatTrigger = this@FlexSpanSizeLookup.RepeatTrigger()
 
     init {
-        if (recyclerView != null) {
-            recycler = recyclerView
-            recyclerView.addOnLayoutChangeListener(this)
-            updateArea(resources.displayMetrics.widthPixels)
-        }
+        if (recyclerView != null) setRecyclerView(recyclerView)
         manager.spanCount = COLUMNS_INT
         manager.spanSizeLookup = this
         adapter.registerAdapterDataObserver(this@FlexSpanSizeLookup.ItemObserver())
+    }
+
+    fun setRecyclerView(view: MeasuringRecyclerView) {
+        if (::recycler.isInitialized) throw IllegalStateException()
+        recycler = view
+        view.addMeasureListener { width, _ -> updateArea(width) }
     }
 
     override fun onCreate(holder: Holder, viewType: Int) {
@@ -77,17 +77,7 @@ class FlexSpanSizeLookup(
         }
     }
 
-    fun onMeasure(width: Int) {
-        if (availableArea == 0f) {
-            updateArea(width)
-        }
-    }
-
-    override fun onLayoutChange(v: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
-        updateArea(right - left)
-    }
-
-    private fun updateArea(width: Int = recycler.width) {
+    private fun updateArea(width: Int = recycler.availableWidth) {
         val available = width.toFloat() - recycler.run { paddingStart + paddingEnd }
         if (available > 0 && available != availableArea) {
             availableArea = available

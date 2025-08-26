@@ -60,11 +60,10 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         layoutManager.reverseLayout = true
         binding.recyclerView.run {
             addItemDecoration(SectionBackgroundDecorator(context, FinderStateItem.groups))
-            addOnLayoutChangeListener(spanSizeLookup)
             layoutManager = this@FinderFragment.layoutManager
             itemAnimator = null
             adapter = finderAdapter
-            spanSizeLookup.recycler = this
+            spanSizeLookup.setRecyclerView(this)
         }
         binding.root.setWindow(requireActivity().window)
         binding.drawer.run {
@@ -101,9 +100,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     }
 
     override fun FragmentFinderBinding.onApplyInsets() {
-        root.apply(recyclerView = recyclerView) {
-            spanSizeLookup.onMeasure(it)
-        }
+        root.apply(recyclerView = recyclerView)
     }
 
     override fun onBack(soft: Boolean): Boolean {

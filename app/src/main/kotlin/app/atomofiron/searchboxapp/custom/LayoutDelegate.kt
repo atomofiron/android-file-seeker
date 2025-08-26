@@ -125,11 +125,11 @@ object LayoutDelegate {
 
     private fun MeasureProvider.addLayoutListener(callback: (width: Int, Layout) -> Unit) {
         val display = view.context.getDisplayCompat()
-        var widthWas = 0
+        var was: Layout? = null
         addMeasureListener { width, height ->
-            if (width != widthWas) {
-                widthWas = width
-                val layout = view.getLayout(width, height, display)
+            val layout = view.getLayout(width, height, display)
+            if (layout != was) {
+                was = layout
                 callback(width, layout)
             }
         }
@@ -138,11 +138,11 @@ object LayoutDelegate {
     fun View.setScreenSizeListener(listener: (width: ScreenSize, height: ScreenSize) -> Unit) {
         var heightWas: ScreenSize? = null
         var verticalWas: ScreenSize? = null
+        val compactThreshold = resources.getDimensionPixelSize(R.dimen.screen_compact)
+        val mediumThreshold = resources.getDimensionPixelSize(R.dimen.screen_medium)
         addOnLayoutChangeListener { view, left, top, right, bottom, _, _, _, _ ->
             val width = right - left
             val height = bottom - top
-            val compactThreshold = view.resources.getDimensionPixelSize(R.dimen.screen_compact)
-            val mediumThreshold = view.resources.getDimensionPixelSize(R.dimen.screen_medium)
             val horizontal = when {
                 width < compactThreshold -> ScreenSize.Compact
                 width < mediumThreshold -> ScreenSize.Medium

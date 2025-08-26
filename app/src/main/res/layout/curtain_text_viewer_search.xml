@@ -15,7 +15,7 @@
         android:layout_marginBottom="@dimen/padding_half"
         />
 
-    <androidx.recyclerview.widget.RecyclerView
+    <app.atomofiron.searchboxapp.custom.view.layout.MeasuringRecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
