@@ -70,7 +70,7 @@ class EditOptionsHolder(
         val items = mutableListOf(Item(!item.toggles.ignoreCase), Item(item.toggles.useRegex))
         if (!isLocal) {
             items.add(Item(isChecked = item.contentSearch))
-            items.add(Item(isChecked = item.excludeDirs, isEnabled = !item.excludeDirs || !item.contentSearch))
+            items.add(Item(isChecked = item.excludeDirs, isEnabled = !item.contentSearch))
         }
         adapter.submit(items)
     }
