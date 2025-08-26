@@ -1,5 +1,5 @@
 [versions]
-agp = "8.9.3"
+agp = "8.12.1"
 ksp = "2.2.10-2.0.2"
 kapt = "2.2.10"
 kotlin = "2.2.10"
@@ -78,4 +78,3 @@ serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref 
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kapt" }
-
