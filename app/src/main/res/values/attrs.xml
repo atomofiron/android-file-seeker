@@ -8,6 +8,7 @@
     <attr name="colorFieldDivider" format="color" />
     <attr name="colorOverlay" format="color" />
     <attr name="topRadioGroupBackground" format="color" />
+    <attr name="materialTonalButton" format="color" />
 
     <declare-styleable name="DrawerView">
         <attr name="title" format="string" />

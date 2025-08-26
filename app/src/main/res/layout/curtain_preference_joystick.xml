@@ -88,7 +88,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:text="@string/by_default"
-            style="?materialButtonOutlinedStyle"
+            style="?materialTonalButton"
             />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
