@@ -137,12 +137,13 @@ class ExplorerListDelegate(
         val dir = items.find { it.uniqueId == uniqueId }
         dir ?: return
         val holder = recyclerView.findViewHolderForItemId(dir.uniqueId.toLong())
-        if (holder !is ExplorerHolder) return
-        val scrollOffset = recyclerView.paddingTop - holder.itemView.top
-        if (scrollOffset > 0) {
-            recyclerView.smoothScrollBy(0, -scrollOffset)
+        if (holder is ExplorerHolder) {
+            val scrollOffset = recyclerView.paddingTop - holder.itemView.top
+            if (scrollOffset > 0) recyclerView.smoothScrollBy(0, -scrollOffset)
+            holder.highlight()
+        } else {
+            scrollTo(dir)
         }
-        holder.highlight()
     }
 
     private inner class StickyListener : ExplorerItemBinderActionListener {
