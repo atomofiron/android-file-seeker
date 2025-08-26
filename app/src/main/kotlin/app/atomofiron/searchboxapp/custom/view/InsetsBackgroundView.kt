@@ -4,10 +4,12 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.view.RoundedCorner
 import android.view.View
 import androidx.core.content.withStyledAttributes
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.Insets
+import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.getColorByAttr
@@ -50,9 +52,10 @@ class InsetsBackgroundView : View, InsetsListener {
 
     private val maxStatusBar: Float
     private val statusBarMinPadding: Float
-    private val commonSemi: Float
     private var navigationBar = Insets.NONE
     private var cutout = Insets.NONE
+    private var topLeftCorner = 0
+    private var topRightCorner = 0
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -66,8 +69,17 @@ class InsetsBackgroundView : View, InsetsListener {
         }
         maxStatusBar = resources.getDimension(R.dimen.status_bar_max)
         statusBarMinPadding = resources.getDimension(R.dimen.status_bar_min_padding)
-        commonSemi = resources.getDimension(R.dimen.padding_semi)
         attachInsetsListener(this)
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        if (Android.S) {
+            topLeftCorner = rootWindowInsets?.getRoundedCorner(RoundedCorner.POSITION_TOP_LEFT)
+                ?.radius ?: topLeftCorner
+            topRightCorner = rootWindowInsets?.getRoundedCorner(RoundedCorner.POSITION_TOP_RIGHT)
+                ?.radius ?: topRightCorner
+        }
     }
 
     fun setColor(color: Int, alpha: Int = Alpha.LEVEL_67) {
@@ -105,18 +117,18 @@ class InsetsBackgroundView : View, InsetsListener {
             val padding = (topInset - maxStatusBar) / 2
             if (padding > statusBarMinPadding) {
                 val cutout = max(cutout.left, cutout.right)
-                val margin = max(commonSemi - cutout, 0f)
+                val marginLeft = max(topLeftCorner * 0.6f - cutout, 0f)
+                val marginRight = max(topRightCorner * 0.6f - cutout, 0f)
                 val rawLeft = max(navigationBar.left, cutout)
                 val rawRight = max(navigationBar.right, cutout)
-                val left = rawLeft + margin + padding
-                val right = width - padding - margin - rawRight
+                val left = rawLeft + max(marginLeft, padding)
+                val right = width - rawRight - max(marginRight, padding)
                 canvas.drawRoundRect(left, padding, right, topInset - padding, maxStatusBar, maxStatusBar, paint)
             } else {
                 canvas.drawRect(0f, 0f, width, topInset, paint)
                 navigationHorizontalTop = topInset
             }
         }
-
         sides.takeIf { !it.empty }?.run {
             if (horizontal) {
                 canvas.drawRect(0f, navigationHorizontalTop, leftInset, height - bottomInset, paint)
