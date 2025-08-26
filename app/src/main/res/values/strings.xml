@@ -139,6 +139,7 @@
     <string name="empty_check_box">Empty mark</string>
     <string name="item_explorer_details">Details</string>
     <string name="item_explorer_background">Alternating row background</string>
+    <string name="create_new">Create new</string>
     <string name="create_a_new">Create a new</string>
     <string name="make_a_clone">Make a clone</string>
     <string name="a_name">Name</string>

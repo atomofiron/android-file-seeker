@@ -5,8 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/padding_half"
     android:orientation="horizontal"
-    android:paddingVertical="@dimen/padding_common"
-    android:paddingStart="@dimen/padding_common"
+    android:paddingVertical="@dimen/padding_semi"
+    android:paddingStart="@dimen/padding_semi"
     android:gravity="center_vertical"
     android:background="@drawable/item_menu"
     android:clickable="true"
@@ -16,7 +16,7 @@
         android:id="@+id/icon"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/padding_semi"
+        android:layout_marginEnd="@dimen/padding_half"
         android:tint="?attr/colorContent"
         />
     <com.google.android.material.textview.MaterialTextView
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="?attr/colorContent"
-        android:textSize="18sp"
+        android:textSize="16sp"
         android:maxLines="1"
         android:ellipsize="middle"
         />

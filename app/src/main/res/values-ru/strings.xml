@@ -133,6 +133,7 @@
     <string name="item_explorer_details">Детали</string>
     <string name="item_explorer_background">Чередующийся фон строк</string>
     <string name="create_a_new">Создать новый(ую)</string>
+    <string name="create_new">Создать</string>
     <string name="make_a_clone">Создать копию</string>
     <string name="clone">Клонировать</string>
     <string name="copy_move">Копировать</string>

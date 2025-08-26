@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/padding_half"
-    android:padding="@dimen/padding_common"
-    app:textSize="18sp"
+    android:padding="@dimen/padding_semi"
+    app:textSize="16sp"
     app:icon="@drawable/ic_trashbox"
-    app:iconPadding="@dimen/padding_semi"
+    app:iconPadding="@dimen/padding_half"
     app:cornerRadius="@dimen/corner_radius"
     />

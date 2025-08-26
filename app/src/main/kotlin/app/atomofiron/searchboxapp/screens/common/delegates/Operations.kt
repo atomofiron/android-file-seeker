@@ -12,7 +12,7 @@ object Operations {
     val UseAs = MenuItem(id = Increment(), UniText(R.string.use_as), R.drawable.ic_puzzle, outside = true)
     val Clone = MenuItem(id = Increment(), UniText(R.string.clone), R.drawable.ic_clone)
     val CopyMove = MenuItem(id = Increment(), UniText(R.string.copy_move), R.drawable.ic_copy)
-    val Create = MenuItem(id = Increment(), UniText(R.string.create_file_dir), R.drawable.ic_create, longLabel = UniText(R.string.create_file_or_dir))
+    val Create = MenuItem(id = Increment(), UniText(R.string.create_new), R.drawable.ic_create, longLabel = UniText(R.string.create_file_or_dir))
     val Rename = MenuItem(id = Increment(), UniText(R.string.rename), R.drawable.ic_rename)
     val OpenWith = MenuItem(id = Increment(), UniText(R.string.open_with), R.drawable.ic_outside, outside = true)
     val Share = MenuItem(id = Increment(), UniText(R.string.share), R.drawable.ic_share, outside = true)
