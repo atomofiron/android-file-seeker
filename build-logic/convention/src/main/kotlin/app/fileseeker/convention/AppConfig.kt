@@ -13,8 +13,8 @@ object AppConfig {
 
     const val minSdk = 24
     const val targetSdk = 35
-    const val compileSdk = 35
-    const val buildToolsVersion = "35.0.0"
+    const val compileSdk = 36
+    const val buildToolsVersion = "36.0.0"
 
     const val versionCode = 25
     const val versionName = "1.4.6"
