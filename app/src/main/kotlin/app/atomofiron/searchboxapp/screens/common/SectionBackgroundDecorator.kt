@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.common
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.Rect
 import android.view.View
 import androidx.core.view.children
@@ -15,9 +16,9 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.roundToInt
-import kotlin.math.sign
 import kotlin.reflect.KClass
+
+private const val RADII = 8
 
 class SectionBackgroundDecorator(
     context: Context,
@@ -25,10 +26,12 @@ class SectionBackgroundDecorator(
 ) : RecyclerView.ItemDecoration() {
 
     private val paint = Paint()
+    private val path = Path()
+    private val radii = FloatArray(RADII)
     private val marginHalf = context.resources.getDimensionPixelSize(R.dimen.padding_half)
     private val internalRadius = context.resources.getDimension(R.dimen.corner_nano)
     private val edgeRadius = context.resources.getDimension(R.dimen.corner_extra)
-    private val internalSpace = internalRadius / 2
+    private val internalSpaceHalf = internalRadius / 4
 
     init {
         paint.style = Paint.Style.FILL
@@ -102,20 +105,29 @@ class SectionBackgroundDecorator(
         hasNext: Boolean,
         reversed: Boolean,
     ) {
+        val hasTop = if (reversed) hasNext else hasPrev
+        val hasBottom = if (reversed) hasPrev else hasNext
         val left = parent.paddingLeft.toFloat()
-        val width = parent.run { width - paddingStart - paddingEnd }.toFloat()
-        val halfSpace = internalSpace / 2
-        var from = if (reversed) last else first
-        if (hasPrev) from -= halfSpace.roundToInt()
-        var to = if (reversed) first else last
-        if (hasNext) to += halfSpace.roundToInt()
-        val offset = edgeRadius * 2 * (to - from).sign
-        var radius = if (hasPrev) internalRadius else edgeRadius
-        val bottom = if (hasPrev) from + offset else to.toFloat()
-        canvas.drawRoundRect(left, from.toFloat(), left + width, bottom, radius, radius, paint)
-        radius = if (hasNext) internalRadius else edgeRadius
-        val top = if (hasNext) to - offset else from.toFloat()
-        canvas.drawRoundRect(left, top, left + width, to.toFloat(), radius, radius, paint)
+        val right = parent.run { width - paddingRight }.toFloat()
+        var top = start.toFloat()
+        if (hasTop) top += internalSpaceHalf
+        var bottom = last.toFloat()
+        if (hasBottom) bottom -= internalSpaceHalf
+        val topRadius = if (hasTop) internalRadius else edgeRadius
+        radii.setTopRadius(topRadius)
+        val bottomRadius = if (hasBottom) internalRadius else edgeRadius
+        radii.setBottomRadius(bottomRadius)
+        path.reset()
+        path.addRoundRect(left, top, right, bottom, radii, Path.Direction.CW)
+        canvas.drawPath(path, paint)
+    }
+
+    private fun FloatArray.setTopRadius(value: Float) {
+        for (i in 0..<RADII / 2) set(i, value)
+    }
+
+    private fun FloatArray.setBottomRadius(value: Float) {
+        for (i in 4..<RADII) set(i, value)
     }
 
     private fun List<List<KClass<*>>>.findGroup(item: Any?): List<KClass<*>>? {
