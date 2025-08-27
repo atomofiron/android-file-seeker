@@ -354,7 +354,7 @@ object ExplorerUtils {
         ?: ""
 
     private fun Node.resolveType(type: String, path: String): Node {
-        return resolveType(type.substring(path.length.inc()))
+        return resolveType(type.substring(path.length + 2)) // cutoff "/path: "
     }
 
     private fun Node.resolveType(type: String): Node {
