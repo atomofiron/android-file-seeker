@@ -2,20 +2,17 @@ package app.atomofiron.searchboxapp.screens.explorer.fragment
 
 import android.content.Context
 import android.content.res.Resources
-import android.graphics.PointF
 import android.util.AttributeSet
-import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import android.widget.CheckBox
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_SETTLING
-import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.utils.isRtl
-import kotlin.math.abs
 import app.atomofiron.common.util.progressionTo
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
+import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.performHapticLite
 
 private data class State(
@@ -28,7 +25,6 @@ class SwipeMarkerDelegate(resources: Resources) {
     private val isRtl = resources.isRtl()
     private val allowedAria = resources.getDimensionPixelSize(R.dimen.edge_size)
     private var state: State? = null
-    private var downPoint: PointF? = null
 
     private fun onDown(rv: RecyclerView, x: Float, y: Float): Boolean {
         if (rv.scrollState == SCROLL_STATE_SETTLING) {
@@ -46,18 +42,11 @@ class SwipeMarkerDelegate(resources: Resources) {
             val prevIndex = rv.getChildLayoutPosition(itemView)
             val check = itemView.getCheckBox() ?: return false
             state = State(!check.isChecked, prevIndex)
-            downPoint = PointF(x, y)
         }
         return state != null
     }
 
     private fun onMove(rv: RecyclerView, x: Float, y: Float): Boolean {
-        downPoint?.let {
-            if (abs(it.x - x) > abs(it.y - y)) {
-                state = null
-            }
-        }
-        downPoint = null
         return rv.check(x, y)
     }
 
