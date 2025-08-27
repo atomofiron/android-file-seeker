@@ -79,8 +79,6 @@ class ExplorerItemBinderImpl(
         if (cbBox.buttonTintList == null) {
             cbBox.isUseMaterialThemeColors = true
         }
-        cbBox.isHapticFeedbackEnabled = true
-
         val stateEnabledChecked = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked)
         val stateDisabledChecked = intArrayOf(-android.R.attr.state_enabled, android.R.attr.state_checked)
         val stateEnabledUnchecked = intArrayOf(android.R.attr.state_enabled, -android.R.attr.state_checked)

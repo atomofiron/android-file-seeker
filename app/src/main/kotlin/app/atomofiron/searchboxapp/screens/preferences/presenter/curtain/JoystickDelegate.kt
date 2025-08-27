@@ -6,26 +6,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.CompoundButton
 import android.widget.SeekBar
-import androidx.core.view.isVisible
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainPreferenceJoystickBinding
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.custom.view.effect
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
-import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
+import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
-import app.atomofiron.searchboxapp.utils.context
-import app.atomofiron.searchboxapp.utils.hasHaptic
 import app.atomofiron.searchboxapp.utils.performHapticEffect
+import app.atomofiron.searchboxapp.utils.setHapticEffect
 import lib.atomofiron.insets.insetsPadding
 
 class JoystickDelegate(
-    private val preferenceStore: PreferenceStore,
+    private val preferences: PreferenceStore,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
     companion object {
         private fun JoystickComposition.withPrimary(context: Context): JoystickComposition {
@@ -34,7 +32,9 @@ class JoystickDelegate(
         }
     }
 
-    private var entity: JoystickComposition = preferenceStore.joystickComposition.value
+    private var entity: JoystickComposition = preferences.joystickComposition.value
+    private val hapticFeedbackWasEnabled: Boolean = preferences.hapticFeedback.value
+    private val hapticFeedback: Boolean get() = preferences.hapticFeedback.value
 
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
         val binding = CurtainPreferenceJoystickBinding.inflate(inflater, null, false)
@@ -51,6 +51,7 @@ class JoystickDelegate(
         preferenceJoystickTvTitle.text = entity.colorText()
         hapticScale.max = JoystickHaptic.entries.lastIndex
 
+        bind()
         val listener = Listener(this)
         sbRed.setOnSeekBarChangeListener(listener)
         sbGreen.setOnSeekBarChangeListener(listener)
@@ -60,20 +61,18 @@ class JoystickDelegate(
         hapticScale.setOnSeekBarChangeListener(listener)
         btnDefault.setOnClickListener(listener)
         colorPicker.setStrokedBackground(vertical = R.dimen.padding_half)
-        val hasHaptic = context.hasHaptic()
-        hapticScaleTitle.isVisible = hasHaptic
-        hapticScale.isVisible = hasHaptic
-
-        bind(entity)
     }
 
-    private fun CurtainPreferenceJoystickBinding.bind(composition: JoystickComposition) {
-        sbRed.progress = composition.red
-        sbGreen.progress = composition.green
-        sbBlue.progress = composition.blue
-        invForTheme.isChecked = composition.invForDark
-        invHighlight.isChecked = composition.invGlowing
-        hapticScale.progress = composition.haptic.index
+    private fun CurtainPreferenceJoystickBinding.bind() {
+        sbRed.progress = entity.red
+        sbGreen.progress = entity.green
+        sbBlue.progress = entity.blue
+        invForTheme.isChecked = entity.invForDark
+        invHighlight.isChecked = entity.invGlowing
+        hapticScale.progress = when {
+            hapticFeedback -> entity.haptic.index
+            else -> JoystickHaptic.None.index
+        }
     }
 
     private inner class Listener(
@@ -101,14 +100,23 @@ class JoystickDelegate(
         private fun onNewColor(new: JoystickComposition) {
             entity = new
             binding.preferenceJoystickTvTitle.text = entity.colorText()
-            preferenceStore { setJoystickComposition(entity) }
+            preferences { setJoystickComposition(entity) }
         }
 
         private fun View.onNewHaptic(new: Int) {
             val haptic = JoystickHaptic.index(new)
             entity = entity.copy(haptic = haptic)
-            preferenceStore { setJoystickComposition(entity) }
-            isHapticFeedbackEnabled = true
+            preferences {
+                setJoystickComposition(entity)
+                when {
+                    haptic != JoystickHaptic.None -> setHapticFeedback(true)
+                    !hapticFeedbackWasEnabled -> setHapticFeedback(false)
+                }
+            }
+            when {
+                haptic != JoystickHaptic.None -> setHapticEffect(true)
+                !hapticFeedbackWasEnabled -> setHapticEffect(false)
+            }
             performHapticEffect(haptic.effect(press = true))
             postDelayed({
                 performHapticEffect(haptic.effect(press = false))
@@ -117,15 +125,15 @@ class JoystickDelegate(
 
         override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
 
-        override fun onStopTrackingTouch(seekBar: SeekBar?) = preferenceStore { setJoystickComposition(entity) }
+        override fun onStopTrackingTouch(seekBar: SeekBar?) = preferences { setJoystickComposition(entity) }
 
         override fun onClick(view: View) {
             entity = when (view.id) {
                 R.id.btn_default -> JoystickComposition.Default.withPrimary(view.context)
                 else -> throw Exception()
             }
-            binding.bind(entity)
-            preferenceStore { setJoystickComposition(entity) }
+            binding.bind()
+            preferences { setJoystickComposition(entity) }
         }
 
         override fun onCheckedChanged(button: CompoundButton, isChecked: Boolean) {
@@ -134,8 +142,8 @@ class JoystickDelegate(
                 R.id.inv_highlight -> entity.copy(invGlowing = button.isChecked)
                 else -> throw Exception()
             }
-            binding.bind(entity)
-            preferenceStore { setJoystickComposition(entity) }
+            binding.bind()
+            preferences { setJoystickComposition(entity) }
         }
     }
 }

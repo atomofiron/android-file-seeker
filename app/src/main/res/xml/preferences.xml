@@ -35,6 +35,12 @@
             app:entryValues="@array/orientation_val"
             app:icon="@drawable/ic_screen_rotation"
             />
+        <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
+            app:title="@string/pref_haptic_feedback"
+            app:key="pref_haptic_feedback"
+            app:defaultValue="true"
+            app:widgetLayout="@layout/widget_switch"
+            />
         <Preference
             app:title="@string/pref_explorer_item"
             app:key="pref_explorer_item"

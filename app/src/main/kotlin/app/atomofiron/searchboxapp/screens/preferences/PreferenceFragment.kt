@@ -50,13 +50,17 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         initViewModel(this, PreferenceViewModel::class, savedInstanceState)
 
         preferenceManager.preferenceDataStore = viewState.preferenceDataStore
-        preferenceDelegate = PreferenceFragmentDelegate(resources, viewState, presenter)
+        preferenceDelegate = PreferenceFragmentDelegate(::getView, resources, viewState, presenter)
         setPreferencesFromResource(R.xml.preferences, rootKey)
         preferenceDelegate.onCreatePreference(preferenceScreen)
 
         val deepBlack = findPreference<Preference>(PreferenceKeys.KeyDeepBlack.name)!!
         viewState.showDeepBlack.collect(lifecycleScope) {
             deepBlack.isVisible = it
+        }
+        val hapticFeedback = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyHapticFeedback.name)!!
+        viewState.hapticFeedback.collect(lifecycleScope) {
+            hapticFeedback.isChecked = it
         }
         val uppUpdate = findPreference<AppUpdatePreference>(PreferenceKeys.PREF_APP_UPDATE)!!
         uppUpdate.listener = presenter

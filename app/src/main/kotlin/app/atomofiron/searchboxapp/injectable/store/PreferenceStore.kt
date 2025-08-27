@@ -17,6 +17,7 @@ import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppUpdate
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDeepBlack
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDrawerGravity
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyExplorerItem
+import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyHapticFeedback
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyJoystick
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyMaxDepth
 import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyMaxSize
@@ -176,6 +177,12 @@ class PreferenceStore(
 
     suspend fun setJoystickComposition(value: JoystickComposition) {
         edit { it[KeyJoystick] = value.data }
+    }
+
+    val hapticFeedback = getFlow(KeyHapticFeedback)
+
+    suspend fun setHapticFeedback(value: Boolean) {
+        edit { it[KeyHapticFeedback] = value }
     }
 
     val toyboxVariant = getFlow(KeyToybox, ToyboxVariant.Companion::invoke)

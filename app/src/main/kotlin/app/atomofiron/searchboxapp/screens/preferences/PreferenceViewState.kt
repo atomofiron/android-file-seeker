@@ -29,6 +29,7 @@ class PreferenceViewState(
     val alertOutputError = ChannelFlow<Shell.Output>()
     val showDeepBlack = MutableStateFlow(false)
     val useSu: StateFlow<Boolean> = preferenceStore.useSu
+    val hapticFeedback: StateFlow<Boolean> = preferenceStore.hapticFeedback
     val toybox: StateFlow<ToyboxVariant> = preferenceStore.toyboxVariant
     val withDebugGroup = appWatcher.isAvailable
     val appUpdate: StateFlow<AppUpdateState> = updateStore.state

@@ -35,10 +35,11 @@ object PreferenceKeys {
     val KeyUseSu = PreferenceKey("pref_use_su", false)
     val KeyExplorerItem = PreferenceKey("pref_explorer_item", ExplorerItemComposition.DEFAULT)
     val KeyJoystick = PreferenceKey("pref_joystick", JoystickComposition.DEFAULT)
+    val KeyHapticFeedback = PreferenceKey("pref_haptic_feedback", true)
     val KeyToybox = PreferenceKey(PREF_TOYBOX, ToyboxVariant.Undefined.EMPTY)
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
-        arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyShownNotificationUpdateCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyToybox)
+        arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyShownNotificationUpdateCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyHapticFeedback, KeyToybox)
     }
 
     @Suppress("UNCHECKED_CAST") // omg it's an error in Kotlin 2.2
