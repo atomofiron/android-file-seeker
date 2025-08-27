@@ -4,7 +4,7 @@ import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import java.util.Objects
 
-data class NodeRoot private constructor(
+data class NodeRoot(
     val type: NodeRootType,
     val item: Node,
     val sorting: NodeSorting,
@@ -19,6 +19,7 @@ data class NodeRoot private constructor(
             : this(type, Node.asRoot(pathVariants.first(), type), sorting, pathVariants = pathVariants.takeIf { it.size > 1 })
 
     val stableId: Int = type.stableId
+    val isEnabled: Boolean get() = item.isCached || type is NodeRootType.InternalStorage
     val withPreview: Boolean = when (type) {
         is NodeRootType.Photos,
         is NodeRootType.Videos,

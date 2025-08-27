@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide
 
 class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     companion object {
+
         fun Node.getTitle(resources: Resources): String = content.rootType?.getTitle(resources) ?: name
 
         fun NodeRootType.getTitle(resources: Resources): String? = when (this) {
@@ -58,8 +59,8 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
         val withArc = item.type is NodeRootType.InternalStorage
         cardArc.isVisible = withArc
         root.isSelected = item.isSelected
-        root.isEnabled = item.item.isCached
-        root.alpha = Alpha.enabled(item.item.isCached)
+        root.isEnabled = item.isEnabled
+        root.alpha = Alpha.enabled(item.isEnabled)
         cardTitle.text = item.type.getTitle(itemView.resources)
         cardThumbnail.imageTintList = if (item.withPreview) null else colors
         cardThumbnail.background = item.getThumbnailBackground()
@@ -75,9 +76,10 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     }
 
     private fun NodeRoot.bindType() {
-        if (type !is NodeRootType.InternalStorage) return
-        binding.cardArc.set(type.used, type.used + type.free)
-        binding.cardArc.text = type.used.convert(suffixes, lossless = false, separator = "\u2009")
+        if (type is NodeRootType.InternalStorage) {
+            binding.cardArc.set(type.used, type.used + type.free)
+            binding.cardArc.text = type.used.convert(suffixes, lossless = false, separator = "\u2009")
+        }
     }
 
     private fun NodeRoot.getIcon(): Drawable {

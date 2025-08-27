@@ -102,7 +102,7 @@ object Shell {
                 process?.destroy()
             } catch (e: Exception) { }
         }
-        return Output(code, "", error)
+        return Output(code, "", error.trim())
     }
 
     fun exec(command: String, su: Boolean, processObserver: ((Process) -> Unit)? = null, forEachLine: ((String) -> Unit)? = null): Output {
@@ -152,7 +152,7 @@ object Shell {
                 logE(e.toString())
             }
         }
-        return Output(code, output, error)
+        return Output(code, output.trim(), error.trim())
     }
 
     data class Output(

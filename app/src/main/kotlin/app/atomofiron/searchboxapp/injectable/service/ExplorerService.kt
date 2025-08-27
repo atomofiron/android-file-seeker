@@ -30,6 +30,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeTab
 import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.Operation
+import app.atomofiron.searchboxapp.model.explorer.UNSELECTED_ROOT_ID
 import app.atomofiron.searchboxapp.model.explorer.isMedia
 import app.atomofiron.searchboxapp.model.explorer.isMovie
 import app.atomofiron.searchboxapp.model.explorer.isPicture
@@ -174,12 +175,13 @@ class ExplorerService(
 
     suspend fun tryToggleRoot(key: NodeTabKey, root: NodeRoot) {
         renderTab(key) {
-            roots.indexOfFirst { it.type.stableId == selectedRootId }
-                .takeIf { it >= 0 }
+            roots.takeIf { selectedRootId != UNSELECTED_ROOT_ID }
+                ?.indexOfFirst { it.stableId == selectedRootId }
+                ?.takeIf { it >= 0 }
                 ?.let { roots[it] = roots[it].copy(item = tree.first()) }
-            selectedRootId = when (root.type.stableId) {
-                selectedRootId -> 0
-                else -> root.type.stableId
+            selectedRootId = when (root.stableId) {
+                selectedRootId -> UNSELECTED_ROOT_ID
+                else -> root.stableId
             }
         }
         tryCache(key, root.item)
@@ -243,8 +245,8 @@ class ExplorerService(
                 withCachingState(root.stableId) {
                     var updated = root.item.update(config)
                     updated = when (updated.error) {
-                        !is NodeError.NoSuchFile -> updated
-                        else -> tryAlternative(root, updated)
+                        is NodeError.NoSuchFile -> tryAlternative(root, updated)
+                        else -> updated
                     }
                     // todo async updated.resolveDirChildren(config.useSu)
                     updated = updated.copy(children = updated.children?.copy(isOpened = true))
@@ -730,7 +732,8 @@ class ExplorerService(
         val count = min(1, tree.size) + tree.sumOf { it.childCount }
         val items = MutableList<Node>(count)
         tree.firstOrNull()
-            ?.let { if (it.isOpened && !it.hasOpened()) it.copy(isDeepest = true, children = it.children?.fetch()) else it }
+            ?.takeIf { it.isOpened }
+            ?.let { it.copy(isDeepest = !it.hasOpened(), children = it.children?.fetch()) }
             ?.also { items.add(updateStateFor(it).defineDirKind()) }
             .let { if (it?.isOpened != true) return items }
 

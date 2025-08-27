@@ -291,7 +291,7 @@ object ExplorerUtils {
 
     fun Node.update(config: CacheConfig, ensureCached: Boolean = true): Node {
         val output = Shell.exec(Shell[Shell.LS_LALD_FILE].format(path, path), config.useSu)
-        val lines = output.output.trim().split(LF)
+        val lines = output.output.split(LF)
         return when {
             output.success && lines.size == 2 -> parseNode(lines.first())
                 .resolveType(type = lines.last(), path = path)
@@ -347,7 +347,6 @@ object ExplorerUtils {
 
     fun Node.resolveSize(useSu: Boolean): String = Shell.exec(Shell[Shell.DU_HD0].format(path), useSu)
         .output
-        .trim()
         .split(Const.TAB)
         .takeIf { it.size == 2 }
         ?.firstOrNull()
@@ -355,7 +354,7 @@ object ExplorerUtils {
         ?: ""
 
     private fun Node.resolveType(type: String, path: String): Node {
-        return resolveType(type.substring(path.length.inc()).trim())
+        return resolveType(type.substring(path.length.inc()))
     }
 
     private fun Node.resolveType(type: String): Node {
@@ -667,7 +666,7 @@ object ExplorerUtils {
     }
 
     private fun String.toNodeError(path: String): NodeError {
-        val lines = trim().split(LF)
+        val lines = split(LF)
         val first = lines.find { it.isNotBlank() }
         return when {
             lines.size > 1 -> NodeError.Multiply(lines)
