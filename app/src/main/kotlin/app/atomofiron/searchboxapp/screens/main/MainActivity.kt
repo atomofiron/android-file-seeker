@@ -33,6 +33,7 @@ import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.main.util.offerKeyCodeToChildren
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.setHapticEffect
 import com.google.android.material.color.DynamicColors
 import lib.atomofiron.insets.InsetsSource
 import lib.atomofiron.insets.builder
@@ -70,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         onCreateView(savedInstanceState)
         CornerPathDebug(resources.displayMetrics)
         if (Android.R) unlockHighFrameRate()
+        binding.root.setHapticEffect(viewState.hapticFeedback.value)
     }
 
     private fun onCreateView(savedInstanceState: Bundle?) {
