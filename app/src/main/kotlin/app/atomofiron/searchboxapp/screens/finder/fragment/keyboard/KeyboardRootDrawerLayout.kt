@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.finder.fragment.keyboard
 
 import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.PointF
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.VelocityTracker
@@ -40,7 +41,8 @@ import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.GestureTrack
 
 private const val AlphaThreshold = Alpha.SMALL
 private const val HorizontalStart = 0
-private const val SpeedThreshold = 10
+private const val DistanceThreshold = 16
+private const val SpeedThreshold = 16
 private const val VelocityPeriod = 100
 
 private const val TRANSITION_DURATION = 512L
@@ -57,6 +59,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private var ignoreHorizontal = false
     private var tracker = VelocityTracker.obtain()
     private var tracking: Tracking? = null
+    private var downPoint = PointF(0f, 0f)
     private var prevX = 0f
     private var prevY = 0f
 
@@ -187,30 +190,33 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                 delegate.resetAnimation()
                 animHorizontal?.cancel()
                 animVertical?.cancel()
+                downPoint = PointF(event.x, event.y)
             }
             MotionEvent.ACTION_MOVE -> {
                 tracker.addMovement(event)
                 val dx = event.x - prevX
                 val dy = event.y - prevY
+                val distanceX = event.x - downPoint.x
+                val distanceY = event.y - downPoint.y
                 when {
                     tracking == Tracking.None -> Unit
                     tracking == Tracking.Vertical -> moveVertically(dy)
                     tracking is Tracking.Horizontal -> moveHorizontally(dx)
-                    dx == 0f && dy == 0f -> Unit
-                    abs(dx) > abs(dy) && ignoreHorizontal -> tracking = Tracking.None
-                    abs(dx) > abs(dy) -> {
+                    notEnoughYet(distanceX, distanceY) -> Unit
+                    abs(distanceX) > abs(distanceY) && ignoreHorizontal -> tracking = Tracking.None
+                    abs(distanceX) > abs(distanceY) || horizontalCurrent != HorizontalStart -> {
                         val direction = when {
                             horizontalCurrent > HorizontalStart -> Direction.Right
                             horizontalCurrent < HorizontalStart -> Direction.Left
-                            dx > 0 -> Direction.Right
+                            distanceX > 0 -> Direction.Right
                             else -> Direction.Left
                         }
                         tracking = Tracking.Horizontal(direction)
                         superCancelTouchEvents(event)
                         focusedView?.hideKeyboard()
                     }
-                    dy > 0 && keyboardNow == keyboardMin -> tracking = Tracking.None
-                    dy < 0 && keyboardNow == keyboardMax || startVertically() -> {
+                    distanceY > 0 && keyboardNow == keyboardMin -> tracking = Tracking.None
+                    distanceY < 0 && keyboardNow == keyboardMax || startVertically() -> {
                         tracking = Tracking.Vertical
                         superCancelTouchEvents(event)
                         moveVertically(dy)
@@ -246,6 +252,12 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         prevY = event.y
         if (!tracking.consuming) super.dispatchTouchEvent(event)
         return true
+    }
+
+    private fun notEnoughYet(distanceX: Float, distanceY: Float): Boolean = when {
+        abs(distanceX) > DistanceThreshold || horizontalCurrent != HorizontalStart -> false
+        abs(distanceY) > DistanceThreshold || keyboardNow > keyboardMin && keyboardNow < keyboardMax -> false
+        else -> true
     }
 
     private fun superCancelTouchEvents(event: MotionEvent) {
