@@ -7,14 +7,16 @@ interface KeyCodeConsumer {
 }
 
 fun Fragment.offerKeyCodeToChildren(keyCode: Int): Boolean {
-    if (!this.isVisible) return false
+    if (!isVisible) return false
     childFragmentManager.fragments.run {
-        for (i in this.size.dec() downTo 0) {
-            if (get(i).offerKeyCodeToChildren(keyCode)) return true
+        for (i in indices.reversed()) {
+            if (get(i).offerKeyCodeToChildren(keyCode)) {
+                return true
+            }
         }
     }
     return when (this) {
-        !is KeyCodeConsumer -> false
-        else -> onKeyDown(keyCode)
+        is KeyCodeConsumer -> onKeyDown(keyCode)
+        else -> false
     }
 }
