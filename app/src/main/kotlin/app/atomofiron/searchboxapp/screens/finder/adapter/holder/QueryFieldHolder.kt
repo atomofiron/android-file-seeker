@@ -5,6 +5,8 @@ import android.text.TextWatcher
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
+import androidx.core.view.marginEnd
+import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemQueryFieldBinding
@@ -14,6 +16,7 @@ import app.atomofiron.searchboxapp.custom.view.showError
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Query
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.marginLayoutParams
 import java.util.regex.Pattern
 
 class QueryFieldHolder(
@@ -41,6 +44,7 @@ class QueryFieldHolder(
             setOnEditorActionListener { _, actioId, _ ->
                 this@QueryFieldHolder.onEditorAction(actioId)
             }
+            updatePaddingRelative(end = binding.button.marginLayoutParams.run { width + marginEnd } - textLayout.marginEnd)
         }
     }
 

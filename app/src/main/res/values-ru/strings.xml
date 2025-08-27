@@ -77,7 +77,7 @@
     <string name="pref_about">О Приложении</string>
     <string name="look_github">GitHub репозиторий</string>
     <string name="faq_4pda">FAQ / Обсудить</string>
-    <string name="test_field">Тестовое поле</string>
+    <string name="test_field">Тестовый текст</string>
     <string name="try_find_this_text">Попробуйте найти этот текст</string>
     <string name="waiting_for_results">Ожидание результатов…</string>
     <string name="no_access">Нет доступа</string>

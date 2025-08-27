@@ -79,7 +79,7 @@
     <string name="pref_about">About the App</string>
     <string name="look_github">GitHub repository</string>
     <string name="faq_4pda">FAQ / Discuss</string>
-    <string name="test_field">Test text field</string>
+    <string name="test_field">Test text</string>
     <string name="try_find_this_text">Try to find this text</string>
     <string name="waiting_for_results">Waiting for the results…</string>
     <string name="no_access">No access</string>
