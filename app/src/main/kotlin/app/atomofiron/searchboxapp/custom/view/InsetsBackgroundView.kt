@@ -37,8 +37,7 @@ class InsetsBackgroundView : View, InsetsListener {
         val empty: Boolean get() = (value and ALL == 0)
     }
 
-    override val types get() = common + Type.navigationBars
-    private var common = Type.statusBars
+    override val types get() = Type.statusBars + Type.navigationBars
 
     private var leftInset = 0
     private var topInset = 0
@@ -89,13 +88,13 @@ class InsetsBackgroundView : View, InsetsListener {
     override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
         navigationBar = windowInsets[Type.navigationBars]
         cutout = windowInsets[Type.displayCutout]
-        val common = windowInsets[common]
+        val statusBars = windowInsets[Type.statusBars]
         val navigationBars = windowInsets[Type.navigationBars]
         val tappableElement = windowInsets[Type.tappableElement]
-        leftInset = max(common.left, navigationBars.left.only(tappableElement.left))
-        topInset = common.top
-        rightInset = max(common.right, navigationBars.right.only(tappableElement.right))
-        bottomInset = max(common.bottom, navigationBars.bottom.only(tappableElement.bottom))
+        leftInset = max(statusBars.left, navigationBars.left.only(tappableElement.left))
+        topInset = statusBars.top
+        rightInset = max(statusBars.right, navigationBars.right.only(tappableElement.right))
+        bottomInset = max(statusBars.bottom, navigationBars.bottom.only(tappableElement.bottom))
         invalidate()
     }
 
