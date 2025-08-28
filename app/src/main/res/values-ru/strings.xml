@@ -196,9 +196,9 @@
         <item quantity="other">%d файлов</item>
     </plurals>
     <plurals name="x_deleted">
-        <item quantity="one">Было удалено: %d</item>
-        <item quantity="few">Были удалены: %d</item>
-        <item quantity="many">Были удалены: %d</item>
-        <item quantity="other">Были удалены: %d</item>
+        <item quantity="one">Было удалено: %s</item>
+        <item quantity="few">Были удалены: %s</item>
+        <item quantity="many">Были удалены: %s</item>
+        <item quantity="other">Были удалены: %s</item>
     </plurals>
 </resources>
