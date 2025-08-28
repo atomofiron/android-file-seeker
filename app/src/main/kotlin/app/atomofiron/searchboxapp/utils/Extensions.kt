@@ -4,7 +4,6 @@ import android.app.PendingIntent
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.StateListDrawable
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.FastScroller2
@@ -168,10 +167,6 @@ fun <T> MutableList<T>.move(from: Int, to: Int) {
 inline fun <T, R : Comparable<R>> MutableList<T>.sortBy(descending: Boolean = false, crossinline selector: (T) -> R?) {
     return if (descending) sortByDescending(selector) else sortBy(selector)
 }
-
-fun Int.setColorAlpha(alpha: Int): Int = ColorUtils.setAlphaComponent(this, alpha)
-
-fun Int.asOverlayOn(background: Int): Int = ColorUtils.compositeColors(this, background)
 
 // prevents ConcurrentModificationException
 inline fun <reified E> List<E>.findOnMut(predicate: (E) -> Boolean): E? {

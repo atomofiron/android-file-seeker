@@ -1,5 +1,7 @@
 package app.atomofiron.searchboxapp.utils
 
+import androidx.core.graphics.ColorUtils
+
 object Alpha {
     const val INVISIBLE = 0f
     const val SMALL = 0.1f
@@ -31,3 +33,9 @@ object Alpha {
 }
 
 fun Float.toIntAlpha(): Int = (this * Alpha.VISIBLE_INT).toInt().coerceIn(Alpha.INVISIBLE_INT, Alpha.VISIBLE_INT)
+
+infix fun Int.withAlpha(alpha: Float): Int = this withAlpha alpha.toIntAlpha()
+
+infix fun Int.withAlpha(alpha: Int): Int = ColorUtils.setAlphaComponent(this, alpha)
+
+infix fun Int.over(background: Int): Int = ColorUtils.compositeColors(this, background)

@@ -15,7 +15,6 @@ import android.text.style.CharacterStyle
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.Gravity
-import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.animation.BounceInterpolator
 import android.view.animation.DecelerateInterpolator
@@ -25,14 +24,15 @@ import android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
 import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
-import androidx.core.graphics.ColorUtils
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
 import app.atomofiron.searchboxapp.utils.isRtl
+import app.atomofiron.searchboxapp.utils.over
 import app.atomofiron.searchboxapp.utils.performHapticLite
 import app.atomofiron.searchboxapp.utils.toIntAlpha
+import app.atomofiron.searchboxapp.utils.withAlpha
 import com.google.android.material.color.MaterialColors
 import com.google.android.material.textview.MaterialTextView
 import kotlin.math.PI
@@ -315,10 +315,6 @@ class DangerousSliderView @JvmOverloads constructor(
         else -> first
     }
 }
-
-infix fun Int.withAlpha(alpha: Float): Int = this withAlpha alpha.toIntAlpha()
-infix fun Int.withAlpha(alpha: Int): Int = ColorUtils.setAlphaComponent(this, alpha)
-infix fun Int.over(background: Int): Int = ColorUtils.compositeColors(this, background)
 
 fun <D,T> dependOn(dependency: () -> D, factory: (D) -> T) = object : ReadOnlyProperty<Any?, T> {
 

@@ -12,10 +12,10 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.TextField
-import app.atomofiron.searchboxapp.custom.view.dangerous.over
-import app.atomofiron.searchboxapp.custom.view.dangerous.withAlpha
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.drawable
+import app.atomofiron.searchboxapp.utils.over
+import app.atomofiron.searchboxapp.utils.withAlpha
 import com.google.android.material.textfield.TextInputLayout
 
 fun View.setMenuItemBackground() {
