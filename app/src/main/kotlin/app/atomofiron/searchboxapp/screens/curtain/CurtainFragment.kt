@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.screens.curtain
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +38,6 @@ import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.insetsPadding
 import java.lang.ref.WeakReference
 import kotlin.math.max
-import kotlin.math.min
 
 private const val SAVED_STACK = "SAVED_STACK"
 private const val MAX_OVERLAY_SATURATION = 200
@@ -75,7 +73,6 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         }
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -119,6 +116,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         root.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
         val verticalPadding = resources.getDimensionPixelSize(R.dimen.curtain_padding)
         root.setInsetsModifier { _, windowInsets ->
+            keyboardCallback.onApplyWindowInsets(windowInsets)
             val bars = windowInsets[ExtType.barsWithCutout].bottom
             val joystick = windowInsets[ExtType.joystickBottom].bottom
             bottomPadding = max(joystick, bars + verticalPadding)
@@ -130,7 +128,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
 
     override fun onImeMove(current: Int) {
         val offset = -max(0, current - bottomPadding)
-        binding.root.translationY = offset.toFloat()
+        binding.curtainParent.translationY = offset.toFloat()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

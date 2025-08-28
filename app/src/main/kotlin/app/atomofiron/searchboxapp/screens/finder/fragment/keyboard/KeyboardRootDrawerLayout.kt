@@ -66,7 +66,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private val manager = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     private lateinit var controller: WindowInsetsControllerCompat
     private val delegate = InsetsAnimator(anyFocused = { focusedView != null }, gesture = { tracking.vertical })
-    private val callback = KeyboardInsetCallback(KeyboardListener(), delegate.keyboardListener)
+    private val keyboardCallback = KeyboardInsetCallback(KeyboardListener(), delegate.keyboardListener)
     private var isControlling = false // onReady is too slow
 
     private lateinit var recyclerView: RecyclerView
@@ -78,7 +78,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     // from the bottom
     private var keyboardNow = 0
     private val keyboardMin = 0
-    private var keyboardMax = resources.displayMetrics.heightPixels
+    private var keyboardMax = resources.displayMetrics.heightPixels / 2
     private var barrierBottom = 0
         set(value) {
             debugRequire(value <= keyboardMax)
@@ -98,11 +98,12 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     init {
         setInsetsModifier { _, insets ->
+            keyboardCallback.onApplyWindowInsets(insets)
             insets.builder()
                 .consume(ExtType.ime)
                 .build()
         }
-        ViewCompat.setWindowInsetsAnimationCallback(this, callback)
+        ViewCompat.setWindowInsetsAnimationCallback(this, keyboardCallback)
         addDrawerListener(drawerListener)
     }
 
@@ -202,7 +203,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                     tracking == Tracking.None -> Unit
                     tracking == Tracking.Vertical -> moveVertically(dy)
                     tracking is Tracking.Horizontal -> moveHorizontally(dx)
-                    notEnoughYet(distanceX, distanceY) -> Unit
+                    skipForNow(distanceX, distanceY) -> Unit
                     abs(distanceX) > abs(distanceY) && ignoreHorizontal -> tracking = Tracking.None
                     abs(distanceX) > abs(distanceY) || horizontalCurrent != HorizontalStart -> {
                         val direction = when {
@@ -250,11 +251,13 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         }
         prevX = event.x
         prevY = event.y
-        if (!tracking.consuming) super.dispatchTouchEvent(event)
+        if (!tracking.consuming) {
+            super.dispatchTouchEvent(event)
+        }
         return true
     }
 
-    private fun notEnoughYet(distanceX: Float, distanceY: Float): Boolean = when {
+    private fun skipForNow(distanceX: Float, distanceY: Float): Boolean = when {
         abs(distanceX) > DistanceThreshold || horizontalCurrent != HorizontalStart -> false
         abs(distanceY) > DistanceThreshold || keyboardNow > keyboardMin && keyboardNow < keyboardMax -> false
         else -> true
@@ -273,14 +276,17 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     }
 
     private fun startVertically(): Boolean {
-        val editText = editText ?: return false
+        val editText = editText?.takeIf { keyboardCallback.controllable }
+            ?: return false
         when {
             editText.isFocused -> Unit
             focusedView != null -> Unit
             !editText.isFullyAboveBottom() -> return false
             else -> editText.requestFocus()
         }
-        if (!callback.visible) manager.showSoftInput(editText, 0)
+        if (!keyboardCallback.visible) {
+            manager.showSoftInput(editText, 0)
+        }
         ensureControlKeyboard()
         delegate.resetAnimation()
         return true

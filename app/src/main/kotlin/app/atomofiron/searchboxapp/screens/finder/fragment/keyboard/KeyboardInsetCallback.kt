@@ -4,13 +4,32 @@ import androidx.core.view.WindowInsetsAnimationCompat
 import androidx.core.view.WindowInsetsAnimationCompat.BoundsCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsCompat.Type
+import app.atomofiron.common.util.Android
+import app.atomofiron.searchboxapp.utils.ExtType
+import lib.atomofiron.insets.ExtendedWindowInsets
+import lib.atomofiron.insets.InsetsListener
 
 class KeyboardInsetCallback(
     private vararg val listeners: KeyboardInsetListener,
-) : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP) {
+) : WindowInsetsAnimationCompat.Callback(DISPATCH_MODE_STOP), InsetsListener {
 
+    private var uncontrollableMax = 0
+    val controllable = Android.R
     var visible = false
         private set
+
+    override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
+        if (!controllable) {
+            val current = windowInsets[ExtType.ime].bottom
+            if (current > 0) uncontrollableMax = current
+            if (uncontrollableMax > 0 && visible != current > 0) {
+                visible = current > 0
+                listeners.forEach { it.onImeStart(uncontrollableMax) }
+                listeners.forEach { it.onImeMove(current) }
+                listeners.forEach { it.onImeEnd(visible = current > 0) }
+            }
+        }
+    }
 
     override fun onStart(
         animation: WindowInsetsAnimationCompat,
