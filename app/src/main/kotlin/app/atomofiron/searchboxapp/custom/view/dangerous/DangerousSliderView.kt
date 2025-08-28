@@ -123,6 +123,7 @@ class DangerousSliderView @JvmOverloads constructor(
         }
 
         done.setTint(textColor)
+        borderPaint.isAntiAlias = true
         borderPaint.style = Paint.Style.STROKE
         borderPaint.strokeWidth = strokeWidth.toFloat()
 
