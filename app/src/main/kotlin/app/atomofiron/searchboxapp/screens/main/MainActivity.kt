@@ -23,6 +23,7 @@ import app.atomofiron.common.util.extension.CornerPathDebug
 import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.collect
+import app.atomofiron.common.util.flow.first
 import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.common.util.reallyDisableFitsSystemWindows
@@ -77,7 +78,6 @@ class MainActivity : AppCompatActivity() {
         onCreateView(savedInstanceState)
         CornerPathDebug(resources.displayMetrics)
         if (Android.R) unlockHighFrameRate()
-        binding.root.setHapticEffect(viewState.hapticFeedback.value)
     }
 
     private fun onCreateView(savedInstanceState: Bundle?) {
@@ -185,6 +185,7 @@ class MainActivity : AppCompatActivity() {
             setTheme.collect(lifecycleScope, ::updateTheme)
             setOrientation.collect(lifecycleScope, ::setOrientation)
             setJoystick.collect(lifecycleScope, binding.joystick::setComposition)
+            hapticFeedback.first(lifecycleScope, binding.root::setHapticEffect)
         }
     }
 

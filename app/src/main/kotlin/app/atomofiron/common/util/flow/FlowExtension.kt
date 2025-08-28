@@ -32,6 +32,9 @@ operator fun MutableStateFlow<Unit>.invoke() = set(Unit)
 fun <T> Flow<T>.collect(scope: CoroutineScope, collector: FlowCollector<T>) {
     scope.launch { collect(collector) }
 }
+fun <T> Flow<T>.first(scope: CoroutineScope, collector: FlowCollector<T>) {
+    scope.launch { collector.emit(first()) }
+}
 
 fun <T> Flow<T>.collect(
     scope: CoroutineScope,
