@@ -60,11 +60,6 @@ class MainActivity : AppCompatActivity() {
         val color = findColorByAttr(R.attr.colorBackground) withAlpha 1
         enableEdgeToEdge(navigationBarStyle = SystemBarStyle.auto(color, color))
         if (Android.Q) window.isNavigationBarContrastEnforced = false
-        // system insets providing breaks at least on Android 15 after app theme has been changed
-        // enableEdgeToEdge() won’t help you in this hell
-        // UPD 29.04.2025: WindowCompat.setDecorFitsSystemWindows() is not enough
-        // UPD 21.05.2025: LOL enableEdgeToEdge() breaks the delivery of insets!
-        window.reallyDisableFitsSystemWindows()
 
         val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.setView(this)
@@ -76,6 +71,11 @@ class MainActivity : AppCompatActivity() {
 
         updateTheme(viewState.setTheme.value)
         onCreateView(savedInstanceState)
+        // system insets providing breaks at least on Android 15 after app theme has been changed
+        // enableEdgeToEdge() won’t help you in this hell
+        // UPD 29.04.2025: WindowCompat.setDecorFitsSystemWindows() is not enough
+        window.reallyDisableFitsSystemWindows()
+
         CornerPathDebug(resources.displayMetrics)
         if (Android.R) unlockHighFrameRate()
     }
