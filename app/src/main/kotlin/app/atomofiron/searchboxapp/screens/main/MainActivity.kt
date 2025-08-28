@@ -5,13 +5,15 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.SystemBarStyle
+import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.Insets
+import androidx.core.view.WindowCompat.enableEdgeToEdge
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -34,6 +36,7 @@ import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.main.util.offerKeyCodeToChildren
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.setHapticEffect
+import app.atomofiron.searchboxapp.utils.withAlpha
 import com.google.android.material.color.DynamicColors
 import lib.atomofiron.insets.InsetsSource
 import lib.atomofiron.insets.builder
@@ -52,12 +55,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        enableEdgeToEdge(window)
+        val color = findColorByAttr(R.attr.colorBackground) withAlpha 1
+        enableEdgeToEdge(navigationBarStyle = SystemBarStyle.auto(color, color))
+        if (Android.Q) window.isNavigationBarContrastEnforced = false
         // system insets providing breaks at least on Android 15 after app theme has been changed
         // enableEdgeToEdge() won’t help you in this hell
         // UPD 29.04.2025: WindowCompat.setDecorFitsSystemWindows() is not enough
-        // UPD 21.05.2025: LOL enableEdgeToEdge() breaks the delivery of inserts!
+        // UPD 21.05.2025: LOL enableEdgeToEdge() breaks the delivery of insets!
         window.reallyDisableFitsSystemWindows()
-        window.setFlags(FLAG_LAYOUT_NO_LIMITS, FLAG_LAYOUT_NO_LIMITS)
 
         val viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.setView(this)
