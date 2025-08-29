@@ -17,6 +17,7 @@ import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.context
 import app.atomofiron.searchboxapp.utils.performHapticEffect
 import app.atomofiron.searchboxapp.utils.setHapticEffect
 import lib.atomofiron.insets.insetsPadding
@@ -119,10 +120,15 @@ class JoystickDelegate(
 
         override fun onCheckedChanged(button: CompoundButton, isChecked: Boolean) {
             when (button.id) {
-                R.id.inv_for_theme -> entity.copy(invForDark = button.isChecked, overrideColor = true)
+                R.id.inv_for_theme -> entity.copy(invForDark = button.isChecked, overrideColor = !button.isChecked || !entity.isColorDefault())
                 R.id.inv_highlight -> entity.copy(invGlowing = button.isChecked)
                 else -> throw Exception()
             }.apply()
+        }
+
+        private fun JoystickComposition.isColorDefault(): Boolean {
+            val default = withDefaultColor(binding.context)
+            return default.red == red && default.green == green && default.blue == blue
         }
 
         private fun JoystickComposition.apply() {

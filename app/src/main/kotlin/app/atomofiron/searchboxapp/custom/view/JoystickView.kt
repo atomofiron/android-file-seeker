@@ -40,7 +40,7 @@ fun JoystickHaptic.effect(press: Boolean) = when (this) {
     JoystickHaptic.None -> HAPTIC_NO
     JoystickHaptic.Lite -> if (press) HAPTIC_LITE else HAPTIC_NO
     JoystickHaptic.Double -> HAPTIC_LITE
-    JoystickHaptic.Heavy -> if (press) HAPTIC_HEAVY else HAPTIC_HEAVY
+    JoystickHaptic.Heavy -> if (press) HAPTIC_HEAVY else HAPTIC_LITE
 }
 
 fun Context.joystickDefaultColor() = findColorByAttr(MaterialAttr.colorTertiaryContainer)
@@ -110,8 +110,8 @@ class JoystickView @JvmOverloads constructor(
         }
         paint.color = circleColor
         glowColor = when {
-            composition.overrideColor -> composition.glow(isDark)
-            else -> composition.glow(isDark, defaultColor)
+            composition.overrideColor -> composition.glow(composition.color(isDark))
+            else -> composition.glow(defaultColor)
         }
 
         val black = ContextCompat.getColor(context, R.color.black)

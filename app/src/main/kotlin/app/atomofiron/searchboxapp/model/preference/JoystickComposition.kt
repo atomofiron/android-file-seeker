@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.model.preference
 
 import android.graphics.Color
+import androidx.core.graphics.ColorUtils
 
 private const val INV_FOR_DARK  =  1 shl 24
 private const val INV_GLOWING =    1 shl 25
@@ -8,6 +9,8 @@ private const val OVERRIDE_COLOR = 1 shl 26
 private const val HAPTIC_OFFSET = 27
 private const val BYTE = 256
 private const val FF = 255
+
+private val hsl = FloatArray(3)
 
 data class JoystickComposition(
     val invForDark: Boolean,
@@ -19,7 +22,7 @@ data class JoystickComposition(
     val blue: Int,
 ) {
     companion object {
-        val DEFAULT = 16732754/*#ff5252*/ + JoystickHaptic.Heavy.bits(HAPTIC_OFFSET)
+        val DEFAULT = 0xff5252 + INV_FOR_DARK + JoystickHaptic.Heavy.bits(HAPTIC_OFFSET)
         val Default = JoystickComposition(DEFAULT)
     }
 
@@ -36,7 +39,7 @@ data class JoystickComposition(
     val data: Int
 
     init {
-        var data = red * BYTE * BYTE + green * BYTE + blue
+        var data = rgb()
         if (invForDark) {
             data += INV_FOR_DARK
         }
@@ -50,36 +53,34 @@ data class JoystickComposition(
         this.data = data
     }
 
-    fun color(isDark: Boolean): Int = when (isDark && invForDark) {
-        true -> Color.argb(FF, FF - red, FF - green, FF - blue)
-        else -> Color.argb(FF, red, green, blue)
+    fun color(isDark: Boolean): Int = when {
+        isDark && invForDark -> inverseColor()
+        else -> rgba()
     }
 
-    fun glow(isDark: Boolean): Int = when ((isDark && invForDark) xor invGlowing) {
-        true -> Color.argb(FF, FF - red, FF - green, FF - blue)
-        else -> Color.argb(FF, red, green, blue)
-    }
-
-    fun glow(isDark: Boolean, color: Int): Int = when {
-        !invGlowing -> color
-        !isDark -> color
-        else -> {
-            val alpha = Color.alpha(color)
-            val red = FF - Color.red(color)
-            val green = FF - Color.green(color)
-            val blue = FF - Color.blue(color)
-            Color.argb(alpha, red, green, blue)
-        }
+    fun glow(color: Int): Int = when {
+        invGlowing -> inverseColor(color)
+        else -> color
     }
 
     fun colorText(): String {
         val builder = StringBuilder("#")
-        val color = red * BYTE * BYTE + green * BYTE + blue
+        val color = rgb()
         val hex = Integer.toHexString(color)
         for (i in 0..(5 - hex.length)) {
             builder.append("0")
         }
         builder.append(hex)
         return builder.toString()
+    }
+
+    private fun rgb(): Int = Color.argb(0, red, green, blue)
+
+    private fun rgba(): Int = Color.argb(FF, red, green, blue)
+
+    private fun inverseColor(color: Int = rgba()): Int {
+        ColorUtils.colorToHSL(color, hsl)
+        hsl[2] = 1f - hsl[2]
+        return ColorUtils.HSLToColor(hsl)
     }
 }
