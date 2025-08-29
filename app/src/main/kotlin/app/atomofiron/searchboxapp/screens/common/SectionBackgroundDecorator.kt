@@ -54,17 +54,14 @@ class SectionBackgroundDecorator(
             // we cant set top/bottom to the multiple items in a group, so we set to neighbours
             return
         }
-        val next = groups.findGroup(nextItem)
-        val prev = groups.findGroup(prevItem)
-        when {
-            next == null -> Unit
-            reversed -> outRect.top = marginHalf
-            else -> outRect.bottom = marginHalf
+        var bottom = groups.findGroup(nextItem)
+        var top = groups.findGroup(prevItem)
+        if (reversed) bottom = top.also { top = bottom }
+        if (bottom != null) {
+            outRect.bottom = marginHalf
         }
-        when {
-            prev == null -> Unit
-            reversed -> outRect.bottom = marginHalf
-            else -> outRect.top = marginHalf
+        if (top != null) {
+            outRect.top = marginHalf
         }
     }
 
