@@ -87,6 +87,7 @@ class StickyTopDelegate(
                 MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
             )
         }
+        view.translationY = -stickyBox.height.toFloat()
         return view
     }
 
