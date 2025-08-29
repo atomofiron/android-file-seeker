@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.fileseeker.R
 import app.atomofiron.common.util.Unreachable
+import app.atomofiron.searchboxapp.injectable.AppScope
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
@@ -26,7 +27,6 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import kotlinx.coroutines.CoroutineScope
 
 class AppUpdateServiceGoogleImpl(
     private val context: Context,
@@ -37,7 +37,7 @@ class AppUpdateServiceGoogleImpl(
     companion object : AppUpdateService.Factory {
         override fun new(
             context: Context,
-            scope: CoroutineScope,
+            scope: AppScope,
             apkService: ApkService,
             updateStore: AppUpdateStore,
             preferences: PreferenceStore,

@@ -5,12 +5,12 @@ import android.content.Context
 import android.content.pm.PackageInstaller
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
+import app.atomofiron.searchboxapp.injectable.AppScope
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import dagger.Module
 import dagger.Provides
 import app.atomofiron.searchboxapp.injectable.service.*
 import app.atomofiron.searchboxapp.injectable.store.*
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 @Module
@@ -28,13 +28,13 @@ open class ServiceModule {
     @Provides
     @Singleton
     fun finderService(
-        scoope: CoroutineScope,
+        scope: AppScope,
         workManager: WorkManager,
         notificationManager: NotificationManagerCompat,
         finderStore: FinderStore,
         preferenceStore: PreferenceStore,
         explorerStore: ExplorerStore,
-    ): FinderService = FinderService(scoope, workManager, notificationManager, finderStore, preferenceStore, explorerStore)
+    ): FinderService = FinderService(scope, workManager, notificationManager, finderStore, preferenceStore, explorerStore)
 
     @Provides
     @Singleton
@@ -59,7 +59,7 @@ open class ServiceModule {
     @Provides
     @Singleton
     fun textViewerService(
-        scope: CoroutineScope,
+        scope: AppScope,
         preferenceStore: PreferenceStore,
         textViewerStore: TextViewerStore,
         explorerStore: ExplorerStore,
@@ -71,7 +71,7 @@ open class ServiceModule {
     fun updateService(
         factory: AppUpdateService.Factory,
         context: Context,
-        scope: CoroutineScope,
+        scope: AppScope,
         apkService: ApkService,
         updateStore: AppUpdateStore,
         preferences: PreferenceStore,

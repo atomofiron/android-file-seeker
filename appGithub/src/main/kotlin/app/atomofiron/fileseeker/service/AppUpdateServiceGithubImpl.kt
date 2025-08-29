@@ -8,6 +8,7 @@ import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.common.util.Unreachable
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
+import app.atomofiron.searchboxapp.injectable.AppScope
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
@@ -22,7 +23,6 @@ import app.atomofiron.searchboxapp.model.other.UpdateType
 import app.atomofiron.searchboxapp.utils.Rslt.Err
 import app.atomofiron.searchboxapp.utils.Rslt.Ok
 import app.atomofiron.searchboxapp.utils.apkInfo
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -31,7 +31,7 @@ private const val SUBDIR = "updates" // src/res/xml/provider_paths.xml
 
 class AppUpdateServiceGithubImpl(
     private val context: Context,
-    private val scope: CoroutineScope,
+    private val scope: AppScope,
     private val apks: ApkService,
     private val api: UpdateApi,
     private val store: AppUpdateStore,
@@ -40,7 +40,7 @@ class AppUpdateServiceGithubImpl(
     companion object : AppUpdateService.Factory {
         override fun new(
             context: Context,
-            scope: CoroutineScope,
+            scope: AppScope,
             apkService: ApkService,
             updateStore: AppUpdateStore,
             preferences: PreferenceStore,

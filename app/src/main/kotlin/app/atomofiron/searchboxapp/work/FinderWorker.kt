@@ -21,6 +21,7 @@ import app.atomofiron.searchboxapp.android.tryShow
 import app.atomofiron.searchboxapp.android.updateChannel
 import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.di.DaggerInjector
+import app.atomofiron.searchboxapp.injectable.AppScope
 import app.atomofiron.searchboxapp.injectable.service.TextViewerService
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
@@ -46,7 +47,6 @@ import app.atomofiron.searchboxapp.utils.escapeQuotes
 import app.atomofiron.searchboxapp.utils.ifCanNotice
 import app.atomofiron.searchboxapp.utils.putStringArray
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
@@ -117,7 +117,7 @@ class FinderWorker(
     @Inject
     lateinit var notifications: NotificationManagerCompat
     @Inject
-    lateinit var appScope: CoroutineScope
+    lateinit var appScope: AppScope
     @Inject
     lateinit var preferenceStore: PreferenceStore
     @Inject
