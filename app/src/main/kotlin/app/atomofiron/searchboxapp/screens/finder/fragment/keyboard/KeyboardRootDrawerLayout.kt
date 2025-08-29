@@ -58,7 +58,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private var ignoreHorizontal = false
     private var tracker = VelocityTracker.obtain()
-    private var tracking: Tracking? = null
+    private var tracking: Tracking = Tracking.Unknown
     private var downPoint = PointF(0f, 0f)
     private var prevX = 0f
     private var prevY = 0f
@@ -159,7 +159,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private fun updateAnyFocused(focusedView: View) {
         this.focusedView = focusedView
         focusedView.onFocusChangeListener = focusListener
-        if (tracking.consuming) {
+        if (tracking.any) {
             return
         }
         val itemBottom = focusedView.calcBottom() ?: return
@@ -183,28 +183,31 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        tracker.addMovement(event)
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                tracker.addMovement(event)
-                tracking = Tracking.None.takeIf { drawerListener.isOpened }
                 ignoreHorizontal = false
                 delegate.resetAnimation()
                 animHorizontal?.cancel()
                 animVertical?.cancel()
                 downPoint = PointF(event.x, event.y)
+                if (drawerListener.isOpened) {
+                    tracking = Tracking.Skipping
+                }
             }
             MotionEvent.ACTION_MOVE -> {
-                tracker.addMovement(event)
                 val dx = event.x - prevX
                 val dy = event.y - prevY
                 val distanceX = event.x - downPoint.x
                 val distanceY = event.y - downPoint.y
                 when {
-                    tracking == Tracking.None -> Unit
-                    tracking == Tracking.Vertical -> moveVertically(dy)
-                    tracking is Tracking.Horizontal -> moveHorizontally(dx)
+                    tracking.skipped -> Unit
+                    tracking.cancelled -> Unit
+                    tracking.horizontal -> moveHorizontally(dx)
+                    tracking.vertical && !keyboardCallback.isControllableNow -> cancelControlKeyboard()
+                    tracking.vertical -> moveVertically(dy)
                     skipForNow(distanceX, distanceY) -> Unit
-                    abs(distanceX) > abs(distanceY) && ignoreHorizontal -> tracking = Tracking.None
+                    abs(distanceX) > abs(distanceY) && ignoreHorizontal -> tracking = Tracking.Skipping
                     abs(distanceX) > abs(distanceY) || horizontalCurrent != HorizontalStart -> {
                         val direction = when {
                             horizontalCurrent > HorizontalStart -> Direction.Right
@@ -216,18 +219,18 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                         superCancelTouchEvents(event)
                         focusedView?.hideKeyboard()
                     }
-                    distanceY > 0 && keyboardNow == keyboardMin -> tracking = Tracking.None
+                    !keyboardCallback.isControllableNow -> tracking = Tracking.Skipping
+                    distanceY > 0 && keyboardNow == keyboardMin -> tracking = Tracking.Skipping
                     distanceY < 0 && keyboardNow == keyboardMax || startVertically() -> {
                         tracking = Tracking.Vertical
                         superCancelTouchEvents(event)
                         moveVertically(dy)
                     }
-                    tracking == null -> tracking = Tracking.None
+                    tracking.unknown -> tracking = Tracking.Skipping
                 }
             }
             MotionEvent.ACTION_UP,
             MotionEvent.ACTION_CANCEL -> {
-                tracker.addMovement(event)
                 tracker.computeCurrentVelocity(VelocityPeriod)
                 val toRight = when {
                     tracking !is Tracking.Horizontal -> null
@@ -245,13 +248,13 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                     (!toShown && keyboardNow > keyboardMin) -> delegate.start(toShown)
                     else -> delegate.finish(toShown)
                 }
-                tracking = null
+                tracking = Tracking.Unknown
                 tracker.clear()
             }
         }
         prevX = event.x
         prevY = event.y
-        if (!tracking.consuming) {
+        if (tracking.unknown || tracking.skipped) {
             super.dispatchTouchEvent(event)
         }
         return true
@@ -276,8 +279,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     }
 
     private fun startVertically(): Boolean {
-        val editText = editText?.takeIf { keyboardCallback.controllable }
-            ?: return false
+        val editText = editText ?: return false
         when {
             editText.isFocused -> Unit
             focusedView != null -> Unit
@@ -389,6 +391,15 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         val moved = moveNeeded - recyclerView.translationY.toInt()
         recyclerView.translationY = moveNeeded.toFloat()
         return scrolled + moved
+    }
+
+    private fun cancelControlKeyboard() {
+        tracking = Tracking.Skipping
+        if (isControlling) {
+            isControlling = false
+            delegate.finish(false)
+            focusedView?.hideKeyboard()
+        }
     }
 
     private fun ensureControlKeyboard() {

@@ -1,14 +1,16 @@
 package app.atomofiron.searchboxapp.screens.finder.fragment.keyboard
 
-sealed class GestureTracking(
-    val consuming: Boolean,
-    val vertical: Boolean,
-) {
-    data object None : GestureTracking(false, false)
-    data object Vertical : GestureTracking(true, true)
-    data class Horizontal(val direction: GestureDirection) : GestureTracking(true, false)
+sealed interface GestureTracking {
+    val unknown: Boolean get() = this == Unknown
+    val skipped: Boolean get() = this == Skipping
+    val cancelled: Boolean get() = this == Cancelled
+    val vertical: Boolean get() = this == Vertical
+    val horizontal: Boolean get() = this is Horizontal
+    val any: Boolean get() = vertical || horizontal
+
+    data object Unknown : GestureTracking
+    data object Skipping : GestureTracking
+    data object Cancelled : GestureTracking
+    data object Vertical : GestureTracking
+    data class Horizontal(val direction: GestureDirection) : GestureTracking
 }
-
-val GestureTracking?.consuming: Boolean get() = this?.consuming == true
-
-val GestureTracking?.vertical: Boolean get() = this?.vertical == true
