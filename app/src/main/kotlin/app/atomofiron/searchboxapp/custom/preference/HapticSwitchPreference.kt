@@ -8,6 +8,7 @@ import androidx.core.view.HapticFeedbackConstantsCompat.TOGGLE_OFF
 import androidx.core.view.HapticFeedbackConstantsCompat.TOGGLE_ON
 import androidx.preference.PreferenceViewHolder
 import androidx.preference.SwitchPreferenceCompat
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.performHapticEffect
 import java.lang.ref.WeakReference
 
@@ -19,6 +20,10 @@ class HapticSwitchPreference : SwitchPreferenceCompat {
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes)
+
+    init {
+        widgetLayoutResource = R.layout.widget_switch
+    }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
         super.onBindViewHolder(holder)

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
     <app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
         app:key="pref_app_update"
         />
@@ -11,10 +11,10 @@
         app:key="pref_use_su"
         app:defaultValue="false"
         app:icon="@drawable/ic_hash"
-        app:widgetLayout="@layout/widget_switch"
         />
     <PreferenceCategory
-        app:title="@string/user_interface">
+        app:title="@string/user_interface"
+        >
         <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
             app:title="@string/pref_theme"
             app:key="pref_app_theme"
@@ -26,7 +26,6 @@
             app:title="@string/pref_deep_black"
             app:key="pref_deep_black"
             app:defaultValue="false"
-            app:widgetLayout="@layout/widget_switch"
             />
         <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
             app:title="@string/pref_orientation"
@@ -39,7 +38,6 @@
             app:title="@string/pref_haptic_feedback"
             app:key="pref_haptic_feedback"
             app:defaultValue="true"
-            app:widgetLayout="@layout/widget_switch"
             />
         <Preference
             app:title="@string/pref_explorer_item"
@@ -54,7 +52,8 @@
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_category_system"
-        app:title="@string/pref_category_system">
+        app:title="@string/pref_category_system"
+        >
         <Preference
             app:title="@string/pref_export_import"
             app:key="pref_export_import"
@@ -65,16 +64,15 @@
             app:title="@string/pref_embedded_toybox"
             app:key="pref_toybox_path"
             app:icon="@drawable/ic_shell"
-            app:widgetLayout="@layout/widget_switch"
             />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_category_debug"
-        app:title="@string/pref_category_debug">
+        app:title="@string/pref_category_debug"
+        >
         <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
             app:title="@string/pref_leak_canary"
             app:key="pref_leak_canary"
-            app:widgetLayout="@layout/widget_switch"
             />
         <Preference
             app:title="@string/pref_color_scheme"
