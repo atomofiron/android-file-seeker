@@ -26,8 +26,8 @@ class JoystickDelegate(
     private val preferences: PreferenceStore,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
     companion object {
-        private fun JoystickComposition.withPrimary(context: Context): JoystickComposition {
-            val color = context.findColorByAttr(MaterialAttr.colorPrimary)
+        private fun JoystickComposition.withDefault(context: Context): JoystickComposition {
+            val color = context.findColorByAttr(MaterialAttr.colorTertiaryContainer)
             return copy(red = Color.red(color), green = Color.green(color), blue = Color.blue(color))
         }
     }
@@ -46,7 +46,7 @@ class JoystickDelegate(
     private fun CurtainPreferenceJoystickBinding.init() {
         if (!entity.overrideTheme) {
             // day/night themes has different primary colors
-            entity = entity.withPrimary(root.context)
+            entity = entity.withDefault(root.context)
         }
         preferenceJoystickTvTitle.text = entity.colorText()
         hapticScale.max = JoystickHaptic.entries.lastIndex
@@ -129,7 +129,7 @@ class JoystickDelegate(
 
         override fun onClick(view: View) {
             entity = when (view.id) {
-                R.id.btn_default -> JoystickComposition.Default.withPrimary(view.context)
+                R.id.btn_default -> JoystickComposition.Default.withDefault(view.context)
                 else -> throw Exception()
             }
             binding.bind()

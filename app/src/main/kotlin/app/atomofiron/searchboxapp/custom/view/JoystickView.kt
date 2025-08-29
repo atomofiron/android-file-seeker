@@ -11,7 +11,6 @@ import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import android.util.AttributeSet
-import android.view.HapticFeedbackConstants
 import android.view.MotionEvent
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -23,15 +22,13 @@ import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
+import app.atomofiron.searchboxapp.utils.HAPTIC_HEAVY
+import app.atomofiron.searchboxapp.utils.HAPTIC_LITE
+import app.atomofiron.searchboxapp.utils.HAPTIC_NO
 import app.atomofiron.searchboxapp.utils.performHapticEffect
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sin
-
-@SuppressLint("InlinedApi")
-private const val NO = HapticFeedbackConstants.NO_HAPTICS
-private const val PRESS = HapticFeedbackConstants.KEYBOARD_TAP
-private const val RELEASE = HapticFeedbackConstants.CLOCK_TICK
 
 private const val RELEASED = 0f
 private const val PRESSED = (Math.PI / 2).toFloat()
@@ -40,10 +37,10 @@ private const val FULL = 255
 private const val GLOW_DURATION = 256L
 
 fun JoystickHaptic.effect(press: Boolean) = when (this) {
-    JoystickHaptic.None -> NO
-    JoystickHaptic.Lite -> if (press) RELEASE else NO
-    JoystickHaptic.Double -> RELEASE
-    JoystickHaptic.Heavy -> PRESS
+    JoystickHaptic.None -> HAPTIC_NO
+    JoystickHaptic.Lite -> if (press) HAPTIC_LITE else HAPTIC_NO
+    JoystickHaptic.Double -> HAPTIC_LITE
+    JoystickHaptic.Heavy -> if (press) HAPTIC_HEAVY else HAPTIC_HEAVY
 }
 
 class JoystickView @JvmOverloads constructor(
@@ -103,7 +100,7 @@ class JoystickView @JvmOverloads constructor(
         composition ?: return
         this.composition = composition
         val isDark = context.findBooleanByAttr(R.attr.isDarkTheme)
-        val colorPrimary = context.findColorByAttr(MaterialAttr.colorPrimary)
+        val colorPrimary = context.findColorByAttr(MaterialAttr.colorTertiaryContainer)
 
         val circleColor = when {
             composition.overrideTheme -> composition.color(isDark)
@@ -120,6 +117,7 @@ class JoystickView @JvmOverloads constructor(
         val contrastBlack = ColorUtils.calculateContrast(black, circleColor)
         val contrastWhite = ColorUtils.calculateContrast(white, circleColor)
         val iconColor = when {
+            !composition.overrideTheme -> context.findColorByAttr(MaterialAttr.colorOnTertiaryContainer)
             contrastBlack > contrastWhite -> black
             else -> white
         }
