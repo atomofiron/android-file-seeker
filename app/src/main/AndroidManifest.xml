@@ -32,7 +32,6 @@
             android:screenOrientation="unspecified"
             android:exported="true"
             android:theme="@style/CompatTheme"
-            android:windowSoftInputMode="adjustNothing"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

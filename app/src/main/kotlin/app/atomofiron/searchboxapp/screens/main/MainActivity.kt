@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
+import android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.activity.OnBackPressedCallback
@@ -77,7 +78,10 @@ class MainActivity : AppCompatActivity() {
         window.reallyDisableFitsSystemWindows()
 
         CornerPathDebug(resources.displayMetrics)
-        if (Android.R) unlockHighFrameRate()
+        if (Android.R) {
+            window.setSoftInputMode(SOFT_INPUT_ADJUST_NOTHING)
+            unlockHighFrameRate()
+        }
     }
 
     private fun onCreateView(savedInstanceState: Bundle?) {
