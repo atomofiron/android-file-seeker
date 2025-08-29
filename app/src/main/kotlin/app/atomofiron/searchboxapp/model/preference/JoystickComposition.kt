@@ -63,14 +63,23 @@ data class JoystickComposition(
         else -> color
     }
 
+    fun colorText(channel: Int): String {
+        val hex = Integer.toHexString(channel)
+        val builder = StringBuilder(hex)
+        while (builder.length < 2) {
+            builder.insert(0, '0')
+        }
+        return builder.toString()
+    }
+
     fun colorText(): String {
-        val builder = StringBuilder("#")
         val color = rgb()
         val hex = Integer.toHexString(color)
-        for (i in 0..(5 - hex.length)) {
-            builder.append("0")
+        val builder = StringBuilder(hex)
+        while (builder.length < 6) {
+            builder.insert(0, '0')
         }
-        builder.append(hex)
+        builder.insert(0, '#')
         return builder.toString()
     }
 

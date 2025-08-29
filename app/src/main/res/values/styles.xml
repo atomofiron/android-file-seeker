@@ -28,7 +28,7 @@
 
 		<item name="isDarkTheme">@bool/isNightTheme</item>
 		<item name="materialCardViewStyle">@style/CardViewStyle</item>
-		<item name="materialTonalButton">@style/Widget.Material3.Button.TonalButton</item>
+		<item name="materialTonalButton">@style/TonalButtonStyle</item>
 		<item name="chipStyle">@style/ChipStyle</item>
 		<item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.FilledBox</item>
 
@@ -98,6 +98,10 @@
 
 	<style name="CardViewStyle" parent="@style/Widget.Material3.CardView.Elevated" />
 
+	<style name="TonalButtonStyle" parent="@style/Widget.Material3.Button.TonalButton">
+		<item name="cornerRadius">@dimen/padding_semi</item>
+	</style>
+
 	<style name="AppBarLayoutStyle.Amoled" parent="@style/Widget.Material3.AppBarLayout" />
 
 	<style name="CollapsingToolbarLayoutStyle.Amoled" parent="@style/Widget.Material3.CollapsingToolbar.Large" />
@@ -105,6 +109,7 @@
 	<style name="ChipStyle" parent="@style/Widget.Material3.Chip.Assist">
 		<item name="chipStrokeColor">?colorSurfaceVariant</item>
 		<item name="chipIconTint">@color/m3_chip_text_color</item>
+		<item name="chipMinTouchTargetSize">@dimen/chip_area</item>
 	</style>
 
 	<style name="ShapeAppearance.Corners" parent="ShapeAppearance.MaterialComponents.SmallComponent">

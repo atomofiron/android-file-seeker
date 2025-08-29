@@ -26,8 +26,4 @@
         <item>МБ</item>
         <item>ГБ</item>
     </string-array>
-
-    <string-array name="dont_ask_anymore">
-        <item>больше не спрашивать</item>
-    </string-array>
 </resources>

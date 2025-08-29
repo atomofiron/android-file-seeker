@@ -143,9 +143,9 @@
     <string name="a_name">Имя</string>
     <string name="a_file">Файл</string>
     <string name="a_directory">Директорию</string>
-    <string name="inverse_glowing">Инвертировать свечение</string>
+    <string name="inverse_glow">Инвертировать свечение</string>
     <string name="haptic_effect">Тактильный отклик</string>
-    <string name="inverse_for_dark">Инвертировать при тёмной теме</string>
+    <string name="inverse_for_dark">Инвертировать на тёмной теме</string>
     <string name="pref_category_debug">Отладка</string>
     <string name="root">Корень</string>
     <string name="copy_path">Скопировать путь</string>
@@ -183,6 +183,10 @@
     <string name="fetching">Получение метаданных…</string>
     <string name="and">\u0020и\u0020</string>
     <string name="nothing_was_deleted">Ничего не было удалено</string>
+    <string name="none">Нет</string>
+    <string name="lite">Лёгкий</string>
+    <string name="twice">Двойной</string>
+    <string name="heavy">Тяжёлый</string>
     <plurals name="x_dirs">
         <item quantity="one">%d директория</item>
         <item quantity="few">%d директории</item>

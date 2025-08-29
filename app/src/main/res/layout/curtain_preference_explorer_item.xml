@@ -118,7 +118,7 @@
             android:layout_marginHorizontal="@dimen/padding_mini"
             android:checkable="true"
             android:text="@string/empty_check_box"
-            app:chipIcon="@drawable/ic_checkbox_outline"
+            app:chipIcon="@drawable/ic_check_box_outline"
             app:chipMinTouchTargetSize="@dimen/chip_area"
             />
         <com.google.android.material.chip.Chip

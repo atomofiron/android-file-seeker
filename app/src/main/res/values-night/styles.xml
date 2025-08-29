@@ -40,9 +40,4 @@
         <item name="contentScrim">@color/black</item>
     </style>
 
-    <style name="ChipStyle" parent="@style/Widget.Material3.Chip.Assist">
-        <item name="chipStrokeColor">?colorSurfaceVariant</item>
-        <item name="chipIconTint">@color/m3_chip_text_color</item>
-    </style>
-
 </resources>

@@ -42,6 +42,7 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import java.io.Serializable
@@ -247,4 +248,8 @@ fun View.updateLayoutParams(width: Int = Int.MIN_VALUE, height: Int = Int.MIN_VA
         if (height != Int.MIN_VALUE) this.height = height
     }
 }
+
+var Slider.intValue: Int
+    get() = value.toInt()
+    set(value) { this.value = value.toFloat() }
 
