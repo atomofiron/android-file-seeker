@@ -151,6 +151,7 @@
     <string name="inverse_for_dark">Inverse for Dark theme</string>
     <string name="pref_category_debug">Debug</string>
     <string name="pref_leak_canary" translatable="false">Leak Canary</string>
+    <string name="pref_color_scheme" translatable="false">Color scheme</string>
     <string name="root">Root</string>
     <string name="foreground_notification_name" translatable="false">Foreground Notification</string>
     <string name="result_notification_name" translatable="false">Result Notification</string>

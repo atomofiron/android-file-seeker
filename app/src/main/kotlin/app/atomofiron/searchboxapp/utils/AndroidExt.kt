@@ -31,6 +31,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.view.ScrollingView
 import androidx.core.view.isEmpty
+import androidx.core.view.updateLayoutParams
 import androidx.documentfile.provider.DocumentFile
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -239,3 +240,11 @@ fun Uri.name(context: Context): String? {
 }
 
 val View.marginLayoutParams: ViewGroup.MarginLayoutParams get() = layoutParams as ViewGroup.MarginLayoutParams
+
+fun View.updateLayoutParams(width: Int = Int.MIN_VALUE, height: Int = Int.MIN_VALUE) {
+    updateLayoutParams {
+        if (width != Int.MIN_VALUE) this.width = width
+        if (height != Int.MIN_VALUE) this.height = height
+    }
+}
+

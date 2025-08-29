@@ -76,5 +76,9 @@
             app:key="pref_leak_canary"
             app:widgetLayout="@layout/widget_switch"
             />
+        <Preference
+            app:title="@string/pref_color_scheme"
+            app:key="pref_color_scheme"
+            />
     </PreferenceCategory>
 </PreferenceScreen>

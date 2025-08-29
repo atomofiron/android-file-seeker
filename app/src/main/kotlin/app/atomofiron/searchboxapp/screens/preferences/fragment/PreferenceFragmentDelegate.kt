@@ -70,6 +70,7 @@ class PreferenceFragmentDelegate(
     override fun onPreferenceClick(preference: Preference): Boolean {
         when (preference.key) {
             PreferenceKeys.PREF_EXPORT_IMPORT -> clickOutput.onExportImportClick()
+            PreferenceKeys.PREF_COLOR_SCHEME -> clickOutput.onColorSchemeClick()
             PreferenceKeys.KeyExplorerItem.name -> clickOutput.onExplorerItemClick()
             PreferenceKeys.KeyJoystick.name -> clickOutput.onJoystickClick()
         }

@@ -35,6 +35,7 @@ class PreferenceClickPresenterDelegate(
                 R.layout.curtain_preference_export_import -> ExportImportDelegate(exportImportDelegate)
                 R.layout.curtain_preference_explorer_item -> ExplorerItemDelegate(preferenceStore, appStore.resourcesProperty)
                 R.layout.curtain_preference_joystick -> JoystickDelegate(preferenceStore)
+                R.layout.curtain_color_scheme -> ColorSchemeDelegate()
                 else -> return@collectForMe
             }
             adapter.setController(controller)
@@ -42,6 +43,8 @@ class PreferenceClickPresenterDelegate(
     }
 
     override fun onAboutClick() = router.showCurtain(recipient, R.layout.curtain_about)
+
+    override fun onColorSchemeClick() = router.showCurtain(recipient, R.layout.curtain_color_scheme)
 
     override fun onExportImportClick() = router.showCurtain(recipient, R.layout.curtain_preference_export_import)
 

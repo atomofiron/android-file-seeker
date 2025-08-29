@@ -15,7 +15,7 @@ object PreferenceKeys {
     const val PREF_LEAK_CANARY = "pref_leak_canary"
     const val PREF_CATEGORY_SYSTEM = "pref_category_system"
     const val PREF_CATEGORY_DEBUG = "pref_category_debug"
-    private const val PREF_TOYBOX = "pref_toybox_path"
+    const val PREF_COLOR_SCHEME = "pref_color_scheme"
 
     val KeyOpenedDirPath = PreferenceKey("pref_opened_dir_path", "")
     val KeyDrawerGravity = PreferenceKey("pref_drawer_gravity", Gravity.START)
@@ -36,7 +36,7 @@ object PreferenceKeys {
     val KeyExplorerItem = PreferenceKey("pref_explorer_item", ExplorerItemComposition.DEFAULT)
     val KeyJoystick = PreferenceKey("pref_joystick", JoystickComposition.DEFAULT)
     val KeyHapticFeedback = PreferenceKey("pref_haptic_feedback", true)
-    val KeyToybox = PreferenceKey(PREF_TOYBOX, ToyboxVariant.Undefined.EMPTY)
+    val KeyToybox = PreferenceKey("pref_toybox_path", ToyboxVariant.Undefined.EMPTY)
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
         arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyShownNotificationUpdateCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyHapticFeedback, KeyToybox)
