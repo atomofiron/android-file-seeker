@@ -4,7 +4,7 @@ import android.graphics.Color
 
 private const val INV_FOR_DARK  =  1 shl 24
 private const val INV_GLOWING =    1 shl 25
-private const val OVERRIDE_THEME = 1 shl 26
+private const val OVERRIDE_COLOR = 1 shl 26
 private const val HAPTIC_OFFSET = 27
 private const val BYTE = 256
 private const val FF = 255
@@ -12,7 +12,7 @@ private const val FF = 255
 data class JoystickComposition(
     val invForDark: Boolean,
     val invGlowing: Boolean,
-    val overrideTheme: Boolean,
+    val overrideColor: Boolean,
     val haptic: JoystickHaptic,
     val red: Int,
     val green: Int,
@@ -26,7 +26,7 @@ data class JoystickComposition(
     constructor(flags: Int) : this(
         invForDark = (flags and INV_FOR_DARK) == INV_FOR_DARK,
         invGlowing = (flags and INV_GLOWING) == INV_GLOWING,
-        overrideTheme = (flags and OVERRIDE_THEME) == OVERRIDE_THEME,
+        overrideColor = (flags and OVERRIDE_COLOR) == OVERRIDE_COLOR,
         haptic = JoystickHaptic.bits(flags, HAPTIC_OFFSET),
         red = flags / BYTE / BYTE % BYTE,
         green = flags / BYTE % BYTE,
@@ -43,8 +43,8 @@ data class JoystickComposition(
         if (invGlowing) {
             data += INV_GLOWING
         }
-        if (overrideTheme) {
-            data += OVERRIDE_THEME
+        if (overrideColor) {
+            data += OVERRIDE_COLOR
         }
         data += haptic.bits(HAPTIC_OFFSET)
         this.data = data

@@ -43,6 +43,8 @@ fun JoystickHaptic.effect(press: Boolean) = when (this) {
     JoystickHaptic.Heavy -> if (press) HAPTIC_HEAVY else HAPTIC_HEAVY
 }
 
+fun Context.joystickDefaultColor() = findColorByAttr(MaterialAttr.colorTertiaryContainer)
+
 class JoystickView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -100,16 +102,16 @@ class JoystickView @JvmOverloads constructor(
         composition ?: return
         this.composition = composition
         val isDark = context.findBooleanByAttr(R.attr.isDarkTheme)
-        val colorPrimary = context.findColorByAttr(MaterialAttr.colorTertiaryContainer)
+        val defaultColor = context.joystickDefaultColor()
 
         val circleColor = when {
-            composition.overrideTheme -> composition.color(isDark)
-            else -> colorPrimary
+            composition.overrideColor -> composition.color(isDark)
+            else -> defaultColor
         }
         paint.color = circleColor
         glowColor = when {
-            composition.overrideTheme -> composition.glow(isDark)
-            else -> composition.glow(isDark, colorPrimary)
+            composition.overrideColor -> composition.glow(isDark)
+            else -> composition.glow(isDark, defaultColor)
         }
 
         val black = ContextCompat.getColor(context, R.color.black)
@@ -117,7 +119,7 @@ class JoystickView @JvmOverloads constructor(
         val contrastBlack = ColorUtils.calculateContrast(black, circleColor)
         val contrastWhite = ColorUtils.calculateContrast(white, circleColor)
         val iconColor = when {
-            !composition.overrideTheme -> context.findColorByAttr(MaterialAttr.colorOnTertiaryContainer)
+            !composition.overrideColor -> context.findColorByAttr(MaterialAttr.colorOnTertiaryContainer)
             contrastBlack > contrastWhite -> black
             else -> white
         }
