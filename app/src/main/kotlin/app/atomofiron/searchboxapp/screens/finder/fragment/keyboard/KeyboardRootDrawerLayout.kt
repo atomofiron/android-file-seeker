@@ -204,7 +204,6 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                     tracking.skipped -> Unit
                     tracking.cancelled -> Unit
                     tracking.horizontal -> moveHorizontally(dx)
-                    tracking.vertical && !keyboardCallback.isControllableNow -> cancelControlKeyboard()
                     tracking.vertical -> moveVertically(dy)
                     skipForNow(distanceX, distanceY) -> Unit
                     abs(distanceX) > abs(distanceY) && ignoreHorizontal -> tracking = Tracking.Skipping
@@ -219,7 +218,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                         superCancelTouchEvents(event)
                         focusedView?.hideKeyboard()
                     }
-                    !keyboardCallback.isControllableNow -> tracking = Tracking.Skipping
+                    !keyboardCallback.isControllable -> tracking = Tracking.Skipping
                     distanceY > 0 && keyboardNow == keyboardMin -> tracking = Tracking.Skipping
                     distanceY < 0 && keyboardNow == keyboardMax || startVertically() -> {
                         tracking = Tracking.Vertical
@@ -393,13 +392,10 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         return scrolled + moved
     }
 
-    private fun cancelControlKeyboard() {
+    private fun cancelControlKeyboard(visible: Boolean) {
         tracking = Tracking.Skipping
-        if (isControlling) {
-            isControlling = false
-            delegate.finish(false)
-            focusedView?.hideKeyboard()
-        }
+        isControlling = false
+        delegate.finish(visible)
     }
 
     private fun ensureControlKeyboard() {
@@ -472,5 +468,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             if (!visible) focusedView?.clearFocus()
             isControlling = false
         }
+
+        override fun onImeBroke(visible: Boolean) = cancelControlKeyboard(visible)
     }
 }

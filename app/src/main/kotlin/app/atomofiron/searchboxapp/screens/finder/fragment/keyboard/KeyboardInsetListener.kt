@@ -4,4 +4,5 @@ interface KeyboardInsetListener {
     fun onImeStart(max: Int) = Unit
     fun onImeMove(current: Int) = Unit
     fun onImeEnd(visible: Boolean) = Unit
+    fun onImeBroke(visible: Boolean) = Unit
 }

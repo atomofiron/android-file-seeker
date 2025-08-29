@@ -15,43 +15,51 @@ class KeyboardInsetCallback(
 
     private var max = 0
     private var isPrepareCalled = false
-    var isControllableNow = Android.R
+    var isControllable = Android.R
         private set
     var visible = false
         private set
 
     override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
         val current = windowInsets[ExtType.ime].bottom
-        if (!isControllableNow) {
-            if (current > 0) {
-                max = current
-            }
-            if (max > 0 && visible != (current > 0)) {
-                visible = current > 0
-                listeners.forEach { it.onImeStart(max) }
-                listeners.forEach { it.onImeMove(current) }
-                listeners.forEach { it.onImeEnd(visible = current > 0) }
-            }
-        } else if (!visible && current > 0 && !isPrepareCalled) {
+        if (isControllable && !visible && current > 0 && !isPrepareCalled) {
             // it just got broken
-            isControllableNow = false
+            isControllable = false
+            notifyListeners(current)
+            listeners.forEach { it.onImeBroke(visible) }
+        } else if (!isControllable) {
+            notifyListeners(current)
+        }
+    }
+
+    private fun notifyListeners(current: Int) {
+        if (current > 0) {
+            max = current
+        }
+        if (max > 0 && visible != (current > 0)) {
+            visible = current > 0
+            listeners.forEach { it.onImeStart(max) }
+            listeners.forEach { it.onImeMove(current) }
+            listeners.forEach { it.onImeEnd(visible = current > 0) }
         }
     }
 
     override fun onPrepare(animation: WindowInsetsAnimationCompat) {
-        isPrepareCalled = true
+        if (animation.typeMask == Type.ime()) {
+            isPrepareCalled = true
+        }
     }
 
     override fun onStart(
         animation: WindowInsetsAnimationCompat,
         bounds: BoundsCompat,
     ): BoundsCompat {
-        isPrepareCalled = false
-        isControllableNow = true
-        val anim = animation.takeIf { it.typeMask == Type.ime() }
-        anim ?: return bounds
-        max = bounds.upperBound.bottom
-        listeners.forEach { it.onImeStart(bounds.upperBound.bottom) }
+        if (animation.typeMask == Type.ime()) {
+            isPrepareCalled = false
+            isControllable = true
+            max = bounds.upperBound.bottom
+            listeners.forEach { it.onImeStart(max) }
+        }
         return bounds
     }
 
@@ -59,16 +67,18 @@ class KeyboardInsetCallback(
         insets: WindowInsetsCompat,
         runningAnimations: List<WindowInsetsAnimationCompat>,
     ): WindowInsetsCompat {
-        val anim = runningAnimations.find { it.typeMask == Type.ime() }
-        anim ?: return insets
-        val ime = insets.getInsets(Type.ime()).bottom
-        visible = ime > 0
-        listeners.forEach { it.onImeMove(ime) }
+        if (runningAnimations.any { it.typeMask == Type.ime() }) {
+            val ime = insets.getInsets(Type.ime()).bottom
+            visible = ime > 0
+            listeners.forEach { it.onImeMove(ime) }
+        }
         return insets
     }
 
     override fun onEnd(animation: WindowInsetsAnimationCompat) {
-        // when app was minimized
-        listeners.forEach { it.onImeEnd(visible) }
+        // on app was minimized
+        if (animation.typeMask == Type.ime()) {
+            listeners.forEach { it.onImeEnd(visible) }
+        }
     }
 }
