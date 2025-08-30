@@ -72,6 +72,7 @@
         app:layout_constraintStart_toEndOf="@+id/barrier_start"
         app:layout_constraintTop_toBottomOf="@id/item_explorer_tv_title"
         app:layout_constraintEnd_toStartOf="@+id/item_explorer_tv_details"
+        app:layout_goneMarginEnd="@dimen/edge_size"
         tools:text="0000-00-00 00:00 -rwxrwxrwx atomofiron everybody"
         />
     <com.google.android.material.textview.MaterialTextView
