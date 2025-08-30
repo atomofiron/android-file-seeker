@@ -48,23 +48,23 @@ class JoystickDelegate(
 
         bind()
         val delegate = LocalDelegate(this)
-        sbRed.addOnChangeListener(delegate::onColorChanged)
-        sbRed.setLabelFormatter(delegate::colorLabels)
-        sbGreen.addOnChangeListener(delegate::onColorChanged)
-        sbGreen.setLabelFormatter(delegate::colorLabels)
-        sbBlue.addOnChangeListener(delegate::onColorChanged)
-        sbBlue.setLabelFormatter(delegate::colorLabels)
+        red.addOnChangeListener(delegate::onColorChanged)
+        red.setLabelFormatter(delegate::colorLabels)
+        green.addOnChangeListener(delegate::onColorChanged)
+        green.setLabelFormatter(delegate::colorLabels)
+        blue.addOnChangeListener(delegate::onColorChanged)
+        blue.setLabelFormatter(delegate::colorLabels)
         invForTheme.setOnCheckedChangeListener(delegate::onThemeInvertingChanged)
         invHighlight.setOnCheckedChangeListener(delegate::onHighlightInvertingChanged)
         hapticScale.addOnChangeListener(delegate::onHapticChanged)
-        btnDefault.setOnClickListener(delegate::onResetDefaultClick)
         hapticScale.setLabelFormatter(delegate::hapticLabels)
+        btnReset.setOnClickListener(delegate::onResetDefaultClick)
     }
 
     private fun CurtainPreferenceJoystickBinding.bind() {
-        sbRed.intValue = entity.red
-        sbGreen.intValue = entity.green
-        sbBlue.intValue = entity.blue
+        red.intValue = entity.red
+        green.intValue = entity.green
+        blue.intValue = entity.blue
         invForTheme.isChecked = entity.invForDark
         invForTheme.setChipIconResource(entity.invForDark.iconId())
         invHighlight.isChecked = entity.invGlowing
@@ -73,7 +73,8 @@ class JoystickDelegate(
             hapticFeedback -> entity.haptic.index
             else -> JoystickHaptic.None.index
         }
-        preferenceJoystickTvTitle.text = entity.colorText()
+        title.text = entity.colorText()
+        btnReset.isEnabled = entity.overrideColor || entity != JoystickComposition.Default.copy(red = entity.red, green = entity.green, blue = entity.blue)
     }
 
     private fun Boolean.iconId() = if (this) R.drawable.ic_check_box else R.drawable.ic_check_box_outline
@@ -91,21 +92,27 @@ class JoystickDelegate(
             }.let { binding.context.getString(it) }
         }
 
-        fun onColorChanged(seekBar: Slider, value: Float, fromUser: Boolean) {
+        fun onColorChanged(slider: Slider, value: Float, fromUser: Boolean) {
+            if (!fromUser) {
+                return
+            }
             val value = value.toInt()
-            val overrideColor = entity.overrideColor || fromUser
-            when (seekBar.id) {
-                R.id.sb_red -> entity.copy(red = value, overrideColor = overrideColor)
-                R.id.sb_green -> entity.copy(green = value, overrideColor = overrideColor)
-                R.id.sb_blue -> entity.copy(blue = value, overrideColor = overrideColor)
+            when (slider.id) {
+                R.id.red -> entity.copy(red = value, overrideColor = true)
+                R.id.green -> entity.copy(green = value, overrideColor = true)
+                R.id.blue -> entity.copy(blue = value, overrideColor = true)
                 else -> throw Exception()
             }.apply()
         }
 
-        fun onHapticChanged(seekBar: Slider, value: Float, fromUser: Boolean) {
+        fun onHapticChanged(slider: Slider, value: Float, fromUser: Boolean) {
+            if (!fromUser) {
+                return
+            }
             val value = value.toInt()
             val haptic = JoystickHaptic.index(value)
             entity = entity.copy(haptic = haptic)
+            binding.bind()
             preferences {
                 setJoystickComposition(entity)
                 when {
@@ -126,10 +133,7 @@ class JoystickDelegate(
         }
 
         fun onResetDefaultClick(view: View) {
-            when (view.id) {
-                R.id.btn_default -> JoystickComposition.Default.withDefaultColor(view.context)
-                else -> throw Exception()
-            }.apply()
+            JoystickComposition.Default.withDefaultColor(view.context).apply()
         }
 
         fun onThemeInvertingChanged(button: CompoundButton, isChecked: Boolean) {

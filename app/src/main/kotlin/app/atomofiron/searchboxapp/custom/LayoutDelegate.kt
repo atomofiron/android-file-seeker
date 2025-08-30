@@ -26,6 +26,7 @@ import app.atomofiron.searchboxapp.custom.view.layout.RootFrameLayout
 import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.addOnAttachListener
 import app.atomofiron.searchboxapp.utils.getDisplayCompat
 import app.atomofiron.searchboxapp.utils.isRtl
 import com.google.android.material.appbar.AppBarLayout
@@ -45,7 +46,6 @@ object LayoutDelegate {
         tabLayout: MaterialButtonToggleGroup? = null,
         appBarLayout: AppBarLayout? = null,
         snackbarContainer: CoordinatorLayout? = null,
-        preMeasureCallback: ((width: Int) -> Unit)? = null,
     ) {
         val insetsProvider = (view as View).findInsetsProvider()!!
         var layoutWas: Layout? = null
@@ -55,8 +55,7 @@ object LayoutDelegate {
             DockNotch(size)
         }
         val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock + joystick }, start = true, top = appBarLayout == null, end = true, bottom = true)
-        addLayoutListener { width, layout ->
-            preMeasureCallback?.invoke(width)
+        addLayoutListener { layout ->
             if (layout == layoutWas) {
                 return@addLayoutListener
             }
@@ -107,12 +106,9 @@ object LayoutDelegate {
         setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.run { ground.isBottom && withJoystick } }))
     }
 
-    private var last = false
-    private fun Layout.Ground.withJoystick(root: ViewGroup): Boolean {
-        val insets = ViewCompat.getRootWindowInsets(root)
-        insets ?: return true
-        val ime = insets.getInsets(Type.ime())
-        if (isBottom && ime.bottom > 0) return last
+    private fun View.withJoystick(): Boolean {
+        val insets = ViewCompat.getRootWindowInsets(this)
+        insets ?: return false
         val tap = insets.getInsetsIgnoringVisibility(Type.tappableElement())
         val nav = insets.getInsetsIgnoringVisibility(Type.navigationBars())
         return when {
@@ -120,19 +116,21 @@ object LayoutDelegate {
             nav.right > 0 -> false
             nav.bottom == 0 -> true
             else -> nav.bottom != tap.bottom
-        }.also { last = it }
+        }
     }
 
-    private fun MeasureProvider.addLayoutListener(callback: (width: Int, Layout) -> Unit) {
+    fun MeasureProvider.addLayoutListener(callback: (Layout) -> Unit) {
         val display = view.context.getDisplayCompat()
         var was: Layout? = null
-        addMeasureListener { width, height ->
-            val layout = view.getLayout(width, height, display)
+        val action = {
+            val layout = view.getLayout(display)
             if (layout != was) {
                 was = layout
-                callback(width, layout)
+                callback(layout)
             }
         }
+        view.addOnAttachListener(oneTime = true, onAttach = action)
+        addMeasureListener { _, _ -> action() }
     }
 
     fun View.setScreenSizeListener(listener: (width: ScreenSize, height: ScreenSize) -> Unit) {
@@ -163,27 +161,28 @@ object LayoutDelegate {
         }
     }
 
-    fun ViewGroup.getLayout(): Layout = getLayout(measuredWidth, measuredHeight, context.getDisplayCompat())
+    fun ViewGroup.getLayout(): Layout = getLayout(context.getDisplayCompat())
 
-    fun ViewGroup.getLayout(width: Int, height: Int, display: Display?): Layout {
-        val w = if (width > 0) width else resources.displayMetrics.widthPixels
-        val h = if (height > 0) height else resources.displayMetrics.heightPixels
+    fun ViewGroup.getLayout(display: Display?): Layout {
+        val metrics = resources.displayMetrics // size should be the same for each place in the view tree
+        val width = metrics.widthPixels
+        val height = metrics.heightPixels
         val maxSpace = resources.getDimensionPixelSize(R.dimen.bottom_bar_max_width)
         val minSpace = resources.getDimensionPixelSize(R.dimen.min_space_with_joystick)
         val ground = when {
-            w < h && w < maxSpace -> Layout.Ground.Bottom
+            width < height && width < maxSpace -> Layout.Ground.Bottom
             display?.rotation == Surface.ROTATION_270 -> Layout.Ground.Left
             else -> Layout.Ground.Right
         }
-        val largeScreen = w >= maxSpace && h >= maxSpace
-        val smallScreen = w < minSpace && h < minSpace
-        val withJoystick = !smallScreen && (largeScreen || ground.withJoystick(root = this))
+        val largeScreen = width >= maxSpace && height >= maxSpace
+        val smallScreen = width < minSpace && height < minSpace
+        val withJoystick = !smallScreen && (largeScreen || withJoystick())
         return Layout(ground, withJoystick, isRtl())
     }
 
     fun JoystickView.syncWithLayout(root: RootFrameLayout) {
         var was: Layout? = null
-        root.addLayoutListener { width, layout ->
+        root.addLayoutListener { layout ->
             if (layout == was) {
                 return@addLayoutListener
             }

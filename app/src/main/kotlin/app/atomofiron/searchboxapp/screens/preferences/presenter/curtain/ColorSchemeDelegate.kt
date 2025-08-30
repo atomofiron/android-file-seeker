@@ -27,7 +27,7 @@ class ColorSchemeDelegate : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
     private fun CurtainColorSchemeBinding.init() {
         for (attr in attrs()) {
             val textView = TextView(root.context)
-            val padding = root.resources.getDimensionPixelSize(R.dimen.padding_common)
+            val padding = root.resources.getDimensionPixelSize(R.dimen.padding_half)
             textView.updatePaddingRelative(start = padding, top = padding, end = padding, bottom = padding)
             textView.text = root.resources.getResourceEntryName(attr)
             val color = root.context.findColorByAttr(attr)

@@ -253,3 +253,31 @@ var Slider.intValue: Int
     get() = value.toInt()
     set(value) { this.value = value.toFloat() }
 
+fun View.addOnAttachListener(
+    oneTime: Boolean = false,
+    onDetach: (() -> Unit)? = null,
+    onAttach: (() -> Unit)? = null,
+) {
+    if (onAttach == null && onDetach == null) {
+        return
+    }
+    if (onAttach != null && isAttachedToWindow) {
+        onAttach()
+        if (oneTime) return
+    }
+    val listener = object : View.OnAttachStateChangeListener {
+        override fun onViewAttachedToWindow(v: View) {
+            onAttach?.invoke()
+            if (oneTime && onAttach != null) {
+                removeOnAttachStateChangeListener(this)
+            }
+        }
+        override fun onViewDetachedFromWindow(v: View) {
+            onDetach?.invoke()
+            if (oneTime && onDetach != null) {
+                removeOnAttachStateChangeListener(this)
+            }
+        }
+    }
+    addOnAttachStateChangeListener(listener)
+}

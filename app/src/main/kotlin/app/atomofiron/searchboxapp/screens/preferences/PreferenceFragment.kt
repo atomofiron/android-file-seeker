@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewStub
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updatePadding
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +22,7 @@ import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentPreferenceBinding
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.addLayoutListener
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
@@ -45,6 +45,8 @@ class PreferenceFragment : PreferenceFragmentCompat(),
 {
     private lateinit var preferenceDelegate: PreferenceFragmentDelegate
     private lateinit var binding: FragmentPreferenceBinding
+
+    private lateinit var joystickPreference: Preference
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         initViewModel(this, PreferenceViewModel::class, savedInstanceState)
@@ -77,11 +79,12 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         }
         val debugGroup = findPreference<PreferenceGroup>(PreferenceKeys.PREF_CATEGORY_DEBUG)!!
         debugGroup.isVisible = viewState.withDebugGroup
+
+        joystickPreference = findPreference(PreferenceKeys.KeyJoystick.name)!!
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        val root = inflater.inflate(R.layout.fragment_preference, container, false)
-        root as ViewGroup
+        val binding = FragmentPreferenceBinding.inflate(inflater, container, false)
         val view = super.onCreateView(inflater, container, savedInstanceState)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         (recyclerView.parent as ViewGroup).removeView(recyclerView)
@@ -90,11 +93,14 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         recyclerView.layoutParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
             behavior = AppBarLayout.ScrollingViewBehavior()
         }
-        root.findViewById<RecyclerView>(R.id.recycler_view)
-            .let { root.indexOfChild(it) }
-            .also { root.removeViewAt(it) }
-            .also { root.addView(recyclerView, it) }
-        return root
+        binding.root.findViewById<RecyclerView>(R.id.recycler_view)
+            .let { binding.root.indexOfChild(it) }
+            .also { binding.root.removeViewAt(it) }
+            .also { binding.root.addView(recyclerView, it) }
+        binding.root.addLayoutListener {
+            joystickPreference.isVisible = it.withJoystick
+        }
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

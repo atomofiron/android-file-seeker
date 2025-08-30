@@ -125,7 +125,7 @@
     <string name="oops_not_working">Oops, not working yet</string>
     <string name="user_interface">Interface</string>
     <string name="pref_explorer_item">File / Directory</string>
-    <string name="pref_joystick">ESC button\'s settings</string>
+    <string name="pref_joystick">ESC button settings</string>
     <string name="use_as">Use as…</string>
     <string name="create">Create</string>
     <string name="clone">Clone</string>
@@ -185,7 +185,7 @@
     <string name="update">Update</string>
     <string name="channel_name_updates">Updates</string>
     <string name="search_here">Search here:</string>
-    <string name="by_default">Reset to default</string>
+    <string name="by_default">Reset to defaults</string>
     <string name="dash" translatable="false">—</string>
     <string name="fix_android_12">Starting from Android 12, the search may be interrupted by the system, which will cause it to partially or fully restart</string>
     <string name="fetching">Fetching metadata…</string>

@@ -21,12 +21,13 @@ class MeasureProviderImpl : MeasureProvider {
     override var availableWidth = 0
         private set
     private var availableHeight = 0
+    private var measured = false
     private var listeners = mutableListOf<MeasureListener>()
 
     override fun addMeasureListener(listener: MeasureListener) {
         if (!listeners.contains(listener)) {
             listeners.add(listener)
-            listener(availableWidth, availableHeight)
+            if (measured) listener(availableWidth, availableHeight)
         }
     }
 
@@ -35,6 +36,7 @@ class MeasureProviderImpl : MeasureProvider {
     override fun onPreMeasure(widthSpec: Int, heightSpec: Int) {
         this.availableWidth = MeasureSpec.getSize(widthSpec)
         this.availableHeight = MeasureSpec.getSize(heightSpec)
+        measured = true
         listeners.forEach { it(availableWidth, availableHeight) }
     }
 }
