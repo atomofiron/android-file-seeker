@@ -23,7 +23,7 @@ import kotlin.collections.ArrayList
 
 class TextViewerService(
     private val scope: CoroutineScope,
-    private val preferenceStore: PreferenceStore,
+    private val preferences: PreferenceStore,
     private val store: TextViewerStore,
     private val explorerStore: ExplorerStore,
     private val finderStore: FinderStore,
@@ -63,7 +63,7 @@ class TextViewerService(
         }
     }
 
-    private val useSu: Boolean get() = preferenceStore.useSu.value
+    private val useSu: Boolean get() = preferences.useSu.value
 
     fun getFileSession(path: String): TextViewerSession {
         val item = explorerStore.currentItems.find { it.path == path }

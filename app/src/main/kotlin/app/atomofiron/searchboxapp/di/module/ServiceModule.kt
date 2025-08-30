@@ -20,10 +20,10 @@ open class ServiceModule {
     @Singleton
     fun explorerService(
         context: Context,
-        appStore: AppStore,
+        appScope: AppScope,
         explorerStore: ExplorerStore,
         preferenceStore: PreferenceStore,
-    ): ExplorerService = ExplorerService(context, appStore, explorerStore, preferenceStore)
+    ): ExplorerService = ExplorerService(context, appScope, explorerStore, preferenceStore)
 
     @Provides
     @Singleton
@@ -39,9 +39,10 @@ open class ServiceModule {
     @Provides
     @Singleton
     fun resultService(
+        context: Context,
         appStore: AppStore,
         clipboardManager: ClipboardManager,
-    ): UtilService = UtilService(appStore, clipboardManager)
+    ): UtilService = UtilService(context, appStore, clipboardManager)
 
     @Provides
     @Singleton
@@ -52,19 +53,9 @@ open class ServiceModule {
     @Provides
     @Singleton
     fun apkService(
-        appStore: AppStore,
+        context: Context,
         packageInstaller: PackageInstaller,
-    ): ApkService = ApkService(appStore.context, packageInstaller)
-
-    @Provides
-    @Singleton
-    fun textViewerService(
-        scope: AppScope,
-        preferenceStore: PreferenceStore,
-        textViewerStore: TextViewerStore,
-        explorerStore: ExplorerStore,
-        finderStore: FinderStore,
-    ): TextViewerService = TextViewerService(scope, preferenceStore, textViewerStore, explorerStore, finderStore)
+    ): ApkService = ApkService(context, packageInstaller)
 
     @Provides
     @Singleton

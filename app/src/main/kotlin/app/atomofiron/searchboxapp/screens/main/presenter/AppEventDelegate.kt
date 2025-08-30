@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.main.presenter
 
+import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -35,6 +36,7 @@ interface AppEventDelegateApi {
 }
 
 class AppEventDelegate(
+    private val context: Context,
     private val scope: CoroutineScope,
     private val router: MainRouter,
     private val appStore: AppStore,

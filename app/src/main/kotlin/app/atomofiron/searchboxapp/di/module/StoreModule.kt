@@ -38,8 +38,8 @@ open class StoreModule {
 
     @Provides
     @Singleton
-    open fun provideAndroidStore(context: Context, resources: AppResources, scope: AppScope): AndroidStore {
-        return AndroidStore(context, scope, resources)
+    open fun provideAndroidStore(resources: AppResources): AndroidStore {
+        return AndroidStore(resources)
     }
 
     @Provides

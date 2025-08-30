@@ -7,7 +7,6 @@ import dagger.Module
 import dagger.Provides
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.channel.ResultChannel
-import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import javax.inject.Singleton
 
@@ -25,7 +24,7 @@ open class ChannelModule {
 
     @Provides
     @Singleton
-    open fun provideCurtainChannel(appStore: AppStore): CurtainChannel = CurtainChannel(appStore.appScope)
+    open fun provideCurtainChannel(appScope: AppScope): CurtainChannel = CurtainChannel(appScope)
 
     @Provides
     @Singleton

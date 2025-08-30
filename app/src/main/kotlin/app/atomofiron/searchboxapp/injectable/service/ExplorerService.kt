@@ -8,10 +8,9 @@ import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.Unreachable
 import app.atomofiron.common.util.dropLast
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.debugDelay
-import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.AppScope
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.CacheConfig
@@ -67,7 +66,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
-import kotlin.collections.set
 import kotlin.math.min
 
 private const val SUB_PATH_CAMERA = "DCIM/Camera/"
@@ -78,11 +76,11 @@ private const val SUB_PATH_DOWNLOAD_BLUETOOTH = "Download/Bluetooth/"
 private const val SUB_PATH_BLUETOOTH = "Bluetooth/"
 
 class ExplorerService(
-    context: Context,
-    private val appStore: AppStore,
+    private val context: Context,
+    private val appScope: AppScope,
     private val store: ExplorerStore,
     private val preferenceStore: PreferenceStore,
-) : AppStore by appStore {
+) {
 
     private val previewSize = context.resources.getDimensionPixelSize(R.dimen.preview_size)
     private var delayedRender: Job? = null
@@ -595,7 +593,7 @@ class ExplorerService(
     }
 
     suspend fun tryReceive(where: Node, uri: Uri) {
-        val inputStream = appStore.context.contentResolver.openInputStream(uri)
+        val inputStream = context.contentResolver.openInputStream(uri)
         inputStream ?: return
         val outputStream = FileOutputStream(File(""))
         val success = inputStream.writeTo(outputStream)

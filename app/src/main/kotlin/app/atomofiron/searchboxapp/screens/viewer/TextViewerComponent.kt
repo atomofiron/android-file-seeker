@@ -5,7 +5,10 @@ import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.injectable.service.TextViewerService
+import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
+import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.injectable.store.TextViewerStore
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.viewer.presenter.SearchAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
@@ -102,10 +105,22 @@ class TextViewerModule {
         session: TextViewerSession,
         preferenceStore: PreferenceStore,
     ): TextViewerViewState = TextViewerViewState(scope, session, preferenceStore)
+
+    @Provides
+    @TextViewerScope
+    fun service(
+        scope: CoroutineScope,
+        preferenceStore: PreferenceStore,
+        textViewerStore: TextViewerStore,
+        explorerStore: ExplorerStore,
+        finderStore: FinderStore,
+    ): TextViewerService = TextViewerService(scope, preferenceStore, textViewerStore, explorerStore, finderStore)
 }
 
 interface TextViewerDependencies {
     fun preferenceStore(): PreferenceStore
+    fun textViewerStore(): TextViewerStore
+    fun explorerStore(): ExplorerStore
+    fun finderStore(): FinderStore
     fun curtainChannel(): CurtainChannel
-    fun textViewerService(): TextViewerService
 }

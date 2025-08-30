@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.injectable.store
 
-import android.content.Context
 import android.content.res.Resources
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
@@ -9,14 +8,11 @@ import app.atomofiron.common.util.property.MutableStrongProperty
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.common.util.property.StrongProperty
 import app.atomofiron.common.util.property.WeakProperty
-import kotlinx.coroutines.CoroutineScope
 
 // todo soo then all deps should be provided as impls of interfaces (because of SomeDep : AppStore by appStore)
 
 interface AppStore {
-    val context: Context
     val resources: Resources
-    val appScope: CoroutineScope
     val activity: AppCompatActivity?
     val resourcesProperty: StrongProperty<Resources>
     val activityProperty: WeakProperty<AppCompatActivity>
@@ -31,8 +27,6 @@ interface AppStoreConsumer {
 }
 
 class AndroidStore(
-    override val context: Context,
-    override val appScope: CoroutineScope,
     override val resourcesProperty: AppResources,
 ) : AppStore, AppStoreConsumer {
 

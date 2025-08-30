@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.main
 
+import android.content.Context
 import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
@@ -60,6 +61,7 @@ class MainModule {
     @Provides
     @MainScope
     fun appEventDelegate(
+        context: Context,
         scope: CoroutineScope,
         router: MainRouter,
         appStore: AppStore,
@@ -70,7 +72,7 @@ class MainModule {
         mainChannel: MainChannel,
         updateService: AppUpdateService,
     ): AppEventDelegate {
-        return AppEventDelegate(scope, router, appStore, appStoreConsumer, operations, preferenceStore, updateStore, mainChannel, updateService)
+        return AppEventDelegate(context, scope, router, appStore, appStoreConsumer, operations, preferenceStore, updateStore, mainChannel, updateService)
     }
 
     @Provides
@@ -87,6 +89,7 @@ class MainModule {
 }
 
 interface MainDependencies {
+    fun context(): Context
     fun windowService(): WindowService
     fun appStore(): AppStore
     fun fileOperationsDelegate(): FileOperationsDelegate

@@ -8,7 +8,6 @@ import androidx.preference.PreferenceDataStore
 import androidx.work.WorkManager
 import app.atomofiron.searchboxapp.injectable.AppScope
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
-import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
 import dagger.Module
@@ -52,9 +51,9 @@ open class CommonModule {
     @Provides
     fun preferenceDataStore(
         preferences: PreferenceStore,
-        appStore: AppStore,
+        appScope: AppScope,
         watcher: LeakWatcher,
     ): PreferenceDataStore {
-        return LegacyPreferenceDataStore(preferences, appStore.appScope, watcher)
+        return LegacyPreferenceDataStore(preferences, appScope, watcher)
     }
 }
