@@ -21,14 +21,14 @@ fun TextField.makeByteSize(listener: (Int) -> Unit) {
     filters += arrayOf<InputFilter>(delegate)
     inputType = inputType and InputType.TYPE_NUMBER_FLAG_DECIMAL.inv()
     addOnFocusChangeListener(delegate)
-    addOnSubmitListener(delegate)
+    addListener(delegate)
     addTextChangedListener(delegate)
 }
 
 class ByteSizeDelegate(
     private val textField: EditText,
     private val listener: (Int) -> Unit,
-) : TextWatcher, InputFilter, TextField.OnSubmitListener, View.OnFocusChangeListener {
+) : TextWatcher, InputFilter, TextField.Listener, View.OnFocusChangeListener {
 
     private val inputLayout = textField.parent.parent as? TextInputLayout
 
@@ -78,7 +78,7 @@ class ByteSizeDelegate(
         }
     }
 
-    override fun onCheck(value: String): Boolean {
+    override fun onSubmitCheck(value: String): Boolean {
         return value.convertOrNull()?.let { valid = it } != null
     }
 

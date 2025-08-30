@@ -8,9 +8,11 @@ import android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
 import androidx.core.view.marginEnd
 import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.recycler.GeneralHolder
+import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemQueryFieldBinding
 import app.atomofiron.searchboxapp.custom.drawable.makeHoled
+import app.atomofiron.searchboxapp.custom.view.TextField
 import app.atomofiron.searchboxapp.custom.view.makeRegex
 import app.atomofiron.searchboxapp.custom.view.showError
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -22,7 +24,7 @@ import java.util.regex.Pattern
 class QueryFieldHolder(
     parent: ViewGroup,
     private val listener: OnActionListener,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_query_field) {
+) : GeneralHolder<FinderStateItem>(parent, R.layout.item_query_field), TextField.Listener {
 
     override val hungry = true
     override val item get() = super.item as Query
@@ -34,6 +36,7 @@ class QueryFieldHolder(
     init {
         binding.button.setOnClickListener {
             listener.onSearchClick(textField.text.toString())
+            textField.hideKeyboard()
         }
         textField.run {
             imeOptions = (imeOptions and IME_ACTION_DONE.inv()) or IME_ACTION_SEARCH
@@ -41,9 +44,7 @@ class QueryFieldHolder(
             makeRegex()
             makeHoled(binding.queryField.box)
             addTextChangedListener(this@QueryFieldHolder.TextChangeListener())
-            setOnEditorActionListener { _, actioId, _ ->
-                this@QueryFieldHolder.onEditorAction(actioId)
-            }
+            addListener(this@QueryFieldHolder)
             updatePaddingRelative(end = binding.button.marginLayoutParams.run { width + marginEnd } - textLayout.marginEnd)
         }
     }
@@ -59,15 +60,10 @@ class QueryFieldHolder(
         bindState(item.query)
     }
 
-    private fun onEditorAction(actionId: Int): Boolean {
-        if (actionId == IME_ACTION_SEARCH) {
-            val query = textField.text.toString()
-            when {
-                query.isEmpty() -> return true
-                else -> listener.onSearchClick(query)
-            }
+    override fun onAction(value: String, code: Int) {
+        if (code == IME_ACTION_SEARCH && value.isNotEmpty()) {
+            listener.onSearchClick(value)
         }
-        return false
     }
 
     private fun bindState(query: String) {

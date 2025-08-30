@@ -16,7 +16,6 @@ class NumberTextField @JvmOverloads constructor(
     companion object {
         private const val ZERO = "0"
     }
-    private var submitListener: OnSubmitListener? = null
 
     init {
         filters = arrayOf<InputFilter>(LengthFilter(9))
@@ -24,16 +23,6 @@ class NumberTextField @JvmOverloads constructor(
         keyListener = DigitsKeyListener.getInstance("0123456789")
         hint = "_____"
         inputType = inputType or InputType.TYPE_NUMBER_FLAG_DECIMAL
-    }
-
-    fun setOnSubmitListener(listener: OnSubmitListener?) {
-        submitListener = listener
-    }
-
-    override fun onCheck(value: String): Boolean { return true } //
-
-    override fun onSubmit(value: String) {
-        submitListener?.onSubmit(value.toInt())
     }
 
     override fun afterTextChanged(editable: Editable) {
@@ -50,9 +39,5 @@ class NumberTextField @JvmOverloads constructor(
                 setSelection(1)
             }
         }
-    }
-
-    fun interface OnSubmitListener {
-        fun onSubmit(value: Int)
     }
 }

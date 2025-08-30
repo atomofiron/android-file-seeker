@@ -13,7 +13,7 @@ private const val SEPARATOR = " "
 class EditCharactersHolder(
     parent: ViewGroup,
     private val output: OnEditCharactersListener,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_text_field), TextField.OnSubmitListener {
+) : GeneralHolder<FinderStateItem>(parent, R.layout.item_text_field), TextField.Listener {
 
     override val hungry = true
 
@@ -24,7 +24,7 @@ class EditCharactersHolder(
         binding.box.setHint(R.string.pref_special_characters)
         binding.field.run {
             maxLines = 1
-            addOnSubmitListener(this@EditCharactersHolder)
+            addListener(this@EditCharactersHolder)
         }
         binding.field.makeHoled(binding.box)
     }

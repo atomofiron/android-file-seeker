@@ -14,7 +14,7 @@ import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 class EditMaxDepthHolder(
     parent: ViewGroup,
     private val output: OnEditMaxDepthListener,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_text_field), TextField.OnSubmitListener, View.OnFocusChangeListener {
+) : GeneralHolder<FinderStateItem>(parent, R.layout.item_text_field), TextField.Listener, View.OnFocusChangeListener {
 
     override val hungry = true
 
@@ -24,7 +24,7 @@ class EditMaxDepthHolder(
     init {
         binding.box.setHint(R.string.pref_max_depth)
         binding.field.maxLines = 1
-        binding.field.addOnSubmitListener(this)
+        binding.field.addListener(this)
         binding.field.addOnFocusChangeListener(this)
         binding.field.run { inputType = inputType or InputType.TYPE_CLASS_NUMBER }
         binding.field.makeHoled(binding.box)
@@ -44,7 +44,7 @@ class EditMaxDepthHolder(
         }
     }
 
-    override fun onCheck(value: String): Boolean = try {
+    override fun onSubmitCheck(value: String): Boolean = try {
         value.toInt()
         true
     } catch (e: NumberFormatException) {

@@ -9,13 +9,11 @@ import android.text.Editable
 import android.text.InputType
 import android.text.TextWatcher
 import android.util.AttributeSet
-import android.view.KeyEvent
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.annotation.ColorInt
 import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.Android
@@ -31,10 +29,9 @@ import com.google.android.material.textfield.TextInputLayout.BOX_BACKGROUND_FILL
 open class TextField @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-) : AutoHideKeyboardField(context, attrs), TextWatcher, TextView.OnEditorActionListener {
+) : AutoHideKeyboardField(context, attrs), TextWatcher {
 
-    private var listeners = mutableListOf<OnSubmitListener>()
-    private var actionListener: OnEditorActionListener? = null
+    private var listeners = mutableListOf<Listener>()
     private var filledDelegate: FilledDelegate? = null
 
     var submitted: CharSequence = ""
@@ -54,12 +51,6 @@ open class TextField @JvmOverloads constructor(
             setAutofillHints(null)
             importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_NO_EXCLUDE_DESCENDANTS
         }
-        super.setOnEditorActionListener(this)
-    }
-
-    override fun setOnEditorActionListener(listener: OnEditorActionListener?) {
-        debugRequire(actionListener == null)
-        actionListener = listener
     }
 
     override fun setText(text: CharSequence?, type: BufferType?) {
@@ -67,15 +58,11 @@ open class TextField @JvmOverloads constructor(
         submitted = text ?: ""
     }
 
-    open fun addOnSubmitListener(listener: OnSubmitListener) {
+    open fun addListener(listener: Listener) {
         if (listener !in listeners) {
             listeners.add(listener)
         }
     }
-
-    open fun onCheck(value: String) = true
-
-    open fun onSubmit(value: String) = Unit
 
     override fun isSuggestionsEnabled(): Boolean = false
 
@@ -83,20 +70,17 @@ open class TextField @JvmOverloads constructor(
     override fun onTextChanged(sequence: CharSequence, start: Int, before: Int, count: Int) = Unit
     override fun afterTextChanged(editable: Editable) = Unit
 
-    override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?/*indeed nullable*/): Boolean {
-        actionListener?.onEditorAction(v, actionId, event)
-        if (actionId == IME_ACTION_DONE) {
-            val value = text.toString()
-            if (onCheck(value) && listeners.all { it.onCheck(value) }) {
+    override fun onEditorAction(actionCode: Int) {
+        super.onEditorAction(actionCode)
+        val value = text.toString()
+        listeners.forEach { it.onAction(value, actionCode) }
+        if (actionCode == IME_ACTION_DONE) {
+            if (listeners.all { it.onSubmitCheck(value) }) {
                 submitted = value
                 clearFocus()
-                onSubmit(value)
                 listeners.forEach { it.onSubmit(value) }
-            } else {
-                return true
             }
         }
-        return false
     }
 
     override fun onFocusChanged(focused: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
@@ -127,9 +111,10 @@ open class TextField @JvmOverloads constructor(
         )
     }
 
-    interface OnSubmitListener {
-        fun onCheck(value: String) = true
-        fun onSubmit(value: String)
+    interface Listener {
+        fun onAction(value: String, code: Int) = Unit
+        fun onSubmitCheck(value: String) = true
+        fun onSubmit(value: String) = Unit
     }
 }
 

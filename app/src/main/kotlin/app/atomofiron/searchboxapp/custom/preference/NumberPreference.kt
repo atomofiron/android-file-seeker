@@ -26,7 +26,7 @@ class NumberPreference(context: Context, attrs: AttributeSet) : Preference(conte
         super.onBindViewHolder(holder)
         if (editText == null) {
             val editText = holder.findViewById(R.id.number) as NumberTextField
-            editText.setOnSubmitListener(::onSubmit)
+            //editText.setOnSubmitListener(::onSubmit)
             editText.setText(value.toString())
             this.editText = editText
         }
