@@ -4,7 +4,9 @@ import android.content.Context
 import android.content.res.AssetManager
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.Registerable
+import app.atomofiron.common.util.dialog.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
@@ -31,7 +33,7 @@ import javax.inject.Scope
 annotation class ExplorerScope
 
 @ExplorerScope
-@Component(dependencies = [ExplorerDependencies::class], modules = [ExplorerModule::class])
+@Component(dependencies = [ExplorerDependencies::class], modules = [ExplorerModule::class, DelegateModule::class])
 interface ExplorerComponent {
     @Component.Builder
     interface Builder {
@@ -48,6 +50,13 @@ interface ExplorerComponent {
 
 @Module
 class ExplorerModule {
+
+    @Provides
+    @ExplorerScope
+    fun activity(property: WeakProperty<out Fragment>): ActivityProperty {
+        return property.map { it?.activity }
+    }
+
     @Provides
     @ExplorerScope
     fun itemListener(
@@ -160,7 +169,6 @@ class ExplorerModule {
 
 interface ExplorerDependencies {
     fun context(): Context
-    fun fileOperationsDelegate(): FileOperationsDelegate
     fun assetManager(): AssetManager
     fun explorerService(): ExplorerService
     fun utilService(): UtilService

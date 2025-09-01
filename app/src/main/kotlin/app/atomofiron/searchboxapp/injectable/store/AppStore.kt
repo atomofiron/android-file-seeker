@@ -5,18 +5,14 @@ import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import app.atomofiron.common.util.property.MutableStrongProperty
-import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.common.util.property.StrongProperty
-import app.atomofiron.common.util.property.WeakProperty
 
 // todo soo then all deps should be provided as impls of interfaces (because of SomeDep : AppStore by appStore)
 
 interface AppStore {
-    val resources: Resources
     val activity: AppCompatActivity?
-    val resourcesProperty: StrongProperty<Resources>
-    val activityProperty: WeakProperty<AppCompatActivity>
-    val windowProperty: WeakProperty<Window>
+    val activityProperty: StrongProperty<AppCompatActivity>
+    val windowProperty: StrongProperty<Window>
     val insetsControllerProperty: StrongProperty<WindowInsetsControllerCompat?>
 }
 
@@ -26,16 +22,19 @@ interface AppStoreConsumer {
     fun onActivityDestroy()
 }
 
+interface AppStoreProvider {
+    val appStore: AppStore
+}
+
 class AndroidStore(
-    override val resourcesProperty: AppResources,
+    activity: AppCompatActivity,
 ) : AppStore, AppStoreConsumer {
 
-    override val activityProperty = MutableWeakProperty<AppCompatActivity>()
-    override val windowProperty = MutableWeakProperty<Window>()
+    override val activityProperty = MutableStrongProperty(activity)
+    override val windowProperty = MutableStrongProperty<Window>(activity.window)
     override val insetsControllerProperty = MutableStrongProperty<WindowInsetsControllerCompat?>(null)
 
     override val activity by activityProperty
-    override val resources by resourcesProperty
 
     override fun onActivityCreate(activity: AppCompatActivity) {
         activityProperty.value = activity
@@ -44,7 +43,6 @@ class AndroidStore(
     }
 
     override fun onResourcesChange(resources: Resources) {
-        resourcesProperty.value = resources
     }
 
     override fun onActivityDestroy() {

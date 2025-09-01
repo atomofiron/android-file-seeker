@@ -9,11 +9,10 @@ import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
 import app.atomofiron.searchboxapp.injectable.service.PreferenceService
-import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.AppResources
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.AppSource
-import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
 import app.atomofiron.searchboxapp.screens.preferences.presenter.ExportImportPresenterDelegate
 import app.atomofiron.searchboxapp.screens.preferences.presenter.PreferenceClickPresenterDelegate
@@ -23,8 +22,8 @@ import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
 import debug.LeakWatcher
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
 @Scope
@@ -71,7 +70,7 @@ class PreferenceModule {
         exportImportDelegate: ExportImportDelegate.ExportImportOutput,
         preferenceStore: PreferenceStore,
         curtainChannel: CurtainChannel,
-        appStore: AppStore,
+        resources: AppResources,
         appSource: AppSource,
     ): PreferenceClickOutput {
         return PreferenceClickPresenterDelegate(
@@ -81,7 +80,7 @@ class PreferenceModule {
             exportImportDelegate,
             preferenceStore,
             curtainChannel,
-            appStore,
+            resources,
             appSource,
         )
     }
@@ -138,12 +137,12 @@ class PreferenceModule {
 
 interface PreferenceDependencies {
     fun appSource(): AppSource
+    fun appResources(): AppResources
     fun preferenceChannel(): PreferenceChannel
     fun preferenceStore(): PreferenceStore
     fun context(): Context
     fun curtainChannel(): CurtainChannel
     fun appWatcherProxy(): LeakWatcher
-    fun appStore(): AppStore
     fun updateStore(): AppUpdateStore
     fun appUpdateService(): AppUpdateService
     fun preferenceDataStore(): PreferenceDataStore

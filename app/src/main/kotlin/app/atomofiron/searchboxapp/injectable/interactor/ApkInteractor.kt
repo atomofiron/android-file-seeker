@@ -1,8 +1,8 @@
 package app.atomofiron.searchboxapp.injectable.interactor
 
-import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.searchboxapp.android.Intents
+import app.atomofiron.searchboxapp.injectable.channel.ApkChannel
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -10,7 +10,6 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.Operation
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
-import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.utils.Rslt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,7 +19,7 @@ class ApkInteractor(
     private val scope: CoroutineScope,
     private val apkService: ApkService,
     private val explorerService: ExplorerService,
-    private val dialogs: DialogDelegate,
+    private val apkChannel: ApkChannel,
 ) {
     fun install(item: Node, tab: NodeTabKey? = null) {
         val content = item.content as? AndroidApp
@@ -38,7 +37,7 @@ class ApkInteractor(
             val result = apkService.install(content, Intents.ACTION_INSTALL_APP)
             if (result is Rslt.Err) {
                 withMain {
-                    dialogs.showError(UniText(result.message))
+                    apkChannel.errorMessage(result.message)
                 }
             }
         }

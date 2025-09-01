@@ -5,7 +5,7 @@ import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
-import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.AppResources
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
@@ -26,12 +26,12 @@ class ResultPresenter(
     private val finderStore: FinderStore,
     private val interactor: ResultInteractor,
     router: ResultRouter,
-    appStore: AppStore,
+    resources: AppResources,
     itemActionDelegate: ResultItemActionDelegate,
 ) : BasePresenter<ResultViewModel, ResultRouter>(scope, router),
     ResultItemActionListener by itemActionDelegate {
     private val taskId = params.taskId
-    private val resources by appStore.resourcesProperty
+    private val resources by resources
 
     init {
         if (!finderStore.tasks.any { it.uniqueId == taskId }) {

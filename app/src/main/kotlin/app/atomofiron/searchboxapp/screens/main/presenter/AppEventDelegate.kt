@@ -6,26 +6,34 @@ import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import app.atomofiron.common.util.Android
+import app.atomofiron.common.util.dialog.DialogConfig
+import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.android.dismissUpdateNotification
 import app.atomofiron.searchboxapp.android.showUpdateNotification
+import app.atomofiron.searchboxapp.injectable.channel.ApkChannel
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
-import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.AppStoreConsumer
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
+import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.UpdateNotification
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.main.MainRouter
+import app.atomofiron.searchboxapp.utils.launch
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.FlowCollector
 
 interface AppEventDelegateApi {
     fun onActivityCreate(activity: AppCompatActivity)
@@ -39,20 +47,24 @@ class AppEventDelegate(
     private val context: Context,
     private val scope: CoroutineScope,
     private val router: MainRouter,
-    private val appStore: AppStore,
     private val appStoreConsumer: AppStoreConsumer,
     private val operations: FileOperationsDelegate,
+    private val dialogs: DialogDelegate,
     private val preferences: PreferenceStore,
     updateStore: AppUpdateStore,
     private val mainChannel: MainChannel,
+    apkChannel: ApkChannel,
     private val updateService: AppUpdateService,
-) : AppStore by appStore, AppEventDelegateApi {
+) : AppEventDelegateApi {
 
     private var currentTheme: AppTheme? = null
+    private val activity get() = router.activity
 
     init {
         preferences.appTheme.collect(scope, ::onThemeApplied)
         updateStore.state.collect(scope, ::onUpdateState)
+        apkChannel.errorMessage.collectWhenResumed(scope) { dialogs.showError(UniText(it)) }
+        apkChannel.offerPackageName.collectWhenResumed(scope) { offerLaunch(it) }
     }
 
     override fun onActivityCreate(activity: AppCompatActivity) {
@@ -121,4 +133,26 @@ class AppEventDelegate(
     }
 
     private fun Uri.viewFile() = operations.askForApks(NodeRef(path = toString()), context.contentResolver)
+
+    private fun offerLaunch(packageName: String) {
+        dialogs show DialogConfig(
+            cancelable = true,
+            title = UniText(R.string.install_succeeded),
+            negative = DialogDelegate.Cancel,
+            positive = UniText(R.string.launch),
+            onPositiveClick = {
+                if (!context.launch(packageName.toString())) {
+                    dialogs.showError()
+                }
+            },
+        )
+    }
+
+    private fun <T> Flow<T>.collectWhenResumed(scope: CoroutineScope, collector: FlowCollector<T>) {
+        collect(scope) {
+            if (activity?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
+                collector.emit(it)
+            }
+        }
+    }
 }

@@ -1,22 +1,31 @@
 package app.atomofiron.searchboxapp.screens.main
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
+import app.atomofiron.common.util.dialog.ActivityProperty
+import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.searchboxapp.di.module.DelegateModule
+import app.atomofiron.searchboxapp.injectable.channel.ApkChannel
 import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
+import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.service.WindowService
+import app.atomofiron.searchboxapp.injectable.store.AndroidStore
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.AppStoreConsumer
+import app.atomofiron.searchboxapp.injectable.store.AppStoreProvider
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
+import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
+import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegate
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
 import dagger.Provides
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
-import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
-import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegate
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
@@ -26,7 +35,7 @@ import javax.inject.Scope
 annotation class MainScope
 
 @MainScope
-@Component(dependencies = [MainDependencies::class], modules = [MainModule::class])
+@Component(dependencies = [MainDependencies::class], modules = [MainModule::class, DelegateModule::class])
 interface MainComponent {
     @Component.Builder
     interface Builder {
@@ -34,6 +43,10 @@ interface MainComponent {
         fun bind(scope: CoroutineScope): Builder
         @BindsInstance
         fun bind(view: WeakProperty<out FragmentActivity>): Builder
+        @BindsInstance
+        fun bind(activity: AppCompatActivity): Builder
+        @BindsInstance
+        fun bind(appStoreProvider: AppStoreProvider): Builder
         fun dependencies(dependencies: MainDependencies): Builder
         fun build(): MainComponent
     }
@@ -43,6 +56,12 @@ interface MainComponent {
 
 @Module
 class MainModule {
+
+    @Provides
+    @MainScope
+    fun activity(property: WeakProperty<out FragmentActivity>): ActivityProperty {
+        return property
+    }
 
     @Provides
     @MainScope
@@ -64,15 +83,16 @@ class MainModule {
         context: Context,
         scope: CoroutineScope,
         router: MainRouter,
-        appStore: AppStore,
         operations: FileOperationsDelegate,
+        dialogs: DialogDelegate,
         appStoreConsumer: AppStoreConsumer,
         preferenceStore: PreferenceStore,
         updateStore: AppUpdateStore,
         mainChannel: MainChannel,
+        apkChannel: ApkChannel,
         updateService: AppUpdateService,
     ): AppEventDelegate {
-        return AppEventDelegate(context, scope, router, appStore, appStoreConsumer, operations, preferenceStore, updateStore, mainChannel, updateService)
+        return AppEventDelegate(context, scope, router, appStoreConsumer, operations, dialogs, preferenceStore, updateStore, mainChannel, apkChannel, updateService)
     }
 
     @Provides
@@ -82,21 +102,43 @@ class MainModule {
     @Provides
     @MainScope
     fun viewState(
-        scope: CoroutineScope,
         preferenceStore: PreferenceStore,
         initialDelegate: InitialDelegate,
-    ): MainViewState = MainViewState(scope, preferenceStore, initialDelegate)
+    ): MainViewState = MainViewState(preferenceStore, initialDelegate)
+
+    @Provides
+    @MainScope
+    fun provideAndroidStore(activity: AppCompatActivity): AndroidStore {
+        return AndroidStore(activity)
+    }
+
+    @Provides
+    @MainScope
+    fun provideAppStore(androidStore: AndroidStore): AppStore {
+        return androidStore
+    }
+
+    @Provides
+    @MainScope
+    fun provideAppStoreConsumer(androidStore: AndroidStore): AppStoreConsumer {
+        return androidStore
+    }
+
+    @Provides
+    @MainScope
+    fun windowService(
+        appStore: AppStore,
+    ): WindowService = WindowService(appStore)
 }
 
 interface MainDependencies {
     fun context(): Context
-    fun windowService(): WindowService
-    fun appStore(): AppStore
-    fun fileOperationsDelegate(): FileOperationsDelegate
-    fun appStoreConsumer(): AppStoreConsumer
     fun preferenceStore(): PreferenceStore
     fun mainChannel(): MainChannel
+    fun apkChannel (): ApkChannel
     fun initialDelegate(): InitialDelegate
     fun appUpdateService(): AppUpdateService
     fun appUpdateStore(): AppUpdateStore
+    fun apks(): ApkInteractor
+    fun utils(): UtilService
 }

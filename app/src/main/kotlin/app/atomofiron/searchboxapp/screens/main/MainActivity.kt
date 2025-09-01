@@ -32,6 +32,8 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ActivityMainBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.getLayout
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.syncWithLayout
+import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.AppStoreProvider
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
@@ -45,13 +47,14 @@ import lib.atomofiron.insets.builder
 import lib.atomofiron.insets.insetsMargin
 import lib.atomofiron.insets.insetsSource
 
-class MainActivity : AppCompatActivity() {
+open class MainActivity : AppCompatActivity(), AppStoreProvider {
 
     private lateinit var binding: ActivityMainBinding
     private val rooFragment: Fragment get() = binding.navHostFragment.getFragment()
 
     private lateinit var viewState: MainViewState
     private lateinit var presenter: MainPresenter
+    override lateinit var appStore: AppStore
     private var isFirstStart = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,6 +74,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         updateTheme(viewState.setTheme.value)
+        presenter.onActivityCreate(this)
         onCreateView(savedInstanceState)
         // system insets providing breaks at least on Android 15 after app theme has been changed
         // enableEdgeToEdge() won’t help you in this hell
@@ -88,8 +92,6 @@ class MainActivity : AppCompatActivity() {
         // todo Caused by: java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        presenter.onActivityCreate(this)
 
         binding.joystick.setOnClickListener { onEscClick() }
         binding.joystick.syncWithLayout(binding.root)

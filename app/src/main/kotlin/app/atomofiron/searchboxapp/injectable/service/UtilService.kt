@@ -7,17 +7,17 @@ import androidx.core.content.FileProvider
 import app.atomofiron.common.util.extension.copy
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.android.Intents.useAs
-import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.AppResources
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import java.io.File
 
 class UtilService(
     private val context: Context,
-    appStore: AppStore,
+    resources: AppResources,
     private val clipboardManager: ClipboardManager,
 ) {
-    private val resources by appStore.resourcesProperty
+    private val resources by resources
 
     fun copyToClipboard(item: Node) = copyToClipboard(item.name, item.path)
 

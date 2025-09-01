@@ -1,5 +1,6 @@
 package app.atomofiron.common.util.dialog
 
+import android.app.Activity
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Resources
@@ -8,7 +9,6 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
-import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.extension.copy
 import app.atomofiron.common.util.property.RoProperty
 import app.atomofiron.common.util.withNotNull
@@ -25,7 +25,9 @@ import kotlin.LazyThreadSafetyMode.NONE
 
 private const val STUB = "stub"
 
-class DialogDelegateImpl(activity: RoProperty<out FragmentActivity?>) : DialogDelegate {
+typealias ActivityProperty = RoProperty<out Activity?>
+
+class DialogDelegateImpl(activity: ActivityProperty) : DialogDelegate {
 
     private val activity by activity
     private val resources get() = activity?.resources

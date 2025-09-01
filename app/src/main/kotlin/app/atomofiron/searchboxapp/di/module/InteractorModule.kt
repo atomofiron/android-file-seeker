@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.di.module
 
-import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.searchboxapp.injectable.AppScope
+import app.atomofiron.searchboxapp.injectable.channel.ApkChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.service.ApkService
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
@@ -18,6 +18,6 @@ class InteractorModule {
         appScope: AppScope,
         apkService: ApkService,
         explorerService: ExplorerService,
-        dialogs: DialogDelegate,
-    ): ApkInteractor = ApkInteractor(appScope, apkService, explorerService, dialogs)
+        apkChannel: ApkChannel,
+    ): ApkInteractor = ApkInteractor(appScope, apkService, explorerService, apkChannel)
 }

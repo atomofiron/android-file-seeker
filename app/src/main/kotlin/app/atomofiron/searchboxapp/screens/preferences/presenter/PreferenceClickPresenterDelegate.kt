@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.preferences.presenter
 import app.atomofiron.common.arch.Recipient
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
-import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.AppResources
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
@@ -21,11 +21,11 @@ class PreferenceClickPresenterDelegate(
     private val exportImportDelegate: ExportImportDelegate.ExportImportOutput,
     private val preferenceStore: PreferenceStore,
     curtainChannel: CurtainChannel,
-    appStore: AppStore,
+    resources: AppResources,
     appSource: AppSource,
 ) : Recipient, PreferenceClickOutput {
 
-    val resources by appStore.resourcesProperty
+    val resources by resources
 
     init {
         curtainChannel.flow.collectForMe(scope) { controller ->
@@ -33,7 +33,7 @@ class PreferenceClickPresenterDelegate(
             val adapter: CurtainApi.Adapter<*> = when (controller.requestId) {
                 R.layout.curtain_about -> AboutDelegate(router, appSource)
                 R.layout.curtain_preference_export_import -> ExportImportDelegate(exportImportDelegate)
-                R.layout.curtain_preference_explorer_item -> ExplorerItemDelegate(preferenceStore, appStore.resourcesProperty)
+                R.layout.curtain_preference_explorer_item -> ExplorerItemDelegate(preferenceStore, resources)
                 R.layout.curtain_preference_joystick -> JoystickDelegate(preferenceStore)
                 R.layout.curtain_color_scheme -> ColorSchemeDelegate()
                 else -> return@collectForMe

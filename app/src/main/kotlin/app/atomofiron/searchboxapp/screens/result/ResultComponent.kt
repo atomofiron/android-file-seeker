@@ -1,20 +1,17 @@
 package app.atomofiron.searchboxapp.screens.result
 
 import androidx.fragment.app.Fragment
+import app.atomofiron.common.util.dialog.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
-import dagger.BindsInstance
-import dagger.Component
-import dagger.Module
-import dagger.Provides
-import kotlinx.coroutines.CoroutineScope
 import app.atomofiron.searchboxapp.injectable.channel.ResultChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.injectable.service.FinderService
 import app.atomofiron.searchboxapp.injectable.service.UtilService
-import app.atomofiron.searchboxapp.injectable.store.AppStore
+import app.atomofiron.searchboxapp.injectable.store.AppResources
 import app.atomofiron.searchboxapp.injectable.store.FinderStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import app.atomofiron.searchboxapp.injectable.store.ResultStore
@@ -22,6 +19,11 @@ import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelega
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultCurtainMenuDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultItemActionDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
+import dagger.BindsInstance
+import dagger.Component
+import dagger.Module
+import dagger.Provides
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
 @Scope
@@ -30,7 +32,7 @@ import javax.inject.Scope
 annotation class ResultScope
 
 @ResultScope
-@Component(dependencies = [ResultDependencies::class], modules = [ResultModule::class])
+@Component(dependencies = [ResultDependencies::class], modules = [ResultModule::class, DelegateModule::class])
 interface ResultComponent {
     @Component.Builder
     interface Builder {
@@ -52,6 +54,12 @@ class ResultModule {
 
     @Provides
     @ResultScope
+    fun activity(property: WeakProperty<out Fragment>): ActivityProperty {
+        return property.map { it?.activity }
+    }
+
+    @Provides
+    @ResultScope
     fun presenter(
         params: ResultPresenterParams,
         scope: CoroutineScope,
@@ -59,7 +67,7 @@ class ResultModule {
         finderStore: FinderStore,
         interactor: ResultInteractor,
         router: ResultRouter,
-        appStore: AppStore,
+        resources: AppResources,
         itemActionDelegate: ResultItemActionDelegate,
     ): ResultPresenter {
         return ResultPresenter(
@@ -69,7 +77,7 @@ class ResultModule {
             finderStore,
             interactor,
             router,
-            appStore,
+            resources,
             itemActionDelegate,
         )
     }
@@ -126,8 +134,8 @@ class ResultModule {
 }
 
 interface ResultDependencies {
+    fun appResources(): AppResources
     fun finderStore(): FinderStore
-    fun fileOperationsDelegate(): FileOperationsDelegate
     fun preferenceStore(): PreferenceStore
     fun resultService(): UtilService
     fun explorerService(): ExplorerService
@@ -135,6 +143,5 @@ interface ResultDependencies {
     fun apkInteractor(): ApkInteractor
     fun resultStore(): ResultStore
     fun resultChannel(): ResultChannel
-    fun appStore(): AppStore
     fun curtainChannel(): CurtainChannel
 }

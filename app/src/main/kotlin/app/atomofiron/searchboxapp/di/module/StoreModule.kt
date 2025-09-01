@@ -2,7 +2,13 @@ package app.atomofiron.searchboxapp.di.module
 
 import android.content.Context
 import app.atomofiron.searchboxapp.injectable.AppScope
-import app.atomofiron.searchboxapp.injectable.store.*
+import app.atomofiron.searchboxapp.injectable.store.AppResources
+import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
+import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
+import app.atomofiron.searchboxapp.injectable.store.FinderStore
+import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.injectable.store.ResultStore
+import app.atomofiron.searchboxapp.injectable.store.TextViewerStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -35,20 +41,6 @@ open class StoreModule {
     open fun providePreferenceStore(context: Context, scope: AppScope): PreferenceStore {
         return PreferenceStore(context, scope)
     }
-
-    @Provides
-    @Singleton
-    open fun provideAndroidStore(resources: AppResources): AndroidStore {
-        return AndroidStore(resources)
-    }
-
-    @Provides
-    @Singleton
-    open fun provideAppStoreConsumer(store: AndroidStore): AppStoreConsumer = store
-
-    @Provides
-    @Singleton
-    open fun provideAppStore(store: AndroidStore): AppStore = store
 
     @Provides
     @Singleton

@@ -7,10 +7,18 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import app.atomofiron.searchboxapp.injectable.AppScope
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
+import app.atomofiron.searchboxapp.injectable.service.ApkService
+import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
+import app.atomofiron.searchboxapp.injectable.service.ExplorerService
+import app.atomofiron.searchboxapp.injectable.service.FinderService
+import app.atomofiron.searchboxapp.injectable.service.UtilService
+import app.atomofiron.searchboxapp.injectable.store.AppResources
+import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
+import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
+import app.atomofiron.searchboxapp.injectable.store.FinderStore
+import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
 import dagger.Module
 import dagger.Provides
-import app.atomofiron.searchboxapp.injectable.service.*
-import app.atomofiron.searchboxapp.injectable.store.*
 import javax.inject.Singleton
 
 @Module
@@ -40,15 +48,9 @@ open class ServiceModule {
     @Singleton
     fun resultService(
         context: Context,
-        appStore: AppStore,
+        resources: AppResources,
         clipboardManager: ClipboardManager,
-    ): UtilService = UtilService(context, appStore, clipboardManager)
-
-    @Provides
-    @Singleton
-    fun windowService(
-        appStore: AppStore,
-    ): WindowService = WindowService(appStore)
+    ): UtilService = UtilService(context, resources, clipboardManager)
 
     @Provides
     @Singleton
