@@ -95,6 +95,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private val horizontalMax get() = contentView.width
     private var exitDirection = Direction.right(!isLayoutRtl)
     private var exitCallback: (() -> Unit)? = null
+    private var exiting = false
 
     init {
         setInsetsModifier { _, insets ->
@@ -116,6 +117,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     }
 
     fun animAppearing() {
+        exiting = false
         doOnPreDraw {
             var from = horizontalMax.dec()
             when (exitDirection) {
@@ -183,10 +185,14 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (almostExited()) {
+            return false
+        }
         tracker.addMovement(event)
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
                 ignoreHorizontal = false
+                exiting = false
                 delegate.resetAnimation()
                 animHorizontal?.cancel()
                 animVertical?.cancel()
@@ -259,6 +265,8 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         return true
     }
 
+    private fun almostExited() = exiting && abs(horizontalCurrent) > horizontalMax * 2 / 3
+
     private fun skipForNow(distanceX: Float, distanceY: Float): Boolean = when {
         abs(distanceX) > DistanceThreshold || horizontalCurrent != HorizontalStart -> false
         abs(distanceY) > DistanceThreshold || keyboardNow > keyboardMin && keyboardNow < keyboardMax -> false
@@ -323,6 +331,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         contentView.translationX = new.toFloat()
         alpha = AlphaThreshold + (horizontalMax - new.absoluteValue) / horizontalMax.toFloat()
         if (new.absoluteValue == horizontalMax) {
+            exiting = false
             exitCallback?.invoke()
         }
         when {
@@ -352,6 +361,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     }
 
     private fun animHorizontally(from: Int, to: Int) {
+        exiting = to != HorizontalStart
         animHorizontal = ValueAnimator.ofInt(from, to).apply {
             duration = (TRANSITION_DURATION * abs(from - to) / horizontalMax)
             interpolator = ViscousFluidInterpolator()

@@ -7,10 +7,13 @@ import app.atomofiron.common.util.permission.PermissionDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
+import app.atomofiron.searchboxapp.screens.root.RootRoutingModel
 
-class FinderRouter(fragment: WeakProperty<out Fragment>) : BaseRouter(fragment), Registerable {
+class FinderRouter(property: WeakProperty<out Fragment>) : BaseRouter(property), Registerable {
 
     override val currentDestinationId = R.id.rootFragment
+
+    private val routingModel = property.value?.let { RootRoutingModel(it) }
 
     val permissions = PermissionDelegate.create(activityProperty)
 
@@ -22,5 +25,7 @@ class FinderRouter(fragment: WeakProperty<out Fragment>) : BaseRouter(fragment),
 
     fun showResult(taskId: Int) = navigate(R.id.resultFragment, ResultPresenterParams.arguments(taskId))
 
-    fun hide() = switchInParent<FinderFragment>(visible = false)
+    fun hide() {
+        routingModel?.hideSearch()
+    }
 }

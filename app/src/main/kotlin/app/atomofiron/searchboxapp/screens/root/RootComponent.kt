@@ -29,6 +29,7 @@ interface RootComponent {
     }
 
     fun inject(target: RootViewModel)
+    fun inject(target: RootRoutingModel)
 }
 
 @Module

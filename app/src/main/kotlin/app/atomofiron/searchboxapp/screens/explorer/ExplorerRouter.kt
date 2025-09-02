@@ -6,7 +6,7 @@ import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.screens.finder.FinderFragment
+import app.atomofiron.searchboxapp.screens.root.RootRoutingModel
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 
 class ExplorerRouter(
@@ -15,7 +15,9 @@ class ExplorerRouter(
 
     override val currentDestinationId = R.id.rootFragment
 
-    fun showFinder() = switchInParent<FinderFragment>(visible = true)
+    private val routingModel = property.value?.let { RootRoutingModel(it) }
+
+    fun showFinder() = routingModel?.showSearch()
 
     fun showSettings() = navigate(R.id.preferenceFragment)
 

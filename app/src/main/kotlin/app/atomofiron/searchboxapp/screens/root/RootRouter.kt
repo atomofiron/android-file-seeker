@@ -17,7 +17,7 @@ class RootRouter(property: WeakProperty<out Fragment>) : BaseRouter(property) {
 
     fun onBack(soft: Boolean): Boolean {
         fragment {
-            childFragmentManager?.run {
+            childFragmentManager.run {
                 fragments.findLastVisibleFragment()
                     ?.onBack(soft)
                     ?.takeIf { it }
@@ -41,6 +41,24 @@ class RootRouter(property: WeakProperty<out Fragment>) : BaseRouter(property) {
                     .add(R.id.root_fl_container, finder)
                     .hide(finder)
                     .commit()
+            }
+        }
+    }
+
+    fun showSearch(show: Boolean) {
+        fragment {
+            if (show == (childFragmentManager.backStackEntryCount > 0)) {
+                return
+            }
+            val fragment = childFragmentManager.fragments
+                .find { it is FinderFragment }
+                ?: return
+            when {
+                show -> childFragmentManager.beginTransaction()
+                        .addToBackStack(null)
+                        .show(fragment)
+                        .commit()
+                else -> childFragmentManager.popBackStack()
             }
         }
     }

@@ -103,25 +103,8 @@ abstract class BaseRouter(
         }
     }
 
-    protected fun List<Fragment>?.findLastVisibleFragment() = this?.filter {
-        it is BaseFragment<*,*,*,*>
-    }?.run {
-        lastOrNull { it.isVisible } ?: lastOrNull { !it.isHidden }
-    } as? BaseFragment<*,*,*,*>
-
-    protected inline fun <reified F : Fragment> switchInParent(
-        visible: Boolean,
-        addToBackStack: Boolean = false,
-    ) {
-        fragment {
-            val fragment = parentFragmentManager.fragments
-                .find { it is F }
-                ?.takeIf { it.isVisible != visible }
-                ?: return
-            parentFragmentManager.beginTransaction()
-                .run { if (addToBackStack) addToBackStack(null) else this }
-                .run { if (visible) show(fragment) else hide(fragment) }
-                .commit()
-        }
-    }
+    protected fun List<Fragment>?.findLastVisibleFragment() = this
+        ?.filter { it is BaseFragment<*,*,*,*> }
+        ?.run { lastOrNull { it.isVisible } ?: lastOrNull { !it.isHidden } }
+            as? BaseFragment<*,*,*,*>
 }

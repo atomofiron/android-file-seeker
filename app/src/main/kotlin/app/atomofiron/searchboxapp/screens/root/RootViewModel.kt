@@ -11,6 +11,7 @@ class RootViewModel : BaseViewModel<RootComponent, RootFragment, RootViewState, 
     override lateinit var presenter: RootPresenter
     @Inject
     override lateinit var viewState: RootViewState
+    private lateinit var routingModel: RootRoutingModel
 
     override fun component(view: RootFragment) = DaggerRootComponent
         .builder()
@@ -18,6 +19,8 @@ class RootViewModel : BaseViewModel<RootComponent, RootFragment, RootViewState, 
         .bind(viewProperty)
         .dependencies(DaggerInjector.appComponent)
         .build().apply {
+            routingModel = RootRoutingModel(view)
             inject(this@RootViewModel)
+            inject(routingModel)
         }
 }
