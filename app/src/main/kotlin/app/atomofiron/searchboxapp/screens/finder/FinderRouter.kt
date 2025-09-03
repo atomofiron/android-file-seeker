@@ -7,7 +7,7 @@ import app.atomofiron.common.util.permission.PermissionDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
-import app.atomofiron.searchboxapp.screens.root.RootRoutingModel
+import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
 
 class FinderRouter(property: WeakProperty<out Fragment>) : BaseRouter(property), Registerable {
 

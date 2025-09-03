@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.root
+package app.atomofiron.searchboxapp.screens.common
 
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -11,9 +11,14 @@ class RootRoutingModel : ViewModel() {
     }
 
     @Inject
-    lateinit var router: RootRouter
+    lateinit var router: RootRouting
 
-    fun showSearch() = router.showSearch(true)
+    fun showSearch() = router.showSearch()
 
-    fun hideSearch() = router.showSearch(false)
+    fun hideSearch() = router.hideSearch()
+}
+
+interface RootRouting {
+    fun showSearch()
+    fun hideSearch()
 }

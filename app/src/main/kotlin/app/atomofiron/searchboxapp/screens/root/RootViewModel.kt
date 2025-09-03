@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.root
 import androidx.lifecycle.viewModelScope
 import app.atomofiron.common.arch.BaseViewModel
 import app.atomofiron.searchboxapp.di.DaggerInjector
+import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
 import javax.inject.Inject
 
 class RootViewModel : BaseViewModel<RootComponent, RootFragment, RootViewState, RootPresenter>() {

@@ -6,7 +6,7 @@ import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.screens.root.RootRoutingModel
+import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 
 class ExplorerRouter(

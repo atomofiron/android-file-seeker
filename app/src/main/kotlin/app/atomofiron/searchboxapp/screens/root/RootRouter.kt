@@ -4,10 +4,11 @@ import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.screens.common.RootRouting
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerFragment
 import app.atomofiron.searchboxapp.screens.finder.FinderFragment
 
-class RootRouter(property: WeakProperty<out Fragment>) : BaseRouter(property) {
+class RootRouter(property: WeakProperty<out Fragment>) : BaseRouter(property), RootRouting {
 
     override val currentDestinationId = R.id.rootFragment
 
@@ -45,20 +46,23 @@ class RootRouter(property: WeakProperty<out Fragment>) : BaseRouter(property) {
         }
     }
 
-    fun showSearch(show: Boolean) {
+    override fun showSearch() {
         fragment {
-            if (show == (childFragmentManager.backStackEntryCount > 0)) {
-                return
-            }
             val fragment = childFragmentManager.fragments
-                .find { it is FinderFragment }
+                .takeIf { childFragmentManager.backStackEntryCount == 0 }
+                ?.find { it is FinderFragment }
                 ?: return
-            when {
-                show -> childFragmentManager.beginTransaction()
-                        .addToBackStack(null)
-                        .show(fragment)
-                        .commit()
-                else -> childFragmentManager.popBackStack()
+            childFragmentManager.beginTransaction()
+                .addToBackStack(null)
+                .show(fragment)
+                .commit()
+        }
+    }
+
+    override fun hideSearch() {
+        fragment {
+            if (childFragmentManager.backStackEntryCount > 0) {
+                childFragmentManager.popBackStack()
             }
         }
     }

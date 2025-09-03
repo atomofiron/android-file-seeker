@@ -3,6 +3,8 @@ package app.atomofiron.searchboxapp.screens.root
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.screens.common.RootRouting
+import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -49,6 +51,10 @@ class RootModule {
     fun router(
         fragment: WeakProperty<out Fragment>,
     ): RootRouter = RootRouter(fragment)
+
+    @Provides
+    @RootScope
+    fun rootRouting(router: RootRouter): RootRouting = router
 
     @Provides
     @RootScope
