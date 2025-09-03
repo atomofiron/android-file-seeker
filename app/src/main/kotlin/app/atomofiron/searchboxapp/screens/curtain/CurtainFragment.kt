@@ -9,6 +9,8 @@ import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.doOnNextLayout
+import androidx.core.view.marginBottom
+import androidx.core.view.marginTop
 import androidx.fragment.app.DialogFragment
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
@@ -80,6 +82,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
             ViewCompat.setWindowInsetsAnimationCallback(view, keyboardCallback)
         }
         binding = FragmentCurtainBinding.bind(view).apply {
+            curtainParent.elevation = resources.getDimension(MaterialDimen.m3_comp_snackbar_container_elevation).inc()
             curtainSheet.clipToOutline = true
             curtainSheet.background = CurtainBackground(requireContext())
             curtainSheet.setOnClickListener { /* intercept clicks */ }
@@ -205,17 +208,20 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         val overlayAlpha = (MAX_OVERLAY_SATURATION * alpha).toInt()
         val overlayColor = ColorUtils.setAlphaComponent(overlayColor, overlayAlpha)
         binding.root.setBackgroundColor(overlayColor)
-        snackbarView.get()?.alpha = alpha
     }
 
     private fun updateSnackbarTranslation() {
         val snackbarView = snackbarView.get() ?: return
         val params = snackbarView.layoutParams as ViewGroup.MarginLayoutParams
         val minBottom = binding.root.paddingTop + params.topMargin + snackbarView.height
-        val minOffset = minBottom - binding.root.height
+        val minOffset = minBottom - binding.root.height.toFloat()
         val bottomInset = params.bottomMargin - params.topMargin
-        val offset = binding.curtainSheet.top - binding.curtainSheet.height + bottomInset
-        snackbarView.translationY = max(minOffset, offset).toFloat()
+        val sheet = binding.curtainSheet
+        val parent = sheet.parent as View
+        var offset = snackbarView.run { height + marginBottom + marginTop }.toFloat()
+        offset *= ((sheet.bottom - parent.height) / sheet.height.toFloat()).coerceIn(0f, 1f)
+        offset += binding.curtainSheet.top - binding.curtainSheet.height + bottomInset
+        snackbarView.translationY = max(minOffset, offset)
     }
 
     private fun expand() {
@@ -234,11 +240,13 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         init {
             bottomSheet.post {
                 updateSaturation()
+                updateSnackbarTranslation()
             }
         }
 
         override fun onStateChanged(bottomSheet: View, newState: Int) {
             updateSaturation()
+            updateSnackbarTranslation()
             if (newState == BottomSheetBehavior.STATE_HIDDEN) {
                 presenter.onHidden()
             }

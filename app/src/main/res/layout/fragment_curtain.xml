@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<app.atomofiron.searchboxapp.custom.view.layout.RootFrameLayout
+<app.atomofiron.searchboxapp.custom.view.layout.RootCoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
@@ -26,4 +26,4 @@
             app:behavior_hideable="true"
             />
     </app.atomofiron.searchboxapp.custom.view.layout.LimitedWidthCoordinatorLayout>
-</app.atomofiron.searchboxapp.custom.view.layout.RootFrameLayout>
+</app.atomofiron.searchboxapp.custom.view.layout.RootCoordinatorLayout>
