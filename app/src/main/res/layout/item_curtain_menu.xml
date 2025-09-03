@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="@dimen/padding_half"
@@ -21,11 +22,20 @@
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1"
         android:textColor="?attr/colorContent"
         android:textSize="16sp"
         android:maxLines="1"
         android:ellipsize="middle"
+        />
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/tail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="@dimen/padding_half"
+        android:tint="?attr/colorContent"
+        tools:src="@drawable/ic_forward"
         />
 </LinearLayout>

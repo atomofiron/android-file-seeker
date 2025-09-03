@@ -35,8 +35,8 @@ import kotlinx.coroutines.launch
 import java.io.FileInputStream
 
 private val rootOptions = listOf(Operations.Create, Operations.CopyPath)
-private val directoryOptions = listOf(Operations.Create, Operations.Clone, Operations.Rename, Operations.CopyPath, Operations.Delete)
-private val oneFileOptions = listOf(Operations.Share, Operations.OpenWith, Operations.Clone, Operations.Rename, Operations.CopyPath, Operations.Delete)
+private val directoryOptions = listOf(Operations.Create, Operations.CopyPath, Operations.Clone, Operations.Rename, Operations.Delete)
+private val oneFileOptions = listOf(Operations.Share, Operations.OpenWith, Operations.CopyPath, Operations.Clone, Operations.Rename, Operations.Delete)
 private val readWrite = listOf(Operations.Create, Operations.Clone, Operations.Rename)
 
 class FileOperationsDelegate(

@@ -64,6 +64,8 @@
     <string name="tasks">Задачи</string>
     <string name="settings">Настройки</string>
     <string name="share">Поделиться</string>
+    <string name="share_file">Поделиться файлом</string>
+    <string name="share_files">Поделиться файлами</string>
     <string name="pref_orientation">Ориентация экрана</string>
     <string name="fucking_provider">Не удалось открыть файл из-за системных ограничений, попробуйте скопировать абсолютный путь к файлу и открыть его в другом приложении</string>
     <string name="pref_theme">Тема оформления</string>
@@ -95,7 +97,7 @@
     <string name="delete">Удалить</string>
     <string name="slide_to">проведите вправо</string>
     <string name="rename">Переименовать</string>
-    <string name="open_with">Открыть в другом приложении</string>
+    <string name="open_with">Открыть в…</string>
     <string name="no_such_file">Файла не существует</string>
     <string name="no_such_directory">Директории не существует</string>
     <string name="no_such_file_or_directory">Файла или директории не существует</string>

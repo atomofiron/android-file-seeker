@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.custom.view.menu.holder;
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import app.atomofiron.fileseeker.databinding.ItemCurtainMenuBinding
 import app.atomofiron.searchboxapp.custom.drawable.setMenuItemBackground
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
@@ -35,5 +36,9 @@ class MenuItemHolder private constructor(
         binding.icon.setImageResource(content.head)
         val label = item.longLabel?.takeIf { isLong } ?: item.label
         binding.label.text = binding.resources[label]
+        binding.tail.isVisible = content.tail != null
+        if (content.tail != null) {
+            binding.tail.setImageResource(content.tail)
+        }
     }
 }
