@@ -1,10 +1,8 @@
 package app.atomofiron.searchboxapp.custom.view.menu.holder
 
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.updatePaddingRelative
-import app.atomofiron.common.util.findBooleanByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemCurtainMenuDangerousBinding
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer

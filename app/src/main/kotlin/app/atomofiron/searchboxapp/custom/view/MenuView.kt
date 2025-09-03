@@ -22,7 +22,7 @@ class MenuView : RecyclerView {
     private val adapter = MenuAdapter()
 
     init {
-        overScrollMode = View.OVER_SCROLL_NEVER
+        overScrollMode = OVER_SCROLL_NEVER
         layoutManager = GridLayoutManager(context, 2)
             .apply { spanSizeLookup = adapter.spanSizeLookup }
         isVerticalScrollBarEnabled = false
