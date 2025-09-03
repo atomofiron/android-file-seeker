@@ -289,6 +289,35 @@
                     />
             </intent-filter>
         </activity>
+        <activity
+            android:name="app.atomofiron.searchboxapp.screens.picker.PickerActivity"
+            android:configChanges="orientation|screenLayout|screenSize|keyboard|navigation"
+            android:launchMode="standard"
+            android:screenOrientation="unspecified"
+            android:exported="true"
+            android:theme="@style/CompatTheme"
+            android:windowSoftInputMode="adjustNothing"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.PICK" />
+                <action android:name="android.intent.action.GET_CONTENT" />
+                <action android:name="android.intent.action.OPEN_DOCUMENT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
 
         <provider
             android:name="androidx.core.content.FileProvider"

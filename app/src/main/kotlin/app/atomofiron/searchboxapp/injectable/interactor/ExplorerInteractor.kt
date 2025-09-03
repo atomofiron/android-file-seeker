@@ -55,7 +55,7 @@ class ExplorerInteractor(
 ) {
     private val context = Dispatchers.IO
 
-    fun getFlow(tab: NodeTabKey) = service.getOrCreateFlowSync(tab)
+    fun getFlow(tab: NodeTabKey) = service.getOrCreateFlow(tab)
 
     fun copyToClipboard(item: Node) = utils.copyToClipboard(item)
 

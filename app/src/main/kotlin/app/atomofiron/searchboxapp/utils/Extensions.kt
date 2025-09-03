@@ -14,7 +14,6 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import java.io.InputStream
 import java.io.OutputStream
 import java.util.Locale
-import kotlin.math.min
 
 fun String.escapeQuotes(): String = this.replace(Const.QUOTE, "\\" + Const.QUOTE)
 
@@ -35,19 +34,17 @@ fun Number.toHumanReadable(suffixes: Array<String?>): String {
     return String.format(Locale.US, "%1$.2f %2\$s", byteCount, suffixes[order]).replace("[.,]00|(?<=[.,][0-9])0".toRegex(), "")
 }
 
-fun String.endingDot(): String = "${this}."
-
-fun InputStream.writeTo(stream: OutputStream): Boolean {
-    var remaining = available()
-    val bytes = ByteArray(1024)
-    while (remaining > 0) {
-        val length = min(bytes.size, remaining)
-        val read = read(bytes, 0, length)
-        if (read < 0) break
-        stream.write(bytes, 0, length)
-        remaining -= read
+inline fun InputStream.writeTo(out: OutputStream, callback: (Long) -> Unit = {}): Long {
+    val buffer = ByteArray(16 * 1024)
+    var copied: Long = 0
+    var bytes = read(buffer)
+    while (bytes >= 0) {
+        out.write(buffer, 0, bytes)
+        copied += bytes.toLong()
+        callback(bytes.toLong())
+        bytes = read(buffer)
     }
-    return remaining == 0
+    return copied
 }
 
 fun Int.convert(suffixes: Array<String>, lossless: Boolean = true): String = toLong().convert(suffixes, lossless)

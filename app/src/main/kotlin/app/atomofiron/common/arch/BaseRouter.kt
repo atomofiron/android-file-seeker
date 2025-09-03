@@ -83,9 +83,11 @@ abstract class BaseRouter(
     }
 
     fun minimize() {
-        activity {
-            moveTaskToBack(true)
-        }
+        activity?.moveTaskToBack(true)
+    }
+
+    fun finish() {
+        activity?.finish()
     }
 
     fun navigate(actionId: Int, args: Bundle? = null, navOptions: NavOptions = Companion.navOptions) {

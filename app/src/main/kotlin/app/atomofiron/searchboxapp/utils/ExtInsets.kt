@@ -6,6 +6,7 @@ import lib.atomofiron.insets.TypeSet
 
 object ExtType : ExtendedWindowInsets.Type() {
     val dock = define("dock")
+    val topDisclaimer = define("topDisclaimer")
     val joystickTop = define("joystickTop")
     val joystickFlank = define("joystickFlank")
     val joystickBottom = define("joystickBottom")

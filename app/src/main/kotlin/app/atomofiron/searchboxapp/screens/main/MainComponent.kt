@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.main
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
-import app.atomofiron.common.util.dialog.ActivityProperty
+import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.module.DelegateModule
@@ -17,9 +17,9 @@ import app.atomofiron.searchboxapp.injectable.service.WindowService
 import app.atomofiron.searchboxapp.injectable.store.AndroidStore
 import app.atomofiron.searchboxapp.injectable.store.AppStore
 import app.atomofiron.searchboxapp.injectable.store.AppStoreConsumer
-import app.atomofiron.searchboxapp.injectable.store.AppStoreProvider
 import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegate
 import dagger.BindsInstance
@@ -46,7 +46,7 @@ interface MainComponent {
         @BindsInstance
         fun bind(activity: AppCompatActivity): Builder
         @BindsInstance
-        fun bind(appStoreProvider: AppStoreProvider): Builder
+        fun bind(activityMode: ActivityMode): Builder
         fun dependencies(dependencies: MainDependencies): Builder
         fun build(): MainComponent
     }
@@ -102,9 +102,10 @@ class MainModule {
     @Provides
     @MainScope
     fun viewState(
+        activityMode: ActivityMode,
         preferenceStore: PreferenceStore,
         initialDelegate: InitialDelegate,
-    ): MainViewState = MainViewState(preferenceStore, initialDelegate)
+    ): MainViewState = MainViewState(activityMode, preferenceStore, initialDelegate)
 
     @Provides
     @MainScope

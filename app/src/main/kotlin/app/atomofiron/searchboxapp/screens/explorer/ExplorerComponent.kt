@@ -3,8 +3,9 @@ package app.atomofiron.searchboxapp.screens.explorer
 import android.content.Context
 import android.content.res.AssetManager
 import androidx.fragment.app.Fragment
+import androidx.work.WorkManager
 import app.atomofiron.common.arch.Registerable
-import app.atomofiron.common.util.dialog.ActivityProperty
+import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
@@ -12,13 +13,17 @@ import app.atomofiron.searchboxapp.injectable.channel.MainChannel
 import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
+import app.atomofiron.searchboxapp.injectable.router.FilePickingDelegate
+import app.atomofiron.searchboxapp.injectable.router.FileSharingDelegateImpl
 import app.atomofiron.searchboxapp.injectable.service.ExplorerService
 import app.atomofiron.searchboxapp.injectable.service.UtilService
 import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
 import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMenuDelegate
+import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerDockDelegate
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerItemActionListenerDelegate
 import dagger.BindsInstance
 import dagger.Component
@@ -41,6 +46,8 @@ interface ExplorerComponent {
         fun bind(view: WeakProperty<out Fragment>): Builder
         @BindsInstance
         fun bind(scope: CoroutineScope): Builder
+        @BindsInstance
+        fun bind(mode: ActivityMode): Builder
         fun dependencies(dependencies: ExplorerDependencies): Builder
         fun build(): ExplorerComponent
     }
@@ -112,6 +119,7 @@ class ExplorerModule {
         store: ExplorerStore,
         itemListener: ExplorerItemActionListenerDelegate,
         mainChannel: MainChannel,
+        dockDelegate: ExplorerDockDelegate,
     ): ExplorerPresenter {
         return ExplorerPresenter(
             scope,
@@ -122,6 +130,7 @@ class ExplorerModule {
             store,
             itemListener,
             mainChannel,
+            dockDelegate,
         )
     }
 
@@ -146,12 +155,13 @@ class ExplorerModule {
     @ExplorerScope
     fun viewState(
         scope: CoroutineScope,
+        mode: ActivityMode,
+        dockDelegate: ExplorerDockDelegate,
         explorerStore: ExplorerStore,
         interactor: ExplorerInteractor,
         preferenceStore: PreferenceStore,
-        preferenceChannel: PreferenceChannel,
     ): ExplorerViewState {
-        return ExplorerViewState(scope, explorerStore, interactor, preferenceStore, preferenceChannel)
+        return ExplorerViewState(scope, mode, dockDelegate, explorerStore, interactor, preferenceStore)
     }
 
     @Provides
@@ -163,8 +173,15 @@ class ExplorerModule {
     @Provides
     @ExplorerScope
     fun registerable(
+        router: ExplorerRouter,
         storagePermissionDelegate: StoragePermissionDelegate,
-    ) = Registerable(storagePermissionDelegate)
+    ) = Registerable(router, storagePermissionDelegate)
+
+    @Provides
+    @ExplorerScope
+    fun fileSharingDelegate(
+        activityProperty: ActivityProperty,
+    ): FilePickingDelegate = FileSharingDelegateImpl(activityProperty)
 }
 
 interface ExplorerDependencies {
@@ -178,4 +195,5 @@ interface ExplorerDependencies {
     fun apkInteractor(): ApkInteractor
     fun mainChannel(): MainChannel
     fun preferenceChannel(): PreferenceChannel
+    fun workManager(): WorkManager
 }

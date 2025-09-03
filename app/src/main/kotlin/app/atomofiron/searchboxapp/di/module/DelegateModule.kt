@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.di.module
 
-import app.atomofiron.common.util.dialog.ActivityProperty
+import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.dialog.DialogDelegateImpl
 import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor

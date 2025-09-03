@@ -15,7 +15,7 @@ class MainViewModel : BaseViewModel<MainComponent, MainActivity, MainViewState, 
     override fun component(view: MainActivity) = DaggerMainComponent
         .builder()
         .bind(viewProperty)
-        .bind(appStoreProvider = view)
+        .bind(view.activityMode)
         .bind(activity = view)
         .bind(viewModelScope)
         .dependencies(DaggerInjector.appComponent)

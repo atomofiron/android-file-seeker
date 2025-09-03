@@ -30,6 +30,7 @@
 		<item name="materialCardViewStyle">@style/CardViewStyle</item>
 		<item name="materialTonalButton">@style/TonalButtonStyle</item>
 		<item name="chipStyle">@style/ChipStyle</item>
+		<item name="snackbarStyle">@style/SnackbarStyle</item>
 		<item name="textInputStyle">@style/Widget.MaterialComponents.TextInputLayout.FilledBox</item>
 
 		<item name="colorControlHighlight" tools:ignore="PrivateResource">@color/mtrl_btn_text_btn_ripple_color</item>
@@ -115,6 +116,10 @@
 	<style name="ShapeAppearance.Corners" parent="ShapeAppearance.MaterialComponents.SmallComponent">
 		<item name="cornerFamily">rounded</item>
 		<item name="cornerSize">8dp</item>
+	</style>
+
+	<style name="SnackbarStyle" parent="Widget.Material3.Snackbar">
+		<item name="shapeAppearance">?shapeAppearanceCornerLarge</item>
 	</style>
 
 </resources>

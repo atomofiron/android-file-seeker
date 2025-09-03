@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.injectable.service
 
 import android.content.Context
-import android.net.Uri
 import android.os.Environment
 import android.os.StatFs
 import app.atomofiron.common.util.MutableList
@@ -56,16 +55,14 @@ import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.searchboxapp.utils.removeOneIf
 import app.atomofiron.searchboxapp.utils.replaceEach
 import app.atomofiron.searchboxapp.utils.verify
-import app.atomofiron.searchboxapp.utils.writeTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
 import kotlin.math.min
 
 private const val SUB_PATH_CAMERA = "DCIM/Camera/"
@@ -124,13 +121,9 @@ class ExplorerService(
         preferenceStore { setEmbeddedToybox(variant) }
     }
 
-    suspend fun getOrCreateFlow(key: NodeTabKey): MutableSharedFlow<NodeTabItems> {
-        return withGarden {
-            getOrCreateFlowSync(key)
-        }
-    }
+    fun getOrCreateFlow(key: NodeTabKey): SharedFlow<NodeTabItems> = getOrCreateFlowSync(key)
 
-    fun getOrCreateFlowSync(key: NodeTabKey): MutableSharedFlow<NodeTabItems> {
+    private fun getOrCreateFlowSync(key: NodeTabKey): MutableSharedFlow<NodeTabItems> {
         return garden.run {
             trees[key]?.run { return flow }
             val tree = NodeTab(key, states)
@@ -498,7 +491,7 @@ class ExplorerService(
             if (state?.withOperation == true) return
             if (!checked.tryUpdateCheck(item.uniqueId, isChecked)) return
             renderUpdate(item)
-            renderChecked(item, isChecked)
+            renderChecked(key, item, isChecked)
         }
     }
 
@@ -573,7 +566,7 @@ class ExplorerService(
         }
         val jobs = items.map { item ->
             appScope.launch {
-                debugDelay(2)
+                debugDelay(1)
                 val result = item.delete(config.useSu)
                 withGarden(key) { tab ->
                     tab.tree.replaceItem(item.uniqueId, item.parentPath, result)
@@ -590,15 +583,6 @@ class ExplorerService(
                 updateRootAsync(key, mediaRoot)
             }
         }
-    }
-
-    suspend fun tryReceive(where: Node, uri: Uri) {
-        val inputStream = context.contentResolver.openInputStream(uri)
-        inputStream ?: return
-        val outputStream = FileOutputStream(File(""))
-        val success = inputStream.writeTo(outputStream)
-        inputStream.close()
-        outputStream.close()
     }
 
     suspend fun resetChecked(key: NodeTabKey) {
@@ -662,8 +646,8 @@ class ExplorerService(
         updateStates(items)
         updateChecked(items)
         val checked = items.filter { it.isChecked }
-        store.emitChecked(checked)
-        store.setCurrentItems(items)
+        store.emitChecked(key, checked)
+        store.setCurrentItems(key, items)
 
         require(this.roots.all { !it.isSelected })
     }
@@ -767,13 +751,13 @@ class ExplorerService(
             .let { store.emitUpdate(it) }
     }
 
-    private suspend fun renderChecked(new: Node, isChecked: Boolean) {
+    private suspend fun renderChecked(tab: NodeTabKey, new: Node, isChecked: Boolean) {
         store.checked.value.mutate {
             when {
                 isChecked -> add(new.copy(isChecked = true))
                 else -> removeOneIf { it.uniqueId == new.uniqueId }
             }
-            store.emitChecked(this)
+            store.emitChecked(tab, this)
         }
     }
 

@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.content.ContextCompat
+import androidx.core.graphics.Insets
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -19,17 +20,20 @@ import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock
-import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDockState
 import app.atomofiron.searchboxapp.screens.main.util.KeyCodeConsumer
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.recyclerView
 import com.google.android.material.snackbar.Snackbar
+import lib.atomofiron.insets.InsetsSource
+import lib.atomofiron.insets.attachInsetsListener
 import lib.atomofiron.insets.insetsPadding
+import lib.atomofiron.insets.insetsSource
 
 class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     BaseFragment<ExplorerFragment, ExplorerViewState, ExplorerPresenter, FragmentExplorerBinding> by BaseFragmentImpl(),
@@ -38,7 +42,6 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     private lateinit var binding: FragmentExplorerBinding
     private lateinit var pagerAdapter: ExplorerPagerAdapter
     private val explorerViews get() = pagerAdapter.items
-    private val tabIds = arrayOf(R.id.first_button, R.id.second_button)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,38 +60,25 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     private fun FragmentExplorerBinding.initView() {
         pager.adapter = pagerAdapter
-        dockBar.submit(ExplorerDockState.Default)
         dockBar.setListener(::onNavigationItemSelected)
         pager.recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
         pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(position: Int) {
                 presenter.onTabSelected(position)
-                explorerTabs.check(tabIds[position])
             }
         })
-
-        explorerTabs.addOnButtonCheckedListener { group, id, isChecked ->
-            if (!isChecked && group.checkedButtonId == View.NO_ID) {
-                getCurrentTabView().scrollToTop()
-                group.check(id)
-            }
-            if (isChecked) {
-                pager.currentItem = tabIds.indexOf(id)
-            }
+        when (viewState.mode) {
+            ActivityMode.Default -> binding.disclaimer.isVisible = false
+            is ActivityMode.Share -> binding.disclaimer.setText(R.string.disclaimer_pick_files)
+            is ActivityMode.Receive -> binding.disclaimer.setText(R.string.disclaimer_choose_directory)
         }
-        explorerTabs.setOnClickListener {
-            getCurrentTabView().scrollToTop()
-        }
-
-        val textColors = ContextCompat.getColorStateList(requireContext(), R.color.redio_text_button_foreground_color_selector)
-        firstButton.setTextColor(textColors)
-        secondButton.setTextColor(textColors)
     }
 
     private fun onNavigationItemSelected(item: DockItem) {
-        when (item.id) {
-            ExplorerDock.Search -> presenter.onSearchOptionSelected()
-            ExplorerDock.Settings -> presenter.onSettingsOptionSelected()
+        when (item.id as ExplorerDock) {
+            ExplorerDock.Search -> presenter.onSearchClick()
+            ExplorerDock.Settings -> presenter.onSettingsClick()
+            ExplorerDock.Confirm -> presenter.onConfirmClick()
         }
     }
 
@@ -96,16 +86,10 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
         viewCollect(updates) {
             explorerViews.first().submit(it)
         }
-        viewCollect(firstTabItems) {
+        viewCollect(currentTabFlow) {
             val first = explorerViews.first()
             first.submit(it)
-            binding.firstButton.text = first.title ?: getString(R.string.dash)
         }
-        /*viewCollect(secondTabItems) {
-            val second = explorerViews.last()
-            second.submitList(it)
-            binding.secondButton.text = second.title ?: getString(R.string.dash)
-        }*/
         viewCollect(itemComposition) { composition ->
             explorerViews.forEach { it.setComposition(composition) }
         }
@@ -121,8 +105,13 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     }
 
     override fun FragmentExplorerBinding.onApplyInsets() {
-        binding.explorerTabs.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
-        binding.root.apply(dockView = binding.dockBar, /*tabLayout = explorerTabs,*/)
+        root.apply(dockView = binding.dockBar)
+        systemUiBackground += ExtType.topDisclaimer
+        root.attachInsetsListener(systemUiBackground)
+        disclaimer.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
+        disclaimer.insetsSource {
+            InsetsSource.submit(ExtType.topDisclaimer, Insets.of(0, it.height, 0, 0))
+        }
     }
 
     override fun onBack(soft: Boolean): Boolean = presenter.onBack(soft, getCurrentTabView()::scrollToTop)

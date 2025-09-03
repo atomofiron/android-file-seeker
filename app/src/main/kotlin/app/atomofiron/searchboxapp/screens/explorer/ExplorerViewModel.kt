@@ -4,6 +4,7 @@ import androidx.lifecycle.viewModelScope
 import app.atomofiron.common.arch.BaseViewModel
 import app.atomofiron.common.arch.Registerable
 import app.atomofiron.searchboxapp.di.DaggerInjector
+import app.atomofiron.searchboxapp.screens.common.activityMode
 import javax.inject.Inject
 
 class ExplorerViewModel : BaseViewModel<ExplorerComponent, ExplorerFragment, ExplorerViewState, ExplorerPresenter>() {
@@ -19,6 +20,7 @@ class ExplorerViewModel : BaseViewModel<ExplorerComponent, ExplorerFragment, Exp
         .builder()
         .bind(viewProperty)
         .bind(viewModelScope)
+        .bind(view.activityMode)
         .dependencies(DaggerInjector.appComponent)
         .build().apply {
             inject(this@ExplorerViewModel)

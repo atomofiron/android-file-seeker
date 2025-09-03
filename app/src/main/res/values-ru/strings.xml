@@ -4,6 +4,7 @@
     <string name="case_sens">Учитывать регистр</string>
     <string name="storage_err">Ошибка доступа к памяти</string>
     <string name="searching">Поиск…</string>
+    <string name="receiving">Получеиние…</string>
     <string name="search_stopped">Поиск был остановлен</string>
     <string name="search_stopping">Прерывание поиска</string>
     <string name="search_empty">Поиск не дал результатов</string>
@@ -14,6 +15,7 @@
     <string name="search_error">Ошибка: %s</string>
     <string name="error">Ошибка</string>
     <string name="wrong_value">Неверное значение</string>
+    <string name="wrong_intent">Неверное намерение</string>
     <string name="nothing">Ничего не найдено</string>
     <string name="warning">Вы не выбрали ни одной директории. Поиск будет произведён по всему корневому разделу</string>
     <string name="ok">ОК</string>
@@ -151,6 +153,8 @@
     <string name="copy_path">Скопировать путь</string>
     <string name="pref_category_system">Системные</string>
     <string name="pref_embedded_toybox">Использовать встроенный toybox</string>
+    <string name="disclaimer_pick_files">Пометьте файл(ы) и\u00A0Подтвердите</string>
+    <string name="disclaimer_choose_directory">Выберите папку для сохранения файла(ов) и\u00A0Подтвердите</string>
     <string name="dismiss">Скрыть</string>
     <string name="got_it">Понятно</string>
     <string name="next">Next</string>
@@ -204,5 +208,17 @@
         <item quantity="few">Были удалены: %s</item>
         <item quantity="many">Были удалены: %s</item>
         <item quantity="other">Были удалены: %s</item>
+    </plurals>
+    <plurals name="receiving_files">
+        <item quantity="one">Получение %d файла…</item>
+        <item quantity="few">Получение %d файлов…</item>
+        <item quantity="many">Получение %d файлов…</item>
+        <item quantity="other">Получение %d файлов…</item>
+    </plurals>
+    <plurals name="files_received">
+        <item quantity="one">Получен %d из %d файл</item>
+        <item quantity="few">Получено %d из %d файла</item>
+        <item quantity="many">Получено %d из %d файлов</item>
+        <item quantity="other">Получено %d из %d файлов</item>
     </plurals>
 </resources>

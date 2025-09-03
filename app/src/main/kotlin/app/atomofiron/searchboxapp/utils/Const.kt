@@ -16,6 +16,7 @@ object Const {
     const val SCHEME_PACKAGE = "package"
     const val SCHEME_CONTENT = "content"
     const val SCHEME_FILE = "file"
+    const val SELECTED = "selected"
     const val MIME_TYPE_ANY = "*/*"
     const val DOT_APK = ".apk"
 
@@ -23,10 +24,12 @@ object Const {
     const val COMMON_DURATION = 512L
     const val COMMON_DELAY = 256L
     const val SMALL_DELAY = 128L
+    const val MINI_DELAY = 64L
 
     const val MIME_TYPE = "mimeType"
     const val DATE_PATTERN = "yyyy-MM-dd_HH-mm-ss"
-    const val MIME_TEXT = "text/plain"
+    const val MIME_TEXT = "text/"
+    const val MIME_TEXT_PLAIN = "text/plain"
     const val GITHUB_URL = "https://github.com/atomofiron/android-file-seeker"
     const val FORPDA_URL = "https://4pda.to/forum/index.php?showtopic=1000070&view=findpost&p=98557921"
 

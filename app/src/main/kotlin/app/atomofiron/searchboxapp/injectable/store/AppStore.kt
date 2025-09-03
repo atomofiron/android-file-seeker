@@ -26,9 +26,7 @@ interface AppStoreProvider {
     val appStore: AppStore
 }
 
-class AndroidStore(
-    activity: AppCompatActivity,
-) : AppStore, AppStoreConsumer {
+class AndroidStore(activity: AppCompatActivity) : AppStore, AppStoreConsumer {
 
     override val activityProperty = MutableStrongProperty(activity)
     override val windowProperty = MutableStrongProperty<Window>(activity.window)

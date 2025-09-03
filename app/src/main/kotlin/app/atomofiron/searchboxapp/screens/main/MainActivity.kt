@@ -37,6 +37,8 @@ import app.atomofiron.searchboxapp.injectable.store.AppStoreProvider
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
+import app.atomofiron.searchboxapp.screens.common.ActivityMode
+import app.atomofiron.searchboxapp.screens.common.ActivityModeProvider
 import app.atomofiron.searchboxapp.screens.main.util.offerKeyCodeToChildren
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.setHapticEffect
@@ -47,7 +49,7 @@ import lib.atomofiron.insets.builder
 import lib.atomofiron.insets.insetsMargin
 import lib.atomofiron.insets.insetsSource
 
-open class MainActivity : AppCompatActivity(), AppStoreProvider {
+open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModeProvider {
 
     private lateinit var binding: ActivityMainBinding
     private val rooFragment: Fragment get() = binding.navHostFragment.getFragment()
@@ -56,6 +58,9 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider {
     private lateinit var presenter: MainPresenter
     override lateinit var appStore: AppStore
     private var isFirstStart = true
+
+    override var activityMode: ActivityMode = ActivityMode.Default
+        protected set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

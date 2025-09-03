@@ -11,6 +11,7 @@ data class DockItem(
     val enabled: Boolean = true,
     val clickable: Boolean? = null, // null = by enabled
     val selected: Boolean = false,
+    val primary: Boolean = false,
     val progress: Boolean = false,
     val notice: Boolean = false,
     val children: DockItemChildren = DockItemChildren.Stub,
@@ -49,12 +50,12 @@ data class DockItem(
         private value class Digit(override val value: Long) : Id
 
         open class Auto : Id {
+            private var next = Int.MAX_VALUE.toLong()
             override val value = next++
         }
 
         companion object {
             val Undefined: Id = Digit(-1L)
-            private var next = Int.MAX_VALUE.toLong()
 
             operator fun invoke(value: Int): Id = Digit(value.toLong())
             operator fun invoke(value: Long): Id = Digit(value)

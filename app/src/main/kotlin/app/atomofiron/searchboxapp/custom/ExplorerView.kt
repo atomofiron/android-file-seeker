@@ -28,7 +28,6 @@ import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.addFastScroll
 import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
 import app.atomofiron.searchboxapp.utils.scrollToTop
-import lib.atomofiron.insets.attachInsetsListener
 import lib.atomofiron.insets.insetsPadding
 
 @SuppressLint("ViewConstructor")
@@ -76,9 +75,8 @@ class ExplorerView(
     }
 
     private fun ViewExplorerBinding.applyInsets() {
-        recyclerView.insetsPadding(ExtType { barsWithCutout + dock })
-        binding.stickyBox.insetsPadding(ExtType { tappableElement + displayCutout + dock })
-        root.attachInsetsListener(binding.systemUiBackground)
+        recyclerView.insetsPadding(ExtType { barsWithCutout + dock + topDisclaimer })
+        binding.stickyBox.insetsPadding(ExtType { tappableElement + displayCutout + dock + topDisclaimer })
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {

@@ -3,7 +3,6 @@ package app.atomofiron.common.util
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,10 +11,10 @@ import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
-import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.utils.colorAttr
 import com.google.android.material.color.MaterialColors
 import kotlin.math.min
 
@@ -45,22 +44,6 @@ fun View.hideKeyboard(): Boolean {
     val wasShown = inputMethodManager?.hideSoftInputFromWindow(windowToken, 0) == true
     clearFocus()
     return wasShown
-}
-
-
-fun Context.findResIdByAttr(@AttrRes attr: Int): Int = findResIdsByAttr(attr)[0]
-
-fun Context.findResIdsByAttr(@AttrRes vararg attrs: Int): IntArray {
-    @SuppressLint("ResourceType")
-    val array = obtainStyledAttributes(attrs)
-
-    val resIds = IntArray(attrs.size)
-    for (i in attrs.indices) {
-        resIds[i] = array.getResourceId(i, 0)
-    }
-    array.recycle()
-
-    return resIds
 }
 
 fun Context.findBooleanByAttr(@AttrRes attr: Int): Boolean = findBooleansByAttr(attr)[0]
@@ -94,11 +77,7 @@ fun Context.findDimensByAttr(@AttrRes vararg attrs: Int): IntArray {
 }
 
 @ColorInt
-fun Context.findColorByAttr(@AttrRes attr: Int): Int {
-    val colorId = findResIdByAttr(attr)
-    if (colorId == 0) return Color.MAGENTA
-    return ContextCompat.getColor(this, colorId)
-}
+fun Context.findColorByAttr(@AttrRes attr: Int): Int = colorAttr(attr)
 
 @ColorInt
 fun Context.materialColor(@AttrRes attr: Int) = MaterialColors.getColor(this, attr, -1)

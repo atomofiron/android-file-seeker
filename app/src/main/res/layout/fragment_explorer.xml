@@ -7,46 +7,28 @@
     android:layout_height="match_parent"
     android:background="?colorBackground"
     >
-    <LinearLayout
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
-        <com.google.android.material.button.MaterialButtonToggleGroup
-            android:id="@+id/explorer_tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
-            android:background="@drawable/top_radio_group_background"
-            android:paddingHorizontal="@dimen/padding_common"
-            android:visibility="gone"
-            app:singleSelection="true"
-            tools:background="@null"
-            >
-            <com.google.android.material.button.MaterialButton
-                style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/first_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/dash"
-                />
-            <com.google.android.material.button.MaterialButton
-                style="?attr/materialButtonOutlinedStyle"
-                android:id="@+id/second_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/dash"
-                />
-        </com.google.android.material.button.MaterialButtonToggleGroup>
-        <androidx.viewpager2.widget.ViewPager2
-            android:id="@+id/pager"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            />
-    </LinearLayout>
+        />
+    <app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
+        android:id="@+id/system_ui_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:navigationBar="none"
+        />
+    <TextView
+        android:id="@+id/disclaimer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="@dimen/padding_mini"
+        android:paddingHorizontal="@dimen/padding_half"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        tools:text="Please do something"
+        />
     <app.atomofiron.searchboxapp.custom.view.SnackbarContainerLayout
         android:id="@+id/snackbar_container"
         android:layout_width="0dp"

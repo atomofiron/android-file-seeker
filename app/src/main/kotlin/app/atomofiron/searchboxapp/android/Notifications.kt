@@ -11,21 +11,23 @@ import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.NotificationManagerCompat.IMPORTANCE_DEFAULT
+import androidx.core.content.ContextCompat
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.materialColor
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.other.UpdateNotification
 import app.atomofiron.searchboxapp.utils.Codes
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.immutable
 
 object Notifications {
     const val CHANNEL_ID_UPDATE = "update_channel_id"
-    const val CHANNEL_ID_FOREGROUND = "foreground_channel_id"
+    const val CHANNEL_ID_SEARCH = "search_channel_id"
     const val CHANNEL_ID_RESULT = "result_channel_id"
+    const val CHANNEL_ID_RECEIVE = "receive_channel_id"
 
-    const val ID_FOREGROUND = 101
-    const val ID_UPDATE = 102
+    const val ID_UPDATE = 100
 }
 
 fun Context.dismiss(notificationId: Int) = NotificationManagerCompat.from(this).cancel(notificationId)
@@ -69,6 +71,14 @@ fun Context.showAppUpdatedNotification() = tryShow { context ->
         .setContentIntent(PendingIntent.getActivity(context, Codes.LAUNCH_APP, Intents.mainActivity(context), FLAG_UPDATE_CURRENT.immutable()))
         .setColor(materialColor(MaterialAttr.colorPrimary))
         .build() to Notifications.ID_UPDATE
+}
+
+fun Context.receivingNotificationBuilder(): NotificationCompat.Builder {
+    return NotificationCompat.Builder(this, Notifications.CHANNEL_ID_RECEIVE)
+        .setContentTitle(getString(R.string.receiving))
+        .setSmallIcon(R.drawable.ic_progress_download)
+        .setOnlyAlertOnce(true)
+        .setSound(null)
 }
 
 fun NotificationManagerCompat.updateChannel(id: String, name: String, importance: Int = IMPORTANCE_DEFAULT) {

@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.screens.result
 
-import androidx.core.os.ConfigurationCompat
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.fileseeker.R
@@ -13,11 +12,9 @@ import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultItemActionDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
-import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.formatDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Date
 
 class ResultPresenter(
     params: ResultPresenterParams,
@@ -58,10 +55,7 @@ class ResultPresenter(
         val result = viewState.task.value.result as SearchResult.FinderResult
         val checkedOnly = result.matches.any { it.item.isChecked }
         val data = result.toMarkdown(checkedOnly)
-        val locale = ConfigurationCompat.getLocales(resources.configuration)[0]
-        val date = SimpleDateFormat(Const.DATE_PATTERN, locale).format(Date())
-        val title = "search_$date.md.txt";
-
+        val title = "search_${resources.formatDate()}.md.txt";
         if (!router.shareFile(title, data)) {
             viewState.showAlert(AlertMessage(R.string.no_activity, important = true))
         }

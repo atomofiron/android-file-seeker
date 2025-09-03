@@ -6,6 +6,7 @@
     <string name="case_sens">Case sensitivity</string>
     <string name="storage_err">Error accessing memory</string>
     <string name="searching">Search…</string>
+    <string name="receiving">Receiving…</string>
     <string name="search_stopped">Search was stopped</string>
     <string name="search_stopping">Search is stopping</string>
     <string name="search_empty">Search returned no results</string>
@@ -16,6 +17,7 @@
     <string name="search_error">Error: %s</string>
     <string name="error">Error</string>
     <string name="wrong_value">Wrong value</string>
+    <string name="wrong_intent">Wrong intent</string>
     <string name="nothing">Nothing found</string>
     <string name="warning">You have not selected any directory. The search will be made around the root section</string>
     <string name="ok">OK</string>
@@ -153,11 +155,14 @@
     <string name="pref_leak_canary" translatable="false">Leak Canary</string>
     <string name="pref_color_scheme" translatable="false">Color scheme</string>
     <string name="root">Root</string>
-    <string name="foreground_notification_name" translatable="false">Foreground Notification</string>
-    <string name="result_notification_name" translatable="false">Result Notification</string>
+    <string name="search_notification_name" translatable="false">Search notifications</string>
+    <string name="result_notification_name" translatable="false">Search result notifications</string>
+    <string name="receive_notification_name" translatable="false">File receiving notifications</string>
     <string name="copy_path">Copy path</string>
     <string name="pref_category_system">System</string>
     <string name="pref_embedded_toybox">Use embedded toybox</string>
+    <string name="disclaimer_pick_files">Mark file(s) and\u00A0press\u00A0Confirm</string>
+    <string name="disclaimer_choose_directory">Choose a folder to save the file(s) and\u00A0press\u00A0Confirm</string>
     <string name="dismiss">Dismiss</string>
     <string name="got_it">Got it</string>
     <string name="next">Next</string>
@@ -218,5 +223,21 @@
         <item quantity="few">%s were deleted</item>
         <item quantity="many">%s were deleted</item>
         <item quantity="other">%s were deleted</item>
+    </plurals>
+    <plurals name="receiving_files">
+        <item quantity="zero">Receiving %d files…</item>
+        <item quantity="one">Receiving a single file…</item>
+        <item quantity="two">Receiving %d files…</item>
+        <item quantity="few">Receiving %d files…</item>
+        <item quantity="many">Receiving %d files…</item>
+        <item quantity="other">Receiving %d files…</item>
+    </plurals>
+    <plurals name="files_received">
+        <item quantity="zero">%d of %d files received</item>
+        <item quantity="one">%d of %d file received</item>
+        <item quantity="two">%d of %d files received</item>
+        <item quantity="few">%d of %d files received</item>
+        <item quantity="many">%d of %d files received</item>
+        <item quantity="other">%d of %d files received</item>
     </plurals>
 </resources>

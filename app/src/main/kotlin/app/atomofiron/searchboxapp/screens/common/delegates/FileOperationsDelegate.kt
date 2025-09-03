@@ -37,7 +37,7 @@ import java.io.FileInputStream
 private val rootOptions = listOf(Operations.Create, Operations.CopyPath)
 private val directoryOptions = listOf(Operations.Create, Operations.Clone, Operations.Rename, Operations.CopyPath, Operations.Delete)
 private val oneFileOptions = listOf(Operations.Share, Operations.OpenWith, Operations.Clone, Operations.Rename, Operations.CopyPath, Operations.Delete)
-private val manyFilesOptions = listOf(Operations.Delete)
+private val manyFilesOptions = listOf(Operations.Share, Operations.Delete)
 private val readWrite = listOf(Operations.Create, Operations.Clone, Operations.Rename)
 
 class FileOperationsDelegate(

@@ -6,10 +6,15 @@ inline fun debugRequire(predicate: () -> Boolean) {
     if (BuildConfig.DEBUG_BUILD) debugRequire(predicate())
 }
 
-fun debugRequire(value: Boolean, lazyMessage: (() -> Any)? = null) = when {
-    !BuildConfig.DEBUG_BUILD -> Unit
-    lazyMessage == null -> require(value)
-    else -> require(value, lazyMessage)
+fun debugRequire(value: Boolean)  {
+    if (BuildConfig.DEBUG_BUILD) require(value)
 }
 
-fun Any?.debugRequireNotNull(lazyMessage: (() -> Any)? = null) = debugRequire(this != null, lazyMessage)
+inline fun debugRequire(value: Boolean, lazyMessage: () -> Any)  {
+    if (BuildConfig.DEBUG_BUILD) require(value, lazyMessage)
+}
+
+fun Any?.debugRequireNotNull(lazyMessage: (() -> Any)? = null) = when (lazyMessage) {
+    null -> debugRequire(this != null)
+    else -> debugRequire(this != null, lazyMessage)
+}

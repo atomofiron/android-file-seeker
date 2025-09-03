@@ -29,6 +29,7 @@ import app.atomofiron.searchboxapp.custom.view.dock.shape.DockBottomShape
 import app.atomofiron.searchboxapp.custom.view.dock.shape.DockNotch
 import app.atomofiron.searchboxapp.custom.view.dock.shape.DockStyle
 import app.atomofiron.searchboxapp.model.Layout
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.removeOneIf
 
 interface DockView {
@@ -54,9 +55,10 @@ class DockViewImpl(
     private val gridManager = GridLayoutManager(context, 1)
     private val colors = DockItemColors(
         default = Color.TRANSPARENT,
-        selected = context.findColorByAttr(MaterialAttr.colorSecondaryContainer),
-        hovered = context.findColorByAttr(MaterialAttr.colorControlHighlight),
-        focused = context.findColorByAttr(MaterialAttr.colorPrimary),
+        selected = context.colorAttr(MaterialAttr.colorSecondaryContainer),
+        activated = context.colorAttr(MaterialAttr.colorPrimary),
+        hovered = context.colorAttr(MaterialAttr.colorControlHighlight),
+        focused = context.colorAttr(MaterialAttr.colorPrimary),
     )
     private val padding = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
     private val contentPadding = resources.getDimensionPixelSize(R.dimen.content_margin)

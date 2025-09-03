@@ -29,10 +29,12 @@ exif = "1.4.1"
 asyncInflater = "1.1.0"
 ktor = "3.2.3"
 glide = "4.16.0"
+protobuf = "1.7.3"
 
 [libraries]
 kotlinx-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlinx-core-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
+kotlinx-protobuf = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-protobuf", version.ref = "protobuf" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }

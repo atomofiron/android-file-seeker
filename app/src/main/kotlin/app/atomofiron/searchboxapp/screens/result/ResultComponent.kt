@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.result
 
 import androidx.fragment.app.Fragment
-import app.atomofiron.common.util.dialog.ActivityProperty
+import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel

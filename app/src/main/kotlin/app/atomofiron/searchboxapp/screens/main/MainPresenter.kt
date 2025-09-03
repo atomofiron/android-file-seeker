@@ -31,11 +31,16 @@ class MainPresenter(
 
     override fun onSubscribeData() = Unit
 
-    fun onEscClick(): Boolean = router.onBack(soft = true)
+    fun onEscClick(): Boolean = when {
+        router.onBack(soft = true) -> true
+        viewState.activityMode.default -> false
+        else -> false.also { router.finish() }
+    }
 
     fun onBackButtonClick() = when {
         router.onBack(soft = false) -> Unit
-        else -> router.minimize()
+        viewState.activityMode.default -> router.minimize()
+        else -> router.finish()
     }
 
     fun onThemeApplied(isDarkTheme: Boolean) {

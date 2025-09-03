@@ -89,7 +89,7 @@ class ExplorerCurtainMenuDelegate(
             Operations.Create.id -> controller?.showNext(CREATE)
             Operations.Rename.id -> controller?.showNext(RENAME)
             Operations.Delete.id -> onRemoveConfirm(items)
-            Operations.Share.id -> router.shareWith(items.first())
+            Operations.Share.id -> router.shareWith(items)
             Operations.OpenWith.id -> router.openWith(items.first())
             Operations.InstallApp.id -> apkInteractor.install(items.first(), viewState.currentTab.value)
             Operations.LaunchApp.id -> apkInteractor.launch(items.first())

@@ -256,8 +256,8 @@ class FinderWorker(
         }
         if (context.canForegroundService()) {
             notifications.updateChannel(
-                Notifications.CHANNEL_ID_FOREGROUND,
-                context.getString(R.string.foreground_notification_name),
+                Notifications.CHANNEL_ID_SEARCH,
+                context.getString(R.string.search_notification_name),
             )
             setForeground(getForegroundInfo())
         }
@@ -319,7 +319,7 @@ class FinderWorker(
     private fun newNode(path: String) = Node(path, rootId = task.uniqueId, content = NodeContent.Unknown).update(cacheConfig)
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
-        return ForegroundInfo(Notifications.ID_FOREGROUND, foregroundNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
+        return ForegroundInfo(hashCode(), foregroundNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
     }
 
     private fun showNotification() {
@@ -376,11 +376,11 @@ class FinderWorker(
         val intent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(context, Codes.FOREGROUND, intent, UPDATING_FLAG)
         notifications.updateChannel(
-            Notifications.CHANNEL_ID_FOREGROUND,
-            context.getString(R.string.foreground_notification_name),
+            Notifications.CHANNEL_ID_SEARCH,
+            context.getString(R.string.search_notification_name),
             NotificationManagerCompat.IMPORTANCE_DEFAULT,
         )
-        return NotificationCompat.Builder(context, Notifications.CHANNEL_ID_FOREGROUND)
+        return NotificationCompat.Builder(context, Notifications.CHANNEL_ID_SEARCH)
             .setDefaults(Notification.DEFAULT_ALL)
             .setContentTitle(context.getString(R.string.searching))
             .setSmallIcon(R.drawable.ic_notification)

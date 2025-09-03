@@ -1,6 +1,8 @@
 package app.atomofiron.common.util
 
+import android.app.Activity
 import android.os.Build.VERSION_CODES
+import app.atomofiron.common.util.property.RoProperty
 import kotlin.collections.removeLast as dropLast
 
 typealias AndroidSdk = VERSION_CODES
@@ -14,6 +16,7 @@ typealias MaterialDimen = com.google.android.material.R.dimen
 
 typealias Unreachable = Unit
 typealias UnreachableException = Exception
+typealias ActivityProperty = RoProperty<out Activity?>
 
 fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NONE, initializer)
 

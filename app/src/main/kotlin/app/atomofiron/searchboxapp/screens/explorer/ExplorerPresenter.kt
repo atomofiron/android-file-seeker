@@ -13,6 +13,8 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemAc
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerItemActionListenerDelegate
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
+import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerDockListener
+import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerDockDelegate
 import kotlinx.coroutines.CoroutineScope
 
 class ExplorerPresenter(
@@ -24,9 +26,11 @@ class ExplorerPresenter(
     private val store: ExplorerStore,
     itemListener: ExplorerItemActionListenerDelegate,
     mainChannel: MainChannel,
+    dockDelegate: ExplorerDockDelegate,
 ) : BasePresenter<ExplorerViewModel, ExplorerRouter>(scope, router),
     ExplorerView.ExplorerViewOutput,
     RootAdapter.RootClickListener,
+    ExplorerDockListener by dockDelegate,
     ExplorerItemActionListener by itemListener {
 
     private val currentTab get() = viewState.currentTab.value
@@ -48,23 +52,16 @@ class ExplorerPresenter(
 
     fun onAllowStorageClick() = storagePermissionDelegate.launchSettings()
 
-    fun onSearchOptionSelected() = router.showFinder()
-
     fun onTabSelected(index: Int) {
-        viewState.currentTab.value = when (index) {
-            0 -> viewState.firstTab
-            else -> viewState.secondTab
-        }
+        viewState.currentTab.value = viewState.tabs[index]
         interactor.updateRoots(currentTab)
         interactor.updateCurrentTab(currentTab)
     }
 
-    fun onSettingsOptionSelected() = router.showSettings()
-
     fun onVolumeUp(isCurrentDirVisible: Boolean) {
-        val currentDir = viewState.getCurrentDir()
-        currentDir ?: return
-        scrollOrOpenParent(currentDir, isCurrentDirVisible)
+        val currentNode = viewState.currentNode
+        currentNode ?: return
+        scrollOrOpenParent(currentNode, isCurrentDirVisible)
     }
 
     fun onBack(soft: Boolean, scrollToTop: () -> Boolean): Boolean = when {
@@ -79,7 +76,7 @@ class ExplorerPresenter(
     }
 
     private fun unselectRoot(): Boolean {
-        return null != viewState.firstTabItems
+        return null != viewState.currentTabFlow
             .valueOrNull
             ?.roots
             ?.find { it.isSelected }

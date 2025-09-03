@@ -33,6 +33,7 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.button.MaterialButtonToggleGroup
 import lib.atomofiron.insets.InsetsCombining
 import lib.atomofiron.insets.InsetsSource
+import lib.atomofiron.insets.TypeSet
 import lib.atomofiron.insets.ViewInsetsDelegate
 import lib.atomofiron.insets.findInsetsProvider
 import lib.atomofiron.insets.insetsPadding
@@ -46,6 +47,7 @@ object LayoutDelegate {
         tabLayout: MaterialButtonToggleGroup? = null,
         appBarLayout: AppBarLayout? = null,
         snackbarContainer: CoordinatorLayout? = null,
+        recyclerAddInsetType: TypeSet = TypeSet.Empty,
     ) {
         val insetsProvider = (view as View).findInsetsProvider()!!
         var layoutWas: Layout? = null
@@ -54,7 +56,7 @@ object LayoutDelegate {
             val size = getDimensionPixelSize(R.dimen.joystick_size) - 2 * getDimensionPixelSize(R.dimen.joystick_padding)
             DockNotch(size)
         }
-        val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock + joystick }, start = true, top = appBarLayout == null, end = true, bottom = true)
+        val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock + joystick + recyclerAddInsetType }, start = true, top = appBarLayout == null, end = true, bottom = true)
         addLayoutListener { layout ->
             if (layout == layoutWas) {
                 return@addLayoutListener

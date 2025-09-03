@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.utils.getColorByAttr
 import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.ExtendedWindowInsets.Type
 import lib.atomofiron.insets.InsetsListener
+import lib.atomofiron.insets.TypeSet
 import lib.atomofiron.insets.attachInsetsListener
 import kotlin.math.max
 
@@ -37,12 +38,14 @@ class InsetsBackgroundView : View, InsetsListener {
         val empty: Boolean get() = (value and ALL == 0)
     }
 
-    override val types get() = Type.statusBars + Type.navigationBars
+    override var types = Type.statusBars + Type.navigationBars
+        private set
 
     private var leftInset = 0
     private var topInset = 0
     private var rightInset = 0
     private var bottomInset = 0
+    private var statusBarTop = 0
 
     private val paint = Paint()
 
@@ -85,16 +88,22 @@ class InsetsBackgroundView : View, InsetsListener {
         paint.color = ColorUtils.setAlphaComponent(color, alpha)
     }
 
+    operator fun plusAssign(types: TypeSet) {
+        this.types += types
+    }
+
     override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
         navigationBar = windowInsets[Type.navigationBars]
         cutout = windowInsets[Type.displayCutout]
         val statusBars = windowInsets[Type.statusBars]
+        val common = windowInsets[types]
         val navigationBars = windowInsets[Type.navigationBars]
         val tappableElement = windowInsets[Type.tappableElement]
-        leftInset = max(statusBars.left, navigationBars.left.only(tappableElement.left))
-        topInset = statusBars.top
-        rightInset = max(statusBars.right, navigationBars.right.only(tappableElement.right))
-        bottomInset = max(statusBars.bottom, navigationBars.bottom.only(tappableElement.bottom))
+        leftInset = max(common.left, navigationBars.left.only(tappableElement.left))
+        topInset = common.top
+        rightInset = max(common.right, navigationBars.right.only(tappableElement.right))
+        bottomInset = max(common.bottom, navigationBars.bottom.only(tappableElement.bottom))
+        statusBarTop = statusBars.top
         invalidate()
     }
 
@@ -107,13 +116,14 @@ class InsetsBackgroundView : View, InsetsListener {
         val topInset = topInset.toFloat()
         val rightInset = rightInset.toFloat()
         val bottomInset = bottomInset.toFloat()
+        val statusBarTop = statusBarTop.toFloat()
 
         val width = width.toFloat()
         val height = height.toFloat()
 
         var navigationHorizontalTop = 0f
         if (statusBar) {
-            val padding = (topInset - maxStatusBar) / 2
+            val padding = (statusBarTop - maxStatusBar) / 2
             if (padding > statusBarMinPadding) {
                 val cutout = max(cutout.left, cutout.right)
                 val marginLeft = max(topLeftCorner * 0.6f - cutout, 0f)
@@ -122,7 +132,11 @@ class InsetsBackgroundView : View, InsetsListener {
                 val rawRight = max(navigationBar.right, cutout)
                 val left = rawLeft + max(marginLeft, padding)
                 val right = width - rawRight - max(marginRight, padding)
-                canvas.drawRoundRect(left, padding, right, topInset - padding, maxStatusBar, maxStatusBar, paint)
+                val bottom = when (topInset) {
+                    statusBarTop -> topInset - padding
+                    else -> statusBarTop
+                }
+                canvas.drawRoundRect(left, padding, right, bottom, maxStatusBar, maxStatusBar, paint)
             } else {
                 canvas.drawRect(0f, 0f, width, topInset, paint)
                 navigationHorizontalTop = topInset

@@ -27,8 +27,8 @@ object Alpha {
 
     fun visible(value: Boolean) = if (value) VISIBLE else INVISIBLE
     fun visibleInt(value: Boolean) = if (value) VISIBLE_INT else INVISIBLE_INT
-    fun enabled(value: Boolean) = if (value) VISIBLE else HALF
-    fun enabledInt(value: Boolean) = if (value) VISIBLE_INT else HALF_INT
+    fun enabled(value: Boolean) = if (value) VISIBLE else VODKA
+    fun enabledInt(value: Boolean) = if (value) VISIBLE_INT else VODKA_INT
     fun vodkaInt(value: Boolean) = if (value) VODKA_INT else VISIBLE_INT
 }
 

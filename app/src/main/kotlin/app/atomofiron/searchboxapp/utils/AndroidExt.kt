@@ -6,6 +6,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Resources
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -29,6 +30,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.ScrollingView
 import androidx.core.view.isEmpty
 import androidx.core.view.updateLayoutParams
@@ -39,6 +41,7 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Data
 import app.atomofiron.common.util.Android
+import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
@@ -206,6 +209,25 @@ fun Context.getDisplayCompat(): Display? = when {
 fun Context.drawable(@DrawableRes resId: Int): Drawable = ContextCompat.getDrawable(this, resId)!!
 // todo replace everywhere
 fun Context.color(@ColorRes resId: Int): Int = ContextCompat.getColor(this, resId)
+
+fun Context.colorAttr(@AttrRes attrId: Int): Int {
+    val typedValue = TypedValue()
+    debugRequire(theme.resolveAttribute(attrId, typedValue, true)) {
+        return Color.MAGENTA
+    }
+    return when (typedValue.resourceId) {
+        0 -> typedValue.data
+        else -> ContextCompat.getColor(this, typedValue.resourceId)
+    }
+}
+
+private val hsl = FloatArray(3)
+
+fun Int.inverseColor(): Int {
+    ColorUtils.colorToHSL(this, hsl)
+    hsl[2] = 1f - hsl[2]
+    return ColorUtils.HSLToColor(hsl)
+}
 
 // it was sweaty...
 fun ViewParent.disallowInterceptTouches() {

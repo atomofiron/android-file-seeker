@@ -1,6 +1,5 @@
 package app.atomofiron.common.util.dialog
 
-import android.app.Activity
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.res.Resources
@@ -9,23 +8,18 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
+import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.extension.copy
-import app.atomofiron.common.util.property.RoProperty
 import app.atomofiron.common.util.withNotNull
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.DialogCheckboxBinding
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.model.other.UniText
-import app.atomofiron.searchboxapp.model.other.UniText.Fmt
-import app.atomofiron.searchboxapp.model.other.UniText.Res
-import app.atomofiron.searchboxapp.model.other.UniText.Str
 import app.atomofiron.searchboxapp.model.other.get
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlin.LazyThreadSafetyMode.NONE
 
 private const val STUB = "stub"
-
-typealias ActivityProperty = RoProperty<out Activity?>
 
 class DialogDelegateImpl(activity: ActivityProperty) : DialogDelegate {
 
@@ -34,11 +28,7 @@ class DialogDelegateImpl(activity: ActivityProperty) : DialogDelegate {
 
     override fun loadingIcon(): Drawable? = activity?.let { MuonsDrawable(it) }
 
-    override operator fun get(text: UniText) = when (text) {
-        is Fmt -> activity?.resources?.getString(text.res, text.args).toString()
-        is Res -> activity?.resources?.getString(text.value).toString()
-        is Str -> text.value
-    }
+    override operator fun get(text: UniText): String = activity?.resources?.get(text).toString()
 
     override fun showError(message: UniText?) {
         val text = resources?.get(message)

@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.model.preference
 
 import android.graphics.Color
-import androidx.core.graphics.ColorUtils
+import app.atomofiron.searchboxapp.utils.inverseColor
 
 private const val INV_FOR_DARK  =  1 shl 24
 private const val INV_GLOWING =    1 shl 25
@@ -9,8 +9,6 @@ private const val OVERRIDE_COLOR = 1 shl 26
 private const val HAPTIC_OFFSET = 27
 private const val BYTE = 256
 private const val FF = 255
-
-private val hsl = FloatArray(3)
 
 data class JoystickComposition(
     val invForDark: Boolean,
@@ -54,12 +52,12 @@ data class JoystickComposition(
     }
 
     fun color(isDark: Boolean): Int = when {
-        isDark && invForDark -> inverseColor()
+        isDark && invForDark -> rgba().inverseColor()
         else -> rgba()
     }
 
     fun glow(color: Int): Int = when {
-        invGlowing -> inverseColor(color)
+        invGlowing -> color.inverseColor()
         else -> color
     }
 
@@ -86,10 +84,4 @@ data class JoystickComposition(
     private fun rgb(): Int = Color.argb(0, red, green, blue)
 
     private fun rgba(): Int = Color.argb(FF, red, green, blue)
-
-    private fun inverseColor(color: Int = rgba()): Int {
-        ColorUtils.colorToHSL(color, hsl)
-        hsl[2] = 1f - hsl[2]
-        return ColorUtils.HSLToColor(hsl)
-    }
 }

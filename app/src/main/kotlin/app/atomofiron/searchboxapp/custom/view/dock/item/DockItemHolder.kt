@@ -1,10 +1,9 @@
 package app.atomofiron.searchboxapp.custom.view.dock.item
 
+import android.content.res.ColorStateList
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.Insets
-import androidx.core.view.HapticFeedbackConstantsCompat
-import androidx.core.view.ViewCompat
 import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -17,6 +16,8 @@ import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Companion.setMu
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Icon
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Label
+import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.performHapticLite
 
 class DockItemHolder(
@@ -28,6 +29,9 @@ class DockItemHolder(
     private var config: DockItemConfig? = null
     private val drawable = DockItemDrawable(
         ripple = binding.root.context.findColorByAttr(MaterialAttr.colorControlHighlight),
+        primary = binding.root.context.findColorByAttr(MaterialAttr.colorPrimary),
+        surface = binding.root.context.findColorByAttr(MaterialAttr.colorSurface),
+        stroke = binding.root.resources.getDimension(R.dimen.stroke_width),
         corners = binding.root.resources.getDimension(R.dimen.dock_item_corner),
     )
 
@@ -37,6 +41,16 @@ class DockItemHolder(
             popup.noClip()
             button.background = drawable
             button.setOnClickListener { onClick() }
+            ColorStateList(
+                arrayOf(intArrayOf(android.R.attr.state_activated), intArrayOf()),
+                intArrayOf(
+                    root.context.colorAttr(MaterialAttr.colorOnPrimary),
+                    root.context.colorAttr(MaterialAttr.colorOnSurface),
+                ),
+            ).let {
+                icon.imageTintList = it
+                label.setTextColor(it)
+            }
         }
     }
 
@@ -74,7 +88,9 @@ class DockItemHolder(
         label.isVisible = item.label != null
         button.isEnabled = item.enabled
         button.isSelected = item.selected
+        button.isActivated = item.primary
         button.isClickable = item.clickable ?: item.enabled
+        button.alpha = Alpha.enabled(!item.primary || item.enabled)
         popup.bind(item)
     }
 

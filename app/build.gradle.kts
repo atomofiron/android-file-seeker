@@ -22,6 +22,7 @@ android {
 dependencies {
     implementation(libs.kotlinx.core)
     implementation(libs.kotlinx.core.android)
+    implementation(libs.kotlinx.protobuf)
     api(libs.androidx.appcompat)
     api(libs.androidx.datastore)
     implementation(libs.androidx.core.ktx)
