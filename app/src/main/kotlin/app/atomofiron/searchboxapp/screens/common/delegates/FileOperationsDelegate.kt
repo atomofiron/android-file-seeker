@@ -37,7 +37,6 @@ import java.io.FileInputStream
 private val rootOptions = listOf(Operations.Create, Operations.CopyPath)
 private val directoryOptions = listOf(Operations.Create, Operations.Clone, Operations.Rename, Operations.CopyPath, Operations.Delete)
 private val oneFileOptions = listOf(Operations.Share, Operations.OpenWith, Operations.Clone, Operations.Rename, Operations.CopyPath, Operations.Delete)
-private val manyFilesOptions = listOf(Operations.Share, Operations.Delete)
 private val readWrite = listOf(Operations.Create, Operations.Clone, Operations.Rename)
 
 class FileOperationsDelegate(
@@ -52,7 +51,7 @@ class FileOperationsDelegate(
         val merged = items.merge()
         val first = merged.firstOrNull() ?: return null
         val operations = when {
-            merged.size > 1 -> manyFilesOptions
+            merged.size > 1 -> forMany(count =  merged.count { it.isFile })
             first.content.rootType?.editable == true -> rootOptions
             first.isRoot -> return null
             first.isDirectory -> directoryOptions
@@ -66,6 +65,15 @@ class FileOperationsDelegate(
     fun askForAndroidApp(content: NodeContent.AndroidApp, tab: NodeTabKey? = null) = askForAndroidApp(content, contentResolver = null, tab)
 
     fun askForApks(ref: NodeRef, contentResolver: ContentResolver) = askForAndroidApp(NodeContent.AndroidApp.apks(ref), contentResolver)
+
+    private fun forMany(count: Int) = buildList {
+        when (count) {
+             0 -> Unit
+             1 -> add(Operations.Share.copy(label = UniText(R.string.share_file)))
+             else -> add(Operations.Share.copy(label = UniText(R.string.share_files)))
+        }
+        add(Operations.Delete)
+    }
 
     private fun List<MenuItem>.completeForSingle(single: Node): List<MenuItem> = mutate {
         if (single.content is NodeContent.AndroidApp) {

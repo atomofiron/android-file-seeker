@@ -47,6 +47,7 @@ class ExplorerDockDelegate @Inject constructor(
     }
 
     private fun dockItems(currentDir: Node?, notice: Boolean, checked: List<Node>): List<DockItem> {
+        val checked = checked.filter { it.isFile }
         return ExplorerDockState {
             add(it.search)
             when (mode) {

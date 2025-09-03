@@ -49,7 +49,7 @@ class ResultCurtainMenuDelegate(
                 viewState.showAlert(AlertMessage(R.string.copied))
             }
             Operations.OpenWith.id -> router.openWith(items.first())
-            Operations.Share.id -> router.shareWith(items)
+            Operations.Share.id -> router.shareWith(items.filter { it.isFile })
             Operations.Delete.id -> interactor.deleteItems(items)
             Operations.InstallApp.id -> apks.install(items.first())
             Operations.LaunchApp.id -> apks.launch(items.first())
