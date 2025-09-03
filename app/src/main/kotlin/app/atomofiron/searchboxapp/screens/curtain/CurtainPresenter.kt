@@ -18,7 +18,7 @@ class CurtainPresenter(
 ) : BasePresenter<CurtainViewModel, CurtainRouter>(viewState.scope, router), CurtainApi.Controller {
     private var adapter: CurtainApi.Adapter<*>? = null
 
-    override val requestFrom: String = params.recipient
+    override val requestFrom: Int = params.recipient
     override val requestId: Int = params.layoutId
 
     init {

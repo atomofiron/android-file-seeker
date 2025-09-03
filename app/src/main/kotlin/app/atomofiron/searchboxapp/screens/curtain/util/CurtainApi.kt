@@ -18,7 +18,7 @@ import java.util.*
 object CurtainApi {
 
     interface Controller {
-        val requestFrom: String
+        val requestFrom: Int
         val requestId: Int
 
         fun setAdapter(adapter: Adapter<*>)

@@ -96,7 +96,7 @@ abstract class BaseRouter(
         }
     }
 
-    fun showCurtain(recipient: String, layoutId: Int) {
+    fun showCurtain(recipient: Int, layoutId: Int) {
         navigation {
             val args = CurtainPresenterParams.args(recipient, layoutId)
             navigate(R.id.curtainFragment, args, curtainOptions)
