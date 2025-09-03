@@ -37,6 +37,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/padding_mini"
         android:layout_marginHorizontal="@dimen/padding_semi"
+        android:layout_marginBottom="@dimen/padding_semi"
         android:scrollbars="none"
         />
 </LinearLayout>
