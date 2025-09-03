@@ -12,6 +12,7 @@ import androidx.core.graphics.Insets
 import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.ExtendedWindowInsets.Type
@@ -52,8 +53,8 @@ class InsetsBackgroundView : View, InsetsListener {
     private var statusBar = true
     private var sides = Sides(ALL)
 
-    private val maxStatusBar: Float
-    private val statusBarMinPadding: Float
+    private val maxStatusBar = resources.getDimensionPixelSize(R.dimen.status_bar_max)
+    private val statusBarMinPadding = resources.getDimensionPixelSize(R.dimen.status_bar_min_padding)
     private var navigationBar = Insets.NONE
     private var cutout = Insets.NONE
     private var topLeftCorner = 0
@@ -69,8 +70,6 @@ class InsetsBackgroundView : View, InsetsListener {
             sides = getInt(R.styleable.InsetsBackgroundView_navigationBar, sides.value)
                 .let { Sides(it) }
         }
-        maxStatusBar = resources.getDimension(R.dimen.status_bar_max)
-        statusBarMinPadding = resources.getDimension(R.dimen.status_bar_min_padding)
         attachInsetsListener(this)
     }
 
@@ -113,34 +112,15 @@ class InsetsBackgroundView : View, InsetsListener {
         if (!statusBar && sides.empty) return
 
         val leftInset = leftInset.toFloat()
-        val topInset = topInset.toFloat()
         val rightInset = rightInset.toFloat()
         val bottomInset = bottomInset.toFloat()
-        val statusBarTop = statusBarTop.toFloat()
 
         val width = width.toFloat()
         val height = height.toFloat()
 
-        var navigationHorizontalTop = 0f
-        if (statusBar) {
-            val padding = (statusBarTop - maxStatusBar) / 2
-            if (padding > statusBarMinPadding) {
-                val cutout = max(cutout.left, cutout.right)
-                val marginLeft = max(topLeftCorner * 0.6f - cutout, 0f)
-                val marginRight = max(topRightCorner * 0.6f - cutout, 0f)
-                val rawLeft = max(navigationBar.left, cutout)
-                val rawRight = max(navigationBar.right, cutout)
-                val left = rawLeft + max(marginLeft, padding)
-                val right = width - rawRight - max(marginRight, padding)
-                val bottom = when (topInset) {
-                    statusBarTop -> topInset - padding
-                    else -> statusBarTop
-                }
-                canvas.drawRoundRect(left, padding, right, bottom, maxStatusBar, maxStatusBar, paint)
-            } else {
-                canvas.drawRect(0f, 0f, width, topInset, paint)
-                navigationHorizontalTop = topInset
-            }
+        val navigationHorizontalTop = when {
+            statusBar -> canvas.drawStatusBar()
+            else -> 0f
         }
         sides.takeIf { !it.empty }?.run {
             if (horizontal) {
@@ -149,6 +129,20 @@ class InsetsBackgroundView : View, InsetsListener {
             }
             if (bottom) canvas.drawRect(0f, height - bottomInset, width, height, paint)
         }
+    }
+
+    private fun Canvas.drawStatusBar(): Float {
+        calcStatusBarPadding(statusBarTop, maxStatusBar, statusBarMinPadding, cutout, navigationBar, topLeftCorner, topRightCorner) { left, vertical, right ->
+            val bottom = when (topInset) {
+                statusBarTop -> statusBarTop - vertical
+                else -> topInset
+            }
+            val radius = statusBarTop / 2f - vertical
+            drawRoundRect(left.toFloat(), vertical.toFloat(), width - right.toFloat(), bottom.toFloat(), radius, radius, paint)
+            return 0f
+        }
+        drawRect(0f, 0f, width.toFloat(), topInset.toFloat(), paint)
+        return topInset.toFloat()
     }
 
     fun update(
@@ -161,4 +155,46 @@ class InsetsBackgroundView : View, InsetsListener {
     }
 
     private fun Int.only(value: Int): Int = if (this == value) this else 0
+}
+
+fun View.calcStatusBarPadding(insets: ExtendedWindowInsets): Insets {
+    val statusBar = insets[ExtType.statusBars].top
+    val cutout = insets[ExtType.displayCutout]
+    val navigationBar = insets[ExtType.navigationBars]
+    val maxStatusBar = resources.getDimensionPixelSize(R.dimen.status_bar_max)
+    val statusBarMinPadding = resources.getDimensionPixelSize(R.dimen.status_bar_min_padding)
+    val topLeftCorner = if (Android.S) rootWindowInsets?.getRoundedCorner(RoundedCorner.POSITION_TOP_LEFT)
+        ?.radius ?: 0 else 0
+    val topRightCorner = if (Android.S) rootWindowInsets?.getRoundedCorner(RoundedCorner.POSITION_TOP_RIGHT)
+        ?.radius ?: 0 else 0
+    calcStatusBarPadding(statusBar, maxStatusBar, statusBarMinPadding, cutout, navigationBar, topLeftCorner, topRightCorner) { left, vertical, right ->
+        return Insets.of(left, vertical, right, vertical)
+    }
+    return Insets.NONE
+}
+
+private inline fun calcStatusBarPadding(
+    statusBar: Int,
+    maxStatusBar: Int,
+    statusBarMinPadding: Int,
+    cutout: Insets,
+    navigationBar: Insets,
+    topLeftCorner: Int,
+    topRightCorner: Int,
+    action: (left: Int, vertical: Int, right: Int) -> Unit,
+): Boolean {
+    val padding = (statusBar - maxStatusBar) / 2
+    return if (padding < statusBarMinPadding) {
+        false
+    } else {
+        val cutout = max(cutout.left, cutout.right)
+        val marginLeft = max(topLeftCorner * 0.6f - cutout, 0f).toInt()
+        val marginRight = max(topRightCorner * 0.6f - cutout, 0f).toInt()
+        val rawLeft = max(navigationBar.left, cutout)
+        val rawRight = max(navigationBar.right, cutout)
+        val left = rawLeft + max(marginLeft, padding)
+        val right = rawRight + max(marginRight, padding)
+        action(left, padding, right)
+        true
+    }
 }

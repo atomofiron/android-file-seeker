@@ -6,6 +6,7 @@ import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.Insets
 import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -17,6 +18,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentExplorerBinding
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
+import app.atomofiron.searchboxapp.custom.view.calcStatusBarPadding
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeError
@@ -32,8 +34,8 @@ import app.atomofiron.searchboxapp.utils.recyclerView
 import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.InsetsSource
 import lib.atomofiron.insets.attachInsetsListener
-import lib.atomofiron.insets.insetsPadding
 import lib.atomofiron.insets.insetsSource
+import kotlin.math.max
 
 class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     BaseFragment<ExplorerFragment, ExplorerViewState, ExplorerPresenter, FragmentExplorerBinding> by BaseFragmentImpl(),
@@ -105,13 +107,21 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     }
 
     override fun FragmentExplorerBinding.onApplyInsets() {
-        root.apply(dockView = binding.dockBar)
-        systemUiBackground += ExtType.topDisclaimer
-        root.attachInsetsListener(systemUiBackground)
-        disclaimer.insetsPadding(ExtType { barsWithCutout + dock }, start = true, top = true, end = true)
-        disclaimer.insetsSource {
-            InsetsSource.submit(ExtType.topDisclaimer, Insets.of(0, it.height, 0, 0))
+        if (disclaimer.isVisible) {
+            root.addInsetsListener {
+                val dock = it[ExtType.dock]
+                val statusBar = it[ExtType.statusBars]
+                val paddings = root.calcStatusBarPadding(it)
+                disclaimer.translationY = (statusBar.top - paddings.bottom).toFloat()
+                disclaimer.updatePadding(left = max(dock.left, paddings.left), right = max(dock.right, paddings.right))
+            }
+            systemUiBackground += ExtType.topDisclaimer
+            disclaimer.insetsSource {
+                InsetsSource.submit(ExtType.topDisclaimer, Insets.of(0, it.height + it.translationY.toInt(), 0, 0))
+            }
         }
+        root.attachInsetsListener(systemUiBackground)
+        root.apply(dockView = binding.dockBar)
     }
 
     override fun onBack(soft: Boolean): Boolean = presenter.onBack(soft, getCurrentTabView()::scrollToTop)
