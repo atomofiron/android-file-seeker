@@ -22,12 +22,12 @@ class KeyboardInsetCallback(
 
     override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
         val current = windowInsets[ExtType.ime].bottom
-        if (isControllable && !visible && current > 0 && !isPrepareCalled) {
+        if (isControllable && current > 0 && !visible && !isPrepareCalled) {
             // it just got broken
             isControllable = false
-            notifyListeners(current)
             listeners.forEach { it.onImeBroke(visible) }
-        } else if (!isControllable) {
+        }
+        if (!isControllable || current > 0 && max > 0 && current != max) {
             notifyListeners(current)
         }
     }
@@ -36,7 +36,7 @@ class KeyboardInsetCallback(
         if (current > 0) {
             max = current
         }
-        if (max > 0 && visible != (current > 0)) {
+        if (max > 0) {
             visible = current > 0
             listeners.forEach { it.onImeStart(max) }
             listeners.forEach { it.onImeMove(current) }
