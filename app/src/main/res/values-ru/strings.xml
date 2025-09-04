@@ -1,6 +1,4 @@
 <resources>
-    <string name="tips">Подсказки</string>
-
     <string name="case_sens">Учитывать регистр</string>
     <string name="storage_err">Ошибка доступа к памяти</string>
     <string name="searching">Поиск…</string>
@@ -67,7 +65,6 @@
     <string name="share_file">Поделиться файлом</string>
     <string name="share_files">Поделиться файлами</string>
     <string name="pref_orientation">Ориентация экрана</string>
-    <string name="fucking_provider">Не удалось открыть файл из-за системных ограничений, попробуйте скопировать абсолютный путь к файлу и открыть его в другом приложении</string>
     <string name="pref_theme">Тема оформления</string>
     <string name="pref_deep_black">Глубокий чёрный</string>
     <string name="pref_haptic_feedback">Тактильный отклик</string>
@@ -193,6 +190,9 @@
     <string name="lite">Лёгкий</string>
     <string name="twice">Двойной</string>
     <string name="heavy">Тяжёлый</string>
+    <string name="yaroslav_nesterov">Ярослав Нестеров</string>
+    <string name="dmitrii_pavlov">Дмитрий Павлов</string>
+
     <plurals name="x_dirs">
         <item quantity="one">%d директория</item>
         <item quantity="few">%d директории</item>

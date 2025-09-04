@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name" translatable="false">File Seeker</string>
     <string name="ellipsis" translatable="false">…</string>
-    <string name="tips">Tips</string>
 
     <string name="case_sens">Case sensitivity</string>
     <string name="storage_err">Error accessing memory</string>
@@ -69,7 +68,6 @@
     <string name="share_file">Share file</string>
     <string name="share_files">Share files</string>
     <string name="pref_orientation">Screen orientation</string>
-    <string name="fucking_provider">Сould not open file due to system limitations, try to copy the absolute path to the file and open it in another application</string>
     <string name="pref_theme">App theme</string>
     <string name="pref_deep_black">Deep black</string>
     <string name="pref_haptic_feedback">Haptic feedback</string>
@@ -202,6 +200,10 @@
     <string name="lite">Lite</string>
     <string name="twice">Double</string>
     <string name="heavy">Heavy</string>
+    <string name="dev_ui_ux" translatable="false">Dev/UI/UX</string>
+    <string name="ui" translatable="false">UI</string>
+    <string name="yaroslav_nesterov">Yaroslav Nesterov</string>
+    <string name="dmitrii_pavlov">Dmitrii Pavlov</string>
     <plurals name="x_dirs">
         <item quantity="zero">%d directories</item>
         <item quantity="one">%d directory</item>

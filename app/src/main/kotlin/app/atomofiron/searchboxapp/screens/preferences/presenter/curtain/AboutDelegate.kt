@@ -35,25 +35,25 @@ class AboutDelegate(
         version.setCompoundDrawablesRelativeWithIntrinsicBounds(versionIcon, 0, 0, 0)
         val context = root.context
         var available = context.resolve(Intents.github)
-        aboutTvGithub.isEnabled = available
-        aboutTvGithub.alpha = Alpha.enabled(available)
+        github.isEnabled = available
+        github.alpha = Alpha.enabled(available)
         val tint = context.findColorByAttr(MaterialAttr.colorOnSurface)
-        aboutTvGithub.compoundDrawablesRelative[0].setTint(tint)
-        aboutTvForpda.compoundDrawablesRelative[0].setTint(tint)
+        github.compoundDrawablesRelative[0].setTint(tint)
+        forpda.compoundDrawablesRelative[0].setTint(tint)
 
         available = context.resolve(Intents.forPda)
-        aboutTvForpda.isEnabled = available
-        aboutTvForpda.alpha = Alpha.enabled(available)
+        forpda.isEnabled = available
+        forpda.alpha = Alpha.enabled(available)
 
         val listener = ::onClick
-        aboutTvGithub.setOnClickListener(listener)
-        aboutTvForpda.setOnClickListener(listener)
+        github.setOnClickListener(listener)
+        forpda.setOnClickListener(listener)
     }
 
     private fun onClick(view: View) {
         when (view.id) {
-            R.id.about_tv_github -> router.goToGithub()
-            R.id.about_tv_forpda -> router.goToForPda()
+            R.id.github -> router.goToGithub()
+            R.id.forpda -> router.goToForPda()
         }
     }
 }
