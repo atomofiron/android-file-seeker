@@ -10,7 +10,7 @@ import androidx.preference.get
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.setHapticEffect
 
 class PreferenceFragmentDelegate(

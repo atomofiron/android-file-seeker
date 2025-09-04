@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.utils.prederences
+package app.atomofiron.searchboxapp.utils.preferences
 
 import android.view.Gravity
 import app.atomofiron.searchboxapp.model.finder.SearchOptions

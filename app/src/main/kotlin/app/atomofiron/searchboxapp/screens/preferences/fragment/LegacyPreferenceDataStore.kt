@@ -12,7 +12,7 @@ import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.preference.PreferenceDataStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers

@@ -30,7 +30,7 @@ import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.makeSnackbar
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

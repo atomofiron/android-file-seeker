@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.utils.prederences
+package app.atomofiron.searchboxapp.utils.preferences
 
 import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences

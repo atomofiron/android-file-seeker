@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.edit
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.utils.ExplorerUtils
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyAppTheme
-import app.atomofiron.searchboxapp.utils.prederences.PreferenceKeys.KeyDeepBlack
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyAppTheme
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyDeepBlack
 
 class InitialDelegate(
     context: Context,
