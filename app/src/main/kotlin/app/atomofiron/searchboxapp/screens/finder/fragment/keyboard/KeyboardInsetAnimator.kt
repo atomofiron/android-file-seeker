@@ -65,6 +65,9 @@ class InsetsAnimator(
         when {
             shown == true && keyboardMax - keyboardNow <= 2 -> return finish(true)
             shown == false && keyboardNow - keyboardMin <= 2 -> return finish(false)
+            shown != null -> Unit
+            keyboardNow == keyboardMax -> return finish(true)
+            keyboardNow == keyboardMin -> return finish(false)
         }
         toVisible = shown ?: (keyboardNow > keyboardMax / 2)
         val from = keyboardNow
