@@ -6,9 +6,9 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import app.atomofiron.common.util.Unreachable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
-import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
-import app.atomofiron.searchboxapp.injectable.router.FilePickingDelegate
-import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
+import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
+import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
+import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter

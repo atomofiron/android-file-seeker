@@ -2,9 +2,9 @@ package app.atomofiron.searchboxapp.screens.main
 
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
-import app.atomofiron.searchboxapp.injectable.service.WindowService
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.di.dependencies.service.WindowService
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegate
 import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegateApi
 import app.atomofiron.searchboxapp.screens.main.util.tasks.XTask

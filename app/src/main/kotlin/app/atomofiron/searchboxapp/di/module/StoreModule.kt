@@ -1,14 +1,14 @@
 package app.atomofiron.searchboxapp.di.module
 
 import android.content.Context
-import app.atomofiron.searchboxapp.injectable.AppScope
-import app.atomofiron.searchboxapp.injectable.store.AppResources
-import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
-import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
-import app.atomofiron.searchboxapp.injectable.store.FinderStore
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
-import app.atomofiron.searchboxapp.injectable.store.ResultStore
-import app.atomofiron.searchboxapp.injectable.store.TextViewerStore
+import app.atomofiron.searchboxapp.di.dependencies.AppScope
+import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
+import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
+import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
+import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.ResultStore
+import app.atomofiron.searchboxapp.di.dependencies.store.TextViewerStore
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

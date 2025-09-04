@@ -4,7 +4,7 @@ import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.S
 import app.atomofiron.common.util.flow.mapState
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchTask

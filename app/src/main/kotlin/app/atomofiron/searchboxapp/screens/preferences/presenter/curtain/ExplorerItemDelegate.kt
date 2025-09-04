@@ -9,7 +9,7 @@ import app.atomofiron.fileseeker.BuildConfig.VERSION_NAME
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainPreferenceExplorerItemBinding
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent

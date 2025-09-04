@@ -6,9 +6,9 @@ import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
-import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
-import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
-import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
+import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
+import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
+import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations

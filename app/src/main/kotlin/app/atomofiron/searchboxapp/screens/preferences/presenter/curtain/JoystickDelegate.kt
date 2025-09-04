@@ -10,7 +10,7 @@ import app.atomofiron.fileseeker.databinding.CurtainPreferenceJoystickBinding
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.custom.view.effect
 import app.atomofiron.searchboxapp.custom.view.joystickDefaultColor
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi

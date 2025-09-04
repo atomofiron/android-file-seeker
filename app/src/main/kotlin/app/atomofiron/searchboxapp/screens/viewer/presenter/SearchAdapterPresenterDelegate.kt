@@ -2,9 +2,9 @@ package app.atomofiron.searchboxapp.screens.viewer.presenter
 
 import app.atomofiron.common.arch.Recipient
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
-import app.atomofiron.searchboxapp.injectable.interactor.TextViewerInteractor
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
+import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteractor
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput

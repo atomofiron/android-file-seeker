@@ -3,9 +3,9 @@ package app.atomofiron.searchboxapp.screens.result
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.injectable.interactor.ResultInteractor
-import app.atomofiron.searchboxapp.injectable.store.AppResources
-import app.atomofiron.searchboxapp.injectable.store.FinderStore
+import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
+import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
+import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult

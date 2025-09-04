@@ -2,9 +2,9 @@ package app.atomofiron.searchboxapp.screens.preferences.presenter
 
 import app.atomofiron.common.arch.Recipient
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
-import app.atomofiron.searchboxapp.injectable.store.AppResources
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
+import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceRouter

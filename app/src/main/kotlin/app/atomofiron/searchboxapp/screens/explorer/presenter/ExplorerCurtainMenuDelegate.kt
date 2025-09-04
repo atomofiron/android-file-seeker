@@ -5,11 +5,11 @@ import app.atomofiron.common.arch.Recipient
 import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
-import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
-import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
-import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
-import app.atomofiron.searchboxapp.injectable.service.UtilService
-import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
+import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
+import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
+import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
+import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
+import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi

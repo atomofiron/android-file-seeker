@@ -10,7 +10,7 @@ import android.content.pm.PackageInstaller.STATUS_FAILURE
 import android.content.pm.PackageInstaller.STATUS_PENDING_USER_ACTION
 import android.content.pm.PackageInstaller.STATUS_SUCCESS
 import androidx.core.content.IntentCompat
-import app.atomofiron.searchboxapp.injectable.channel.ApkChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
 import javax.inject.Inject
 
 class InstallReceiver : BroadcastReceiver() {

@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.curtain
 
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module

@@ -1,10 +1,10 @@
 package app.atomofiron.searchboxapp.di.module
 
-import app.atomofiron.searchboxapp.injectable.AppScope
-import app.atomofiron.searchboxapp.injectable.channel.ApkChannel
-import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
-import app.atomofiron.searchboxapp.injectable.service.ApkService
-import app.atomofiron.searchboxapp.injectable.service.ExplorerService
+import app.atomofiron.searchboxapp.di.dependencies.AppScope
+import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
+import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
+import app.atomofiron.searchboxapp.di.dependencies.service.ApkService
+import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

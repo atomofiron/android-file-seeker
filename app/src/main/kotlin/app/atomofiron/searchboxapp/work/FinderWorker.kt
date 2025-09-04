@@ -21,10 +21,10 @@ import app.atomofiron.searchboxapp.android.tryShow
 import app.atomofiron.searchboxapp.android.updateChannel
 import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.di.DaggerInjector
-import app.atomofiron.searchboxapp.injectable.AppScope
-import app.atomofiron.searchboxapp.injectable.service.TextViewerService
-import app.atomofiron.searchboxapp.injectable.store.FinderStore
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.AppScope
+import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
+import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node

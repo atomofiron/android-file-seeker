@@ -2,13 +2,13 @@ package app.atomofiron.searchboxapp.screens.viewer
 
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
-import app.atomofiron.searchboxapp.injectable.interactor.TextViewerInteractor
-import app.atomofiron.searchboxapp.injectable.service.TextViewerService
-import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
-import app.atomofiron.searchboxapp.injectable.store.FinderStore
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
-import app.atomofiron.searchboxapp.injectable.store.TextViewerStore
+import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
+import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteractor
+import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
+import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
+import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.TextViewerStore
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.viewer.presenter.SearchAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams

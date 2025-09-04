@@ -4,8 +4,8 @@ import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.common.util.flow.valueOrNull
-import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
-import app.atomofiron.searchboxapp.injectable.channel.CurtainResponse
+import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainResponse
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi

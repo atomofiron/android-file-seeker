@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.explorer.presenter
 
-import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
-import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
+import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
+import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate

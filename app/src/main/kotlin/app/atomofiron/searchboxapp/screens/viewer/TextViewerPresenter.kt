@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.viewer
 
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.searchboxapp.injectable.interactor.TextViewerInteractor
+import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput

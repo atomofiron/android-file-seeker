@@ -6,9 +6,9 @@ import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceDataStore
 import androidx.work.WorkManager
-import app.atomofiron.searchboxapp.injectable.AppScope
-import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.AppScope
+import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
 import dagger.Module
 import dagger.Provides

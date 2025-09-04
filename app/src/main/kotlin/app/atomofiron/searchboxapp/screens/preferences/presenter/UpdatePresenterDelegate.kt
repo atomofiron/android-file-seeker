@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.preferences.presenter
 
 import app.atomofiron.searchboxapp.custom.preference.UpdateActionListener
-import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
+import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.model.other.AppUpdateAction
 
 class UpdatePresenterDelegate(

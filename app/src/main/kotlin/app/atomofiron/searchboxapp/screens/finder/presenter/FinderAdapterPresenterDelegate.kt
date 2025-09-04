@@ -1,8 +1,8 @@
 package app.atomofiron.searchboxapp.screens.finder.presenter
 
 import android.Manifest.permission.POST_NOTIFICATIONS
-import app.atomofiron.searchboxapp.injectable.interactor.FinderInteractor
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.interactor.FinderInteractor
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate

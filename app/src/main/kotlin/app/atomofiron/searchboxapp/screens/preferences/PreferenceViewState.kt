@@ -3,9 +3,9 @@ package app.atomofiron.searchboxapp.screens.preferences
 import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.set
-import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
-import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
+import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.Shell

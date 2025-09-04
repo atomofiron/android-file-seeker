@@ -4,9 +4,9 @@ import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.valueOrNull
 import app.atomofiron.searchboxapp.custom.ExplorerView
-import app.atomofiron.searchboxapp.injectable.channel.MainChannel
-import app.atomofiron.searchboxapp.injectable.interactor.ExplorerInteractor
-import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
+import app.atomofiron.searchboxapp.di.dependencies.channel.MainChannel
+import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
+import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener

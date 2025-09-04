@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.template
 
 import app.atomofiron.common.arch.BasePresenter
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import kotlinx.coroutines.CoroutineScope
 
 class TemplatePresenter(

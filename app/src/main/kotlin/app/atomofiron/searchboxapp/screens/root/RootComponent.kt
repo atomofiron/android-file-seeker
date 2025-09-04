@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.root
 
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.screens.common.RootRouting
 import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
 import dagger.BindsInstance

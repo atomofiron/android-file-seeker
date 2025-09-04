@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.finder.presenter
 
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.searchboxapp.injectable.store.ExplorerStore
+import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.finder.FinderViewState
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder

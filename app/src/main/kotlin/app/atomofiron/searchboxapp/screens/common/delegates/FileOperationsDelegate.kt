@@ -12,9 +12,9 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.LongItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.debugDelay
-import app.atomofiron.searchboxapp.injectable.interactor.ApkInteractor
-import app.atomofiron.searchboxapp.injectable.service.UtilService
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
+import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRef

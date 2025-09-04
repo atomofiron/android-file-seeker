@@ -32,8 +32,8 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ActivityMainBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.getLayout
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.syncWithLayout
-import app.atomofiron.searchboxapp.injectable.store.AppStore
-import app.atomofiron.searchboxapp.injectable.store.AppStoreProvider
+import app.atomofiron.searchboxapp.di.dependencies.store.AppStore
+import app.atomofiron.searchboxapp.di.dependencies.store.AppStoreProvider
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme

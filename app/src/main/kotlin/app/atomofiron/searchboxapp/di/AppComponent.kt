@@ -12,7 +12,7 @@ import app.atomofiron.searchboxapp.di.module.CommonModule
 import app.atomofiron.searchboxapp.di.module.InteractorModule
 import app.atomofiron.searchboxapp.di.module.ServiceModule
 import app.atomofiron.searchboxapp.di.module.StoreModule
-import app.atomofiron.searchboxapp.injectable.service.AppUpdateService
+import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.curtain.CurtainDependencies
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerDependencies

@@ -1,15 +1,15 @@
 package app.atomofiron.searchboxapp.di.module
 
-import app.atomofiron.searchboxapp.injectable.AppScope
-import app.atomofiron.searchboxapp.injectable.channel.ApkChannel
-import app.atomofiron.searchboxapp.injectable.channel.CurtainChannel
-import app.atomofiron.searchboxapp.injectable.channel.MainChannel
+import app.atomofiron.searchboxapp.di.dependencies.AppScope
+import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.MainChannel
 import dagger.Module
 import dagger.Provides
-import app.atomofiron.searchboxapp.injectable.channel.PreferenceChannel
-import app.atomofiron.searchboxapp.injectable.channel.ResultChannel
-import app.atomofiron.searchboxapp.injectable.store.AppResources
-import app.atomofiron.searchboxapp.injectable.store.AppUpdateStore
+import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.ResultChannel
+import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
+import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
 import javax.inject.Singleton
 
 

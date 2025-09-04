@@ -5,8 +5,8 @@ import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
-import app.atomofiron.searchboxapp.injectable.store.FinderStore
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsStateDelegate
 import kotlinx.coroutines.CoroutineScope

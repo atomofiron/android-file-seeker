@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.main
 
-import app.atomofiron.searchboxapp.injectable.delegate.InitialDelegate
-import app.atomofiron.searchboxapp.injectable.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.main.util.tasks.XTask
 import kotlinx.coroutines.flow.MutableStateFlow
