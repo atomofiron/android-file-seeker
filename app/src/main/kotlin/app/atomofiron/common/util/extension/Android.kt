@@ -22,6 +22,7 @@ fun ClipboardManager.copy(
     label: String,
     text: String,
     resources: Resources = context.resources,
+    withAlert: Boolean = false,
 ) {
     val clip = ClipData.newPlainText(label, text)
     val toast = try {
@@ -30,7 +31,7 @@ fun ClipboardManager.copy(
     } catch (e: Exception) {
         e.toString()
     }
-    Toast.makeText(context, toast, Toast.LENGTH_LONG).show()
+    if (withAlert && Android.Below.T) Toast.makeText(context, toast, Toast.LENGTH_LONG).show()
 }
 
 fun PackageInfo.signature(): ApkSignature? {

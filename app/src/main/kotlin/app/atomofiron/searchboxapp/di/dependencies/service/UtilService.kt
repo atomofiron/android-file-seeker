@@ -19,9 +19,9 @@ class UtilService(
 ) {
     private val resources by resources
 
-    fun copyToClipboard(item: Node) = copyToClipboard(item.name, item.path)
+    fun copyToClipboard(item: Node, withAlert: Boolean = false) = copyToClipboard(item.name, item.path, withAlert)
 
-    fun copyToClipboard(label: String, text: String) = clipboardManager.copy(context, label, text, resources)
+    fun copyToClipboard(label: String, text: String, withAlert: Boolean = false) = clipboardManager.copy(context, label, text, resources, withAlert)
 
     fun getUriForFile(file: File) = FileProvider.getUriForFile(context, BuildConfig.AUTHORITY, file)
 

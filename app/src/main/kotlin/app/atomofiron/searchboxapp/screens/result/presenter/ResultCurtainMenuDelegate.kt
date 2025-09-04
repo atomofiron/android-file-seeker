@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.result.presenter
 
 import android.view.LayoutInflater
 import app.atomofiron.common.arch.Recipient
-import app.atomofiron.common.util.AlertMessage
+import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
@@ -41,16 +41,18 @@ class ResultCurtainMenuDelegate(
 
     override fun onMenuItemSelected(id: Int) {
         val data = data ?: return
-        controller?.close(irrevocably = true)
         val items = data.items
         when (id) {
             Operations.CopyPath.id -> {
                 interactor.copyToClipboard(items.first())
-                viewState.showAlert(AlertMessage(R.string.copied))
+                if (Android.Below.T) controller?.showSnackbar(R.string.copied)
             }
             Operations.OpenWith.id -> router.openWith(items.first())
             Operations.Share.id -> router.shareWith(items.filter { it.isFile })
-            Operations.Delete.id -> interactor.deleteItems(items)
+            Operations.Delete.id -> {
+                controller?.close(irrevocably = true)
+                interactor.deleteItems(items)
+            }
             Operations.InstallApp.id -> apks.install(items.first())
             Operations.LaunchApp.id -> apks.launch(items.first())
         }

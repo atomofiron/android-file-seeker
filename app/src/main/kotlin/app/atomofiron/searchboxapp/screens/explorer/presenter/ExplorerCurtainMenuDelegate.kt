@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer.presenter
 
 import android.view.LayoutInflater
 import app.atomofiron.common.arch.Recipient
-import app.atomofiron.common.util.AlertMessage
+import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
@@ -96,8 +96,7 @@ class ExplorerCurtainMenuDelegate(
             Operations.UseAs.id -> utils.useAs(options.items.first())
             Operations.CopyPath.id -> {
                 interactor.copyToClipboard(items.first())
-                viewState.showAlert(AlertMessage(R.string.copied))
-                controller?.close()
+                if (Android.Below.T) controller?.showSnackbar(R.string.copied)
             }
         }
     }

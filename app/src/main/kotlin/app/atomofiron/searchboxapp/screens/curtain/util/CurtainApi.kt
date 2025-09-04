@@ -25,8 +25,8 @@ object CurtainApi {
         fun showNext(layoutId: Int)
         fun showPrev()
         fun close(immediately: Boolean = false, irrevocably: Boolean = false)
-        fun showSnackbar(string: String, duration: Int)
-        fun showSnackbar(stringId: Int, duration: Int)
+        fun showSnackbar(string: String, duration: Int = Snackbar.LENGTH_SHORT)
+        fun showSnackbar(stringId: Int, duration: Int = Snackbar.LENGTH_SHORT)
         fun showSnackbar(provider: SnackbarProvider)
         fun setCancelable(value: Boolean)
     }
