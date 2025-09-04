@@ -11,6 +11,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
+import app.atomofiron.searchboxapp.utils.performHapticLite
 import app.atomofiron.searchboxapp.utils.setHapticEffect
 
 class PreferenceFragmentDelegate(
@@ -63,11 +64,8 @@ class PreferenceFragmentDelegate(
         return true
     }
 
-    private fun Preference.updateStringSummary(newValue: String? = null) {
-        summary = newValue ?: preferenceDataStore?.getString(key, null)
-    }
-
     override fun onPreferenceClick(preference: Preference): Boolean {
+        view()?.performHapticLite()
         when (preference.key) {
             PreferenceKeys.PREF_EXPORT_IMPORT -> clickOutput.onExportImportClick()
             PreferenceKeys.PREF_COLOR_SCHEME -> clickOutput.onColorSchemeClick()

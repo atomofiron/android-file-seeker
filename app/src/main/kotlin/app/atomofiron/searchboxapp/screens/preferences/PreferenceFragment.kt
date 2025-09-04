@@ -30,6 +30,7 @@ import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.makeSnackbar
+import app.atomofiron.searchboxapp.utils.performHapticLite
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
@@ -113,6 +114,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         recyclerView.updatePadding(top = resources.getDimensionPixelSize(R.dimen.content_margin_half))
         binding.toolbar.setNavigationOnClickListener { presenter.onNavigationClick() }
         binding.toolbar.setOnMenuItemClickListener { item ->
+            view.performHapticLite()
             when (item.itemId) {
                 R.id.pref_about -> presenter.onAboutClick()
             }
