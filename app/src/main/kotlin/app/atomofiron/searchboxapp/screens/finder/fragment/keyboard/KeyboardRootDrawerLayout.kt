@@ -26,6 +26,7 @@ import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.layout.RootDrawerLayout
+import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -99,7 +100,14 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     init {
         setInsetsModifier { _, insets ->
+            poop("insets ${insets[ExtType.ime]}")
             keyboardCallback.onApplyWindowInsets(insets)
+            val ime = insets[ExtType.ime].bottom
+            if (ime > 0 && ime != keyboardMax && tracking != Tracking.Vertical) {
+                // useful after screen orientations change
+                keyboardMax = ime
+                updateVertically(keyboardNow = ime)
+            }
             insets.builder()
                 .consume(ExtType.ime)
                 .build()
