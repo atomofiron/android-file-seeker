@@ -42,7 +42,7 @@ class ExplorerItemDelegate(
             .split(' ').first()
         val name = "$appName $versionName.apk".replace(' ', '_')
         val properties = NodeProperties("drwxrwx---", "owner", "group", "47K", "2038-01-19", "03:14", name)
-        val apkInfo = ApkInfo(Thumbnail(R.mipmap.ic_launcher), "", VERSION_NAME, 0, "", 0, 0, null, null)
+        val apkInfo = ApkInfo(Thumbnail(R.mipmap.ic_launcher), "", VERSION_NAME, 0, "", 0, 0, null, 0, null)
         val content = NodeContent.AndroidApp.apk(NodeRef(""), apkInfo)
         Node(path = "", properties = properties, content = content)
     }

@@ -26,7 +26,7 @@ class ApkService(
     fun install(content: AndroidApp, action: String): Rslt<Unit> = try {
         when {
             content.splitApk -> installApks(content, action)
-            else -> installApk(content.ref, action, stringId = content.info?.stringId())
+            else -> installApk(content, action)
         }
     } catch (e: Exception) {
         e.toRslt()
@@ -35,7 +35,7 @@ class ApkService(
     private fun installApks(content: AndroidApp, action: String): Rslt<Unit> {
         val stringId = content.info?.stringId()
         return ZipInputStream(BufferedInputStream(content.ref.stream())).use { stream ->
-            install(stream.available().toLong(), action) {
+            install(stream.available().toLong(), action, installLocation = content.info?.installLocation) {
                 var entry: ZipEntry? = stream.nextEntry
                     ?: return@install Rslt.Err("archive is empty")
                 while (entry != null) {
@@ -53,11 +53,15 @@ class ApkService(
         }
     }
 
-    fun installApk(ref: NodeRef, action: String, stringId: String? = null, silently: Boolean = false): Rslt<Unit> {
+    fun installApk(content: AndroidApp, action: String, silently: Boolean = false): Rslt<Unit> {
+        return installApk(content.ref, action, content.info?.stringId(), silently, content.info?.installLocation)
+    }
+
+    fun installApk(ref: NodeRef, action: String, stringId: String? = null, silently: Boolean = false, installLocation: Int? = null): Rslt<Unit> {
         val stream = ref.stream()
         stream ?: return Rslt.Err("unknown error")
         val length = stream.available().toLong()
-        return install(length, action, silently) {
+        return install(length, action, silently, installLocation) {
             openWrite(stringId ?: "unused", 0, length).use { output ->
                 stream.use {
                     it.copyTo(output)
@@ -72,9 +76,11 @@ class ApkService(
         length: Long,
         action: String,
         silently: Boolean = false,
+        installLocation: Int? = null,
         block: PackageInstaller.Session.() -> Rslt<Unit>,
     ) = try {
         val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
+        installLocation?.let { params.setInstallLocation(it) }
         if (silently) {
             params.setAppPackageName(context.packageName)
             params.setSize(length)
