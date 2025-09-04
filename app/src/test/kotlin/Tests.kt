@@ -2,8 +2,8 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.merge
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.name
-import junit.framework.Assert.assertEquals
 import org.junit.Test
+import kotlin.test.assertEquals
 
 class Tests {
     @Test
