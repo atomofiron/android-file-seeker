@@ -49,6 +49,7 @@ open class CommonModule {
     }
 
     @Provides
+    @Singleton
     fun preferenceDataStore(
         preferences: PreferenceStore,
         appScope: AppScope,

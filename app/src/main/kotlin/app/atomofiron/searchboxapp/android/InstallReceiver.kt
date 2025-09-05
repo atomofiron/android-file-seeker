@@ -10,6 +10,7 @@ import android.content.pm.PackageInstaller.STATUS_FAILURE
 import android.content.pm.PackageInstaller.STATUS_PENDING_USER_ACTION
 import android.content.pm.PackageInstaller.STATUS_SUCCESS
 import androidx.core.content.IntentCompat
+import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
 import javax.inject.Inject
 
@@ -19,6 +20,7 @@ class InstallReceiver : BroadcastReceiver() {
     lateinit var channel: ApkChannel
 
     override fun onReceive(context: Context, intent: Intent) {
+        DaggerInjector.appComponent.inject(this)
         when (intent.getIntExtra(EXTRA_STATUS, STATUS_FAILURE)) {
             STATUS_SUCCESS -> when (intent.action) {
                 Intents.ACTION_INSTALL_UPDATE -> context.showAppUpdatedNotification()
