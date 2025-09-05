@@ -192,35 +192,4 @@
     <string name="heavy">Тяжёлый</string>
     <string name="yaroslav_nesterov">Ярослав Нестеров</string>
     <string name="dmitrii_pavlov">Дмитрий Павлов</string>
-
-    <plurals name="x_dirs">
-        <item quantity="one">%d директория</item>
-        <item quantity="few">%d директории</item>
-        <item quantity="many">%d директорий</item>
-        <item quantity="other">%d директорий</item>
-    </plurals>
-    <plurals name="x_files">
-        <item quantity="one">%d файл</item>
-        <item quantity="few">%d файла</item>
-        <item quantity="many">%d файлов</item>
-        <item quantity="other">%d файлов</item>
-    </plurals>
-    <plurals name="x_deleted">
-        <item quantity="one">Было удалено: %s</item>
-        <item quantity="few">Были удалены: %s</item>
-        <item quantity="many">Были удалены: %s</item>
-        <item quantity="other">Были удалены: %s</item>
-    </plurals>
-    <plurals name="receiving_files">
-        <item quantity="one">Получение %d файла…</item>
-        <item quantity="few">Получение %d файлов…</item>
-        <item quantity="many">Получение %d файлов…</item>
-        <item quantity="other">Получение %d файлов…</item>
-    </plurals>
-    <plurals name="files_received">
-        <item quantity="one">Получен %d из %d файл</item>
-        <item quantity="few">Получено %d из %d файла</item>
-        <item quantity="many">Получено %d из %d файлов</item>
-        <item quantity="other">Получено %d из %d файлов</item>
-    </plurals>
 </resources>

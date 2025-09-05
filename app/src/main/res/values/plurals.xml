@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="x_dirs">
+        <item quantity="zero">%d directories</item>
+        <item quantity="one">%d directory</item>
+        <item quantity="two">%d directories</item>
+        <item quantity="few">%d directories</item>
+        <item quantity="many">%d directories</item>
+        <item quantity="other">%d directories</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="zero">%d files</item>
+        <item quantity="one">%d file</item>
+        <item quantity="two">%d files</item>
+        <item quantity="few">%d files</item>
+        <item quantity="many">%d files</item>
+        <item quantity="other">%d files</item>
+    </plurals>
+    <plurals name="x_deleted">
+        <item quantity="zero">%s was deleted</item>
+        <item quantity="one">%s was deleted</item>
+        <item quantity="two">%s were deleted</item>
+        <item quantity="few">%s were deleted</item>
+        <item quantity="many">%s were deleted</item>
+        <item quantity="other">%s were deleted</item>
+    </plurals>
+    <plurals name="receiving_files">
+        <item quantity="zero">Receiving %d files…</item>
+        <item quantity="one">Receiving a single file…</item>
+        <item quantity="two">Receiving %d files…</item>
+        <item quantity="few">Receiving %d files…</item>
+        <item quantity="many">Receiving %d files…</item>
+        <item quantity="other">Receiving %d files…</item>
+    </plurals>
+    <plurals name="files_received">
+        <item quantity="zero">%d of %d files received</item>
+        <item quantity="one">%d of %d file received</item>
+        <item quantity="two">%d of %d files received</item>
+        <item quantity="few">%d of %d files received</item>
+        <item quantity="many">%d of %d files received</item>
+        <item quantity="other">%d of %d files received</item>
+    </plurals>
+</resources>

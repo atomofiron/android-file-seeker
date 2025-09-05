@@ -1,25 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string-array name="tab_titles">
-        <item>Проверка</item>
-        <item>Выбрано</item>
-        <item>Проводник</item>
-    </string-array>
-
     <string-array name="orientation_var">
         <item>Системная</item>
         <item>Портретная</item>
         <item>Альбомная</item>
         <item>Автоматическая</item>
     </string-array>
-
     <string-array
         name="theme_var"
         tools:ignore="InconsistentArrays">
         <item>Светлая</item>
         <item>Тёмная</item>
     </string-array>
-
     <string-array name="size_suffix_arr">
         <item>Б</item>
         <item>КБ</item>
