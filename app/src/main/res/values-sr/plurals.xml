@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <plurals name="x_dirs">
+        <item quantity="one">%d директоријум</item>
+        <item quantity="few">%d директоријума</item>
+        <item quantity="other">%d директоријума</item>
+    </plurals>
+    <plurals name="x_files">
+        <item quantity="one">%d датотека</item>
+        <item quantity="few">%d датотеке</item>
+        <item quantity="other">%d датотека</item>
+    </plurals>
+    <plurals name="x_deleted">
+        <item quantity="one">%s је обрисан(а)</item>
+        <item quantity="few">%s су обрисана</item>
+        <item quantity="other">%s су обрисана</item>
+    </plurals>
+    <plurals name="receiving_files">
+        <item quantity="one">Примање %d датотеке…</item>
+        <item quantity="few">Примање %d датотеке…</item>
+        <item quantity="other">Примање %d датотека…</item>
+    </plurals>
+    <plurals name="files_received">
+        <item quantity="one">Примљена %d од %d датотека</item>
+        <item quantity="few">Примљене %d од %d датотеке</item>
+        <item quantity="other">Примљено %d од %d датотека</item>
+    </plurals>
+</resources>

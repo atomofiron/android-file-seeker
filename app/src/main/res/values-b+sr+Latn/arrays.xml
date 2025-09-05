@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string-array name="orientation_var">
+        <item>Sistemska</item>
+        <item>Portretna</item>
+        <item>Pejzažna</item>
+        <item>Automatska</item>
+    </string-array>
+    <string-array
+        name="theme_var"
+        tools:ignore="InconsistentArrays">
+        <item>Svetla</item>
+        <item>Tamna</item>
+    </string-array>
+    <string-array name="size_suffix_arr">
+        <item>Б</item>
+        <item>КБ</item>
+        <item>МБ</item>
+        <item>ГБ</item>
+    </string-array>
+</resources>
