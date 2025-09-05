@@ -12,6 +12,7 @@ class ExplorerSpanSizeLookup(
     private val layoutManager: GridLayoutManager,
     private val rootsAdapter: RootAdapter,
 ) : GridLayoutManager.SpanSizeLookup() {
+
     private val minWidth = resources.getDimensionPixelSize(R.dimen.column_min_width)
     private val maxWidth = resources.getDimensionPixelSize(R.dimen.column_max_width)
 
@@ -21,11 +22,10 @@ class ExplorerSpanSizeLookup(
     override fun getSpanSize(position: Int): Int = if (position < rootCount) 1 else spanCount
 
     fun updateSpanCount(recyclerView: RecyclerView) {
-        val width = recyclerView.width
-        val padding = recyclerView.run { paddingStart + paddingEnd }
         val frameWidth = let {
+            val width = recyclerView.width
             val layoutWidth = if (width == 0) resources.displayMetrics.widthPixels else width
-            layoutWidth - padding
+            layoutWidth - recyclerView.run { paddingStart + paddingEnd }
         }
         var spanCount = frameWidth / minWidth
         if (spanCount > rootCount) {

@@ -14,7 +14,8 @@ import kotlin.math.max
 
 class RootItemMarginDecorator(resources: Resources) : RecyclerView.ItemDecoration(), InsetsListener {
 
-    private val margin = resources.getDimensionPixelSize(R.dimen.content_margin)
+    private val outerMargin = resources.getDimensionPixelSize(R.dimen.padding_common)
+    private val innerMargin = resources.getDimensionPixelSize(R.dimen.padding_half)
     private var margins = IntArray(2)
     private val cellCount get() = margins.size / 2
     private var leftMargin
@@ -42,7 +43,7 @@ class RootItemMarginDecorator(resources: Resources) : RecyclerView.ItemDecoratio
 
     override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
         val cutout = windowInsets[ExtType { displayCutout + dock }]
-        update(leftMargin = max(margin - cutout.left, 0), rightMargin = max(margin - cutout.right, 0))
+        update(leftMargin = max(outerMargin - cutout.left, 0), rightMargin = max(outerMargin - cutout.right, 0))
     }
 
     private fun update(
@@ -64,7 +65,7 @@ class RootItemMarginDecorator(resources: Resources) : RecyclerView.ItemDecoratio
 
     private fun updateMargins() {
         val spanCount = margins.size / 2
-        var internal = margin * spanCount.dec()
+        var internal = innerMargin * spanCount.dec()
         val sum = leftMargin + rightMargin + internal
         val avg = sum / spanCount
         // распределяем отступы так, чтобы ячейки стали одинаковой ширины
@@ -75,7 +76,7 @@ class RootItemMarginDecorator(resources: Resources) : RecyclerView.ItemDecoratio
                 internal -= avg
             } else {
                 val index = i * 2
-                val left = margin - margins[index.dec()]
+                val left = innerMargin - margins[index.dec()]
                 margins[index] = left
                 margins[index.inc()] = avg - left
                 internal -= avg

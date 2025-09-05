@@ -50,9 +50,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     init {
         binding.cardTitle.setTextColor(colors)
         binding.cardThumbnail.clipToOutline = true
-        if (context.isDarkDeep()) {
-            binding.root.setCardBackgroundColor(context.colorSurfaceContainer())
-        }
+        binding.root.setCardBackgroundColor(context.colorSurfaceContainer())
     }
 
     override fun onBind(item: NodeRoot, position: Int) = binding.run {
@@ -97,13 +95,13 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     }
 
     private fun NodeRoot.getThumbnailBackground(): Drawable? = when (type) {
+        is NodeRootType.InternalStorage -> null
+        is NodeRootType.Favorite,
         is NodeRootType.Photos,
         is NodeRootType.Videos,
         is NodeRootType.Camera,
-        is NodeRootType.Screenshots -> ContextCompat.getDrawable(context, R.drawable.item_root_thumbnail)
+        is NodeRootType.Screenshots,
         is NodeRootType.Downloads,
-        is NodeRootType.Bluetooth,
-        is NodeRootType.InternalStorage,
-        is NodeRootType.Favorite -> null
+        is NodeRootType.Bluetooth -> ContextCompat.getDrawable(context, R.drawable.item_root_thumbnail)
     }
 }

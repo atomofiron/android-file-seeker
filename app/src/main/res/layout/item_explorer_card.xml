@@ -6,7 +6,8 @@
     android:id="@+id/item_explorer_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/padding_common"
+    android:layout_marginBottom="@dimen/padding_half"
+    app:cardBackgroundColor="?colorSurfaceContainer"
     >
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/card_content"
@@ -14,21 +15,25 @@
         android:layout_height="match_parent"
         android:duplicateParentState="true"
         android:layout_margin="3dp"
+        android:clipToPadding="false"
+        android:clipChildren="false"
         >
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/card_thumbnail"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:background="@drawable/item_root_thumbnail"
             android:scaleType="centerCrop"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/card_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/card_title"
             app:layout_constraintDimensionRatio="1:1"
             />
         <app.atomofiron.searchboxapp.custom.view.ArcView
             android:id="@+id/card_arc"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="10dp"
+            android:layout_margin="@dimen/padding_half"
             android:textSize="12sp"
             android:textColor="?colorPrimary"
             android:textStyle="bold"
@@ -40,19 +45,19 @@
             />
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/card_title"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="@dimen/padding_half"
-            android:layout_marginHorizontal="5dp"
+            android:paddingStart="@dimen/padding_half"
             android:textStyle="bold"
             android:textSize="@dimen/item_root_title"
-            android:gravity="center_horizontal"
+            android:gravity="center_vertical|start"
             android:duplicateParentState="true"
-            android:maxLines="2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/card_thumbnail"
+            android:lines="3"
+            app:layout_constraintStart_toEndOf="@+id/card_thumbnail"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:text="Some Root"
+            app:layout_constraintEnd_toEndOf="parent"
+            tools:text="Some\nRoot"
             />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </app.atomofiron.searchboxapp.custom.view.SelectableMaterialCardView>
