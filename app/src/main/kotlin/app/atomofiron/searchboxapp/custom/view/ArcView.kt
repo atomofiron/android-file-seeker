@@ -8,6 +8,7 @@ import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.Gravity
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.withTranslation
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
@@ -15,7 +16,6 @@ import app.atomofiron.searchboxapp.utils.Alpha
 import com.google.android.material.textview.MaterialTextView
 import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.asin
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sign
@@ -26,15 +26,16 @@ class ArcView : MaterialTextView {
         private const val STEP_MAX = 0.01f
     }
 
-    private var progress = 0f
-    private var targetProgress = 0f
-    private val rect = RectF()
-    private val paint = Paint()
-
     private val colorProgress = context.findColorByAttr(MaterialAttr.colorPrimary)
     private val colorTrack = ColorUtils.setAlphaComponent(colorProgress, Alpha.LEVEL_30)
     private val strokeWidth = resources.getDimension(R.dimen.arc_stroke_width)
-    private val strokeMargin = strokeWidth * 2
+
+    private val paint = Paint()
+    private val rect = RectF()
+    private var targetProgress = 0f
+    private var progress = 0f
+    private var arcDegrees = 0f
+    private var startDegrees = 0f
 
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
@@ -47,6 +48,12 @@ class ArcView : MaterialTextView {
         gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
         maxLines = 1
         ellipsize = TextUtils.TruncateAt.END
+        clipToOutline = false
+    }
+
+    override fun setText(text: CharSequence?, type: BufferType?) {
+        super.setText(text, type)
+        updateDegrees()
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
@@ -62,27 +69,33 @@ class ArcView : MaterialTextView {
         dif = max(0f, width - height)
         rect.left += dif + offset
         rect.right -= dif + offset
+
+        updateDegrees()
+    }
+
+    private fun updateDegrees() {
+        val textPaint = super.paint
+        val descent = textPaint.descent()
+        val textWidth = textPaint.measureText(text, 0, text.length)
+        val textTop = baseline + descent - textPaint.textSize
+        val textHeight = height - textTop
+        val holeLength = textWidth + textHeight
+        val diameter = min(width, height) - strokeWidth
+        val circle = PI * diameter
+        val arcLength = circle - holeLength
+        val arc = 2 * PI * arcLength / circle
+        arcDegrees = Math.toDegrees(arc).toFloat()
+        startDegrees = 270 - arcDegrees / 2
     }
 
     override fun onDraw(canvas: Canvas) {
-        super.onDraw(canvas)
-
-        val textPaint = getPaint()
-        val textWidth = textPaint.measureText(text, 0, text.length)
-        val top = baseline + textPaint.descent() - textPaint.textSize
-        val textHeight = baseline - top
-        val radius = (height - strokeWidth) / 2
-        val minArc = PI + 2 * asin((height / 2 - textHeight - strokeMargin) / radius)
-        val arc = max(minArc, PI * 2 - (textWidth + 2 * strokeMargin) / radius)
-        val maxArcDegrees = Math.toDegrees(arc).toFloat()
-        val part = (maxArcDegrees - 180) / 2
-        val start = 180 - part
-        val arcDegrees = maxArcDegrees * progress
-
+        canvas.withTranslation(y = super.paint.descent()) {
+            super.onDraw(canvas)
+        }
         paint.color = colorTrack
-        canvas.drawArc(rect, start, maxArcDegrees, false, paint)
+        canvas.drawArc(rect, startDegrees, arcDegrees, false, paint)
         paint.color = colorProgress
-        canvas.drawArc(rect, start, arcDegrees, false, paint)
+        canvas.drawArc(rect, startDegrees, arcDegrees * progress, false, paint)
         if (progress != targetProgress) {
             var dif = targetProgress - progress
             val sign = dif.sign
