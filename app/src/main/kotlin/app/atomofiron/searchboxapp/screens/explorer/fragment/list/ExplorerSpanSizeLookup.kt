@@ -1,40 +1,66 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list
 
-import android.content.res.Resources
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.RootItemPaddingDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import kotlin.math.max
 
+const val EXPLORER_SPAN_COUNT = 144
+
 class ExplorerSpanSizeLookup(
-    private val resources: Resources,
-    private val layoutManager: GridLayoutManager,
+    private val recyclerView: RecyclerView,
     private val rootsAdapter: RootAdapter,
+    private val marginDecorator: RootItemPaddingDecorator,
 ) : GridLayoutManager.SpanSizeLookup() {
 
-    private val minWidth = resources.getDimensionPixelSize(R.dimen.column_min_width)
-    private val maxWidth = resources.getDimensionPixelSize(R.dimen.column_max_width)
+    private val minWidth = recyclerView.resources.getDimensionPixelSize(R.dimen.column_min_width)
 
     private val rootCount: Int get() = rootsAdapter.itemCount
-    private val spanCount: Int get() = layoutManager.spanCount
+    private val virtualParentPadding = recyclerView.resources.getDimensionPixelSize(R.dimen.padding_common)
 
-    override fun getSpanSize(position: Int): Int = if (position < rootCount) 1 else spanCount
+    private var spanArr = IntArray(0)
 
-    fun updateSpanCount(recyclerView: RecyclerView) {
-        val frameWidth = let {
-            val width = recyclerView.width
-            val layoutWidth = if (width == 0) resources.displayMetrics.widthPixels else width
-            layoutWidth - recyclerView.run { paddingStart + paddingEnd }
+    override fun getSpanSize(position: Int): Int = when {
+        position < rootCount -> spanArr[position]
+        else -> EXPLORER_SPAN_COUNT
+    }
+
+    fun update(availableWidth: Int) {
+        if (rootCount == 0) {
+            return
         }
-        var spanCount = frameWidth / minWidth
-        if (spanCount > rootCount) {
-            val minSpanCount = frameWidth / maxWidth
-            spanCount = max(minSpanCount, rootCount)
+        val frameWidth = availableWidth - recyclerView.run { max(paddingStart, virtualParentPadding) + max(paddingEnd, virtualParentPadding) }
+        val spanWidth = frameWidth / EXPLORER_SPAN_COUNT
+        val column = minWidth / spanWidth //+?
+        val columns = EXPLORER_SPAN_COUNT / column
+        val rowCount = rootCount / columns + if ((rootCount % columns) == 0) 0 else 1
+        var count = rootCount
+        val rows = IntArray(rowCount) {
+            count -= columns
+            if (count < 0) count + columns
+            else columns
         }
-        if (spanCount > 0 && spanCount != this.spanCount) {
-            layoutManager.spanCount = spanCount
-            rootsAdapter.notifyItemRangeChanged(0, rootCount)
+        var free = columns - rows.last() - 1
+        while (free > 0) {
+            var still = free / rows.size.dec()
+            if (still == 0) still = 1
+            for (i in rows.lastIndex.dec()..0) {
+                free -= still
+                rows[rows.lastIndex] += still
+                rows[i] -= still
+                if (free == 0) break else if (free < 0) throw Exception()
+            }
         }
+        spanArr = IntArray(rootCount)
+        var index = 0
+        for (i in rows.indices) {
+            val row = rows[i]
+            for (j in 0..<row) {
+                spanArr[index++] = EXPLORER_SPAN_COUNT / row
+            }
+        }
+        marginDecorator.update(rows)
     }
 }

@@ -11,17 +11,15 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.FrameLayout
 import androidx.recyclerview.widget.ConcatAdapter
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.databinding.ViewExplorerBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerListDelegate
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerSpanSizeLookup
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.SwipeMarkerDelegate
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerListDelegate
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.SwipeMarkerDelegate
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -42,8 +40,6 @@ class ExplorerView(
 
     private val rootAdapter = RootAdapter(output)
     private val explorerAdapter = ExplorerAdapter(output, ::onSeparatorClick)
-    private val layoutManager = GridLayoutManager(context, 1)
-    private val spanSizeLookup = ExplorerSpanSizeLookup(resources, layoutManager, rootAdapter)
     private val swipeMarker = SwipeMarkerDelegate(resources)
 
     private val listDelegate: ExplorerListDelegate = ExplorerListDelegate(
@@ -61,13 +57,11 @@ class ExplorerView(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        spanSizeLookup.updateSpanCount(binding.recyclerView)
+        listDelegate.onMeasure(MeasureSpec.getSize(widthMeasureSpec))
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
     private fun ViewExplorerBinding.init() {
-        layoutManager.spanSizeLookup = spanSizeLookup
-        recyclerView.layoutManager = layoutManager
         val config = ConcatAdapter.Config.Builder()
             .setStableIdMode(ConcatAdapter.Config.StableIdMode.SHARED_STABLE_IDS)
             .build()

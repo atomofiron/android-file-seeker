@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer.fragment.list
 
 import android.view.View
 import android.widget.FrameLayout
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.CoroutineListDiffer
 import app.atomofiron.fileseeker.R
@@ -10,7 +11,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node.Companion.toUniqueId
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBorderDecorator
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.RootItemMarginDecorator
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.RootItemPaddingDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
@@ -29,14 +30,18 @@ class ExplorerListDelegate(
 ) : CoroutineListDiffer.ListListener<Node> {
 
     private val stickyDelegate = ExplorerStickyDelegate(recyclerView, rootAdapter, nodeAdapter, stickyBox, StickyListener())
-    private val rootMarginDecorator = RootItemMarginDecorator(recyclerView.resources)
+    private val rootMarginDecorator = RootItemPaddingDecorator(recyclerView.resources, rootAdapter)
     private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = true)
+    private val layoutManager = GridLayoutManager(recyclerView.context, EXPLORER_SPAN_COUNT)
     private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter, stickyDelegate::getDeepest)
+    private val spanSizeLookup = ExplorerSpanSizeLookup(recyclerView, rootAdapter, rootMarginDecorator)
 
     private var deepestDir: Node? = null
     private val items get() = nodeAdapter.items
 
     init {
+        layoutManager.spanSizeLookup = spanSizeLookup
+        recyclerView.layoutManager = layoutManager
         recyclerView.attachInsetsListener(rootMarginDecorator)
         recyclerView.addItemDecoration(rootMarginDecorator)
         recyclerView.addItemDecoration(backgroundDecorator)
@@ -57,6 +62,8 @@ class ExplorerListDelegate(
     private fun getFirstChild(offset: Int = 0): View? = recyclerView.getChildAt(offset)
 
     private fun getLastChild(offset: Int = 0): View? = recyclerView.getChildAt(recyclerView.childCount.dec() + offset)
+
+    fun onMeasure(availableWidth: Int) = spanSizeLookup.update(availableWidth)
 
     fun isDeepestDirVisible(): Boolean? = deepestDir?.let { isVisible(it) }?.takeIf { !it || deepestDir?.isRoot == false }
 
