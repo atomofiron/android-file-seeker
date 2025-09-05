@@ -23,13 +23,14 @@
         android:supportsRtl="true"
         android:theme="@style/CompatTheme"
         android:requestLegacyExternalStorage="true"
+        android:localeConfig="@xml/locales_config"
         tools:remove="android:appComponentFactory"
-        tools:ignore="AllowBackup,GoogleAppIndexingWarning">
+        tools:ignore="UnusedAttribute"
+        >
         <activity
             android:name="app.atomofiron.searchboxapp.screens.main.MainActivity"
             android:configChanges="orientation|screenLayout|screenSize|keyboard|navigation"
             android:launchMode="singleTask"
-            android:screenOrientation="unspecified"
             android:exported="true"
             android:theme="@style/CompatTheme"
             >
@@ -293,7 +294,6 @@
             android:name="app.atomofiron.searchboxapp.screens.picker.PickerActivity"
             android:configChanges="orientation|screenLayout|screenSize|keyboard|navigation"
             android:launchMode="standard"
-            android:screenOrientation="unspecified"
             android:exported="true"
             android:theme="@style/CompatTheme"
             android:windowSoftInputMode="adjustNothing"
