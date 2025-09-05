@@ -119,9 +119,9 @@
     <string name="root_photos">Photos</string>
     <string name="root_videos">Videos</string>
     <string name="root_camera">Camera</string>
-    <string name="root_downloads">Down&#8203;loads</string>
-    <string name="root_bluetooth" translatable="false">Blue&#8203;tooth</string>
-    <string name="root_screenshots">Screen&#8203;shots</string>
+    <string name="root_downloads">Down&#x00AD;loads</string>
+    <string name="root_bluetooth" translatable="false">Blue&#x00AD;tooth</string>
+    <string name="root_screenshots">Screen&#x00AD;shots</string>
     <string name="internal_storage">Internal storage</string>
     <string name="external_storage">External storage</string>
     <string name="oops_not_working">Oops, not working yet</string>

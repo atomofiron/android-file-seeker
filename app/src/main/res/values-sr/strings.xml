@@ -113,10 +113,10 @@
     <string name="access_to_storage_forbidden">Приступ меморији је забрањен</string>
     <string name="allow">Дозволи</string>
     <string name="confirm">Потврди</string>
-    <string name="root_photos">Фото&#8203;графије</string>
+    <string name="root_photos">Фото&#x00AD;графије</string>
     <string name="root_videos">Видео</string>
     <string name="root_camera">Камера</string>
-    <string name="root_downloads">Преузи&#8203;мања</string>
+    <string name="root_downloads">Преузи&#x00AD;мања</string>
     <string name="root_screenshots">Снимци екрана</string>
     <string name="internal_storage">Интерна меморија</string>
     <string name="external_storage">Екстерна меморија</string>
