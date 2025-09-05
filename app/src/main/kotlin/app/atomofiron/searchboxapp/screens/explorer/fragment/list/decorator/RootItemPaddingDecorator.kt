@@ -13,7 +13,7 @@ import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.InsetsListener
 import kotlin.math.max
 
-class RootItemMarginDecorator(
+class RootItemPaddingDecorator(
     resources: Resources,
     private val adapter: RootAdapter,
 ) : RecyclerView.ItemDecoration(), InsetsListener {
