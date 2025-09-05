@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.RootItemPaddingDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
-import kotlin.math.max
 
 const val EXPLORER_SPAN_COUNT = 144
 
@@ -16,10 +15,7 @@ class ExplorerSpanSizeLookup(
 ) : GridLayoutManager.SpanSizeLookup() {
 
     private val minWidth = recyclerView.resources.getDimensionPixelSize(R.dimen.column_min_width)
-
     private val rootCount: Int get() = rootsAdapter.itemCount
-    private val virtualParentPadding = recyclerView.resources.getDimensionPixelSize(R.dimen.padding_common)
-
     private var spanArr = IntArray(0)
 
     override fun getSpanSize(position: Int): Int = when {
@@ -31,7 +27,7 @@ class ExplorerSpanSizeLookup(
         if (rootCount == 0) {
             return
         }
-        val frameWidth = availableWidth - recyclerView.run { max(paddingStart, virtualParentPadding) + max(paddingEnd, virtualParentPadding) }
+        val frameWidth = availableWidth - recyclerView.run { paddingStart + paddingEnd }
         val spanWidth = frameWidth / EXPLORER_SPAN_COUNT
         val column = minWidth / spanWidth //+?
         val columns = EXPLORER_SPAN_COUNT / column
