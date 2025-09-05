@@ -35,13 +35,12 @@ class ItemBorderDecorator(
     private val items get() = adapter.items
     private val cornerRadius = context.resources.getDimension(R.dimen.explorer_border_corner_radius)
     private val borderWidth = context.resources.getDimension(R.dimen.explorer_border_width)
-    private val listPaddingTop = context.resources.getDimension(R.dimen.padding_half)
     // под открытой не пустой директорией
     private val space = context.resources.getDimension(R.dimen.explorer_item_space)
     // под последним айтемом глубочайшей директории
-    private val doubleSpace = cornerRadius * 2
+    private val doubleSpace = space * 2
     // под открытой пустой директорией
-    private val tripleSpace = cornerRadius * 2.5f
+    private val tripleSpace = space * 2.5f
     // расстояние между низом последнего айтема глубочайшей директории и нижним краем рамки
     private val frameBottomOffset = doubleSpace / 2 + borderWidth / 2
 
@@ -70,6 +69,9 @@ class ItemBorderDecorator(
         val holder = parent.getChildViewHolder(view)
         val item = items[holder.bindingAdapterPosition]
         val next = items.getOrNull(holder.bindingAdapterPosition.inc())
+        if (holder.bindingAdapterPosition == 0) {
+            outRect.top = space.toInt()
+        }
         outRect.bottom = when {
             item.isOpened && item.isEmpty == true -> tripleSpace
             item.isOpened -> space
@@ -98,7 +100,7 @@ class ItemBorderDecorator(
         rect.right = parent.width - parent.paddingRight.toFloat()
 
         var frameRect: RectF? = null
-        val headerBottom = stickyView.measuredHeight + parent.paddingTop - listPaddingTop
+        val headerBottom = stickyView.measuredHeight + parent.paddingTop
         val paddingBottom = parent.paddingBottom.let { if (it < gestureBar) 0 else it }
         val parentBottom = (parent.height - paddingBottom).toFloat()
 
@@ -130,7 +132,7 @@ class ItemBorderDecorator(
                     // или у низа айтема текущей директории
                     if (item.parentPath != prev?.parentPath) {
                         rect.top = child.top - space
-                        rect.top = max(rect.top, headerBottom)
+                        rect.top = max(rect.top, headerBottom.toFloat())
                     }
                     // top: хедер уезжает вместе с низом последнего айтема текущей директории
                     // bottom: указываем на нижнюю границу рамки,

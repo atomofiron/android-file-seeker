@@ -6,7 +6,7 @@
     android:id="@+id/item_explorer_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/padding_half"
+    android:layout_marginTop="@dimen/padding_half"
     app:cardBackgroundColor="?colorSurfaceContainer"
     >
     <androidx.constraintlayout.widget.ConstraintLayout
