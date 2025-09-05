@@ -17,7 +17,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeState
-import app.atomofiron.searchboxapp.model.explorer.Operation
+import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import app.atomofiron.searchboxapp.utils.Const.SLASH
@@ -678,8 +678,8 @@ object ExplorerUtils {
         }
     }
 
-    fun NodeState?.theSame(cachingJob: Job?, operation: Operation): Boolean {
-        val currentOperation = this?.operation ?: Operation.None
+    fun NodeState?.theSame(cachingJob: Job?, operation: NodeOperation): Boolean {
+        val currentOperation = this?.operation ?: NodeOperation.None
         return when {
             this?.cachingJob != cachingJob -> false
             currentOperation != operation -> false

@@ -6,29 +6,19 @@ data class NodeState(
     // fields hidden from view
     val uniqueId: Int,
     val cachingJob: Job? = null,
-    override val operation: Operation = Operation.None,
+    override val operation: NodeOperation = NodeOperation.None,
 ) : INodeState {
-    val withoutState: Boolean = cachingJob == null && operation is Operation.None
+    val withoutState: Boolean = cachingJob == null && operation is NodeOperation.None
 
     val isCaching: Boolean = cachingJob != null
-    val isDeleting: Boolean = operation is Operation.Deleting
-    val isCopying: Boolean = operation is Operation.Copying
-    override val withOperation: Boolean = operation !is Operation.None
+    val isDeleting: Boolean = operation is NodeOperation.Deleting
+    val isCopying: Boolean = operation is NodeOperation.Copying
+    override val withOperation: Boolean = operation !is NodeOperation.None
 
     override fun toString(): String = "NodeState{caching=${cachingJob != null},operation=${operation.javaClass.simpleName}}"
 }
 
-sealed class Operation {
-    data object None : Operation()
-    data object Deleting : Operation()
-    data class Copying(
-        val isSource: Boolean,
-        val asMoving: Boolean = false,
-    ) : Operation()
-    data object Installing : Operation()
-}
-
 interface INodeState {
-    val operation: Operation?
+    val operation: NodeOperation?
     val withOperation: Boolean
 }

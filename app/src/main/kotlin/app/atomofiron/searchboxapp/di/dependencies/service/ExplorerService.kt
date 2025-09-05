@@ -27,7 +27,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeState
 import app.atomofiron.searchboxapp.model.explorer.NodeTab
 import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
-import app.atomofiron.searchboxapp.model.explorer.Operation
+import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.UNSELECTED_ROOT_ID
 import app.atomofiron.searchboxapp.model.explorer.isMedia
 import app.atomofiron.searchboxapp.model.explorer.isMovie
@@ -455,10 +455,10 @@ class ExplorerService(
     suspend fun tryCopy(key: NodeTabKey, from: Node, to: Node, asMoving: Boolean) {
         renderTab(key) {
             states.updateState(from.uniqueId) {
-                nextState(from.uniqueId, copying = Operation.Copying(isSource = true, asMoving = asMoving))
+                nextState(from.uniqueId, copying = NodeOperation.Copying(isSource = true, asMoving = asMoving))
             }.let { if (it?.isCopying != true) return }
             states.updateState(to.uniqueId) {
-                nextState(to.uniqueId, copying = Operation.Copying(isSource = false))
+                nextState(to.uniqueId, copying = NodeOperation.Copying(isSource = false))
             }
             val parent = tree.find(to.parentPath)
             parent?.children?.run {
@@ -495,7 +495,7 @@ class ExplorerService(
         }
     }
 
-    suspend fun tryMarkInstalling(tab: NodeTabKey?, ref: NodeRef, installing: Operation.Installing?): Boolean? {
+    suspend fun tryMarkInstalling(tab: NodeTabKey?, ref: NodeRef, installing: NodeOperation.Installing?): Boolean? {
         return withGarden {
             var state = states.find { it.uniqueId == ref.uniqueId }
             if (state?.operation == installing) return false
@@ -557,7 +557,7 @@ class ExplorerService(
                     } else {
                         this?.cachingJob?.cancel()
                         checked.tryUpdateCheck(item.uniqueId, makeChecked = false)
-                        nextState(item.uniqueId, cachingJob = null, deleting = Operation.Deleting)
+                        nextState(item.uniqueId, cachingJob = null, deleting = NodeOperation.Deleting)
                     }
                 }
                 tree.findNode(item.uniqueId)
@@ -842,22 +842,22 @@ class ExplorerService(
     private fun NodeState?.nextState(
         uniqueId: Int,
         cachingJob: Job? = this?.cachingJob,
-        deleting: Operation.Deleting? = this?.operation as? Operation.Deleting,
-        copying: Operation.Copying? = this?.operation as? Operation.Copying,
-        installing: Operation.Installing? = this?.operation as? Operation.Installing,
+        deleting: NodeOperation.Deleting? = this?.operation as? NodeOperation.Deleting,
+        copying: NodeOperation.Copying? = this?.operation as? NodeOperation.Copying,
+        installing: NodeOperation.Installing? = this?.operation as? NodeOperation.Installing,
     ): NodeState? {
-        val nextOperation = when (this?.operation ?: Operation.None) {
-            is Operation.None -> deleting ?: copying ?: installing
-            is Operation.Deleting -> deleting ?: copying
-            is Operation.Copying -> copying ?: deleting
-            is Operation.Installing -> installing ?: deleting
-        } ?: Operation.None
+        val nextOperation = when (this?.operation ?: NodeOperation.None) {
+            is NodeOperation.None -> deleting ?: copying ?: installing
+            is NodeOperation.Deleting -> deleting ?: copying
+            is NodeOperation.Copying -> copying ?: deleting
+            is NodeOperation.Installing -> installing ?: deleting
+        } ?: NodeOperation.None
         val nextJob = when (cachingJob) {
             null -> null
             else -> this?.cachingJob ?: cachingJob
         }
         return when {
-            nextJob == null && nextOperation is Operation.None -> null
+            nextJob == null && nextOperation is NodeOperation.None -> null
             theSame(nextJob, nextOperation) -> return this
             else -> NodeState(uniqueId, nextJob, nextOperation)
         }

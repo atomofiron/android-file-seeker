@@ -8,7 +8,7 @@ import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
-import app.atomofiron.searchboxapp.model.explorer.Operation
+import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.utils.Rslt
 import kotlinx.coroutines.CoroutineScope
@@ -30,7 +30,7 @@ class ApkInteractor(
     fun install(content: AndroidApp, tab: NodeTabKey? = null) {
         scope.launch(Dispatchers.IO) {
             if (tab != null) {
-                val allowed = explorerService.tryMarkInstalling(tab, content.ref, Operation.Installing)
+                val allowed = explorerService.tryMarkInstalling(tab, content.ref, NodeOperation.Installing)
                 if (allowed != true) return@launch
                 explorerService.tryMarkInstalling(tab, content.ref, installing = null)
             }
