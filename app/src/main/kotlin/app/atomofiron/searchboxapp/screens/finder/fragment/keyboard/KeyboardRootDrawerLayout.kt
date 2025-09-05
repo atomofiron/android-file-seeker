@@ -81,7 +81,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private var keyboardMax = resources.displayMetrics.heightPixels / 2
     private var barrierBottom = 0
         set(value) {
-            debugRequire(value <= keyboardMax)
+            debugRequire(value <= keyboardMax) { "barrierBottom($value) <= keyboardMax($keyboardMax)" }
             field = value
         }
     private var focusedView: View? = null

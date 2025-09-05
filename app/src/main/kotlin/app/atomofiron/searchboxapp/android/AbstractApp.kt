@@ -1,12 +1,14 @@
 package app.atomofiron.searchboxapp.android
 
 import android.app.Application
+import app.atomofiron.common.util.extension.debugContext
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.model.AppSource
 import com.google.android.material.color.DynamicColors
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 abstract class AbstractApp : Application() {
@@ -22,6 +24,8 @@ abstract class AbstractApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        debugContext = WeakReference(this)
 
         DynamicColors.applyToActivitiesIfAvailable(this)
 

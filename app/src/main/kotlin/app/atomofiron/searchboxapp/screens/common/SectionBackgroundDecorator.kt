@@ -11,7 +11,7 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.util.extension.debugRequire
+import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import kotlin.math.max
@@ -42,8 +42,8 @@ class SectionBackgroundDecorator(
         val adapter = parent.adapter as? ListAdapter<*,*> ?: return
         val reversed = parent.layoutManager?.isLayoutReversed ?: return
         val holder = parent.findContainingViewHolder(view) ?: return
-        debugRequire(holder.bindingAdapterPosition >= 0)
         if (holder.bindingAdapterPosition < 0) {
+            debugFail { holder.bindingAdapterPosition }
             return
         }
         val item = adapter.currentList[holder.bindingAdapterPosition]

@@ -21,6 +21,7 @@ import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.debugRequireNotNull
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.HybridTextLayoutDrawable
+import app.atomofiron.searchboxapp.simpleName
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputLayout.BOX_BACKGROUND_FILLED
@@ -137,7 +138,7 @@ private fun TextInputLayout.showErrorIf(message: String?) {
     if (error != null) getChildAt(1)
         ?.let { indicatorArea -> indicatorArea as? LinearLayout }
         ?.updatePaddingRelative(end = 0)
-        .debugRequireNotNull()
+        .also { debugRequireNotNull(it) { "getChildAt(1) == null" } }
 }
 
 private class FilledDelegate(
@@ -157,7 +158,7 @@ private class FilledDelegate(
     }
 
     fun makeBackgroundFilled(background: Drawable?): Drawable? {
-        debugRequire(background is MaterialShapeDrawable)
+        debugRequire(background is MaterialShapeDrawable) { background.simpleName }
         background as MaterialShapeDrawable
         if (filledColor != Color.TRANSPARENT) background.fillColor = ColorStateList.valueOf(filledColor)
         background.strokeColor = ColorStateList.valueOf(Color.TRANSPARENT)

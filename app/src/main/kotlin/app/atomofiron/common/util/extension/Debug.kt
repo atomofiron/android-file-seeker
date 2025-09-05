@@ -1,20 +1,28 @@
 package app.atomofiron.common.util.extension
 
+import android.content.Context
+import android.widget.Toast
 import app.atomofiron.fileseeker.BuildConfig
+import app.atomofiron.searchboxapp.simpleName
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.lang.ref.WeakReference
 
-inline fun debugRequire(predicate: () -> Boolean) {
-    if (BuildConfig.DEBUG_BUILD) debugRequire(predicate())
-}
+var debugContext = WeakReference<Context>(null)
 
-fun debugRequire(value: Boolean)  {
-    if (BuildConfig.DEBUG_BUILD) require(value)
-}
+inline fun Any.debugFail(lazyMessage: () -> Any) = debugRequire(false, lazyMessage)
 
-inline fun debugRequire(value: Boolean, lazyMessage: () -> Any)  {
-    if (BuildConfig.DEBUG_BUILD) require(value, lazyMessage)
-}
+inline fun Any.debugRequireNotNull(any: Any?, lazyMessage: () -> Any) = debugRequire(any != null, lazyMessage)
 
-fun Any?.debugRequireNotNull(lazyMessage: (() -> Any)? = null) = when (lazyMessage) {
-    null -> debugRequire(this != null)
-    else -> debugRequire(this != null, lazyMessage)
+inline fun Any.debugRequire(value: Boolean, lazyMessage: () -> Any)  {
+    if (BuildConfig.DEBUG_BUILD) require(value) {
+        val message = "$simpleName: ${lazyMessage()}"
+        debugContext.get()?.let {
+            GlobalScope.launch(Dispatchers.Main) {
+                Toast.makeText(it, message, Toast.LENGTH_LONG).show()
+            }
+        }
+        message
+    }
 }
