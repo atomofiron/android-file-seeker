@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="?colorBackground"
     >
-    <app.atomofiron.searchboxapp.screens.explorer.fragment.SwipeMarkerLayout
+    <app.atomofiron.searchboxapp.screens.explorer.fragment.list.SwipeMarkerLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:maxWidth="@dimen/card_max_width"
@@ -17,7 +17,7 @@
             android:layout_height="match_parent"
             android:paddingBottom="@dimen/dock_notch_inset"
             />
-    </app.atomofiron.searchboxapp.screens.explorer.fragment.SwipeMarkerLayout>
+    </app.atomofiron.searchboxapp.screens.explorer.fragment.list.SwipeMarkerLayout>
     <app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
         android:id="@+id/system_ui_background"
         android:layout_width="match_parent"

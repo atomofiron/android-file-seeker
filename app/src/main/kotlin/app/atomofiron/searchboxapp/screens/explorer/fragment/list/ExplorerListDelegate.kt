@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.explorer.fragment
+package app.atomofiron.searchboxapp.screens.explorer.fragment.list
 
 import android.view.View
 import android.widget.FrameLayout
@@ -8,7 +8,6 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.Node.Companion.toUniqueId
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.*
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBorderDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.RootItemMarginDecorator

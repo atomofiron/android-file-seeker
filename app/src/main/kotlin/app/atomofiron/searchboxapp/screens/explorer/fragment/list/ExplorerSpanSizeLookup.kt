@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.explorer.fragment
+package app.atomofiron.searchboxapp.screens.explorer.fragment.list
 
 import android.content.res.Resources
 import androidx.recyclerview.widget.GridLayoutManager

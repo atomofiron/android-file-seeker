@@ -17,9 +17,9 @@ import app.atomofiron.fileseeker.databinding.ViewExplorerBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerListDelegate
-import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerSpanSizeLookup
-import app.atomofiron.searchboxapp.screens.explorer.fragment.SwipeMarkerDelegate
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerListDelegate
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerSpanSizeLookup
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.SwipeMarkerDelegate
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
