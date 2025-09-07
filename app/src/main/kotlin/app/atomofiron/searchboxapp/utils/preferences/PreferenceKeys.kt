@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.utils.preferences
 
 import android.view.Gravity
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
+import app.atomofiron.searchboxapp.model.preference.AppLocale
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
@@ -26,6 +27,7 @@ object PreferenceKeys {
     val KeySearchOptions = PreferenceKey("pref_search_options", SearchOptions.DEFAULT)
     val KeySpecialCharacters = PreferenceKey("pref_special_characters", Const.DEFAULT_SPECIAL_CHARACTERS)
     val KeyAppOrientation = PreferenceKey("pref_app_orientation", AppOrientation.UNDEFINED.ordinal.toString())
+    val KeyLocale = PreferenceKey("pref_locale", AppLocale.System.ordinal.toString())
     val KeyAppTheme = PreferenceKey("pref_app_theme", AppTheme.defaultName())
     val KeyDeepBlack = PreferenceKey("pref_deep_black", false)
     // todo pack KeyMaxSize and KeyMaxDepth with other in one

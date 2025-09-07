@@ -6,6 +6,7 @@ import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Lifecycle
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.dialog.DialogConfig
@@ -27,7 +28,9 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.UpdateNotification
+import app.atomofiron.searchboxapp.model.preference.AppLocale
 import app.atomofiron.searchboxapp.model.preference.AppTheme
+import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.main.MainRouter
 import app.atomofiron.searchboxapp.utils.launch
@@ -71,6 +74,7 @@ class AppEventDelegate(
         appStoreConsumer.onActivityCreate(activity)
         appStoreConsumer.onResourcesChange(activity.resources)
         updateService.onActivityCreate(activity)
+        if (Android.T) updateLocalePreference()
     }
 
     override fun onIntent(intent: Intent) {
@@ -141,7 +145,7 @@ class AppEventDelegate(
             negative = DialogDelegate.Cancel,
             positive = UniText(R.string.launch),
             onPositiveClick = {
-                if (!context.launch(packageName.toString())) {
+                if (!context.launch(packageName)) {
                     dialogs.showError()
                 }
             },
@@ -154,5 +158,13 @@ class AppEventDelegate(
                 collector.emit(it)
             }
         }
+    }
+
+    private fun updateLocalePreference() {
+        val appLocale = AppCompatDelegate.getApplicationLocales().get(0)
+            .also { poop("it ${it?.toLanguageTag()}") }
+            ?.let { AppLocale[it.toLanguageTag()] }
+            ?: AppLocale.System
+        preferences { setAppLocale(appLocale) }
     }
 }

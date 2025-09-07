@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.android
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -23,6 +24,10 @@ object Intents {
     //val telegramLink get() = Intent(Intent.ACTION_VIEW, Uri.parse(Const.TELEGRAM_LINK))
     val github = Intent(Intent.ACTION_VIEW, Const.GITHUB_URL.toUri())
     val forPda = Intent(Intent.ACTION_VIEW, Const.FORPDA_URL.toUri())
+    @SuppressLint("InlinedApi")
+    val locales = Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
+        data = Uri.fromParts(Const.SCHEME_PACKAGE, BuildConfig.PACKAGE_NAME, null)
+    }
 
     fun mainActivity(context: Context, action: String? = null) = Intent(context, MainActivity::class.java).setAction(action)
 

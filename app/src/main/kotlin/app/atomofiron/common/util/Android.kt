@@ -30,6 +30,7 @@ object Android {
     val V = SDK_INT >= Sdk.VANILLA_ICE_CREAM // 35
 
     object Below {
+        val Q = !Android.Q
         val R = !Android.R
         val T = !Android.T
     }

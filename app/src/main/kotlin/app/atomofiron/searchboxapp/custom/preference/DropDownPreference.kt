@@ -13,6 +13,8 @@ class DropDownPreference(
     attrs: AttributeSet? = null,
 ) : DropDownPreference(context, attrs) {
 
+    private var interceptClicks = false
+
     init {
         layoutResource = androidx.preference.R.layout.preference_material
         widgetLayoutResource = R.layout.widget_spinner
@@ -22,4 +24,12 @@ class DropDownPreference(
     override fun createAdapter(): ArrayAdapter<*> = ArrayAdapter<Any?>(context, R.layout.item_drop_down)
 
     override fun setSummary(summary: CharSequence?) = super.setSummary(null)
+
+    override fun onClick() {
+        if (!interceptClicks) super.onClick()
+    }
+
+    fun interceptClicks() {
+        interceptClicks = true
+    }
 }

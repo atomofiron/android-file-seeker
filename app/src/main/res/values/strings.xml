@@ -68,6 +68,8 @@
     <string name="share_file">Share file</string>
     <string name="share_files">Share files</string>
     <string name="pref_orientation">Screen orientation</string>
+    <string name="pref_locale">Locale</string>
+    <string name="by_system">System</string>
     <string name="pref_theme">App theme</string>
     <string name="pref_deep_black">Deep black</string>
     <string name="pref_haptic_feedback">Haptic feedback</string>

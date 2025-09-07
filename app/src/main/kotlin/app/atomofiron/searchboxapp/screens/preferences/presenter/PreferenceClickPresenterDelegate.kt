@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.preferences.presenter
 
 import app.atomofiron.common.arch.Recipient
+import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
@@ -51,6 +52,10 @@ class PreferenceClickPresenterDelegate(
     override fun onExplorerItemClick() = router.showCurtain(recipient, R.layout.curtain_preference_explorer_item)
 
     override fun onJoystickClick() = router.showCurtain(recipient, R.layout.curtain_preference_joystick)
+
+    override fun onLocaleClick() {
+        if (Android.T) router.showLocaleSettings()
+    }
 
     override fun onUseSuChanged(value: Boolean): Boolean {
         val output = Shell.checkSu()

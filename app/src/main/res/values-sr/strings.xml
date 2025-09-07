@@ -65,6 +65,8 @@
     <string name="share_file">Подели датотеку</string>
     <string name="share_files">Подели датотеке</string>
     <string name="pref_orientation">Оријентација екрана</string>
+    <string name="pref_locale">Jезик</string>
+    <string name="by_system">Системски</string>
     <string name="pref_theme">Тема апликације</string>
     <string name="pref_deep_black">Дубока црна</string>
     <string name="pref_haptic_feedback">Тактилни одзив</string>

@@ -12,4 +12,6 @@ class PreferenceRouter(fragmentProperty: WeakProperty<out Fragment>) : BaseRoute
     fun goToGithub() = context { startActivity(Intents.github) }
 
     fun goToForPda() = context { startActivity(Intents.forPda) }
+
+    fun showLocaleSettings() = activity { startActivity(Intents.locales) }
 }

@@ -16,6 +16,7 @@ import androidx.preference.forEach
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
+import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.collect
@@ -24,6 +25,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentPreferenceBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.addLayoutListener
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
+import app.atomofiron.searchboxapp.custom.preference.DropDownPreference
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -82,6 +84,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         debugGroup.isVisible = viewState.withDebugGroup
 
         joystickPreference = findPreference(PreferenceKeys.KeyJoystick.name)!!
+        if (Android.T) findPreference<DropDownPreference>(PreferenceKeys.KeyLocale.name)!!.interceptClicks()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {

@@ -19,6 +19,7 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyDrawerGra
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyExplorerItem
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyHapticFeedback
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyJoystick
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyLocale
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxDepth
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxSize
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyOpenedDirPath
@@ -161,6 +162,14 @@ class PreferenceStore(
 
     suspend fun setAppOrientation(value: AppOrientation) {
         edit { it[KeyAppOrientation] = value.ordinal.toString() }
+    }
+
+    val appLocale = getFlow(KeyLocale) {
+        AppLocale.entries[it.toInt()]
+    }
+
+    suspend fun setAppLocale(value: AppLocale) {
+        edit { it[KeyLocale] = value.ordinal.toString() }
     }
 
     val explorerItemComposition = getFlow(KeyExplorerItem) {

@@ -65,6 +65,8 @@
     <string name="share_file">Поделиться файлом</string>
     <string name="share_files">Поделиться файлами</string>
     <string name="pref_orientation">Ориентация экрана</string>
+    <string name="pref_locale">Язык</string>
+    <string name="by_system">Системный</string>
     <string name="pref_theme">Тема оформления</string>
     <string name="pref_deep_black">Глубокий чёрный</string>
     <string name="pref_haptic_feedback">Тактильный отклик</string>

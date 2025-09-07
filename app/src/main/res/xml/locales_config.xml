@@ -1,6 +1,6 @@
 <locale-config xmlns:android="http://schemas.android.com/apk/res/android">
     <locale android:name="en-US"/>
-    <locale android:name="ru"/>
-    <locale android:name="sr"/>
-    <locale android:name="sr-Latn"/>
+    <locale android:name="ru-RU"/>
+    <locale android:name="sr-Cyrl-RS"/>
+    <locale android:name="sr-Latn-RS"/>
 </locale-config>

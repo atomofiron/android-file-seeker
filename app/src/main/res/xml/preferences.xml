@@ -39,6 +39,13 @@
             app:key="pref_haptic_feedback"
             app:defaultValue="true"
             />
+        <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
+            app:title="@string/pref_locale"
+            app:key="pref_locale"
+            app:entries="@array/locale_label"
+            app:entryValues="@array/locale_value"
+            app:icon="@drawable/ic_translate"
+            />
         <Preference
             app:title="@string/pref_explorer_item"
             app:key="pref_explorer_item"

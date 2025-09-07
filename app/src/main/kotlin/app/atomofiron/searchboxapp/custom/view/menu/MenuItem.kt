@@ -17,5 +17,5 @@ data class MenuItem(
         @DrawableRes icon: Int,
         forwardable: Boolean = false,
         longLabel: UniText? = null,
-    ) : this(id, title, MenuItemContent(icon, R.drawable.ic_forward.takeIf { forwardable }), longLabel = longLabel)
+    ) : this(id, title, MenuItemContent(icon, R.drawable.ic_forward_12.takeIf { forwardable }), longLabel = longLabel)
 }
