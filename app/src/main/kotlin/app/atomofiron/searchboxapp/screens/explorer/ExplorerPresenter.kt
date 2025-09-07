@@ -37,7 +37,7 @@ class ExplorerPresenter(
 
     init {
         mainChannel.maximized.collect(scope) {
-            interactor.updateRoots(currentTab)
+            interactor.updateRoots()
         }
     }
 
@@ -54,7 +54,6 @@ class ExplorerPresenter(
 
     fun onTabSelected(index: Int) {
         viewState.currentTab.value = viewState.tabs[index]
-        interactor.updateRoots(currentTab)
         interactor.updateCurrentTab(currentTab)
     }
 

@@ -8,6 +8,8 @@ import androidx.preference.PreferenceDataStore
 import androidx.work.WorkManager
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.di.dependencies.delegate.StorageDelegate
+import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
 import dagger.Module
@@ -57,4 +59,11 @@ open class CommonModule {
     ): PreferenceDataStore {
         return LegacyPreferenceDataStore(preferences, appScope, watcher)
     }
+
+    @Provides
+    @Singleton
+    open fun provideStorageDelegate(
+        context: Context,
+        store: ExplorerStore,
+    ): StorageDelegate = StorageDelegate(context, store)
 }

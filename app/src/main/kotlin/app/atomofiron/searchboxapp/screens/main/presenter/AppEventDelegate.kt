@@ -30,7 +30,6 @@ import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.UpdateNotification
 import app.atomofiron.searchboxapp.model.preference.AppLocale
 import app.atomofiron.searchboxapp.model.preference.AppTheme
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.main.MainRouter
 import app.atomofiron.searchboxapp.utils.launch
@@ -162,7 +161,6 @@ class AppEventDelegate(
 
     private fun updateLocalePreference() {
         val appLocale = AppCompatDelegate.getApplicationLocales().get(0)
-            .also { poop("it ${it?.toLanguageTag()}") }
             ?.let { AppLocale[it.toLanguageTag()] }
             ?: AppLocale.System
         preferences { setAppLocale(appLocale) }

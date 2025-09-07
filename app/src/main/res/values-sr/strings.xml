@@ -122,6 +122,8 @@
     <string name="root_screenshots">Снимци екрана</string>
     <string name="internal_storage">Интерна меморија</string>
     <string name="external_storage">Екстерна меморија</string>
+    <string name="sdcard">SD картица</string>
+    <string name="usb_storage">USB мемориjа</string>
     <string name="oops_not_working">Упс, још не ради</string>
     <string name="user_interface">Интерфејс</string>
     <string name="pref_explorer_item">Датотека / Директоријум</string>
@@ -194,4 +196,6 @@
     <string name="heavy">Тежак</string>
     <string name="yaroslav_nesterov">Jарослав Нестеров</string>
     <string name="dmitrii_pavlov">Дмитриj Павлов</string>
+    <string name="file_access_expired">Приступ фајлу је истекао</string>
+    <string name="file_not_found">Фајл није пронађен</string>
 </resources>

@@ -122,6 +122,8 @@
     <string name="root_screenshots">Снимки экрана</string>
     <string name="internal_storage">Внутрен&#x00AD;няя память</string>
     <string name="external_storage">Внешняя память</string>
+    <string name="sdcard">SD карта</string>
+    <string name="usb_storage">USB накопи&#x00AD;тель</string>
     <string name="oops_not_working">Упс, пока не работает</string>
     <string name="user_interface">Интерфейс</string>
     <string name="pref_explorer_item">Файл / Директория</string>
@@ -194,4 +196,6 @@
     <string name="heavy">Тяжёлый</string>
     <string name="yaroslav_nesterov">Ярослав Нестеров</string>
     <string name="dmitrii_pavlov">Дмитрий Павлов</string>
+    <string name="file_access_expired">Доступ к файлу истёк</string>
+    <string name="file_not_found">Файл не найден</string>
 </resources>

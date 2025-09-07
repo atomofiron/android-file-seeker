@@ -53,12 +53,15 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
 fun VariantDimension.buildConfig(debug: Boolean) {
     val packageId = if (debug) AppConfig.packageIdDebug else AppConfig.packageId
     val fileProvider = if (debug) AppConfig.fileProviderDebug else AppConfig.fileProvider
+    val externalProvider = if (debug) AppConfig.externalProviderDebug else AppConfig.externalProvider
     buildConfigField("boolean", "DEBUG_BUILD", debug.toString())
     buildConfigField("String", "PACKAGE_NAME", "\"$packageId\"")
     buildConfigField("String", "VERSION_NAME", "\"${AppConfig.versionName}\"")
     buildConfigField("String", "AUTHORITY", "\"$fileProvider\"")
+    buildConfigField("String", "EXTERNAL_AUTHORITY", "\"$externalProvider\"")
     manifestPlaceholders["PACKAGE_NAME"] = packageId
     manifestPlaceholders["PROVIDER"] = fileProvider
+    manifestPlaceholders["EXTERNAL_PROVIDER"] = externalProvider
 }
 
 fun VariantDimension.leakWatcher(value: String? = null) {

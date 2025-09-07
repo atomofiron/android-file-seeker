@@ -126,6 +126,8 @@
     <string name="root_screenshots">Screen&#x00AD;shots</string>
     <string name="internal_storage">Internal storage</string>
     <string name="external_storage">External storage</string>
+    <string name="sdcard">SDCard</string>
+    <string name="usb_storage">USB Storage</string>
     <string name="oops_not_working">Oops, not working yet</string>
     <string name="user_interface">Interface</string>
     <string name="pref_explorer_item">File / Directory</string>
@@ -206,4 +208,6 @@
     <string name="ui" translatable="false">UI</string>
     <string name="yaroslav_nesterov">Yaroslav Nesterov</string>
     <string name="dmitrii_pavlov">Dmitrii Pavlov</string>
+    <string name="file_access_expired">File access expired</string>
+    <string name="file_not_found">File not found</string>
 </resources>

@@ -7,9 +7,11 @@ object AppConfig {
 
     const val packageId = "app.atomofiron.searchboxapp"
     const val fileProvider = "$packageId.FileProvider"
+    const val externalProvider = "$packageId.ExternalProvider"
 
     const val packageIdDebug = "$packageId.debug"
     const val fileProviderDebug = "$packageIdDebug.FileProvider"
+    const val externalProviderDebug = "$packageIdDebug.ExternalProvider"
 
     const val minSdk = 24
     const val targetSdk = 35

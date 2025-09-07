@@ -55,13 +55,13 @@ class ExplorerInteractor(
 ) {
     private val context = Dispatchers.IO
 
-    fun getFlow(tab: NodeTabKey) = service.getOrCreateFlow(tab)
+    fun getFlow(key: NodeTabKey) = service.getFlow(key)
 
     fun copyToClipboard(item: Node) = utils.copyToClipboard(item)
 
-    fun toggleRoot(tab: NodeTabKey, item: NodeRoot) {
+    fun toggleRoot(key: NodeTabKey, item: NodeRoot) {
         scope.launch(context) {
-            service.tryToggleRoot(tab, item)
+            service.tryToggleRoot(key, item)
         }
     }
 
@@ -71,63 +71,63 @@ class ExplorerInteractor(
         }
     }
 
-    fun toggleDir(tab: NodeTabKey, dir: Node) {
+    fun toggleDir(key: NodeTabKey, dir: Node) {
         scope.launch(context) {
-            service.tryToggle(tab, dir)
+            service.tryToggle(key, dir)
         }
     }
 
-    fun updateItems(tab: NodeTabKey, items: List<Node>) {
+    fun updateItems(key: NodeTabKey, items: List<Node>) {
         scope.launch(context) {
             items.forEach {
                 launch {
-                    service.tryCache(tab, it)
+                    service.tryCache(key, it)
                 }
             }
         }
     }
 
-    fun updateRoots(tab: NodeTabKey) {
+    fun updateRoots() {
         scope.launch(context) {
-            service.updateRootsAsync(tab)
+            service.updateRootsAsync(store.storage.value)
         }
     }
 
-    fun updateCurrentTab(tab: NodeTabKey) {
+    fun updateCurrentTab(key: NodeTabKey) {
         scope.launch(Dispatchers.Default) {
-            store.setCurrentTab(tab)
+            store.setCurrentTab(key)
         }
     }
 
-    fun deleteItems(tab: NodeTabKey, items: List<Node>) {
+    fun deleteItems(key: NodeTabKey, items: List<Node>) {
         scope.launch(context) {
-            service.tryDelete(tab, items)
+            service.tryDelete(key, items)
         }
     }
 
-    fun rename(tab: NodeTabKey, item: Node, name: String) {
+    fun rename(key: NodeTabKey, item: Node, name: String) {
         scope.launch(context) {
-            service.tryRename(tab, item, name)
+            service.tryRename(key, item, name)
         }
     }
 
-    fun create(tab: NodeTabKey, dir: Node, name: String, directory: Boolean) {
+    fun create(key: NodeTabKey, dir: Node, name: String, directory: Boolean) {
         scope.launch(context) {
-            service.tryCreate(tab, dir, name, directory)
+            service.tryCreate(key, dir, name, directory)
         }
     }
 
-    fun clone(tab: NodeTabKey, target: Node, name: String) {
+    fun clone(key: NodeTabKey, target: Node, name: String) {
         scope.launch(context) {
             var to = target.move(name = name)
             if (to.isDirectory) to = to.copy(children = null)
-            service.tryCopy(tab, target, to, asMoving = false)
+            service.tryCopy(key, target, to, asMoving = false)
         }
     }
 
-    fun resetChecked(tab: NodeTabKey) {
+    fun resetChecked(key: NodeTabKey) {
         scope.launch(context) {
-            service.resetChecked(tab)
+            service.resetChecked(key)
         }
     }
 }

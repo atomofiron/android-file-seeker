@@ -7,12 +7,12 @@ import android.content.pm.PackageManager
 import android.content.res.AssetManager
 import app.atomofiron.searchboxapp.android.AbstractApp
 import app.atomofiron.searchboxapp.android.InstallReceiver
+import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.module.ChannelModule
 import app.atomofiron.searchboxapp.di.module.CommonModule
 import app.atomofiron.searchboxapp.di.module.InteractorModule
 import app.atomofiron.searchboxapp.di.module.ServiceModule
 import app.atomofiron.searchboxapp.di.module.StoreModule
-import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.curtain.CurtainDependencies
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerDependencies

@@ -33,7 +33,7 @@
             android:id="@+id/card_arc"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_margin="@dimen/padding_half"
+            android:layout_margin="6dp"
             android:textSize="12sp"
             android:textColor="?colorPrimary"
             android:textStyle="bold"

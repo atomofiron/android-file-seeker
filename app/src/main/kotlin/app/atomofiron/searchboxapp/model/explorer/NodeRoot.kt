@@ -19,7 +19,7 @@ data class NodeRoot(
             : this(type, Node.asRoot(pathVariants.first(), type), sorting, pathVariants = pathVariants.takeIf { it.size > 1 })
 
     val stableId: Int = type.stableId
-    val isEnabled: Boolean get() = item.isCached || type is NodeRootType.InternalStorage
+    val isEnabled: Boolean get() = item.isCached || type is NodeRootType.Storage
     val withPreview: Boolean = when (type) {
         is NodeRootType.Photos,
         is NodeRootType.Videos,
@@ -32,8 +32,11 @@ data class NodeRoot(
         require(item.children?.isOpened != false)
     }
 
-    sealed class NodeRootType(val editable: Boolean = false) {
-        val stableId: Int = Objects.hash(this::class)
+    sealed class NodeRootType(
+        open val editable: Boolean = false,
+        val removable: Boolean = false,
+    ) {
+        open val stableId: Int = Objects.hash(this::class)
 
         data object Photos : NodeRootType()
         data object Videos : NodeRootType()
@@ -41,10 +44,15 @@ data class NodeRoot(
         data object Screenshots : NodeRootType()
         data object Downloads : NodeRootType(editable = true)
         data object Bluetooth : NodeRootType(editable = true)
-        data class InternalStorage(
-            val used: Long = 0,
-            val free: Long = 0,
-        ) : NodeRootType(editable = true)
+        data class Storage(
+            val info: NodeStorage,
+            override val editable: Boolean = true,
+        ) : NodeRootType(editable, info.kind.removable) {
+            override val stableId: Int = info.path.hashCode()
+            val kind = info.kind
+            val total = info.total
+            val used = info.used
+        }
         data object Favorite : NodeRootType()
     }
 

@@ -329,6 +329,12 @@
                 android:resource="@xml/provider_paths"
                 />
         </provider>
+        <provider
+            android:name="app.atomofiron.searchboxapp.android.ExternalFileProvider"
+            android:authorities="${EXTERNAL_PROVIDER}"
+            android:exported="false"
+            android:grantUriPermissions="true"
+            />
         <receiver
             android:name="app.atomofiron.searchboxapp.android.InstallReceiver"
             android:exported="false"

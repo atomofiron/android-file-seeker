@@ -6,15 +6,13 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.webkit.MimeTypeMap
-import androidx.core.content.FileProvider
 import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.extension.unit
-import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.getUriForFile
 import java.io.File
-
 
 class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingDelegate, FilePickingDelegate {
 
@@ -47,8 +45,10 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
         val files = ArrayList<Uri>()
         for (item in items) {
             val file = File(item.path)
-            val uri = FileProvider.getUriForFile(context, BuildConfig.AUTHORITY, file)
-            files.add(uri)
+            files.add(context.getUriForFile(file))
+        }
+        if (files.isEmpty()) {
+            return
         }
         intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -58,7 +58,7 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
 
     private fun Context.startForFile(action: String, item: Node) {
         val file = File(item.path)
-        val contentUri = FileProvider.getUriForFile(this, BuildConfig.AUTHORITY, file)
+        val contentUri = getUriForFile(file)
         val type = item.content.mimeType ?: let {
             val ext = MimeTypeMap.getFileExtensionFromUrl(file.name)
             MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext)
@@ -73,7 +73,7 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
 
     override fun shareSinglePicked(item: Node) = activity?.run {
         val file = File(item.path)
-        val uri = FileProvider.getUriForFile(this, BuildConfig.AUTHORITY, file)
+        val uri = getUriForFile(file)
         val data = Intent().apply {
             setDataAndType(uri, contentResolver.getType(uri))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -84,7 +84,10 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
 
     override fun shareMultiplePicked(items: List<Node>) = activity?.run {
         val uris = items.map {
-            FileProvider.getUriForFile(this, BuildConfig.AUTHORITY, File(it.path))
+            getUriForFile(File(it.path))
+        }
+        if (uris.isEmpty()) {
+            return@run
         }
         val clip = ClipData.newUri(contentResolver, Const.SELECTED, uris.first())
         for (i in 1..<uris.size) {

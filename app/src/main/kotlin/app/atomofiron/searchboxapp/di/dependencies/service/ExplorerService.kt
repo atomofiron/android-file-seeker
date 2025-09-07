@@ -1,11 +1,9 @@
 package app.atomofiron.searchboxapp.di.dependencies.service
 
 import android.content.Context
-import android.os.Environment
-import android.os.StatFs
 import app.atomofiron.common.util.MutableList
-import app.atomofiron.common.util.Unreachable
 import app.atomofiron.common.util.dropLast
+import app.atomofiron.common.util.extension.replace
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.debugDelay
@@ -19,26 +17,26 @@ import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeGarden
+import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeState
+import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import app.atomofiron.searchboxapp.model.explorer.NodeTab
 import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
-import app.atomofiron.searchboxapp.model.explorer.NodeOperation
-import app.atomofiron.searchboxapp.model.explorer.UNSELECTED_ROOT_ID
 import app.atomofiron.searchboxapp.model.explorer.isMedia
 import app.atomofiron.searchboxapp.model.explorer.isMovie
 import app.atomofiron.searchboxapp.model.explorer.isPicture
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
+import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.close
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.completePath
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.open
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
@@ -60,7 +58,6 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import kotlin.math.min
@@ -78,26 +75,25 @@ class ExplorerService(
     private val store: ExplorerStore,
     private val preferenceStore: PreferenceStore,
 ) {
-
     private val previewSize = context.resources.getDimensionPixelSize(R.dimen.preview_size)
     private var delayedRender: Job? = null
 
     private var config = CacheConfig(useSu = false)
-    private val internalStoragePath = Environment
-        .getExternalStorageDirectory()
-        .absolutePath
-        .completePath(directory = true)
-
-    private val garden = NodeGarden()
+    private val garden = NodeGarden(store.firstTab, store.middleTab, store.lastTab)
 
     init {
         val useSuDefined = Job()
         val toyboxDefined = Job()
         appScope.launch(Dispatchers.IO) {
-            withGarden {
+            garden {
                 useSuDefined.join()
                 toyboxDefined.join()
                 context.resolveToybox(preferenceStore.toyboxVariant.value)
+                initRoots()
+                get(store.currentTabKey.value).render()
+            }
+            store.storage.collect {
+                updateRootsAsync(it)
             }
         }
         val thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size)
@@ -112,7 +108,6 @@ class ExplorerService(
         store.currentNode.collect(appScope) {
             preferenceStore.setOpenedDirPath(it?.path)
         }
-        store.setStorageRoot(Node.asRoot(internalStoragePath, NodeRootType.InternalStorage()))
     }
 
     private fun Context.resolveToybox(embedded: ToyboxVariant) {
@@ -121,58 +116,38 @@ class ExplorerService(
         preferenceStore { setEmbeddedToybox(variant) }
     }
 
-    fun getOrCreateFlow(key: NodeTabKey): SharedFlow<NodeTabItems> = getOrCreateFlowSync(key)
+    fun getFlow(key: NodeTabKey): SharedFlow<NodeTabItems> = garden.getFlow(key)
 
-    private fun getOrCreateFlowSync(key: NodeTabKey): MutableSharedFlow<NodeTabItems> {
-        return garden.run {
-            trees[key]?.run { return flow }
-            val tree = NodeTab(key, states)
-            tree.initRoots()
-            trees[key] = tree
-            appScope.launch {
-                withGarden(key) { tab ->
-                    tab.updateRootsAsync()
-                }
-            }
-            tree.flow
-        }
-    }
-
-    suspend fun dropTab(key: NodeTabKey) {
-        withGarden {
-            trees.remove(key)
-        }
-    }
-
-    private fun NodeTab.initRoots() {
-        val storagePath = internalStoragePath
+    private fun NodeGarden.initRoots() {
+        val storage = store.internalStorage.value
+        val storagePath = storage.path
         val roots = listOf(
             NodeRoot(NodeRootType.Photos, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_CAMERA"),
             NodeRoot(NodeRootType.Videos, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_CAMERA"),
             NodeRoot(NodeRootType.Screenshots, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_PIC_SCREENSHOTS", "${storagePath}$SUB_PATH_DCIM_SCREENSHOTS"),
             NodeRoot(NodeRootType.Bluetooth, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_BLUETOOTH", "${storagePath}$SUB_PATH_DOWNLOAD_BLUETOOTH"),
             NodeRoot(NodeRootType.Downloads, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_DOWNLOAD"),
-            NodeRoot(NodeRootType.InternalStorage(), NodeSorting.Name, storagePath),
         )
-        this.roots.clear()
         this.roots.addAll(roots)
     }
 
     private suspend fun tryUnselectRoot(key: NodeTabKey, item: Node) {
-        val root = garden[key]?.getSelectedRoot()?.takeIf { it.item.uniqueId == item.uniqueId }
+        val root = garden {
+            getSelectedRoot(key)?.takeIf { it.item.uniqueId == item.uniqueId }
+        }
         root ?: return
         tryToggleRoot(key, root)
     }
 
     suspend fun tryToggleRoot(key: NodeTabKey, root: NodeRoot) {
-        renderTab(key) {
-            roots.takeIf { selectedRootId != UNSELECTED_ROOT_ID }
+        garden(key) {
+            roots.takeIf { hasSelectedRoot() }
                 ?.indexOfFirst { it.stableId == selectedRootId }
                 ?.takeIf { it >= 0 }
                 ?.let { roots[it] = roots[it].copy(item = tree.first()) }
-            selectedRootId = when (root.stableId) {
-                selectedRootId -> UNSELECTED_ROOT_ID
-                else -> root.stableId
+            when {
+                selected(root) -> deselectRoot()
+                else -> select(root)
             }
         }
         tryCache(key, root.item)
@@ -216,23 +191,25 @@ class ExplorerService(
         tryCache(key, it)
     }
 
-    suspend fun updateRootsAsync(key: NodeTabKey) {
-        withGarden(key) { tab ->
-            updateInternalStorageStats(tab)
+    suspend fun updateRootsAsync(volumes: List<NodeStorage>) {
+        garden {
+            volumes.forEach { updateStats(it) }
+            removeMissed(volumes)
+            val key = store.currentTabKey.value
+            val tab = get(key)
+            if (roots.none { it.stableId == tab.selectedRootId }) {
+                tab.deselectRoot()
+            }
             tab.render()
-            tab.updateRootsAsync()
-        }
-    }
-
-    private fun NodeTab.updateRootsAsync() {
-        roots.forEach { root ->
-            updateRootAsync(key, root)
+            roots.forEach { root ->
+                updateRootAsync(key, root)
+            }
         }
     }
 
     private fun updateRootAsync(key: NodeTabKey, root: NodeRoot) {
         appScope.launch {
-            withGarden {
+            garden(key) {
                 withCachingState(root.stableId) {
                     var updated = root.item.update(config)
                     updated = when (updated.error) {
@@ -263,18 +240,18 @@ class ExplorerService(
         }
     }
 
-    private fun NodeGarden.updateInternalStorageStats(targetTab: NodeTab) {
-        var root = targetTab.roots
-            .find { it.type is NodeRootType.InternalStorage }
-            ?: return Unreachable
-        val statFs = StatFs(root.item.path)
-        val freeBytes = statFs.freeBytes
-        val totalBytes = statFs.totalBytes
-        val type = (root.type as NodeRootType.InternalStorage).copy(used = totalBytes - freeBytes, free = freeBytes)
-        trees.values.forEach { tab ->
-            root = tab.roots.find { it.type is NodeRootType.InternalStorage }!!
-            root = root.copy(type = type)
-            tab.roots.replace(root) { it.stableId == root.stableId }
+    private fun NodeGarden.updateStats(storage: NodeStorage) {
+        val index = roots.indexOfFirst { it.type is NodeRootType.Storage && it.type.kind == storage.kind && it.item.path == storage.path }
+        var root = roots.getOrNull(index)
+        var type = root?.type ?: NodeRootType.Storage(storage)
+        type = (type as NodeRootType.Storage).copy(storage)
+        root = root ?: NodeRoot(type, Node.asRoot(storage.path, type), NodeSorting.Name)
+        roots.replace(root) { it.stableId == root.stableId }
+    }
+
+    private fun NodeGarden.removeMissed(storage: List<NodeStorage>) {
+        roots.removeAll { root ->
+            root.type.removable && storage.none { it.path == root.item.path }
         }
     }
 
@@ -316,68 +293,43 @@ class ExplorerService(
     private suspend fun updateRootSync(updated: Node, key: NodeTabKey, targetRoot: NodeRoot) {
         filterMediaRootChildren(updated, targetRoot.type)
         val updatedRoot = updateRootThumbnail(updated, targetRoot)
-        withGarden(key) { currentTab ->
+        garden(key) {
             states.updateState(updatedRoot.stableId) {
                 nextState(updatedRoot.stableId, cachingJob = null)
             }
-            trees.values.forEach { tab ->
-                tab.roots.replace { root ->
-                    when (root.stableId) {
-                        targetRoot.stableId -> {
-                            if (tab.selected(root) && !updatedRoot.item.isCached) {
-                                tab.tree.clear()
-                            }
-                            val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sorting)
-                            if (tab.key == key) updatedRoot.copy(item = updatedItem, type = root.type) else root.copy(
-                                type = root.type,
-                                thumbnail = updatedRoot.thumbnail,
-                                thumbnailPath = updatedRoot.thumbnailPath,
-                                item = updatedItem,
-                            )
-                        }
-                        else -> root
-                    }.also { updated ->
-                        if (!tab.selected(updated)) return@also
-                        val treeRoot = tab.tree.firstOrNull()
-                        treeRoot ?: return@also
-                        tab.tree[0] = updated.item
+            roots.replace { root ->
+                when (root.stableId) {
+                    targetRoot.stableId -> {
+                        val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sorting)
+                        if (this.key == key) updatedRoot.copy(item = updatedItem, type = root.type) else root.copy(
+                            type = root.type,
+                            thumbnail = updatedRoot.thumbnail,
+                            thumbnailPath = updatedRoot.thumbnailPath,
+                            item = updatedItem,
+                        )
                     }
+                    else -> root
+                }.also { updated ->
+                    if (!selected(updated)) return@also
+                    val treeRoot = tree.firstOrNull()
+                    treeRoot ?: return@also
+                    tree[0] = updated.item
                 }
             }
-            currentTab.render()
-            trees.values.forEach { otherTab ->
+            render()
+            /*tabs.values.forEach { otherTab ->
                 if (otherTab.key != key) otherTab.render()
-            }
-        }
-    }
-
-    private inline fun <T> MutableList<T>.replace(new: T?, action: (T) -> Boolean) {
-        replace {
-            if (action(it)) new else it
-        }
-    }
-
-    private inline fun <T> MutableList<T>.replace(action: (T) -> T?) {
-        val iterator = listIterator()
-        while (iterator.hasNext()) {
-            val next = iterator.next()
-            val new = action(next)
-            when {
-                new === next -> Unit
-                new == null -> iterator.remove()
-                else -> iterator.set(new)
-            }
+            }*/
         }
     }
 
     suspend fun tryCache(key: NodeTabKey, item: Node) {
-        withGarden(key) { tab ->
-            tab.roots
-                .takeIf { item.isRoot }
+        garden(key) {
+            roots.takeIf { item.isRoot }
                 ?.find { it.item.uniqueId == item.uniqueId }
                 ?.let { return updateRootAsync(key, it) }
 
-            val current = tab.tree
+            val current = tree
                 .findNode(item.uniqueId)
                 ?: return
 
@@ -388,19 +340,19 @@ class ExplorerService(
         }
     }
 
-    private fun NodeGarden.resolveDirChildren(key: NodeTabKey, it: Node) {
+    private fun NodeTab.resolveDirChildren(it: Node) {
         val children = it.children?.fetch() ?: return
         withCachingState(it.uniqueId) {
             val done = it.copy(children = children)
                 .resolveDirChildren(config.useSu)
-            withTab(key) {
+            garden {
                 states.updateState(it.uniqueId) {
                     nextState(it.uniqueId, cachingJob = null)
                 }
                 if (!done) {
                     return@withCachingState
                 }
-                val item = tree.findNode(it.uniqueId) ?: return@withTab
+                val item = tree.findNode(it.uniqueId) ?: return@garden
                 val items = item.children?.items ?: return@withCachingState
                 items.forEachIndexed { index, current ->
                     val resolved = children.find { child -> child.uniqueId == current.uniqueId }
@@ -417,7 +369,7 @@ class ExplorerService(
     }
 
     suspend fun tryRename(key: NodeTabKey, it: Node, name: String) {
-        val item = withTab(key) {
+        val item = garden(key) {
             tree.findNode(it.uniqueId)
         }
         item ?: return
@@ -486,7 +438,7 @@ class ExplorerService(
     }
 
     suspend fun tryCheckItem(key: NodeTabKey, item: Node, isChecked: Boolean) {
-        withTab(key) {
+        garden(key) {
             val (_, state) = states.findState(item.uniqueId)
             if (state?.withOperation == true) return
             if (!checked.tryUpdateCheck(item.uniqueId, isChecked)) return
@@ -495,15 +447,16 @@ class ExplorerService(
         }
     }
 
-    suspend fun tryMarkInstalling(tab: NodeTabKey?, ref: NodeRef, installing: NodeOperation.Installing?): Boolean? {
-        return withGarden {
+    suspend fun tryMarkInstalling(key: NodeTabKey?, ref: NodeRef, installing: NodeOperation.Installing?): Boolean? {
+        return garden {
             var state = states.find { it.uniqueId == ref.uniqueId }
             if (state?.operation == installing) return false
             state = states.updateState(ref.uniqueId) {
                 nextState(ref.uniqueId, installing = installing)
             }
+            // todo replace with emitUpdate
             (state?.operation == installing).also {
-                if (it) tab?.let { get(tab)?.render() }
+                if (it) key?.let { get(key).render() }
             }
         }
     }
@@ -549,7 +502,7 @@ class ExplorerService(
         var mediaRootAffected: NodeRoot? = null
         val items = mutableListOf<Node>()
         renderTab(key) {
-            mediaRootAffected = roots.find { it.isSelected() && it.withPreview }
+            mediaRootAffected = roots.find { selected(it) && it.withPreview }
             its.mapNotNull { item ->
                 val state = states.updateState(item.uniqueId) {
                     if (this?.isDeleting == true) {
@@ -568,18 +521,18 @@ class ExplorerService(
             appScope.launch {
                 debugDelay(1)
                 val result = item.delete(config.useSu)
-                withGarden(key) { tab ->
-                    tab.tree.replaceItem(item.uniqueId, item.parentPath, result)
+                garden(key) {
+                    tree.replaceItem(item.uniqueId, item.parentPath, result)
                     states.updateState(item.uniqueId) { null }
                     store.emitRemoved(item.copy(children = null))
-                    tab.lazyRender()
+                    lazyRender()
                 }
             }
         }
         jobs.forEach { it.join() }
         store.emitDeleted(items)
         mediaRootAffected?.let { mediaRoot ->
-            withGarden {
+            garden {
                 updateRootAsync(key, mediaRoot)
             }
         }
@@ -591,40 +544,20 @@ class ExplorerService(
         }
     }
 
-    private suspend inline fun <R> withGarden(block: NodeGarden.() -> R): R = garden.withGarden(block)
-
-    private suspend inline fun withGarden(key: NodeTabKey, block: NodeGarden.(NodeTab) -> Unit) {
-        withGarden {
-            get(key)?.let { block(it) }
-        }
-    }
-
-    private suspend inline fun <R> withTab(key: NodeTabKey, block: NodeTab.() -> R): R? {
-        return withGarden {
-            get(key)?.block()
-        }
-    }
-
-    private suspend fun renderTab(key: NodeTabKey) {
-        withGarden {
-            val tab = get(key) ?: return
-            tab.render()
-        }
-    }
-
     private suspend inline fun renderTab(key: NodeTabKey, block: NodeTab.() -> Unit) {
-        withGarden {
-            val tab = get(key) ?: return
-            tab.block()
-            tab.render()
+        garden(key) {
+            block()
+            render()
         }
     }
 
     private fun NodeTab.lazyRender() {
         delayedRender = delayedRender ?: appScope.launch {
-            delay(128)
+            delay(Const.SMALL_DELAY)
             delayedRender = null
-            renderTab(key)
+            garden(key) {
+                render()
+            }
         }
     }
 
@@ -751,13 +684,13 @@ class ExplorerService(
             .let { store.emitUpdate(it) }
     }
 
-    private suspend fun renderChecked(tab: NodeTabKey, new: Node, isChecked: Boolean) {
+    private fun renderChecked(key: NodeTabKey, new: Node, isChecked: Boolean) {
         store.checked.value.mutate {
             when {
                 isChecked -> add(new.copy(isChecked = true))
                 else -> removeOneIf { it.uniqueId == new.uniqueId }
             }
-            store.emitChecked(tab, this)
+            store.emitChecked(key, this)
         }
     }
 
@@ -775,7 +708,7 @@ class ExplorerService(
 
     private fun Node.defineDirKind(levelIndex: Int = 0): Node = when {
         levelIndex != 0 -> this
-        parentPath != internalStoragePath -> this
+        parentPath != store.internalStorage.value.path -> this
         content !is NodeContent.Directory -> this
         else -> ExplorerUtils.getDirectoryType(name)
             .takeIf { it != DirectoryKind.Ordinary }
@@ -784,7 +717,7 @@ class ExplorerService(
     }
 
     /** @return already existing caching job */
-    private fun NodeGarden.withCachingState(id: Int, caching: suspend CoroutineScope.() -> Unit): Job? {
+    private fun NodeTab.withCachingState(id: Int, caching: suspend CoroutineScope.() -> Unit): Job? {
         var state = states.find { it.uniqueId == id }
         if (state != null) return state.cachingJob
         val job = appScope.launch(start = CoroutineStart.LAZY, block = caching)
@@ -798,7 +731,7 @@ class ExplorerService(
 
     private suspend fun cacheSync(key: NodeTabKey, item: Node) {
         var updated = item.update(config).sortByName()
-        withTab(key) {
+        garden(key) {
             states.updateState(item.uniqueId) {
                 nextState(item.uniqueId, cachingJob = null)
             }
@@ -813,7 +746,7 @@ class ExplorerService(
             val replaced = tree.replaceItem(updated)
             when {
                 !replaced -> return
-                updated.isDirectory -> garden.resolveDirChildren(key, updated)
+                updated.isDirectory -> resolveDirChildren(updated)
             }
             if (!updated.areContentsTheSame(item)) {
                 renderUpdate(updated)
@@ -827,7 +760,7 @@ class ExplorerService(
             if (size == item.size) {
                 return@launch
             }
-            withTab(key) {
+            garden(key) {
                 val current = tree.findNode(item.uniqueId)
                 current ?: return@launch
                 val updated = current.copy(properties = item.properties.copy(size = size))

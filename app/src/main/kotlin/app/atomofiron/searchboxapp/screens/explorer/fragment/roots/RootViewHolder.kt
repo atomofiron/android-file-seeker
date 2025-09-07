@@ -8,13 +8,13 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerCardBinding
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
+import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.convert
 import app.atomofiron.searchboxapp.utils.getColorByAttr
@@ -32,7 +32,11 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
             is NodeRootType.Screenshots -> resources.getString(R.string.root_screenshots)
             is NodeRootType.Downloads -> resources.getString(R.string.root_downloads)
             is NodeRootType.Bluetooth -> resources.getString(R.string.root_bluetooth)
-            is NodeRootType.InternalStorage -> resources.getString(R.string.internal_storage)
+            is NodeRootType.Storage -> when (kind) {
+                NodeStorage.Kind.InternalStorage -> resources.getString(R.string.internal_storage)
+                NodeStorage.Kind.SdCard -> resources.getString(R.string.sdcard)
+                NodeStorage.Kind.UsbStorage -> info.alias ?: info.name ?: resources.getString(R.string.usb_storage)
+            }
             is NodeRootType.Favorite -> null
         }
     }
@@ -54,7 +58,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     }
 
     override fun onBind(item: NodeRoot, position: Int) = binding.run {
-        val withArc = item.type is NodeRootType.InternalStorage
+        val withArc = item.type is NodeRootType.Storage
         cardArc.isVisible = withArc
         root.isSelected = item.isSelected
         root.isEnabled = item.isEnabled
@@ -74,8 +78,8 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     }
 
     private fun NodeRoot.bindType() {
-        if (type is NodeRootType.InternalStorage) {
-            binding.cardArc.set(type.used, type.used + type.free)
+        if (type is NodeRootType.Storage) {
+            binding.cardArc.set(progress = type.used, max = type.total)
             binding.cardArc.text = type.used.convert(suffixes, lossless = false, separator = "\u2009")
         }
     }
@@ -88,14 +92,18 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
             is NodeRootType.Downloads -> R.drawable.ic_thumbnail_download
             is NodeRootType.Bluetooth -> R.drawable.ic_thumbnail_bluetooth
             is NodeRootType.Screenshots -> R.drawable.ic_thumbnail_screenshot
-            is NodeRootType.InternalStorage -> R.drawable.ic_thumbnail_memory
+            is NodeRootType.Storage -> when (type.kind) {
+                NodeStorage.Kind.InternalStorage -> R.drawable.ic_thumbnail_memory
+                NodeStorage.Kind.SdCard -> R.drawable.ic_thumbnail_micro_sd
+                NodeStorage.Kind.UsbStorage -> R.drawable.ic_thumbnail_usb_flash
+            }
             is NodeRootType.Favorite -> R.drawable.ic_thumbnail_favorite
         }
         return ContextCompat.getDrawable(context, resId) as Drawable
     }
 
     private fun NodeRoot.getThumbnailBackground(): Drawable? = when (type) {
-        is NodeRootType.InternalStorage -> null
+        is NodeRootType.Storage -> null
         is NodeRootType.Favorite,
         is NodeRootType.Photos,
         is NodeRootType.Videos,

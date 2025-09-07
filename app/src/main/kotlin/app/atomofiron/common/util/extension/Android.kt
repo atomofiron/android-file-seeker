@@ -9,6 +9,7 @@ import android.widget.Toast
 import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.other.ApkSignature
+import app.atomofiron.searchboxapp.utils.Const
 import java.security.MessageDigest
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
@@ -46,7 +47,7 @@ fun PackageInfo.signature(): ApkSignature? {
         val cert = factory.generateCertificate(signature.toByteArray().inputStream()) as X509Certificate
         val digest = MessageDigest.getInstance(HASH_ALG)
         val hashBytes = digest.digest(bytes)
-        val hash = hashBytes.joinToString("") { "%02x".format(it) }
+        val hash = hashBytes.joinToString("") { Const.HEX_BYTE.format(it) }
         object : ApkSignature {
             override val algName = cert.sigAlgName
             override val algOID = cert.sigAlgOID

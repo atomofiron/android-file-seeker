@@ -5,6 +5,7 @@ import app.atomofiron.common.util.extension.debugContext
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.di.dependencies.delegate.StorageDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.model.AppSource
 import com.google.android.material.color.DynamicColors
@@ -15,6 +16,8 @@ abstract class AbstractApp : Application() {
 
     @Inject
     lateinit var initialDelegate: InitialDelegate
+    @Inject
+    lateinit var storageDelegate: StorageDelegate
 
     @Inject
     lateinit var updateService: AppUpdateService

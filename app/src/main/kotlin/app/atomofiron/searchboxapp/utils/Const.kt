@@ -37,4 +37,5 @@ object Const {
     const val TEXT_FILE_PAGINATION_STEP_OFFSET = 16
 
     const val PLACEHOLDER = "{}"
+    const val HEX_BYTE = "%02x"
 }
