@@ -37,6 +37,6 @@
         android:layout_marginStart="@dimen/padding_mini"
         android:layout_marginEnd="@dimen/padding_half"
         android:tint="?attr/colorContent"
-        tools:src="@drawable/ic_forward"
+        tools:src="@drawable/ic_forward_12"
         />
 </LinearLayout>
