@@ -40,14 +40,13 @@ class ExplorerSpanSizeLookup(
         }
         var free = columns - rows.last() - 1
         while (free > 0) {
-            var still = free / rows.size.dec()
-            if (still == 0) still = 1
-            for (i in rows.lastIndex.dec()..0) {
-                free -= still
-                rows[rows.lastIndex] += still
-                rows[i] -= still
-                if (free == 0) break else if (free < 0) throw Exception()
+            for (i in rows.lastIndex.dec() downTo 0) {
+                free -= 1
+                rows[rows.lastIndex] += 1
+                rows[i] -= 1
+                if (free == 0) break
             }
+            free -= 1
         }
         spanArr = IntArray(rootCount)
         var index = 0
