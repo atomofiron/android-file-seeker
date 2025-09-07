@@ -5,6 +5,7 @@ import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.extension.debugRequire
+import app.atomofiron.common.util.extension.resizeWith
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -21,7 +22,7 @@ class RootItemPaddingDecorator(
     private val outerPadding = resources.getDimensionPixelSize(R.dimen.padding_common)
     private val innerPadding = resources.getDimensionPixelSize(R.dimen.padding_half)
     private var rows = IntArray(0)
-    private var paddings = IntArray(2)
+    private var paddings = mutableListOf<Int>()
     private var leftPadding = 0
     private var rightPadding = 0
 
@@ -60,15 +61,17 @@ class RootItemPaddingDecorator(
         if (left != leftPadding || right != rightPadding) {
             leftPadding = left
             rightPadding = right
-            paddings = intArrayOf(left, right)
+            paddings.resizeWith(2, 0)
+            paddings[0] = leftPadding
+            paddings[1] = rightPadding
         }
     }
 
-    private fun getPaddings(cellCount: Int): IntArray {
+    private fun getPaddings(cellCount: Int): List<Int> {
         if (cellCount == paddings.size / 2) {
             return paddings
         }
-        paddings = IntArray(cellCount * 2)
+        paddings.resizeWith(cellCount * 2, 0)
         paddings[0] = leftPadding
         val spanCount = paddings.size / 2
         val sum = leftPadding + rightPadding + innerPadding * spanCount.dec()

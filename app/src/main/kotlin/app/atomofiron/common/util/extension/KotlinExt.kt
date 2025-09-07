@@ -58,9 +58,13 @@ fun <T> MutableList<T>.clear(from: Int, to: Int = size) {
     if (fromIndex <= toIndex) subList(fromIndex, toIndex).clear()
 }
 
-fun Int.rangePlus(over: Int): IntRange = this..<(this + over)
-
-fun IntRange.relative(absolute: Int) = absolute - first
+fun <T> MutableList<T>.resizeWith(size: Int, with: T) {
+    when {
+        this.size < size -> repeat(size - this.size) { add(with) }
+        this.size > size -> subList(size, this.size).clear()
+    }
+    fill(with)
+}
 
 inline fun <T> List<T>.indexOfFirst(fromIndex: Int, orElse: Int = -1, predicate: (T) -> Boolean): Int {
     if (fromIndex in indices) {
