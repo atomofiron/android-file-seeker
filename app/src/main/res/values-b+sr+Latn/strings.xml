@@ -195,29 +195,4 @@
     <string name="yaroslav_nesterov">Jaroslav Nesterov</string>
     <string name="dmitrii_pavlov">Dmitrij Pavlov</string>
 
-    <plurals name="x_dirs">
-        <item quantity="one">%d direktorijum</item>
-        <item quantity="few">%d direktorijuma</item>
-        <item quantity="other">%d direktorijuma</item>
-    </plurals>
-    <plurals name="x_files">
-        <item quantity="one">%d datoteka</item>
-        <item quantity="few">%d datoteke</item>
-        <item quantity="other">%d datoteka</item>
-    </plurals>
-    <plurals name="x_deleted">
-        <item quantity="one">%s je obrisan(a)</item>
-        <item quantity="few">%s su obrisana</item>
-        <item quantity="other">%s su obrisana</item>
-    </plurals>
-    <plurals name="receiving_files">
-        <item quantity="one">Primanje %d datoteke…</item>
-        <item quantity="few">Primanje %d datoteke…</item>
-        <item quantity="other">Primanje %d datoteka…</item>
-    </plurals>
-    <plurals name="files_received">
-        <item quantity="one">Primljena %d od %d datoteka</item>
-        <item quantity="few">Primljene %d od %d datoteke</item>
-        <item quantity="other">Primljeno %d od %d datoteka</item>
-    </plurals>
 </resources>
