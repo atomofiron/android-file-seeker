@@ -132,15 +132,15 @@ class ExplorerService(
     }
 
     private suspend fun tryUnselectRoot(key: NodeTabKey, item: Node) {
-        val root = garden {
-            getSelectedRoot(key)?.takeIf { it.item.uniqueId == item.uniqueId }
-        }
-        root ?: return
-        tryToggleRoot(key, root)
+        garden[key].getSelectedRoot()
+            ?.takeIf { it.item.uniqueId == item.uniqueId }
+            ?.let { tryToggleRoot(key, it) }
     }
 
     suspend fun tryToggleRoot(key: NodeTabKey, root: NodeRoot) {
         garden(key) {
+            val root = roots.find { it.stableId == root.stableId }
+            root ?: return
             roots.takeIf { hasSelectedRoot() }
                 ?.indexOfFirst { it.stableId == selectedRootId }
                 ?.takeIf { it >= 0 }
@@ -149,6 +149,7 @@ class ExplorerService(
                 selected(root) -> deselectRoot()
                 else -> select(root)
             }
+            render()
         }
         tryCache(key, root.item)
     }
@@ -564,6 +565,7 @@ class ExplorerService(
     private suspend fun NodeTab.render() {
         delayedRender?.cancel()
         delayedRender = null
+        val start = System.currentTimeMillis()
         states.replace {
             // todo NullPointerException
             if (it.withoutState) null else it
@@ -582,6 +584,7 @@ class ExplorerService(
         store.emitChecked(key, checked)
         store.setCurrentItems(key, items)
 
+        val end = System.currentTimeMillis()
         require(this.roots.all { !it.isSelected })
     }
 

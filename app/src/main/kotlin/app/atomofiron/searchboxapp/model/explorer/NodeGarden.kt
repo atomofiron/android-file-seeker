@@ -17,8 +17,6 @@ class NodeGarden(vararg keys: NodeTabKey) {
 
     fun getFlow(key: NodeTabKey): StateFlow<NodeTabItems> = tabs[key]!!.flow
 
-    fun getSelectedRoot(key: NodeTabKey): NodeRoot? = tabs[key]?.getSelected(roots)
-
     suspend inline operator fun <R> invoke(action: NodeGarden.() -> R): R {
         return mutex.withLock { action() }
     }

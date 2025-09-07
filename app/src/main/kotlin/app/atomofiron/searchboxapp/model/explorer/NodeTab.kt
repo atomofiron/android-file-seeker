@@ -17,7 +17,7 @@ class NodeTab(
 
     fun NodeRoot.isSelected(): Boolean = stableId == selectedRootId
 
-    fun getSelected(roots: List<NodeRoot>): NodeRoot? = roots.find { it.isSelected() }
+    fun getSelectedRoot(): NodeRoot? = roots.find { it.isSelected() }
 
     fun selected(root: NodeRoot): Boolean = root.isSelected()
 
