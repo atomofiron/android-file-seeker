@@ -130,7 +130,7 @@
     <string name="usb_storage">USB Storage</string>
     <string name="oops_not_working">Oops, not working yet</string>
     <string name="user_interface">Interface</string>
-    <string name="pref_explorer_item">File / Directory</string>
+    <string name="pref_explorer_item">Files and folders view</string>
     <string name="pref_joystick">ESC button settings</string>
     <string name="use_as">Use as…</string>
     <string name="create">Create</string>

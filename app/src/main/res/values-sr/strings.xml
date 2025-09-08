@@ -126,7 +126,7 @@
     <string name="usb_storage">USB мемориjа</string>
     <string name="oops_not_working">Упс, још не ради</string>
     <string name="user_interface">Интерфејс</string>
-    <string name="pref_explorer_item">Датотека / Директоријум</string>
+    <string name="pref_explorer_item">Приказ фајлова и фасцикли</string>
     <string name="pref_joystick">Подешавања ESC дугмета</string>
     <string name="use_as">Користи као…</string>
     <string name="create">Направи</string>

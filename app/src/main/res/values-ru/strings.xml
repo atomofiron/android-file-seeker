@@ -126,7 +126,7 @@
     <string name="usb_storage">USB накопи&#x00AD;тель</string>
     <string name="oops_not_working">Упс, пока не работает</string>
     <string name="user_interface">Интерфейс</string>
-    <string name="pref_explorer_item">Файл / Директория</string>
+    <string name="pref_explorer_item">Вид файлов и папок</string>
     <string name="pref_joystick">Настройки кнопки ESC</string>
     <string name="use_as">Использовать как…</string>
     <string name="create">Создать</string>
