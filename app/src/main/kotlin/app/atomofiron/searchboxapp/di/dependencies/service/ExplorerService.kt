@@ -79,6 +79,7 @@ class ExplorerService(
 
     private var config = CacheConfig(useSu = false)
     private val garden = NodeGarden(store.firstTab, store.middleTab, store.lastTab)
+    private val internalStoragePath = store.internalStorage.value.path
 
     init {
         val useSuDefined = Job()
@@ -118,14 +119,12 @@ class ExplorerService(
     fun getFlow(key: NodeTabKey): SharedFlow<NodeTabItems> = garden.getFlow(key)
 
     private fun NodeGarden.initRoots() {
-        val storage = store.internalStorage.value
-        val storagePath = storage.path
         val roots = listOf(
-            NodeRoot(NodeRootType.Photos, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_CAMERA"),
-            NodeRoot(NodeRootType.Videos, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_CAMERA"),
-            NodeRoot(NodeRootType.Screenshots, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_PIC_SCREENSHOTS", "${storagePath}$SUB_PATH_DCIM_SCREENSHOTS"),
-            NodeRoot(NodeRootType.Bluetooth, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_BLUETOOTH", "${storagePath}$SUB_PATH_DOWNLOAD_BLUETOOTH"),
-            NodeRoot(NodeRootType.Downloads, NodeSorting.Date.Reversed, "${storagePath}$SUB_PATH_DOWNLOAD"),
+            NodeRoot(NodeRootType.Photos, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_CAMERA"),
+            NodeRoot(NodeRootType.Videos, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_CAMERA"),
+            NodeRoot(NodeRootType.Screenshots, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_PIC_SCREENSHOTS", "${internalStoragePath}$SUB_PATH_DCIM_SCREENSHOTS"),
+            NodeRoot(NodeRootType.Bluetooth, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_BLUETOOTH", "${internalStoragePath}$SUB_PATH_DOWNLOAD_BLUETOOTH"),
+            NodeRoot(NodeRootType.Downloads, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_DOWNLOAD"),
         )
         this.roots.addAll(roots)
     }
@@ -613,11 +612,10 @@ class ExplorerService(
         tree.firstOrNull()
             .let { it ?: root.item }
             .let { updateStateFor(it).defineDirKind() }
-            .run { copy(isDeepest = tree.size == 1, children = children?.fetch(isOpened = true)) }
+            .run { copy(isDeepest = tree.size == 1, children = children?.fetch(isOpened = tree.isNotEmpty())) }
             .also { items.add(it) }
-        if (tree.isEmpty()) {
-            return items
-        }
+            .takeIf { !it.isOpened }
+            ?.let { return items }
         val openedIndexes = mutableListOf<Int>()
         var parent = items.first()
         for (i in tree.indices) {
@@ -687,9 +685,10 @@ class ExplorerService(
         return item.copy(isChecked = isChecked, state = state ?: item.state, children = children)
     }
 
-    private fun Node.defineDirKind(levelIndex: Int = 0): Node = when {
-        levelIndex != 0 -> this
-        parentPath != store.internalStorage.value.path -> this
+    private fun Node.defineDirKind(levelIndex: Int = -1): Node = when {
+        levelIndex > 0 -> this
+        !path.startsWith(internalStoragePath) -> this
+        internalStoragePath.length != (path.length.dec() - name.length) -> this
         content !is NodeContent.Directory -> this
         else -> ExplorerUtils.getDirectoryType(name)
             .takeIf { it != DirectoryKind.Ordinary }
