@@ -67,9 +67,5 @@ data class Node(
         else -> other.children.areChildrenContentsTheSame(children)
     }
 
-    fun withPath(path: String) = copy(path = path, uniqueId = -uniqueId)
-
-    fun getOpenedIndex(orElse: Int = -1): Int = children?.indexOfFirst { it.isOpened }
-        ?.takeIf { it >= 0 }
-        ?: orElse
+    fun getOpenedIndex(): Int = children?.indexOfFirst { it.isOpened } ?: -1
 }

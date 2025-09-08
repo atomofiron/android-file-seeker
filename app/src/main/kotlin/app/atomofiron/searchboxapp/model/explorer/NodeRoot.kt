@@ -29,7 +29,7 @@ data class NodeRoot(
     }
 
     init {
-        require(item.children?.isOpened != false)
+        require(item.children?.isOpened != true)
     }
 
     sealed class NodeRootType(

@@ -13,11 +13,11 @@ import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeState
-import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import app.atomofiron.searchboxapp.utils.Const.SLASH
@@ -563,22 +563,11 @@ object ExplorerUtils {
             else -> DirectoryKind.Ordinary
         }
         return copy(
-            children = NodeChildren(items, isOpened = children?.isOpened == true),
+            children = NodeChildren(items),
             content = NodeContent.Directory(directoryKind, content.rootType),
             error = null,
         )
     }
-
-    fun Node.open(value: Boolean = true): Node = when {
-        children == null -> this
-        children.isOpened == value -> this
-        else -> {
-            if (!value) children.clearChildren()
-            copy(children = children.copy(isOpened = value))
-        }
-    }
-
-    fun Node.close(): Node = open(false)
 
     fun Node.isParentOf(other: Node): Boolean = other.parentPath == path
 
@@ -622,7 +611,7 @@ object ExplorerUtils {
 
     fun Node.asSeparator(): Node = when {
         isSeparator() -> this
-        else -> copy(path = "$path.", uniqueId = -uniqueId, children = children?.fetch())
+        else -> copy(path = "$path.", uniqueId = -uniqueId)
     }
 
     fun Node.originalPath(): String = when {
@@ -783,7 +772,7 @@ object ExplorerUtils {
             }
         }
         if (children != null && this.children != null && children.isOpened != this.children.isOpened) {
-            children = children.copy(isOpened = isOpened)
+            //children = children.copy(isOpened = isOpened)
         }
         val content = when (true) {
             (item.content::class != content::class),

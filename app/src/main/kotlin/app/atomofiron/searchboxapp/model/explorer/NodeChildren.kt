@@ -6,8 +6,8 @@ import java.util.*
 data class NodeChildren(
     // a copy is made during rendering by NodeChildren.fetch()
     val items: MutableList<Node>,
-    // can be true in the tree and in the NodeRoot
-    val isOpened: Boolean,
+    // isOpened is always false in the garden
+    val isOpened: Boolean = false,
 ) : List<Node> by items {
 
     private val names = items.map { it.name }.toMutableList()

@@ -33,7 +33,7 @@ class ExplorerItemDelegate(
         val dirContent = NodeContent.Directory()
         val fileContent = NodeContent.Unknown
         val items = Array(17) { Node("", "", content = if (it < 3) dirContent else fileContent) }.toList()
-        val children = NodeChildren(items.toMutableList(), isOpened = false)
+        val children = NodeChildren(items.toMutableList())
         Node(path = "", properties = properties, content = dirContent, children = children)
     }
     private val file = run {
