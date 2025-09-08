@@ -514,8 +514,11 @@ class ExplorerService(
     }
 
     suspend fun resetChecked(key: NodeTabKey) {
-        renderTab(key) {
-            checked.clear()
+        garden(key) {
+            store.emitChecked(key, emptyList())
+            checked.mapNotNull { tree.findNode(it) }
+                .also { checked.clear() }
+                .forEach { renderUpdate(it) }
         }
     }
 
