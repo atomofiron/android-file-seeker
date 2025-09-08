@@ -419,16 +419,19 @@ class ExplorerService(
         }
     }
 
-    suspend fun tryMarkInstalling(key: NodeTabKey?, ref: NodeRef, installing: NodeOperation.Installing?): Boolean? {
+    suspend fun tryMarkInstalling(key: NodeTabKey, ref: NodeRef, installing: NodeOperation.Installing?): Boolean? {
         return garden {
             var state = states.find { it.uniqueId == ref.uniqueId }
             if (state?.operation == installing) return false
             state = states.updateState(ref.uniqueId) {
                 nextState(ref.uniqueId, installing = installing)
             }
-            // todo replace with emitUpdate
             (state?.operation == installing).also {
-                if (it) key?.let { get(key).render() }
+                if (it) {
+                    val tab = get(key)
+                    val item = tab.tree.findNode(ref.uniqueId)
+                    tab.renderUpdate(item ?: return@also)
+                }
             }
         }
     }
@@ -842,6 +845,5 @@ class ExplorerService(
 
     private fun List<Node>.findIndexed(path: String): Pair<Int, Node?> = findWithIndex { it.path == path }
 
-    // todo WTF 'NodeState.getUniqueId()' on a null object reference
     private fun List<NodeState>.findState(uniqueId: Int): Pair<Int, NodeState?> = findWithIndex { it.uniqueId == uniqueId }
 }

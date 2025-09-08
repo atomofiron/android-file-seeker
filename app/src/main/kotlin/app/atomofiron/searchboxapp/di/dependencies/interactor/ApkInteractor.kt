@@ -32,13 +32,15 @@ class ApkInteractor(
             if (tab != null) {
                 val allowed = explorerService.tryMarkInstalling(tab, content.ref, NodeOperation.Installing)
                 if (allowed != true) return@launch
-                explorerService.tryMarkInstalling(tab, content.ref, installing = null)
             }
             val result = apkService.install(content, Intents.ACTION_INSTALL_APP)
             if (result is Rslt.Err) {
                 withMain {
                     apkChannel.errorMessage(result.message)
                 }
+            }
+            if (tab != null) {
+                explorerService.tryMarkInstalling(tab, content.ref, installing = null)
             }
         }
     }
