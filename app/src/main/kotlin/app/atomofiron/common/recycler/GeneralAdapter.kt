@@ -1,5 +1,6 @@
 package app.atomofiron.common.recycler
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
@@ -31,9 +32,10 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>>(
 
     override fun onBindViewHolder(holder: H, position: Int) = holder.bind(mutableItems[position], position)
 
-    fun submit(items: List<D>) {
+    @SuppressLint("NotifyDataSetChanged")
+    fun submit(items: List<D>, isNew: Boolean = false) {
         val differ = differ
-        if (differ == null) {
+        if (differ == null || isNew) {
             mutableItems.clear()
             mutableItems.addAll(items)
             notifyDataSetChanged()

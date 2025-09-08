@@ -10,13 +10,12 @@ import kotlinx.coroutines.withContext
 
 // todo add and use 2-thread-safe mutable list for updates
 
-private const val DetectMoves = false
-
 class CoroutineListDiffer<I : Any>(
     private val actualList: MutableList<I>,
     private val adapter: RecyclerView.Adapter<*>,
     private val itemCallback: DiffUtil.ItemCallback<I>,
     private val itemUpdater: (I.(new: I) -> I)? = null,
+    private val detectMoves: Boolean = true,
     listener: ListListener<I>? = null,
 ) {
     private val listeners = mutableListOf<ListListener<I>>()
@@ -34,7 +33,7 @@ class CoroutineListDiffer<I : Any>(
         val currentCounter = ++counter
         val old = current.copy()
         scope.launch {
-            val result = DiffUtil.calculateDiff(DiffCallback(itemCallback, old, new), DetectMoves)
+            val result = DiffUtil.calculateDiff(DiffCallback(itemCallback, old, new), detectMoves)
             withContext(Dispatchers.Main) {
                 if (currentCounter != counter) {
                     return@withContext

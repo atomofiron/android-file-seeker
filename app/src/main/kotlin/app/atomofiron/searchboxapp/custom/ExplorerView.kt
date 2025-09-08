@@ -20,6 +20,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapte
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerListDelegate
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.SwipeMarkerDelegate
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.NodeCallback
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -84,9 +85,12 @@ class ExplorerView(
     fun isDeepestDirVisible(): Boolean? = listDelegate.isDeepestDirVisible()
 
     fun submit(items: NodeTabItems) {
-        rootAdapter.submitList(items.roots)
-        explorerAdapter.submit(items.items)
         title = items.deepest?.getTitle(resources)
+        rootAdapter.submitList(items.roots)
+        val oldFirst = items.items.firstOrNull()
+        val newFirst = items.items.firstOrNull()
+        val isNew = oldFirst == null || newFirst == null || !NodeCallback.areItemsTheSame(oldFirst, newFirst)
+        explorerAdapter.submit(items.items, isNew)
     }
 
     fun submit(item: Node) = explorerAdapter.submit(item)

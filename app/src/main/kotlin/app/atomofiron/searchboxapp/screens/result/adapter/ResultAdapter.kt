@@ -30,7 +30,7 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCa
                 add(ResultItem.Item(it))
             }
         }
-        super.submit(items)
+        submit(items)
     }
 
     fun setComposition(composition: ExplorerItemComposition) {
