@@ -47,6 +47,7 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCa
         super.onAttachedToRecyclerView(recyclerView)
         recyclerView.addItemDecoration(gravityDecorator)
         recyclerView.addItemDecoration(backgroundDecorator)
+        backgroundDecorator.init(recyclerView.resources)
     }
 
     override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {

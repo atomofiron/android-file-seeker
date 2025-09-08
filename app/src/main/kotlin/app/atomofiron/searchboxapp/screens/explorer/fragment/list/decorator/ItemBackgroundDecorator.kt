@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator
 
+import android.content.res.Resources
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
@@ -12,8 +13,13 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.getSorted
 
 class ItemBackgroundDecorator(private val evenNumbered: Boolean) : RecyclerView.ItemDecoration() {
 
+    private var cornerRadius = 0f
     private val paint = Paint()
     var enabled = false
+
+    fun init(resources: Resources) {
+        cornerRadius = resources.getDimension(R.dimen.explorer_border_width)
+    }
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         paint.color = parent.context.colorSurfaceContainer()
@@ -33,7 +39,11 @@ class ItemBackgroundDecorator(private val evenNumbered: Boolean) : RecyclerView.
             val position = holder.bindingAdapterPosition
 
             if ((position % 2 == 0) == evenNumbered) {
-                canvas.drawRect(0f, child.top.toFloat(), parent.width.toFloat(), child.bottom.toFloat(), paint)
+                var left = parent.paddingLeft.toFloat()
+                var right = parent.paddingRight.toFloat()
+                if (left == 0f) left = -cornerRadius
+                if (right == 0f) right = -cornerRadius
+                canvas.drawRoundRect(left, child.top.toFloat(), parent.width - right, child.bottom.toFloat(), cornerRadius, cornerRadius, paint)
             }
         }
     }

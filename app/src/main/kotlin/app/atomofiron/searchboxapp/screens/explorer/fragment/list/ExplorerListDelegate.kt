@@ -40,6 +40,7 @@ class ExplorerListDelegate(
     private val items get() = nodeAdapter.items
 
     init {
+        backgroundDecorator.init(recyclerView.resources)
         layoutManager.spanSizeLookup = spanSizeLookup
         recyclerView.layoutManager = layoutManager
         recyclerView.attachInsetsListener(rootMarginDecorator)
