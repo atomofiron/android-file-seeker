@@ -6,7 +6,7 @@ private const val UNSELECTED_ROOT_ID = 0
 
 class NodeTab(
     val key: NodeTabKey,
-    val roots: MutableList<NodeRoot>,
+    val roots: List<NodeRoot>,
     val states: MutableList<NodeState>,
 ) {
     var selectedRootId = UNSELECTED_ROOT_ID

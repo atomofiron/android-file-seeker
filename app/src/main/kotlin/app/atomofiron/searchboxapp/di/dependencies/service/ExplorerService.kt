@@ -138,18 +138,19 @@ class ExplorerService(
     }
 
     suspend fun tryToggleRoot(key: NodeTabKey, root: NodeRoot) {
-        garden(key) {
+        garden {
             val root = roots.find { it.stableId == root.stableId }
             root ?: return
-            roots.takeIf { hasSelectedRoot() }
-                ?.indexOfFirst { it.stableId == selectedRootId }
+            val tab = get(key)
+            roots.takeIf { tab.hasSelectedRoot() }
+                ?.indexOfFirst { it.stableId == tab.selectedRootId }
                 ?.takeIf { it >= 0 }
-                ?.let { roots[it] = roots[it].copy(item = tree.first()) }
+                ?.let { roots[it] = roots[it].copy(item = tab.tree.first()) }
             when {
-                selected(root) -> deselectRoot()
-                else -> select(root)
+                tab.selected(root) -> tab.deselectRoot()
+                else -> tab.select(root)
             }
-            render()
+            tab.render()
         }
         tryCache(key, root.item)
     }
@@ -294,15 +295,16 @@ class ExplorerService(
     private suspend fun updateRootSync(updated: Node, key: NodeTabKey, targetRoot: NodeRoot) {
         filterMediaRootChildren(updated, targetRoot.type)
         val updatedRoot = updateRootThumbnail(updated, targetRoot)
-        garden(key) {
+        garden {
             states.updateState(updatedRoot.stableId) {
                 nextState(updatedRoot.stableId, cachingJob = null)
             }
+            val tab = get(key)
             roots.replace { root ->
                 when (root.stableId) {
                     targetRoot.stableId -> {
                         val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sorting)
-                        if (this.key == key) updatedRoot.copy(item = updatedItem, type = root.type) else root.copy(
+                        if (tab.key == key) updatedRoot.copy(item = updatedItem, type = root.type) else root.copy(
                             type = root.type,
                             thumbnail = updatedRoot.thumbnail,
                             thumbnailPath = updatedRoot.thumbnailPath,
@@ -311,13 +313,13 @@ class ExplorerService(
                     }
                     else -> root
                 }.also { updated ->
-                    if (!selected(updated)) return@also
-                    val treeRoot = tree.firstOrNull()
+                    if (!tab.selected(updated)) return@also
+                    val treeRoot = tab.tree.firstOrNull()
                     treeRoot ?: return@also
-                    tree[0] = updated.item
+                    tab.tree[0] = updated.item
                 }
             }
-            render()
+            tab.render()
             /*tabs.values.forEach { otherTab ->
                 if (otherTab.key != key) otherTab.render()
             }*/
