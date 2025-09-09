@@ -27,7 +27,7 @@ class TestHolder(
 
     private val binding = ItemTextFieldBinding.bind(itemView)
     override val itemOrNull get() = super.itemOrNull as TestField?
-    private val default = parent.resources.getString(R.string.try_find_this_text)
+    private val default = parent.resources.getString(R.string.pangram)
     private val span get() = RoundedBackgroundSpan(
         backgroundColor = context.findColorByAttr(MaterialAttr.colorSurfaceVariant),
         borderColor = context.findColorByAttr(MaterialAttr.colorSecondary),
@@ -37,7 +37,7 @@ class TestHolder(
     )
 
     init {
-        binding.box.setHint(R.string.test_field)
+        binding.box.setHint(R.string.try_find_this_text)
         binding.field.run {
             isSingleLine = false
             maxLines = 5

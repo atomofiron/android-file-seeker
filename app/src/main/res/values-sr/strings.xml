@@ -80,8 +80,8 @@
     <string name="pref_about">О апликацији</string>
     <string name="look_github">GitHub репозиторијум</string>
     <string name="faq_4pda">FAQ / Дискусија</string>
-    <string name="test_field">Тест текст</string>
     <string name="try_find_this_text">Покушај да пронађеш овај текст</string>
+    <string name="pangram">због њих смрдљив ђак Џеф штанцује жлепчић</string>
     <string name="waiting_for_results">Чекање на резултате…</string>
     <string name="no_access">Нема приступа</string>
     <string name="data_was_lost">Подаци су изгубљени</string>
