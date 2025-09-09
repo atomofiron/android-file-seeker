@@ -164,8 +164,8 @@ class ExplorerService(
                     ?.find { it.path == item.path }
                     ?.also { tree.add(it) }
             }
-            tree.lastOrNull()?.children?.items?.forEach {
-                it.children?.clearChildren()
+            if (tree.isEmpty()) {
+                root.item.children?.clearChildren()
             }
         }
         rootItem?.let { tryCache(key, it) }
