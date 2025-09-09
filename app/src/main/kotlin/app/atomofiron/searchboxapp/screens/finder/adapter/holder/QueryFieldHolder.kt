@@ -2,11 +2,11 @@ package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 
 import android.text.Editable
 import android.text.TextWatcher
+import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo.IME_ACTION_DONE
 import android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
-import androidx.core.view.marginEnd
-import androidx.core.view.updatePaddingRelative
+import androidx.core.view.isVisible
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.fileseeker.R
@@ -17,15 +17,17 @@ import app.atomofiron.searchboxapp.custom.view.makeRegex
 import app.atomofiron.searchboxapp.custom.view.showError
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Query
-import app.atomofiron.searchboxapp.utils.Alpha
-import app.atomofiron.searchboxapp.utils.marginLayoutParams
+import app.atomofiron.searchboxapp.utils.updateLayoutParams
 import java.util.regex.Pattern
 
 class QueryFieldHolder(
     parent: ViewGroup,
     private val listener: OnActionListener,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_query_field), TextField.Listener {
-
+) : GeneralHolder<FinderStateItem>(parent, R.layout.item_query_field)
+    , TextField.Listener
+    , View.OnFocusChangeListener
+    , View.OnLayoutChangeListener
+{
     override val hungry = true
     override val item get() = super.item as Query
 
@@ -45,7 +47,15 @@ class QueryFieldHolder(
             makeHoled(binding.queryField.box)
             addTextChangedListener(this@QueryFieldHolder.TextChangeListener())
             addListener(this@QueryFieldHolder)
-            updatePaddingRelative(end = binding.button.marginLayoutParams.run { width + marginEnd } - textLayout.marginEnd)
+            addOnFocusChangeListener(this@QueryFieldHolder)
+        }
+        binding.clear.setOnClickListener { textField.text?.clear() }
+        binding.root.addOnLayoutChangeListener(this)
+    }
+
+    override fun onLayoutChange(v: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
+        if (textLayout.error == null) {
+            binding.button.updateLayoutParams(width = textLayout.height, height = textLayout.height)
         }
     }
 
@@ -66,6 +76,10 @@ class QueryFieldHolder(
         }
     }
 
+    override fun onFocusChange(v: View, hasFocus: Boolean) {
+        binding.clear.isActivated = hasFocus
+    }
+
     private fun bindState(query: String) {
         try {
             if (item.useRegex) Pattern.compile(query)
@@ -76,7 +90,7 @@ class QueryFieldHolder(
         val error = textLayout.error != null
         val enabled = !error && item.enabled
         binding.button.isEnabled = enabled
-        binding.button.alpha = Alpha.enabled(enabled)
+        binding.clear.isVisible = textField.length() > 0
     }
 
     interface OnActionListener {

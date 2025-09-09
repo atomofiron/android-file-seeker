@@ -6,13 +6,27 @@
     <item android:id="@android:id/mask">
         <shape android:shape="rectangle">
             <solid android:color="@color/mask" />
-            <corners android:radius="@dimen/corner_half" />
+            <corners android:radius="@dimen/corner_semi" />
         </shape>
     </item>
+    <item android:id="@+id/disabled">
+        <selector>
+            <item android:state_enabled="false">
+                <shape android:shape="rectangle">
+                    <solid android:color="?colorBackground" />
+                    <corners android:radius="@dimen/corner_semi" />
+                </shape>
+            </item>
+        </selector>
+    </item>
     <item>
-        <shape android:shape="rectangle">
-            <solid android:color="@color/transparent" />
-            <corners android:radius="@dimen/corner_half" />
-        </shape>
+        <selector>
+            <item android:state_enabled="true">
+                <shape android:shape="rectangle">
+                    <solid android:color="?colorPrimary" />
+                    <corners android:radius="@dimen/corner_semi" />
+                </shape>
+            </item>
+        </selector>
     </item>
 </ripple>
