@@ -15,7 +15,7 @@
         android:layout_width="@dimen/edge_size"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        android:src="@drawable/ic_explorer_folder"
+        android:src="@drawable/ic_folder"
         android:foregroundGravity="top"
         android:paddingStart="@dimen/padding_common"
         android:paddingEnd="@dimen/padding_half"

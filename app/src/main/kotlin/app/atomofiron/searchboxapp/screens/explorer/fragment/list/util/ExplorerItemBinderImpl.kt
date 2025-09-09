@@ -11,6 +11,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.widget.TextViewCompat
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.ifVisible
 import app.atomofiron.fileseeker.R
@@ -43,8 +44,8 @@ class ExplorerItemBinderImpl(
     private lateinit var item: Node
     private val binding = ItemExplorerBinding.bind(itemView)
 
-    private var dirDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_explorer_folder)!!.mutate().translated()
-    private var fileDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_explorer_file)!!.mutate().translated()
+    private var dirDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_folder)!!.mutate().translated()
+    private var fileDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_file)!!.mutate().translated()
     private val placeholder = MuonsDrawable(itemView.context)
     private val dirTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorPrimary))
     private val fileTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorAccent))
@@ -140,12 +141,14 @@ class ExplorerItemBinderImpl(
         binding.checkBox.isInvisible = item.withOperation
         binding.details.maxWidth = itemView.resources.displayMetrics.widthPixels / 3
 
+        val iconTint = if (item.isDirectory) dirTint else fileTint
         binding.icon.ifVisible {
             binding.icon.setImageResource(item.getIcon())
-            binding.icon.imageTintList = if (item.isDirectory) dirTint else fileTint
+            binding.icon.imageTintList = iconTint
             binding.icon.alpha = Alpha.enabled(!item.isDirectory || item.isCached)
         }
         binding.title.setCompoundDrawablesRelativeWithIntrinsicBounds(if (withThumbnail) item.getIcon() else 0, 0, 0, 0)
+        TextViewCompat.setCompoundDrawableTintList(binding.title, iconTint)
     }
 
     override fun setOnItemActionListener(listener: ExplorerItemBinderActionListener?) {

@@ -6,8 +6,8 @@
     android:viewportHeight="24"
     >
     <path
-        android:fillColor="?attr/colorPrimary"
-        android:pathData="M13 20H4C2.9 20 2 19.11 2 18V6C2 4.89 2.89 4 4 4H10L12 6H20C21.1 6 22 6.89 22 8V13 h -2 V8H4V18H13Z"
+        android:fillColor="@android:color/white"
+        android:pathData="M13 20H4C2.9 20 2 19.11 2 18V6C2 4.89 2.89 4 4 4H10L12 6H20C21.1 6 22 6.89 22 8V13 h -7 a 2 2 0 0 0 -2 2"
         />
     <group
         android:scaleX="0.4"
@@ -16,7 +16,7 @@
         android:translateY="14.2"
         >
         <path
-            android:fillColor="?attr/colorPrimary"
+            android:fillColor="@android:color/white"
             android:pathData="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z"
             />
     </group>
