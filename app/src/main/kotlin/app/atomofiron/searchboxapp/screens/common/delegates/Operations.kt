@@ -17,5 +17,5 @@ object Operations {
     val OpenWith = MenuItem(id = Increment(), UniText(R.string.open_with), R.drawable.ic_open_outside)
     val Share = MenuItem(id = Increment(), UniText(R.string.share_files), R.drawable.ic_share)
     val CopyPath = MenuItem(id = Increment(), UniText(R.string.copy_path), R.drawable.ic_link)
-    val Delete = MenuItem(id = Increment(), UniText(R.string.delete), MenuItemContent.Dangerous)
+    val Delete = MenuItem(id = Increment(), UniText(R.string.delete), MenuItemContent.Dangerous(R.drawable.ic_trashbox))
 }

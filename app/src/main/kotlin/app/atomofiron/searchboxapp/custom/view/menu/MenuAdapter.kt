@@ -31,7 +31,7 @@ class MenuAdapter : GeneralAdapter<MenuItem, MenuHolder>() {
 
     override fun getItemViewType(position: Int): Int {
         return when (get(position).content) {
-            MenuItemContent.Dangerous -> MenuItemType.Dangerous.viewType
+            is MenuItemContent.Dangerous -> MenuItemType.Dangerous.viewType
             is MenuItemContent.Common -> MenuItemType.Common.viewType
         }
     }

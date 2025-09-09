@@ -8,6 +8,7 @@ import app.atomofiron.fileseeker.databinding.ItemCurtainMenuDangerousBinding
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.custom.view.dangerous.DangerousSliderView
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
+import app.atomofiron.searchboxapp.custom.view.menu.MenuItemContent
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.utils.Const
@@ -37,7 +38,9 @@ class DangerousMenuItemHolder private constructor(
     override fun onBind(item: MenuItem, position: Int) {
         itemId = item.id
         val title = view.resources[item.label]
+        val content = item.content as MenuItemContent.Dangerous
         view.setText(title)
+        view.setIcon(content.icon)
         view.resources
             .getString(R.string.slide_to)
             .replace(Const.PLACEHOLDER, title.lowercase())

@@ -9,7 +9,9 @@ sealed class MenuItemContent(val cells: Int) {
         @DrawableRes val tail: Int? = null,
     ) : MenuItemContent(cells = 1)
 
-    data object Dangerous : MenuItemContent(cells = 2)
+    data class Dangerous(
+        @DrawableRes val icon: Int,
+    ) : MenuItemContent(cells = 2)
     
     companion object {
         operator fun invoke(
