@@ -76,7 +76,7 @@ class SwipeMarkerDelegate(resources: Resources) {
         return true
     }
 
-    private fun View.getCheckBox(): CheckBox? = findViewById(R.id.item_explorer_cb)
+    private fun View.getCheckBox(): CheckBox? = findViewById(R.id.check_box)
 
     fun onTouch(view: RecyclerView, event: MotionEvent): Boolean = when (event.action) {
         MotionEvent.ACTION_DOWN -> onDown(view, event.x, event.y)

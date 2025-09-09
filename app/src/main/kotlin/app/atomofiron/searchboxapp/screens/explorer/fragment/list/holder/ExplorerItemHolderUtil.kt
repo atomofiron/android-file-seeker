@@ -59,14 +59,14 @@ private fun ItemExplorerBinding.makeOpposite(
     val rippleColorList = ColorStateList.valueOf(rippleColor)
     root.background = RippleDrawable(rippleColorList, drawable, rippleMask)
     val filter = BlendModeColorFilterCompat.createBlendModeColorFilterCompat(content, BlendModeCompat.SRC_IN)
-    itemExplorerIvIcon.colorFilter = filter
-    itemExplorerCb.buttonTintList = ColorStateList.valueOf(content)
-    itemExplorerCb.buttonIconTintList = ColorStateList.valueOf(buttonIcon)
-    itemExplorerTvTitle.setTextColor(content)
-    itemExplorerTvSize.setTextColor(content)
-    itemExplorerTvDescription.setTextColor(content)
-    itemExplorerTvDetails.setTextColor(content)
-    itemExplorerErrorTv.setTextColor(content)
-    itemExplorerPs.setTint(content)
+    icon.colorFilter = filter
+    checkBox.buttonTintList = ColorStateList.valueOf(content)
+    checkBox.buttonIconTintList = ColorStateList.valueOf(buttonIcon)
+    title.setTextColor(content)
+    size.setTextColor(content)
+    description.setTextColor(content)
+    details.setTextColor(content)
+    error.setTextColor(content)
+    progress.setTint(content)
     root.tag = TAG_EXPLORER_OPENED_ITEM
 }

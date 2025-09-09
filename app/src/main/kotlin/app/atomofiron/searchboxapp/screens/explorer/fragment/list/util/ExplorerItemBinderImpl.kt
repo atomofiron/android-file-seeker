@@ -8,19 +8,17 @@ import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.text.style.ImageSpan.ALIGN_BASELINE
 import android.view.View
-import android.widget.ImageView
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.ifVisible
 import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
 import app.atomofiron.searchboxapp.custom.LemonDrawable
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.custom.drawable.translated
-import app.atomofiron.searchboxapp.custom.view.MuonsView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -33,8 +31,6 @@ import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.isRtl
 import com.bumptech.glide.Glide
-import com.google.android.material.checkbox.MaterialCheckBox
-import com.google.android.material.textview.MaterialTextView
 
 class ExplorerItemBinderImpl(
     private val itemView: View,
@@ -45,6 +41,7 @@ class ExplorerItemBinderImpl(
     }
 
     private lateinit var item: Node
+    private val binding = ItemExplorerBinding.bind(itemView)
 
     private var dirDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_explorer_folder)!!.mutate().translated()
     private var fileDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_explorer_file)!!.mutate().translated()
@@ -52,19 +49,9 @@ class ExplorerItemBinderImpl(
     private val dirTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorPrimary))
     private val fileTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorAccent))
 
-    private val ivIcon = itemView.findViewById<ImageView>(R.id.item_explorer_iv_icon)
-    private val ivThumbnail = itemView.findViewById<ImageView>(R.id.item_explorer_iv_thumbnail)
-    private val tvName = itemView.findViewById<TextView>(R.id.item_explorer_tv_title)
-    private val tvDescription = itemView.findViewById<TextView>(R.id.item_explorer_tv_description)
-    private val tvDetails = itemView.findViewById<MaterialTextView>(R.id.item_explorer_tv_details)
-    private val tvSize = itemView.findViewById<TextView>(R.id.item_explorer_tv_size)
-    private val cbBox = itemView.findViewById<MaterialCheckBox>(R.id.item_explorer_cb)
-    private val tvError = itemView.findViewById<TextView>(R.id.item_explorer_error_tv)
-    private val psProgress = itemView.findViewById<MuonsView>(R.id.item_explorer_ps)
-
     private var onItemActionListener: ExplorerItemBinderActionListener? = null
 
-    private val defaultBoxTintList: ColorStateList by lazy(LazyThreadSafetyMode.NONE) { cbBox.buttonTintList!! }
+    private val defaultBoxTintList: ColorStateList by lazy(LazyThreadSafetyMode.NONE) { binding.checkBox.buttonTintList!! }
     private val transparentBoxTintList: ColorStateList
 
     private val onClickListener: ((View) -> Unit) = {
@@ -80,8 +67,8 @@ class ExplorerItemBinderImpl(
         }
     }
     init {
-        if (cbBox.buttonTintList == null) {
-            cbBox.isUseMaterialThemeColors = true
+        if (binding.checkBox.buttonTintList == null) {
+            binding.checkBox.isUseMaterialThemeColors = true
         }
         val stateEnabledChecked = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked)
         val stateDisabledChecked = intArrayOf(-android.R.attr.state_enabled, android.R.attr.state_checked)
@@ -92,9 +79,9 @@ class ExplorerItemBinderImpl(
         val states = arrayOf(stateEnabledChecked, stateDisabledChecked, stateEnabledUnchecked, stateDisabledUnchecked)
         val colors = intArrayOf(colorEnabledChecked, colorDisabledChecked, Color.TRANSPARENT, Color.TRANSPARENT)
         transparentBoxTintList = ColorStateList(states, colors)
-        ivThumbnail.clipToOutline = true
+        binding.thumbnail.clipToOutline = true
 
-        val size = tvDetails.textSize.toInt()
+        val size = binding.details.textSize.toInt()
         dirDrawable.setBounds(0, 0, size, size)
         fileDrawable.setBounds(0, 0, size, size)
         val dx = when {
@@ -104,8 +91,8 @@ class ExplorerItemBinderImpl(
         val dy = size.toFloat() / dirDrawable.intrinsicHeight * 6
         dirDrawable.set(dx = dx * 2, dy = dy * 2)
         fileDrawable.set(dx = dx, dy = dy)
-        dirDrawable.setTint(tvDetails.currentTextColor)
-        fileDrawable.setTint(tvDetails.currentTextColor)
+        dirDrawable.setTint(binding.details.currentTextColor)
+        fileDrawable.setTint(binding.details.currentTextColor)
         dirDrawable.alpha = Alpha.LEVEL_67
         fileDrawable.alpha = Alpha.LEVEL_67
 
@@ -117,7 +104,7 @@ class ExplorerItemBinderImpl(
 
         itemView.setOnClickListener(onClickListener)
         itemView.setOnLongClickListener(onLongClickListener)
-        cbBox.setOnCheckedChangeListener(onCheckListener)
+        binding.checkBox.setOnCheckedChangeListener(onCheckListener)
 
         val thumbnail = (item.content as? NodeContent.File)?.thumbnail
         when (thumbnail) {
@@ -126,39 +113,39 @@ class ExplorerItemBinderImpl(
                 .load(thumbnail.value)
                 .placeholder(placeholder)
                 .error(LemonDrawable())
-                .into(ivThumbnail)
-            is Thumbnail.Bitmap -> ivThumbnail.setImageBitmap(thumbnail.value)
-            is Thumbnail.Drawable -> ivThumbnail.setImageDrawable(thumbnail.value)
-            is Thumbnail.Res -> ivThumbnail.setImageResource(thumbnail.value)
-            is Thumbnail.Loading -> ivThumbnail.setImageDrawable(placeholder)
-            null -> ivThumbnail.setImageDrawable(null)
+                .into(binding.thumbnail)
+            is Thumbnail.Bitmap -> binding.thumbnail.setImageBitmap(thumbnail.value)
+            is Thumbnail.Drawable -> binding.thumbnail.setImageDrawable(thumbnail.value)
+            is Thumbnail.Res -> binding.thumbnail.setImageResource(thumbnail.value)
+            is Thumbnail.Loading -> binding.thumbnail.setImageDrawable(placeholder)
+            null -> binding.thumbnail.setImageDrawable(null)
         }
 
-        tvName.text = when {
+        binding.title.text = when {
             item.isRoot -> item.getTitle(itemView.resources)
             else -> item.name
         }
-        tvName.typeface = if (item.isDirectory) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+        binding.title.typeface = if (item.isDirectory) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
 
         val error = item.error?.let { itemView.resources.getString(it, item.content) }
-        tvError.text = error
+        binding.error.text = error
 
-        cbBox.isChecked = item.isChecked
+        binding.checkBox.isChecked = item.isChecked
 
         val withThumbnail = thumbnail != null
-        ivIcon.isVisible = !withThumbnail
-        ivThumbnail.isVisible = withThumbnail
-        tvError.isVisible = error?.isNotBlank() == true
-        psProgress.isVisible = item.withOperation
-        cbBox.isInvisible = item.withOperation
-        tvDetails.maxWidth = itemView.resources.displayMetrics.widthPixels / 3
+        binding.icon.isVisible = !withThumbnail
+        binding.thumbnail.isVisible = withThumbnail
+        binding.error.isVisible = error?.isNotBlank() == true
+        binding.progress.isVisible = item.withOperation
+        binding.checkBox.isInvisible = item.withOperation
+        binding.details.maxWidth = itemView.resources.displayMetrics.widthPixels / 3
 
-        ivIcon.ifVisible {
-            ivIcon.setImageResource(item.getIcon())
-            ivIcon.imageTintList = if (item.isDirectory) dirTint else fileTint
-            ivIcon.alpha = Alpha.enabled(!item.isDirectory || item.isCached)
+        binding.icon.ifVisible {
+            binding.icon.setImageResource(item.getIcon())
+            binding.icon.imageTintList = if (item.isDirectory) dirTint else fileTint
+            binding.icon.alpha = Alpha.enabled(!item.isDirectory || item.isCached)
         }
-        tvName.setCompoundDrawablesRelativeWithIntrinsicBounds(if (withThumbnail) item.getIcon() else 0, 0, 0, 0)
+        binding.title.setCompoundDrawablesRelativeWithIntrinsicBounds(if (withThumbnail) item.getIcon() else 0, 0, 0, 0)
     }
 
     override fun setOnItemActionListener(listener: ExplorerItemBinderActionListener?) {
@@ -172,17 +159,17 @@ class ExplorerItemBinderImpl(
         if (composition.visibleAccess) string.append(item.access).append(SPACE)
         if (composition.visibleOwner) string.append(item.owner).append(SPACE)
         if (composition.visibleGroup) string.append(item.group).append(SPACE)
-        tvDescription.text = string.toString()
-        tvDetails.text = item
+        binding.description.text = string.toString()
+        binding.details.text = item
             .takeIf { composition.visibleDetails }
             ?.getDetails()
-        tvDetails.isVisible = tvDetails.text.isNotEmpty()
-        tvSize.text = if (composition.visibleSize) item.size else EMPTY
-        cbBox.buttonTintList = if (composition.visibleBox) defaultBoxTintList else transparentBoxTintList
+        binding.details.isVisible = binding.details.text.isNotEmpty()
+        binding.size.text = if (composition.visibleSize) item.size else EMPTY
+        binding.checkBox.buttonTintList = if (composition.visibleBox) defaultBoxTintList else transparentBoxTintList
     }
 
     override fun disableClicks() {
-        cbBox.isEnabled = false
+        binding.checkBox.isEnabled = false
         itemView.setOnClickListener(null)
         itemView.setOnLongClickListener(null)
         itemView.background = null
@@ -192,7 +179,7 @@ class ExplorerItemBinderImpl(
     }
 
     override fun hideCheckBox() {
-        cbBox.isVisible = false
+        binding.checkBox.isVisible = false
     }
 
     override fun showAlternatingBackground(visible: Boolean) {

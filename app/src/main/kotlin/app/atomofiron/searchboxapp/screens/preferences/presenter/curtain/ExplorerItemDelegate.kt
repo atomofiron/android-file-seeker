@@ -86,8 +86,8 @@ class ExplorerItemDelegate(
         fileBinder.bind(file)
         holders.bind()
 
-        explorerDir.itemExplorerIvIcon.alpha = Alpha.VISIBLE
-        explorerDir.itemExplorerTvSize.text = dir.size
+        explorerDir.icon.alpha = Alpha.VISIBLE
+        explorerDir.size.text = dir.size
     }
 
     private fun Array<out ExplorerItemBinder>.bind() {

@@ -11,7 +11,7 @@
     android:paddingVertical="1dp"
     >
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/item_explorer_iv_icon"
+        android:id="@+id/icon"
         android:layout_width="@dimen/edge_size"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
@@ -23,10 +23,10 @@
         android:translationX="-2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/barrier_start"
-        app:layout_constraintBaseline_toBaselineOf="@+id/item_explorer_tv_title"
+        app:layout_constraintBaseline_toBaselineOf="@+id/title"
         />
     <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/item_explorer_iv_thumbnail"
+        android:id="@+id/thumbnail"
         android:layout_width="45sp"
         android:layout_height="45sp"
         android:layout_marginStart="@dimen/padding_common"
@@ -36,17 +36,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/barrier_start"
-        app:layout_constraintBottom_toBottomOf="@+id/item_explorer_tv_description"
+        app:layout_constraintBottom_toBottomOf="@+id/description"
         />
     <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrier_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:barrierDirection="end"
-        app:constraint_referenced_ids="item_explorer_iv_icon,item_explorer_iv_thumbnail"
+        app:constraint_referenced_ids="icon,thumbnail"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/item_explorer_tv_title"
+        android:id="@+id/title"
         android:layout_width="0dp"
         android:layout_height="26sp"
         android:layout_marginEnd="@dimen/edge_size"
@@ -63,7 +63,7 @@
         tools:text="Android"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/item_explorer_tv_description"
+        android:id="@+id/description"
         android:layout_width="0dp"
         android:layout_height="19sp"
         android:textSize="12sp"
@@ -71,13 +71,13 @@
         android:maxLines="1"
         android:ellipsize="end"
         app:layout_constraintStart_toEndOf="@+id/barrier_start"
-        app:layout_constraintTop_toBottomOf="@id/item_explorer_tv_title"
-        app:layout_constraintEnd_toStartOf="@+id/item_explorer_tv_details"
+        app:layout_constraintTop_toBottomOf="@id/title"
+        app:layout_constraintEnd_toStartOf="@+id/details"
         app:layout_goneMarginEnd="@dimen/edge_size"
         tools:text="0000-00-00 00:00 -rwxrwxrwx atomofiron everybody"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/item_explorer_tv_details"
+        android:id="@+id/details"
         android:layout_width="wrap_content"
         android:layout_height="19sp"
         android:layout_marginEnd="@dimen/edge_size"
@@ -86,12 +86,12 @@
         android:maxLines="1"
         android:ellipsize="middle"
         android:paddingHorizontal="@dimen/padding_mini"
-        app:layout_constraintTop_toBottomOf="@id/item_explorer_tv_title"
+        app:layout_constraintTop_toBottomOf="@id/title"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="1080x2600-00:01:00"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/item_explorer_error_tv"
+        android:id="@+id/error"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="-3dp"
@@ -100,13 +100,13 @@
         android:maxLines="2"
         android:ellipsize="end"
         app:layout_goneMarginTop="@dimen/padding_common"
-        app:layout_constraintStart_toStartOf="@+id/item_explorer_tv_description"
-        app:layout_constraintTop_toBottomOf="@+id/item_explorer_tv_description"
+        app:layout_constraintStart_toStartOf="@+id/description"
+        app:layout_constraintTop_toBottomOf="@+id/description"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="No such file or directory"
         />
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/item_explorer_tv_size"
+        android:id="@+id/size"
         android:layout_width="wrap_content"
         android:layout_height="19sp"
         android:layout_gravity="end"
@@ -114,21 +114,21 @@
         android:textSize="12sp"
         android:typeface="monospace"
         android:gravity="end"
-        app:layout_constraintTop_toBottomOf="@id/item_explorer_tv_title"
+        app:layout_constraintTop_toBottomOf="@id/title"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="000K"
         />
     <app.atomofiron.searchboxapp.custom.view.MuonsView
-        android:id="@+id/item_explorer_ps"
+        android:id="@+id/progress"
         android:layout_width="@dimen/icon_size"
         android:layout_height="@dimen/icon_size"
         android:layout_marginTop="@dimen/padding_mini"
-        app:layout_constraintStart_toStartOf="@+id/item_explorer_cb"
-        app:layout_constraintTop_toTopOf="@+id/item_explorer_cb"
-        app:layout_constraintEnd_toEndOf="@+id/item_explorer_cb"
+        app:layout_constraintStart_toStartOf="@+id/check_box"
+        app:layout_constraintTop_toTopOf="@+id/check_box"
+        app:layout_constraintEnd_toEndOf="@+id/check_box"
         />
     <com.google.android.material.checkbox.MaterialCheckBox
-        android:id="@+id/item_explorer_cb"
+        android:id="@+id/check_box"
         android:layout_width="@dimen/edge_size"
         android:layout_height="@dimen/edge_size"
         android:layout_marginTop="-2dp"
