@@ -9,21 +9,21 @@ import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
+import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations
 import app.atomofiron.searchboxapp.screens.explorer.curtain.OptionsDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
-import app.atomofiron.searchboxapp.screens.result.ResultViewState
 import kotlinx.coroutines.CoroutineScope
 
 class ResultCurtainMenuDelegate(
     scope: CoroutineScope,
-    private val viewState: ResultViewState,
     private val router: ResultRouter,
     private val interactor: ResultInteractor,
     private val apks: ApkInteractor,
     curtainChannel: CurtainChannel,
+    private val utils: UtilService,
 ) : Recipient, CurtainApi.Adapter<CurtainApi.ViewHolder>(), MenuListener {
 
     private val optionsDelegate = OptionsDelegate(this)
@@ -55,6 +55,7 @@ class ResultCurtainMenuDelegate(
             }
             Operations.InstallApp.id -> apks.install(items.first())
             Operations.LaunchApp.id -> apks.launch(items.first())
+            Operations.UseAs.id -> utils.useAs(items.first())
         }
     }
 

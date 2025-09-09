@@ -97,13 +97,13 @@ class ResultModule {
     @ResultScope
     fun menuListenerDelegate(
         scope: CoroutineScope,
-        viewState: ResultViewState,
         router: ResultRouter,
         interactor: ResultInteractor,
         apks: ApkInteractor,
         curtainChannel: CurtainChannel,
+        utils: UtilService,
     ): ResultCurtainMenuDelegate {
-        return ResultCurtainMenuDelegate(scope, viewState, router, interactor, apks, curtainChannel)
+        return ResultCurtainMenuDelegate(scope, router, interactor, apks, curtainChannel, utils)
     }
 
     @Provides

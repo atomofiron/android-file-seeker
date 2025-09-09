@@ -117,8 +117,7 @@ class DangerousSliderView @JvmOverloads constructor(
             endBorderColor = getColor(R.styleable.DangerousSliderView_endBorderColor, endBorderColor)
             val thumbBorder = getBoolean(R.styleable.DangerousSliderView_thumbBorder, false)
             setThumbBorder(thumbBorder)
-            icon = getDrawable(R.styleable.DangerousSliderView_icon)
-            button.setCompoundDrawablesRelativeWithIntrinsicBounds(icon, null, null, null)
+            setIcon(getDrawable(R.styleable.DangerousSliderView_icon))
             button.compoundDrawablePadding = getDimensionPixelSize(R.styleable.DangerousSliderView_iconPadding, button.paddingStart)
         }
 
@@ -238,6 +237,13 @@ class DangerousSliderView @JvmOverloads constructor(
     fun setText(@StringRes resId: Int) = setText(resources.getString(resId))
 
     fun setText(text: CharSequence?) = button.setText(text?.withSpan(thumbSpan))
+
+    fun setIcon(drawableId: Int) = setIcon(ContextCompat.getDrawable(context, drawableId))
+
+    fun setIcon(drawable: Drawable?) {
+        icon = drawable
+        button.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
+    }
 
     fun setTip(@StringRes resId: Int) = setTip(resources.getString(resId))
 
