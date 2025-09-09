@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.ifVisible
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.LemonDrawable
@@ -28,6 +29,7 @@ import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.isRtl
 import com.bumptech.glide.Glide
@@ -44,9 +46,11 @@ class ExplorerItemBinderImpl(
 
     private lateinit var item: Node
 
-    private var dirIcon = ContextCompat.getDrawable(itemView.context, R.drawable.ic_explorer_folder)!!.mutate().translated()
-    private var fileIcon = ContextCompat.getDrawable(itemView.context, R.drawable.ic_explorer_file)!!.mutate().translated()
+    private var dirDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_explorer_folder)!!.mutate().translated()
+    private var fileDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_explorer_file)!!.mutate().translated()
     private val placeholder = MuonsDrawable(itemView.context)
+    private val dirTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorPrimary))
+    private val fileTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorAccent))
 
     private val ivIcon = itemView.findViewById<ImageView>(R.id.item_explorer_iv_icon)
     private val ivThumbnail = itemView.findViewById<ImageView>(R.id.item_explorer_iv_thumbnail)
@@ -91,19 +95,19 @@ class ExplorerItemBinderImpl(
         ivThumbnail.clipToOutline = true
 
         val size = tvDetails.textSize.toInt()
-        dirIcon.setBounds(0, 0, size, size)
-        fileIcon.setBounds(0, 0, size, size)
+        dirDrawable.setBounds(0, 0, size, size)
+        fileDrawable.setBounds(0, 0, size, size)
         val dx = when {
             itemView.isRtl() -> 0f
-            else -> size.toFloat() / dirIcon.intrinsicWidth * 6
+            else -> size.toFloat() / dirDrawable.intrinsicWidth * 6
         }
-        val dy = size.toFloat() / dirIcon.intrinsicHeight * 6
-        dirIcon.set(dx = dx * 2, dy = dy * 2)
-        fileIcon.set(dx = dx, dy = dy)
-        dirIcon.setTint(tvDetails.currentTextColor)
-        fileIcon.setTint(tvDetails.currentTextColor)
-        dirIcon.alpha = Alpha.LEVEL_67
-        fileIcon.alpha = Alpha.LEVEL_67
+        val dy = size.toFloat() / dirDrawable.intrinsicHeight * 6
+        dirDrawable.set(dx = dx * 2, dy = dy * 2)
+        fileDrawable.set(dx = dx, dy = dy)
+        dirDrawable.setTint(tvDetails.currentTextColor)
+        fileDrawable.setTint(tvDetails.currentTextColor)
+        dirDrawable.alpha = Alpha.LEVEL_67
+        fileDrawable.alpha = Alpha.LEVEL_67
 
         placeholder.setPadding(placeholder.intrinsicSize / 6)
     }
@@ -151,6 +155,7 @@ class ExplorerItemBinderImpl(
 
         ivIcon.ifVisible {
             ivIcon.setImageResource(item.getIcon())
+            ivIcon.imageTintList = if (item.isDirectory) dirTint else fileTint
             ivIcon.alpha = Alpha.enabled(!item.isDirectory || item.isCached)
         }
         tvName.setCompoundDrawablesRelativeWithIntrinsicBounds(if (withThumbnail) item.getIcon() else 0, 0, 0, 0)
@@ -214,7 +219,7 @@ class ExplorerItemBinderImpl(
         if (this.dirs > 0) {
             builder.append(dirs)
             builder.append("*")
-            builder.setSpan(ImageSpan(dirIcon, ALIGN_BASELINE), builder.length.dec(), builder.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+            builder.setSpan(ImageSpan(dirDrawable, ALIGN_BASELINE), builder.length.dec(), builder.length, SPAN_EXCLUSIVE_EXCLUSIVE)
             builder.append(Const.SPACE)
             for (i in 0..<(3 - files.length)) {
                 builder.append(Const.SPACE)
@@ -222,8 +227,8 @@ class ExplorerItemBinderImpl(
         }
         builder.append(files)
         builder.append("*")
-        builder.setSpan(ImageSpan(fileIcon, ALIGN_BASELINE), builder.length.dec(), builder.length, SPAN_EXCLUSIVE_EXCLUSIVE)
-        fileIcon.setVisible(files.isNotEmpty(), restart = false)
+        builder.setSpan(ImageSpan(fileDrawable, ALIGN_BASELINE), builder.length.dec(), builder.length, SPAN_EXCLUSIVE_EXCLUSIVE)
+        fileDrawable.setVisible(files.isNotEmpty(), restart = false)
         return builder
     }
 

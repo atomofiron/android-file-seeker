@@ -1,20 +1,18 @@
 <vector
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:height="24dp"
     android:width="24dp"
+    android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24"
     >
-    <group android:translateX="-2">
-        <path
-            android:fillColor="?attr/colorPrimary"
-            android:pathData="M13 20H4C2.9 20 2 19.11 2 18V6C2 4.89 2.89 4 4 4H10L12 6H20C21.1 6 22 6.89 22 8V13.81 a 6 6 0 0 0 -9 5"
-            />
-    </group>
+    <path
+        android:fillColor="?attr/colorPrimary"
+        android:pathData="M13 20H4C2.9 20 2 19.11 2 18V6C2 4.89 2.89 4 4 4H10L12 6H20C21.1 6 22 6.89 22 8V13.81 a 6 6 0 0 0 -9 5"
+        />
     <group
         android:scaleX="0.4"
         android:scaleY="0.4"
-        android:translateX="12.2"
+        android:translateX="14.2"
         android:translateY="14.2"
         >
         <path

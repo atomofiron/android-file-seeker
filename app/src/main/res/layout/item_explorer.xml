@@ -20,6 +20,7 @@
         android:paddingStart="@dimen/padding_common"
         android:paddingEnd="@dimen/padding_half"
         android:baseline="19dp"
+        android:translationX="-2dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/barrier_start"
         app:layout_constraintBaseline_toBaselineOf="@+id/item_explorer_tv_title"
@@ -119,9 +120,9 @@
         />
     <app.atomofiron.searchboxapp.custom.view.MuonsView
         android:id="@+id/item_explorer_ps"
-        android:layout_width="24dp"
-        android:layout_height="24dp"
-        android:layout_marginTop="4dp"
+        android:layout_width="@dimen/icon_size"
+        android:layout_height="@dimen/icon_size"
+        android:layout_marginTop="@dimen/padding_mini"
         app:layout_constraintStart_toStartOf="@+id/item_explorer_cb"
         app:layout_constraintTop_toTopOf="@+id/item_explorer_cb"
         app:layout_constraintEnd_toEndOf="@+id/item_explorer_cb"
