@@ -4,8 +4,8 @@ import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.IdRes
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 
 open class GeneralHolder<D : Any>(view: View) : RecyclerView.ViewHolder(view) {
 
@@ -18,15 +18,16 @@ open class GeneralHolder<D : Any>(view: View) : RecyclerView.ViewHolder(view) {
         get() = _itemOrNull!!
 
     open val hungry = true
+    var trueBindingAdapterPosition = NO_POSITION
+        private set
 
     constructor(parent: ViewGroup, layoutId: Int) : this(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
 
-    fun bind(item: D, position: Int = -1) {
+    fun bind(item: D, position: Int) {
+        trueBindingAdapterPosition = position
         _itemOrNull = item
         onBind(item, position)
     }
-
-    fun <T : View> requireViewById(@IdRes id: Int): T = itemView.findViewById(id)!!
 
     protected open fun onBind(item: D, position: Int) = Unit
 

@@ -37,6 +37,7 @@ import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asSeparator
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.clearChildren
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
@@ -142,7 +143,7 @@ class ExplorerService(
     }
 
     suspend fun tryToggle(key: NodeTabKey, item: Node) {
-        var uncached: Node? = null
+        var rootItem: Node? = null
         renderTab(key) {
             val root = getSelectedRoot() ?: return
             if (tree.isEmpty() && root.item.uniqueId != item.uniqueId) {
@@ -150,8 +151,8 @@ class ExplorerService(
             }
             val index = tree.indexOfFirst { it.uniqueId == item.uniqueId }
             if (tree.isEmpty()) {
-                tree.add(root.item)
-                uncached = root.item
+                rootItem = root.item.copy(children = root.item.children?.fetch())
+                tree.add(rootItem)
             } else if (index == tree.lastIndex) {
                 tree.dropLast()
             } else if (index >= 0) {
@@ -159,12 +160,15 @@ class ExplorerService(
             } else {
                 val index = tree.indexOfFirst { it.path == item.parentPath }
                 tree.clear(from = index.inc())
-                uncached = tree[index].children
+                rootItem = tree[index].children
                     ?.find { it.path == item.path }
                     ?.also { tree.add(it) }
             }
+            tree.lastOrNull()?.children?.items?.forEach {
+                it.children?.clearChildren()
+            }
         }
-        uncached?.let { tryCache(key, it) }
+        rootItem?.let { tryCache(key, it) }
     }
 
     suspend fun updateRootsAsync(volumes: List<NodeStorage>) {
@@ -193,7 +197,6 @@ class ExplorerService(
                         else -> updated
                     }
                     // todo async updated.resolveDirChildren(config.useSu)
-                    //updated = updated.copy(children = updated.children?.copy(isOpened = true))
                     updateRootSync(updated, key, root)
                 }
             }

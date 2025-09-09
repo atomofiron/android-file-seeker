@@ -70,7 +70,7 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCa
     }
 
     override fun onBindViewHolder(holder: ResultsHolder, position: Int) = when (position) {
-        POSITION_HEADER -> holder.bind(items[position])
+        POSITION_HEADER -> holder.bind(items[position], position)
         else -> {
             holder as ResultsItemHolder
             holder.setOnItemActionListener(itemActionListener)

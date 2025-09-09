@@ -34,7 +34,7 @@ class RootAdapter(private val listener: RootClickListener) : ListAdapter<NodeRoo
         val itemView = inflater.inflate(R.layout.item_explorer_card, parent, false)
         val holder = RootViewHolder(itemView)
         itemView.setOnClickListener {
-            val item = currentList[holder.bindingAdapterPosition]
+            val item = currentList[holder.trueBindingAdapterPosition]
             listener.onRootClick(item)
         }
         return holder

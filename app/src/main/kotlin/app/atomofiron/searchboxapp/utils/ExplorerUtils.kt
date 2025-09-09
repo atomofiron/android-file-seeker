@@ -134,7 +134,7 @@ object ExplorerUtils {
     private const val EXT_OSB = ".osb" // osu storyboard
 
     private val spaces = Regex(" +")
-    private val lastPart = Regex("(?<=/)/*[^/]+/*$|^/+\$")
+    private val lastPart = Regex("(?<=/)/*[^/]+/*$|^/+$")
     private val fileType = Regex(": +")
 
     fun String.completePath(directory: Boolean): String = when {
@@ -573,7 +573,7 @@ object ExplorerUtils {
 
     fun Node.isSomeParentOf(other: Node): Boolean = path.length <= other.path.length && other.path.startsWith(path)
 
-    private fun NodeChildren.clearChildren() = update {
+    fun NodeChildren.clearChildren() = update {
         val iter = listIterator()
         while (iter.hasNext()) {
             val item = iter.next()
@@ -591,8 +591,7 @@ object ExplorerUtils {
             this == null -> return false
             other.size != this.size -> return false
         }
-        this!!
-        other!!.forEachIndexed { i, it ->
+        other.forEachIndexed { i, it ->
             if (!it.areContentsTheSame(get(i))) {
                 return false
             }
@@ -742,7 +741,7 @@ object ExplorerUtils {
     }
 
     fun Node.updateWith(item: Node, sorting: NodeSorting? = null): Node {
-        var children = when {
+        val children = when {
             children == null && item.children == null -> null
             children == null || item.children == null -> item.children
             children === item.children -> children
@@ -770,9 +769,6 @@ object ExplorerUtils {
                     iterator.set(actual)
                 }
             }
-        }
-        if (children != null && this.children != null && children.isOpened != this.children.isOpened) {
-            //children = children.copy(isOpened = isOpened)
         }
         val content = when (true) {
             (item.content::class != content::class),
