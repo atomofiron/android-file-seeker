@@ -19,9 +19,9 @@ import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.debugRequireNotNull
+import app.atomofiron.common.util.extension.simpleName
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.HybridTextLayoutDrawable
-import app.atomofiron.searchboxapp.simpleName
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputLayout.BOX_BACKGROUND_FILLED

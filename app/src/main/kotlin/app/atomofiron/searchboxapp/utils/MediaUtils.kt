@@ -6,8 +6,8 @@ import android.provider.MediaStore.Images.Thumbnails.MICRO_KIND
 import android.provider.MediaStore.Images.Thumbnails.MINI_KIND
 import android.util.Size
 import app.atomofiron.common.util.Android
+import app.atomofiron.common.util.extension.logE
 import app.atomofiron.fileseeker.BuildConfig
-import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import java.io.File
 

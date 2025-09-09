@@ -4,10 +4,10 @@ import android.content.Context
 import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.dropLast
 import app.atomofiron.common.util.extension.clear
+import app.atomofiron.common.util.extension.debugDelay
 import app.atomofiron.common.util.extension.replace
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore

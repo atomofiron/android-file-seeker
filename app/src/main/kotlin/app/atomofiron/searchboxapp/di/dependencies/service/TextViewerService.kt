@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.di.dependencies.service
 
+import app.atomofiron.common.util.extension.logE
 import app.atomofiron.searchboxapp.di.dependencies.store.*
-import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent

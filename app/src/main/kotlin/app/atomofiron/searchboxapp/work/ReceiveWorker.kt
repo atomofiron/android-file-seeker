@@ -11,11 +11,11 @@ import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import app.atomofiron.common.util.extension.debugDelay
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Notifications
 import app.atomofiron.searchboxapp.android.receivingNotificationBuilder
 import app.atomofiron.searchboxapp.android.updateChannel
-import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.utils.Const

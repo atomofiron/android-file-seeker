@@ -2,11 +2,11 @@ package app.atomofiron.searchboxapp.screens.result
 
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.AlertMessage
+import app.atomofiron.common.util.extension.logE
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
-import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener

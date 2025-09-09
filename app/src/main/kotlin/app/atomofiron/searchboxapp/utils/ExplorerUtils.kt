@@ -2,8 +2,8 @@ package app.atomofiron.searchboxapp.utils
 
 import android.content.pm.PackageManager
 import app.atomofiron.common.util.MutableList
+import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.property.MutableWeakProperty
-import app.atomofiron.searchboxapp.logE
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node

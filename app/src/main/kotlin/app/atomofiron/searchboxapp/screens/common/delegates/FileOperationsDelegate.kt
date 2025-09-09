@@ -6,12 +6,12 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.UnreachableException
 import app.atomofiron.common.util.dialog.DialogConfig
 import app.atomofiron.common.util.dialog.DialogDelegate
+import app.atomofiron.common.util.extension.debugDelay
 import app.atomofiron.common.util.extension.then
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.LongItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
-import app.atomofiron.searchboxapp.debugDelay
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore

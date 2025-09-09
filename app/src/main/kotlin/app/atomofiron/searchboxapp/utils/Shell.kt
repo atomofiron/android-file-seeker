@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.utils
 
-import app.atomofiron.searchboxapp.logE
+import app.atomofiron.common.util.extension.logE
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import java.io.InputStream
 import java.io.InterruptedIOException
