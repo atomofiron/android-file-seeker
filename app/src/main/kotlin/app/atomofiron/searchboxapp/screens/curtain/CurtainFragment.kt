@@ -7,7 +7,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.Insets
-import androidx.core.view.ViewCompat
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
@@ -23,14 +22,13 @@ import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentCurtainBinding
+import app.atomofiron.searchboxapp.screens.curtain.fragment.BottomSheetKeyboardBehavior
 import app.atomofiron.searchboxapp.screens.curtain.fragment.CurtainContentDelegate
 import app.atomofiron.searchboxapp.screens.curtain.fragment.CurtainNode
 import app.atomofiron.searchboxapp.screens.curtain.fragment.TransitionAnimator
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainBackground
-import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.KeyboardInsetCallback
-import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.KeyboardInsetListener
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getColorByAttr
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -46,18 +44,15 @@ private const val MAX_OVERLAY_SATURATION = 200
 
 class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     BaseFragment<CurtainFragment, CurtainViewState, CurtainPresenter, FragmentCurtainBinding> by BaseFragmentImpl(),
-    TranslucentFragment,
-    KeyboardInsetListener
+    TranslucentFragment
 {
-    private val keyboardCallback = KeyboardInsetCallback(this)
     private lateinit var binding: FragmentCurtainBinding
-    private lateinit var behavior: BottomSheetBehavior<View>
+    private lateinit var behavior: BottomSheetKeyboardBehavior<View>
     private val stack: MutableList<CurtainNode> = ArrayList()
     private lateinit var contentDelegate: CurtainContentDelegate
     private lateinit var transitionAnimator: TransitionAnimator
     private var snackbarView = WeakReference<View>(null)
     private var overlayColor = 0
-    private var bottomPadding = 0
 
     override val isLightStatusBar: Boolean = false
 
@@ -78,9 +73,6 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        view.post { // Ime callback not found. Ignoring unregisterReceivedCallback. callbackId: 16662255
-            ViewCompat.setWindowInsetsAnimationCallback(view, keyboardCallback)
-        }
         binding = FragmentCurtainBinding.bind(view).apply {
             curtainParent.elevation = resources.getDimension(MaterialDimen.m3_comp_snackbar_container_elevation).inc()
             curtainSheet.clipToOutline = true
@@ -99,9 +91,10 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
             }
             root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateSnackbarTranslation() }
             val layoutParams = curtainSheet.layoutParams as CoordinatorLayout.LayoutParams
-            behavior = layoutParams.behavior as BottomSheetBehavior
+            behavior = layoutParams.behavior as BottomSheetKeyboardBehavior
             behavior.addBottomSheetCallback(BottomSheetCallbackImpl(curtainSheet))
             behavior.state = BottomSheetBehavior.STATE_HIDDEN
+            behavior.setWindow(requireActivity().window)
 
             onApplyInsets()
         }
@@ -119,19 +112,14 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         root.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
         val verticalPadding = resources.getDimensionPixelSize(R.dimen.curtain_padding)
         root.setInsetsModifier { _, windowInsets ->
-            keyboardCallback.onApplyWindowInsets(windowInsets)
             val bars = windowInsets[ExtType.barsWithCutout].bottom
             val joystick = windowInsets[ExtType.joystickBottom].bottom
-            bottomPadding = max(joystick, bars + verticalPadding)
+            val bottomPadding = max(joystick, bars + verticalPadding)
+            behavior.onApplyWindowInsets(windowInsets, bottomPadding)
             ExtendedWindowInsets.Builder()
                 .set(ExtType.curtain, Insets.of(0, verticalPadding, 0, bottomPadding))
                 .build()
         }
-    }
-
-    override fun onImeMove(current: Int) {
-        val offset = -max(0, current - bottomPadding)
-        binding.curtainParent.translationY = offset.toFloat()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
