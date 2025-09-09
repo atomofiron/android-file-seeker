@@ -18,6 +18,7 @@ import androidx.core.view.ViewCompat.ScrollAxis
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.children
 import androidx.core.view.doOnPreDraw
 import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.RecyclerView
@@ -69,6 +70,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private val keyboardCallback = KeyboardInsetCallback(KeyboardListener(), delegate.keyboardListener)
     private var isControlling = false // onReady is too slow
 
+    private var neighbourView: View? = null
     private lateinit var recyclerView: RecyclerView
     private lateinit var contentView: ViewGroup
     private var editText: EditText? = null
@@ -135,6 +137,11 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             Direction.Left -> -horizontalMax
         }
         animHorizontally(horizontalCurrent, to)
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        neighbourView = (parent as ViewGroup).children.find { it !== this }
     }
 
     override fun onDetachedFromWindow() {
@@ -330,6 +337,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private fun updateHorizontally(new: Int) {
         contentView.translationX = new.toFloat()
         alpha = AlphaThreshold + (horizontalMax - new.absoluteValue) / horizontalMax.toFloat()
+        neighbourView?.alpha = Alpha.VISIBLE - alpha
         if (new.absoluteValue == horizontalMax) {
             exiting = false
             exitCallback?.invoke()
