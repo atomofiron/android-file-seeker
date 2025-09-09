@@ -130,7 +130,7 @@
     <string name="pref_joystick">Podešavanja ESC dugmeta</string>
     <string name="use_as">Koristi kao…</string>
     <string name="create">Napravi</string>
-    <string name="clone">Kloniraj</string>
+    <string name="duplicate">Dubliraj</string>
     <string name="copy_move">Kopiraj/Premesti</string>
     <string name="create_file_or_dir">Napravi novu datoteku ili fasciklu</string>
     <string name="create_file_dir">Nova datoteka/fascikla</string>

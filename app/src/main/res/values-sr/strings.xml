@@ -130,7 +130,7 @@
     <string name="pref_joystick">Подешавања ESC дугмета</string>
     <string name="use_as">Користи као…</string>
     <string name="create">Направи</string>
-    <string name="clone">Клонирај</string>
+    <string name="duplicate">Дублирај</string>
     <string name="copy_move">Копирај/Премести</string>
     <string name="create_file_or_dir">Направи нову датотеку или фасциклу</string>
     <string name="create_file_dir">Нова датотека/фасцикла</string>

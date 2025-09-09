@@ -134,7 +134,7 @@
     <string name="pref_joystick">ESC button settings</string>
     <string name="use_as">Use as…</string>
     <string name="create">Create</string>
-    <string name="clone">Clone</string>
+    <string name="duplicate">Duplicate</string>
     <string name="copy_move">Copy/Move</string>
     <string name="create_file_or_dir">Create a new file or folder</string>
     <string name="create_file_dir">New file/folder</string>

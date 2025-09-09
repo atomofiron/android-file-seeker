@@ -10,7 +10,7 @@ object Operations {
     val InstallApp = MenuItem(id = Increment(), UniText(R.string.install), R.drawable.ic_download)
     val LaunchApp = MenuItem(id = Increment(), UniText(R.string.launch), R.drawable.ic_play)
     val UseAs = MenuItem(id = Increment(), UniText(R.string.use_as), R.drawable.ic_puzzle)
-    val Clone = MenuItem(id = Increment(), UniText(R.string.clone), R.drawable.ic_clone, forwardable = true)
+    val Duplicate = MenuItem(id = Increment(), UniText(R.string.duplicate), R.drawable.ic_duplicate, forwardable = true)
     val CopyMove = MenuItem(id = Increment(), UniText(R.string.copy_move), R.drawable.ic_copy)
     val Create = MenuItem(id = Increment(), UniText(R.string.create_new), R.drawable.ic_create, longLabel = UniText(R.string.create_file_or_dir), forwardable = true)
     val Rename = MenuItem(id = Increment(), UniText(R.string.rename), R.drawable.ic_rename, forwardable = true)

@@ -85,7 +85,7 @@ class ExplorerCurtainMenuDelegate(
         val options = data ?: return
         val items = options.items
         when (id) {
-            Operations.Clone.id -> controller?.showNext(CLONE)
+            Operations.Duplicate.id -> controller?.showNext(CLONE)
             Operations.Create.id -> controller?.showNext(CREATE)
             Operations.Rename.id -> controller?.showNext(RENAME)
             Operations.Delete.id -> onRemoveConfirm(items)
