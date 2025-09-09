@@ -43,7 +43,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         >
         <com.google.android.material.chip.Chip
-            android:id="@+id/date"
+            android:id="@+id/chip_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_mini"
@@ -53,7 +53,7 @@
             app:chipMinTouchTargetSize="@dimen/chip_area"
             />
         <com.google.android.material.chip.Chip
-            android:id="@+id/time"
+            android:id="@+id/chip_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_mini"
@@ -63,7 +63,7 @@
             app:chipMinTouchTargetSize="@dimen/chip_area"
             />
         <com.google.android.material.chip.Chip
-            android:id="@+id/access"
+            android:id="@+id/chip_access"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_mini"
@@ -73,7 +73,7 @@
             app:chipMinTouchTargetSize="@dimen/chip_area"
             />
         <com.google.android.material.chip.Chip
-            android:id="@+id/owner"
+            android:id="@+id/chip_owner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_mini"
@@ -83,7 +83,7 @@
             app:chipMinTouchTargetSize="@dimen/chip_area"
             />
         <com.google.android.material.chip.Chip
-            android:id="@+id/group"
+            android:id="@+id/chip_group"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_mini"
@@ -93,7 +93,7 @@
             app:chipMinTouchTargetSize="@dimen/chip_area"
             />
         <com.google.android.material.chip.Chip
-            android:id="@+id/details"
+            android:id="@+id/chip_details"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_mini"
@@ -103,7 +103,7 @@
             app:chipMinTouchTargetSize="@dimen/chip_area"
             />
         <com.google.android.material.chip.Chip
-            android:id="@+id/size"
+            android:id="@+id/chip_size"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_mini"
@@ -113,7 +113,7 @@
             app:chipMinTouchTargetSize="@dimen/chip_area"
             />
         <com.google.android.material.chip.Chip
-            android:id="@+id/box"
+            android:id="@+id/chip_box"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_mini"
@@ -123,7 +123,7 @@
             app:chipMinTouchTargetSize="@dimen/chip_area"
             />
         <com.google.android.material.chip.Chip
-            android:id="@+id/alternating"
+            android:id="@+id/chip_alternating"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="@dimen/padding_mini"

@@ -8,6 +8,7 @@
     android:foreground="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true"
+    app:cardBackgroundColor="?colorSurfaceContainer"
     app:cardCornerRadius="@dimen/card_corner_radius"
     app:cardElevation="4dp"
     />

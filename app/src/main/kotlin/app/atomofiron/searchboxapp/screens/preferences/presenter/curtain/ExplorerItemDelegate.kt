@@ -57,30 +57,30 @@ class ExplorerItemDelegate(
     }
 
     private fun CurtainPreferenceExplorerItemBinding.init() {
-        details.isChecked = composition.visibleDetails
-        access.isChecked = composition.visibleAccess
-        owner.isChecked = composition.visibleOwner
-        group.isChecked = composition.visibleGroup
-        date.isChecked = composition.visibleDate
-        time.isChecked = composition.visibleTime
-        size.isChecked = composition.visibleSize
-        box.isChecked = composition.visibleBox
-        alternating.isChecked = composition.visibleBg
+        chipDetails.isChecked = composition.visibleDetails
+        chipAccess.isChecked = composition.visibleAccess
+        chipOwner.isChecked = composition.visibleOwner
+        chipGroup.isChecked = composition.visibleGroup
+        chipDate.isChecked = composition.visibleDate
+        chipTime.isChecked = composition.visibleTime
+        chipSize.isChecked = composition.visibleSize
+        chipBox.isChecked = composition.visibleBox
+        chipAlternating.isChecked = composition.visibleBg
 
         demoItems.setStrokedBackground(vertical = R.dimen.padding_half)
         val dirBinder = ExplorerItemBinderImpl(explorerDir.root)
         val fileBinder = ExplorerItemBinderImpl(explorerFile.root)
         val holders = arrayOf(dirBinder, fileBinder)
         val onClickListener = Listener(*holders)
-        details.setOnClickListener(onClickListener)
-        access.setOnClickListener(onClickListener)
-        owner.setOnClickListener(onClickListener)
-        group.setOnClickListener(onClickListener)
-        date.setOnClickListener(onClickListener)
-        time.setOnClickListener(onClickListener)
-        size.setOnClickListener(onClickListener)
-        box.setOnClickListener(onClickListener)
-        alternating.setOnClickListener(onClickListener)
+        chipDetails.setOnClickListener(onClickListener)
+        chipAccess.setOnClickListener(onClickListener)
+        chipOwner.setOnClickListener(onClickListener)
+        chipGroup.setOnClickListener(onClickListener)
+        chipDate.setOnClickListener(onClickListener)
+        chipTime.setOnClickListener(onClickListener)
+        chipSize.setOnClickListener(onClickListener)
+        chipBox.setOnClickListener(onClickListener)
+        chipAlternating.setOnClickListener(onClickListener)
 
         dirBinder.bind(dir)
         fileBinder.bind(file)
@@ -106,15 +106,15 @@ class ExplorerItemDelegate(
             view as CompoundButton
             val isChecked = view.isChecked
             composition = when (view.id) {
-                R.id.details -> composition.copy(visibleDetails = isChecked)
-                R.id.access -> composition.copy(visibleAccess = isChecked)
-                R.id.owner -> composition.copy(visibleOwner = isChecked)
-                R.id.group -> composition.copy(visibleGroup = isChecked)
-                R.id.date -> composition.copy(visibleDate = isChecked)
-                R.id.time -> composition.copy(visibleTime = isChecked)
-                R.id.size -> composition.copy(visibleSize = isChecked)
-                R.id.box -> composition.copy(visibleBox = isChecked)
-                R.id.alternating -> composition.copy(visibleBg = isChecked)
+                R.id.chip_details -> composition.copy(visibleDetails = isChecked)
+                R.id.chip_access -> composition.copy(visibleAccess = isChecked)
+                R.id.chip_owner -> composition.copy(visibleOwner = isChecked)
+                R.id.chip_group -> composition.copy(visibleGroup = isChecked)
+                R.id.chip_date -> composition.copy(visibleDate = isChecked)
+                R.id.chip_time -> composition.copy(visibleTime = isChecked)
+                R.id.chip_size -> composition.copy(visibleSize = isChecked)
+                R.id.chip_box -> composition.copy(visibleBox = isChecked)
+                R.id.chip_alternating -> composition.copy(visibleBg = isChecked)
                 else -> throw Exception()
             }
             binders.bind()
