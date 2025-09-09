@@ -7,8 +7,8 @@ import app.atomofiron.searchboxapp.custom.view.menu.MenuItemContent
 import app.atomofiron.searchboxapp.model.other.UniText
 
 object Operations {
-    val InstallApp = MenuItem(id = Increment(), UniText(R.string.install), R.drawable.ic_download)
-    val LaunchApp = MenuItem(id = Increment(), UniText(R.string.launch), R.drawable.ic_play)
+    val InstallApp = MenuItem(id = Increment(), UniText(R.string.install), R.drawable.ic_download_circle)
+    val LaunchApp = MenuItem(id = Increment(), UniText(R.string.launch), R.drawable.ic_play_circle)
     val UseAs = MenuItem(id = Increment(), UniText(R.string.use_as), R.drawable.ic_puzzle)
     val Duplicate = MenuItem(id = Increment(), UniText(R.string.duplicate), R.drawable.ic_duplicate, forwardable = true)
     val CopyMove = MenuItem(id = Increment(), UniText(R.string.copy_move), R.drawable.ic_copy)
