@@ -31,7 +31,7 @@
     <dimen name="thumbnail_size">48dp</dimen>
     <dimen name="preview_size">192dp</dimen>
 	<dimen name="title_size">20sp</dimen>
-	<dimen name="title_margin">40dp</dimen>
+	<dimen name="title_margin">36dp</dimen>
 	<dimen name="curtain_title_margin">52dp</dimen>
 	<dimen name="curtain_title_size">@dimen/title_size</dimen>
     <dimen name="background_span_corner_radius">4dp</dimen>

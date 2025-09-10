@@ -21,8 +21,7 @@
         android:layout_height="wrap_content"
         android:clipToPadding="false"
         android:overScrollMode="never"
-        android:paddingHorizontal="@dimen/content_margin_half"
-        android:paddingVertical="@dimen/content_margin_half"
+        android:padding="@dimen/padding_semi"
         android:scrollbars="none"
         />
 </LinearLayout>

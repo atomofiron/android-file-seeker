@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/padding_half"
-    android:layout_marginBottom="@dimen/padding_half"
+    android:layout_marginHorizontal="@dimen/padding_mini"
     android:orientation="horizontal"
     android:gravity="center_vertical"
     >

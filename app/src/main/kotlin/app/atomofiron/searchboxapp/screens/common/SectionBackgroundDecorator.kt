@@ -6,16 +6,25 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.Rect
 import android.view.View
+import android.view.ViewGroup
 import androidx.core.view.children
 import androidx.core.view.marginBottom
+import androidx.core.view.marginEnd
+import androidx.core.view.marginLeft
+import androidx.core.view.marginRight
+import androidx.core.view.marginStart
 import androidx.core.view.marginTop
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.common.recycler.FILL_ROW
+import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
+import app.atomofiron.searchboxapp.utils.isRtl
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.roundToInt
 import kotlin.reflect.KClass
 
 private const val RADII = 8
@@ -28,10 +37,11 @@ class SectionBackgroundDecorator(
     private val paint = Paint()
     private val path = Path()
     private val radii = FloatArray(RADII)
-    private val marginHalf = context.resources.getDimensionPixelSize(R.dimen.padding_half)
+    private val paddingHalf = context.resources.getDimensionPixelSize(R.dimen.padding_half)
+    private val paddingMini = context.resources.getDimension(R.dimen.padding_mini)
     private val internalRadius = context.resources.getDimension(R.dimen.corner_nano)
     private val edgeRadius = context.resources.getDimension(R.dimen.corner_extra)
-    private val internalSpaceHalf = internalRadius / 4
+    private val innerSpace = (internalRadius / 2).roundToInt()
 
     init {
         paint.style = Paint.Style.FILL
@@ -42,26 +52,44 @@ class SectionBackgroundDecorator(
         val adapter = parent.adapter as? ListAdapter<*,*> ?: return
         val reversed = parent.layoutManager?.isLayoutReversed ?: return
         val holder = parent.findContainingViewHolder(view) ?: return
-        if (holder.bindingAdapterPosition < 0) {
-            debugFail { holder.bindingAdapterPosition }
+        holder as GeneralHolder<*>
+        var position = holder.bindingAdapterPosition
+        if (position < 0) {
+            debugFail { position }
             return
         }
-        val item = adapter.currentList[holder.bindingAdapterPosition]
-        val nextItem = adapter.currentList.getOrNull(holder.bindingAdapterPosition.inc())
-        val prevItem = adapter.currentList.getOrNull(holder.bindingAdapterPosition.dec())
+        val item = adapter.currentList[position]
         val current = groups.findGroup(item)
-        if (current != null) {
-            // we cant set top/bottom to the multiple items in a group, so we set to neighbours
-            return
+        var viewIndex = parent.children.indexOfLast { it === view }.dec()
+        position--
+        val minWidth = holder.minWidth().let {
+            if (it == FILL_ROW) it else it + holder.itemView.run { marginStart + marginEnd }
         }
-        var bottom = groups.findGroup(nextItem)
-        var top = groups.findGroup(prevItem)
-        if (reversed) bottom = top.also { top = bottom }
-        if (bottom != null) {
-            outRect.bottom = marginHalf
+        var free = parent.run { width - paddingStart - paddingEnd } - minWidth
+        if (current != null && minWidth != FILL_ROW && parent.getFree(viewIndex) > minWidth) {
+            while (free > 0) {
+                val other = parent.getChildAt(--viewIndex)
+                val prevItem = adapter.currentList.getOrNull(--position)
+                val prev = groups.findGroup(prevItem)
+                when {
+                    other == null -> break
+                    prev != current -> break
+                    else -> free -= other.run { width + marginStart + marginEnd }
+                }
+            }
         }
-        if (top != null) {
-            outRect.top = marginHalf
+        if (position < 0) return
+        val prevItem = adapter.currentList.getOrNull(position)
+        val prev = groups.findGroup(prevItem)
+        val offset = when {
+            current == null && prev == null -> 0
+            current == prev -> 0
+            current != null && prev != null -> paddingHalf + innerSpace
+            else -> paddingMini.roundToInt()
+        }
+        when {
+            reversed -> outRect.bottom = offset
+            else -> outRect.top = offset
         }
     }
 
@@ -104,12 +132,10 @@ class SectionBackgroundDecorator(
     ) {
         val hasTop = if (reversed) hasNext else hasPrev
         val hasBottom = if (reversed) hasPrev else hasNext
-        val left = parent.paddingLeft.toFloat()
-        val right = parent.run { width - paddingRight }.toFloat()
-        var top = start.toFloat()
-        if (hasTop) top += internalSpaceHalf
-        var bottom = last.toFloat()
-        if (hasBottom) bottom -= internalSpaceHalf
+        val left = parent.paddingLeft - paddingMini
+        val right = parent.run { width - paddingRight } + paddingMini
+        val top = start - paddingMini
+        val bottom = last + paddingMini
         val topRadius = if (hasTop) internalRadius else edgeRadius
         radii.setTopRadius(topRadius)
         val bottomRadius = if (hasBottom) internalRadius else edgeRadius
@@ -117,6 +143,15 @@ class SectionBackgroundDecorator(
         path.reset()
         path.addRoundRect(left, top, right, bottom, radii, Path.Direction.CW)
         canvas.drawPath(path, paint)
+    }
+
+    private fun ViewGroup.getFree(childIndex: Int): Int {
+        val child = getChildAt(childIndex)
+        return when {
+            child == null -> 0
+            isRtl() -> child.left - child.marginLeft - paddingLeft
+            else -> width - paddingRight - child.right - child.marginRight
+        }
     }
 
     private fun FloatArray.setTopRadius(value: Float) {

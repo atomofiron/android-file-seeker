@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="@dimen/padding_half"
+    android:paddingHorizontal="@dimen/padding_mini"
+    android:paddingBottom="@dimen/padding_common"
     >
     <androidx.appcompat.widget.AppCompatImageView
         android:layout_width="48dp"

@@ -7,6 +7,8 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 
+const val FILL_ROW = 0f
+
 open class GeneralHolder<D : Any>(view: View) : RecyclerView.ViewHolder(view) {
 
     protected val context: Context = view.context
@@ -31,5 +33,5 @@ open class GeneralHolder<D : Any>(view: View) : RecyclerView.ViewHolder(view) {
 
     protected open fun onBind(item: D, position: Int) = Unit
 
-    open fun minWidth() = 0f
+    open fun minWidth() = FILL_ROW
 }

@@ -180,7 +180,7 @@ class FlexSpanSizeLookup(
 
     private fun Int.toColumns(hungry: Boolean): UInt {
         return when {
-            this <= 0 && hungry -> COLUMNS
+            this <= FILL_ROW && hungry -> COLUMNS
             else -> (this / columnWidth)
                 .ceilToInt()
                 .toUInt()
