@@ -28,10 +28,23 @@ class CoroutineListDiffer<I : Any>(
         listener?.let { listeners.add(it) }
     }
 
-    fun submit(current: List<I>, new: List<I>) {
+    fun submit(new: List<I>, isNew: Boolean) {
+        if (isNew) {
+            counter++
+            updated.clear()
+            isCalculating = false
+            actualList.clear()
+            actualList.addAll(new)
+            adapter.notifyDataSetChanged()
+            listeners.forEach { it.onCurrentListChanged(new) }
+        } else {
+            submit(old = actualList.copy(), new)
+        }
+    }
+
+    private fun submit(old: List<I>, new: List<I>) {
         isCalculating = true
         val currentCounter = ++counter
-        val old = current.copy()
         scope.launch {
             val result = DiffUtil.calculateDiff(DiffCallback(itemCallback, old, new), detectMoves)
             withContext(Dispatchers.Main) {
@@ -52,7 +65,7 @@ class CoroutineListDiffer<I : Any>(
                     }
                     updated.clear()
                 }
-                listeners.forEach { it.onCurrentListChanged(actualList) }
+                listeners.forEach { it.onCurrentListChanged(actualList.copy()) }
             }
         }
     }

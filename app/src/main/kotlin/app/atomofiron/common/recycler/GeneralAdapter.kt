@@ -35,12 +35,12 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>>(
     @SuppressLint("NotifyDataSetChanged")
     fun submit(items: List<D>, isNew: Boolean = false) {
         val differ = differ
-        if (differ == null || isNew) {
+        if (differ == null) {
             mutableItems.clear()
             mutableItems.addAll(items)
             notifyDataSetChanged()
         } else {
-            differ.submit(mutableItems, items)
+            differ.submit(items, isNew)
         }
     }
 
