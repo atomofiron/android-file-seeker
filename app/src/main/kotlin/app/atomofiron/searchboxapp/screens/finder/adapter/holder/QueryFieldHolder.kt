@@ -76,9 +76,7 @@ class QueryFieldHolder(
         }
     }
 
-    override fun onFocusChange(v: View, hasFocus: Boolean) {
-        binding.clear.isActivated = hasFocus
-    }
+    override fun onFocusChange(v: View, hasFocus: Boolean) = bindClearButton(focused = hasFocus)
 
     private fun bindState(query: String) {
         try {
@@ -91,6 +89,15 @@ class QueryFieldHolder(
         val enabled = !error && item.enabled
         binding.button.isEnabled = enabled
         binding.clear.isVisible = textField.length() > 0
+        bindClearButton()
+    }
+
+    private fun bindClearButton(
+        focused: Boolean = textField.hasFocus(),
+        error: Boolean = textLayout.error != null,
+    ) {
+        binding.clear.isActivated = focused
+        binding.clear.isSelected = error
     }
 
     interface OnActionListener {
