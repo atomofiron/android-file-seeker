@@ -79,7 +79,6 @@
     <string name="pref_exclude_dirs">Exclude directories</string>
     <string name="exclude_dirs_summary">From search results</string>
     <string name="pref_use_su">Use super user</string>
-    <string name="preferences">Preferences</string>
     <string name="pref_about">About the App</string>
     <string name="look_github">GitHub repository</string>
     <string name="faq_4pda">FAQ / Discuss</string>

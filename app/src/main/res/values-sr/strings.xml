@@ -76,7 +76,6 @@
     <string name="pref_exclude_dirs">Искључи директоријуме</string>
     <string name="exclude_dirs_summary">Из резултата претраге</string>
     <string name="pref_use_su">Користи root</string>
-    <string name="preferences">Подешавања</string>
     <string name="pref_about">О апликацији</string>
     <string name="look_github">GitHub репозиторијум</string>
     <string name="faq_4pda">FAQ / Дискусија</string>
