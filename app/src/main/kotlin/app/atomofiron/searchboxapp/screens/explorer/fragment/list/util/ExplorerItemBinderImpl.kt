@@ -42,7 +42,7 @@ private const val EMPTY = ""
 class ExplorerItemBinderImpl private constructor(
     private val itemView: View,
     private val binding: ItemExplorerBinding,
-    isOpened: Boolean,
+    private val isOpened: Boolean,
 ) : ExplorerItemBinder {
 
     private lateinit var item: Node
@@ -152,7 +152,7 @@ class ExplorerItemBinderImpl private constructor(
         }
         binding.title.setCompoundDrawablesRelativeWithIntrinsicBounds(if (withThumbnail) item.getIcon() else 0, 0, 0, 0)
         TextViewCompat.setCompoundDrawableTintList(binding.title, iconTint)
-        debugRequire(item.isOpened == (isDeepest != null)) { "isOpened change: ${item.isOpened}, $isDeepest" }
+        debugRequire(item.isOpened == isOpened) { "isOpened change: ${item.isOpened}, $isDeepest" }
         bindState(item.isOpened, item.isDeepest)
     }
 
