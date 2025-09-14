@@ -4,7 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter
-import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
+import app.atomofiron.fileseeker.databinding.ItemHeaderBinding
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
@@ -58,14 +59,8 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCa
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, inflater: LayoutInflater): ResultsHolder {
         return when (viewType) {
-            TYPE_HEADER -> {
-                val itemView = inflater.inflate(R.layout.item_header, parent, false)
-                ResultsHeaderHolder(itemView)
-            }
-            else -> {
-                val itemView = inflater.inflate(R.layout.item_explorer, parent, false)
-                ResultsItemHolder(itemView)
-            }
+            TYPE_HEADER -> ResultsHeaderHolder(ItemHeaderBinding.inflate(inflater, parent, false))
+            else -> ResultsItemHolder(ItemExplorerBinding.inflate(inflater, parent, false))
         }
     }
 

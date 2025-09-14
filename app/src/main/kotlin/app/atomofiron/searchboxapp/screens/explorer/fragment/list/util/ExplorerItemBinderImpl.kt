@@ -13,6 +13,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.ifVisible
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
@@ -25,6 +26,8 @@ import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeDeepest
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeOpened
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
@@ -33,16 +36,17 @@ import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.isRtl
 import com.bumptech.glide.Glide
 
-class ExplorerItemBinderImpl(
+private const val SPACE = " "
+private const val EMPTY = ""
+
+class ExplorerItemBinderImpl private constructor(
     private val itemView: View,
+    private val binding: ItemExplorerBinding,
+    isOpened: Boolean,
 ) : ExplorerItemBinder {
-    companion object {
-        private const val SPACE = " "
-        private const val EMPTY = ""
-    }
 
     private lateinit var item: Node
-    private val binding = ItemExplorerBinding.bind(itemView)
+    private var isDeepest: Boolean? = null
 
     private var dirDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_folder)!!.mutate().translated()
     private var fileDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_file)!!.mutate().translated()
@@ -52,7 +56,7 @@ class ExplorerItemBinderImpl(
 
     private var onItemActionListener: ExplorerItemBinderActionListener? = null
 
-    private val defaultBoxTintList: ColorStateList by lazy(LazyThreadSafetyMode.NONE) { binding.checkBox.buttonTintList!! }
+    private val defaultBoxTintList: ColorStateList
     private val transparentBoxTintList: ColorStateList
 
     private val onClickListener: ((View) -> Unit) = {
@@ -67,20 +71,18 @@ class ExplorerItemBinderImpl(
             onItemActionListener?.onItemCheck(item, checked)
         }
     }
+
+    constructor(itemView: View, isOpened: Boolean) : this(itemView, ItemExplorerBinding.bind(itemView), isOpened)
+
+    constructor(binding: ItemExplorerBinding, isOpened: Boolean = false) : this(binding.root, binding, isOpened)
+
     init {
+        bindState(isOpened, isDeepest = false)
         if (binding.checkBox.buttonTintList == null) {
             binding.checkBox.isUseMaterialThemeColors = true
         }
-        val stateEnabledChecked = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked)
-        val stateDisabledChecked = intArrayOf(-android.R.attr.state_enabled, android.R.attr.state_checked)
-        val stateEnabledUnchecked = intArrayOf(android.R.attr.state_enabled, -android.R.attr.state_checked)
-        val stateDisabledUnchecked = intArrayOf(-android.R.attr.state_enabled, -android.R.attr.state_checked)
-        val colorEnabledChecked = defaultBoxTintList.getColorForState(stateEnabledChecked, Color.RED)
-        val colorDisabledChecked = defaultBoxTintList.getColorForState(stateDisabledChecked, Color.RED)
-        val states = arrayOf(stateEnabledChecked, stateDisabledChecked, stateEnabledUnchecked, stateDisabledUnchecked)
-        val colors = intArrayOf(colorEnabledChecked, colorDisabledChecked, Color.TRANSPARENT, Color.TRANSPARENT)
-        transparentBoxTintList = ColorStateList(states, colors)
-        binding.thumbnail.clipToOutline = true
+        defaultBoxTintList = binding.checkBox.buttonTintList!!
+        transparentBoxTintList = transparentCheckbox(defaultBoxTintList)
 
         val size = binding.details.textSize.toInt()
         dirDrawable.setBounds(0, 0, size, size)
@@ -98,6 +100,7 @@ class ExplorerItemBinderImpl(
         fileDrawable.alpha = Alpha.LEVEL_67
 
         placeholder.setPadding(placeholder.intrinsicSize / 6)
+        binding.thumbnail.clipToOutline = true
     }
 
     override fun bind(item: Node) {
@@ -149,6 +152,30 @@ class ExplorerItemBinderImpl(
         }
         binding.title.setCompoundDrawablesRelativeWithIntrinsicBounds(if (withThumbnail) item.getIcon() else 0, 0, 0, 0)
         TextViewCompat.setCompoundDrawableTintList(binding.title, iconTint)
+        debugRequire(item.isOpened == (isDeepest != null)) { "isOpened change: ${item.isOpened}, $isDeepest" }
+        bindState(item.isOpened, item.isDeepest)
+    }
+
+    private fun transparentCheckbox(defaultBoxTintList: ColorStateList): ColorStateList {
+        val stateEnabledChecked = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked)
+        val stateDisabledChecked = intArrayOf(-android.R.attr.state_enabled, android.R.attr.state_checked)
+        val stateEnabledUnchecked = intArrayOf(android.R.attr.state_enabled, -android.R.attr.state_checked)
+        val stateDisabledUnchecked = intArrayOf(-android.R.attr.state_enabled, -android.R.attr.state_checked)
+        val colorEnabledChecked = defaultBoxTintList.getColorForState(stateEnabledChecked, Color.MAGENTA)
+        val colorDisabledChecked = defaultBoxTintList.getColorForState(stateDisabledChecked, Color.MAGENTA)
+        val states = arrayOf(stateEnabledChecked, stateDisabledChecked, stateEnabledUnchecked, stateDisabledUnchecked)
+        val colors = intArrayOf(colorEnabledChecked, colorDisabledChecked, Color.TRANSPARENT, Color.TRANSPARENT)
+        return ColorStateList(states, colors)
+    }
+
+    private fun bindState(isOpened: Boolean, isDeepest: Boolean) {
+        when {
+            !isOpened -> Unit // always is opened or not
+            isDeepest == this.isDeepest -> Unit
+            isDeepest -> binding.makeDeepest()
+            else -> binding.makeOpened()
+        }
+        this.isDeepest = isDeepest.takeIf { isOpened }
     }
 
     override fun setOnItemActionListener(listener: ExplorerItemBinderActionListener?) {

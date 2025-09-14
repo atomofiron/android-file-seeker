@@ -77,7 +77,7 @@ class StickyTopDelegate(
     }
 
     private fun newSticky(new: Node): ExplorerStickyTopView {
-        val view = ExplorerStickyTopView(stickyBox.context, new.isDeepest, listener)
+        val view = ExplorerStickyTopView(stickyBox.context, listener)
         view.bind(new, composition)
         view.layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
         stickyBox.addView(view)

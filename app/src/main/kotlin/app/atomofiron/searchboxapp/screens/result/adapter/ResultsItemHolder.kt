@@ -1,22 +1,18 @@
 package app.atomofiron.searchboxapp.screens.result.adapter
 
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.view.isVisible
-import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
+import app.atomofiron.fileseeker.databinding.ItemResultCountBinding
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
+import app.atomofiron.searchboxapp.utils.attach
 
-class ResultsItemHolder(itemView: View) : ResultsHolder(itemView) {
-    private val binder = ExplorerItemBinderImpl(itemView)
+class ResultsItemHolder(binding: ItemExplorerBinding) : ResultsHolder(binding.root) {
 
-    private val tvCounter = LayoutInflater
-        .from(itemView.context)
-        .inflate(R.layout.item_result_count, itemView as ViewGroup)
-        .findViewById<TextView>(R.id.result_tv_count)
+    private val binder = ExplorerItemBinderImpl(binding)
+
+    private val tvCounter = binding.root.attach(ItemResultCountBinding::inflate).resultTvCount
 
     fun setOnItemActionListener(listener: ExplorerItemBinderActionListener?) {
         binder.setOnItemActionListener(listener)

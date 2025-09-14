@@ -35,7 +35,6 @@ fun PackageManager.apkInfo(path: String, icon: Boolean = true, signature: Boolea
     info ?: return null
     info.sourceDir = path
     info.publicSourceDir = path
-    packageInfo.installLocation
     return ApkInfo(
         icon = icon then { Thumbnail(info.loadIcon(this)) },
         appName = info.loadLabel(this).toString(),

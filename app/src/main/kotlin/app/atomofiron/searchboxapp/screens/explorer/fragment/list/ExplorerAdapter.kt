@@ -10,10 +10,9 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerItemViewFactory
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerItemViewFactory.CurrentOpenedNodeItem
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerItemViewFactory.NodeItem
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerItemViewFactory.OpenedNodeItem
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerItemViewFactory.SeparatorNodeItem
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerItemViewFactory.Opened
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerItemViewFactory.Regular
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerItemViewFactory.Separator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerSeparatorHolder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ItemVisibilityDelegate
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.NodeCallback
@@ -47,7 +46,7 @@ class ExplorerAdapter(
         super.onAttachedToRecyclerView(recyclerView)
         recyclerView.itemAnimator = null
         viewFactory = RecycleItemViewFactory(recyclerView.context, R.layout.item_explorer)
-        viewFactory.generate(NodeItem.layoutId, recyclerView)
+        viewFactory.generate(Regular.layoutId, recyclerView)
         ExplorerItemViewFactory.entries.forEach {
             recyclerView.recycledViewPool.setMaxRecycledViews(it.viewType, it.cache)
         }
@@ -57,10 +56,9 @@ class ExplorerAdapter(
     override fun getItemViewType(position: Int): Int {
         val item = items[position]
         return when {
-            item.isSeparator() -> SeparatorNodeItem
-            item.isDeepest -> CurrentOpenedNodeItem
-            item.isOpened -> OpenedNodeItem
-            else -> NodeItem
+            item.isSeparator() -> Separator
+            item.isOpened -> Opened
+            else -> Regular
         }.viewType
     }
 
@@ -70,7 +68,7 @@ class ExplorerAdapter(
         if (parent.childCount > viewCacheLimit) {
             viewCacheLimit = parent.childCount
             parent as RecyclerView
-            parent.recycledViewPool.setMaxRecycledViews(NodeItem.viewType, viewCacheLimit)
+            parent.recycledViewPool.setMaxRecycledViews(Regular.viewType, viewCacheLimit)
             viewFactory.setLimit(viewCacheLimit)
         }
         val enum = ExplorerItemViewFactory.entries[viewType]

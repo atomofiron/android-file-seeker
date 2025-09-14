@@ -68,8 +68,8 @@ class ExplorerItemDelegate(
         chipAlternating.isChecked = composition.visibleBg
 
         demoItems.setStrokedBackground(vertical = R.dimen.padding_half)
-        val dirBinder = ExplorerItemBinderImpl(explorerDir.root)
-        val fileBinder = ExplorerItemBinderImpl(explorerFile.root)
+        val dirBinder = ExplorerItemBinderImpl(explorerDir)
+        val fileBinder = ExplorerItemBinderImpl(explorerFile)
         val holders = arrayOf(dirBinder, fileBinder)
         val onClickListener = Listener(*holders)
         chipDetails.setOnClickListener(onClickListener)

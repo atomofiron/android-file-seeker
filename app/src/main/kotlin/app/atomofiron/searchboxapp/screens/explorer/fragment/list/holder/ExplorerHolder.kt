@@ -9,9 +9,9 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemAc
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
 import app.atomofiron.searchboxapp.utils.Const
 
-class ExplorerHolder(itemView: View) : GeneralHolder<Node>(itemView) {
+class ExplorerHolder(itemView: View, isOpened: Boolean) : GeneralHolder<Node>(itemView) {
 
-    private val binder = ExplorerItemBinderImpl(itemView)
+    private val binder = ExplorerItemBinderImpl(itemView, isOpened)
 
     override fun onBind(item: Node, position: Int) = binder.bind(item)
 

@@ -1,11 +1,9 @@
 package app.atomofiron.searchboxapp.screens.result.adapter
 
-import android.view.View
-import android.widget.TextView
 import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemHeaderBinding
 
-class ResultsHeaderHolder(itemView: View) : ResultsHolder(itemView) {
-    private val tvTitle = itemView.findViewById<TextView>(R.id.item_tv_title)
+class ResultsHeaderHolder(private val binding: ItemHeaderBinding) : ResultsHolder(binding.root) {
 
     override fun onBind(item: ResultItem, position: Int) {
         item as ResultItem.Header
@@ -20,6 +18,6 @@ class ResultsHeaderHolder(itemView: View) : ResultsHolder(itemView) {
         if (item.filesCount > 0) {
             string.append(context.resources.getQuantityString(R.plurals.x_files, item.filesCount, item.filesCount))
         }
-        tvTitle.text = string.toString()
+        binding.itemTvTitle.text = string.toString()
     }
 }

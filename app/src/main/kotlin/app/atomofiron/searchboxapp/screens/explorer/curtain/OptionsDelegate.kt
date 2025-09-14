@@ -31,7 +31,7 @@ class OptionsDelegate(private val output: MenuListener) {
         itemView.root.isVisible = single
         title.isVisible = !single
         if (single) {
-            val binder = ExplorerItemBinderImpl(itemView.root)
+            val binder = ExplorerItemBinderImpl(itemView)
             binder.bind(options.items.first())
             binder.bindComposition(options.composition)
             binder.disableClicks()

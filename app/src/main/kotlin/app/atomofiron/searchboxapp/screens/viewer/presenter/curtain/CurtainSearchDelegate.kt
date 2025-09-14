@@ -41,7 +41,7 @@ class CurtainSearchDelegate(
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
         val binding = CurtainTextViewerSearchBinding.inflate(inflater, null, false)
 
-        val holder = ExplorerItemBinderImpl(binding.itemExplorer.root)
+        val holder = ExplorerItemBinderImpl(binding.itemExplorer)
         holder.bind(node)
         holder.bindComposition(composition)
         holder.disableClicks()

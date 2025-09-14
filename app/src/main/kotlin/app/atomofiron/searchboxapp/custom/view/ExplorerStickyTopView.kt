@@ -4,37 +4,27 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.FrameLayout
+import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeDeepest
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeOpened
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
+import app.atomofiron.searchboxapp.utils.attach
 
 @SuppressLint("ViewConstructor")
 class ExplorerStickyTopView(
     context: Context,
-    deepest: Boolean? = null,
     listener: ExplorerItemBinderActionListener? = null,
 ) : FrameLayout(context) {
 
     private val cornerRadius = resources.getDimension(R.dimen.explorer_border_corner_radius)
-    private val binder = LayoutInflater.from(context).inflate(R.layout.item_explorer, this).run {
-        val binding = ItemExplorerBinding.bind(getChildAt(0))
-        when (deepest) {
-            true -> binding.makeDeepest()
-            false -> binding.makeOpened()
-            null -> Unit
-        }
-        ExplorerItemBinderImpl(binding.root)
-    }
+    private val binder = ExplorerItemBinderImpl(attach(ItemExplorerBinding::inflate), isOpened = true)
 
     private var composition: ExplorerItemComposition? = null
     private var item: Node? = null
@@ -61,9 +51,10 @@ class ExplorerStickyTopView(
         item: Node? = this.item,
         composition: ExplorerItemComposition? = this.composition,
     ) {
+        item ?: return debugFail { "why item is null?" }
         this.item = item
         this.composition = composition ?: this.composition
-        item?.let { binder.bind(it) }
+        binder.bind(item)
         composition?.let { binder.bindComposition(it) }
     }
 
