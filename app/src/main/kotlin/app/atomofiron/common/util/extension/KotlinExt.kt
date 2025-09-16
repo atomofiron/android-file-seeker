@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlin.math.ceil
-import kotlin.math.roundToInt
 
 inline fun <T> T.ctx(action: T.() -> Unit) = action()
 
@@ -45,8 +44,6 @@ fun Long.pow(exp: Long): Long {
     }
     return result
 }
-
-fun Float.fix(): Float = (this * 10000).roundToInt() / 10000f
 
 fun <T> List<T>.copy(): List<T> = mutableCopy()
 
