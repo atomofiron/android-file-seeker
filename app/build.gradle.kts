@@ -65,7 +65,7 @@ dependencies {
 // cargo install cargo-ndk
 
 val ndkApi = android.defaultConfig.minSdk
-val nativeLibPath = "$projectDir/../native-lib"
+val nativeLibPath = "$projectDir/../native"
 
 tasks.register<Exec>("buildRust") {
     group = "rust"
