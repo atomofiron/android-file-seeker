@@ -58,3 +58,34 @@ dependencies {
     testImplementation(kotlin("test"))
     androidTestImplementation(libs.androidx.junit)
 }
+
+// cargo install cargo-ndk
+
+val ndkApi = android.defaultConfig.minSdk
+val nativeLibPath = "$projectDir/../native-lib"
+
+tasks.register<Exec>("buildRust") {
+    group = "rust"
+    val cargoPath = "${System.getProperty("user.home")}/.cargo/bin/cargo"
+    workingDir(nativeLibPath)
+    commandLine(
+        cargoPath, "ndk",
+        "-t", "arm64-v8a",
+        "-t", "armeabi-v7a",
+        "-t", "x86",
+        "-t", "x86_64",
+        "-P", "$ndkApi",
+        "-o", "$projectDir/src/main/jniLibs",
+        "build", "--release"
+    ).apply {
+        println("run if fails: cd $nativeLibPath && ${commandLine.joinToString(separator = " ")}\n")
+    }
+}
+
+tasks.named("preBuild") {
+    dependsOn("buildRust")
+}
+
+tasks.named("preBuild") {
+    dependsOn("clean")
+}
