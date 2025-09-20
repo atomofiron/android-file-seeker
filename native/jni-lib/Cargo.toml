@@ -4,7 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [lib]
-crate-type = ["cdylib", "staticlib"]
+name = "native_lib"
+crate-type = [
+    "cdylib", # for lib.so
+    "rlib", # for binary
+    #"staticlib", for ios?
+]
 
 [dependencies]
 jni = "0.21"

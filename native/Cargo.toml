@@ -1,0 +1,6 @@
+[workspace]
+members = [
+    "jni-lib",
+    "cli-bin",
+]
+resolver = "2"

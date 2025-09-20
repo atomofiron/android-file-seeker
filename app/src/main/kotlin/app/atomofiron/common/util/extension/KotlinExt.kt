@@ -2,14 +2,19 @@ package app.atomofiron.common.util.extension
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.math.ceil
 
 inline fun <T> T.ctx(action: T.() -> Unit) = action()
 
-suspend fun withMain(
+inline fun CoroutineScope.launchOnIO(
+    noinline action: suspend CoroutineScope.() -> Unit,
+) = launch(Dispatchers.IO, block = action)
+
+suspend inline fun withMain(
     now: Boolean = false,
-    action: suspend CoroutineScope.() -> Unit,
+    noinline action: suspend CoroutineScope.() -> Unit,
 ) = withContext(if (now) Dispatchers.Main.immediate else Dispatchers.Main, action)
 
 inline infix fun <T> Boolean.then(action: () -> T): T? {

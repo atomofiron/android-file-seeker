@@ -64,6 +64,7 @@ class PreferenceModule {
     @Provides
     @PreferenceScope
     fun preferenceClickPresenterDelegate(
+        context: Context,
         scope: CoroutineScope,
         viewState: PreferenceViewState,
         router: PreferenceRouter,
@@ -74,6 +75,7 @@ class PreferenceModule {
         appSource: AppSource,
     ): PreferenceClickOutput {
         return PreferenceClickPresenterDelegate(
+            context,
             scope,
             viewState,
             router,

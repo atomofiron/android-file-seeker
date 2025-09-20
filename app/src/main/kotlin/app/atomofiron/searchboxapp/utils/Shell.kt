@@ -74,22 +74,19 @@ object Shell {
 
     operator fun get(template: String, toyboxPath: String = Shell.toyboxPath): String = template.replace(TOYBOX, toyboxPath)
 
-    fun checkSu(): Output {
+    fun checkSu(command: String = ""): Output {
         var code = -1
-        var error = ""
+        var error: String
         var process: Process? = null
-        var outputStream: OutputStream? = null
         var errorStream: InputStream? = null
 
         try {
-            process = Runtime.getRuntime().exec(SU)
-            outputStream = process.outputStream
+            val runtime = Runtime.getRuntime()
+            process = when {
+                command.isEmpty() -> runtime.exec(SU)
+                else -> runtime.exec(arrayOf(SU, "-c", command))
+            }
             errorStream = process.errorStream
-            val osw = outputStream.writer()
-
-            osw.write(SU)
-            osw.flush()
-            osw.close()
 
             code = process.waitFor()
             error = errorStream.reader().readText()
@@ -97,7 +94,6 @@ object Shell {
             error = e.message ?: e.toString()
         } finally {
             try {
-                outputStream?.close()
                 errorStream?.close()
                 process?.destroy()
             } catch (e: Exception) { }

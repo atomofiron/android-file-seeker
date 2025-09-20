@@ -1,4 +1,4 @@
 .idea/
 target/
 .cargo/config.toml
-jni-lib/Cargo.lock
+Cargo.lock

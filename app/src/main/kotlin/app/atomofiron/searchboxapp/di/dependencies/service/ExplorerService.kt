@@ -1,14 +1,18 @@
 package app.atomofiron.searchboxapp.di.dependencies.service
 
 import android.content.Context
+import android.widget.Toast
 import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.dropLast
 import app.atomofiron.common.util.extension.clear
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.debugDelay
+import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.common.util.extension.replace
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.android.NativeBridge
+import app.atomofiron.searchboxapp.android.verifyNativeBin
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -48,6 +52,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortByName
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateWith
+import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.findWithIndex
 import app.atomofiron.searchboxapp.utils.mutate
@@ -56,7 +61,6 @@ import app.atomofiron.searchboxapp.utils.replaceEach
 import app.atomofiron.searchboxapp.utils.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
@@ -86,11 +90,13 @@ class ExplorerService(
     init {
         val useSuDefined = Job()
         val toyboxDefined = Job()
-        appScope.launch(Dispatchers.IO) {
+        NativeBridge.setBinDir(context.filesDir.absolutePath)
+        appScope.launchOnIO {
             garden {
                 useSuDefined.join()
                 toyboxDefined.join()
                 context.resolveToybox(preferenceStore.toyboxVariant.value)
+                if (config.useSu) checkSu()
                 initRoots()
                 get(store.currentTabKey.value).render()
             }
@@ -116,6 +122,16 @@ class ExplorerService(
         val variant = verify(embedded)
         Shell.toyboxPath = variant.path
         preferenceStore { setEmbeddedToybox(variant) }
+    }
+
+    private suspend fun checkSu() {
+        val result = context.verifyNativeBin()
+        if (result is Rslt.Err) {
+            preferenceStore.setUseSu(false)
+            if (result.message.isNotEmpty()) {
+                Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
     fun getFlow(key: NodeTabKey): SharedFlow<NodeTabItems> = garden.getFlow(key)
