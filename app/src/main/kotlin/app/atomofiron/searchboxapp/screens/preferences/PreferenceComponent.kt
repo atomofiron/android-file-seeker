@@ -3,6 +3,8 @@ package app.atomofiron.searchboxapp.screens.preferences
 import android.content.Context
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceDataStore
+import app.atomofiron.common.util.ActivityProperty
+import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.custom.preference.UpdateActionListener
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
@@ -12,6 +14,7 @@ import app.atomofiron.searchboxapp.di.dependencies.service.PreferenceService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
 import app.atomofiron.searchboxapp.screens.preferences.presenter.ExportImportPresenterDelegate
@@ -32,7 +35,7 @@ import javax.inject.Scope
 annotation class PreferenceScope
 
 @PreferenceScope
-@Component(dependencies = [PreferenceDependencies::class], modules = [PreferenceModule::class])
+@Component(dependencies = [PreferenceDependencies::class], modules = [PreferenceModule::class, DelegateModule::class])
 interface PreferenceComponent {
     @Component.Builder
     interface Builder {
@@ -73,6 +76,7 @@ class PreferenceModule {
         curtainChannel: CurtainChannel,
         resources: AppResources,
         appSource: AppSource,
+        dialogs: DialogDelegate,
     ): PreferenceClickOutput {
         return PreferenceClickPresenterDelegate(
             context,
@@ -84,6 +88,7 @@ class PreferenceModule {
             curtainChannel,
             resources,
             appSource,
+            dialogs,
         )
     }
 
@@ -124,6 +129,10 @@ class PreferenceModule {
     @Provides
     @PreferenceScope
     fun router(fragment: WeakProperty<out Fragment>): PreferenceRouter = PreferenceRouter(fragment)
+
+    @Provides
+    @PreferenceScope
+    fun activity(property: WeakProperty<out Fragment>): ActivityProperty = property.map { it?.activity }
 
     @Provides
     @PreferenceScope

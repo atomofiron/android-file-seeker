@@ -23,6 +23,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
@@ -45,6 +46,8 @@ import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.model.other.UniText
+import app.atomofiron.searchboxapp.model.other.get
 import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -87,6 +90,12 @@ fun Context.resolve(intent: Intent): Boolean {
 }
 
 fun Context.getMarketIntent() = Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName"))
+
+fun Context.showShortToast(text: UniText) = showToast(text, Toast.LENGTH_SHORT)
+
+fun Context.showLongToast(text: UniText) = showToast(text, Toast.LENGTH_LONG)
+
+private fun Context.showToast(text: UniText, duration: Int) = Toast.makeText(this, resources[text], duration).show()
 
 fun Resources.getString(error: NodeError, content: NodeContent? = null): String {
     return when (error) {

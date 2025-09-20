@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.di.dependencies.service
 
 import android.content.Context
-import android.widget.Toast
 import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.dropLast
 import app.atomofiron.common.util.extension.clear
@@ -9,6 +8,7 @@ import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.debugDelay
 import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.common.util.extension.replace
+import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
@@ -37,6 +37,7 @@ import app.atomofiron.searchboxapp.model.explorer.isMedia
 import app.atomofiron.searchboxapp.model.explorer.isMovie
 import app.atomofiron.searchboxapp.model.explorer.isPicture
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
+import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils
@@ -58,6 +59,7 @@ import app.atomofiron.searchboxapp.utils.findWithIndex
 import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.searchboxapp.utils.removeOneIf
 import app.atomofiron.searchboxapp.utils.replaceEach
+import app.atomofiron.searchboxapp.utils.showLongToast
 import app.atomofiron.searchboxapp.utils.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -129,7 +131,9 @@ class ExplorerService(
         if (result is Rslt.Err) {
             preferenceStore.setUseSu(false)
             if (result.message.isNotEmpty()) {
-                Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                withMain {
+                    context.showLongToast(result.message.toUni())
+                }
             }
         }
     }

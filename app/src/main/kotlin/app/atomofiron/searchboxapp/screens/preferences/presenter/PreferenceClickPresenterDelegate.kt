@@ -3,17 +3,20 @@ package app.atomofiron.searchboxapp.screens.preferences.presenter
 import android.content.Context
 import app.atomofiron.common.arch.Recipient
 import app.atomofiron.common.util.Android
+import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.verifyNativeBin
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.AppSource
+import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceRouter
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
 import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.*
+import app.atomofiron.searchboxapp.utils.Const.LF
 import app.atomofiron.searchboxapp.utils.Rslt
 import kotlinx.coroutines.CoroutineScope
 
@@ -27,6 +30,7 @@ class PreferenceClickPresenterDelegate(
     curtainChannel: CurtainChannel,
     resources: AppResources,
     appSource: AppSource,
+    private val dialogs: DialogDelegate,
 ) : Recipient, PreferenceClickOutput {
 
     val resources by resources
@@ -66,7 +70,12 @@ class PreferenceClickPresenterDelegate(
             val message = result.message
                 .takeIf { it.isNotBlank() }
                 ?: resources.getString(R.string.not_allowed)
-            viewState.showAlert(message)
+            val first = message.indexOfFirst { it == LF }
+            val last = message.indexOfLast { it == LF }
+            when {
+                first != last -> dialogs.showError(message.toUni())
+                else -> viewState.showAlert(message)
+            }
         }
         return result.isOk
     }
