@@ -3,7 +3,6 @@
 !/.idea/icon.png
 *.iml
 /gradle/wrapper/gradle-wrapper.jar
-gradlew*
 .gradle/
 .kotlin/
 local.properties
