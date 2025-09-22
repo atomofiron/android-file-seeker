@@ -152,7 +152,7 @@ class ExplorerItemBinderImpl private constructor(
         }
         binding.title.setCompoundDrawablesRelativeWithIntrinsicBounds(if (withThumbnail) item.getIcon() else 0, 0, 0, 0)
         TextViewCompat.setCompoundDrawableTintList(binding.title, iconTint)
-        debugRequire(item.isOpened == isOpened) { "isOpened change: ${item.isOpened}, $isDeepest" }
+        debugRequire(item.isOpened == isOpened) { "${item.name} isOpened change: $isOpened -> ${item.isOpened}, isDeepest=$isDeepest" }
         bindState(item.isOpened, item.isDeepest)
     }
 

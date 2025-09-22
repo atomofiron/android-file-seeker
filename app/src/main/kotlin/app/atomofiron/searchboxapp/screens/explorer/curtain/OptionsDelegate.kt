@@ -32,7 +32,7 @@ class OptionsDelegate(private val output: MenuListener) {
         title.isVisible = !single
         if (single) {
             val binder = ExplorerItemBinderImpl(itemView)
-            binder.bind(options.items.first())
+            binder.bind(options.items.first().closed())
             binder.bindComposition(options.composition)
             binder.disableClicks()
             itemView.root.setStrokedBackground(vertical = R.dimen.padding_half)

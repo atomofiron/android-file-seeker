@@ -68,4 +68,10 @@ data class Node(
     }
 
     fun getOpenedIndex(): Int = children?.indexOfFirst { it.isOpened } ?: -1
+
+    fun closed() = when {
+        children == null -> this
+        isOpened -> copy(children = children.copy(isOpened = false), isDeepest = false)
+        else -> this
+    }
 }
