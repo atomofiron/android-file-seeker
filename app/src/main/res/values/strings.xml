@@ -11,8 +11,8 @@
     <string name="search_empty">Search returned no results</string>
     <string name="search_succeed">Search completed successfully</string>
     <string name="search_failed">Search ended with an error</string>
-    <string name="search_for_content_result">Substrings: %d, files: %d, total files: %d</string>
-    <string name="search_for_names_result">Files: %d, total files: %d</string>
+    <string name="search_for_content_result">Substrings: %1$d, files: %2$d, total files: %3$d</string>
+    <string name="search_for_names_result">Files: %1$d, total files: %2$d</string>
     <string name="search_error">Error: %s</string>
     <string name="error">Error</string>
     <string name="wrong_value">Wrong value</string>
@@ -189,7 +189,7 @@
     <string name="install">Install</string>
     <string name="install_succeeded">Install succeeded</string>
     <string name="launch">Launch</string>
-    <string name="apk_info">Package: %s\nVersion: %s\nMin SDK: %s\nTarget SDK: %s\nCompile SDK: %s\nSignature: %s</string>
+    <string name="apk_info">Package: %1$s\nVersion: %2$s\nMin SDK: %3$s\nTarget SDK: %4$s\nCompile SDK: %5$s\nSignature: %6$s</string>
     <string name="update">Update</string>
     <string name="channel_name_updates">Updates</string>
     <string name="search_here">Search here:</string>

@@ -180,7 +180,7 @@
     <string name="install">Instaliraj</string>
     <string name="install_succeeded">Instalacija uspešna</string>
     <string name="launch">Pokreni</string>
-    <string name="apk_info">Paket: %s\nVerzija: %s\nMin. SDK: %s\nCiljna SDK: %s\nKompil. SDK: %s\nPotpis: %s</string>
+    <string name="apk_info">Paket: %1$s\nVerzija: %2$s\nMin. SDK: %3$s\nCiljna SDK: %4$s\nKompil. SDK: %5$s\nPotpis: %6$s</string>
     <string name="update">Ažuriraj</string>
     <string name="channel_name_updates">Ažuriranja</string>
     <string name="search_here">Pretraga ovde:</string>
