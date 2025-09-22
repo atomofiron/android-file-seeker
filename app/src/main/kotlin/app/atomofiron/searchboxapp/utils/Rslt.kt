@@ -12,7 +12,7 @@ sealed class Rslt<T>(val isOk: Boolean) {
         }
         abstract val data: T
     }
-    abstract class Err<T> : Rslt<T>(isOk = false) {
+    open class Err<T> : Rslt<T>(isOk = false) {
         companion object {
             private data class Err<T>(override val message: String) : Rslt.Err<T>()
             operator fun <T> invoke(message: String): Rslt.Err<T> = Err(message)

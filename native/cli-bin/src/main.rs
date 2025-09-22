@@ -1,5 +1,5 @@
-use native_lib::features::foo::foo;
+use native_lib::features::r#type::file_type;
 
 fn main() {
-    foo(13, 37);
+    file_type(&"/sdcard/".to_string());
 }

@@ -65,7 +65,7 @@ class PreferenceStore(
         }
     }
 
-    val useSu = getFlow(KeyUseSu)
+    val asSu = getFlow(KeyUseSu)
 
     suspend fun setUseSu(value: Boolean) {
         edit { it[KeyUseSu] = value }

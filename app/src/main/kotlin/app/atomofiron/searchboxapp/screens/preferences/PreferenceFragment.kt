@@ -72,9 +72,9 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         viewState.appUpdate.collect(lifecycleScope) {
             uppUpdate.bind(it)
         }
-        val useSu = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyUseSu.name)!!
-        viewState.useSu.collect(lifecycleScope) {
-            useSu.isChecked = it
+        val asSu = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyUseSu.name)!!
+        viewState.asSu.collect(lifecycleScope) {
+            asSu.isChecked = it
         }
         val toybox = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyToybox.name)!!
         viewState.toybox.collect(lifecycleScope) {

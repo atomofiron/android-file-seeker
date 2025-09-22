@@ -34,10 +34,10 @@ class FinderService(
     fun search(query: String, where: List<Node>, config: SearchOptions) {
         val maxSize = preferenceStore.maxFileSizeForSearch.value
         val maxDepth = preferenceStore.maxDepthForSearch.value
-        val useSu = preferenceStore.useSu.value
+        val asSu = preferenceStore.asSu.value
 
         val targets = where.map { it.path }.toTypedArray()
-        val inputData = FinderWorker.inputData(query, useSu, config, maxSize, maxDepth, targets)
+        val inputData = FinderWorker.inputData(query, asSu, config, maxSize, maxDepth, targets)
         val request = OneTimeWorkRequest.Builder(FinderWorker::class.java)
             .setInputData(inputData)
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)

@@ -5,6 +5,8 @@ import app.atomofiron.searchboxapp.android.NativeBridge.binPath
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.writeTo
+import bridge.Bridge
+import bridge.commandMsg
 import java.io.File
 import java.io.FileOutputStream
 
@@ -19,12 +21,44 @@ object NativeBridge {
         System.loadLibrary("native_lib")
     }
 
-    external fun run(command: String, args: Array<String>): ByteArray
-    external fun runAsync(command: String, args: Array<String>, callback: (ByteArray) -> Unit)
+    external fun run(command: ByteArray, vararg args: String): ByteArray
+    external fun runAsync(command: ByteArray, vararg args: String, callback: (ByteArray) -> Unit)
 
     fun setBinDir(path: String) {
         binPath = "$path/$NATIVE_BIN"
     }
+
+    fun createFile(path: String, asSu: Boolean): Rslt<Bridge.Meta> = run(Bridge.Command.MKFILE, asSu, path)
+
+    fun createDir(path: String, asSu: Boolean): Rslt<Bridge.Meta> = run(Bridge.Command.MKDIR, asSu, path)
+
+    fun type(path: String, asSu: Boolean): Rslt<Bridge.TypeEntry> = run(Bridge.Command.TYPE, asSu, path)
+
+    fun types(path: String, asSu: Boolean): Rslt<List<Bridge.TypeEntry>> = run(Bridge.Command.TYPES, asSu, path)
+
+    fun meta(path: String, asSu: Boolean): Rslt<Bridge.Meta> = run(Bridge.Command.META, asSu, path)
+
+    fun metas(path: String, asSu: Boolean): Rslt<List<Bridge.Meta>> = run(Bridge.Command.METAS, asSu, path)
+
+    fun delete(path: String, asSu: Boolean): Rslt<Boolean> = run(Bridge.Command.DELETE, asSu, path)
+
+    private inline fun <reified R> run(command: Bridge.Command, asSu: Boolean, vararg args: String): Rslt<R> {
+        val msg = commandMsg { cmd = command }
+        // todo asSu
+        val bytes = run(msg.toByteArray(), *args)
+        val result = Bridge.ResultMsg.parseFrom(bytes)
+        val data = when (result.dataCase) {
+            Bridge.ResultMsg.DataCase.OK -> result.ok
+            Bridge.ResultMsg.DataCase.META -> result.meta
+            Bridge.ResultMsg.DataCase.METAS -> result.metas.entriesList
+            Bridge.ResultMsg.DataCase.TYPE -> result.type
+            Bridge.ResultMsg.DataCase.TYPES -> result.types.entriesList
+            Bridge.ResultMsg.DataCase.ERROR -> return Rslt.Err(result.error)
+            Bridge.ResultMsg.DataCase.DATA_NOT_SET -> return Rslt.Err()
+        }
+        return Rslt.Ok(data as R)
+    }
+
 }
 
 fun Context.verifyNativeBin(): Rslt<Unit> {

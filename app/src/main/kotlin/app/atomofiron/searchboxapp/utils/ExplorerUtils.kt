@@ -3,7 +3,9 @@ package app.atomofiron.searchboxapp.utils
 import android.content.pm.PackageManager
 import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.extension.logE
+import app.atomofiron.common.util.extension.takeIfDebug
 import app.atomofiron.common.util.property.MutableWeakProperty
+import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -21,6 +23,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeState
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import app.atomofiron.searchboxapp.utils.Const.SLASH
+import bridge.Bridge
 import kotlinx.coroutines.Job
 import java.io.BufferedInputStream
 import java.io.FileInputStream
@@ -37,42 +40,41 @@ object ExplorerUtils {
 
     private const val ROOT_PARENT_PATH = "root_parent_path"
 
-    private const val TOTAL = "total"
     private const val ROOT = SLASH.toString()
     private const val DIR_CHAR = 'd'
     private const val LINK_CHAR = 'l'
     private const val FILE_CHAR = '-'
-    private const val LS_NO_SUCH_FILE = "ls: %s: No such file or directory"
-    private const val LS_PERMISSION_DENIED = "ls: %s: Permission denied"
+    private const val LS_NO_SUCH_FILE = "No such file or directory"
+    private const val LS_PERMISSION_DENIED = "Permission denied"
     private const val COMMAND_PATH_PREFIX = "[a-z]+: %s: "
 
-    private const val DIRECTORY = "directory"
-    private const val FILE_PNG = "PNG image data"
-    private const val FILE_JPEG = "JPEG image data"
-    private const val FILE_GIF = "GIF image data"
-    private const val FILE_ZIP = "Zip archive data"
-    private const val FILE_GZIP = "gzip compressed data"
-    private const val FILE_JAVA = "Java class file"
-    private const val FILE_XZ = "xz compressed data"
-    private const val FILE_BZIP2 = "bzip2 compressed data"
-    private const val FILE_TAR = "POSIX tar archive" // (GNU)
-    private const val FILE_UTF8_TEXT = "UTF-8 text"
-    private const val FILE_ASCII_TEXT = "ASCII text"
-    private const val FILE_PDF = "PDF document" //, version 1.6
-    private const val FILE_DATA = "data" // pdf mp4 mp3 ogg rar webp
-    private const val FILE_EMPTY = "empty"
-    private const val FILE_BOOTING = "Android bootimg" // img
-    private const val FILE_BOOT_IMAGE = "Android boot image v2" // img
-    private val FILE_SH_SCRIPT = Regex("^[^ ]+ script") // sh
-    private const val FILE_OGG = "Ogg data, opus audio" // oga
-    private const val FILE_PEM = "PEM certificate" // pem
-    private const val FILE_ELF_EXE = "ELF executable"
-    private const val FILE_ELF_RE = "ELF relocatable"
-    private const val FILE_ELF_SO = "ELF shared object" //, 64-bit LSB x86-64, dynamic (/lib64/ld-linux-x86-64.so.2), not stripped
-    private const val FILE_MSP_EXE = "MS PE32+ executable" // (console) x86-64, (GUI) x86-64
-    private const val FILE_MS_EXE = "MS PE32 executable" //  (GUI) x86
-    private const val FILE_APL_EXE = "Mach-O 64-bit x86-64 executable"
-    private const val FILE_APLS_EXE = "Mach-O 64-bit arm64 executable"
+    private const val DIRECTORY = "inode/directory"
+    private const val FILE_UNKNOWN = "application/octet-stream"
+    private const val FILE_PICTURE = "image/"
+    private const val FILE_ZIP = "application/zip"
+    private const val FILE_GZIP = "application/gzip"
+    private const val FILE_JAVA = "application/java-vm"
+    private const val FILE_XZ = "application/x-xz"
+    private const val FILE_BZIP2 = "application/x-bzip2"
+    private const val FILE_TAR = "application/x-tar"
+    private const val FILE_TEXT = "text/plain"
+    private const val FILE_SCRIPT = "text/x-"
+    private const val FILE_PDF = "application/pdf"
+    private const val FILE_AUDIO = "audio/"
+    private const val FILE_VIDEO = "video/"
+    private const val FILE_MATROSKA = "application/x-matroska"
+    private const val FILE_PEM = "application/pkix-cert+pem"
+    private const val FILE_CERT = "application/pkix-cert"
+    private const val FILE_CA_CERT = "application/x-x509-ca-cert"
+    private const val FILE_ELF_EXE = "application/x-executable"
+    private const val FILE_ELF_RE = "application/x-object"
+    private const val FILE_ELF_SO = "application/x-sharedlib"
+    private const val FILE_MSP_EXE = "application/x-dosexec"
+    private const val FILE_MS_EXE = "application/x-dosexec"
+    private const val FILE_APL_EXE = "application/x-mach-binary"
+    private const val FILE_APLS_EXE = "application/x-mach-binary"
+    private const val FILE_TORRENT = "application/x-bittorrent"
+    private const val FILE_ODT = "application/vnd.oasis.opendocument.text"
 
     private const val EXT_APNG = ".apng"
     private const val EXT_PNG = ".png"
@@ -102,6 +104,7 @@ object ExplorerUtils {
     private const val EXT_YAML = ".yaml"
     private const val EXT_HTML = ".html"
     private const val EXT_SH = ".sh"
+    private const val EXT_BAT = ".bat"
     private const val EXT_IMG = ".img"
     private const val EXT_MP4 = ".mp4"
     private const val EXT_MKV = ".mkv"
@@ -133,9 +136,7 @@ object ExplorerUtils {
     private const val EXT_OSR = ".osr" // osu replay
     private const val EXT_OSB = ".osb" // osu storyboard
 
-    private val spaces = Regex(" +")
     private val lastPart = Regex("(?<=/)/*[^/]+/*$|^/+$")
-    private val fileType = Regex(": +")
 
     fun String.completePath(directory: Boolean): String = when {
         this == ROOT -> this
@@ -168,33 +169,33 @@ object ExplorerUtils {
         }
     }
 
-    fun copy(from: Node, to: Node, useSu: Boolean): Node {
-        val output = Shell.exec(Shell[Shell.COPY].format(from.path, to.path), useSu)
-        val new = to.update(CacheConfig(useSu), ensureCached = false)
+    fun copy(from: Node, to: Node, asSu: Boolean): Node {
+        val output = Shell.exec(Shell[Shell.COPY].format(from.path, to.path), asSu)
+        val new = to.update(CacheConfig(asSu), ensureCached = false)
         return when {
             output.success -> new
             else -> from.copy(error = output.error.toNodeError(from.path))
         }
     }
 
-    fun create(parent: Node, name: String, directory: Boolean, useSu: Boolean): Node {
+    fun create(parent: Node, name: String, directory: Boolean, asSu: Boolean): Node? {
         var targetPath = parent.path + name
         if (directory) {
             targetPath = targetPath.completePath(directory = true)
         }
         val output = when {
-            directory -> Shell.exec(Shell[Shell.MKDIR].format(targetPath), useSu)
-            else -> Shell.exec(Shell[Shell.TOUCH].format(targetPath), useSu)
+            directory -> NativeBridge.createDir(targetPath, asSu)
+            else -> NativeBridge.createFile(targetPath, asSu)
         }
         val content = when {
             directory -> NodeContent.Directory()
-            else -> NodeContent.Unknown
+            else -> NodeContent.Empty
         }
-        val item = Node(path = targetPath, parentPath = parent.path, rootId = parent.rootId, content = content)
-        return when {
-            output.success -> item.update(CacheConfig(useSu))
-            else -> item.copy(error = output.error.toNodeError(targetPath))
+        val meta = when (output) {
+            is Rslt.Ok -> output.data
+            is Rslt.Err -> return null
         }
+        return Node(path = targetPath, parentPath = parent.path, rootId = parent.rootId, properties = meta.toProperties(), content = content)
     }
 
     fun Node.Companion.asRoot(path: String, type: NodeRoot.NodeRootType): Node {
@@ -206,28 +207,24 @@ object ExplorerUtils {
         )
     }
 
-    private fun parse(line: String, name: String? = null, size: String = ""): NodeProperties {
-        val parts = line.split(spaces, 7)
-        val last = parts.last()
-        val time = last.substring(0, 5)
-        val isFile = parts[0].firstOrNull() == FILE_CHAR
-        val length = if (!isFile) 0 else parts[4].toLong()
-        val hrSize = if (!isFile) size else length.toSize()
-        // the name can start with spaces
-        val nodeName = name ?: last.substring(6, last.length)
-        // todo links name.contains('->')
+    private fun Bridge.Meta.toProperties(
+        name: String = this.name,
+        size: String = "",
+    ): NodeProperties {
+        val isFile = access.firstOrNull() == FILE_CHAR
         return NodeProperties(
-            access = parts[0],
-            owner = parts[2],
-            group = parts[3],
-            size = hrSize,
-            date = parts[5],
+            name = name,
+            access = access,
+            owner = owner,
+            group = group,
+            date = date,
             time = time,
-            name = nodeName,
-            length = length,
+            length = if (!isFile) 0 else length,
+            size = if (!isFile) size else this.size,
         )
     }
 
+    const val DIMENS = "BKMGTPEZYRQ"
     private fun Long.toSize(): String {
         when {
             this == 0L -> return "0B"
@@ -236,7 +233,7 @@ object ExplorerUtils {
         var dim = 0
         var tmp = this
         var secondary = 0L
-        while (tmp >= 1024 && dim < 5) {
+        while (tmp >= 1024 && dim < DIMENS.lastIndex.dec()) {
             secondary = tmp % 1024
             tmp /= 1024
             dim++
@@ -254,7 +251,7 @@ object ExplorerUtils {
                 builder.append(dec)
             }
         }
-        builder.append("BKMGT"[dim])
+        builder.append(DIMENS[dim])
         return builder.toString()
     }
 
@@ -290,19 +287,15 @@ object ExplorerUtils {
     }
 
     fun Node.update(config: CacheConfig, ensureCached: Boolean = true): Node {
-        val output = Shell.exec(Shell[Shell.LS_LALD_FILE].format(path, path), config.useSu)
-        val lines = output.output.split(LF)
-        return when {
-            output.success && lines.size == 2 -> parseNode(lines.first())
-                .resolveType(type = lines.last(), path = path)
+        return when (val type = NativeBridge.type(path, config.asSu)) {
+            is Rslt.Ok -> parseNode(type.data.meta).resolveType(type.data.mime)
                 .run { if (ensureCached) ensureCached(config, oldProps = properties) else this }
-            output.success -> copy(children = null, error = null)
-            else -> copy(error = output.error.toNodeError(path))
+            is Rslt.Err -> copy(error = type.message.toNodeError(path))
         }
     }
 
     private fun Node.ensureCached(config: CacheConfig, oldProps: NodeProperties): Node = when {
-        isDirectory -> cacheDir(config.useSu)
+        isDirectory -> cacheDir(config.asSu)
         length == 0L && oldProps.size != size -> resolveFileType()
         length == 0L -> this
         isCached && oldProps.size == size -> this
@@ -314,38 +307,35 @@ object ExplorerUtils {
         }
     }
 
-    private fun Node.cacheDir(useSu: Boolean): Node {
-        val output = Shell.exec(Shell[Shell.LS_LAL].format(path), useSu)
-        val lines = output.output.split(LF).filter { it.isNotEmpty() }
-        return when {
-            output.success && lines.isEmpty() -> copy(children = null, error = null)
-            output.success -> parseDir(lines)
-            else -> copy(error = output.error.toNodeError(path))
+    private fun Node.cacheDir(asSu: Boolean): Node {
+        val result = NativeBridge.metas(path, asSu)
+        return when (result) {
+            is Rslt.Ok -> parseDir(result.data)
+            is Rslt.Err -> copy(error = result.message.toNodeError(path))
         }
     }
 
     /** resolve content types */
-    fun Node.resolveDirChildren(useSu: Boolean): Boolean {
+    fun Node.resolveDirChildren(asSu: Boolean): Boolean {
         val children = children ?: return false
-        val output = Shell.exec(Shell[Shell.CD_FILE_CHILDREN].format(path), useSu)
-        val lines = output.output.split(LF).filter { it.isNotEmpty() }
-        when {
-            !output.success -> return false
-            lines.isEmpty() -> return false
+        val types = NativeBridge.types(path, asSu)
+        val entries = when (types) {
+            is Rslt.Ok -> types.data
+            is Rslt.Err -> return false
         }
-        lines.map { it.split(fileType) }.forEach { (path, type) ->
-            val name = path.substring(2) // remove Shell.DOT_SLASH = "./"
+        entries.forEach { entry ->
             val index = children.items
-                .indexOfFirst { it.name == name }
+                .indexOfFirst { it.name == entry.meta.name }
                 .also { if (it < 0) return@forEach }
             children.run {
-                items[index] = items[index].resolveType(type = type)
+                items[index] = items[index].resolveType(mimeType = entry.mime)
+                    .copy(properties = entry.meta.toProperties())
             }
         }
-        return true
+        return entries.isNotEmpty()
     }
 
-    fun Node.resolveSize(useSu: Boolean): String = Shell.exec(Shell[Shell.DU_HD0].format(path), useSu)
+    fun Node.resolveSize(asSu: Boolean): String = Shell.exec(Shell[Shell.DU_HD0].format(path), asSu)
         .output
         .split(Const.TAB)
         .takeIf { it.size == 2 }
@@ -353,21 +343,16 @@ object ExplorerUtils {
         ?.replace(".0", "")
         ?: ""
 
-    private fun Node.resolveType(type: String, path: String): Node {
-        return resolveType(type.substring(path.length + 2)) // cutoff "/path: "
-    }
-
-    private fun Node.resolveType(type: String): Node {
+    private fun Node.resolveType(mimeType: String): Node {
         val content = when (true) {
-            (content is NodeContent.Directory) -> content
-            type.isBlank(),
-            (type == FILE_DATA) -> content.resolveFileType(path)
-            (type == FILE_EMPTY) -> NodeContent.Empty
-            (type == DIRECTORY) -> content.ifNotCached { NodeContent.Directory() }
-            type.startsWith(FILE_PNG) -> content.ifNotCached { NodeContent.Picture.run { if (path.endsWith(EXT_APNG)) apng(path, type) else png(path, type) } }
-            type.startsWith(FILE_JPEG) -> content.ifNotCached { NodeContent.Picture.jpeg(path, type) }
-            type.startsWith(FILE_GIF) -> content.ifNotCached { NodeContent.Picture.gif(path, type) }
-            type.startsWith(FILE_ZIP) -> when (true) {
+            (access.firstOrNull() == DIR_CHAR),
+            mimeType.startsWith(DIRECTORY),
+            (content is NodeContent.Directory) -> content.ifNotCached { NodeContent.Directory() }
+            (length == 0L) -> NodeContent.Empty
+            mimeType.isBlank(),
+            (mimeType == FILE_UNKNOWN) -> content.resolveFileType(path)
+            mimeType.startsWith(FILE_PICTURE) -> content.ifNotCached { NodeContent.Picture(path, mimeType) }
+            mimeType.startsWith(FILE_ZIP) -> when (true) {
                 path.endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { AndroidApp.apk(path) }
                 path.endsWith(EXT_APKS, ignoreCase = true),
                 path.endsWith(EXT_APKM, ignoreCase = true) -> content.ifNotCached { AndroidApp.apks(path) }
@@ -379,43 +364,47 @@ object ExplorerUtils {
                 path.endsWith(EXT_OSB, ignoreCase = true) -> content.ifNotCached { NodeContent.Osu.Storyboard() }
                 else -> content.ifNotCached { NodeContent.Zip() }
             }
-            type.startsWith(FILE_BZIP2) -> when {
+            mimeType.startsWith(FILE_BZIP2) -> when {
                 name.endsWith(EXT_DMG) -> content.ifNotCached { NodeContent.Dmg }
                 else -> content.ifNotCached { NodeContent.Bzip2() }
             }
-            type.startsWith(FILE_GZIP) -> content.ifNotCached { NodeContent.Gz() }
-            type.startsWith(FILE_TAR) -> content.ifNotCached { NodeContent.Tar() }
-            type.startsWith(FILE_XZ) -> content.ifNotCached { NodeContent.Xz }
-            type.startsWith(FILE_UTF8_TEXT),
-            type.startsWith(FILE_ASCII_TEXT) -> when {
+            mimeType.startsWith(FILE_GZIP) -> content.ifNotCached { NodeContent.Gz() }
+            mimeType.startsWith(FILE_TAR) -> content.ifNotCached { NodeContent.Tar() }
+            mimeType.startsWith(FILE_XZ) -> content.ifNotCached { NodeContent.Xz }
+            mimeType.startsWith(FILE_TEXT) -> when {
                 path.endsWith(EXT_SVG, ignoreCase = true) -> content.ifNotCached { NodeContent.Text.Svg }
                 path.endsWith(EXT_OSU, ignoreCase = true) -> content.ifNotCached { NodeContent.Text.Osu }
                 path.endsWith(EXT_CPP, ignoreCase = true) -> content.ifNotCached { NodeContent.Text.Cpp }
                 path.endsWith(EXT_INO, ignoreCase = true) -> content.ifNotCached { NodeContent.Text.Ino }
+                path.endsWith(EXT_BAT, ignoreCase = true) -> content.ifNotCached { NodeContent.Text.BatScript }
                 else -> NodeContent.Text.Plain
             }
-            type.startsWith(FILE_BOOTING),
-            type.startsWith(FILE_BOOT_IMAGE) -> NodeContent.DataImage
-            type.startsWith(FILE_OGG) -> content.ifNotCached { NodeContent.Music() }
-            type.startsWith(FILE_PDF) -> content.ifNotCached { NodeContent.Pdf }
-            type.startsWith(FILE_ELF_EXE) -> content.ifNotCached { NodeContent.Elf }
-            type.startsWith(FILE_ELF_RE) -> when {
+            mimeType.startsWith(FILE_AUDIO) -> content.ifNotCached { NodeContent.Music() }
+            mimeType.startsWith(FILE_VIDEO),
+            mimeType.startsWith(FILE_MATROSKA) -> content.ifNotCached { NodeContent.Movie(path) }
+            mimeType.startsWith(FILE_PDF) -> content.ifNotCached { NodeContent.Pdf }
+            mimeType.startsWith(FILE_ELF_EXE) -> content.ifNotCached { NodeContent.Elf }
+            mimeType.startsWith(FILE_ELF_RE) -> when {
                 name.endsWith(EXT_FAP) -> content.ifNotCached { NodeContent.Fap }
                 else -> content.ifNotCached { NodeContent.Elf }
             }
-            type.startsWith(FILE_PEM) -> content.ifNotCached { NodeContent.Cert }
-            type.startsWith(FILE_ELF_SO) -> content.ifNotCached { NodeContent.ElfSo }
-            type.startsWith(FILE_MSP_EXE),
-            type.startsWith(FILE_MS_EXE) -> content.ifNotCached { NodeContent.ExeMs }
-            type.startsWith(FILE_APLS_EXE) -> content.ifNotCached { NodeContent.ExeApls }
-            type.startsWith(FILE_APL_EXE) -> content.ifNotCached { NodeContent.ExeApl }
-            type.startsWith(FILE_JAVA) -> content.ifNotCached { NodeContent.Java }
-            type.matches(FILE_SH_SCRIPT) -> NodeContent.Text.ShellScript
+            mimeType.startsWith(FILE_PEM),
+            mimeType.startsWith(FILE_CERT),
+            mimeType.startsWith(FILE_CA_CERT) -> content.ifNotCached { NodeContent.Cert }
+            mimeType.startsWith(FILE_TORRENT) -> content.ifNotCached { NodeContent.Torrent }
+            mimeType.startsWith(FILE_ODT) -> content.ifNotCached { NodeContent.Document }
+            mimeType.startsWith(FILE_ELF_SO) -> content.ifNotCached { NodeContent.ElfSo }
+            mimeType.startsWith(FILE_MSP_EXE),
+            mimeType.startsWith(FILE_MS_EXE) -> content.ifNotCached { NodeContent.ExeMs }
+            mimeType.startsWith(FILE_APLS_EXE) -> content.ifNotCached { NodeContent.ExeApls }
+            mimeType.startsWith(FILE_APL_EXE) -> content.ifNotCached { NodeContent.ExeApl }
+            mimeType.startsWith(FILE_JAVA) -> content.ifNotCached { NodeContent.Java }
+            mimeType.startsWith(FILE_SCRIPT) -> NodeContent.Text.ShellScript
             else -> {
                 val ext = name.lastIndexOf(Const.DOT).inc()
                     .let { if (it == 0) name.length else it }
                     .let { name.substring(it) }
-                logE("'$ext' unknown type: $type")
+                logE("'$ext' unknown type: $mimeType ${path.takeIfDebug()}")
                 content.resolveFileType(path)
             }
         }
@@ -513,8 +502,8 @@ object ExplorerUtils {
         return this
     }
 
-    private fun Node.parseNode(line: String): Node {
-        val properties = parse(line, name, size)
+    private fun Node.parseNode(meta: Bridge.Meta): Node {
+        val properties = meta.toProperties()
         val (children, content) = when {
             properties.isDirectory() -> when (content) {
                 is NodeContent.Directory -> children to content
@@ -533,28 +522,25 @@ object ExplorerUtils {
         return copy(children = children, properties = properties, content = content)
     }
 
-    private fun Node.parseDir(lines: List<String>): Node {
-        val items = MutableList<Node>(lines.size)
-        val files = MutableList<Node>(lines.size)
-        val start = if (lines.first().startsWith(TOTAL)) 1 else 0
-        for (i in start until lines.size) {
-            val line = lines[i]
-            if (line.isNotEmpty()) {
-                var properties = parse(line)
-                val child = children?.findOnMut { it.name == properties.name }
-                if (child?.isDirectory == true) {
-                    properties = properties.copy(size = child.properties.size)
-                }
-                val item = when {
-                    child == null -> parse(path, rootId, properties)
-                    child.properties == properties -> child
-                    else -> child.copy(properties = properties)
-                }
-                when {
-                    item.isDirectory -> items.add(item)
-                    item.content is NodeContent.Undefined -> files.add(item.copy(content = resolveFileType(item.path)))
-                    else -> files.add(item)
-                }
+    private fun Node.parseDir(metas: List<Bridge.Meta>): Node {
+        val items = MutableList<Node>(metas.size)
+        val files = MutableList<Node>(metas.size)
+        for (i in metas.indices) {
+            val meta = metas[i]
+            var properties = meta.toProperties()
+            val child = children?.findOnMut { it.name == properties.name }
+            if (child?.isDirectory == true) {
+                properties = properties.copy(size = child.properties.size)
+            }
+            val item = when {
+                child == null -> parse(path, rootId, properties)
+                child.properties == properties -> child
+                else -> child.copy(properties = properties)
+            }
+            when {
+                item.isDirectory -> items.add(item)
+                item.content is NodeContent.Undefined -> files.add(item.copy(content = resolveFileType(item.path)))
+                else -> files.add(item)
             }
         }
         items.addAll(files)
@@ -623,17 +609,18 @@ object ExplorerUtils {
         else -> path
     }
 
-    fun Node.delete(useSu: Boolean): Node? {
-        val output = Shell.exec(Shell[Shell.RM_RF].format(path), useSu)
-        return when {
-            output.success -> null
-            else -> copy(error = output.error.toNodeError(path))
+    fun Node.delete(asSu: Boolean): Node? {
+        val result = NativeBridge.delete(path, asSu)
+        val error = when (result) {
+            is Rslt.Ok -> NodeError.Unknown.takeIf { !result.data }
+            is Rslt.Err -> result.message.toNodeError(path)
         }
+        return copy(error = error)
     }
 
-    fun Node.rename(name: String, useSu: Boolean): Node {
+    fun Node.rename(name: String, asSu: Boolean): Node {
         val targetPath = parentPath + name
-        val output = Shell.exec(Shell[Shell.MV].format(path, targetPath), useSu)
+        val output = Shell.exec(Shell[Shell.MV].format(path, targetPath), asSu)
         return when {
             output.success -> move(name = name).copy(error = null)
             else -> copy(error = output.error.toNodeError(path))
@@ -659,9 +646,8 @@ object ExplorerUtils {
         return when {
             lines.size > 1 -> NodeError.Multiply(lines)
             first.isNullOrBlank() -> NodeError.Unknown
-            path.isBlank() -> NodeError.Message(first)
-            first == LS_NO_SUCH_FILE.format(path) -> NodeError.NoSuchFile
-            first == LS_PERMISSION_DENIED.format(path) -> NodeError.PermissionDenied
+            first.startsWith(LS_NO_SUCH_FILE) -> NodeError.NoSuchFile
+            first.startsWith(LS_PERMISSION_DENIED) -> NodeError.PermissionDenied
             else -> NodeError.Message(first.replace(Regex(COMMAND_PATH_PREFIX.format(path)), ""))
         }
     }
@@ -701,6 +687,7 @@ object ExplorerUtils {
         path.endsWith(EXT_GZ, ignoreCase = true) -> ifNotCached { NodeContent.Gz() }
         path.endsWith(EXT_RAR, ignoreCase = true) -> ifNotCached { NodeContent.Rar() }
         path.endsWith(EXT_SH, ignoreCase = true) -> NodeContent.Text.ShellScript
+        path.endsWith(EXT_BAT, ignoreCase = true) -> NodeContent.Text.BatScript
         path.endsWith(EXT_TXT, ignoreCase = true),
         path.endsWith(EXT_INI, ignoreCase = true),
         path.endsWith(EXT_JAVA, ignoreCase = true),

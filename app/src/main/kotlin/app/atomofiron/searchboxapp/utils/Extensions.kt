@@ -13,26 +13,8 @@ import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.Locale
 
 fun String.escapeQuotes(): String = this.replace(Const.QUOTE, "\\" + Const.QUOTE)
-
-private fun String.getExt(): String {
-    var index = lastIndexOf('/')
-    index = kotlin.math.max(0, index)
-    index = lastIndexOf('.', index)
-    return substring(index.inc()).lowercase()
-}
-
-fun Number.toHumanReadable(suffixes: Array<String?>): String {
-    var order = 0
-    var byteCount = toDouble()
-    while (byteCount >= 970) {
-        byteCount /= 1024f
-        order++
-    }
-    return String.format(Locale.US, "%1$.2f %2\$s", byteCount, suffixes[order]).replace("[.,]00|(?<=[.,][0-9])0".toRegex(), "")
-}
 
 inline fun InputStream.writeTo(out: OutputStream, callback: (Long) -> Unit = {}): Long {
     val buffer = ByteArray(16 * 1024)

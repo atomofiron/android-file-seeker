@@ -21,11 +21,13 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.Movie -> R.drawable.ic_movie
     is NodeContent.AndroidApp -> R.drawable.ic_apk
     is NodeContent.Archive,
+    is NodeContent.Xz,
     is NodeContent.Dmg -> R.drawable.ic_archive_file
     is NodeContent.Text.Osu -> R.drawable.ic_file_osu
     is NodeContent.Text.ShellScript -> R.drawable.ic_script
     is NodeContent.Text.Ino -> R.drawable.ic_infinity
-    is NodeContent.Text -> R.drawable.ic_text
+    is NodeContent.Text,
+    is NodeContent.Document -> R.drawable.ic_text
     is NodeContent.Pdf -> R.drawable.ic_pdf
     is NodeContent.DataImage -> R.drawable.ic_dt
     is NodeContent.DB -> R.drawable.ic_db
@@ -43,10 +45,9 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.ExeMs -> R.drawable.ic_microsoft
     is NodeContent.Cert -> R.drawable.ic_certificate
     is NodeContent.Java -> R.drawable.ic_binary
-    is NodeContent.Xz,
+    is NodeContent.Empty -> R.drawable.ic_empty
     is NodeContent.Other,
     is NodeContent.Flash,
-    is NodeContent.Empty -> R.drawable.ic_empty
     is NodeContent.Unknown -> R.drawable.ic_unknown
 }
 

@@ -29,8 +29,8 @@ class PreferencePresenter(
             viewState.showDeepBlack.value = it !is AppTheme.Light
         }
         scope.launch {
-            val useSu = preferenceStore.useSu.value
-            if (useSu && !onUseSuChanged(true)) {
+            val asSu = preferenceStore.asSu.value
+            if (asSu && !onUseSuChanged(true)) {
                 preferenceStore { setUseSu(false) }
             }
         }

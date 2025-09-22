@@ -1,4 +1,7 @@
+import com.google.protobuf.gradle.id
+import com.google.protobuf.gradle.proto
 import org.gradle.internal.os.OperatingSystem
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.File
 
 plugins {
@@ -7,6 +10,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.serialization)
     alias(libs.plugins.parcelize)
+    alias(libs.plugins.protobuf)
     alias(libs.plugins.kapt)
     id("app.fileseeker.convention.library")
 }
@@ -17,8 +21,31 @@ android {
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
+    }
+    sourceSets {
+        named("main") {
+            proto {
+                srcDir("../proto")
+            }
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:4.32.1"
+    }
+    generateProtoTasks {
+        all().forEach {
+            it.builtins {
+                id("java")
+                id("kotlin")
+            }
+        }
     }
 }
 
@@ -26,6 +53,8 @@ dependencies {
     implementation(libs.kotlinx.core)
     implementation(libs.kotlinx.core.android)
     implementation(libs.kotlinx.protobuf)
+    implementation(libs.protobuf.java)
+    implementation(libs.protobuf.kotlin)
     api(libs.androidx.appcompat)
     api(libs.androidx.datastore)
     implementation(libs.androidx.core.ktx)
@@ -98,6 +127,7 @@ tasks.register<Exec>(taskBuildNative) {
     ).apply {
         println("run if fails: cd $nativeDirPath && ${commandLine.joinToString(separator = " ")}\n")
     }
+    isIgnoreExitValue = false
 }
 
 tasks.register<Copy>(taskCopyNativeBins) {

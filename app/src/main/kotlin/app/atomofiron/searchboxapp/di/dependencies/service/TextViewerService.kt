@@ -29,7 +29,7 @@ class TextViewerService(
     private val finderStore: FinderStore,
 ) {
     companion object {
-        fun searchInside(params: SearchParams, path: String, useSu: Boolean): Rslt<TextSearchResult> {
+        fun searchInside(params: SearchParams, path: String, asSu: Boolean): Rslt<TextSearchResult> {
             val template = when {
                 params.useRegex && params.ignoreCase -> Shell.GREP_BONS_IE
                 params.useRegex -> Shell.GREP_BONS_E
@@ -39,7 +39,7 @@ class TextViewerService(
             var count = 0
             val cmd = Shell[template].format(params.query.escapeQuotes(), path)
             val lineIndexToMatches = hashMapOf<Int, MutableList<TextLineMatch>>()
-            val output = Shell.exec(cmd, useSu) { line ->
+            val output = Shell.exec(cmd, asSu) { line ->
                 val lineByteOffset = line.split(':')
                 val lineIndex = lineByteOffset[0].toInt().dec()
                 val byteOffset = lineByteOffset[1].toLong()
@@ -63,7 +63,7 @@ class TextViewerService(
         }
     }
 
-    private val useSu: Boolean get() = preferences.useSu.value
+    private val asSu: Boolean get() = preferences.asSu.value
 
     fun getFileSession(path: String): TextViewerSession {
         val item = explorerStore.currentItems.find { it.path == path }
@@ -76,7 +76,7 @@ class TextViewerService(
         }
         if (!item.isCached) {
             scope.launch(Dispatchers.IO) {
-                val config = CacheConfig(useSu, thumbnailSize = 0)
+                val config = CacheConfig(asSu, thumbnailSize = 0)
                 session.item.value = item.update(config)
             }
         }
@@ -182,7 +182,7 @@ class TextViewerService(
     }
 
     private fun TextViewerSession.searchInside(task: SearchTask): SearchTask {
-        return when (val result = searchInside(task.params, item.value.path, useSu)) {
+        return when (val result = searchInside(task.params, item.value.path, asSu)) {
             is Rslt.Ok -> task.toEnded(result = result.data)
             is Rslt.Err -> task.toEnded(error = result.message)
         }

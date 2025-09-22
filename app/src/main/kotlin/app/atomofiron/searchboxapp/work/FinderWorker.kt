@@ -79,9 +79,9 @@ class FinderWorker(
         private const val KEY_MAX_DEPTH = "KEY_MAX_DEPTH"
         private const val KEY_WHERE_PATHS = "KEY_WHERE_PATHS"
 
-        fun inputData(query: String, useSu: Boolean, config: SearchOptions, maxSize: Int, maxDepth: Int, where: Array<String>) = Data.Builder()
+        fun inputData(query: String, asSu: Boolean, config: SearchOptions, maxSize: Int, maxDepth: Int, where: Array<String>) = Data.Builder()
             .putString(KEY_QUERY, query)
-            .putBoolean(KEY_USE_SU, useSu)
+            .putBoolean(KEY_USE_SU, asSu)
             .putBoolean(KEY_USE_REGEX, config.useRegex)
             .putInt(KEY_MAX_SIZE, maxSize)
             .putBoolean(KEY_CASE_INSENSITIVE, config.ignoreCase)
@@ -91,7 +91,7 @@ class FinderWorker(
             .putStringArray(KEY_WHERE_PATHS, where)
             .build()
     }
-    private val useSu = inputData.getBoolean(KEY_USE_SU, false)
+    private val asSu = inputData.getBoolean(KEY_USE_SU, false)
     private val useRegex = inputData.getBoolean(KEY_USE_REGEX, false)
     private val query: String = inputData.getString(KEY_QUERY) ?: ""
     private lateinit var pattern: Pattern
@@ -109,7 +109,7 @@ class FinderWorker(
         FinderResult(forContent),
     )
     private var process: Process? = null
-    private val cacheConfig = CacheConfig(useSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size))
+    private val cacheConfig = CacheConfig(asSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size))
     private val progressJobs = mutableListOf<Job>()
 
     @Inject
@@ -154,7 +154,7 @@ class FinderWorker(
                 item.isFile -> template.format(query.escapeQuotes(), item.path)
                 else -> continue@forLoop
             }
-            val output = Shell.exec(command, useSu, processObserver, forContentLineListener)
+            val output = Shell.exec(command, asSu, processObserver, forContentLineListener)
             if (output.handleErrors(checkPoint, item)) {
                 searchForContent(listOf(item))
             }
@@ -181,7 +181,7 @@ class FinderWorker(
             }
             val path = line.substring(0, index)
             val item = newNode(path)
-            val itemMatch = when (val result = TextViewerService.searchInside(params, path, useSu)) {
+            val itemMatch = when (val result = TextViewerService.searchInside(params, path, asSu)) {
                 is Rslt.Ok -> result.data.toItemMatchMultiply(item)
                 is Rslt.Err -> ItemMatch.MultiplyError(item, count, result.message)
             }
@@ -200,7 +200,7 @@ class FinderWorker(
                 else -> Shell[Shell.FIND_FD]
             }
             val command = template.format(item.path, maxDepth)
-            val output = Shell.exec(command, useSu, processObserver, forNameLineListener)
+            val output = Shell.exec(command, asSu, processObserver, forNameLineListener)
             if (output.handleErrors(checkPoint, item)) {
                 searchByName(listOf(item))
             }

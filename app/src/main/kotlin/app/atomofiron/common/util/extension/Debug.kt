@@ -40,6 +40,8 @@ val Any?.className: String get() = when {
     else -> this::class.java.name
 }.toString()
 
+fun <T> T.takeIfDebug(): T? = if (BuildConfig.DEBUG) this else null
+
 fun Any.logE(s: String) {
     if (!BuildConfig.DEBUG) {
         // reportError(s, null)

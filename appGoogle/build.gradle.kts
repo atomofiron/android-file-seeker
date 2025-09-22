@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     id("app.fileseeker.convention.application")
 }
@@ -5,8 +7,10 @@ plugins {
 android {
     namespace = "app.atomofiron.searchboxapp"
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
 }
 

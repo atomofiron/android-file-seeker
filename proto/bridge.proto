@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package bridge;
+
+message CommandMsg {
+  Command cmd = 1;
+}
+
+message ResultMsg {
+  oneof data {
+    bool ok = 1;
+    Meta meta = 2;
+    Metas metas = 3;
+    TypeEntry type = 4;
+    TypeEntries types = 5;
+    string error = 6;
+  }
+}
+
+enum Command {
+  META = 0;
+  METAS = 1;
+  TYPE = 2;
+  TYPES = 3;
+  MKFILE = 4;
+  MKDIR = 5;
+  DELETE = 6;
+}
+
+message Metas {
+  repeated Meta entries = 1;
+}
+
+message TypeEntries {
+  repeated TypeEntry entries = 1;
+}
+
+message TypeEntry {
+  Meta meta = 1;
+  string mime = 2;
+}
+
+message Meta {
+  string name = 1;
+  string access = 2;
+  string owner = 3;
+  string group = 4;
+  string size = 5;
+  uint64 length = 6;
+  string date = 7;
+  string time = 8;
+  string error = 9;
+}

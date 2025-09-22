@@ -85,20 +85,20 @@ class ExplorerService(
     private val previewSize = context.resources.getDimensionPixelSize(R.dimen.preview_size)
     private var delayedRender: Job? = null
 
-    private var config = CacheConfig(useSu = false)
+    private var config = CacheConfig(asSu = false)
     private val garden = NodeGarden(store.firstTab, store.middleTab, store.lastTab)
     private val internalStoragePath = store.internalStorage.value.path
 
     init {
-        val useSuDefined = Job()
+        val asSuDefined = Job()
         val toyboxDefined = Job()
         NativeBridge.setBinDir(context.filesDir.absolutePath)
         appScope.launchOnIO {
             garden {
-                useSuDefined.join()
+                asSuDefined.join()
                 toyboxDefined.join()
                 context.resolveToybox(preferenceStore.toyboxVariant.value)
-                if (config.useSu) checkSu()
+                if (config.asSu) checkSu()
                 initRoots()
                 get(store.currentTabKey.value).render()
             }
@@ -107,8 +107,8 @@ class ExplorerService(
             }
         }
         val thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size)
-        preferenceStore.useSu.collect(appScope) {
-            useSuDefined.complete()
+        preferenceStore.asSu.collect(appScope) {
+            asSuDefined.complete()
             config = CacheConfig(it, thumbnailSize)
         }
         preferenceStore.toyboxVariant.collect(appScope) {
@@ -183,6 +183,7 @@ class ExplorerService(
                 tree.clear(from = index.inc())
                 rootItem = tree[index].children
                     ?.find { it.path == item.path }
+                    ?.takeIf { it.hasChildren }
                     ?.also { tree.add(it) }
             }
             if (tree.isEmpty()) {
@@ -217,7 +218,7 @@ class ExplorerService(
                         is NodeError.NoSuchFile -> tryAlternative(root, updated)
                         else -> updated
                     }
-                    // todo async updated.resolveDirChildren(config.useSu)
+                    // todo async updated.resolveDirChildren(config.asSu)
                     updateRootSync(updated, key, root)
                 }
             }
@@ -340,7 +341,7 @@ class ExplorerService(
         val children = it.children?.fetch() ?: return
         withCachingState(it.uniqueId) {
             val done = it.copy(children = children)
-                .resolveDirChildren(config.useSu)
+                .resolveDirChildren(config.asSu)
             garden {
                 states.updateState(it.uniqueId) {
                     nextState(it.uniqueId, cachingJob = null)
@@ -370,7 +371,7 @@ class ExplorerService(
         }
         item ?: return
         // todo change uniqueId in state, create the new one state instance
-        val renamed = item.rename(name, config.useSu)
+        val renamed = item.rename(name, config.asSu)
         renderTab(key) {
             val level = tree.find(item.parentPath)
             val index = level?.children?.indexOfFirst { it.uniqueId == item.uniqueId }
@@ -392,7 +393,8 @@ class ExplorerService(
     }
 
     suspend fun tryCreate(key: NodeTabKey, dir: Node, name: String, directory: Boolean) {
-        val item = ExplorerUtils.create(dir, name, directory, config.useSu)
+        val item = ExplorerUtils.create(dir, name, directory, config.asSu)
+        item ?: return
         renderTab(key) {
             val children = tree.find(dir.uniqueId)
                 ?.children
@@ -428,7 +430,7 @@ class ExplorerService(
                 parent.sortByName()
             }
         }
-        val new = ExplorerUtils.copy(from, to, config.useSu)
+        val new = ExplorerUtils.copy(from, to, config.asSu)
         renderTab(key) {
             states.updateState(from.uniqueId) {
                 nextState(from.uniqueId, copying = null)
@@ -495,7 +497,7 @@ class ExplorerService(
         items.forEach {
             when {
                 it.isDirectory -> appScope.launch {
-                    it.delete(config.useSu)
+                    it.delete(config.asSu)
                 }
                 else -> it.delete()
             }
@@ -504,7 +506,7 @@ class ExplorerService(
     }
 
     private suspend fun Node.delete() {
-        if (delete(config.useSu) == null) {
+        if (delete(config.asSu) == null) {
             store.emitRemoved(copy(children = null))
         }
     }
@@ -531,7 +533,7 @@ class ExplorerService(
         val jobs = items.map { item ->
             appScope.launch {
                 debugDelay(1)
-                val result = item.delete(config.useSu)
+                val result = item.delete(config.asSu)
                 garden(key) {
                     tree.replaceItem(item.uniqueId, item.parentPath, result)
                     states.updateState(item.uniqueId) { null }
@@ -778,7 +780,7 @@ class ExplorerService(
 
     private fun resolveSizeAsync(key: NodeTabKey, item: Node) {
         appScope.launch {
-            val size = item.resolveSize(config.useSu)
+            val size = item.resolveSize(config.asSu)
             if (size == item.size) {
                 return@launch
             }

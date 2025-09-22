@@ -53,21 +53,23 @@ sealed class NodeContent(
         override val isCached = duration >= 0
     }
 
-    data class Picture private constructor(
+    data class Picture(
         override val thumbnail: Thumbnail,
         override val mimeType: String,
         override val description: String? = null,
         override val details: String? = "", // todo
     ) : File(mimeType) {
         companion object {
-            fun png(path: String, description: String? = null) = Picture(Thumbnail(path), mimeType = "image/png", description = description)
-            fun apng(path: String, description: String? = null) = Picture(Thumbnail(path), mimeType = "image/apng", description = description)
-            fun jpeg(path: String, description: String? = null) = Picture(Thumbnail(path), mimeType = "image/jpeg", description = description)
-            fun gif(path: String, description: String? = null) = Picture(Thumbnail(path), mimeType = "image/gif", description = description)
-            fun webp(path: String) = Picture(Thumbnail(path), mimeType = "image/webp")
-            fun avif(path: String) = Picture(Thumbnail(path), mimeType = "image/avif")
+            fun png(path: String, description: String? = null) = Picture(path, mimeType = "image/png", description)
+            fun apng(path: String, description: String? = null) = Picture(path, mimeType = "image/apng", description)
+            fun jpeg(path: String, description: String? = null) = Picture(path, mimeType = "image/jpeg", description)
+            fun gif(path: String, description: String? = null) = Picture(path, mimeType = "image/gif", description)
+            fun webp(path: String, description: String? = null) = Picture(path, mimeType = "image/webp", description)
+            fun avif(path: String, description: String? = null) = Picture(path, mimeType = "image/avif", description)
         }
         override val isCached = details != null
+
+        constructor(path: String, mimeType: String, description: String? = null) : this(Thumbnail(path), mimeType, description = description)
     }
 
     sealed class Archive(mimeType: String) : File(mimeType) {
@@ -123,6 +125,7 @@ sealed class NodeContent(
     sealed class Text(mimeType: String = "text/plain") : File(mimeType) {
         data object Plain : Text()
         data object ShellScript : Text("text/x-shellscript")
+        data object BatScript : Text("text/plain")
         data object Osu : Text("application/x-osu-beatmap")
         data object Svg : Text("image/svg+xml")
         data object Cpp : Text("text/x-c++src")
@@ -130,6 +133,7 @@ sealed class NodeContent(
     }
     data object Pdf : File("application/pdf")
     data object Torrent : File("application/x-bittorrent")
+    data object Document : File()
     data object Xz : File()
     data object DB : File()
     data object DataImage : File()
