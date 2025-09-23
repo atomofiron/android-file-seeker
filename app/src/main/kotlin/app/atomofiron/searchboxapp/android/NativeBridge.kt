@@ -40,6 +40,8 @@ object NativeBridge {
 
     fun metas(path: String, asSu: Boolean): Rslt<List<Bridge.Meta>> = run(Bridge.Command.METAS, asSu, path)
 
+    fun usage(path: String, asSu: Boolean): Rslt<String> = run(Bridge.Command.USAGE, asSu, path)
+
     fun delete(path: String, asSu: Boolean): Rslt<Boolean> = run(Bridge.Command.DELETE, asSu, path)
 
     private inline fun <reified R> run(command: Bridge.Command, asSu: Boolean, vararg args: String): Rslt<R> {
@@ -53,6 +55,7 @@ object NativeBridge {
             Bridge.ResultMsg.DataCase.METAS -> result.metas.entriesList
             Bridge.ResultMsg.DataCase.TYPE -> result.type
             Bridge.ResultMsg.DataCase.TYPES -> result.types.entriesList
+            Bridge.ResultMsg.DataCase.USAGE -> result.usage
             Bridge.ResultMsg.DataCase.ERROR -> return Rslt.Err(result.error)
             Bridge.ResultMsg.DataCase.DATA_NOT_SET -> return Rslt.Err()
         }

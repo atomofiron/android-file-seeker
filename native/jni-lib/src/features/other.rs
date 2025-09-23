@@ -3,6 +3,8 @@ use crate::features::hr_meta::HumanReadableMeta;
 use crate::staff::Rslt;
 use std::fs::File;
 use std::path::PathBuf;
+use fs_extra::dir;
+use crate::features::hr_size::HumanReadableSize;
 
 pub fn mkfile(path: &String) -> Rslt<bridge::Meta> {
     let path = PathBuf::try_from(path)?;
@@ -19,4 +21,8 @@ pub fn mkdir(path: &String) -> Rslt<bridge::Meta> {
 
 pub fn delete(path: &String) -> bool {
     std::fs::remove_dir_all(path).is_ok()
+}
+
+pub fn usage(path: &String) -> Rslt<String> {
+    Ok(dir::get_size(path)?.to_hr_size())
 }

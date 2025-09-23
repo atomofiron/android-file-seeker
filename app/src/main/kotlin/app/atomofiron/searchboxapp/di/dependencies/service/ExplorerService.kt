@@ -47,7 +47,6 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.clearChildren
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveSize
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortBy
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortByName
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
@@ -60,6 +59,7 @@ import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.searchboxapp.utils.removeOneIf
 import app.atomofiron.searchboxapp.utils.replaceEach
 import app.atomofiron.searchboxapp.utils.showLongToast
+import app.atomofiron.searchboxapp.utils.unwrapOrNull
 import app.atomofiron.searchboxapp.utils.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -780,9 +780,9 @@ class ExplorerService(
 
     private fun resolveSizeAsync(key: NodeTabKey, item: Node) {
         appScope.launch {
-            val size = item.resolveSize(config.asSu)
-            if (size == item.size) {
-                return@launch
+            val size = NativeBridge.usage(item.path, config.asSu).unwrapOrNull()
+            when (size) {
+                null, item.size -> return@launch
             }
             garden(key) {
                 val current = tree.findNode(item.uniqueId)

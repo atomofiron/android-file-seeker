@@ -27,6 +27,11 @@ fun <T> String.toErr() = Rslt.Err<T>(this)
 
 fun <T, E : Throwable> E.toRslt() = Rslt.Err<T>(forHumans())
 
+fun <T> Rslt<T>.unwrapOrNull(): T? = when (this) {
+    is Rslt.Ok -> data
+    is Rslt.Err -> null
+}
+
 @Suppress("NOTHING_TO_INLINE")
 inline fun <T> Rslt<T>.unwrapOr(value: T): T = when (this) {
     is Rslt.Ok -> data

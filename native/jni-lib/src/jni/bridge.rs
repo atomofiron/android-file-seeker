@@ -1,6 +1,6 @@
 use crate::bridge;
 use crate::features::meta::{meta, metas};
-use crate::features::other::{delete, mkdir, mkfile};
+use crate::features::other::{delete, mkdir, mkfile, usage};
 use crate::features::r#type::{file_type, file_types};
 use crate::staff::Rslt;
 use bridge::result_msg::Data;
@@ -97,6 +97,7 @@ fn run(command: Command, argv: Vec<String>) -> Rslt<ResultMsg> {
         Command::Types => file_types(first_arg.unwrap()).map(|entries| ResultMsg { data: Some(Data::Types(entries)) }),
         Command::Mkfile => mkfile(first_arg.unwrap()).map(|it| ResultMsg { data: Some(Data::Meta(it)) }),
         Command::Mkdir => mkdir(first_arg.unwrap()).map(|it| ResultMsg { data: Some(Data::Meta(it)) }),
+        Command::Usage => usage(first_arg.unwrap()).map(|it| ResultMsg { data: Some(Data::Usage(it)) }),
         Command::Delete => Ok(ResultMsg { data: Some(Data::Ok(delete(first_arg.unwrap()))) }),
     };
 }

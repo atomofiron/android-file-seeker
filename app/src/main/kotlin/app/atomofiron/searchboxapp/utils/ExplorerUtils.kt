@@ -220,11 +220,11 @@ object ExplorerUtils {
             date = date,
             time = time,
             length = if (!isFile) 0 else length,
-            size = if (!isFile) size else this.size,
+            size = this.size.takeIf { it.isNotEmpty() } ?: size,
         )
     }
 
-    const val DIMENS = "BKMGTPEZYRQ"
+    private const val DIMENS = "BKMGTPEZYRQ"
     private fun Long.toSize(): String {
         when {
             this == 0L -> return "0B"
@@ -328,20 +328,13 @@ object ExplorerUtils {
                 .indexOfFirst { it.name == entry.meta.name }
                 .also { if (it < 0) return@forEach }
             children.run {
-                items[index] = items[index].resolveType(mimeType = entry.mime)
-                    .copy(properties = entry.meta.toProperties())
+                val child = items[index]
+                items[index] = child.resolveType(mimeType = entry.mime)
+                    .copy(properties = entry.meta.toProperties(child.name, child.size))
             }
         }
         return entries.isNotEmpty()
     }
-
-    fun Node.resolveSize(asSu: Boolean): String = Shell.exec(Shell[Shell.DU_HD0].format(path), asSu)
-        .output
-        .split(Const.TAB)
-        .takeIf { it.size == 2 }
-        ?.firstOrNull()
-        ?.replace(".0", "")
-        ?: ""
 
     private fun Node.resolveType(mimeType: String): Node {
         val content = when (true) {
@@ -503,7 +496,7 @@ object ExplorerUtils {
     }
 
     private fun Node.parseNode(meta: Bridge.Meta): Node {
-        val properties = meta.toProperties()
+        val properties = meta.toProperties(name, size)
         val (children, content) = when {
             properties.isDirectory() -> when (content) {
                 is NodeContent.Directory -> children to content

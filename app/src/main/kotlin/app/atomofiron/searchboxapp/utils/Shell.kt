@@ -17,8 +17,6 @@ object Shell {
     const val COPY = "{toybox} cp -r '%s' '%s'"
     const val VERSION = "{toybox} --version"
     const val MV = "{toybox} mv '%s' '%s'"
-    // 'du -hd 1' is useless because of any error don't allow get info about items below dir with error (Permission denied)
-    const val DU_HD0 = "{toybox} du -hd 0 '%s'"
 
     // grep: No 'E' with 'F'
     const val FIND_GREP_HCS = "{toybox} find '%s' -type f -maxdepth %d -print0 | xargs -0r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: -v ORS='\\0' '{print \$1}' | xargs -0r {toybox} grep -Hcs -e '%s'"

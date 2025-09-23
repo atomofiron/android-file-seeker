@@ -9,11 +9,12 @@ message CommandMsg {
 message ResultMsg {
   oneof data {
     bool ok = 1;
-    Meta meta = 2;
-    Metas metas = 3;
-    TypeEntry type = 4;
-    TypeEntries types = 5;
-    string error = 6;
+    string error = 2;
+    Meta meta = 3;
+    Metas metas = 4;
+    TypeEntry type = 5;
+    TypeEntries types = 6;
+    string usage = 7;
   }
 }
 
@@ -25,6 +26,7 @@ enum Command {
   MKFILE = 4;
   MKDIR = 5;
   DELETE = 6;
+  USAGE = 7;
 }
 
 message Metas {

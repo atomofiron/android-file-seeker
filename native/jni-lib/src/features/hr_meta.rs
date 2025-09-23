@@ -25,11 +25,15 @@ impl HumanReadableMeta for io::Result<Metadata> {
                     .unwrap_or(DATE_STUB.to_string());
                 let time = date_time.map(|it| it.format(TIME).to_string())
                     .unwrap_or(TIME_STUB.to_string());
+                let size = match meta.is_file() {
+                    true => meta.size().to_hr_size(),
+                    false => empty_string(),
+                };
                 Meta {
                     access: meta.mode().to_hr_mode(),
                     owner: meta.to_hr_owner(),
                     group: meta.to_hr_group(),
-                    size: meta.size().to_hr_size(),
+                    size,
                     date,
                     time,
                     name,
