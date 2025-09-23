@@ -90,14 +90,16 @@ fn to_bytes<'l>(env: &JNIEnv<'l>, response: ResultMsg) -> JByteArray<'l> {
 
 fn run(command: Command, argv: Vec<String>) -> Rslt<ResultMsg> {
     let first_arg = argv.first();
-    return match command {
-        Command::Meta => meta(first_arg.unwrap()).map(|it| ResultMsg { data: Some(Data::Meta(it)) }),
-        Command::Metas => metas(first_arg.unwrap()).map(|entries| ResultMsg { data: Some(Data::Metas(Metas { entries })) }),
-        Command::Type => Ok(ResultMsg { data: Some(Data::Type(file_type(first_arg.unwrap()))) }),
-        Command::Types => file_types(first_arg.unwrap()).map(|entries| ResultMsg { data: Some(Data::Types(entries)) }),
-        Command::Mkfile => mkfile(first_arg.unwrap()).map(|it| ResultMsg { data: Some(Data::Meta(it)) }),
-        Command::Mkdir => mkdir(first_arg.unwrap()).map(|it| ResultMsg { data: Some(Data::Meta(it)) }),
-        Command::Usage => usage(first_arg.unwrap()).map(|it| ResultMsg { data: Some(Data::Usage(it)) }),
-        Command::Delete => Ok(ResultMsg { data: Some(Data::Ok(delete(first_arg.unwrap()))) }),
+     let data = match command {
+        Command::Meta => meta(first_arg.unwrap()).map(|it| Data::Meta(it)),
+        Command::Metas => metas(first_arg.unwrap()).map(|entries| Data::Metas(Metas { entries })),
+        Command::Type => file_type(first_arg.unwrap()).map(|entry| Data::Type(entry)),
+        Command::Types => file_types(first_arg.unwrap()).map(|entries| Data::Types(entries)),
+        Command::Mkfile => mkfile(first_arg.unwrap()).map(|it| Data::Meta(it)),
+        Command::Mkdir => mkdir(first_arg.unwrap()).map(|it| Data::Meta(it)),
+        Command::Usage => usage(first_arg.unwrap()).map(|it| Data::Usage(it)),
+        Command::Delete => Ok(Data::Ok(delete(first_arg.unwrap()))),
     };
+    let msg = ResultMsg { data: Some(data?) };
+    return Ok(msg);
 }

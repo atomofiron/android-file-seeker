@@ -287,7 +287,8 @@ object ExplorerUtils {
     }
 
     fun Node.update(config: CacheConfig, ensureCached: Boolean = true): Node {
-        return when (val type = NativeBridge.type(path, config.asSu)) {
+        val type = NativeBridge.type(path, config.asSu)
+        return when (type) {
             is Rslt.Ok -> parseNode(type.data.meta).resolveType(type.data.mime)
                 .run { if (ensureCached) ensureCached(config, oldProps = properties) else this }
             is Rslt.Err -> copy(error = type.message.toNodeError(path))

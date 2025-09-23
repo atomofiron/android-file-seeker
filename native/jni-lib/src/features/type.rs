@@ -1,16 +1,21 @@
-use std::fs;
-use std::path::PathBuf;
 use crate::bridge::{TypeEntries, TypeEntry};
 use crate::features::hr_meta::HumanReadableMeta;
 use crate::staff::{empty_string, Rslt};
+use std::fs;
+use std::path::PathBuf;
 
-pub fn file_type(path: &String) -> TypeEntry {
+pub fn file_type(path: &String) -> Rslt<TypeEntry> {
     let path = PathBuf::from(path);
     let mime = tree_magic_mini::from_filepath(&path);
-    return TypeEntry {
-        meta: Some(path.metadata().to_hr(&path)),
+    let mut metadata = path.metadata();
+    if mime == None {
+        metadata = Ok(metadata?); // check both of them
+    };
+    let entry = TypeEntry {
+        meta: Some(metadata.to_hr(&path)),
         mime: mime.map(|m| m.to_string()).unwrap_or(empty_string()),
     };
+    return Ok(entry)
 }
 
 pub fn file_types(path: &String) -> Rslt<TypeEntries> {
