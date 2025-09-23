@@ -49,8 +49,12 @@ object ExplorerUtils {
     private const val COMMAND_PATH_PREFIX = "[a-z]+: %s: "
 
     private const val DIRECTORY = "inode/directory"
-    private const val FILE_UNKNOWN = "application/octet-stream"
     private const val FILE_PICTURE = "image/"
+    private const val FILE_AUDIO = "audio/"
+    private const val FILE_VIDEO = "video/"
+    private const val FILE_SCRIPT = "text/x-"
+    private const val FILE_TEXT = "text/"
+    private const val FILE_UNKNOWN = "application/octet-stream"
     private const val FILE_ZIP = "application/zip"
     private const val FILE_APK = "application/vnd.android.package-archive"
     private const val FILE_GZIP = "application/gzip"
@@ -58,11 +62,7 @@ object ExplorerUtils {
     private const val FILE_XZ = "application/x-xz"
     private const val FILE_BZIP2 = "application/x-bzip2"
     private const val FILE_TAR = "application/x-tar"
-    private const val FILE_TEXT = "text/plain"
-    private const val FILE_SCRIPT = "text/x-"
     private const val FILE_PDF = "application/pdf"
-    private const val FILE_AUDIO = "audio/"
-    private const val FILE_VIDEO = "video/"
     private const val FILE_MATROSKA = "application/x-matroska"
     private const val FILE_PEM = "application/pkix-cert+pem"
     private const val FILE_CERT = "application/pkix-cert"
@@ -70,10 +70,8 @@ object ExplorerUtils {
     private const val FILE_ELF_EXE = "application/x-executable"
     private const val FILE_ELF_RE = "application/x-object"
     private const val FILE_ELF_SO = "application/x-sharedlib"
-    private const val FILE_MSP_EXE = "application/x-dosexec"
     private const val FILE_MS_EXE = "application/x-dosexec"
     private const val FILE_APL_EXE = "application/x-mach-binary"
-    private const val FILE_APLS_EXE = "application/x-mach-binary"
     private const val FILE_TORRENT = "application/x-bittorrent"
     private const val FILE_ODT = "application/vnd.oasis.opendocument.text"
 
@@ -341,14 +339,14 @@ object ExplorerUtils {
     private fun Node.resolveType(mimeType: String): Node {
         val content = when (true) {
             (access.firstOrNull() == DIR_CHAR),
-            mimeType.startsWith(DIRECTORY),
+            (mimeType == DIRECTORY),
             (content is NodeContent.Directory) -> content.ifNotCached { NodeContent.Directory() }
             (length == 0L) -> NodeContent.Empty
             mimeType.isBlank(),
             (mimeType == FILE_UNKNOWN) -> content.resolveFileType(path)
             mimeType.startsWith(FILE_PICTURE) -> content.ifNotCached { NodeContent.Picture.resolve(mimeType) }
-            mimeType.startsWith(FILE_APK) -> content.ifNotCached { AndroidApp.apk(path) }
-            mimeType.startsWith(FILE_ZIP) -> when (true) {
+            (mimeType == FILE_APK) -> content.ifNotCached { AndroidApp.apk(path) }
+            (mimeType == FILE_ZIP) -> when (true) {
                 path.hasExt(EXT_APKS),
                 path.hasExt(EXT_APKM) -> content.ifNotCached { AndroidApp.apks(path) }
                 (content is AndroidApp) -> return this
@@ -359,13 +357,13 @@ object ExplorerUtils {
                 path.hasExt(EXT_OSB) -> content.ifNotCached { NodeContent.Osu.Storyboard() }
                 else -> content.ifNotCached { NodeContent.Zip() }
             }
-            mimeType.startsWith(FILE_BZIP2) -> when {
+            (mimeType == FILE_BZIP2) -> when {
                 name.hasExt(EXT_DMG) -> content.ifNotCached { NodeContent.Dmg }
                 else -> content.ifNotCached { NodeContent.Bzip2() }
             }
-            mimeType.startsWith(FILE_GZIP) -> content.ifNotCached { NodeContent.Gz() }
-            mimeType.startsWith(FILE_TAR) -> content.ifNotCached { NodeContent.Tar() }
-            mimeType.startsWith(FILE_XZ) -> content.ifNotCached { NodeContent.Xz }
+            (mimeType == FILE_GZIP) -> content.ifNotCached { NodeContent.Gz() }
+            (mimeType == FILE_TAR) -> content.ifNotCached { NodeContent.Tar() }
+            (mimeType == FILE_XZ) -> content.ifNotCached { NodeContent.Xz }
             mimeType.startsWith(FILE_TEXT) -> when {
                 path.hasExt(EXT_SVG) -> content.ifNotCached { NodeContent.Text.Svg }
                 path.hasExt(EXT_OSU) -> content.ifNotCached { NodeContent.Text.Osu }
@@ -376,24 +374,22 @@ object ExplorerUtils {
             }
             mimeType.startsWith(FILE_AUDIO) -> content.ifNotCached { NodeContent.Music.resolve(mimeType) }
             mimeType.startsWith(FILE_VIDEO),
-            mimeType.startsWith(FILE_MATROSKA) -> content.ifNotCached { NodeContent.Movie.resolve(mimeType) }
-            mimeType.startsWith(FILE_PDF) -> content.ifNotCached { NodeContent.Pdf }
-            mimeType.startsWith(FILE_ELF_EXE) -> content.ifNotCached { NodeContent.Elf }
-            mimeType.startsWith(FILE_ELF_RE) -> when {
+            (mimeType == FILE_MATROSKA) -> content.ifNotCached { NodeContent.Movie.resolve(mimeType) }
+            (mimeType == FILE_PDF) -> content.ifNotCached { NodeContent.Pdf }
+            (mimeType == FILE_ELF_EXE) -> content.ifNotCached { NodeContent.Elf }
+            (mimeType == FILE_ELF_RE) -> when {
                 name.hasExt(EXT_FAP) -> content.ifNotCached { NodeContent.Fap }
                 else -> content.ifNotCached { NodeContent.Elf }
             }
-            mimeType.startsWith(FILE_PEM),
-            mimeType.startsWith(FILE_CERT),
-            mimeType.startsWith(FILE_CA_CERT) -> content.ifNotCached { NodeContent.Cert }
-            mimeType.startsWith(FILE_TORRENT) -> content.ifNotCached { NodeContent.Torrent }
-            mimeType.startsWith(FILE_ODT) -> content.ifNotCached { NodeContent.Document }
-            mimeType.startsWith(FILE_ELF_SO) -> content.ifNotCached { NodeContent.ElfSo }
-            mimeType.startsWith(FILE_MSP_EXE),
-            mimeType.startsWith(FILE_MS_EXE) -> content.ifNotCached { NodeContent.ExeMs }
-            mimeType.startsWith(FILE_APLS_EXE) -> content.ifNotCached { NodeContent.ExeApls }
-            mimeType.startsWith(FILE_APL_EXE) -> content.ifNotCached { NodeContent.ExeApl }
-            mimeType.startsWith(FILE_JAVA) -> content.ifNotCached { NodeContent.Java }
+            (mimeType == FILE_PEM),
+            (mimeType == FILE_CERT),
+            (mimeType == FILE_CA_CERT) -> content.ifNotCached { NodeContent.Cert }
+            (mimeType == FILE_TORRENT) -> content.ifNotCached { NodeContent.Torrent }
+            (mimeType == FILE_ODT) -> content.ifNotCached { NodeContent.Document }
+            (mimeType == FILE_ELF_SO) -> content.ifNotCached { NodeContent.ElfSo }
+            (mimeType == FILE_MS_EXE) -> content.ifNotCached { NodeContent.ExeMs }
+            (mimeType == FILE_APL_EXE) -> content.ifNotCached { NodeContent.ExeApl }
+            (mimeType == FILE_JAVA) -> content.ifNotCached { NodeContent.Java }
             mimeType.startsWith(FILE_SCRIPT) -> NodeContent.Text.ShellScript
             else -> {
                 val ext = name.lastIndexOf(Const.DOT).inc()
