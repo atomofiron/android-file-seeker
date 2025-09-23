@@ -1,6 +1,7 @@
 use crate::bridge;
 use crate::features::hr_meta::HumanReadableMeta;
 use crate::staff::Rslt;
+use std::fs;
 use std::fs::File;
 use std::path::PathBuf;
 use fs_extra::dir;
@@ -13,14 +14,19 @@ pub fn mkfile(path: &String) -> Rslt<bridge::Meta> {
 }
 
 pub fn mkdir(path: &String) -> Rslt<bridge::Meta> {
-    std::fs::create_dir_all(path.clone())?;
+    fs::create_dir_all(path.clone())?;
     let path = PathBuf::try_from(path)?;
     let meta = File::open(&path)?.metadata();
     return Ok(meta.to_hr(&path));
 }
 
-pub fn delete(path: &String) -> bool {
-    std::fs::remove_dir_all(path).is_ok()
+pub fn delete(path: &String) -> Rslt<()> {
+    let path = PathBuf::try_from(path)?;
+    match path.is_dir() {
+        true => fs::remove_dir_all(path)?,
+        false => fs::remove_file(path)?,
+    }
+    return Ok(());
 }
 
 pub fn usage(path: &String) -> Rslt<String> {

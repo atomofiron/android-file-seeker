@@ -8,7 +8,6 @@ message CommandMsg {
 
 message ResultMsg {
   oneof data {
-    bool ok = 1;
     string error = 2;
     Meta meta = 3;
     Metas metas = 4;

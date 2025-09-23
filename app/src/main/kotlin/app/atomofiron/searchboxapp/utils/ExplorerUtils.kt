@@ -603,7 +603,7 @@ object ExplorerUtils {
     fun Node.delete(asSu: Boolean): Node? {
         val result = NativeBridge.delete(path, asSu)
         val error = when (result) {
-            is Rslt.Ok -> NodeError.Unknown.takeIf { !result.data }
+            is Rslt.Ok -> return null
             is Rslt.Err -> result.message.toNodeError(path)
         }
         return copy(error = error)

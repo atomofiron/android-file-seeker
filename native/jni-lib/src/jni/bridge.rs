@@ -88,6 +88,10 @@ fn to_bytes<'l>(env: &JNIEnv<'l>, response: ResultMsg) -> JByteArray<'l> {
     env.byte_array_from_slice(&response.encode_to_vec()).unwrap()
 }
 
+fn ok(_: ()) -> Rslt<ResultMsg> {
+    Ok(ResultMsg::default())
+}
+
 fn run(command: Command, argv: Vec<String>) -> Rslt<ResultMsg> {
     let first_arg = argv.first();
      let data = match command {
@@ -98,7 +102,7 @@ fn run(command: Command, argv: Vec<String>) -> Rslt<ResultMsg> {
         Command::Mkfile => mkfile(first_arg.unwrap()).map(|it| Data::Meta(it)),
         Command::Mkdir => mkdir(first_arg.unwrap()).map(|it| Data::Meta(it)),
         Command::Usage => usage(first_arg.unwrap()).map(|it| Data::Usage(it)),
-        Command::Delete => Ok(Data::Ok(delete(first_arg.unwrap()))),
+        Command::Delete => return ok(delete(first_arg.unwrap())?),
     };
     let msg = ResultMsg { data: Some(data?) };
     return Ok(msg);
