@@ -52,6 +52,7 @@ object ExplorerUtils {
     private const val FILE_UNKNOWN = "application/octet-stream"
     private const val FILE_PICTURE = "image/"
     private const val FILE_ZIP = "application/zip"
+    private const val FILE_APK = "application/vnd.android.package-archive"
     private const val FILE_GZIP = "application/gzip"
     private const val FILE_JAVA = "application/java-vm"
     private const val FILE_XZ = "application/x-xz"
@@ -345,9 +346,9 @@ object ExplorerUtils {
             (length == 0L) -> NodeContent.Empty
             mimeType.isBlank(),
             (mimeType == FILE_UNKNOWN) -> content.resolveFileType(path)
-            mimeType.startsWith(FILE_PICTURE) -> content.ifNotCached { NodeContent.Picture(path, mimeType) }
+            mimeType.startsWith(FILE_PICTURE) -> content.ifNotCached { NodeContent.Picture.resolve(mimeType) }
+            mimeType.startsWith(FILE_APK) -> content.ifNotCached { AndroidApp.apk(path) }
             mimeType.startsWith(FILE_ZIP) -> when (true) {
-                path.endsWith(EXT_APK, ignoreCase = true) -> content.ifNotCached { AndroidApp.apk(path) }
                 path.endsWith(EXT_APKS, ignoreCase = true),
                 path.endsWith(EXT_APKM, ignoreCase = true) -> content.ifNotCached { AndroidApp.apks(path) }
                 (content is AndroidApp) -> return this
