@@ -42,14 +42,14 @@ sealed class NodeContent(
         val duration: Int = 0, // todo
     ) : File(mimeType, thumbnail = Thumbnail.FilePath) {
         companion object {
-            val Mp4 = Picture(mimeType = "video/mp4")
-            val Mkv = Picture(mimeType = "video/x-matroska")
-            val Amkv = Picture(mimeType = "application/x-matroska")
-            val Avi = Picture(mimeType = "video/x-msvideo")
-            val Mov = Picture(mimeType = "video/quicktime")
-            val Webm = Picture(mimeType = "video/webm")
-            val Tgp = Picture(mimeType = "video/3gpp")
-            val Tgp2 = Picture(mimeType = "video/3gpp2")
+            val Mp4 = Movie(mimeType = "video/mp4")
+            val Mkv = Movie(mimeType = "video/x-matroska")
+            val Amkv = Movie(mimeType = "application/x-matroska")
+            val Avi = Movie(mimeType = "video/x-msvideo")
+            val Mov = Movie(mimeType = "video/quicktime")
+            val Webm = Movie(mimeType = "video/webm")
+            val Tgp = Movie(mimeType = "video/3gpp")
+            val Tgp2 = Movie(mimeType = "video/3gpp2")
 
             private val popular = listOf(Mp4, Mkv, Amkv, Avi, Mov, Webm, Tgp, Tgp2)
                 .associateBy { it.mimeType }
