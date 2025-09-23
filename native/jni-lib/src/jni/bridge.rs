@@ -94,16 +94,16 @@ fn ok(_: ()) -> Rslt<ResultMsg> {
 
 fn run(command: Command, argv: Vec<String>) -> Rslt<ResultMsg> {
     let first_arg = argv.first();
-     let data = match command {
-        Command::Meta => meta(first_arg.unwrap()).map(|it| Data::Meta(it)),
-        Command::Metas => metas(first_arg.unwrap()).map(|entries| Data::Metas(Metas { entries })),
-        Command::Type => file_type(first_arg.unwrap()).map(|entry| Data::Type(entry)),
-        Command::Types => file_types(first_arg.unwrap()).map(|entries| Data::Types(entries)),
-        Command::Mkfile => mkfile(first_arg.unwrap()).map(|it| Data::Meta(it)),
-        Command::Mkdir => mkdir(first_arg.unwrap()).map(|it| Data::Meta(it)),
-        Command::Usage => usage(first_arg.unwrap()).map(|it| Data::Usage(it)),
+     let data: Data = match command {
+        Command::Meta => Data::Meta(meta(first_arg.unwrap())?),
+        Command::Metas => Data::Metas(Metas { entries: metas(first_arg.unwrap())? }),
+        Command::Type => Data::Type(file_type(first_arg.unwrap())?),
+        Command::Types => Data::Types(file_types(first_arg.unwrap())?),
+        Command::Mkfile => Data::Meta(mkfile(first_arg.unwrap())?),
+        Command::Mkdir => Data::Meta(mkdir(first_arg.unwrap())?),
+        Command::Usage => Data::Usage(usage(first_arg.unwrap())?),
         Command::Delete => return ok(delete(first_arg.unwrap())?),
     };
-    let msg = ResultMsg { data: Some(data?) };
+    let msg = ResultMsg { data: Some(data) };
     return Ok(msg);
 }
