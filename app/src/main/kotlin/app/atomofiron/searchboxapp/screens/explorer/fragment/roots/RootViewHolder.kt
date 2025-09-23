@@ -15,6 +15,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
+import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.convert
 import app.atomofiron.searchboxapp.utils.getColorByAttr
@@ -67,12 +68,15 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
         cardThumbnail.imageTintList = if (item.withPreview) null else colors
         cardThumbnail.background = item.getThumbnailBackground()
         when (val thumbnail = item.thumbnail) {
-            null -> cardThumbnail.setImageDrawable(item.getIcon())
-            else -> Glide
+            Thumbnail.FilePath -> Glide
                 .with(root.context)
-                .load(thumbnail.value)
+                .load(item.thumbnailPath)
                 .placeholder(item.getIcon())
                 .into(cardThumbnail)
+            null, Thumbnail.Loading -> cardThumbnail.setImageDrawable(item.getIcon())
+            is Thumbnail.Bitmap -> cardThumbnail.setImageBitmap(thumbnail.value)
+            is Thumbnail.Drawable -> cardThumbnail.setImageDrawable(thumbnail.value)
+            is Thumbnail.Res -> cardThumbnail.setImageResource(thumbnail.value)
         }
         item.bindType()
     }

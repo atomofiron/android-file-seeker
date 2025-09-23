@@ -4,7 +4,6 @@ import app.atomofiron.common.util.unsafeLazy
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 
-@Suppress("DataClassPrivateConstructor")
 sealed class NodeContent(
     // '*/*' - значит тип неизвестен,
     // null - пока неизвестно, известен тип или нет,
@@ -39,37 +38,70 @@ sealed class NodeContent(
     data object Empty : File()
 
     data class Movie(
-        override val thumbnail: Thumbnail,
+        override val mimeType: String,
         val duration: Int = 0, // todo
-    ) : File() {
+    ) : File(mimeType, thumbnail = Thumbnail.FilePath) {
+        companion object {
+            val Mp4 = Picture(mimeType = "video/mp4")
+            val Mkv = Picture(mimeType = "video/x-matroska")
+            val Amkv = Picture(mimeType = "application/x-matroska")
+            val Avi = Picture(mimeType = "video/x-msvideo")
+            val Mov = Picture(mimeType = "video/quicktime")
+            val Webm = Picture(mimeType = "video/webm")
+            val Tgp = Picture(mimeType = "video/3gpp")
+            val Tgp2 = Picture(mimeType = "video/3gpp2")
+
+            private val popular = listOf(Mp4, Mkv, Amkv, Avi, Mov, Webm, Tgp, Tgp2)
+                .associateBy { it.mimeType }
+
+            fun resolve(mimeType: String) = popular[mimeType] ?: Movie(mimeType = mimeType)
+        }
         override val isCached = duration >= 0
-        constructor(path: String) : this(Thumbnail(path))
     }
 
     data class Music(
+        override val mimeType: String,
         override val thumbnail: Thumbnail? = null,
         val duration: Int = 0, // todo
-    ) : File(mimeType = "audio/*") {
+    ) : File(mimeType = mimeType) {
+        companion object {
+            val Mp3 = Music("audio/mpeg")
+            val Aac = Music("audio/aac")
+            val M4a = Music("audio/mp4")
+            val Ogg = Music("audio/ogg")
+            val Opus = Music("audio/opus")
+            val Flac = Music("audio/flac")
+            val Wma = Music("audio/x-ms-wma")
+            val Wav = Music("audio/wav")
+            val Xwav = Music("audio/x-wav")
+
+            private val popular = listOf(Mp3, Aac, M4a, Ogg, Opus, Flac, Wma, Wav, Xwav)
+                .associateBy { it.mimeType }
+
+            fun resolve(mimeType: String) = popular[mimeType] ?: Music(mimeType = mimeType)
+        }
         override val isCached = duration >= 0
     }
 
     data class Picture(
-        override val thumbnail: Thumbnail,
         override val mimeType: String,
         override val description: String? = null,
         override val details: String? = "", // todo
-    ) : File(mimeType) {
+    ) : File(mimeType, Thumbnail.FilePath) {
         companion object {
-            fun png(path: String, description: String? = null) = Picture(path, mimeType = "image/png", description)
-            fun apng(path: String, description: String? = null) = Picture(path, mimeType = "image/apng", description)
-            fun jpeg(path: String, description: String? = null) = Picture(path, mimeType = "image/jpeg", description)
-            fun gif(path: String, description: String? = null) = Picture(path, mimeType = "image/gif", description)
-            fun webp(path: String, description: String? = null) = Picture(path, mimeType = "image/webp", description)
-            fun avif(path: String, description: String? = null) = Picture(path, mimeType = "image/avif", description)
+            val Png = Picture(mimeType = "image/png")
+            val Apng = Picture(mimeType = "image/apng")
+            val Jpeg = Picture(mimeType = "image/jpeg")
+            val Gif = Picture(mimeType = "image/gif")
+            val Webp = Picture(mimeType = "image/webp")
+            val Avif = Picture(mimeType = "image/avif")
+
+            private val popular = listOf(Png, Apng, Jpeg, Gif, Webp, Avif)
+                .associateBy { it.mimeType }
+
+            fun resolve(mimeType: String) = popular[mimeType] ?: Picture(mimeType = mimeType)
         }
         override val isCached = details != null
-
-        constructor(path: String, mimeType: String, description: String? = null) : this(Thumbnail(path), mimeType, description = description)
     }
 
     sealed class Archive(mimeType: String) : File(mimeType) {
@@ -87,8 +119,7 @@ sealed class NodeContent(
     data class Tar(override val children: List<Node>? = null) : Archive("application/x-tar")
     data class Rar(override val children: List<Node>? = null) : Archive("application/vnd.rar")
 
-
-    data class AndroidApp private constructor(
+    data class AndroidApp(
         val ref: NodeRef,
         val splitApk: Boolean,
         val info: ApkInfo? = null,

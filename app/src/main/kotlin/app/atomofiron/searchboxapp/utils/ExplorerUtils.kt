@@ -373,9 +373,9 @@ object ExplorerUtils {
                 path.endsWith(EXT_BAT, ignoreCase = true) -> content.ifNotCached { NodeContent.Text.BatScript }
                 else -> NodeContent.Text.Plain
             }
-            mimeType.startsWith(FILE_AUDIO) -> content.ifNotCached { NodeContent.Music() }
+            mimeType.startsWith(FILE_AUDIO) -> content.ifNotCached { NodeContent.Music.resolve(mimeType) }
             mimeType.startsWith(FILE_VIDEO),
-            mimeType.startsWith(FILE_MATROSKA) -> content.ifNotCached { NodeContent.Movie(path) }
+            mimeType.startsWith(FILE_MATROSKA) -> content.ifNotCached { NodeContent.Movie.resolve(mimeType) }
             mimeType.startsWith(FILE_PDF) -> content.ifNotCached { NodeContent.Pdf }
             mimeType.startsWith(FILE_ELF_EXE) -> content.ifNotCached { NodeContent.Elf }
             mimeType.startsWith(FILE_ELF_RE) -> when {
@@ -409,7 +409,7 @@ object ExplorerUtils {
         val content = when (content) {
             is NodeContent.Picture,
             is NodeContent.Movie -> content
-            is NodeContent.Music -> NodeContent.Music(path.createAudioThumbnail(config)?.forNode, 0)
+            is NodeContent.Music -> content.copy(thumbnail = path.createAudioThumbnail(config)?.forNode)
             is NodeContent.Zip -> cache(content).contentOrNodeError(this) { return it }.let { zip ->
                 when (zip.children?.any { it.name == BASE_APK }) {
                     null, false -> zip
@@ -664,13 +664,13 @@ object ExplorerUtils {
     private fun resolveFileType(path: String) = null.resolveFileType(path)
 
     private fun NodeContent?.resolveFileType(path: String): NodeContent = when (true) {
-        path.endsWith(EXT_APNG, ignoreCase = true) -> ifNotCached { NodeContent.Picture.apng(path) }
-        path.endsWith(EXT_PNG, ignoreCase = true) -> ifNotCached { NodeContent.Picture.png(path) }
+        path.endsWith(EXT_APNG, ignoreCase = true) -> ifNotCached { NodeContent.Picture.Apng }
+        path.endsWith(EXT_PNG, ignoreCase = true) -> ifNotCached { NodeContent.Picture.Png }
         path.endsWith(EXT_JPG, ignoreCase = true),
-        path.endsWith(EXT_JPEG, ignoreCase = true) -> ifNotCached { NodeContent.Picture.jpeg(path) }
-        path.endsWith(EXT_GIF, ignoreCase = true) -> ifNotCached { NodeContent.Picture.gif(path) }
-        path.endsWith(EXT_WEBP, ignoreCase = true) -> ifNotCached { NodeContent.Picture.webp(path) }
-        path.endsWith(EXT_AVIF, ignoreCase = true) -> ifNotCached { NodeContent.Picture.avif(path) }
+        path.endsWith(EXT_JPEG, ignoreCase = true) -> ifNotCached { NodeContent.Picture.Jpeg }
+        path.endsWith(EXT_GIF, ignoreCase = true) -> ifNotCached { NodeContent.Picture.Gif }
+        path.endsWith(EXT_WEBP, ignoreCase = true) -> ifNotCached { NodeContent.Picture.Webp }
+        path.endsWith(EXT_AVIF, ignoreCase = true) -> ifNotCached { NodeContent.Picture.Avif }
         path.endsWith(EXT_APK, ignoreCase = true) -> ifNotCached { AndroidApp.apk(path) }
         path.endsWith(EXT_APKS, ignoreCase = true),
         path.endsWith(EXT_APKM, ignoreCase = true) -> ifNotCached { AndroidApp.apks(path) }
@@ -692,19 +692,19 @@ object ExplorerUtils {
         path.endsWith(EXT_HTML, ignoreCase = true) -> NodeContent.Text.Plain
         path.endsWith(EXT_SVG, ignoreCase = true) -> ifNotCached { NodeContent.Text.Svg }
         path.endsWith(EXT_IMG, ignoreCase = true) -> NodeContent.DataImage
-        path.endsWith(EXT_MP4, ignoreCase = true),
-        path.endsWith(EXT_MKV, ignoreCase = true),
-        path.endsWith(EXT_MOV, ignoreCase = true),
-        path.endsWith(EXT_WEBM, ignoreCase = true),
-        path.endsWith(EXT_3GP, ignoreCase = true),
-        path.endsWith(EXT_AVI, ignoreCase = true) -> ifNotCached { NodeContent.Movie(path) }
-        path.endsWith(EXT_MP3, ignoreCase = true),
-        path.endsWith(EXT_M4A, ignoreCase = true),
-        path.endsWith(EXT_OGG, ignoreCase = true),
-        path.endsWith(EXT_WAV, ignoreCase = true),
-        path.endsWith(EXT_FLAC, ignoreCase = true),
+        path.endsWith(EXT_MP4, ignoreCase = true) -> ifNotCached { NodeContent.Movie.Mp4 }
+        path.endsWith(EXT_MKV, ignoreCase = true) -> ifNotCached { NodeContent.Movie.Mkv }
+        path.endsWith(EXT_MOV, ignoreCase = true) -> ifNotCached { NodeContent.Movie.Mov }
+        path.endsWith(EXT_WEBM, ignoreCase = true) -> ifNotCached { NodeContent.Movie.Webm }
+        path.endsWith(EXT_3GP, ignoreCase = true) -> ifNotCached { NodeContent.Movie.Tgp }
+        path.endsWith(EXT_AVI, ignoreCase = true) -> ifNotCached { NodeContent.Movie.Avi }
+        path.endsWith(EXT_MP3, ignoreCase = true) -> ifNotCached { NodeContent.Music.Mp3 }
+        path.endsWith(EXT_M4A, ignoreCase = true) -> ifNotCached { NodeContent.Music.M4a }
         path.endsWith(EXT_OGA, ignoreCase = true),
-        path.endsWith(EXT_AAC, ignoreCase = true) -> ifNotCached { NodeContent.Music() }
+        path.endsWith(EXT_OGG, ignoreCase = true) -> ifNotCached { NodeContent.Music.Ogg }
+        path.endsWith(EXT_WAV, ignoreCase = true) -> ifNotCached { NodeContent.Music.Wav }
+        path.endsWith(EXT_FLAC, ignoreCase = true) -> ifNotCached { NodeContent.Music.Flac }
+        path.endsWith(EXT_AAC, ignoreCase = true) -> ifNotCached { NodeContent.Music.Aac }
         path.endsWith(EXT_PDF, ignoreCase = true) -> ifNotCached { NodeContent.Pdf }
         path.endsWith(EXT_TORRENT, ignoreCase = true) -> ifNotCached { NodeContent.Torrent }
         path.endsWith(EXT_FAP, ignoreCase = true) -> ifNotCached { NodeContent.Fap }

@@ -11,23 +11,19 @@ sealed interface Thumbnail {
     data object Loading: Thumbnail {
         override val ready = false
     }
+    data object FilePath : Thumbnail
     @JvmInline
     value class Bitmap(val value: AndroidBitmap) : Thumbnail
-    @JvmInline
-    value class FilePath(val value: String) : Thumbnail
     @JvmInline
     value class Drawable(val value: AndroidDrawable) : Thumbnail
     @JvmInline
     value class Res(@DrawableRes val value: Int) : Thumbnail
-
-    val filePath: String? get() = (this as? FilePath)?.value
 
     val drawable: AndroidDrawable? get() = (this as? Drawable)?.value
 
     companion object {
         operator fun invoke(value: AndroidBitmap) = Bitmap(value)
         operator fun invoke(value: AndroidDrawable) = Drawable(value)
-        operator fun invoke(value: String) = FilePath(value)
         operator fun invoke(@DrawableRes value: Int) = Res(value)
     }
 }

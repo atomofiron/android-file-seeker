@@ -8,7 +8,7 @@ data class NodeRoot(
     val type: NodeRootType,
     val item: Node,
     val sorting: NodeSorting,
-    val thumbnail: Thumbnail.FilePath? = null,
+    val thumbnail: Thumbnail? = null,
     val thumbnailPath: String = "",
     // isSelected is always false in the garden
     val isSelected: Boolean = false,
@@ -20,13 +20,7 @@ data class NodeRoot(
 
     val stableId: Int = type.stableId
     val isEnabled: Boolean get() = item.isCached || type is NodeRootType.Storage
-    val withPreview: Boolean = when (type) {
-        is NodeRootType.Photos,
-        is NodeRootType.Videos,
-        is NodeRootType.Camera,
-        is NodeRootType.Screenshots -> true
-        else -> false
-    }
+    val withPreview: Boolean = type.withPreview
 
     init {
         require(item.children?.isOpened != true)
@@ -35,13 +29,14 @@ data class NodeRoot(
     sealed class NodeRootType(
         open val editable: Boolean = false,
         val removable: Boolean = false,
+        val withPreview: Boolean = false,
     ) {
         open val stableId: Int = Objects.hash(this::class)
 
-        data object Photos : NodeRootType()
-        data object Videos : NodeRootType()
-        data object Camera : NodeRootType()
-        data object Screenshots : NodeRootType()
+        data object Photos : NodeRootType(withPreview = true)
+        data object Videos : NodeRootType(withPreview = true)
+        data object Camera : NodeRootType(withPreview = true)
+        data object Screenshots : NodeRootType(withPreview = true)
         data object Downloads : NodeRootType(editable = true)
         data object Bluetooth : NodeRootType(editable = true)
         data class Storage(
