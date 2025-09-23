@@ -4,6 +4,7 @@ import android.content.Context
 import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.dropLast
 import app.atomofiron.common.util.extension.clear
+import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.debugDelay
 import app.atomofiron.common.util.extension.replace
 import app.atomofiron.common.util.flow.collect
@@ -343,9 +344,9 @@ class ExplorerService(
         }
     }
 
-    suspend fun tryRename(key: NodeTabKey, it: Node, name: String) {
+    suspend fun tryRename(key: NodeTabKey, target: Node, name: String) {
         val item = garden(key) {
-            tree.findNode(it.uniqueId)
+            tree.findNode(target.uniqueId)
         }
         item ?: return
         // todo change uniqueId in state, create the new one state instance
@@ -355,6 +356,18 @@ class ExplorerService(
             val index = level?.children?.indexOfFirst { it.uniqueId == item.uniqueId }
             if (index == null || index < 0) return
             level.children.items[index] = renamed
+            val levelIndex = tree.indexOfFirst { it.path == target.path }
+            if (levelIndex >= 0) {
+                tree[levelIndex] = renamed
+                var prev = renamed
+                for (i in levelIndex.inc()..tree.lastIndex) {
+                    val next = tree[i]
+                    prev = prev.children?.find { it.name == next.name }
+                        ?.also { tree[i] = it }
+                        ?: debugFail { "No ${next.name} in ${prev.name} (children=${prev.children?.map { it.name }})" }
+                            .let { break }
+                }
+            }
         }
     }
 
