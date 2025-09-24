@@ -13,9 +13,9 @@ plugins {
     alias(libs.plugins.protobuf)
     alias(libs.plugins.kapt)
     id("app.fileseeker.convention.library")
-    id("idea")
 }
 
+val kotlinDir = "src/main/kotlin"
 val jniLibsDir = "src/main/jniLibs"
 val nativeLibName = "native_lib"
 
@@ -36,7 +36,7 @@ android {
                 srcDir("../proto")
             }*/
             java {
-                srcDirs("src/main/kotlin/uniffi/$nativeLibName")
+                srcDirs("$kotlinDir/uniffi/$nativeLibName")
             }
             jniLibs {
                 srcDirs(jniLibsDir)
@@ -149,8 +149,8 @@ tasks.register<Exec>(taskGenerateUniffiBindings) {
         cargoPath, "run",
         "--bin", "uniffi-bindgen", "generate",
         "--library", "target/aarch64-linux-android/release/lib$nativeLibName.so",
-        "--language", "kotlin",
-        "--out-dir", "../app/src/main/kotlin",
+        "--language", "kotlin", "--no-format",
+        "--out-dir", "../app/$kotlinDir",
     ).apply {
         println("for manual use: cd $nativeDirPath && ${commandLine.joinToString(separator = " ")}\n")
     }
