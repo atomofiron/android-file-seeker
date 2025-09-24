@@ -66,19 +66,3 @@ fn get_file_types(path: String) -> TypedMetasResult {
         Err(e) => TypedMetasResult::Error(e.to_string()),
     }
 }
-
-#[uniffi::export]
-fn get_mkfile(path: String) -> MetaResult {
-    match new_file(path) {
-        Ok(data) => MetaResult::Ok(data),
-        Err(e) => MetaResult::Error(e.to_string()),
-    }
-}
-
-#[uniffi::export]
-fn get_mkdir(path: String) -> MetaResult {
-    match new_dir(path) {
-        Ok(data) => MetaResult::Ok(data),
-        Err(e) => MetaResult::Error(e.to_string()),
-    }
-}
