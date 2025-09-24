@@ -1,6 +1,6 @@
 use crate::r#impl::hr_meta::HumanReadableMeta;
 use crate::api::protocol::TypedMeta;
-use crate::staff::{empty_string, Rslt};
+use crate::common::{empty_string, Rslt};
 use std::fs;
 use std::path::PathBuf;
 
