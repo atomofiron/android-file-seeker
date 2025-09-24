@@ -3,3 +3,4 @@ src/main/assets/native-bin
 src/main/jniLibs/
 *.iml
 /release
+src/main/kotlin/uniffi/

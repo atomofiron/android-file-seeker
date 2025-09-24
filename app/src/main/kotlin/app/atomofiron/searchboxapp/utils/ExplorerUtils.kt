@@ -23,8 +23,8 @@ import app.atomofiron.searchboxapp.model.explorer.NodeState
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import app.atomofiron.searchboxapp.utils.Const.SLASH
-import bridge.Bridge
 import kotlinx.coroutines.Job
+import uniffi.native_lib.*
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
@@ -191,7 +191,7 @@ object ExplorerUtils {
             else -> NodeContent.Empty
         }
         val meta = when (output) {
-            is Rslt.Ok -> output.data
+            is Rslt.Ok -> output.value
             is Rslt.Err -> return null
         }
         return Node(path = targetPath, parentPath = parent.path, rootId = parent.rootId, properties = meta.toProperties(), content = content)
@@ -206,7 +206,7 @@ object ExplorerUtils {
         )
     }
 
-    private fun Bridge.Meta.toProperties(
+    private fun Meta.toProperties(
         name: String = this.name,
         size: String = "",
     ): NodeProperties {
@@ -218,7 +218,7 @@ object ExplorerUtils {
             group = group,
             date = date,
             time = time,
-            length = if (!isFile) 0 else length,
+            length = if (!isFile) 0 else length.toLong(),
             size = this.size.takeIf { it.isNotEmpty() } ?: size,
         )
     }
@@ -288,7 +288,7 @@ object ExplorerUtils {
     fun Node.update(config: CacheConfig, ensureCached: Boolean = true): Node {
         val type = NativeBridge.type(path, config.asSu)
         return when (type) {
-            is Rslt.Ok -> parseNode(type.data.meta).resolveType(type.data.mime)
+            is Rslt.Ok -> parseNode(type.value.meta).resolveType(type.value.mime)
                 .run { if (ensureCached) ensureCached(config, oldProps = properties) else this }
             is Rslt.Err -> copy(error = type.message.toNodeError(path))
         }
@@ -310,7 +310,7 @@ object ExplorerUtils {
     private fun Node.cacheDir(asSu: Boolean): Node {
         val result = NativeBridge.metas(path, asSu)
         return when (result) {
-            is Rslt.Ok -> parseDir(result.data)
+            is Rslt.Ok -> parseDir(result.value)
             is Rslt.Err -> copy(error = result.message.toNodeError(path))
         }
     }
@@ -320,7 +320,7 @@ object ExplorerUtils {
         val children = children ?: return false
         val types = NativeBridge.types(path, asSu)
         val entries = when (types) {
-            is Rslt.Ok -> types.data
+            is Rslt.Ok -> types.value
             is Rslt.Err -> return false
         }
         entries.forEach { entry ->
@@ -493,7 +493,7 @@ object ExplorerUtils {
         return this
     }
 
-    private fun Node.parseNode(meta: Bridge.Meta): Node {
+    private fun Node.parseNode(meta: Meta): Node {
         val properties = meta.toProperties(name, size)
         val (children, content) = when {
             properties.isDirectory() -> when (content) {
@@ -513,7 +513,7 @@ object ExplorerUtils {
         return copy(children = children, properties = properties, content = content)
     }
 
-    private fun Node.parseDir(metas: List<Bridge.Meta>): Node {
+    private fun Node.parseDir(metas: List<Meta>): Node {
         val items = MutableList<Node>(metas.size)
         val files = MutableList<Node>(metas.size)
         for (i in metas.indices) {

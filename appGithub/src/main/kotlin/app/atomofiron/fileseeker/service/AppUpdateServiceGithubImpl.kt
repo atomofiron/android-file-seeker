@@ -64,7 +64,7 @@ class AppUpdateServiceGithubImpl(
     override fun check(userAction: Boolean) {
         scope.launch {
             when (val releases = api.releases()) {
-                is Ok -> releases.data
+                is Ok -> releases.value
                     .findAsset(userAction)
                     .also { asset = it }
                     ?.checkFile()

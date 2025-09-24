@@ -1,6 +1,7 @@
 pub mod features;
-pub mod jni;
 pub mod staff;
-pub mod bridge {
-    include!(concat!(env!("OUT_DIR"), "/bridge.rs"));
-}
+pub mod protocol;
+pub mod bridge;
+pub mod uniffi_bindgen;
+
+uniffi::setup_scaffolding!();

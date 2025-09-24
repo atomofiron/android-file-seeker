@@ -1,4 +1,4 @@
-use crate::bridge;
+use crate::protocol::Meta;
 use crate::features::hr_meta::HumanReadableMeta;
 use crate::staff::Rslt;
 use std::fs;
@@ -7,21 +7,21 @@ use std::path::PathBuf;
 use fs_extra::dir;
 use crate::features::hr_size::HumanReadableSize;
 
-pub fn mkfile(path: &String) -> Rslt<bridge::Meta> {
-    let path = PathBuf::try_from(path)?;
+pub fn new_file(path: String) -> Rslt<Meta> {
+    let path = PathBuf::try_from(&path)?;
     let meta = File::create(&path)?.metadata();
     return Ok(meta.to_hr(&path));
 }
 
-pub fn mkdir(path: &String) -> Rslt<bridge::Meta> {
+pub fn new_dir(path: String) -> Rslt<Meta> {
     fs::create_dir_all(path.clone())?;
-    let path = PathBuf::try_from(path)?;
+    let path = PathBuf::try_from(&path)?;
     let meta = File::open(&path)?.metadata();
     return Ok(meta.to_hr(&path));
 }
 
-pub fn delete(path: &String) -> Rslt<()> {
-    let path = PathBuf::try_from(path)?;
+pub fn delete(path: String) -> Rslt<()> {
+    let path = PathBuf::try_from(&path)?;
     match path.is_dir() {
         true => fs::remove_dir_all(path)?,
         false => fs::remove_file(path)?,
@@ -29,6 +29,6 @@ pub fn delete(path: &String) -> Rslt<()> {
     return Ok(());
 }
 
-pub fn usage(path: &String) -> Rslt<String> {
+pub fn usage(path: String) -> Rslt<String> {
     Ok(dir::get_size(path)?.to_hr_size())
 }

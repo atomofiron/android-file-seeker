@@ -1,8 +1,8 @@
-use crate::bridge;
+use crate::protocol;
 use crate::features::fs_mode::HumanReadableMode;
 use crate::features::hr_size::HumanReadableSize;
 use crate::features::hr_users::HumanReadableUsers;
-use bridge::Meta;
+use protocol::Meta;
 use std::fs::Metadata;
 use std::io;
 use std::os::unix::fs::MetadataExt;

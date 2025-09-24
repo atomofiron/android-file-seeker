@@ -5,13 +5,20 @@ import app.atomofiron.searchboxapp.android.NativeBridge.binPath
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.writeTo
-import bridge.Bridge
-import bridge.commandMsg
+import uniffi.native_lib.DeleteResult
+import uniffi.native_lib.Meta
+import uniffi.native_lib.MetaResult
+import uniffi.native_lib.MetasResult
+import uniffi.native_lib.TypedMeta
+import uniffi.native_lib.TypedMetaResult
+import uniffi.native_lib.TypedMetasResult
+import uniffi.native_lib.UsageResult
 import java.io.File
 import java.io.FileOutputStream
 
 private const val NATIVE_BIN = "native-bin"
 
+// todo asSu
 object NativeBridge {
 
     var binPath = ""
@@ -21,46 +28,73 @@ object NativeBridge {
         System.loadLibrary("native_lib")
     }
 
-    external fun run(command: ByteArray, vararg args: String): ByteArray
-    external fun runAsync(command: ByteArray, vararg args: String, callback: (ByteArray) -> Unit)
-
     fun setBinDir(path: String) {
         binPath = "$path/$NATIVE_BIN"
     }
 
-    fun createFile(path: String, asSu: Boolean): Rslt<Bridge.Meta> = run(Bridge.Command.MKFILE, asSu, path)
-
-    fun createDir(path: String, asSu: Boolean): Rslt<Bridge.Meta> = run(Bridge.Command.MKDIR, asSu, path)
-
-    fun type(path: String, asSu: Boolean): Rslt<Bridge.TypeEntry> = run(Bridge.Command.TYPE, asSu, path)
-
-    fun types(path: String, asSu: Boolean): Rslt<List<Bridge.TypeEntry>> = run(Bridge.Command.TYPES, asSu, path)
-
-    fun meta(path: String, asSu: Boolean): Rslt<Bridge.Meta> = run(Bridge.Command.META, asSu, path)
-
-    fun metas(path: String, asSu: Boolean): Rslt<List<Bridge.Meta>> = run(Bridge.Command.METAS, asSu, path)
-
-    fun usage(path: String, asSu: Boolean): Rslt<String> = run(Bridge.Command.USAGE, asSu, path)
-
-    fun delete(path: String, asSu: Boolean): Rslt<Unit> = run(Bridge.Command.DELETE, asSu, path)
-
-    private inline fun <reified R> run(command: Bridge.Command, asSu: Boolean, vararg args: String): Rslt<R> {
-        val msg = commandMsg { cmd = command }
-        // todo asSu
-        val bytes = run(msg.toByteArray(), *args)
-        val result = Bridge.ResultMsg.parseFrom(bytes)
-        val data = when (result.dataCase) {
-            Bridge.ResultMsg.DataCase.META -> result.meta
-            Bridge.ResultMsg.DataCase.METAS -> result.metas.entriesList
-            Bridge.ResultMsg.DataCase.TYPE -> result.type
-            Bridge.ResultMsg.DataCase.TYPES -> result.types.entriesList
-            Bridge.ResultMsg.DataCase.USAGE -> result.usage
-            Bridge.ResultMsg.DataCase.ERROR -> return Rslt.Err(result.error)
-            Bridge.ResultMsg.DataCase.DATA_NOT_SET -> Unit
+    fun createFile(path: String, asSu: Boolean): Rslt<Meta> {
+        val response = uniffi.native_lib.createFile(path)
+        return when (response) {
+            is MetaResult.Ok -> Rslt.Ok(response.v1)
+            is MetaResult.Error -> Rslt.Err(response.v1)
         }
-        return Rslt.Ok(data as R)
     }
 
+    fun createDir(path: String, asSu: Boolean): Rslt<Meta> {
+        val response = uniffi.native_lib.createDir(path)
+        return when (response) {
+            is MetaResult.Ok -> Rslt.Ok(response.v1)
+            is MetaResult.Error -> Rslt.Err(response.v1)
+        }
+    }
+
+    fun type(path: String, asSu: Boolean): Rslt<TypedMeta> {
+        val response = uniffi.native_lib.getFileType(path)
+        return when (response) {
+            is TypedMetaResult.Ok -> Rslt.Ok(response.v1)
+            is TypedMetaResult.Error -> Rslt.Err(response.v1)
+        }
+    }
+
+    fun types(path: String, asSu: Boolean): Rslt<List<TypedMeta>> {
+        val response = uniffi.native_lib.getFileTypes(path)
+        return when (response) {
+            is TypedMetasResult.Ok -> Rslt.Ok(response.v1)
+            is TypedMetasResult.Error -> Rslt.Err(response.v1)
+        }
+    }
+
+    fun meta(path: String, asSu: Boolean): Rslt<Meta> {
+        val response = uniffi.native_lib.getMeta(path)
+        return when (response) {
+            is MetaResult.Ok -> Rslt.Ok(response.v1)
+            is MetaResult.Error -> Rslt.Err(response.v1)
+        }
+    }
+
+    fun metas(path: String, asSu: Boolean): Rslt<List<Meta>> {
+        val response = uniffi.native_lib.getMetas(path)
+        return when (response) {
+            is MetasResult.Ok -> Rslt.Ok(response.v1)
+            is MetasResult.Error -> Rslt.Err(response.v1)
+        }
+    }
+
+    fun usage(path: String, asSu: Boolean): Rslt<String> {
+        val response = uniffi.native_lib.getUsage(path)
+        return when (response) {
+            is UsageResult.Ok -> Rslt.Ok(response.v1)
+            is UsageResult.Error -> Rslt.Err(response.v1)
+        }
+    }
+
+    fun delete(path: String, asSu: Boolean): Rslt<Unit> {
+        val response = uniffi.native_lib.deleteBy(path)
+        return when (response) {
+            is DeleteResult.Ok -> Rslt.Ok
+            is DeleteResult.Error -> Rslt.Err(response.v1)
+        }
+    }
 }
 
 fun Context.verifyNativeBin(): Rslt<Unit> {
@@ -86,12 +120,12 @@ fun Context.verifyNativeBin(): Rslt<Unit> {
         }
         file.setExecutable(true, true)
         val output = Shell.checkSu(binPath)
-        errorMessageBuilder.append(output.error)
-        errorMessageBuilder.append("\n")
         if (output.success) {
             errorMessageBuilder.clear()
             break
         } else {
+            errorMessageBuilder.append(output.error)
+            errorMessageBuilder.append("\n")
             file.delete()
         }
     }

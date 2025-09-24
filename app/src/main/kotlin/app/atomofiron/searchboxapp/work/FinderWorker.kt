@@ -182,7 +182,7 @@ class FinderWorker(
             val path = line.substring(0, index)
             val item = newNode(path)
             val itemMatch = when (val result = TextViewerService.searchInside(params, path, asSu)) {
-                is Rslt.Ok -> result.data.toItemMatchMultiply(item)
+                is Rslt.Ok -> result.value.toItemMatchMultiply(item)
                 is Rslt.Err -> ItemMatch.MultiplyError(item, count, result.message)
             }
             addToResult(itemMatch)

@@ -183,7 +183,7 @@ class TextViewerService(
 
     private fun TextViewerSession.searchInside(task: SearchTask): SearchTask {
         return when (val result = searchInside(task.params, item.value.path, asSu)) {
-            is Rslt.Ok -> task.toEnded(result = result.data)
+            is Rslt.Ok -> task.toEnded(result = result.value)
             is Rslt.Err -> task.toEnded(error = result.message)
         }
     }

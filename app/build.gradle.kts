@@ -1,8 +1,8 @@
 import com.google.protobuf.gradle.id
-import com.google.protobuf.gradle.proto
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.File
+import org.gradle.api.tasks.Exec
 
 plugins {
     alias(libs.plugins.android.library)
@@ -13,7 +13,11 @@ plugins {
     alias(libs.plugins.protobuf)
     alias(libs.plugins.kapt)
     id("app.fileseeker.convention.library")
+    id("idea")
 }
+
+val jniLibsDir = "src/main/jniLibs"
+val nativeLibName = "native_lib"
 
 android {
     namespace = "app.atomofiron.fileseeker"
@@ -28,8 +32,14 @@ android {
     }
     sourceSets {
         named("main") {
-            proto {
+            /*proto {
                 srcDir("../proto")
+            }*/
+            java {
+                srcDirs("src/main/kotlin/uniffi/$nativeLibName")
+            }
+            jniLibs {
+                srcDirs(jniLibsDir)
             }
         }
     }
@@ -89,15 +99,17 @@ dependencies {
     testImplementation(libs.junit)
     testImplementation(kotlin("test"))
     androidTestImplementation(libs.androidx.junit)
+    implementation(libs.jna) { artifact { type = "aar" } }
 }
 
 // cargo install cargo-ndk
 
 val taskPreBuild = "preBuild"
 val taskBuildNative = "buildNative"
+val taskGenerateUniffiBindings = "generateUniffiBindings"
 val taskCopyNativeBins = "copyNativeBins"
 val taskClean = "clean"
-val nativeLib= "native-lib"
+val nativeLib = "native-lib"
 val nativeBin = "native-bin"
 
 val ndkApi = android.defaultConfig.minSdk
@@ -120,12 +132,27 @@ tasks.register<Exec>(taskBuildNative) {
         "-t", "x86",
         "-t", "x86_64",
         "-P", "$ndkApi",
-        "-o", "$projectDir/src/main/jniLibs",
+        "-o", "$projectDir/$jniLibsDir",
         "build", "--release",
         "-p", nativeLib,
         "-p", nativeBin,
     ).apply {
         println("run if fails: cd $nativeDirPath && ${commandLine.joinToString(separator = " ")}\n")
+    }
+    isIgnoreExitValue = false
+}
+
+tasks.register<Exec>(taskGenerateUniffiBindings) {
+    group = "rust"
+    workingDir(nativeDirPath)
+    commandLine(
+        cargoPath, "run",
+        "--bin", "uniffi-bindgen", "generate",
+        "--library", "target/aarch64-linux-android/release/lib$nativeLibName.so",
+        "--language", "kotlin",
+        "--out-dir", "../app/src/main/kotlin",
+    ).apply {
+        println("for manual use: cd $nativeDirPath && ${commandLine.joinToString(separator = " ")}\n")
     }
     isIgnoreExitValue = false
 }
@@ -143,7 +170,7 @@ tasks.register<Copy>(taskCopyNativeBins) {
 }
 
 tasks.named(taskPreBuild) {
-    dependsOn(taskBuildNative, taskCopyNativeBins)
+    dependsOn(taskBuildNative, taskGenerateUniffiBindings, taskCopyNativeBins)
 }
 
 tasks.named(taskPreBuild) {
