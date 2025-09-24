@@ -1,8 +1,7 @@
-use crate::protocol;
 use crate::r#impl::fs_mode::HumanReadableMode;
 use crate::r#impl::hr_size::HumanReadableSize;
 use crate::r#impl::hr_users::HumanReadableUsers;
-use protocol::Meta;
+use crate::api::protocol::Meta;
 use std::fs::Metadata;
 use std::io;
 use std::os::unix::fs::MetadataExt;

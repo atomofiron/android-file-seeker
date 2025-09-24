@@ -1,4 +1,4 @@
-use crate::protocol::Meta;
+use crate::api::protocol::Meta;
 
 pub trait MetaExt {
     fn is_dir(&self) -> bool;

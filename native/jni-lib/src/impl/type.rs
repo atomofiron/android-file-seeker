@@ -1,5 +1,5 @@
 use crate::r#impl::hr_meta::HumanReadableMeta;
-use crate::protocol::TypedMeta;
+use crate::api::protocol::TypedMeta;
 use crate::staff::{empty_string, Rslt};
 use std::fs;
 use std::path::PathBuf;
