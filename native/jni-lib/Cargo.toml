@@ -13,7 +13,7 @@ crate-type = [
 
 [[bin]]
 name = "uniffi-bindgen"
-path = "src/uniffi_bindgen.rs"
+path = "src/api/bindgen.rs"
 
 [dependencies]
 uniffi =  { version = "0.29.4", features = ["cli"] }
