@@ -1,6 +1,6 @@
-use crate::features::meta::{meta, metas};
-use crate::features::other::{delete, new_dir, new_file, usage};
-use crate::features::r#type::{file_type, file_types};
+use crate::r#impl::meta::{meta, metas};
+use crate::r#impl::other::{delete, new_dir, new_file, usage};
+use crate::r#impl::r#type::{file_type, file_types};
 use crate::protocol::{DeleteResult, MetaResult, MetasResult, TypedMetaResult, TypedMetasResult, UsageResult};
 
 #[uniffi::export]

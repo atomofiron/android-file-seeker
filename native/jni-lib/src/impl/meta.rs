@@ -1,6 +1,6 @@
 use crate::protocol::Meta;
-use crate::features::hr_meta::HumanReadableMeta;
-use crate::features::meta_ext::MetaExt;
+use crate::r#impl::hr_meta::HumanReadableMeta;
+use crate::r#impl::meta_ext::MetaExt;
 use crate::staff::Rslt;
 use std::fs;
 use std::fs::File;
