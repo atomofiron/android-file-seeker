@@ -51,33 +51,6 @@ object Shell {
 
     operator fun get(template: String, toyboxPath: String = Shell.toyboxPath): String = template.replace(TOYBOX, toyboxPath)
 
-    fun checkSu(command: String = ""): Output {
-        var code = -1
-        var error: String
-        var process: Process? = null
-        var errorStream: InputStream? = null
-
-        try {
-            val runtime = Runtime.getRuntime()
-            process = when {
-                command.isEmpty() -> runtime.exec(SU)
-                else -> runtime.exec(arrayOf(SU, "-c", command))
-            }
-            errorStream = process.errorStream
-
-            code = process.waitFor()
-            error = errorStream.reader().readText()
-        } catch (e: Exception) {
-            error = e.message ?: e.toString()
-        } finally {
-            try {
-                errorStream?.close()
-                process?.destroy()
-            } catch (e: Exception) { }
-        }
-        return Output(code, "", error.trim())
-    }
-
     fun exec(command: String, su: Boolean, processObserver: ((Process) -> Unit)? = null, forEachLine: ((String) -> Unit)? = null): Output {
         var code = -1
         var output = ""

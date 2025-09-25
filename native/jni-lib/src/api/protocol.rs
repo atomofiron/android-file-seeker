@@ -1,40 +1,48 @@
+use bincode::{Decode, Encode};
 
+#[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum MetaResult {
     Ok(Meta),
     Error(String),
 }
 
+#[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum MetasResult {
     Ok(Vec<Meta>),
     Error(String),
 }
 
+#[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum TypedMetaResult {
     Ok(TypedMeta),
     Error(String),
 }
 
+#[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum TypedMetasResult {
     Ok(Vec<TypedMeta>),
     Error(String),
 }
 
+#[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum UsageResult {
     Ok(String),
     Error(String),
 }
 
+#[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
-pub enum DeleteResult {
+pub enum SimpleResult {
     Ok,
     Error(String),
 }
 
+#[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Record)]
 pub struct Meta {
     pub name: String,
@@ -48,6 +56,7 @@ pub struct Meta {
     pub error: String,
 }
 
+#[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Record)]
 pub struct TypedMeta {
     pub meta: Meta,
