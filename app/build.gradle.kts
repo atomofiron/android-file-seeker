@@ -102,8 +102,6 @@ dependencies {
     implementation(libs.jna) { artifact { type = "aar" } }
 }
 
-// cargo install cargo-ndk
-
 val taskPreBuild = "preBuild"
 val taskBuildNative = "buildNative"
 val taskGenerateUniffiBindings = "generateUniffiBindings"
@@ -114,7 +112,7 @@ val nativeBin = "native-bin"
 val ndkApi = android.defaultConfig.minSdk
 val nativeDirPath = "$projectDir/../native"
 val cargoPath = "${System.getProperty("user.home")}/.cargo/bin/cargo"
-val targets = listOf(
+val targets = arrayOf(
     "aarch64-linux-android",
     "armv7-linux-androideabi",
     "x86_64-linux-android",
@@ -173,9 +171,11 @@ tasks.named(taskPreBuild) {
     dependsOn(taskBuildNative, taskGenerateUniffiBindings, taskCopyNativeBins)
 }
 
-val process: Process = ProcessBuilder("rustup", "target", "add", *targets.toTypedArray())
+fun prepare(vararg args: String) = ProcessBuilder(*args)
     .redirectErrorStream(true)
     .start()
-if (process.waitFor() != 0) {
-    throw IllegalStateException(process.inputStream.bufferedReader().readText())
-}
+    .takeIf { it.waitFor() != 0 }
+    ?.run { throw IllegalStateException(inputStream.bufferedReader().readText()) }
+
+prepare("rustup", "target", "add", *targets)
+prepare("cargo", "install", "cargo-ndk")
