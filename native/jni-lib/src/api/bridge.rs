@@ -1,12 +1,26 @@
-use crate::api::protocol::{SimpleResult, MetaResult, MetasResult, TypedMetaResult, TypedMetasResult, UsageResult};
-use crate::api::request::Request;
-use crate::common::{config, Rslt};
+use crate::api::protocol::{MetaResult, MetasResult, SimpleResult, TypedMetaResult, TypedMetasResult, UsageResult};
+use crate::api::su_protocol::Request;
+use crate::api::su_bridge::as_su;
 use crate::r#impl::meta::{meta, metas};
 use crate::r#impl::other::{delete, new_dir, new_file, usage};
 use crate::r#impl::r#type::{file_type, file_types};
-use bincode::{decode_from_slice, encode_to_vec, Decode};
-use std::io::{Read, Write};
-use std::process::{ChildStderr, ChildStdout, Command, Stdio};
+
+#[uniffi::export]
+pub fn debug_thread_info() -> String {
+    let tid = std::thread::current().id();
+    return format!("Rust running on std::thread id: {:?}", tid);
+}
+
+#[uniffi::export]
+pub fn debug_thread_info2() -> String {
+    #[cfg(all(target_os = "android", target_arch = "aarch64"))]
+    unsafe {
+        let tid = libc::syscall(libc::SYS_gettid);
+        return format!("Rust running on Linux TID: {}", tid);
+    }
+    #[allow(unreachable_code)]
+    return "Rust running on Linux TID: ???".to_string();
+}
 
 #[uniffi::export]
 pub fn create_file(path: String, run_as_su: Option<String>) -> MetaResult {
@@ -102,50 +116,4 @@ pub fn get_file_types(path: String, run_as_su: Option<String>) -> TypedMetasResu
         Ok(data) => TypedMetasResult::Ok(data),
         Err(e) => TypedMetasResult::Error(e.to_string()),
     }
-}
-
-#[uniffi::export]
-fn try_as_su(bin_path: String) -> SimpleResult {
-    return as_su::<SimpleResult>(Request::TryRun, bin_path)
-        .unwrap_or_else(|e| SimpleResult::Error(e.to_string()))
-}
-
-fn as_su<D: Decode<()>>(request: Request, bin_path: String) -> Rslt<D> {
-    let bytes = encode_to_vec(request, config())?;
-    let mut child = Command::new("su").arg("-c").arg(bin_path)
-        .stdin(Stdio::piped())
-        .stdout(Stdio::piped())
-        .stderr(Stdio::piped())
-        .spawn()?;
-    let mut stdin = child.stdin.take()
-        .ok_or("failed to open stdin")?;
-    stdin.write_all(&bytes)?;
-    drop(stdin); // EOF
-    let status = child.wait()?;
-    if status.success() {
-        let (response, _) = decode_from_slice::<D,_>(&get_out(child.stdout)?, config())?;
-        return Ok(response)
-    } else {
-        let err = get_err(child.stderr)?;
-        let code = status.code()
-            .map(|x| x.to_string())
-            .unwrap_or("error".to_string());
-        Err(format!("{code}: {err}"))?
-    }
-}
-fn get_out(mut stdout: Option<ChildStdout>) -> Rslt<Vec<u8>> {
-    let mut out = Vec::new();
-    stdout
-        .as_mut().ok_or("stdout.as_mut")?
-        .read_to_end(&mut out)?;
-    return Ok(out);
-}
-fn get_err(mut stderr: Option<ChildStderr>) -> Rslt<String> {
-    let mut out = Vec::new();
-    stderr
-        .as_mut().ok_or("stderr.as_mut")?
-        .read_to_end(&mut out)?;
-    let message = String::from_utf8_lossy(&out)
-        .into_owned().to_string();
-    return Ok(message);
 }

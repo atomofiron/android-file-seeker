@@ -13,9 +13,14 @@ pub enum Request {
     TryRun,
 }
 
-/*#[derive(Debug, Encode, Decode, PartialEq)]
-pub enum ProxyResult {
-    Ok(Vec<u8>),
-    Error(String),
+pub type FrameLength = [u8; 4];
+
+pub fn frame_length() -> FrameLength { [0u8; 4] }
+
+pub fn to_len_frame(size: usize) -> FrameLength {
+    (size as u32).to_le_bytes()
 }
-*/
+
+pub fn from_len_frame(buf: FrameLength) -> usize {
+    u32::from_le_bytes(buf) as usize
+}
