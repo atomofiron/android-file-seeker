@@ -12,3 +12,10 @@ pub enum Request {
     Delete(String),
     TryRun,
 }
+
+/*#[derive(Debug, Encode, Decode, PartialEq)]
+pub enum ProxyResult {
+    Ok(Vec<u8>),
+    Error(String),
+}
+*/
