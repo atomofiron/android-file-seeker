@@ -488,22 +488,24 @@ class ExplorerService(
     }
 
     suspend fun deleteEveryWhere(items: List<Node>) {
-        // todo make good
-        items.forEach {
-            when {
-                it.isDirectory -> appScope.launch {
-                    it.delete(config.asSu)
-                }
-                else -> it.delete()
+        // todo delete every where
+        val files = items.filter { !it.isDirectory }
+        val dirs = items.filter { it.isDirectory }
+        val fileJob = appScope.launch {
+            for (file in files) {
+                file.delete(config.asSu)
+                store.emitRemoved(file.copy(children = null))
             }
         }
-        store.emitDeleted(items)
-    }
-
-    private suspend fun Node.delete() {
-        if (delete(config.asSu) == null) {
-            store.emitRemoved(copy(children = null))
+        val dirJobs = dirs.map { dir ->
+            appScope.launch {
+                dir.delete(config.asSu)
+                store.emitRemoved(dir.copy(children = null))
+            }
         }
+        fileJob.join()
+        dirJobs.forEach { it.join() }
+        store.emitDeleted(items)
     }
 
     suspend fun tryDelete(key: NodeTabKey, its: List<Node>) {
@@ -525,24 +527,36 @@ class ExplorerService(
                     ?.takeIf { state?.isDeleting == true }
             }.let { items.addAll(it) }
         }
-        val jobs = items.map { item ->
-            appScope.launch {
-                debugDelay(1)
-                val result = item.delete(config.asSu)
-                garden(key) {
-                    tree.replaceItem(item.uniqueId, item.parentPath, result)
-                    states.updateState(item.uniqueId) { null }
-                    store.emitRemoved(item.copy(children = null))
-                    lazyRender()
-                }
+        val files = items.filter { !it.isDirectory }
+        val dirs = items.filter { it.isDirectory }
+        debugDelay(1)
+        val fileJob = appScope.launch {
+            for (file in files) {
+                file.deleteIn(key)
             }
         }
-        jobs.forEach { it.join() }
+        val dirJobs = dirs.map { dir ->
+            appScope.launch {
+                dir.deleteIn(key)
+            }
+        }
+        fileJob.join()
+        dirJobs.forEach { it.join() }
         store.emitDeleted(items)
         mediaRootAffected?.let { mediaRoot ->
             garden {
                 updateRootAsync(key, mediaRoot)
             }
+        }
+    }
+
+    private suspend fun Node.deleteIn(key: NodeTabKey) {
+        val result = delete(config.asSu)
+        garden(key) {
+            tree.replaceItem(uniqueId, parentPath, result)
+            states.updateState(uniqueId) { null }
+            store.emitRemoved(copy(children = null))
+            lazyRender()
         }
     }
 
