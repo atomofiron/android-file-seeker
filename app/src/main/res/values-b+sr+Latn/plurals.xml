@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="x_dirs">
-        <item quantity="one">%d direktorijum</item>
-        <item quantity="few">%d direktorijuma</item>
-        <item quantity="other">%d direktorijuma</item>
+        <item quantity="one">%d fascikla</item>
+        <item quantity="few">%d fascikle</item>
+        <item quantity="other">%d fascikle</item>
     </plurals>
     <plurals name="x_files">
         <item quantity="one">%d datoteka</item>

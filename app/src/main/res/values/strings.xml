@@ -18,7 +18,7 @@
     <string name="wrong_value">Wrong value</string>
     <string name="wrong_intent">Wrong intent</string>
     <string name="nothing">Nothing found</string>
-    <string name="warning">You have not selected any directory. The search will be made around the root section</string>
+    <string name="warning">You have not selected any folder. The search will be made around the root section</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="close">Close</string>
@@ -40,7 +40,7 @@
     <string name="multiline">\'Multiline\' flag</string>
     <string name="bad_ex">Incorrect regular expression</string>
     <string name="reset">Reset</string>
-    <string name="no_checked">You didn\'t choose any directory!</string>
+    <string name="no_checked">You didn\'t choose any folder!</string>
     <string name="theme">Theme</string>
     <string name="need_restart">Restart required</string>
     <string name="history">History</string>
@@ -76,7 +76,7 @@
     <string name="pref_max_depth">Max depth</string>
     <string name="pref_max_size">Max file size</string>
     <string name="max_size_sum">If search in the content</string>
-    <string name="pref_exclude_dirs">Exclude directories</string>
+    <string name="pref_exclude_dirs">Exclude folders</string>
     <string name="exclude_dirs_summary">From search results</string>
     <string name="pref_use_su">Use super user</string>
     <string name="pref_about">About the App</string>
@@ -100,8 +100,8 @@
     <string name="rename">Rename</string>
     <string name="open_with">Open with…</string>
     <string name="no_such_file">No such file</string>
-    <string name="no_such_directory">No such directory</string>
-    <string name="no_such_file_or_directory">No such file or directory</string>
+    <string name="no_such_directory">No such folder</string>
+    <string name="no_such_file_or_directory">No such file or folder</string>
     <string name="permission_denied">Permission denied</string>
     <string name="unknown_error">Unknown error</string>
     <string name="unknown">unknown</string>
@@ -150,7 +150,7 @@
     <string name="make_a_clone">Make a clone</string>
     <string name="a_name">Name</string>
     <string name="a_file">File</string>
-    <string name="a_directory">Directory</string>
+    <string name="a_directory">Folder</string>
     <string name="inverse_glow">Inverse glow</string>
     <string name="haptic_effect">Haptic feedback</string>
     <string name="inverse_for_dark">Inverse for Dark theme</string>

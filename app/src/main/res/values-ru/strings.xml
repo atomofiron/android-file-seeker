@@ -15,7 +15,7 @@
     <string name="wrong_value">Неверное значение</string>
     <string name="wrong_intent">Неверное намерение</string>
     <string name="nothing">Ничего не найдено</string>
-    <string name="warning">Вы не выбрали ни одной директории. Поиск будет произведён по всему корневому разделу</string>
+    <string name="warning">Вы не выбрали ни одной папки. Поиск будет произведён по всему корневому разделу</string>
     <string name="ok">ОК</string>
     <string name="cancel">Отмена</string>
     <string name="close">Закрыть</string>
@@ -37,7 +37,7 @@
     <string name="multiline">Флаг \'multiline\'</string>
     <string name="bad_ex">Неверное регулярное выражение</string>
     <string name="reset">Сбросить</string>
-    <string name="no_checked">Вы не выбрали ни одну директорию!</string>
+    <string name="no_checked">Вы не выбрали ни одну папку!</string>
     <string name="theme">Тема</string>
     <string name="need_restart">Нужен перезапуск</string>
 	<string name="history">История</string>
@@ -73,7 +73,7 @@
     <string name="pref_max_depth">Макс. глубина</string>
     <string name="pref_max_size">Макс. размер файла</string>
     <string name="max_size_sum">При поиске по содержимому</string>
-    <string name="pref_exclude_dirs">Исключить директории</string>
+    <string name="pref_exclude_dirs">Исключить папки</string>
     <string name="exclude_dirs_summary">Из результатов поиска</string>
     <string name="pref_use_su">Использовать root</string>
     <string name="pref_about">О Приложении</string>
@@ -97,8 +97,8 @@
     <string name="rename">Переименовать</string>
     <string name="open_with">Открыть в…</string>
     <string name="no_such_file">Файла не существует</string>
-    <string name="no_such_directory">Директории не существует</string>
-    <string name="no_such_file_or_directory">Файла или директории не существует</string>
+    <string name="no_such_directory">Папки не существует</string>
+    <string name="no_such_file_or_directory">Файла или папка не существует</string>
     <string name="permission_denied">Нет доступа</string>
     <string name="unknown_error">Неизвестная ошибка</string>
     <string name="unknown">неизвестно</string>
@@ -142,11 +142,11 @@
     <string name="make_a_clone">Создать копию</string>
     <string name="duplicate">Дублировать</string>
     <string name="copy_move">Копировать</string>
-    <string name="create_file_or_dir">Создать файл или директорию</string>
+    <string name="create_file_or_dir">Создать файл или папку</string>
     <string name="create_file_dir">Создать файл/папку</string>
     <string name="a_name">Имя</string>
     <string name="a_file">Файл</string>
-    <string name="a_directory">Директорию</string>
+    <string name="a_directory">Папку</string>
     <string name="inverse_glow">Инвертировать свечение</string>
     <string name="haptic_effect">Тактильный отклик</string>
     <string name="inverse_for_dark">Инвертировать на тёмной теме</string>

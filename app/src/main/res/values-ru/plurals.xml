@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="x_dirs">
-        <item quantity="one">%d директория</item>
-        <item quantity="few">%d директории</item>
-        <item quantity="many">%d директорий</item>
-        <item quantity="other">%d директорий</item>
+        <item quantity="one">%d папка</item>
+        <item quantity="few">%d папки</item>
+        <item quantity="many">%d папки</item>
+        <item quantity="other">%d папки</item>
     </plurals>
     <plurals name="x_files">
         <item quantity="one">%d файл</item>

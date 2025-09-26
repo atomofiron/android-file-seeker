@@ -15,7 +15,7 @@
     <string name="wrong_value">Нетачна вредност</string>
     <string name="wrong_intent">Нетачна намера</string>
     <string name="nothing">Ништа није пронађено</string>
-    <string name="warning">Нисте изабрали ниједан директоријум. Претрага ће бити извршена у кореном одељку</string>
+    <string name="warning">Нисте изабрали ниједну фасциклу. Претрага ће бити извршена у кореном одељку</string>
     <string name="ok">У реду</string>
     <string name="cancel">Откажи</string>
     <string name="close">Затвори</string>
@@ -37,7 +37,7 @@
     <string name="multiline">Флаг \'multiline\'</string>
     <string name="bad_ex">Нетачан регуларни израз</string>
     <string name="reset">Ресетуј</string>
-    <string name="no_checked">Нисте изабрали ниједан директоријум!</string>
+    <string name="no_checked">Нисте изабрали ниједну фасциклу!</string>
     <string name="theme">Тема</string>
     <string name="need_restart">Потребно је поновно покретање</string>
     <string name="history">Историја</string>
@@ -73,7 +73,7 @@
     <string name="pref_max_depth">Макс. дубина</string>
     <string name="pref_max_size">Макс. величина датотеке</string>
     <string name="max_size_sum">При претрази по садржају</string>
-    <string name="pref_exclude_dirs">Искључи директоријуме</string>
+    <string name="pref_exclude_dirs">Искључи фасцикле</string>
     <string name="exclude_dirs_summary">Из резултата претраге</string>
     <string name="pref_use_su">Користи root</string>
     <string name="pref_about">О апликацији</string>
@@ -97,8 +97,8 @@
     <string name="rename">Преименуј</string>
     <string name="open_with">Отвори помоћу…</string>
     <string name="no_such_file">Датотека не постоји</string>
-    <string name="no_such_directory">Директоријум не постоји</string>
-    <string name="no_such_file_or_directory">Датотека или директоријум не постоји</string>
+    <string name="no_such_directory">Фасцикла не постоји</string>
+    <string name="no_such_file_or_directory">Датотека или фасцикла не постоји</string>
     <string name="permission_denied">Приступ одбијен</string>
     <string name="unknown_error">Непозната грешка</string>
     <string name="unknown">непознато</string>
@@ -146,7 +146,7 @@
     <string name="make_a_clone">Направи копију</string>
     <string name="a_name">Име</string>
     <string name="a_file">Датотека</string>
-    <string name="a_directory">Директоријум</string>
+    <string name="a_directory">Фасцикла</string>
     <string name="inverse_glow">Инвертуј сјај</string>
     <string name="haptic_effect">Тактилни одзив</string>
     <string name="inverse_for_dark">Инвертуј у тамној теми</string>

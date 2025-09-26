@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <plurals name="x_dirs">
-        <item quantity="zero">%d directories</item>
-        <item quantity="one">%d directory</item>
-        <item quantity="two">%d directories</item>
-        <item quantity="few">%d directories</item>
-        <item quantity="many">%d directories</item>
-        <item quantity="other">%d directories</item>
+        <item quantity="zero">%d folders</item>
+        <item quantity="one">%d folder</item>
+        <item quantity="two">%d folders</item>
+        <item quantity="few">%d folders</item>
+        <item quantity="many">%d folders</item>
+        <item quantity="other">%d folders</item>
     </plurals>
     <plurals name="x_files">
         <item quantity="zero">%d files</item>

@@ -15,7 +15,7 @@
     <string name="wrong_value">Netačna vrednost</string>
     <string name="wrong_intent">Netačna namera</string>
     <string name="nothing">Ništa nije pronađeno</string>
-    <string name="warning">Niste izabrali nijedan direktorijum. Pretraga će biti izvršena u korenom odeljku</string>
+    <string name="warning">Niste izabrali nijednu fasciklu. Pretraga će biti izvršena u korenom odeljku</string>
     <string name="ok">U redu</string>
     <string name="cancel">Otkaži</string>
     <string name="close">Zatvori</string>
@@ -37,7 +37,7 @@
     <string name="multiline">Flag „multiline“</string>
     <string name="bad_ex">Netačan regularni izraz</string>
     <string name="reset">Resetuj</string>
-    <string name="no_checked">Niste izabrali nijedan direktorijum!</string>
+    <string name="no_checked">Niste izabrali nijednu fasciklu!</string>
     <string name="theme">Tema</string>
     <string name="need_restart">Potrebno je ponovno pokretanje</string>
     <string name="history">Istorija</string>
@@ -73,7 +73,7 @@
     <string name="pref_max_depth">Maks. dubina</string>
     <string name="pref_max_size">Maks. veličina datoteke</string>
     <string name="max_size_sum">Pri pretrazi po sadržaju</string>
-    <string name="pref_exclude_dirs">Isključi direktorijume</string>
+    <string name="pref_exclude_dirs">Isključi fascikle</string>
     <string name="exclude_dirs_summary">Iz rezultata pretrage</string>
     <string name="pref_use_su">Koristi root</string>
     <string name="pref_about">O aplikaciji</string>
@@ -97,8 +97,8 @@
     <string name="rename">Preimenuj</string>
     <string name="open_with">Otvori pomoću…</string>
     <string name="no_such_file">Datoteka ne postoji</string>
-    <string name="no_such_directory">Direktorijum ne postoji</string>
-    <string name="no_such_file_or_directory">Datoteka ili direktorijum ne postoji</string>
+    <string name="no_such_directory">Fascikla ne postoji</string>
+    <string name="no_such_file_or_directory">Datoteka ili fascikla ne postoji</string>
     <string name="permission_denied">Pristup odbijen</string>
     <string name="unknown_error">Nepoznata greška</string>
     <string name="unknown">nepoznato</string>
@@ -146,7 +146,7 @@
     <string name="make_a_clone">Napravi kopiju</string>
     <string name="a_name">Ime</string>
     <string name="a_file">Datoteka</string>
-    <string name="a_directory">Direktorijum</string>
+    <string name="a_directory">Fascikla</string>
     <string name="inverse_glow">Invertuj sjaj</string>
     <string name="haptic_effect">Taktilni odziv</string>
     <string name="inverse_for_dark">Invertuj u tamnoj temi</string>
