@@ -1,10 +1,10 @@
 use crate::api::protocol::Meta;
-use crate::ext::result::Rslt;
 use crate::r#impl::hr_meta::HumanReadableMeta;
 use crate::r#impl::meta_ext::MetaExt;
 use std::fs;
 use std::fs::File;
 use std::path::PathBuf;
+use crate::common::Rslt;
 
 pub fn meta(path: String) -> Rslt<Meta> {
     let path = PathBuf::from(&path);

@@ -1,11 +1,11 @@
 use crate::api::protocol::Meta;
-use crate::ext::result::Rslt;
 use crate::r#impl::hr_meta::HumanReadableMeta;
 use crate::r#impl::hr_size::HumanReadableSize;
 use fs_extra::dir;
 use std::fs;
 use std::fs::File;
 use std::path::PathBuf;
+use crate::common::Rslt;
 
 pub fn new_file(path: String) -> Rslt<Meta> {
     let path = PathBuf::try_from(&path)?;

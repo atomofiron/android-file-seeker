@@ -1,13 +1,12 @@
 use crate::api::protocol::SimpleResult;
-use crate::api::su_protocol::{from_len_frame, to_len_frame, Request};
-use crate::common::config;
+use crate::api::su_protocol::{frame_length, from_len_frame, to_len_frame, Request, Response};
+use crate::common::{config, Rslt};
 use crate::ext::option::OptionExt;
-use crate::ext::result::Rslt;
 use bincode::{decode_from_slice, encode_to_vec, Decode};
 use once_cell::sync::Lazy;
 use std::io;
-use std::io::{Read, Write};
-use std::process::{Child, Command, Stdio};
+use std::io::{Error, Read, Write};
+use std::process::{Child, ChildStderr, Command, ExitStatus, Stdio};
 use std::sync::Mutex;
 
 static CHILDREN: Lazy<Mutex<Vec<Child>>> = Lazy::new(|| {
@@ -28,22 +27,30 @@ pub fn as_su<D: Decode<()>>(request: Request, bin_path: String) -> Rslt<D> {
     let bytes = encode_to_vec(request, config())?;
     let stdin = child.stdin
         .as_mut().ok_or("failed to open stdin")?;
-    let mut len_buf = to_len_frame(bytes.len());
+    let len_buf = to_len_frame(bytes.len());
     stdin.write_all(&len_buf)?;
     stdin.write_all(&bytes)?;
     stdin.flush()?;
 
     let stdout = child.stdout
         .as_mut().ok_or("failed to open stdout")?;
-    stdout.read_exact(&mut len_buf)?;
+    let mut len_buf = frame_length();
+    let read_result = stdout.read_exact(&mut len_buf);
+    if let Err(e) = read_result {
+        return Err(get_error(&mut child, e))?;
+    }
     let len = from_len_frame(len_buf);
     let mut bytes = vec![0u8; len];
     stdout.read_exact(&mut bytes)?;
     {
         CHILDREN.lock().unwrap().push(child)
     }
-    let (response, _) = decode_from_slice::<D,_>(&bytes, config())?;
-    return Ok(response)
+    let (response, _) = decode_from_slice::<Response,_>(&bytes, config())?;
+    let (result, _) = match response {
+        Response::Ok(bytes) => decode_from_slice::<D,_>(&bytes, config())?,
+        Response::Err(e) => Err(e)?,
+    };
+    return Ok(result);
 }
 
 fn new_child(bin_path: String) -> io::Result<Child> {
@@ -52,4 +59,25 @@ fn new_child(bin_path: String) -> io::Result<Child> {
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
+}
+
+fn get_error(child: &mut Child, error: Error) -> String {
+    let another = match child.try_wait() {
+        Ok(status) => read_error(child.stderr.as_mut(), status)
+            .unwrap_or_else(|e| e.to_string()),
+        Err(e) => e.to_string(),
+    };
+    return format!("{error}\n++++++++++++++++{another}");
+}
+
+fn read_error(stderr: Option<&mut ChildStderr>, status: Option<ExitStatus>) -> Rslt<String> {
+    let stderr = stderr.ok_or_else(|| {
+        let code = status.and_then(|it| it.code())
+            .map(|it| it.to_string())
+            .unwrap_or("null".to_string());
+        format!("code {code}")
+    })?;
+    let mut message = String::new();
+    stderr.read_to_string(&mut message)?;
+    return Ok(message);
 }

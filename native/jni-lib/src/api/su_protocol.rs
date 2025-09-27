@@ -13,6 +13,12 @@ pub enum Request {
     TryRun,
 }
 
+#[derive(Debug, Encode, Decode, PartialEq)]
+pub enum Response {
+    Ok(Vec<u8>),
+    Err(String),
+}
+
 pub type FrameLength = [u8; 4];
 
 pub fn frame_length() -> FrameLength { [0u8; 4] }

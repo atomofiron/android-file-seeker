@@ -1,4 +1,7 @@
+use std::error::Error;
 use bincode::config::Configuration;
+
+pub type Rslt<T> = Result<T, Box<dyn Error>>;
 
 pub fn config() -> Configuration { bincode::config::standard() }
 

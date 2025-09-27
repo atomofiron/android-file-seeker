@@ -1,6 +1,3 @@
-use std::error::Error;
-
-pub type Rslt<T> = Result<T, Box<dyn Error>>;
 
 // Result0.Ok + Result1 = Result0
 // Result0.Err + Result1 = Result1

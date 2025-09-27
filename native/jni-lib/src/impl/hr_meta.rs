@@ -15,7 +15,10 @@ pub trait HumanReadableMeta {
 
 impl HumanReadableMeta for io::Result<Metadata> {
     fn to_hr(self, path: &PathBuf) -> Meta {
-        let name = path.file_name().unwrap().to_str().unwrap().to_owned();
+        let name = path.file_name()
+            .and_then(|it| it.to_str())
+            .unwrap_or_default()
+            .to_owned();
         match self {
             Ok(meta) => {
                 let date_time = DateTime::from_timestamp(meta.mtime(), 0)
