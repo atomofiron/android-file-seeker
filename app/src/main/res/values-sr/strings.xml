@@ -121,6 +121,7 @@
     <string name="root_screenshots">Снимци екрана</string>
     <string name="internal_storage">Интерна меморија</string>
     <string name="external_storage">Екстерна меморија</string>
+    <string name="system_root">Системски корен</string>
     <string name="sdcard">SD картица</string>
     <string name="usb_storage">USB мемориjа</string>
     <string name="oops_not_working">Упс, још не ради</string>

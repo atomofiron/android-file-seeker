@@ -125,6 +125,7 @@
     <string name="root_screenshots">Screen&#x00AD;shots</string>
     <string name="internal_storage">Internal storage</string>
     <string name="external_storage">External storage</string>
+    <string name="system_root">System root</string>
     <string name="sdcard">SDCard</string>
     <string name="usb_storage">USB Storage</string>
     <string name="oops_not_working">Oops, not working yet</string>

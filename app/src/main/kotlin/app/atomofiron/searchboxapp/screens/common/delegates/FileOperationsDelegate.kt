@@ -52,8 +52,8 @@ class FileOperationsDelegate(
         val first = merged.firstOrNull() ?: return null
         val operations = when {
             merged.size > 1 -> forMany(count =  merged.count { it.isFile })
-            first.content.rootType?.editable == true -> rootOptions
-            first.isRoot -> return null
+            first.isFile -> oneFileOptions
+            first.isRoot -> rootOptions
             first.isDirectory -> directoryOptions
             else -> oneFileOptions.completeForSingle(first)
         }.filter {

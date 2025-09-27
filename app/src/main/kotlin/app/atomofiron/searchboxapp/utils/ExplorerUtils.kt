@@ -52,9 +52,10 @@ object ExplorerUtils {
     private const val FILE_PICTURE = "image/"
     private const val FILE_AUDIO = "audio/"
     private const val FILE_VIDEO = "video/"
-    private const val FILE_SCRIPT = "text/x-"
+    private const val FILE_TEXT_SCRIPT = "text/x-"
     private const val FILE_TEXT = "text/"
     private const val FILE_UNKNOWN = "application/octet-stream"
+    private const val FILE_XML = "application/xml"
     private const val FILE_ZIP = "application/zip"
     private const val FILE_APK = "application/vnd.android.package-archive"
     private const val FILE_GZIP = "application/gzip"
@@ -66,6 +67,7 @@ object ExplorerUtils {
     private const val FILE_MATROSKA = "application/x-matroska"
     private const val FILE_PEM = "application/pkix-cert+pem"
     private const val FILE_CERT = "application/pkix-cert"
+    private const val FILE_SCRIPT = "application/x-shellscript"
     private const val FILE_CA_CERT = "application/x-x509-ca-cert"
     private const val FILE_ELF_EXE = "application/x-executable"
     private const val FILE_ELF_RE = "application/x-object"
@@ -87,6 +89,9 @@ object ExplorerUtils {
     private const val EXT_XAPK = ".xapk"
     private const val EXT_APKS = ".apks"
     private const val EXT_APKM = ".apkm"
+    private const val EXT_DEX = ".dex"
+    private const val EXT_ODEX = ".odex"
+    private const val EXT_VDEX = ".vdex"
     private const val EXT_TAR = ".tar"
     private const val EXT_BZ2 = ".bz2"
     private const val EXT_DMG = ".dmg"
@@ -256,9 +261,10 @@ object ExplorerUtils {
 
     private fun parse(parentPath: String, root: Int, properties: NodeProperties): Node {
         val incompletePath = parentPath + properties.name
-        val content = when (properties.access[0]) {
+        val content = when (properties.access.firstOrNull()) {
             DIR_CHAR -> NodeContent.Directory(DirectoryKind.Ordinary)
             LINK_CHAR -> NodeContent.Link
+            null -> NodeContent.Unknown
             else -> resolveFileType(incompletePath)
         }
         val asDir = content is NodeContent.Directory
@@ -372,11 +378,15 @@ object ExplorerUtils {
                 path.hasExt(EXT_BAT) -> content.ifNotCached { NodeContent.Text.BatScript }
                 else -> NodeContent.Text.Plain
             }
+            (mimeType == FILE_XML) -> content.ifNotCached { NodeContent.Text.Xml }
             mimeType.startsWith(FILE_AUDIO) -> content.ifNotCached { NodeContent.Music.resolve(mimeType) }
             mimeType.startsWith(FILE_VIDEO),
             (mimeType == FILE_MATROSKA) -> content.ifNotCached { NodeContent.Movie.resolve(mimeType) }
             (mimeType == FILE_PDF) -> content.ifNotCached { NodeContent.Pdf }
-            (mimeType == FILE_ELF_EXE) -> content.ifNotCached { NodeContent.Elf }
+            (mimeType == FILE_ELF_EXE) -> when {
+                name.hasExt(EXT_ODEX) -> content.ifNotCached { NodeContent.Java }
+                else -> content.ifNotCached { NodeContent.Elf }
+            }
             (mimeType == FILE_ELF_RE) -> when {
                 name.hasExt(EXT_FAP) -> content.ifNotCached { NodeContent.Fap }
                 else -> content.ifNotCached { NodeContent.Elf }
@@ -390,7 +400,8 @@ object ExplorerUtils {
             (mimeType == FILE_MS_EXE) -> content.ifNotCached { NodeContent.ExeMs }
             (mimeType == FILE_APL_EXE) -> content.ifNotCached { NodeContent.ExeApl }
             (mimeType == FILE_JAVA) -> content.ifNotCached { NodeContent.Java }
-            mimeType.startsWith(FILE_SCRIPT) -> NodeContent.Text.ShellScript
+            (mimeType == FILE_SCRIPT),
+            mimeType.startsWith(FILE_TEXT_SCRIPT) -> NodeContent.Text.ShellScript
             else -> {
                 val ext = name.lastIndexOf(Const.DOT).inc()
                     .let { if (it == 0) name.length else it }
@@ -591,7 +602,7 @@ object ExplorerUtils {
     }
 
     fun Node.originalPath(): String = when {
-        !isSeparator() -> throw UnsupportedOperationException()
+        !isSeparator() -> throw UnsupportedOperationException() // todo
         else -> path.substring(0, path.length.dec())
     }
 
@@ -669,6 +680,9 @@ object ExplorerUtils {
         path.hasExt(EXT_WEBP) -> ifNotCached { NodeContent.Picture.Webp }
         path.hasExt(EXT_AVIF) -> ifNotCached { NodeContent.Picture.Avif }
         path.hasExt(EXT_APK) -> ifNotCached { AndroidApp.apk(path) }
+        path.hasExt(EXT_DEX),
+        path.hasExt(EXT_ODEX),
+        path.hasExt(EXT_VDEX) -> ifNotCached { NodeContent.Java }
         path.hasExt(EXT_APKS),
         path.hasExt(EXT_APKM) -> ifNotCached { AndroidApp.apks(path) }
         path.hasExt(EXT_ZIP),

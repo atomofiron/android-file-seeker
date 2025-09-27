@@ -6,6 +6,7 @@ import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
 import androidx.core.view.isVisible
+import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerStickyBottomView
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -53,6 +54,7 @@ class StickyBottomDelegate(
     }
 
     private fun sync(new: Node, position: Int) {
+        debugRequire(new.isSeparator()) { "sync ${new.path}" }
         val sticky = stickies[new.uniqueId]
         val view = when {
             sticky == null -> newSticky(new)

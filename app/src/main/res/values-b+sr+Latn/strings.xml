@@ -120,6 +120,7 @@
     <string name="root_downloads">Preuzi&#x00AD;manja</string>
     <string name="root_screenshots">Snimci ekrana</string>
     <string name="internal_storage">Interna memorija</string>
+    <string name="system_root">Sistemski koren</string>
     <string name="external_storage">Eksterna memorija</string>
     <string name="sdcard">SD kartica</string>
     <string name="usb_storage">USB memorija</string>

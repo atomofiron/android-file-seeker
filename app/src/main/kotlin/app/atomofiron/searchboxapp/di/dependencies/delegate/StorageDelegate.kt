@@ -27,8 +27,7 @@ class StorageDelegate(
 
     private var storageList = mutableListOf<NodeStorage>()
     private val internalStorage = store.internalStorage.value.run {
-        val statFs = StatFs(path)
-        NodeStorage(NodeStorage.Kind.InternalStorage, path, name, "Internal alias", total = statFs.totalBytes, used = statFs.totalBytes - statFs.freeBytes)
+        NodeStorage(NodeStorage.Kind.InternalStorage, path, name, "Internal alias")
     }
 
     init {
@@ -66,10 +65,7 @@ class StorageDelegate(
             path == null -> null
             volume.state == Environment.MEDIA_EJECTING -> null
             !storageManager.storageVolumes.contains(volume) -> null
-            else -> {
-                val statFs = StatFs(path)
-                NodeStorage(kind, path, volume.mediaStoreVolumeName, alias, statFs.totalBytes, statFs.totalBytes - statFs.freeBytes)
-            }
+            else -> NodeStorage(kind, path, volume.mediaStoreVolumeName, alias)
         }
         when {
             item != null && new != null -> storageList[index] = new

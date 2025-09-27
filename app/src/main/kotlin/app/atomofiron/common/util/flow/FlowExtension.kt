@@ -11,6 +11,8 @@ val <T> SharedFlow<T>.value: T get() = replayCache.last()
 
 val <T> SharedFlow<T>.valueOrNull: T? get() = replayCache.lastOrNull()
 
+suspend operator fun MutableSharedFlow<Unit>.invoke() = emit(Unit)
+
 operator fun MutableSharedFlow<Unit>.invoke(scope: CoroutineScope) {
     this[scope] = Unit
 }

@@ -161,6 +161,7 @@ sealed class NodeContent(
         data object Svg : Text("image/svg+xml")
         data object Cpp : Text("text/x-c++src")
         data object Ino : Text("text/x-arduino")
+        data object Xml : Text("application/xml")
     }
     data object Pdf : File("application/pdf")
     data object Torrent : File("application/x-bittorrent")

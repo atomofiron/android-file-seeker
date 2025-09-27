@@ -1,15 +1,20 @@
 package app.atomofiron.searchboxapp.di.dependencies.service
 
 import android.content.Context
+import android.os.StatFs
 import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.dropLast
 import app.atomofiron.common.util.extension.clear
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.debugDelay
+import app.atomofiron.common.util.extension.indexOfFirst
 import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.common.util.extension.replace
+import app.atomofiron.common.util.extension.takeIf
 import app.atomofiron.common.util.extension.withMain
+import app.atomofiron.common.util.flow.TriggerFlow
 import app.atomofiron.common.util.flow.collect
+import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.verifyNativeBin
@@ -66,6 +71,8 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
@@ -80,14 +87,14 @@ class ExplorerService(
     private val context: Context,
     private val appScope: AppScope,
     private val store: ExplorerStore,
-    private val preferenceStore: PreferenceStore,
+    private val preferences: PreferenceStore,
 ) {
-    private val previewSize = context.resources.getDimensionPixelSize(R.dimen.preview_size)
     private var delayedRender: Job? = null
 
     private var config = CacheConfig(asSu = false)
     private val garden = NodeGarden(store.firstTab, store.middleTab, store.lastTab)
     private val internalStoragePath = store.internalStorage.value.path
+    private val updateRootTrigger = TriggerFlow()
 
     init {
         val asSuDefined = Job()
@@ -97,39 +104,39 @@ class ExplorerService(
             garden {
                 asSuDefined.join()
                 toyboxDefined.join()
-                context.resolveToybox(preferenceStore.toyboxVariant.value)
+                context.resolveToybox(preferences.toyboxVariant.value)
                 if (config.asSu) checkSu()
                 initRoots()
                 get(store.currentTabKey.value).render()
             }
-            store.storage.collect {
-                updateRootsAsync(it)
-            }
+            combine(store.storage, preferences.asSu, updateRootTrigger) { volumes, asSu, _ ->
+                updateRootsAsync(volumes)
+            }.collect()
         }
         val thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size)
-        preferenceStore.asSu.collect(appScope) {
+        preferences.asSu.collect(appScope) {
             asSuDefined.complete()
             config = CacheConfig(it, thumbnailSize)
         }
-        preferenceStore.toyboxVariant.collect(appScope) {
+        preferences.toyboxVariant.collect(appScope) {
             toyboxDefined.complete()
             context.resolveToybox(it)
         }
         store.currentNode.collect(appScope) {
-            preferenceStore.setOpenedDirPath(it?.path)
+            preferences.setOpenedDirPath(it?.path)
         }
     }
 
     private fun Context.resolveToybox(embedded: ToyboxVariant) {
         val variant = verify(embedded)
         Shell.toyboxPath = variant.path
-        preferenceStore { setEmbeddedToybox(variant) }
+        preferences { setEmbeddedToybox(variant) }
     }
 
     private suspend fun checkSu() {
         val result = context.verifyNativeBin()
         if (result is Rslt.Err) {
-            preferenceStore.setUseSu(false)
+            preferences.setUseSu(false)
             if (result.message.isNotEmpty()) {
                 withMain {
                     context.showLongToast(result.message.toUni())
@@ -147,6 +154,7 @@ class ExplorerService(
             NodeRoot(NodeRootType.Screenshots, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_PIC_SCREENSHOTS", "${internalStoragePath}$SUB_PATH_DCIM_SCREENSHOTS"),
             NodeRoot(NodeRootType.Bluetooth, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_BLUETOOTH", "${internalStoragePath}$SUB_PATH_DOWNLOAD_BLUETOOTH"),
             NodeRoot(NodeRootType.Downloads, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_DOWNLOAD"),
+            NodeRoot(NodeRootType.SystemRoot, NodeSorting.Name, "/"),
         )
         this.roots.addAll(roots)
     }
@@ -193,6 +201,8 @@ class ExplorerService(
         rootItem?.let { tryCache(key, it) }
     }
 
+    suspend fun updateRootsAsync() = updateRootTrigger()
+
     suspend fun updateRootsAsync(volumes: List<NodeStorage>) {
         garden {
             volumes.forEach { updateStats(it) }
@@ -210,6 +220,11 @@ class ExplorerService(
     }
 
     private fun updateRootAsync(key: NodeTabKey, root: NodeRoot) {
+        when {
+            preferences.asSu.value -> Unit
+            root.type != NodeRootType.SystemRoot -> Unit
+            else -> return
+        }
         appScope.launch {
             garden(key) {
                 withCachingState(root.stableId) {
@@ -218,7 +233,6 @@ class ExplorerService(
                         is NodeError.NoSuchFile -> tryAlternative(root, updated)
                         else -> updated
                     }
-                    // todo async updated.resolveDirChildren(config.asSu)
                     updateRootSync(updated, key, root)
                 }
             }
@@ -241,7 +255,7 @@ class ExplorerService(
         var root = roots.getOrNull(index)
         var type = root?.type ?: NodeRootType.Storage(storage)
         type = (type as NodeRootType.Storage).copy(storage)
-        root = root ?: NodeRoot(type, Node.asRoot(storage.path, type), NodeSorting.Name)
+        root = root ?: NodeRoot(type, NodeSorting.Name, storage.path)
         roots.replace(root) { it.stableId == root.stableId }
     }
 
@@ -293,7 +307,12 @@ class ExplorerService(
                 when (root.stableId) {
                     targetRoot.stableId -> {
                         val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sorting)
-                        if (tab.key == key) updatedRoot.copy(item = updatedItem, type = root.type) else root.copy(
+                        val type = root.type.takeIf<NodeRootType.Storage,_>()?.run {
+                            val stat = StatFs(root.item.path)
+                            val info = info.copy(total = stat.totalBytes, used = stat.totalBytes - stat.freeBytes)
+                            copy(info = info)
+                        } ?: root.type
+                        if (tab.key == key) updatedRoot.copy(item = updatedItem, type = type) else root.copy(
                             type = root.type,
                             thumbnail = updatedRoot.thumbnail,
                             thumbnailPath = updatedRoot.thumbnailPath,
@@ -619,6 +638,9 @@ class ExplorerService(
                     selectedRootId -> it.copy(isSelected = true)
                     else -> it
                 }
+            }
+            if (!preferences.asSu.value) {
+                removeOneIf { it.type is NodeRootType.SystemRoot }
             }
         }
     }

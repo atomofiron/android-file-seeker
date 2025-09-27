@@ -89,7 +89,7 @@ class ExplorerInteractor(
 
     fun updateRoots() {
         scope.launch(context) {
-            service.updateRootsAsync(store.storage.value)
+            service.updateRootsAsync()
         }
     }
 

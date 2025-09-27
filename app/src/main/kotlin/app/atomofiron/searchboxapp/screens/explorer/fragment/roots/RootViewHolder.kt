@@ -39,6 +39,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
                 NodeStorage.Kind.UsbStorage -> info.alias ?: info.name ?: resources.getString(R.string.usb_storage)
             }
             is NodeRootType.Favorite -> null
+            is NodeRootType.SystemRoot -> resources.getString(R.string.system_root)
         }
     }
 
@@ -102,6 +103,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
                 NodeStorage.Kind.UsbStorage -> R.drawable.ic_thumbnail_usb_flash
             }
             is NodeRootType.Favorite -> R.drawable.ic_thumbnail_favorite
+            is NodeRootType.SystemRoot -> R.drawable.ic_thumbnail_system
         }
         return ContextCompat.getDrawable(context, resId) as Drawable
     }
@@ -114,6 +116,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
         is NodeRootType.Camera,
         is NodeRootType.Screenshots,
         is NodeRootType.Downloads,
+        is NodeRootType.SystemRoot,
         is NodeRootType.Bluetooth -> ContextCompat.getDrawable(context, R.drawable.item_root_thumbnail)
     }
 }

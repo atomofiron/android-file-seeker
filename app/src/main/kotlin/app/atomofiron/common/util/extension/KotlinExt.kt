@@ -50,6 +50,8 @@ fun Long.pow(exp: Long): Long {
     return result
 }
 
+inline fun <reified T : O, O> Any.takeIf(): T? = this as? T
+
 fun <T> List<T>.copy(): List<T> = mutableCopy()
 
 fun <T> List<T>.mutableCopy(): MutableList<T> = toMutableList()
@@ -68,7 +70,7 @@ fun <T> MutableList<T>.resizeWith(size: Int, with: T) {
     fill(with)
 }
 
-inline fun <T> List<T>.indexOfFirst(fromIndex: Int, orElse: Int = -1, predicate: (T) -> Boolean): Int {
+inline fun <T> List<T>.indexOfFirst(fromIndex: Int = 0, orElse: Int = -1, predicate: (T) -> Boolean): Int {
     if (fromIndex in indices) {
         var index = fromIndex
         for (item in listIterator(fromIndex)) {
