@@ -4,42 +4,42 @@ use bincode::{Decode, Encode};
 #[derive(uniffi::Enum)]
 pub enum MetaResult {
     Ok(Meta),
-    Error(String),
+    Err(String),
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum MetasResult {
     Ok(Vec<Meta>),
-    Error(String),
+    Err(String),
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum TypedMetaResult {
     Ok(TypedMeta),
-    Error(String),
+    Err(String),
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum TypedMetasResult {
     Ok(Vec<TypedMeta>),
-    Error(String),
+    Err(String),
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum UsageResult {
     Ok(String),
-    Error(String),
+    Err(String),
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum SimpleResult {
     Ok,
-    Error(String),
+    Err(String),
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]

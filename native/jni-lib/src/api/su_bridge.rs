@@ -16,7 +16,7 @@ static CHILDREN: Lazy<Mutex<Vec<Child>>> = Lazy::new(|| {
 #[uniffi::export]
 fn try_as_su(bin_path: String) -> SimpleResult {
     return as_su::<SimpleResult>(Request::TryRun, bin_path)
-        .unwrap_or_else(|e| SimpleResult::Error(e.to_string()))
+        .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
 }
 
 pub fn as_su<D: Decode<()>>(request: Request, bin_path: String) -> Rslt<D> {

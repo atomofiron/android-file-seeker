@@ -32,7 +32,7 @@ object NativeBridge {
         val response = uniffi.native_lib.tryAsSu(binPath)
         return when (response) {
             is SimpleResult.Ok -> Rslt.Ok
-            is SimpleResult.Error -> Rslt.Err(response.v1)
+            is SimpleResult.Err -> Rslt.Err(response.v1)
         }
     }
 
@@ -40,7 +40,7 @@ object NativeBridge {
         val response = uniffi.native_lib.createFile(path, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
-            is MetaResult.Error -> Rslt.Err(response.v1)
+            is MetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
@@ -48,7 +48,7 @@ object NativeBridge {
         val response = uniffi.native_lib.createDir(path, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
-            is MetaResult.Error -> Rslt.Err(response.v1)
+            is MetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
@@ -56,7 +56,7 @@ object NativeBridge {
         val response = uniffi.native_lib.getFileType(path, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is TypedMetaResult.Ok -> Rslt.Ok(response.v1)
-            is TypedMetaResult.Error -> Rslt.Err(response.v1)
+            is TypedMetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
@@ -64,7 +64,7 @@ object NativeBridge {
         val response = uniffi.native_lib.getFileTypes(path, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is TypedMetasResult.Ok -> Rslt.Ok(response.v1)
-            is TypedMetasResult.Error -> Rslt.Err(response.v1)
+            is TypedMetasResult.Err -> Rslt.Err(response.v1)
         }
     }
 
@@ -72,7 +72,7 @@ object NativeBridge {
         val response = uniffi.native_lib.getMeta(path, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
-            is MetaResult.Error -> Rslt.Err(response.v1)
+            is MetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
@@ -80,7 +80,7 @@ object NativeBridge {
         val response = uniffi.native_lib.getMetas(path, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetasResult.Ok -> Rslt.Ok(response.v1)
-            is MetasResult.Error -> Rslt.Err(response.v1)
+            is MetasResult.Err -> Rslt.Err(response.v1)
         }
     }
 
@@ -88,7 +88,7 @@ object NativeBridge {
         val response = uniffi.native_lib.getUsage(path, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is UsageResult.Ok -> Rslt.Ok(response.v1)
-            is UsageResult.Error -> Rslt.Err(response.v1)
+            is UsageResult.Err -> Rslt.Err(response.v1)
         }
     }
 
@@ -96,7 +96,7 @@ object NativeBridge {
         val response = uniffi.native_lib.deleteBy(path, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is SimpleResult.Ok -> Rslt.Ok
-            is SimpleResult.Error -> Rslt.Err(response.v1)
+            is SimpleResult.Err -> Rslt.Err(response.v1)
         }
     }
 }
