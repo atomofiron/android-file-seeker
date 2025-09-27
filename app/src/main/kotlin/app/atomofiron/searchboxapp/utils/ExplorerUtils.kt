@@ -17,7 +17,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
-import app.atomofiron.searchboxapp.model.explorer.NodeRoot
+import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeState
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
@@ -197,7 +197,7 @@ object ExplorerUtils {
         return Node(path = targetPath, parentPath = parent.path, rootId = parent.rootId, properties = meta.toProperties(), content = content)
     }
 
-    fun Node.Companion.asRoot(path: String, type: NodeRoot.NodeRootType): Node {
+    fun Node.Companion.asRoot(path: String, type: NodeRootType): Node {
         return Node(
             path = path,
             parentPath = ROOT_PARENT_PATH,

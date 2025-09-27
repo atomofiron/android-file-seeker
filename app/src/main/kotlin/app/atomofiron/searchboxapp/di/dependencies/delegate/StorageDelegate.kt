@@ -11,7 +11,7 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.copy
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
+import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.completePath
 import kotlinx.coroutines.Dispatchers

@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.di.dependencies.store
 import android.os.Environment
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.searchboxapp.model.explorer.*
-import app.atomofiron.searchboxapp.model.explorer.NodeRoot.NodeRootType
+import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.completePath
 import kotlinx.coroutines.flow.Flow
