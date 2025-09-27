@@ -6,7 +6,7 @@ use bincode::{decode_from_slice, encode_to_vec, Decode};
 use once_cell::sync::Lazy;
 use std::io;
 use std::io::{Error, Read, Write};
-use std::process::{Child, ChildStderr, Command, ExitStatus, Stdio};
+use std::process::{Child, Command, ExitStatus, Stdio};
 use std::sync::Mutex;
 
 static CHILDREN: Lazy<Mutex<Vec<Child>>> = Lazy::new(|| {
@@ -62,22 +62,31 @@ fn new_child(bin_path: String) -> io::Result<Child> {
 }
 
 fn get_error(child: &mut Child, error: Error) -> String {
-    let another = match child.try_wait() {
-        Ok(status) => read_error(child.stderr.as_mut(), status)
-            .unwrap_or_else(|e| e.to_string()),
-        Err(e) => e.to_string(),
-    };
+    let another = read_error(child)
+        .unwrap_or_else(|e| e.to_string());
     return format!("{error}\n++++++++++++++++{another}");
 }
 
-fn read_error(stderr: Option<&mut ChildStderr>, status: Option<ExitStatus>) -> Rslt<String> {
-    let stderr = stderr.ok_or_else(|| {
-        let code = status.and_then(|it| it.code())
-            .map(|it| it.to_string())
-            .unwrap_or("null".to_string());
-        format!("code {code}")
-    })?;
-    let mut message = String::new();
-    stderr.read_to_string(&mut message)?;
+fn read_error(child: &mut Child) -> Rslt<String> {
+    let stderr = child.stderr.as_mut().ok_or("_");
+    let message = match stderr {
+        Ok(stderr) => {
+            let mut message = String::new();
+            stderr.read_to_string(&mut message).map(|_| message)?
+        }
+        Err(_) => {
+            let code = get_exit_code(child.try_wait())
+                .unwrap_or_else(|e| e.to_string());
+            format!("code: {code}")
+        },
+    };
     return Ok(message);
+}
+
+fn get_exit_code(status: io::Result<Option<ExitStatus>>) -> Rslt<String> {
+    let code = status?
+        .and_then(|it| it.code())
+        .map(|it| it.to_string())
+        .ok_or_else(|| "null".to_string())?;
+    return Ok(code);
 }
