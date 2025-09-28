@@ -8,6 +8,7 @@ use std::io;
 use std::io::{Error, Read, Write};
 use std::process::{Child, Command, ExitStatus, Stdio};
 use std::sync::Mutex;
+use crate::ext::result::ResultExt;
 
 static CHILDREN: Lazy<Mutex<Vec<Child>>> = Lazy::new(|| {
     Mutex::new(Vec::new())
@@ -46,11 +47,11 @@ pub fn as_su<D: Decode<()>>(request: Request, bin_path: String) -> Rslt<D> {
         CHILDREN.lock().unwrap().push(child)
     }
     let (response, _) = decode_from_slice::<Response,_>(&bytes, config())?;
-    let (result, _) = match response {
-        Response::Ok(bytes) => decode_from_slice::<D,_>(&bytes, config())?,
-        Response::Err(e) => Err(e)?,
+    return match response {
+        Response::Ok(bytes) => decode_from_slice::<D,_>(&bytes, config())
+            .map(|(r,_)| r).boxed(),
+        Response::Err(e) => Err(e.into()),
     };
-    return Ok(result);
 }
 
 fn new_child(bin_path: String) -> io::Result<Child> {
@@ -69,24 +70,24 @@ fn get_error(child: &mut Child, error: Error) -> String {
 
 fn read_error(child: &mut Child) -> Rslt<String> {
     let stderr = child.stderr.as_mut().ok_or("_");
-    let message = match stderr {
+    return match stderr {
         Ok(stderr) => {
             let mut message = String::new();
-            stderr.read_to_string(&mut message).map(|_| message)?
+            stderr.read_to_string(&mut message)
+                .map(|_| message.as_str().into())
+                .map_err(Into::into)
         }
         Err(_) => {
             let code = get_exit_code(child.try_wait())
                 .unwrap_or_else(|e| e.to_string());
-            format!("code: {code}")
+            Ok(format!("code: {code}"))
         },
     };
-    return Ok(message);
 }
 
 fn get_exit_code(status: io::Result<Option<ExitStatus>>) -> Rslt<String> {
-    let code = status?
+    status?
         .and_then(|it| it.code())
         .map(|it| it.to_string())
-        .ok_or_else(|| "null".to_string())?;
-    return Ok(code);
+        .ok_or_else(|| "null".into())
 }

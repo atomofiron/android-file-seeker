@@ -8,8 +8,8 @@ use crate::common::Rslt;
 
 pub fn meta(path: String) -> Rslt<Meta> {
     let path = PathBuf::from(&path);
-    let meta = File::open(&path)?.metadata().to_hr(&path);
-    return Ok(meta);
+    let meta = File::open(&path)?.metadata();
+    return Ok(meta.to_hr(&path));
 }
 
 pub fn metas(path: String) -> Rslt<Vec<Meta>> {

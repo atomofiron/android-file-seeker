@@ -1,9 +1,10 @@
 use bincode::{decode_from_slice, encode_to_vec};
 use native_lib::api::bridge::{create_dir, create_file, delete_by, get_file_type, get_file_types, get_meta, get_metas, get_usage};
+use native_lib::api::protocol::SimpleResult;
 use native_lib::api::su_protocol::{frame_length, from_len_frame, to_len_frame, Request, Response};
 use native_lib::common::{config, Rslt};
+use native_lib::ext::result::ResultExt;
 use std::io::{stdin, stdout, Read, Write};
-use native_lib::api::protocol::SimpleResult;
 
 fn main() {
     loop {
@@ -24,8 +25,8 @@ fn get_request() -> Rslt<Request> {
     let len = from_len_frame(len_buf);
     let mut bytes = vec![0u8; len];
     stdin.read_exact(&mut bytes)?;
-    let (request, _) = decode_from_slice::<Request, _>(&bytes, config())?;
-    return Ok(request);
+    return decode_from_slice::<Request, _>(&bytes, config())
+        .map(|(r,_)| r).boxed()
 }
 
 fn run(request: Request) -> Rslt<Vec<u8>> {
@@ -40,7 +41,7 @@ fn run(request: Request) -> Rslt<Vec<u8>> {
         Request::CreateFile(arg) => encode_to_vec(create_file(arg, None), config()),
         Request::Delete(arg) => encode_to_vec(delete_by(arg, None), config()),
     };
-    return Ok(result?);
+    return result.boxed();
 }
 
 fn write_response(response: Response) {
