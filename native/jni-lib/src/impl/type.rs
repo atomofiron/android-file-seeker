@@ -4,7 +4,7 @@ use crate::r#impl::hr_meta::HumanReadableMeta;
 use std::fs;
 use std::path::PathBuf;
 
-pub fn file_type(path: String) -> Rslt<TypedMeta> {
+pub fn file_type(path: &String) -> Rslt<TypedMeta> {
     let path = PathBuf::from(path);
     let mime = tree_magic_mini::from_filepath(&path);
     let mut metadata = path.metadata();
@@ -18,7 +18,7 @@ pub fn file_type(path: String) -> Rslt<TypedMeta> {
     return Ok(entry)
 }
 
-pub fn file_types(path: String) -> Rslt<Vec<TypedMeta>> {
+pub fn file_types(path: &String) -> Rslt<Vec<TypedMeta>> {
     let dir = fs::read_dir(path)?;
     let entries = dir.filter_map(|entry| {
         entry.ok().map(|e| e.path()).and_then(|path| {

@@ -43,6 +43,14 @@ pub enum SimpleResult {
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(uniffi::Enum)]
+pub enum DeleteResult {
+    Ok(Option<Meta>),
+    ErrCount(u32),
+    Err(String, Option<Meta>),
+}
+
+#[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Record)]
 pub struct Meta {
     pub name: String,

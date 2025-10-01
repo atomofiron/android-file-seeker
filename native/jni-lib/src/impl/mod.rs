@@ -6,3 +6,4 @@ mod meta_ext;
 pub mod meta;
 pub mod other;
 pub mod r#type;
+pub mod delete;

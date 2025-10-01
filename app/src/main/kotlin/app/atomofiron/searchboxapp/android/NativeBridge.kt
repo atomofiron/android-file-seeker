@@ -95,8 +95,9 @@ object NativeBridge {
     fun delete(path: String, asSu: Boolean): Rslt<Unit> {
         val response = uniffi.native_lib.deleteBy(path, runAsSu = binPath.takeIf { asSu })
         return when (response) {
-            is SimpleResult.Ok -> Rslt.Ok
-            is SimpleResult.Err -> Rslt.Err(response.v1)
+            is DeleteResult.Ok -> Rslt.Ok
+            is DeleteResult.Err -> Rslt.Err(response.v1)
+            is DeleteResult.ErrCount -> Rslt.Err("todo")
         }
     }
 }
