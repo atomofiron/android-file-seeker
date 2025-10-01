@@ -1,11 +1,11 @@
 use crate::common::Rslt;
-use libc::{c_int, closedir, dirent, opendir, readdir, DT_DIR};
+use libc::{closedir, dirent, opendir, readdir, DT_DIR};
 use std::ffi::{CStr, CString};
 use std::io;
 
 type ErrCount = u32;
-type LibcInt = c_int;
-type StatInt = u32;
+type LibcInt = libc::c_int;
+type StatInt = libc::mode_t;
 
 const OK: LibcInt = 0;
 
