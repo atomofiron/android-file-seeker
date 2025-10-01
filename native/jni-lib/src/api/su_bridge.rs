@@ -22,7 +22,7 @@ fn try_as_su(bin_path: String) -> SimpleResult {
 
 pub fn as_su<D: Decode<()>>(request: Request, bin_path: String) -> Rslt<D> {
     let mut child = {
-        CHILDREN.lock().unwrap().pop()
+        CHILDREN.lock()?.pop()
     }.or_then(|| new_child(bin_path))?;
 
     let bytes = encode_to_vec(request, config())?;
@@ -44,7 +44,7 @@ pub fn as_su<D: Decode<()>>(request: Request, bin_path: String) -> Rslt<D> {
     let mut bytes = vec![0u8; len];
     stdout.read_exact(&mut bytes)?;
     {
-        CHILDREN.lock().unwrap().push(child)
+        CHILDREN.lock()?.push(child)
     }
     let (response, _) = decode_from_slice::<Response,_>(&bytes, config())?;
     return match response {
