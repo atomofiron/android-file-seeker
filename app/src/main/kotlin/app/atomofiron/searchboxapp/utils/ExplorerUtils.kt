@@ -76,6 +76,7 @@ object ExplorerUtils {
     private const val FILE_APL_EXE = "application/x-mach-binary"
     private const val FILE_TORRENT = "application/x-bittorrent"
     private const val FILE_ODT = "application/vnd.oasis.opendocument.text"
+    private const val FILE_XRIFF = "application/x-riff" // +webp
 
     private const val EXT_APNG = ".apng"
     private const val EXT_PNG = ".png"
@@ -351,6 +352,7 @@ object ExplorerUtils {
             mimeType.isBlank(),
             (mimeType == FILE_UNKNOWN) -> content.resolveFileType(path)
             mimeType.startsWith(FILE_PICTURE) -> content.ifNotCached { NodeContent.Picture.resolve(mimeType) }
+            (mimeType == FILE_XRIFF) -> content.ifNotCached { NodeContent.Picture(mimeType) }
             (mimeType == FILE_APK) -> content.ifNotCached { AndroidApp.apk(path) }
             (mimeType == FILE_ZIP) -> when (true) {
                 path.hasExt(EXT_APKS),
