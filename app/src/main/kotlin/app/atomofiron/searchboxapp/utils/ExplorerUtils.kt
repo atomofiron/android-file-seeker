@@ -405,10 +405,7 @@ object ExplorerUtils {
             (mimeType == FILE_SCRIPT),
             mimeType.startsWith(FILE_TEXT_SCRIPT) -> NodeContent.Text.ShellScript
             else -> {
-                val ext = name.lastIndexOf(Const.DOT).inc()
-                    .let { if (it == 0) name.length else it }
-                    .let { name.substring(it) }
-                logE("'$ext' unknown type: $mimeType ${path.takeIfDebug()}")
+                logE("'${name.getExt()}' unknown type: $mimeType ${path.takeIfDebug()}")
                 content.resolveFileType(path)
             }
         }

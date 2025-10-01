@@ -147,6 +147,28 @@ inline fun <T, R : Comparable<R>> MutableList<T>.sortBy(descending: Boolean = fa
     return if (descending) sortByDescending(selector) else sortBy(selector)
 }
 
+private val lowerChars = 'a'..'z'
+private val upperChars = 'A'..'Z'
+private val digitChars = '0'..'9'
+
+fun String.getExt(): String {
+    if (isEmpty() || last() == '/') {
+        return ""
+    }
+    var from = lastIndex
+    while (from > 0) {
+        val char = get(from--)
+        when (char) {
+            '.' -> break
+            in lowerChars,
+            in upperChars,
+            in digitChars -> continue
+            else -> return ""
+        }
+    }
+    return substring(from, length)
+}
+
 // prevents ConcurrentModificationException
 inline fun <reified E> List<E>.findOnMut(predicate: (E) -> Boolean): E? {
     var size = size
