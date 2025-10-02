@@ -51,7 +51,7 @@ pub enum DeleteResult {
     Err(String, Option<Meta>),
 }
 
-#[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(Debug, Encode, Decode, PartialEq, Clone)]
 #[derive(uniffi::Record)]
 pub struct Meta {
     pub path: KPath,
