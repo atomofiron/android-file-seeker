@@ -12,8 +12,8 @@ pub enum Request {
     CreateFile(KPath),
     Delete(KPath),
     TryRun,
+    Copy(KPath, KPath, bool),
 }
-    //Copy(KPath, KPath, bool),
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 pub enum Response {
@@ -23,7 +23,10 @@ pub enum Response {
 
 pub type FrameLength = [u8; 4];
 
-pub fn frame_length() -> FrameLength { [0u8; 4] }
+#[allow(dead_code)]
+const FINAL_FRAME: FrameLength = [0; 4];
+
+pub fn frame_length() -> FrameLength { [0; 4] }
 
 pub fn to_len_frame(size: usize) -> FrameLength {
     (size as u32).to_le_bytes()

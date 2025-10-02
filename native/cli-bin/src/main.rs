@@ -40,6 +40,7 @@ fn run(request: Request) -> Rslt<Vec<u8>> {
         Request::CreateDir(arg) => encode_to_vec(create_dir(arg, None), config()),
         Request::CreateFile(arg) => encode_to_vec(create_file(arg, None), config()),
         Request::Delete(arg) => encode_to_vec(delete_by(arg, None), config()),
+        Request::Copy(_from, _to, _moving) => panic!(),
     };
     return result.boxed();
 }

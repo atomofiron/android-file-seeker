@@ -4,6 +4,8 @@ import android.content.Context
 import app.atomofiron.searchboxapp.model.explorer.NodePath
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
+import uniffi.native_lib.CopyCollector
+import uniffi.native_lib.CopyPart
 import uniffi.native_lib.DeleteResult
 import uniffi.native_lib.Meta
 import uniffi.native_lib.MetaResult
@@ -100,6 +102,17 @@ object NativeBridge {
             is DeleteResult.Ok -> Rslt.Ok(0u)
             is DeleteResult.Err -> Rslt.Err(response.v1)
             is DeleteResult.ErrCount -> Rslt.Ok(response.v1)
+        }
+    }
+
+    fun copy(from: NodePath, to: NodePath, move: Boolean, asSu: Boolean, collector: (path: NodePath, Meta, moved: Boolean) -> Unit): Rslt<Unit> {
+        val collector = object : CopyCollector {
+            override fun invoke(part: CopyPart) = collector(NodePath(part.path), part.meta, part.moved)
+        }
+        val response = uniffi.native_lib.copy(from.bytes, to.bytes, move, runAsSu = binPath.takeIf { asSu }, collector)
+        return when (response) {
+            is SimpleResult.Ok -> Rslt.Ok
+            is SimpleResult.Err -> Rslt.Err(response.v1)
         }
     }
 }

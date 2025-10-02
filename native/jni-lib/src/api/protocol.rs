@@ -51,6 +51,15 @@ pub enum DeleteResult {
     Err(String, Option<Meta>),
 }
 
+#[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(uniffi::Record)]
+pub struct CopyPart {
+    pub path: KPath,
+    pub meta: Meta,
+    pub moved: bool,
+    //Err(String),
+}
+
 #[derive(Debug, Encode, Decode, PartialEq, Clone)]
 #[derive(uniffi::Record)]
 pub struct Meta {
@@ -70,4 +79,9 @@ pub struct Meta {
 pub struct TypedMeta {
     pub meta: Meta,
     pub mime: String,
+}
+
+#[uniffi::export(with_foreign)]
+pub trait CopyCollector: Send + Sync {
+    fn invoke(&self, part: CopyPart);
 }
