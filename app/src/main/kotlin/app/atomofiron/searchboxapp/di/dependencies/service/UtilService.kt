@@ -18,7 +18,7 @@ class UtilService(
 ) {
     private val resources by resources
 
-    fun copyToClipboard(item: Node, withAlert: Boolean = false) = copyToClipboard(item.name, item.path, withAlert)
+    fun copyToClipboard(item: Node, withAlert: Boolean = false) = copyToClipboard(item.name, item.path.string, withAlert)
 
     fun copyToClipboard(label: String, text: String, withAlert: Boolean = false) = clipboardManager.copy(context, label, text, resources, withAlert)
 
@@ -33,7 +33,7 @@ class UtilService(
         val mimeType = item.content.mimeType
             ?.takeIf { it != NodeContent.AnyType }
             ?: return null
-        val uri = context.getUriForFile(File(item.path))
+        val uri = context.getUriForFile(File(item.path.string))
         return context.useAs(uri, mimeType)
     }
 }

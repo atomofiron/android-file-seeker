@@ -51,16 +51,16 @@ sealed class SearchResult {
                     continue
                 }
                 val name = if (item.item.isDirectory) item.item.name + Const.SLASH else item.item.name
-                val line = String.format("[%s](%s)\n", name, item.item.path.replace(" ", "\\ "))
+                val line = String.format("[%s](%s)\n", name, item.item.path.string.replace(" ", "\\ "))
                 data.append(line)
             }
             return data.toString()
         }
 
         fun removeItem(removed: Node): SearchResult {
-            val nothing = !matches.any { it.item.path.startsWith(removed.path) }
+            val nothing = !matches.any { it.item.path.isChildOf(removed.path) }
             if (nothing) return this
-            val left = matches.filter { !it.item.path.startsWith(removed.path) }
+            val left = matches.filter { !it.item.path.isChildOf(removed.path) }
             val items = matches.toMutableList()
             val count = left.sumOf { it.count }
             return FinderResult(inContent, count, items, countTotal.dec())

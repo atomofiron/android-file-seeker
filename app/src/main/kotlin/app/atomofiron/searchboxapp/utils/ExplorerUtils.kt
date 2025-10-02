@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.utils
 
 import android.content.pm.PackageManager
 import app.atomofiron.common.util.MutableList
+import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.extension.takeIfDebug
 import app.atomofiron.common.util.property.MutableWeakProperty
@@ -10,21 +11,20 @@ import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.Node.Companion.stateStub
-import app.atomofiron.searchboxapp.model.explorer.Node.Companion.toUniqueId
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
+import app.atomofiron.searchboxapp.model.explorer.NodePath
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeState
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
-import app.atomofiron.searchboxapp.utils.Const.SLASH
 import kotlinx.coroutines.Job
-import uniffi.native_lib.*
+import uniffi.native_lib.Meta
 import java.io.BufferedInputStream
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
@@ -38,15 +38,13 @@ object ExplorerUtils {
     // зато насколько всё становится проще
     val packageManager = MutableWeakProperty<PackageManager>()
 
-    private const val ROOT_PARENT_PATH = "root_parent_path"
+    private val ROOT_PARENT_PATH = NodePath(ByteArray(0))
 
-    private const val ROOT = SLASH.toString()
     private const val DIR_CHAR = 'd'
     private const val LINK_CHAR = 'l'
     private const val FILE_CHAR = '-'
     private const val LS_NO_SUCH_FILE = "No such file or directory"
     private const val LS_PERMISSION_DENIED = "Permission denied"
-    private const val COMMAND_PATH_PREFIX = "[a-z]+: %s: "
 
     private const val DIRECTORY = "inode/directory"
     private const val FILE_PICTURE = "image/"
@@ -54,8 +52,10 @@ object ExplorerUtils {
     private const val FILE_VIDEO = "video/"
     private const val FILE_TEXT_SCRIPT = "text/x-"
     private const val FILE_TEXT = "text/"
+    private const val FILE_MESSAGE = "message/rfc822"
     private const val FILE_UNKNOWN = "application/octet-stream"
     private const val FILE_XML = "application/xml"
+    private const val FILE_RAR = "application/vnd.rar"
     private const val FILE_ZIP = "application/zip"
     private const val FILE_APK = "application/vnd.android.package-archive"
     private const val FILE_GZIP = "application/gzip"
@@ -68,6 +68,8 @@ object ExplorerUtils {
     private const val FILE_PEM = "application/pkix-cert+pem"
     private const val FILE_CERT = "application/pkix-cert"
     private const val FILE_SCRIPT = "application/x-shellscript"
+    private const val FILE_FLASH = "application/vnd.adobe.flash.movie"
+    private const val FILE_EXE = "application/vnd.microsoft.portable-executable"
     private const val FILE_CA_CERT = "application/x-x509-ca-cert"
     private const val FILE_ELF_EXE = "application/x-executable"
     private const val FILE_ELF_RE = "application/x-object"
@@ -141,53 +143,17 @@ object ExplorerUtils {
     private const val EXT_OSR = ".osr" // osu replay
     private const val EXT_OSB = ".osb" // osu storyboard
 
-    private val lastPart = Regex("(?<=/)/*[^/]+/*$|^/+$")
-
-    fun String.completePath(directory: Boolean): String = when {
-        this == ROOT -> this
-        !directory -> this
-        lastOrNull() == SLASH -> this
-        isNotEmpty() -> "$this/"
-        else -> throw IllegalStateException(this)
-    }
-
-    fun String.parent(): String = replace(lastPart, "")
-
-    fun String.name(): String {
-        if (isEmpty()) {
-            return this
-        }
-        var nonSlash = false
-        var end = length
-        for (i in indices.reversed()) {
-            if (nonSlash && get(i) == SLASH) {
-                return substring(i.inc(), end)
-            }
-            if (!nonSlash && get(i) != SLASH) {
-                nonSlash = true
-                end = i.inc()
-            }
-        }
-        return when {
-            nonSlash -> substring(0, end)
-            else -> SLASH.toString()
-        }
-    }
-
     fun copy(from: Node, to: Node, asSu: Boolean): Node {
         val output = Shell.exec(Shell[Shell.COPY].format(from.path, to.path), asSu)
         val new = to.update(CacheConfig(asSu), ensureCached = false)
         return when {
             output.success -> new
-            else -> from.copy(error = output.error.toNodeError(from.path))
+            else -> from.copy(error = output.error.toNodeError())
         }
     }
 
     fun create(parent: Node, name: String, directory: Boolean, asSu: Boolean): Node? {
-        var targetPath = parent.path + name
-        if (directory) {
-            targetPath = targetPath.completePath(directory = true)
-        }
+        val targetPath = parent.path + name
         val output = when {
             directory -> NativeBridge.createDir(targetPath, asSu)
             else -> NativeBridge.createFile(targetPath, asSu)
@@ -203,22 +169,18 @@ object ExplorerUtils {
         return Node(path = targetPath, parentPath = parent.path, rootId = parent.rootId, properties = meta.toProperties(), content = content)
     }
 
-    fun Node.Companion.asRoot(path: String, type: NodeRootType): Node {
+    fun Node.Companion.asRoot(path: NodePath, type: NodeRootType): Node {
         return Node(
             path = path,
             parentPath = ROOT_PARENT_PATH,
-            properties = NodeProperties(name = path.name()),
+            properties = NodeProperties(),
             content = NodeContent.Directory(rootType = type),
         )
     }
 
-    private fun Meta.toProperties(
-        name: String = this.name,
-        size: String = "",
-    ): NodeProperties {
+    private fun Meta.toProperties(size: String = ""): NodeProperties {
         val isFile = access.firstOrNull() == FILE_CHAR
         return NodeProperties(
-            name = name,
             access = access,
             owner = owner,
             group = group,
@@ -260,18 +222,16 @@ object ExplorerUtils {
         return builder.toString()
     }
 
-    private fun parse(parentPath: String, root: Int, properties: NodeProperties): Node {
-        val incompletePath = parentPath + properties.name
+    private fun parse(path: NodePath, parentPath: NodePath, root: Int, properties: NodeProperties): Node {
         val content = when (properties.access.firstOrNull()) {
             DIR_CHAR -> NodeContent.Directory(DirectoryKind.Ordinary)
             LINK_CHAR -> NodeContent.Link
             null -> NodeContent.Unknown
-            else -> resolveFileType(incompletePath)
+            else -> resolveFileType(path)
         }
-        val asDir = content is NodeContent.Directory
         return Node(
             rootId = root,
-            path = incompletePath.completePath(asDir),
+            path = path,
             parentPath = parentPath,
             properties = properties,
             content = content,
@@ -297,7 +257,7 @@ object ExplorerUtils {
         return when (type) {
             is Rslt.Ok -> parseNode(type.value.meta).resolveType(type.value.mime)
                 .run { if (ensureCached) ensureCached(config, oldProps = properties) else this }
-            is Rslt.Err -> copy(error = type.message.toNodeError(path))
+            is Rslt.Err -> copy(error = type.message.toNodeError())
         }
     }
 
@@ -318,7 +278,7 @@ object ExplorerUtils {
         val result = NativeBridge.metas(path, asSu)
         return when (result) {
             is Rslt.Ok -> parseDir(result.value)
-            is Rslt.Err -> copy(error = result.message.toNodeError(path))
+            is Rslt.Err -> copy(error = result.message.toNodeError())
         }
     }
 
@@ -332,12 +292,12 @@ object ExplorerUtils {
         }
         entries.forEach { entry ->
             val index = children.items
-                .indexOfFirst { it.name == entry.meta.name }
+                .indexOfFirst { it.path.theSame(entry.meta.path) }
                 .also { if (it < 0) return@forEach }
             children.run {
                 val child = items[index]
                 items[index] = child.resolveType(mimeType = entry.mime)
-                    .copy(properties = entry.meta.toProperties(child.name, child.size))
+                    .copy(properties = entry.meta.toProperties(child.size))
             }
         }
         return entries.isNotEmpty()
@@ -354,15 +314,16 @@ object ExplorerUtils {
             mimeType.startsWith(FILE_PICTURE) -> content.ifNotCached { NodeContent.Picture.resolve(mimeType) }
             (mimeType == FILE_XRIFF) -> content.ifNotCached { NodeContent.Picture(mimeType) }
             (mimeType == FILE_APK) -> content.ifNotCached { AndroidApp.apk(path) }
+            (mimeType == FILE_RAR) -> content.ifNotCached { NodeContent.Rar() }
             (mimeType == FILE_ZIP) -> when (true) {
-                path.hasExt(EXT_APKS),
-                path.hasExt(EXT_APKM) -> content.ifNotCached { AndroidApp.apks(path) }
+                name.hasExt(EXT_APKS),
+                name.hasExt(EXT_APKM) -> content.ifNotCached { AndroidApp.apks(path) }
                 (content is AndroidApp) -> return this
-                path.hasExt(EXT_OSZ) -> content.ifNotCached { NodeContent.Osu.Map() }
-                path.hasExt(EXT_OSK) -> content.ifNotCached { NodeContent.Osu.Skin() }
-                path.hasExt(EXT_OLZ) -> content.ifNotCached { NodeContent.Osu.LazerMap() }
-                path.hasExt(EXT_OSR) -> content.ifNotCached { NodeContent.Osu.Replay() }
-                path.hasExt(EXT_OSB) -> content.ifNotCached { NodeContent.Osu.Storyboard() }
+                name.hasExt(EXT_OSZ) -> content.ifNotCached { NodeContent.Osu.Map() }
+                name.hasExt(EXT_OSK) -> content.ifNotCached { NodeContent.Osu.Skin() }
+                name.hasExt(EXT_OLZ) -> content.ifNotCached { NodeContent.Osu.LazerMap() }
+                name.hasExt(EXT_OSR) -> content.ifNotCached { NodeContent.Osu.Replay() }
+                name.hasExt(EXT_OSB) -> content.ifNotCached { NodeContent.Osu.Storyboard() }
                 else -> content.ifNotCached { NodeContent.Zip() }
             }
             (mimeType == FILE_BZIP2) -> when {
@@ -372,12 +333,15 @@ object ExplorerUtils {
             (mimeType == FILE_GZIP) -> content.ifNotCached { NodeContent.Gz() }
             (mimeType == FILE_TAR) -> content.ifNotCached { NodeContent.Tar() }
             (mimeType == FILE_XZ) -> content.ifNotCached { NodeContent.Xz }
+            mimeType.startsWith(FILE_FLASH) -> content.ifNotCached { NodeContent.Flash }
+            mimeType.startsWith(FILE_EXE) -> content.ifNotCached { NodeContent.ExeMs }
+            mimeType.startsWith(FILE_MESSAGE) -> NodeContent.Text.Plain
             mimeType.startsWith(FILE_TEXT) -> when {
-                path.hasExt(EXT_SVG) -> content.ifNotCached { NodeContent.Text.Svg }
-                path.hasExt(EXT_OSU) -> content.ifNotCached { NodeContent.Text.Osu }
-                path.hasExt(EXT_CPP) -> content.ifNotCached { NodeContent.Text.Cpp }
-                path.hasExt(EXT_INO) -> content.ifNotCached { NodeContent.Text.Ino }
-                path.hasExt(EXT_BAT) -> content.ifNotCached { NodeContent.Text.BatScript }
+                name.hasExt(EXT_SVG) -> content.ifNotCached { NodeContent.Text.Svg }
+                name.hasExt(EXT_OSU) -> content.ifNotCached { NodeContent.Text.Osu }
+                name.hasExt(EXT_CPP) -> content.ifNotCached { NodeContent.Text.Cpp }
+                name.hasExt(EXT_INO) -> content.ifNotCached { NodeContent.Text.Ino }
+                name.hasExt(EXT_BAT) -> content.ifNotCached { NodeContent.Text.BatScript }
                 else -> NodeContent.Text.Plain
             }
             (mimeType == FILE_XML) -> content.ifNotCached { NodeContent.Text.Xml }
@@ -405,7 +369,7 @@ object ExplorerUtils {
             (mimeType == FILE_SCRIPT),
             mimeType.startsWith(FILE_TEXT_SCRIPT) -> NodeContent.Text.ShellScript
             else -> {
-                logE("'${name.getExt()}' unknown type: $mimeType ${path.takeIfDebug()}")
+                logE("'${path.ext}' unknown type: $mimeType ${path.takeIfDebug()}")
                 content.resolveFileType(path)
             }
         }
@@ -416,22 +380,22 @@ object ExplorerUtils {
         val content = when (content) {
             is NodeContent.Picture,
             is NodeContent.Movie -> content
-            is NodeContent.Music -> content.copy(thumbnail = path.createAudioThumbnail(config)?.forNode)
+            is NodeContent.Music -> content.copy(thumbnail = path.string.createAudioThumbnail(config)?.forNode)
             is NodeContent.Zip -> cache(content).contentOrNodeError(this) { return it }.let { zip ->
                 when (zip.children?.any { it.name == BASE_APK }) {
                     null, false -> zip
                     true -> AndroidApp.apks(path, children = zip.children).let { apks ->
-                        apks.tryGetApksContent(path)
+                        apks.tryGetApksContent(path.string)
                             .contentOrNodeError(this, apks) { return it }
                     }
                 }
             }
             is AndroidApp -> when {
                 content.splitApk -> content
-                    .tryGetApksContent(path)
+                    .tryGetApksContent(path.string)
                     .contentOrNodeError(this) { return it }
                 else -> content
-                    .getApkContent(path)
+                    .getApkContent(path.string)
                     .contentOrNodeError(this) { return it }
             }
             else -> return this
@@ -453,18 +417,18 @@ object ExplorerUtils {
 
     private fun Node.cache(content: NodeContent.Zip): Rslt<NodeContent.Zip> = try {
         val children = mutableListOf<Node>()
-        ZipInputStream(BufferedInputStream(FileInputStream(path))).use { stream ->
+        ZipInputStream(BufferedInputStream(FileInputStream(path.string))).use { stream ->
             var entry: ZipEntry? = stream.nextEntry
             while (entry != null) {
                 val new = when {
                     entry.isDirectory -> NodeContent.Directory()
-                    else -> resolveFileType(entry.name)
+                    else -> resolveFileType(path + entry.name)
                 }
                 val dateTime = SimpleDateFormat(NodeProperties.DATE_TIME_FORMAT, Locale.ROOT)
                     .format(Date(entry.time))
                     .split(NodeProperties.DATE_TIME_SEPARATOR)
-                val properties = NodeProperties(name = entry.name, date = dateTime.first(), time = dateTime.last(), size = entry.size.toSize(), length = entry.size)
-                val node = Node("$path/${entry.name}", parentPath = path, rootId = uniqueId, properties = properties, content = new)
+                val properties = NodeProperties(date = dateTime.first(), time = dateTime.last(), size = entry.size.toSize(), length = entry.size)
+                val node = Node(path + entry.name, parentPath = path, rootId = uniqueId, properties = properties, content = new)
                 children.add(node)
                 entry = stream.nextEntry
             }
@@ -504,7 +468,7 @@ object ExplorerUtils {
     }
 
     private fun Node.parseNode(meta: Meta): Node {
-        val properties = meta.toProperties(name, size)
+        val properties = meta.toProperties(size)
         val (children, content) = when {
             properties.isDirectory() -> when (content) {
                 is NodeContent.Directory -> children to content
@@ -529,12 +493,14 @@ object ExplorerUtils {
         for (i in metas.indices) {
             val meta = metas[i]
             var properties = meta.toProperties()
-            val child = children?.findOnMut { it.name == properties.name }
+            val parentPath = path
+            val path = NodePath(meta.path)
+            val child = children?.findOnMut { it.path == path }
             if (child?.isDirectory == true) {
                 properties = properties.copy(size = child.properties.size)
             }
             val item = when {
-                child == null -> parse(path, rootId, properties)
+                child == null -> parse(path, parentPath, rootId, properties)
                 child.properties == properties -> child
                 else -> child.copy(properties = properties)
             }
@@ -558,7 +524,7 @@ object ExplorerUtils {
 
     fun Node.isParentOf(other: Node): Boolean = other.parentPath == path
 
-    fun Node.isSomeParentOf(other: Node): Boolean = path.length <= other.path.length && other.path.startsWith(path)
+    fun Node.isSomeParentOf(other: Node): Boolean = path.length <= other.path.length && other.path.isChildOf(path)
 
     fun NodeChildren.clearChildren() = update {
         val iter = listIterator()
@@ -593,28 +559,21 @@ object ExplorerUtils {
     fun NodeProperties.isLink(): Boolean = access.firstOrNull() == LINK_CHAR
 
     // means this node the fake, may be is a visual separating item, isn't a dir
-    fun Node.isSeparator(): Boolean = path.endsWith("/.")
+    fun Node.isSeparator(): Boolean = path.uniqueId == -uniqueId
 
     fun Node.asSeparator(): Node = when {
-        isSeparator() -> this
-        else -> copy(path = "$path.", uniqueId = -uniqueId)
-    }
-
-    fun Node.originalPath(): String = when {
-        !isSeparator() -> throw UnsupportedOperationException() // todo
-        else -> path.substring(0, path.length.dec())
-    }
-
-    fun Node.withoutDot(): String = when {
-        isSeparator() -> path.substring(0, path.length.dec())
-        else -> path
+        isSeparator() -> this.also { debugFail { "is already separator" } }
+        else -> copy(uniqueId = -uniqueId)
     }
 
     fun Node.delete(asSu: Boolean): Node? {
         val result = NativeBridge.delete(path, asSu)
         val error = when (result) {
-            is Rslt.Ok -> return null
-            is Rslt.Err -> result.message.toNodeError(path)
+            is Rslt.Ok -> when (result.value) {
+                0u -> return null
+                else -> "Has errors (${result.value})".toNodeError()
+            }
+            is Rslt.Err -> result.message.toNodeError()
         }
         return copy(error = error)
     }
@@ -624,24 +583,23 @@ object ExplorerUtils {
         val output = Shell.exec(Shell[Shell.MV].format(path, targetPath), asSu)
         return when {
             output.success -> move(name = name).copy(error = null)
-            else -> copy(error = output.error.toNodeError(path))
+            else -> copy(error = output.error.toNodeError())
         }
     }
 
-    fun Node.move(parent: String = parentPath, name: String = this.name): Node {
-        val path = "$parent$name".completePath(isDirectory)
-        val properties = if (name == this.name) properties else properties.copy(name = name)
+    fun Node.move(parent: NodePath = parentPath, name: String = this.name): Node {
+        val path = parent + name
         children?.move(path)
-        return copy(path = path, parentPath = parent, uniqueId = path.toUniqueId(), properties = properties, state = stateStub)
+        return copy(path = path, parentPath = parent, uniqueId = path.uniqueId, properties = properties, state = stateStub)
     }
 
-    private fun NodeChildren.move(parent: String) {
+    private fun NodeChildren.move(parent: NodePath) {
         for (i in indices) {
-            items[i] = get(i).move(parent = parent.completePath(true))
+            items[i] = get(i).move(parent = parent)
         }
     }
 
-    private fun String.toNodeError(path: String): NodeError {
+    private fun String.toNodeError(): NodeError {
         val lines = split(LF)
         val first = lines.find { it.isNotBlank() }
         return when {
@@ -649,7 +607,7 @@ object ExplorerUtils {
             first.isNullOrBlank() -> NodeError.Unknown
             first.startsWith(LS_NO_SUCH_FILE) -> NodeError.NoSuchFile
             first.startsWith(LS_PERMISSION_DENIED) -> NodeError.PermissionDenied
-            else -> NodeError.Message(first.replace(Regex(COMMAND_PATH_PREFIX.format(path)), ""))
+            else -> NodeError.Message(first)
         }
     }
 
@@ -668,66 +626,66 @@ object ExplorerUtils {
         return if (new == content) this else copy(content = new)
     }
 
-    private fun resolveFileType(path: String) = null.resolveFileType(path)
+    private fun resolveFileType(path: NodePath) = null.resolveFileType(path)
 
-    private fun NodeContent?.resolveFileType(path: String): NodeContent = when (true) {
-        path.hasExt(EXT_APNG) -> ifNotCached { NodeContent.Picture.Apng }
-        path.hasExt(EXT_PNG) -> ifNotCached { NodeContent.Picture.Png }
-        path.hasExt(EXT_JPG),
-        path.hasExt(EXT_JPEG) -> ifNotCached { NodeContent.Picture.Jpeg }
-        path.hasExt(EXT_GIF) -> ifNotCached { NodeContent.Picture.Gif }
-        path.hasExt(EXT_WEBP) -> ifNotCached { NodeContent.Picture.Webp }
-        path.hasExt(EXT_AVIF) -> ifNotCached { NodeContent.Picture.Avif }
-        path.hasExt(EXT_APK) -> ifNotCached { AndroidApp.apk(path) }
-        path.hasExt(EXT_DEX),
-        path.hasExt(EXT_ODEX),
-        path.hasExt(EXT_VDEX) -> ifNotCached { NodeContent.Java }
-        path.hasExt(EXT_APKS),
-        path.hasExt(EXT_APKM) -> ifNotCached { AndroidApp.apks(path) }
-        path.hasExt(EXT_ZIP),
-        path.hasExt(EXT_XAPK) -> ifNotCached { NodeContent.Zip() }
-        path.hasExt(EXT_TAR) -> ifNotCached { NodeContent.Tar() }
-        path.hasExt(EXT_BZ2) -> ifNotCached { NodeContent.Bzip2() }
-        path.hasExt(EXT_GZ) -> ifNotCached { NodeContent.Gz() }
-        path.hasExt(EXT_RAR) -> ifNotCached { NodeContent.Rar() }
-        path.hasExt(EXT_SH) -> NodeContent.Text.ShellScript
-        path.hasExt(EXT_BAT) -> NodeContent.Text.BatScript
-        path.hasExt(EXT_TXT),
-        path.hasExt(EXT_INI),
-        path.hasExt(EXT_JAVA),
-        path.hasExt(EXT_KT),
-        path.hasExt(EXT_KTS),
-        path.hasExt(EXT_SWIFT),
-        path.hasExt(EXT_YAML),
-        path.hasExt(EXT_HTML) -> NodeContent.Text.Plain
-        path.hasExt(EXT_SVG) -> ifNotCached { NodeContent.Text.Svg }
-        path.hasExt(EXT_IMG) -> NodeContent.DataImage
-        path.hasExt(EXT_MP4) -> ifNotCached { NodeContent.Movie.Mp4 }
-        path.hasExt(EXT_MKV) -> ifNotCached { NodeContent.Movie.Mkv }
-        path.hasExt(EXT_MOV) -> ifNotCached { NodeContent.Movie.Mov }
-        path.hasExt(EXT_WEBM) -> ifNotCached { NodeContent.Movie.Webm }
-        path.hasExt(EXT_3GP) -> ifNotCached { NodeContent.Movie.Tgp }
-        path.hasExt(EXT_AVI) -> ifNotCached { NodeContent.Movie.Avi }
-        path.hasExt(EXT_MP3) -> ifNotCached { NodeContent.Music.Mp3 }
-        path.hasExt(EXT_M4A) -> ifNotCached { NodeContent.Music.M4a }
-        path.hasExt(EXT_OGA),
-        path.hasExt(EXT_OGG) -> ifNotCached { NodeContent.Music.Ogg }
-        path.hasExt(EXT_WAV) -> ifNotCached { NodeContent.Music.Wav }
-        path.hasExt(EXT_FLAC) -> ifNotCached { NodeContent.Music.Flac }
-        path.hasExt(EXT_AAC) -> ifNotCached { NodeContent.Music.Aac }
-        path.hasExt(EXT_PDF) -> ifNotCached { NodeContent.Pdf }
-        path.hasExt(EXT_TORRENT) -> ifNotCached { NodeContent.Torrent }
-        path.hasExt(EXT_FAP) -> ifNotCached { NodeContent.Fap }
-        path.hasExt(EXT_EXE) -> ifNotCached { NodeContent.ExeMs }
-        path.hasExt(EXT_SWF) -> ifNotCached { NodeContent.Flash }
-        path.hasExt(EXT_PEM),
-        path.hasExt(EXT_P12),
-        path.hasExt(EXT_CRT) -> ifNotCached { NodeContent.Cert }
-        path.hasExt(EXT_OSZ) -> ifNotCached { NodeContent.Osu.Map() }
-        path.hasExt(EXT_OSK) -> ifNotCached { NodeContent.Osu.Skin() }
-        path.hasExt(EXT_OLZ) -> ifNotCached { NodeContent.Osu.LazerMap() }
-        path.hasExt(EXT_OSR) -> ifNotCached { NodeContent.Osu.Replay() }
-        path.hasExt(EXT_OSB) -> ifNotCached { NodeContent.Osu.Storyboard() }
+    private fun NodeContent?.resolveFileType(path: NodePath): NodeContent = when (true) {
+        path.name.hasExt(EXT_APNG) -> ifNotCached { NodeContent.Picture.Apng }
+        path.name.hasExt(EXT_PNG) -> ifNotCached { NodeContent.Picture.Png }
+        path.name.hasExt(EXT_JPG),
+        path.name.hasExt(EXT_JPEG) -> ifNotCached { NodeContent.Picture.Jpeg }
+        path.name.hasExt(EXT_GIF) -> ifNotCached { NodeContent.Picture.Gif }
+        path.name.hasExt(EXT_WEBP) -> ifNotCached { NodeContent.Picture.Webp }
+        path.name.hasExt(EXT_AVIF) -> ifNotCached { NodeContent.Picture.Avif }
+        path.name.hasExt(EXT_APK) -> ifNotCached { AndroidApp.apk(path) }
+        path.name.hasExt(EXT_DEX),
+        path.name.hasExt(EXT_ODEX),
+        path.name.hasExt(EXT_VDEX) -> ifNotCached { NodeContent.Java }
+        path.name.hasExt(EXT_APKS),
+        path.name.hasExt(EXT_APKM) -> ifNotCached { AndroidApp.apks(path) }
+        path.name.hasExt(EXT_ZIP),
+        path.name.hasExt(EXT_XAPK) -> ifNotCached { NodeContent.Zip() }
+        path.name.hasExt(EXT_TAR) -> ifNotCached { NodeContent.Tar() }
+        path.name.hasExt(EXT_BZ2) -> ifNotCached { NodeContent.Bzip2() }
+        path.name.hasExt(EXT_GZ) -> ifNotCached { NodeContent.Gz() }
+        path.name.hasExt(EXT_RAR) -> ifNotCached { NodeContent.Rar() }
+        path.name.hasExt(EXT_SH) -> NodeContent.Text.ShellScript
+        path.name.hasExt(EXT_BAT) -> NodeContent.Text.BatScript
+        path.name.hasExt(EXT_TXT),
+        path.name.hasExt(EXT_INI),
+        path.name.hasExt(EXT_JAVA),
+        path.name.hasExt(EXT_KT),
+        path.name.hasExt(EXT_KTS),
+        path.name.hasExt(EXT_SWIFT),
+        path.name.hasExt(EXT_YAML),
+        path.name.hasExt(EXT_HTML) -> NodeContent.Text.Plain
+        path.name.hasExt(EXT_SVG) -> ifNotCached { NodeContent.Text.Svg }
+        path.name.hasExt(EXT_IMG) -> NodeContent.DataImage
+        path.name.hasExt(EXT_MP4) -> ifNotCached { NodeContent.Movie.Mp4 }
+        path.name.hasExt(EXT_MKV) -> ifNotCached { NodeContent.Movie.Mkv }
+        path.name.hasExt(EXT_MOV) -> ifNotCached { NodeContent.Movie.Mov }
+        path.name.hasExt(EXT_WEBM) -> ifNotCached { NodeContent.Movie.Webm }
+        path.name.hasExt(EXT_3GP) -> ifNotCached { NodeContent.Movie.Tgp }
+        path.name.hasExt(EXT_AVI) -> ifNotCached { NodeContent.Movie.Avi }
+        path.name.hasExt(EXT_MP3) -> ifNotCached { NodeContent.Music.Mp3 }
+        path.name.hasExt(EXT_M4A) -> ifNotCached { NodeContent.Music.M4a }
+        path.name.hasExt(EXT_OGA),
+        path.name.hasExt(EXT_OGG) -> ifNotCached { NodeContent.Music.Ogg }
+        path.name.hasExt(EXT_WAV) -> ifNotCached { NodeContent.Music.Wav }
+        path.name.hasExt(EXT_FLAC) -> ifNotCached { NodeContent.Music.Flac }
+        path.name.hasExt(EXT_AAC) -> ifNotCached { NodeContent.Music.Aac }
+        path.name.hasExt(EXT_PDF) -> ifNotCached { NodeContent.Pdf }
+        path.name.hasExt(EXT_TORRENT) -> ifNotCached { NodeContent.Torrent }
+        path.name.hasExt(EXT_FAP) -> ifNotCached { NodeContent.Fap }
+        path.name.hasExt(EXT_EXE) -> ifNotCached { NodeContent.ExeMs }
+        path.name.hasExt(EXT_SWF) -> ifNotCached { NodeContent.Flash }
+        path.name.hasExt(EXT_PEM),
+        path.name.hasExt(EXT_P12),
+        path.name.hasExt(EXT_CRT) -> ifNotCached { NodeContent.Cert }
+        path.name.hasExt(EXT_OSZ) -> ifNotCached { NodeContent.Osu.Map() }
+        path.name.hasExt(EXT_OSK) -> ifNotCached { NodeContent.Osu.Skin() }
+        path.name.hasExt(EXT_OLZ) -> ifNotCached { NodeContent.Osu.LazerMap() }
+        path.name.hasExt(EXT_OSR) -> ifNotCached { NodeContent.Osu.Replay() }
+        path.name.hasExt(EXT_OSB) -> ifNotCached { NodeContent.Osu.Storyboard() }
         else -> NodeContent.Other
     }
 

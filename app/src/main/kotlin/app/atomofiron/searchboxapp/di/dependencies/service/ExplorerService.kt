@@ -5,8 +5,8 @@ import android.os.StatFs
 import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.dropLast
 import app.atomofiron.common.util.extension.clear
-import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.debugDelay
+import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.indexOfFirst
 import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.common.util.extension.replace
@@ -29,6 +29,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeGarden
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
+import app.atomofiron.searchboxapp.model.explorer.NodePath
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
@@ -76,12 +77,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlin.math.min
 
-private const val SUB_PATH_CAMERA = "DCIM/Camera/"
-private const val SUB_PATH_PIC_SCREENSHOTS = "Pictures/Screenshots/"
-private const val SUB_PATH_DCIM_SCREENSHOTS = "DCIM/Screenshots/"
-private const val SUB_PATH_DOWNLOAD = "Download/"
-private const val SUB_PATH_DOWNLOAD_BLUETOOTH = "Download/Bluetooth/"
-private const val SUB_PATH_BLUETOOTH = "Bluetooth/"
+private const val SUB_PATH_CAMERA = "DCIM/Camera"
+private const val SUB_PATH_PIC_SCREENSHOTS = "Pictures/Screenshots"
+private const val SUB_PATH_DCIM_SCREENSHOTS = "DCIM/Screenshots"
+private const val SUB_PATH_DOWNLOAD = "Download"
+private const val SUB_PATH_DOWNLOAD_BLUETOOTH = "Download/Bluetooth"
+private const val SUB_PATH_BLUETOOTH = "Bluetooth"
 
 class ExplorerService(
     private val context: Context,
@@ -123,7 +124,7 @@ class ExplorerService(
             context.resolveToybox(it)
         }
         store.currentNode.collect(appScope) {
-            preferences.setOpenedDirPath(it?.path)
+            preferences.setOpenedDirPath(it?.path?.string)
         }
     }
 
@@ -149,12 +150,12 @@ class ExplorerService(
 
     private fun NodeGarden.initRoots() {
         val roots = listOf(
-            NodeRoot(NodeRootType.Photos, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_CAMERA"),
-            NodeRoot(NodeRootType.Videos, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_CAMERA"),
-            NodeRoot(NodeRootType.Screenshots, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_PIC_SCREENSHOTS", "${internalStoragePath}$SUB_PATH_DCIM_SCREENSHOTS"),
-            NodeRoot(NodeRootType.Bluetooth, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_BLUETOOTH", "${internalStoragePath}$SUB_PATH_DOWNLOAD_BLUETOOTH"),
-            NodeRoot(NodeRootType.Downloads, NodeSorting.Date.Reversed, "${internalStoragePath}$SUB_PATH_DOWNLOAD"),
-            NodeRoot(NodeRootType.SystemRoot, NodeSorting.Name, "/"),
+            NodeRoot(NodeRootType.Photos, NodeSorting.Date.Reversed, internalStoragePath + SUB_PATH_CAMERA),
+            NodeRoot(NodeRootType.Videos, NodeSorting.Date.Reversed, internalStoragePath + SUB_PATH_CAMERA),
+            NodeRoot(NodeRootType.Screenshots, NodeSorting.Date.Reversed, internalStoragePath + SUB_PATH_PIC_SCREENSHOTS, internalStoragePath + SUB_PATH_DCIM_SCREENSHOTS),
+            NodeRoot(NodeRootType.Bluetooth, NodeSorting.Date.Reversed, internalStoragePath + SUB_PATH_BLUETOOTH, internalStoragePath + SUB_PATH_DOWNLOAD_BLUETOOTH),
+            NodeRoot(NodeRootType.Downloads, NodeSorting.Date.Reversed, internalStoragePath + SUB_PATH_DOWNLOAD),
+            NodeRoot(NodeRootType.SystemRoot, NodeSorting.Name, NodePath.Root),
         )
         this.roots.addAll(roots)
     }
@@ -251,17 +252,17 @@ class ExplorerService(
     }
 
     private fun NodeGarden.updateStats(storage: NodeStorage) {
-        val index = roots.indexOfFirst { it.type is NodeRootType.Storage && it.type.kind == storage.kind && it.item.path == storage.path }
+        val index = roots.indexOfFirst { it.type is NodeRootType.Storage && it.type.kind == storage.kind && it.item.path.string == storage.path }
         var root = roots.getOrNull(index)
         var type = root?.type ?: NodeRootType.Storage(storage)
         type = (type as NodeRootType.Storage).copy(storage)
-        root = root ?: NodeRoot(type, NodeSorting.Name, storage.path)
+        root = root ?: NodeRoot(type, NodeSorting.Name, NodePath(storage.path))
         roots.replace(root) { it.stableId == root.stableId }
     }
 
     private fun NodeGarden.removeMissed(storage: List<NodeStorage>) {
         roots.removeAll { root ->
-            root.type.removable && storage.none { it.path == root.item.path }
+            root.type.removable && storage.none { it.path == root.item.path.string }
         }
     }
 
@@ -290,8 +291,8 @@ class ExplorerService(
             ?.firstOrNull()
         return when {
             newestChild == null -> targetRoot.copy(item = updated, thumbnail = null, thumbnailPath = "")
-            targetRoot.thumbnailPath == newestChild.path -> targetRoot
-            else -> targetRoot.copy(item = updated, thumbnail = Thumbnail.FilePath, thumbnailPath = newestChild.path)
+            targetRoot.thumbnailPath == newestChild.path.string -> targetRoot
+            else -> targetRoot.copy(item = updated, thumbnail = Thumbnail.FilePath, thumbnailPath = newestChild.path.string)
         }
     }
 
@@ -308,7 +309,7 @@ class ExplorerService(
                     targetRoot.stableId -> {
                         val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sorting)
                         val type = root.type.takeIf<NodeRootType.Storage,_>()?.run {
-                            val stat = StatFs(root.item.path)
+                            val stat = StatFs(root.item.path.string)
                             val info = info.copy(total = stat.totalBytes, used = stat.totalBytes - stat.freeBytes)
                             copy(info = info)
                         } ?: root.type
@@ -762,7 +763,7 @@ class ExplorerService(
 
     private fun Node.defineDirKind(levelIndex: Int = -1): Node = when {
         levelIndex > 0 -> this
-        !path.startsWith(internalStoragePath) -> this
+        !path.isChildOf(internalStoragePath) -> this
         internalStoragePath.length != (path.length.dec() - name.length) -> this
         content !is NodeContent.Directory -> this
         else -> ExplorerUtils.getDirectoryType(name)
@@ -875,7 +876,7 @@ class ExplorerService(
 
     private fun MutableList<Node>.replaceItem(item: Node) = replaceItem(item.uniqueId, item.parentPath, item)
 
-    private fun MutableList<Node>.replaceItem(uniqueId: Int, parentPath: String, item: Node?): Boolean {
+    private fun MutableList<Node>.replaceItem(uniqueId: Int, parentPath: NodePath, item: Node?): Boolean {
         val parent = find(parentPath)
         val parentChildren = parent?.children?.items
         val index = parentChildren?.indexOfFirst { it.uniqueId == uniqueId } ?: -1
@@ -913,9 +914,9 @@ class ExplorerService(
 
     private fun List<Node>.findIndexed(uniqueId: Int): Pair<Int, Node?> = findWithIndex { it.uniqueId == uniqueId }
 
-    private fun List<Node>.find(path: String): Node? = find { it.path == path }
+    private fun List<Node>.find(path: NodePath): Node? = find { it.path == path }
 
-    private fun List<Node>.findIndexed(path: String): Pair<Int, Node?> = findWithIndex { it.path == path }
+    private fun List<Node>.findIndexed(path: NodePath): Pair<Int, Node?> = findWithIndex { it.path == path }
 
     private fun List<NodeState>.findState(uniqueId: Int): Pair<Int, NodeState?> = findWithIndex { it.uniqueId == uniqueId }
 }

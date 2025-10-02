@@ -5,9 +5,9 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.CoroutineListDiffer
+import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.Node.Companion.toUniqueId
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBorderDecorator
@@ -17,7 +17,6 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerI
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.ExplorerStickyDelegate
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.withoutDot
 import lib.atomofiron.insets.attachInsetsListener
 import kotlin.math.min
 
@@ -69,8 +68,7 @@ class ExplorerListDelegate(
     fun isDeepestDirVisible(): Boolean? = deepestDir?.let { isVisible(it) }?.takeIf { !it || deepestDir?.isRoot == false }
 
     fun isVisible(item: Node): Boolean {
-        val path = item.withoutDot()
-        val index = items.indexOfFirst { it.path == path }
+        val index = items.indexOfFirst { it.path == item.path }
         return isVisible(index + rootAdapter.itemCount)
     }
 
@@ -105,8 +103,7 @@ class ExplorerListDelegate(
     }
 
     fun scrollTo(item: Node) {
-        val targetPath = item.withoutDot()
-        val nodePosition = items.indexOfFirst { it.path == targetPath }
+        val nodePosition = items.indexOfFirst { it.path == item.path }
         val position = nodePosition + rootAdapter.itemCount
         recyclerView.findViewHolderForAdapterPosition(position)
             ?.takeIf { recyclerView.run { it.itemView.top > paddingTop && it.itemView.bottom < height - paddingBottom } }
@@ -140,8 +137,8 @@ class ExplorerListDelegate(
     }
 
     fun highlight(item: Node) {
-        val uniqueId = item.withoutDot().toUniqueId()
-        val dir = items.find { it.uniqueId == uniqueId }
+        debugRequire(item.uniqueId == -item.path.uniqueId) { item.path.toString() }
+        val dir = items.find { it.uniqueId == item.path.uniqueId }
         dir ?: return
         val holder = recyclerView.findViewHolderForItemId(dir.uniqueId.toLong())
         if (holder is ExplorerHolder) {

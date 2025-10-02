@@ -5,6 +5,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.*
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
+import app.atomofiron.searchboxapp.model.explorer.NodePath
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
@@ -29,7 +30,7 @@ class TextViewerService(
     private val finderStore: FinderStore,
 ) {
     companion object {
-        fun searchInside(params: SearchParams, path: String, asSu: Boolean): Rslt<TextSearchResult> {
+        fun searchInside(params: SearchParams, path: NodePath, asSu: Boolean): Rslt<TextSearchResult> {
             val template = when {
                 params.useRegex && params.ignoreCase -> Shell.GREP_BONS_IE
                 params.useRegex -> Shell.GREP_BONS_E
@@ -37,7 +38,7 @@ class TextViewerService(
                 else -> Shell.GREP_BONS
             }
             var count = 0
-            val cmd = Shell[template].format(params.query.escapeQuotes(), path)
+            val cmd = Shell[template].format(params.query.escapeQuotes(), path.string)
             val lineIndexToMatches = hashMapOf<Int, MutableList<TextLineMatch>>()
             val output = Shell.exec(cmd, asSu) { line ->
                 val lineByteOffset = line.split(':')
@@ -65,7 +66,7 @@ class TextViewerService(
 
     private val asSu: Boolean get() = preferences.asSu.value
 
-    fun getFileSession(path: String): TextViewerSession {
+    fun getFileSession(path: NodePath): TextViewerSession {
         val item = explorerStore.currentItems.find { it.path == path }
             ?: Node(path, content = NodeContent.Undefined)
         var session = findSession(item)

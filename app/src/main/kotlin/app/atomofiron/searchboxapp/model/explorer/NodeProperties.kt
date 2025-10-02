@@ -7,7 +7,6 @@ data class NodeProperties(
     override val size: String = "",
     override val date: String = "",
     override val time: String = "",
-    override val name: String = "",
     override val length: Long = -1,
 ) : INodeProperties {
     companion object {
@@ -24,6 +23,5 @@ interface INodeProperties {
     val size: String
     val date: String
     val time: String
-    val name: String
     val length: Long
 }

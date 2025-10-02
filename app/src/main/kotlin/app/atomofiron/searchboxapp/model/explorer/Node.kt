@@ -1,17 +1,16 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.areChildrenContentsTheSame
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.name
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.parent
 
 data class Node(
-    val path: String,
-    val parentPath: String = path.parent(),
-    val uniqueId: Int = path.toUniqueId(),
+    val path: NodePath,
+    val parentPath: NodePath = path.parent,
+    val uniqueId: Int = path.uniqueId,
     val rootId: Int = uniqueId,
     val children: NodeChildren? = null,
 
-    val properties: NodeProperties = NodeProperties(name = path.name()),
+    val properties: NodeProperties = NodeProperties(),
     val content: NodeContent,
     val error: NodeError? = null,
     // state is always stateStub in the garden
@@ -23,8 +22,8 @@ data class Node(
 ) : INodeProperties by properties, INodeState by state {
     companion object {
         val stateStub = NodeState(0)
-        fun String.toUniqueId(): Int = hashCode()
     }
+    val name get() = path.name
     val isRoot: Boolean = uniqueId == rootId
 
     val isDirectory: Boolean = content is NodeContent.Directory
@@ -35,6 +34,10 @@ data class Node(
     val isOpened: Boolean get() = children?.isOpened == true
     val hasChildren: Boolean get() = children != null
     val childCount: Int get() = children?.size ?: 0
+
+    init {
+        debugRequire(uniqueId == path.uniqueId || uniqueId == -path.uniqueId) { path.toString() }
+    }
 
     fun areContentsTheSame(other: Node?): Boolean = when {
         other == null -> false

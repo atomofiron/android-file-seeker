@@ -12,10 +12,10 @@ data class NodeRoot(
     val thumbnailPath: String = "",
     // isSelected is always false in the garden
     val isSelected: Boolean = false,
-    val pathVariants: Array<out String>? = null,
+    val pathVariants: Array<out NodePath>? = null,
 ) {
 
-    constructor(type: NodeRootType, sorting: NodeSorting, vararg pathVariants: String)
+    constructor(type: NodeRootType, sorting: NodeSorting, vararg pathVariants: NodePath)
             : this(type, Node.asRoot(pathVariants.first(), type), sorting, pathVariants = pathVariants.takeIf { it.size > 1 })
 
     val stableId: Int = type.stableId

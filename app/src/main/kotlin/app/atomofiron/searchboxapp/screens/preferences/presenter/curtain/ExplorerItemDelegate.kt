@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
+import app.atomofiron.searchboxapp.model.explorer.NodePath
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
@@ -29,22 +30,22 @@ class ExplorerItemDelegate(
     private val resources: StrongProperty<Resources>,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
     private val dir = run {
-        val properties = NodeProperties("drwxrwx---", "owner", "group", "4K", "2038-01-19", "03:14", "Android")
+        val properties = NodeProperties("drwxrwx---", "owner", "group", "4K", "2038-01-19", "03:14")
         val dirContent = NodeContent.Directory()
         val fileContent = NodeContent.Unknown
-        val items = Array(17) { Node("", "", content = if (it < 3) dirContent else fileContent) }.toList()
+        val items = Array(17) { Node(NodePath.Stub, NodePath.Stub, content = if (it < 3) dirContent else fileContent) }.toList()
         val children = NodeChildren(items.toMutableList())
-        Node(path = "", properties = properties, content = dirContent, children = children)
+        Node(path = NodePath("Android"), properties = properties, content = dirContent, children = children)
     }
     private val file = run {
         val appName = resources.value.getString(R.string.app_name)
         val versionName = resources.value.getString(R.string.version_name)
             .split(' ').first()
         val name = "$appName $versionName.apk".replace(' ', '_')
-        val properties = NodeProperties("drwxrwx---", "owner", "group", "47K", "2038-01-19", "03:14", name)
+        val properties = NodeProperties("drwxrwx---", "owner", "group", "47K", "2038-01-19", "03:14")
         val apkInfo = ApkInfo(Thumbnail(R.mipmap.ic_launcher), "", VERSION_NAME, 0, "", 0, 0, null, 0, null)
         val content = NodeContent.AndroidApp.apk(NodeRef(""), apkInfo)
-        Node(path = "", properties = properties, content = content)
+        Node(path = NodePath(name), properties = properties, content = content)
     }
 
     private var composition = preferenceStore.explorerItemComposition.value

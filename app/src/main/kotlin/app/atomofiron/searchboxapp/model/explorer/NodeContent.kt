@@ -135,8 +135,8 @@ sealed class NodeContent(
             else -> info.icon
         }
         companion object {
-            fun apk(path: String, children: List<Node>? = null) = apk(NodeRef(path), children = children)
-            fun apks(path: String, children: List<Node>? = null) = apks(NodeRef(path), children = children)
+            fun apk(path: NodePath, children: List<Node>? = null) = apk(NodeRef(path), children = children)
+            fun apks(path: NodePath, children: List<Node>? = null) = apks(NodeRef(path), children = children)
             fun apk(ref: NodeRef, info: ApkInfo? = null, children: List<Node>? = null) = AndroidApp(ref, splitApk = false, info, children)
             fun apks(ref: NodeRef, info: ApkInfo? = null, children: List<Node>? = null) = AndroidApp(ref, splitApk = true, info, children)
         }

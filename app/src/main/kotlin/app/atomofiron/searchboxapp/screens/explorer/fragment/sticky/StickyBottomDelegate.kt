@@ -14,7 +14,6 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerI
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderInfo
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.StickyInfo
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.originalPath
 import kotlin.math.min
 
 private typealias StickyBottom = StickyInfo<ExplorerStickyBottomView>
@@ -123,7 +122,7 @@ class StickyBottomDelegate(
         val openedIndex = sticky.item.getOpenedIndex()
         for (holder in this) {
             sticky.item.children
-                .takeIf { holder.item.parentPath == sticky.item.originalPath() }
+                .takeIf { holder.item.parentPath == sticky.item.path }
                 ?.indexOfFirst { it.uniqueId == holder.item.uniqueId }
                 ?.takeIf { it > openedIndex }
                 ?.let { return holder.view.bottom }
@@ -141,7 +140,7 @@ class StickyBottomDelegate(
                 // next separator above
                 info.item.isSeparator() -> info.view.bottom + space
                 // skip closed children
-                !info.item.isOpened && info.item.parentPath == item.originalPath() -> continue
+                !info.item.isOpened && info.item.parentPath == item.path -> continue
                 // nothing below
                 i == 0 -> return null
                 // the first child after children of other opened

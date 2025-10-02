@@ -7,21 +7,19 @@ use std::path::PathBuf;
 use crate::common::Rslt;
 use crate::kopy;
 
-pub fn meta(path: &String) -> Rslt<Meta> {
-    let path = PathBuf::from(path);
-    let meta = File::open(&path)?.metadata();
-    return Ok(meta.to_hr(&path));
+pub fn meta(path: &PathBuf) -> Rslt<Meta> {
+    let meta = File::open(path)?.metadata();
+    return Ok(meta.to_hr(path));
 }
 
-pub fn meta_with_error(path: &String, error: String) -> Meta {
-    let path = PathBuf::from(path);
-    let meta = File::open(&path)
+pub fn meta_with_error(path: &PathBuf, error: String) -> Meta {
+    let meta = File::open(path)
         .and_then(|f| f.metadata())
-        .to_hr(&path);
+        .to_hr(path);
     return kopy!(meta, error = error);
 }
 
-pub fn metas(path: &String) -> Rslt<Vec<Meta>> {
+pub fn metas(path: &PathBuf) -> Rslt<Vec<Meta>> {
     let dir = fs::read_dir(path)?;
     let mut entries: Vec<_> = dir.filter_map(|entry| {
         match entry {

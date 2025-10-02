@@ -30,11 +30,6 @@ import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_
 class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
     BaseFragment<TextViewerFragment, TextViewerViewState, TextViewerPresenter, FragmentTextViewerBinding> by BaseFragmentImpl()
 {
-    companion object {
-        const val KEY_PATH = "KEY_PATH"
-        const val KEY_TASK_ID = "KEY_TASK_ID"
-    }
-
     private lateinit var binding: FragmentTextViewerBinding
 
     private val viewerAdapter = TextViewerAdapter()

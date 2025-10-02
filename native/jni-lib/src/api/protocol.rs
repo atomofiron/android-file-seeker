@@ -1,4 +1,5 @@
 use bincode::{Decode, Encode};
+use crate::ext::kpath::KPath;
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
@@ -53,7 +54,7 @@ pub enum DeleteResult {
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Record)]
 pub struct Meta {
-    pub name: String,
+    pub path: KPath,
     pub access: String,
     pub owner: String,
     pub group: String,

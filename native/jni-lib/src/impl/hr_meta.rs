@@ -4,6 +4,7 @@ use crate::r#impl::hr_users::HumanReadableUsers;
 use crate::api::protocol::Meta;
 use std::fs::Metadata;
 use std::io;
+use std::os::unix::ffi::OsStrExt;
 use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 use chrono::{DateTime, Local};
@@ -15,10 +16,7 @@ pub trait HumanReadableMeta {
 
 impl HumanReadableMeta for io::Result<Metadata> {
     fn to_hr(self, path: &PathBuf) -> Meta {
-        let name = path.file_name()
-            .and_then(|it| it.to_str())
-            .unwrap_or_default()
-            .to_owned();
+        let path = path.as_os_str().as_bytes().to_vec();
         match self {
             Ok(meta) => {
                 let date_time = DateTime::from_timestamp(meta.mtime(), 0)
@@ -38,7 +36,7 @@ impl HumanReadableMeta for io::Result<Metadata> {
                     size,
                     date,
                     time,
-                    name,
+                    path,
                     length: meta.size(),
                     error: empty_string(),
                 }
@@ -50,7 +48,7 @@ impl HumanReadableMeta for io::Result<Metadata> {
                 size: empty_string(),
                 date: empty_string(),
                 time: empty_string(),
-                name,
+                path,
                 length: 0,
                 error: e.to_string(),
             }

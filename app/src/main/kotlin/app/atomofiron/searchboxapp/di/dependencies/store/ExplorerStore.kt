@@ -5,7 +5,6 @@ import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.completePath
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,10 +15,9 @@ class ExplorerStore {
     val middleTab = NodeTabKey(index = 0)
     val lastTab = NodeTabKey(index = 2)
 
-    val internalStoragePath = Environment
+    private val internalStoragePath: String = Environment
         .getExternalStorageDirectory()
         .absolutePath
-        .completePath(directory = true)
 
     private val deepestNodes = mutableMapOf<NodeTabKey, Node?>()
     private val checkedLists = mutableMapOf<NodeTabKey, List<Node>?>()
@@ -28,7 +26,7 @@ class ExplorerStore {
     private val _storage = MutableStateFlow<List<NodeStorage>>(emptyList())
     private val _currentTab = MutableStateFlow(middleTab)
     private val _currentNode = MutableStateFlow<Node?>(null)
-    private val _internalRoot = MutableStateFlow(Node.asRoot(internalStoragePath, NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
+    private val _internalRoot = MutableStateFlow(Node.asRoot(NodePath(internalStoragePath), NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
     private val _checked = MutableStateFlow<List<Node>>(listOf())
     private val _alerts = EventFlow<NodeError>()
     private val _removed = EventFlow<Node>()
@@ -100,8 +98,8 @@ class ExplorerStore {
     }
 
     private fun updateCurrentItems(tab: NodeTabKey) {
-        currentLists.takeIf { tab == _currentTab.value }
-            ?.let { it[tab] }
+        tab.takeIf { it == _currentTab.value }
+            ?.let { currentLists[it] }
             ?.let { currentItems = it }
     }
 }

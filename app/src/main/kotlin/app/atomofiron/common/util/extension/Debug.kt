@@ -12,6 +12,11 @@ import java.lang.ref.WeakReference
 
 var debugContext = WeakReference<Context>(null)
 
+inline fun debug(action: () -> Unit) = when {
+    BuildConfig.DEBUG -> action()
+    else -> Unit
+}
+
 inline fun Any.debugFail(lazyMessage: () -> Any) = debugRequire(false, lazyMessage)
 
 inline fun Any.debugRequireNotNull(any: Any?, lazyMessage: () -> Any) = debugRequire(any != null, lazyMessage)

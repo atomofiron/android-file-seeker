@@ -72,7 +72,7 @@ class FinderAdapterPresenterDelegate(
             .filter { it.isChecked }
             .run {
                 filter { checked ->
-                    !any { checked.parentPath.startsWith(it.path) }
+                    !any { checked.parentPath.isChildOf(it.path) }
                 }
             }
         if (targets.isNotEmpty()) {

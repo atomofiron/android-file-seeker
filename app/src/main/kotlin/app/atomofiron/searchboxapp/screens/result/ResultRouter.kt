@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.model.explorer.NodePath
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 import app.atomofiron.searchboxapp.utils.Const
 import java.util.*
@@ -30,7 +31,7 @@ class ResultRouter(property: WeakProperty<out Fragment>) : BaseRouter(property) 
         return success
     }
 
-    fun openFile(path: String, taskId: UUID) {
+    fun openFile(path: NodePath, taskId: UUID) {
         val arguments = TextViewerParams.arguments(path, taskId)
         navigate(R.id.textViewerFragment, arguments)
     }

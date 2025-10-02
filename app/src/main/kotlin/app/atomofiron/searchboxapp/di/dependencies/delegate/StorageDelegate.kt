@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.di.dependencies.delegate
 import android.content.Context
 import android.os.Build
 import android.os.Environment
-import android.os.StatFs
 import android.os.storage.StorageManager
 import android.os.storage.StorageVolume
 import androidx.annotation.RequiresApi
@@ -13,7 +12,6 @@ import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.completePath
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 
@@ -27,7 +25,7 @@ class StorageDelegate(
 
     private var storageList = mutableListOf<NodeStorage>()
     private val internalStorage = store.internalStorage.value.run {
-        NodeStorage(NodeStorage.Kind.InternalStorage, path, name, "Internal alias")
+        NodeStorage(NodeStorage.Kind.InternalStorage, path.string, name, "Internal alias")
     }
 
     init {
@@ -42,7 +40,7 @@ class StorageDelegate(
             storageManager.registerStorageVolumeCallback(Dispatchers.Default.asExecutor(), StorageVolumeCallbackImpl())
             for (volume in storageManager.storageVolumes) {
                 val path = volume.directory?.path
-                if (path != null && path.completePath(directory = true) != internalStorage.path) {
+                if (path != null && path != internalStorage.path) {
                     onStateChanged(volume)
                 }
             }
@@ -56,7 +54,7 @@ class StorageDelegate(
         val index = storageList.indexOfFirst { it.name == volume.mediaStoreVolumeName }
         val alias = volume.getDescription(context)
         val item = storageList.getOrNull(index)
-        val path = volume.directory?.path?.completePath(directory = true) ?: item?.path
+        val path = volume.directory?.path ?: item?.path
         val kind = when {
             alias?.contains("SD") == true -> NodeStorage.Kind.SdCard
             else -> NodeStorage.Kind.UsbStorage

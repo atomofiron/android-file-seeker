@@ -44,7 +44,7 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
         intent.setType(mimeType ?: commonMimeType)
         val files = ArrayList<Uri>()
         for (item in items) {
-            val file = File(item.path)
+            val file = File(item.path.string)
             files.add(context.getUriForFile(file))
         }
         if (files.isEmpty()) {
@@ -57,7 +57,7 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
     }
 
     private fun Context.startForFile(action: String, item: Node) {
-        val file = File(item.path)
+        val file = File(item.path.string)
         val contentUri = getUriForFile(file)
         val type = item.content.mimeType ?: let {
             val ext = MimeTypeMap.getFileExtensionFromUrl(file.name)
@@ -72,7 +72,7 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
     }
 
     override fun shareSinglePicked(item: Node) = activity?.run {
-        val file = File(item.path)
+        val file = File(item.path.string)
         val uri = getUriForFile(file)
         val data = Intent().apply {
             setDataAndType(uri, contentResolver.getType(uri))
@@ -84,7 +84,7 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
 
     override fun shareMultiplePicked(items: List<Node>) = activity?.run {
         val uris = items.map {
-            getUriForFile(File(it.path))
+            getUriForFile(File(it.path.string))
         }
         if (uris.isEmpty()) {
             return@run

@@ -124,7 +124,7 @@ class ReceiveWorker(
             async {
                 val input = context.contentResolver.openInputStream(uri)
                 input?.use { input ->
-                    val output = FileOutputStream(File(data.destination, name))
+                    val output = FileOutputStream(File(data.destination.string, name))
                     val step = max(MB, input.available() / 100)
                     var read = 0L
                     input.writeTo(output) {

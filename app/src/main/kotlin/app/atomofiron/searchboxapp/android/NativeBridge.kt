@@ -1,8 +1,10 @@
 package app.atomofiron.searchboxapp.android
 
 import android.content.Context
+import app.atomofiron.searchboxapp.model.explorer.NodePath
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
+import uniffi.native_lib.DeleteResult
 import uniffi.native_lib.Meta
 import uniffi.native_lib.MetaResult
 import uniffi.native_lib.MetasResult
@@ -36,68 +38,68 @@ object NativeBridge {
         }
     }
 
-    fun createFile(path: String, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.createFile(path, runAsSu = binPath.takeIf { asSu })
+    fun createFile(path: NodePath, asSu: Boolean): Rslt<Meta> {
+        val response = uniffi.native_lib.createFile(path.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun createDir(path: String, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.createDir(path, runAsSu = binPath.takeIf { asSu })
+    fun createDir(path: NodePath, asSu: Boolean): Rslt<Meta> {
+        val response = uniffi.native_lib.createDir(path.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun type(path: String, asSu: Boolean): Rslt<TypedMeta> {
-        val response = uniffi.native_lib.getFileType(path, runAsSu = binPath.takeIf { asSu })
+    fun type(path: NodePath, asSu: Boolean): Rslt<TypedMeta> {
+        val response = uniffi.native_lib.getFileType(path.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is TypedMetaResult.Ok -> Rslt.Ok(response.v1)
             is TypedMetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun types(path: String, asSu: Boolean): Rslt<List<TypedMeta>> {
-        val response = uniffi.native_lib.getFileTypes(path, runAsSu = binPath.takeIf { asSu })
+    fun types(path: NodePath, asSu: Boolean): Rslt<List<TypedMeta>> {
+        val response = uniffi.native_lib.getFileTypes(path.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is TypedMetasResult.Ok -> Rslt.Ok(response.v1)
             is TypedMetasResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun meta(path: String, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.getMeta(path, runAsSu = binPath.takeIf { asSu })
+    fun meta(path: NodePath, asSu: Boolean): Rslt<Meta> {
+        val response = uniffi.native_lib.getMeta(path.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun metas(path: String, asSu: Boolean): Rslt<List<Meta>> {
-        val response = uniffi.native_lib.getMetas(path, runAsSu = binPath.takeIf { asSu })
+    fun metas(path: NodePath, asSu: Boolean): Rslt<List<Meta>> {
+        val response = uniffi.native_lib.getMetas(path.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetasResult.Ok -> Rslt.Ok(response.v1)
             is MetasResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun usage(path: String, asSu: Boolean): Rslt<String> {
-        val response = uniffi.native_lib.getUsage(path, runAsSu = binPath.takeIf { asSu })
+    fun usage(path: NodePath, asSu: Boolean): Rslt<String> {
+        val response = uniffi.native_lib.getUsage(path.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is UsageResult.Ok -> Rslt.Ok(response.v1)
             is UsageResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun delete(path: String, asSu: Boolean): Rslt<Unit> {
-        val response = uniffi.native_lib.deleteBy(path, runAsSu = binPath.takeIf { asSu })
+    fun delete(path: NodePath, asSu: Boolean): Rslt<UInt> {
+        val response = uniffi.native_lib.deleteBy(path.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
-            is DeleteResult.Ok -> Rslt.Ok
+            is DeleteResult.Ok -> Rslt.Ok(0u)
             is DeleteResult.Err -> Rslt.Err(response.v1)
-            is DeleteResult.ErrCount -> Rslt.Err("todo")
+            is DeleteResult.ErrCount -> Rslt.Ok(response.v1)
         }
     }
 }

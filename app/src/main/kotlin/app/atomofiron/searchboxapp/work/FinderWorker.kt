@@ -29,6 +29,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
+import app.atomofiron.searchboxapp.model.explorer.NodePath
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchParams
@@ -38,14 +39,12 @@ import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.finder.toItemMatchMultiply
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.name
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.escapeQuotes
 import app.atomofiron.searchboxapp.utils.ifCanNotice
-import app.atomofiron.searchboxapp.utils.putStringArray
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -77,9 +76,9 @@ class FinderWorker(
         private const val KEY_EXCLUDE_DIRS = "KEY_EXCLUDE_DIRS"
         private const val KEY_FOR_CONTENT = "KEY_FOR_CONTENT"
         private const val KEY_MAX_DEPTH = "KEY_MAX_DEPTH"
-        private const val KEY_WHERE_PATHS = "KEY_WHERE_PATHS"
+        private const val KEY_WHERE_PATH = "KEY_WHERE_PATH_"
 
-        fun inputData(query: String, asSu: Boolean, config: SearchOptions, maxSize: Int, maxDepth: Int, where: Array<String>) = Data.Builder()
+        fun inputData(query: String, asSu: Boolean, config: SearchOptions, maxSize: Int, maxDepth: Int, targets: Array<NodePath>) = Data.Builder()
             .putString(KEY_QUERY, query)
             .putBoolean(KEY_USE_SU, asSu)
             .putBoolean(KEY_USE_REGEX, config.useRegex)
@@ -88,7 +87,9 @@ class FinderWorker(
             .putBoolean(KEY_EXCLUDE_DIRS, config.excludeDirs)
             .putBoolean(KEY_FOR_CONTENT, config.contentSearch)
             .putInt(KEY_MAX_DEPTH, maxDepth)
-            .putStringArray(KEY_WHERE_PATHS, where)
+            .apply {
+                for (i in targets.indices) putByteArray("$KEY_WHERE_PATH$i", targets[i].bytes)
+            }
             .build()
     }
     private val asSu = inputData.getBoolean(KEY_USE_SU, false)
@@ -181,7 +182,7 @@ class FinderWorker(
             }
             val path = line.substring(0, index)
             val item = newNode(path)
-            val itemMatch = when (val result = TextViewerService.searchInside(params, path, asSu)) {
+            val itemMatch = when (val result = TextViewerService.searchInside(params, item.path, asSu)) {
                 is Rslt.Ok -> result.value.toItemMatchMultiply(item)
                 is Rslt.Err -> ItemMatch.MultiplyError(item, count, result.message)
             }
@@ -226,7 +227,7 @@ class FinderWorker(
         return false
     }
     private val forNameLineListener: (String) -> Unit = { path ->
-        val name = path.name()
+        val name = NodePath(path).name
         when {
             useRegex && !pattern.matcher(name).find() -> Unit
             !useRegex && !name.contains(query, ignoreCase) -> Unit
@@ -282,13 +283,15 @@ class FinderWorker(
         val dataBuilder = Data.Builder()
         try {
             finderStore.addOrUpdate(task)
-
-            val where = inputData.getStringArray(KEY_WHERE_PATHS)!!.map { path ->
-                Node(path, content = NodeContent.Unknown).update(cacheConfig)
+            val targets = mutableListOf<Node>()
+            for (i in 0..Int.MAX_VALUE) {
+                val path = inputData.getByteArray("$KEY_WHERE_PATH$i")
+                path ?: break
+                Node(NodePath(path), content = NodeContent.Unknown).update(cacheConfig)
             }
             when {
-                forContent -> searchForContent(where)
-                else -> searchByName(where)
+                forContent -> searchForContent(targets)
+                else -> searchByName(targets)
             }
             waitForJobs()
             debugDelay(5)
@@ -316,7 +319,7 @@ class FinderWorker(
         return Result.success(dataBuilder.build())
     }
 
-    private fun newNode(path: String) = Node(path, rootId = task.uniqueId, content = NodeContent.Unknown).update(cacheConfig)
+    private fun newNode(path: String) = Node(NodePath(path), rootId = task.uniqueId, content = NodeContent.Unknown).update(cacheConfig)
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return ForegroundInfo(hashCode(), foregroundNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)

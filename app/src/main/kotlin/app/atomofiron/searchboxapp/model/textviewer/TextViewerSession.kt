@@ -10,8 +10,8 @@ import java.lang.Exception
 class TextViewerSession(node: Node) {
     val mutex = Mutex()
     val item = MutableStateFlow(node)
-    val reader = File(node.path).run {
-        try {
+    val reader = File(node.path.string).run {
+        try { // todo lazy reading in Rust
             inputStream().reader().buffered()
         } catch (e: Exception) {
             // FileNotFoundException, ...
