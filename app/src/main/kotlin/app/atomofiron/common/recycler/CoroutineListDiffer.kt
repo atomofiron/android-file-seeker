@@ -79,9 +79,11 @@ class CoroutineListDiffer<I : Any>(
             index > UNDEFINED -> index
             else -> actualList.indexOfFirst { itemCallback.areItemsTheSame(it, item) }
         }
-        actualList[itemIndex] = item
-        adapter.notifyItemChanged(itemIndex)
-        listeners.forEach { it.onChanged(itemIndex, item) }
+        if (itemIndex >= 0) {
+            actualList[itemIndex] = item
+            adapter.notifyItemChanged(itemIndex)
+            listeners.forEach { it.onChanged(itemIndex, item) }
+        }
     }
 
     fun addListener(listener: ListListener<I>): Boolean {
