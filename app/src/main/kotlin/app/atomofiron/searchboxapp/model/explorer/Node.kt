@@ -19,6 +19,8 @@ data class Node(
     val isChecked: Boolean = false,
     // isDeepest is always false in the garden
     val isDeepest: Boolean = false,
+    // generation is always 0 in the garden
+    val generation: Int = 0,
 ) : INodeProperties by properties, INodeState by state {
     companion object {
         val stateStub = NodeState(0)

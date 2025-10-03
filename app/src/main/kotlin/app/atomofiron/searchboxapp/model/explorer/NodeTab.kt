@@ -14,6 +14,8 @@ class NodeTab(
     val trees = mutableMapOf<Int, MutableList<Node>>()
     var selectedRootId = UNSELECTED_ROOT_ID
         private set
+    var generation = 0
+        private set
     val tree: MutableList<Node> get() = trees[selectedRootId] ?: EmptyMutableList
     val checked = mutableListOf<Int>()
     val flow = MutableStateFlow(NodeTabItems(emptyList(), emptyList(), null))
@@ -32,6 +34,10 @@ class NodeTab(
 
     fun select(root: NodeRoot) {
         selectedRootId = root.stableId
+    }
+
+    fun incrementGeneration() {
+        generation++
     }
 
     fun Node.opened(): Boolean = roots.find { it.item.uniqueId == rootId }

@@ -22,7 +22,12 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 class ExplorerAdapter(
     private val itemActionListener: ExplorerItemActionListener,
     private val separatorClickListener: (Node) -> Unit,
-) : GeneralAdapter<Node, GeneralHolder<Node>>(NodeCallback, Node::updater) {
+) : GeneralAdapter<Node, GeneralHolder<Node>>(
+    itemCallback = NodeCallback,
+    itemId = { uniqueId },
+    itemUpdater = Node::updater,
+    itemGeneration = { generation },
+) {
 
     private lateinit var composition: ExplorerItemComposition
     private var viewCacheLimit = 5 // RecycledViewPool.DEFAULT_MAX_SCRAP

@@ -630,6 +630,7 @@ class ExplorerService(
         store.setCurrentItems(key, items)
 
         require(this.roots.all { !it.isSelected })
+        incrementGeneration()
     }
 
     private fun NodeTab.renderRoots(): List<NodeRoot> {
@@ -687,8 +688,7 @@ class ExplorerService(
         val items = MutableList<Node>(count)
         tree.firstOrNull()
             .let { it ?: root.item }
-            .let { updateStateFor(it).defineDirKind() }
-            .run { copy(isDeepest = tree.size == 1, children = children?.fetch(isOpened = tree.isNotEmpty())) }
+            .let { renderNode(it, content = it.defineDirKind(), isOpened = tree.isNotEmpty(), isDeepest = tree.size == 1) }
             .also { items.add(it) }
             .takeIf { !it.isOpened }
             ?.let { return items }
@@ -698,12 +698,13 @@ class ExplorerService(
             val level = tree[i]
             val nextLevelId = tree.getOrNull(i.inc())?.uniqueId
             for (j in 0..<level.childCount) {
-                var item = updateStateFor(level.children!![j])
-                    .defineDirKind(i)
+                var item = level.children!![j]
                 val isOpened = item.uniqueId == nextLevelId
-                item = item.copy(
+                item = renderNode(
+                    item,
                     isDeepest = isOpened && i == tree.lastIndex.dec(),
-                    children = item.children?.fetch(isOpened = isOpened),
+                    isOpened = isOpened,
+                    content = item.defineDirKind(i),
                 )
                 items.add(item)
                 if (isOpened) {
@@ -719,9 +720,9 @@ class ExplorerService(
             val level = tree[i]
             val opened = openedIndexes[i]
             for (j in opened.inc() until level.childCount) {
-                updateStateFor(level.children!![j])
-                    .defineDirKind(i)
-                    .let { items.add(it) }
+                var item = level.children!![j]
+                item = renderNode(item, content = item.defineDirKind(i))
+                items.add(item)
             }
             if (i < tree.lastIndex) {
                 items.find { it.uniqueId == level.uniqueId }
@@ -734,9 +735,8 @@ class ExplorerService(
 
     private suspend fun NodeTab.renderUpdate(new: Node) {
         val isOpened = tree.any { it.uniqueId == new.uniqueId }
-        updateStateFor(new, children = new.children?.fetch(isOpened = isOpened))
-            .defineDirKind()
-            .let { store.emitUpdate(it) }
+        val item = renderNode(new, isOpened = isOpened, content = new.defineDirKind())
+        store.emitUpdate(item)
     }
 
     private fun renderChecked(key: NodeTabKey, new: Node, isChecked: Boolean) {
@@ -749,27 +749,31 @@ class ExplorerService(
         }
     }
 
-    private fun NodeTab.updateStateFor(item: Node, children: NodeChildren? = item.children): Node {
-        val state = states.find { it.uniqueId == item.uniqueId }
-        val isChecked = checked.find { it == item.uniqueId } != null
-        when {
-            state != null -> Unit
-            isChecked != item.isChecked -> Unit
-            children !== item.children -> Unit
-            else -> return item
-        }
-        return item.copy(isChecked = isChecked, state = state ?: item.state, children = children)
+    private fun NodeTab.renderNode(
+        item: Node,
+        isOpened: Boolean = false,
+        isDeepest: Boolean = false,
+        content: NodeContent = item.content,
+    ): Node {
+        return item.copy(
+            isChecked = checked.any { it == item.uniqueId },
+            isDeepest = isDeepest,
+            state = states.find { it.uniqueId == item.uniqueId } ?: item.state,
+            children = item.children?.fetch(isOpened = isOpened),
+            generation = generation,
+            content = content,
+        )
     }
 
-    private fun Node.defineDirKind(levelIndex: Int = -1): Node = when {
-        levelIndex > 0 -> this
-        !path.isChildOf(internalStoragePath) -> this
-        internalStoragePath.length != (path.length.dec() - name.length) -> this
-        content !is NodeContent.Directory -> this
+    private fun Node.defineDirKind(levelIndex: Int = -1): NodeContent = when {
+        levelIndex > 0 -> content
+        content !is NodeContent.Directory -> content
+        internalStoragePath.length != (path.length.dec() - name.length) -> content
+        !path.isChildOf(internalStoragePath) -> content
         else -> ExplorerUtils.getDirectoryType(name)
             .takeIf { it != DirectoryKind.Ordinary }
-            ?.let { copy(content = content.copy(kind = it)) }
-            ?: this
+            ?.let { content.copy(kind = it) }
+            ?: content
     }
 
     /** @return already existing caching job */

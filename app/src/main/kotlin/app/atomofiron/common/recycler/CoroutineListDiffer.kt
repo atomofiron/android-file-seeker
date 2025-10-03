@@ -8,18 +8,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-// todo add and use 2-thread-safe mutable list for updates
-
 class CoroutineListDiffer<I : Any>(
     private val actualList: MutableList<I>,
     private val adapter: RecyclerView.Adapter<*>,
+    private val itemId: (I.() -> Int)? = null,
     private val itemCallback: DiffUtil.ItemCallback<I>,
+    private val itemGeneration: (I.() -> Int)? = null,
     private val itemUpdater: (I.(new: I) -> I)? = null,
     private val detectMoves: Boolean = true,
     listener: ListListener<I>? = null,
 ) {
     private val listeners = mutableListOf<ListListener<I>>()
-    private var updated = mutableListOf<I>()
+    private var updated = mutableMapOf<Int, I>()
     private val scope = CoroutineScope(Dispatchers.Default)
     private var counter = 0
     private var isCalculating = false
@@ -55,15 +55,16 @@ class CoroutineListDiffer<I : Any>(
                 actualList.clear()
                 actualList.addAll(new)
                 result.dispatchUpdatesTo(adapter)
-                if (updated.isNotEmpty()) {
-                    for (newer in updated) {
-                        val index = actualList.indexOfFirst { itemCallback.areItemsTheSame(it, newer) }
-                        if (index >= 0) {
-                            actualList[index] = itemUpdater?.invoke(actualList[index], newer) ?: newer
-                            adapter.notifyItemChanged(index)
-                        }
+                new.firstOrNull()?.syncByGeneration()
+                if (updated.isNotEmpty() && itemId != null) {
+                    for (i in actualList.indices) {
+                        val item = actualList[i]
+                        val newer = updated[itemId(item)]
+                        newer ?: continue
+                        actualList[i] = itemUpdater?.invoke(item, newer) ?: newer
+                        adapter.notifyItemChanged(i)
                     }
-                    updated.clear()
+                    itemGeneration ?: updated.clear()
                 }
                 listeners.forEach { it.onCurrentListChanged(actualList.copy()) }
             }
@@ -71,13 +72,12 @@ class CoroutineListDiffer<I : Any>(
     }
 
     fun submit(item: I, index: Int = UNDEFINED) {
+        item.syncByGeneration()
+        itemId?.invoke(item)
+            ?.let { updated[it] = item }
         val itemIndex = when {
-            isCalculating -> return updated
-                .indexOfFirst { itemCallback.areItemsTheSame(it, item) }
-                .let { if (it >= 0) updated[it] = item else updated.add(item) }
             index > UNDEFINED -> index
             else -> actualList.indexOfFirst { itemCallback.areItemsTheSame(it, item) }
-                .also { if (it < 0) return }
         }
         actualList[itemIndex] = item
         adapter.notifyItemChanged(itemIndex)
@@ -91,6 +91,15 @@ class CoroutineListDiffer<I : Any>(
     }
 
     fun removeListener(listener: ListListener<I>): Boolean = listeners.remove(listener)
+
+    private fun I.syncByGeneration() {
+        itemGeneration ?: return
+        updated.values
+            .firstOrNull()
+            ?.itemGeneration()
+            ?.takeIf { it < this.itemGeneration() }
+            ?.let { updated.clear() }
+    }
 
     interface ListListener<I> {
         fun onCurrentListChanged(current: List<I>)
