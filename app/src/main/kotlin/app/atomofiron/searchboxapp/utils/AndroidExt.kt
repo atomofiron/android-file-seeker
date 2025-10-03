@@ -275,6 +275,9 @@ val View.marginLayoutParams: ViewGroup.MarginLayoutParams get() = layoutParams a
 
 fun View.updateLayoutParams(width: Int = Int.MIN_VALUE, height: Int = Int.MIN_VALUE) {
     updateLayoutParams {
+        if (width == this.width && height == this.height) {
+            return
+        }
         if (width != Int.MIN_VALUE) this.width = width
         if (height != Int.MIN_VALUE) this.height = height
     }
