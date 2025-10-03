@@ -15,6 +15,7 @@ class KeyboardInsetCallback(
 
     private var max = 0
     private var isPrepareCalled = false
+    private var isControlling = false
     var isControllable = Android.R
         private set
     var visible = false
@@ -27,7 +28,7 @@ class KeyboardInsetCallback(
             isControllable = false
             listeners.forEach { it.onImeBroke(visible) }
         }
-        if (!isControllable || current > 0 && max > 0 && current != max) {
+        if (!isControllable || !isControlling && current > 0 && max > 0 && current != max) {
             notifyListeners(current)
         }
     }
@@ -46,6 +47,7 @@ class KeyboardInsetCallback(
 
     override fun onPrepare(animation: WindowInsetsAnimationCompat) {
         if (animation.typeMask == Type.ime()) {
+            isControlling = true
             isPrepareCalled = true
         }
     }
@@ -78,6 +80,7 @@ class KeyboardInsetCallback(
     override fun onEnd(animation: WindowInsetsAnimationCompat) {
         // on app was minimized
         if (animation.typeMask == Type.ime()) {
+            isControlling = false
             listeners.forEach { it.onImeEnd(visible) }
         }
     }
