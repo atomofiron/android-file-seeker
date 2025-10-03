@@ -189,11 +189,12 @@ class ExplorerService(
                 tree.clear(from = index.inc())
             } else {
                 val index = tree.indexOfFirst { it.path == item.parentPath }
-                tree.clear(from = index.inc())
                 rootItem = tree[index].children
                     ?.find { it.path == item.path }
                     ?.takeIf { it.hasChildren }
-                    ?.also { tree.add(it) }
+                    ?: return
+                tree.clear(from = index.inc())
+                tree.add(rootItem)
             }
             if (tree.isEmpty()) {
                 root.item.children?.clearChildren()
