@@ -390,7 +390,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
             itemView = itemView.parent as? View
                 ?: return null
         }
-        return recyclerView.height - itemView.run { bottom + marginBottom }
+        return recyclerView.height - itemView.bottom
     }
 
     private fun updateVertically(

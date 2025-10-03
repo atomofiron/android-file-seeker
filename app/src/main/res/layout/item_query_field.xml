@@ -4,6 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/padding_mini"
     android:paddingTop="@dimen/padding_mini"
     >
     <include
@@ -13,7 +14,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/padding_mini"
         android:layout_marginEnd="@dimen/padding_half"
-        android:layout_marginBottom="@dimen/padding_mini"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/button"
@@ -36,7 +36,6 @@
         android:layout_height="0dp"
         android:layout_gravity="end|center_vertical"
         android:layout_marginEnd="@dimen/padding_mini"
-        android:layout_marginBottom="@dimen/padding_mini"
         android:background="@drawable/query_button"
         android:src="@drawable/ic_find"
         android:tint="@color/query_button_icon"
