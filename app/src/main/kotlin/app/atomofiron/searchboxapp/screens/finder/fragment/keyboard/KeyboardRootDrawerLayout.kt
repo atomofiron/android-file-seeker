@@ -20,7 +20,6 @@ import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.children
 import androidx.core.view.doOnPreDraw
-import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.DrawerStateListenerImpl
 import app.atomofiron.common.util.extension.debugRequire
