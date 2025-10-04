@@ -15,8 +15,8 @@ pub fn new_file(path: &PathBuf) -> Rslt<Meta> {
 
 pub fn new_dir(path: &PathBuf) -> Rslt<Meta> {
     fs::create_dir_all(path.clone())?;
-    let meta = File::open(&path)?.metadata();
-    return Ok(meta.to_hr(&path));
+    let meta = File::open(path)?.metadata();
+    return Ok(meta.to_hr(path));
 }
 
 pub fn usage(path: &PathBuf) -> Rslt<String> {

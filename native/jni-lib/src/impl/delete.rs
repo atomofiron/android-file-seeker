@@ -35,7 +35,7 @@ pub fn delete(path: &PathBuf) -> Rslt<ErrCount> {
 }
 
 pub fn delete_recursively(path: &CString, as_dir: bool, st_dev: mode_t) -> Rslt<ErrCount> {
-    if get_dev(&path) != st_dev || call_delete(&path, as_dir) == OK {
+    if get_dev(path) != st_dev || call_delete(path, as_dir) == OK {
         return Ok(0);
     }
     let error = io::Error::last_os_error()

@@ -5,13 +5,13 @@ use std::fs;
 use std::path::PathBuf;
 
 pub fn file_type(path: &PathBuf) -> Rslt<TypedMeta> {
-    let mime = tree_magic_mini::from_filepath(&path);
+    let mime = tree_magic_mini::from_filepath(path);
     let mut metadata = path.metadata();
     if mime == None {
         metadata = Ok(metadata?); // check both of them
     };
     let entry = TypedMeta {
-        meta: metadata.to_hr(&path),
+        meta: metadata.to_hr(path),
         mime: mime.map(|m| m.to_string()).unwrap_or(empty_string()),
     };
     return Ok(entry)
@@ -22,7 +22,7 @@ pub fn file_types(path: &PathBuf) -> Rslt<Vec<TypedMeta>> {
     let entries = dir.filter_map(|entry| {
         entry.ok().map(|e| e.path()).and_then(|path| {
             let meta = path.metadata().to_hr(&path);
-            tree_magic_mini::from_filepath(&PathBuf::from(path))
+            tree_magic_mini::from_filepath(&path)
                 .map(|mime| TypedMeta { meta, mime: mime.to_string() })
         })
     }).collect::<Vec<_>>();
