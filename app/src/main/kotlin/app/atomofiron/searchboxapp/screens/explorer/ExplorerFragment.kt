@@ -115,12 +115,11 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
                 disclaimer.translationY = (statusBar.top - paddings.bottom).toFloat()
                 disclaimer.updatePadding(left = max(dock.left, paddings.left), right = max(dock.right, paddings.right))
             }
-            systemUiBackground += ExtType.topDisclaimer
+            insetsBackground += ExtType.topDisclaimer
             disclaimer.insetsSource {
-                InsetsSource.submit(ExtType.topDisclaimer, Insets.of(0, it.height + it.translationY.toInt(), 0, 0))
+                InsetsSource.submit(ExtType.topDisclaimer, Insets.of(0, it.height + it.y.toInt(), 0, 0))
             }
         }
-        root.attachInsetsListener(systemUiBackground)
         root.apply(dockView = binding.dockBar)
     }
 

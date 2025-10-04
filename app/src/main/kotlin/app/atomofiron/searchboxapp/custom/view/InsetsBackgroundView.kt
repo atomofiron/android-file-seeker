@@ -184,7 +184,7 @@ private inline fun calcStatusBarPadding(
     action: (left: Int, vertical: Int, right: Int) -> Unit,
 ): Boolean {
     val padding = (statusBar - maxStatusBar) / 2
-    return if (padding < statusBarMinPadding) {
+    return if (padding <= statusBarMinPadding) { // <= !!
         false
     } else {
         val cutout = max(cutout.left, cutout.right)
