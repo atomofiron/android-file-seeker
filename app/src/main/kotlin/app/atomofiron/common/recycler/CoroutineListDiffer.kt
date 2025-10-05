@@ -7,6 +7,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.max
 
 class CoroutineListDiffer<I : Any>(
     private val actualList: MutableList<I>,
@@ -55,24 +56,26 @@ class CoroutineListDiffer<I : Any>(
                 actualList.clear()
                 actualList.addAll(new)
                 result.dispatchUpdatesTo(adapter)
-                new.firstOrNull()?.syncByGeneration()
+                new.firstOrNull()?.syncWithGeneration()
                 if (updated.isNotEmpty() && itemId != null) {
                     for (i in actualList.indices) {
                         val item = actualList[i]
                         val newer = updated[itemId(item)]
                         newer ?: continue
-                        actualList[i] = itemUpdater?.invoke(item, newer) ?: newer
+                        actualList[i] = newer
                         adapter.notifyItemChanged(i)
                     }
                     itemGeneration ?: updated.clear()
                 }
-                listeners.forEach { it.onCurrentListChanged(actualList.copy()) }
+                val copy = actualList.copy()
+                listeners.forEach { it.onCurrentListChanged(copy) }
             }
         }
     }
 
     fun submit(item: I, index: Int = UNDEFINED) {
-        item.syncByGeneration()
+        val item = item.syncWithGeneration()
+        item ?: return
         itemId?.invoke(item)
             ?.let { updated[it] = item }
         val itemIndex = when {
@@ -94,13 +97,20 @@ class CoroutineListDiffer<I : Any>(
 
     fun removeListener(listener: ListListener<I>): Boolean = listeners.remove(listener)
 
-    private fun I.syncByGeneration() {
-        itemGeneration ?: return
-        updated.values
+    private fun I.syncWithGeneration(): I? {
+        itemGeneration ?: return this
+        val generation = itemGeneration()
+        val updatesGeneration = updated.values
             .firstOrNull()
             ?.itemGeneration()
-            ?.takeIf { it < this.itemGeneration() }
-            ?.let { updated.clear() }
+        val minGeneration = max(
+            updatesGeneration ?: 0,
+            actualList.firstOrNull()?.itemGeneration() ?: 0,
+        )
+        if (updatesGeneration != null && updatesGeneration < generation) {
+            updated.clear()
+        }
+        return this.takeIf { generation >= minGeneration }
     }
 
     interface ListListener<I> {
