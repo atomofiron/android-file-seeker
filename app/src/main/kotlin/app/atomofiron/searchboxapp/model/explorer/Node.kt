@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.extension.debugRequire
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.areChildrenContentsTheSame
 
 data class Node(
     val path: NodePath,
@@ -69,7 +68,7 @@ data class Node(
     override fun equals(other: Any?): Boolean = when {
         other !is Node -> false
         !areContentsTheSame(other) -> false
-        else -> other.children.areChildrenContentsTheSame(children)
+        else -> true
     }
 
     fun getOpenedIndex(): Int = children?.indexOfFirst { it.isOpened } ?: -1

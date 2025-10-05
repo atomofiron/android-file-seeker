@@ -537,21 +537,6 @@ object ExplorerUtils {
         }
     }
 
-    fun NodeChildren?.areChildrenContentsTheSame(other: NodeChildren?): Boolean {
-        when {
-            other == null && this == null -> return true
-            other == null -> return false
-            this == null -> return false
-            other.size != this.size -> return false
-        }
-        other.forEachIndexed { i, it ->
-            if (!it.areContentsTheSame(get(i))) {
-                return false
-            }
-        }
-        return true
-    }
-
     fun NodeProperties.isFile(): Boolean = access.firstOrNull() == FILE_CHAR
 
     fun NodeProperties.isDirectory(): Boolean = access.firstOrNull() == DIR_CHAR
