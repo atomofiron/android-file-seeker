@@ -21,11 +21,15 @@ class ExplorerItemActionListenerDelegate(
     private val currentTab get() = viewState.currentTab.value
 
     override fun onItemLongClick(item: Node) {
-        val files: List<Node> = when {
-            item.isChecked -> explorerStore.checked.value
-            else -> listOf(item)
+        val nodes: List<Node> = if (item.isChecked) {
+            val checked = explorerStore.checked.value
+            explorerStore.currentItems.filter { node ->
+                checked.any { node.path == it.path }
+            }
+        } else {
+            listOf(item)
         }
-        val options = operations.operations(files) ?: return
+        val options = operations.operations(nodes) ?: return
         menuListenerDelegate.showOptions(options)
     }
 
@@ -39,7 +43,29 @@ class ExplorerItemActionListenerDelegate(
         }
     }
 
-    override fun onItemCheck(item: Node, isChecked: Boolean) = interactor.checkItem(currentTab, item, isChecked)
+    override fun onItemCheck(item: Node, toChecked: Boolean): Boolean {
+        if (item.isOpened && toChecked) {
+            val checked = explorerStore.checked.value
+                .filter { it.path.isChildOf(item.path) }
+            if (checked.isEmpty()) {
+                interactor.check(currentTab, item, true)
+            } else {
+                interactor.check(currentTab, checked, false)
+                return false
+            }
+        } else if (item.isOpened && !toChecked) {
+            interactor.check(currentTab, item, false)
+            item.children?.let {
+                interactor.check(currentTab, it, true)
+            }
+        } else {
+            interactor.check(currentTab, item, toChecked)
+            val checked = explorerStore.checked.value
+                .filter { item.path.isChildOf(it.path) }
+            interactor.check(currentTab, checked, false)
+        }
+        return true
+    }
 
     override fun onItemsBecomeVisible(items: List<Node>) = interactor.updateItems(currentTab, items)
 }

@@ -8,6 +8,7 @@ import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
 import android.text.style.ImageSpan.ALIGN_BASELINE
 import android.view.View
+import android.widget.CompoundButton
 import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
@@ -66,9 +67,9 @@ class ExplorerItemBinderImpl private constructor(
         onItemActionListener?.onItemLongClick(item)
         true
     }
-    private val onCheckListener: ((View, Boolean) -> Unit) = { _, checked ->
-        if (checked != item.isChecked) {
-            onItemActionListener?.onItemCheck(item, checked)
+    private val onCheckListener: ((CompoundButton, Boolean) -> Unit) = { view, checked ->
+        if (checked != item.isChecked && onItemActionListener?.onItemCheck(item, checked) == false) {
+            view.isChecked = item.isChecked
         }
     }
 
@@ -252,6 +253,7 @@ class ExplorerItemBinderImpl private constructor(
     interface ExplorerItemBinderActionListener {
         fun onItemClick(item: Node)
         fun onItemLongClick(item: Node)
-        fun onItemCheck(item: Node, isChecked: Boolean)
+        /** @return false if is not allowed */
+        fun onItemCheck(item: Node, toChecked: Boolean): Boolean
     }
 }

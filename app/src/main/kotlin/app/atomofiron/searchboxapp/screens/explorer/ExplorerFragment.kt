@@ -33,7 +33,6 @@ import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.recyclerView
 import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.InsetsSource
-import lib.atomofiron.insets.attachInsetsListener
 import lib.atomofiron.insets.insetsSource
 import kotlin.math.max
 

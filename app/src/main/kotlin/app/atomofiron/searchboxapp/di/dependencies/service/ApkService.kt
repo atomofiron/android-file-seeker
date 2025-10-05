@@ -112,7 +112,7 @@ class ApkService(
     fun launchApk(packageName: String) = context.launch(packageName)
 
     private fun NodeRef.stream() = when {
-        isContent -> context.contentResolver.openInputStream(path.toUri())
-        else -> FileInputStream(path)
+        isContent -> context.contentResolver.openInputStream(path.string.toUri())
+        else -> FileInputStream(path.string)
     }
 }

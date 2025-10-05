@@ -8,6 +8,7 @@ import app.atomofiron.common.util.extension.takeIfDebug
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.model.CacheConfig
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.Node.Companion.stateStub
@@ -20,7 +21,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodePath
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
-import app.atomofiron.searchboxapp.model.explorer.NodeState
+import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
@@ -596,7 +597,7 @@ object ExplorerUtils {
         }
     }
 
-    fun NodeState?.theSame(cachingJob: Job?, operation: NodeOperation): Boolean {
+    fun NodeStateImpl?.theSame(cachingJob: Job?, operation: NodeOperation): Boolean {
         val currentOperation = this?.operation ?: NodeOperation.None
         return when {
             this?.cachingJob != cachingJob -> false
@@ -756,4 +757,8 @@ object ExplorerUtils {
     }
 
     private fun String.hasExt(ext: String) = endsWith(ext, ignoreCase = true)
+
+    fun List<Node>.toRef(): List<NodeRef> = map { it.toRef() }
+
+    fun Node.toRef() = NodeRef(path)
 }

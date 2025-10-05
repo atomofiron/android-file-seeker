@@ -154,7 +154,7 @@ class ExplorerListDelegate(
 
         override fun onItemLongClick(item: Node) = output.onItemLongClick(item)
 
-        override fun onItemCheck(item: Node, isChecked: Boolean) = output.onItemCheck(item, isChecked)
+        override fun onItemCheck(item: Node, toChecked: Boolean) = output.onItemCheck(item, toChecked)
 
         override fun onItemClick(item: Node) = when {
             item.isSeparator() -> highlight(item)

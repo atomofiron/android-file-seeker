@@ -7,13 +7,13 @@ import kotlinx.coroutines.sync.withLock
 class NodeGarden(vararg keys: NodeTabKey) {
 
     val roots = mutableListOf<NodeRoot>()
-    val states = mutableListOf<NodeState>()
+    val states = mutableListOf<NodeStateImpl>()
     val mutex = Mutex()
     val tabs = keys.associateWith { NodeTab(it, roots, states) }
 
     operator fun get(key: NodeTabKey): NodeTab = tabs[key]!!
 
-    operator fun get(item: Node): NodeState? = states.find { it.uniqueId == item.uniqueId }
+    operator fun get(item: Node): NodeStateImpl? = states.find { it.uniqueId == item.uniqueId }
 
     fun getFlow(key: NodeTabKey): StateFlow<NodeTabItems> = tabs[key]!!.flow
 

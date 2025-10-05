@@ -2,13 +2,13 @@ package app.atomofiron.searchboxapp.model.explorer
 
 import kotlinx.coroutines.Job
 
-data class NodeState(
-    // fields hidden from view
+data class NodeStateImpl(
+    // fields are hidden from view
     val uniqueId: Int,
     val cachingJob: Job? = null,
     override val operation: NodeOperation = NodeOperation.None,
-) : INodeState {
-    val withoutState: Boolean = cachingJob == null && operation is NodeOperation.None
+) : NodeState {
+    val empty: Boolean = cachingJob == null && operation is NodeOperation.None
 
     val isCaching: Boolean = cachingJob != null
     val isDeleting: Boolean = operation is NodeOperation.Deleting
@@ -18,7 +18,7 @@ data class NodeState(
     override fun toString(): String = "NodeState{caching=${cachingJob != null},operation=${operation.javaClass.simpleName}}"
 }
 
-interface INodeState {
+interface NodeState {
     val operation: NodeOperation?
     val withOperation: Boolean
 }

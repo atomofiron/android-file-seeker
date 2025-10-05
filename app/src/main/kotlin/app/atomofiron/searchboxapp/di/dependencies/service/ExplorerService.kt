@@ -24,7 +24,6 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeGarden
@@ -34,7 +33,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
-import app.atomofiron.searchboxapp.model.explorer.NodeState
+import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import app.atomofiron.searchboxapp.model.explorer.NodeTab
 import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
@@ -463,13 +462,23 @@ class ExplorerService(
         tryCache(key, to)
     }
 
-    suspend fun tryCheckItem(key: NodeTabKey, item: Node, isChecked: Boolean) {
+    suspend fun tryCheck(key: NodeTabKey, refs: List<Node>, toChecked: Boolean) {
         garden(key) {
-            val (_, state) = states.findState(item.uniqueId)
-            if (state?.withOperation == true) return
-            if (!checked.tryUpdateCheck(item.uniqueId, isChecked)) return
-            renderUpdate(item)
-            renderChecked(key, item, isChecked)
+            val toRender = mutableListOf<Node>()
+            for (item in refs) {
+                val (_, state) = states.findState(item.uniqueId)
+                if (state?.withOperation != true && checked.tryUpdateCheck(item.uniqueId, toChecked)) {
+                    toRender.add(item)
+                }
+            }
+            if (toRender.size == 1) {
+                val item = tree.findNode(toRender.first().uniqueId)
+                item ?: return@garden
+                renderUpdate(item)
+                renderChecked(key, item, toChecked)
+            } else if (toRender.size > 1) {
+                render()
+            }
         }
     }
 
@@ -491,21 +500,21 @@ class ExplorerService(
     }
 
     /** @return action succeed */
-    private fun MutableList<Int>.tryUpdateCheck(uniqueId: Int, makeChecked: Boolean): Boolean {
+    private fun MutableList<Int>.tryUpdateCheck(uniqueId: Int, toChecked: Boolean): Boolean {
         val iter = iterator()
         while (iter.hasNext()) {
             val item = iter.next()
             when {
                 item != uniqueId -> Unit
-                makeChecked -> return false
+                toChecked -> return false
                 else -> {
                     iter.remove()
                     return true
                 }
             }
         }
-        if (makeChecked) add(uniqueId)
-        return makeChecked
+        if (toChecked) add(uniqueId)
+        return toChecked
     }
 
     suspend fun deleteEveryWhere(items: List<Node>) {
@@ -540,7 +549,7 @@ class ExplorerService(
                         null
                     } else {
                         this?.cachingJob?.cancel()
-                        checked.tryUpdateCheck(item.uniqueId, makeChecked = false)
+                        checked.tryUpdateCheck(item.uniqueId, toChecked = false)
                         nextState(item.uniqueId, cachingJob = null, deleting = NodeOperation.Deleting)
                     }
                 }
@@ -610,8 +619,9 @@ class ExplorerService(
     private suspend fun NodeTab.render() {
         delayedRender?.cancel()
         delayedRender = null
+        incrementGeneration()
         states.replace {
-            if (it.withoutState) null else it
+            if (it.empty) null else it
         }
         val roots = renderRoots()
         roots.find { it.isSelected }
@@ -659,7 +669,7 @@ class ExplorerService(
             val iterator = states.listIterator()
             while (iterator.hasNext()) {
                 val state = iterator.next()
-                if (state.withoutState) continue
+                if (state.empty) continue
                 var item = roots.find { it.stableId == state.uniqueId }?.item
                 item = item ?: items.find { it.uniqueId == state.uniqueId }
                 if (item == null) {
@@ -676,8 +686,9 @@ class ExplorerService(
             val iterator = checked.listIterator()
             while (iterator.hasNext()) {
                 val uniqueId = iterator.next()
-                val item = items.find { it.uniqueId == uniqueId }
-                if (item == null) iterator.remove()
+                if (items.none { it.uniqueId == uniqueId }) {
+                    iterator.remove()
+                }
             }
         }
     }
@@ -735,16 +746,14 @@ class ExplorerService(
     }
 
     private suspend fun NodeTab.renderUpdate(new: Node) {
-        val isOpened = tree.any { it.uniqueId == new.uniqueId }
-        val item = renderNode(new, isOpened = isOpened, content = new.defineDirKind())
-        store.emitUpdate(item)
+        store.emitUpdate(renderNode(new))
     }
 
-    private fun renderChecked(key: NodeTabKey, new: Node, isChecked: Boolean) {
+    private fun renderChecked(key: NodeTabKey, item: Node, toChecked: Boolean) {
         store.checked.value.mutate {
             when {
-                isChecked -> add(new.copy(isChecked = true))
-                else -> removeOneIf { it.uniqueId == new.uniqueId }
+                toChecked -> add(item)
+                else -> removeOneIf { it.uniqueId == item.uniqueId }
             }
             store.emitChecked(key, this)
         }
@@ -752,9 +761,9 @@ class ExplorerService(
 
     private fun NodeTab.renderNode(
         item: Node,
-        isOpened: Boolean = false,
-        isDeepest: Boolean = false,
-        content: NodeContent = item.content,
+        isOpened: Boolean = tree.any { it.uniqueId == item.uniqueId },
+        isDeepest: Boolean = tree.lastOrNull()?.uniqueId == item.uniqueId,
+        content: NodeContent = item.defineDirKind(),
     ): Node {
         return item.copy(
             isChecked = checked.any { it == item.uniqueId },
@@ -833,13 +842,13 @@ class ExplorerService(
         }
     }
 
-    private fun NodeState?.nextState(
+    private fun NodeStateImpl?.nextState(
         uniqueId: Int,
         cachingJob: Job? = this?.cachingJob,
         deleting: NodeOperation.Deleting? = this?.operation as? NodeOperation.Deleting,
         copying: NodeOperation.Copying? = this?.operation as? NodeOperation.Copying,
         installing: NodeOperation.Installing? = this?.operation as? NodeOperation.Installing,
-    ): NodeState? {
+    ): NodeStateImpl? {
         val nextOperation = when (this?.operation ?: NodeOperation.None) {
             is NodeOperation.None -> deleting ?: copying ?: installing
             is NodeOperation.Deleting -> deleting ?: copying
@@ -853,14 +862,14 @@ class ExplorerService(
         return when {
             nextJob == null && nextOperation is NodeOperation.None -> null
             theSame(nextJob, nextOperation) -> return this
-            else -> NodeState(uniqueId, nextJob, nextOperation)
+            else -> NodeStateImpl(uniqueId, nextJob, nextOperation)
         }
     }
 
-    private fun MutableList<NodeState>.updateState(
+    private fun MutableList<NodeStateImpl>.updateState(
         uniqueId: Int,
-        block: NodeState?.() -> NodeState?,
-    ): NodeState? {
+        block: NodeStateImpl?.() -> NodeStateImpl?,
+    ): NodeStateImpl? {
         val (index, state) = findState(uniqueId)
         val new = state.block()
         when {
@@ -871,7 +880,7 @@ class ExplorerService(
         return new
     }
 
-    private fun MutableListIterator<NodeState>.updateState(current: NodeState?, new: NodeState?) {
+    private fun MutableListIterator<NodeStateImpl>.updateState(current: NodeStateImpl?, new: NodeStateImpl?) {
         when {
             current == null && new != null -> add(new)
             current != null && new == null -> remove()
@@ -923,5 +932,5 @@ class ExplorerService(
 
     private fun List<Node>.findIndexed(path: NodePath): Pair<Int, Node?> = findWithIndex { it.path == path }
 
-    private fun List<NodeState>.findState(uniqueId: Int): Pair<Int, NodeState?> = findWithIndex { it.uniqueId == uniqueId }
+    private fun List<NodeStateImpl>.findState(uniqueId: Int): Pair<Int, NodeStateImpl?> = findWithIndex { it.uniqueId == uniqueId }
 }

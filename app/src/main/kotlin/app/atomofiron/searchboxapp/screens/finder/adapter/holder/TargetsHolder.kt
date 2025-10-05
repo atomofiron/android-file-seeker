@@ -28,7 +28,7 @@ class TargetsHolder(parent: ViewGroup, output: FinderTargetsOutput) : GeneralHol
         adapter.submitList(item.targets)
     }
 
-    private class TargetAdapter(private val output: FinderTargetsOutput): ListAdapter<Node, TargetHolder>(DiffUtilCallback()) {
+    private class TargetAdapter(private val output: FinderTargetsOutput): ListAdapter<Node, TargetHolder>(DiffUtilCallback) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = TargetHolder(parent, output)
 
@@ -37,7 +37,7 @@ class TargetsHolder(parent: ViewGroup, output: FinderTargetsOutput) : GeneralHol
         }
     }
 
-    private class DiffUtilCallback : DiffUtil.ItemCallback<Node>() {
+    private object DiffUtilCallback : DiffUtil.ItemCallback<Node>() {
 
         override fun areItemsTheSame(oldItem: Node, newItem: Node): Boolean = oldItem.uniqueId == newItem.uniqueId
 

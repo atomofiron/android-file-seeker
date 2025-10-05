@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+import app.atomofiron.common.util.flow.DataFlow
 import app.atomofiron.searchboxapp.utils.EmptyMutableList
-import kotlinx.coroutines.flow.MutableStateFlow
 
 private const val UNSELECTED_ROOT_ID = 0
 private val EmptyMutableList = EmptyMutableList<Node>()
@@ -9,7 +9,7 @@ private val EmptyMutableList = EmptyMutableList<Node>()
 class NodeTab(
     val key: NodeTabKey,
     val roots: List<NodeRoot>,
-    val states: MutableList<NodeState>,
+    val states: MutableList<NodeStateImpl>,
 ) {
     val trees = mutableMapOf<Int, MutableList<Node>>()
     var selectedRootId = UNSELECTED_ROOT_ID
@@ -18,7 +18,7 @@ class NodeTab(
         private set
     val tree: MutableList<Node> get() = trees[selectedRootId] ?: EmptyMutableList
     val checked = mutableListOf<Int>()
-    val flow = MutableStateFlow(NodeTabItems(emptyList(), emptyList(), null))
+    val flow = DataFlow(NodeTabItems(emptyList(), emptyList(), null))
 
     fun NodeRoot.isSelected(): Boolean = stableId == selectedRootId
 

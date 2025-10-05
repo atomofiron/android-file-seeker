@@ -3,21 +3,22 @@ package app.atomofiron.searchboxapp.screens.finder.presenter
 import android.Manifest.permission.POST_NOTIFICATIONS
 import app.atomofiron.searchboxapp.di.dependencies.interactor.FinderInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
-import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.finder.FinderRouter
 import app.atomofiron.searchboxapp.screens.finder.FinderViewState
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRef
 
 class FinderAdapterPresenterDelegate(
     private val viewState: FinderViewState,
@@ -80,14 +81,14 @@ class FinderAdapterPresenterDelegate(
                 .request(POST_NOTIFICATIONS)
                 .any {
                     storagePermissionDelegate.request(
-                        granted = { startSearch(value, targets) },
+                        granted = { startSearch(value, targets.toRef()) },
                         denied = { viewState.showPermissionRequiredWarning() }
                     )
                 }
         }
     }
 
-    private fun startSearch(query: String, targets: List<Node>) {
+    private fun startSearch(query: String, targets: List<NodeRef>) {
         viewState.addToHistory(query)
         val config = viewState.toggles.value.toggles
         interactor.search(query, targets, config)

@@ -13,16 +13,16 @@ data class Node(
     val content: NodeContent,
     val error: NodeError? = null,
     // state is always stateStub in the garden
-    val state: NodeState = stateStub,
+    val state: NodeStateImpl = stateStub,
     // isChecked is always false in the garden
     val isChecked: Boolean = false,
     // isDeepest is always false in the garden
     val isDeepest: Boolean = false,
     // generation is always 0 in the garden
     val generation: Int = 0,
-) : INodeProperties by properties, INodeState by state {
+) : INodeProperties by properties, NodeState by state {
     companion object {
-        val stateStub = NodeState(0)
+        val stateStub = NodeStateImpl(0)
     }
     val name get() = path.name
     val isRoot: Boolean = uniqueId == rootId

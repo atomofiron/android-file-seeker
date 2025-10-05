@@ -51,7 +51,9 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.Unknown -> R.drawable.ic_unknown
 }
 
-fun NodeContent.Directory.getIcon(isEmpty: Boolean): Int = when (kind) {
+fun NodeContent.Directory.getIcon(isEmpty: Boolean): Int = kind.getIcon(isEmpty)
+
+fun DirectoryKind.getIcon(isEmpty: Boolean): Int = when (this) {
     DirectoryKind.Alarms -> when {
         isEmpty -> R.drawable.ic_folder_alarms_empty
         else -> R.drawable.ic_folder_alarms

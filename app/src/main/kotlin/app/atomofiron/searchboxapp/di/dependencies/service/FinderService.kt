@@ -8,13 +8,13 @@ import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
-import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.work.FinderWorker
 import kotlinx.coroutines.CoroutineScope
-import java.util.*
+import java.util.UUID
 
 class FinderService(
     scope: CoroutineScope,
@@ -31,7 +31,7 @@ class FinderService(
         }
     }
 
-    fun search(query: String, where: List<Node>, config: SearchOptions) {
+    fun search(query: String, where: List<NodeRef>, config: SearchOptions) {
         val maxSize = preferenceStore.maxFileSizeForSearch.value
         val maxDepth = preferenceStore.maxDepthForSearch.value
         val asSu = preferenceStore.asSu.value

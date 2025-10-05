@@ -65,9 +65,11 @@ class ExplorerInteractor(
         }
     }
 
-    fun checkItem(tab: NodeTabKey, item: Node, isChecked: Boolean) {
+    fun check(tab: NodeTabKey, item: Node, toChecked: Boolean) = check(tab, listOf(item), toChecked)
+
+    fun check(tab: NodeTabKey, items: List<Node>, toChecked: Boolean) {
         scope.launch(context) {
-            service.tryCheckItem(tab, item, isChecked)
+            service.tryCheck(tab, items, toChecked)
         }
     }
 

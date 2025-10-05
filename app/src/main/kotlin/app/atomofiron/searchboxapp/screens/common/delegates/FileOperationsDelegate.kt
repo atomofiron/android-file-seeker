@@ -132,10 +132,10 @@ class FileOperationsDelegate(
 
     private fun NodeContent.AndroidApp.resolve(resolver: ContentResolver?, signature: Boolean): Rslt<NodeContent.AndroidApp> {
         val stream = when {
-            !splitApk -> return getApkContent(ref.path, signature)
-            !ref.isContent -> FileInputStream(ref.path)
+            !splitApk -> return getApkContent(ref.path.string, signature)
+            !ref.isContent -> FileInputStream(ref.path.string)
             resolver == null -> throw UnreachableException()
-            else -> resolver.openInputStream(ref.path.toUri())
+            else -> resolver.openInputStream(ref.path.string.toUri())
         }
         return getApksContent(stream, signature)
     }

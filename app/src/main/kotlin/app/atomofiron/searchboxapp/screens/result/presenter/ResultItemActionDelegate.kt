@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.screens.result.presenter
 
-import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.finder.SearchResult
@@ -35,13 +34,14 @@ class ResultItemActionDelegate(
         curtainDelegate.showOptions(options)
     }
 
-    override fun onItemCheck(item: Node, isChecked: Boolean) {
+    override fun onItemCheck(item: Node, toChecked: Boolean): Boolean {
         val checked = viewState.checked.value.toMutableList()
         when {
-            isChecked -> checked.add(item.uniqueId)
+            toChecked -> checked.add(item.uniqueId)
             else -> checked.remove(item.uniqueId)
         }
         viewState.checked.value = checked
+        return true
     }
 
     override fun onItemVisible(item: ResultItem.Item) = Unit
