@@ -53,7 +53,7 @@ class StickyBottomDelegate(
     }
 
     private fun sync(new: Node, position: Int) {
-        debugRequire(new.isSeparator()) { "sync ${new.path}" }
+        debugRequire(new.isSeparator()) { "sync ${new.ref}" }
         val sticky = stickies[new.uniqueId]
         val view = when {
             sticky == null -> newSticky(new)
@@ -122,7 +122,7 @@ class StickyBottomDelegate(
         val openedIndex = sticky.item.getOpenedIndex()
         for (holder in this) {
             sticky.item.children
-                .takeIf { holder.item.parentPath == sticky.item.path }
+                .takeIf { holder.item.parentRef == sticky.item.ref }
                 ?.indexOfFirst { it.uniqueId == holder.item.uniqueId }
                 ?.takeIf { it > openedIndex }
                 ?.let { return holder.view.bottom }
@@ -140,7 +140,7 @@ class StickyBottomDelegate(
                 // next separator above
                 info.item.isSeparator() -> info.view.bottom + space
                 // skip closed children
-                !info.item.isOpened && info.item.parentPath == item.path -> continue
+                !info.item.isOpened && info.item.parentRef == item.ref -> continue
                 // nothing below
                 i == 0 -> return null
                 // the first child after children of other opened

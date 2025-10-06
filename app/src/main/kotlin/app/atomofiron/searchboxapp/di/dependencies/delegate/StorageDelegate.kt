@@ -25,7 +25,7 @@ class StorageDelegate(
 
     private var storageList = mutableListOf<NodeStorage>()
     private val internalStorage = store.internalStorage.value.run {
-        NodeStorage(NodeStorage.Kind.InternalStorage, path.string, name, "Internal alias")
+        NodeStorage(NodeStorage.Kind.InternalStorage, ref.string, name, "Internal alias")
     }
 
     init {

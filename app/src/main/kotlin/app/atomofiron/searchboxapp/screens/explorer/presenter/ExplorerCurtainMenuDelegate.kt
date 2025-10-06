@@ -68,7 +68,7 @@ class ExplorerCurtainMenuDelegate(
             CLONE -> {
                 val target = data?.items?.firstOrNull() ?: return null
                 val parent = explorerStore.currentItems
-                    .find { it.path == target.parentPath }
+                    .find { it.ref == target.parentRef }
                     ?: return null
                 cloneDelegate.getView(parent, target, inflater)
             }

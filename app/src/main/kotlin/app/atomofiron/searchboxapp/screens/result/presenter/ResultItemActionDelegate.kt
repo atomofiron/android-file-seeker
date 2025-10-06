@@ -18,7 +18,7 @@ class ResultItemActionDelegate(
     override fun onItemClick(item: Node) {
         when {
             item.isDirectory -> Unit // todo open dir
-            item.content is NodeContent.Text -> router.openFile(item.path, viewState.task.value.uuid)
+            item.content is NodeContent.Text -> router.openFile(item.ref, viewState.task.value.uuid)
             item.content is NodeContent.AndroidApp -> operations.askForAndroidApp(item.content)
             else -> router.openWith(item)
         }

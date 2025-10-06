@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.work
 
 import android.net.Uri
-import app.atomofiron.searchboxapp.model.explorer.NodePath
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.utils.UriListSerializer
 import kotlinx.serialization.Serializable
 
@@ -11,5 +11,5 @@ data class ReceiveData(
     @Serializable(UriListSerializer::class)
     val uris: List<Uri>,
     val texts: List<String>,
-    val destination: NodePath,
+    val destination: NodeRef,
 )

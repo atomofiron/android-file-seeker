@@ -14,7 +14,7 @@ data class NodeChildren(
     var dirs = items.count { it.isDirectory }
         private set
 
-    override fun hashCode(): Int = Objects.hash(isOpened, items.map { it.path })
+    override fun hashCode(): Int = Objects.hash(isOpened, items.map { it.ref })
 
     override fun equals(other: Any?): Boolean {
         return when {

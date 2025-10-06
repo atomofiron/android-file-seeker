@@ -1,4 +1,4 @@
-import app.atomofiron.searchboxapp.model.explorer.NodePath
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import org.junit.Test
 import kotlin.test.assertEquals
 
@@ -7,17 +7,17 @@ class NodePathTests {
     @Test
     fun parent() {
         listOf(
-            "parent" to NodePath("/parent/child"),
-            "parent" to NodePath("/parent/child/"),
-            "parent" to NodePath("/parent/child//"),
-            "/" to NodePath("/child"),
-            "" to NodePath("child"),
-            "" to NodePath("child/"),
-            "" to NodePath(""),
-            "" to NodePath("/"),
-            "" to NodePath("//"),
+            "parent" to NodeRef("/parent/child"),
+            "parent" to NodeRef("/parent/child/"),
+            "parent" to NodeRef("/parent/child//"),
+            "/" to NodeRef("/child"),
+            "" to NodeRef("child"),
+            "" to NodeRef("child/"),
+            "" to NodeRef(""),
+            "" to NodeRef("/"),
+            "" to NodeRef("//"),
         ).map { (expected, path) ->
-            Triple(expected, path, path.parentString)
+            Triple(expected, path, path.parent.string)
         }.filter { (expected, _, actual) ->
             actual != expected
         }.let {
@@ -28,19 +28,19 @@ class NodePathTests {
     @Test
     fun name() {
         listOf(
-            "name" to NodePath("/sdcard/name"),
-            "name" to NodePath("/sdcard/name/"),
-            "name" to NodePath("/sdcard/name//"),
-            "name" to NodePath("name"),
-            "name" to NodePath("name/"),
-            ".name" to NodePath(".name"),
-            "." to NodePath("/sdcard/name/."),
-            "." to NodePath("/sdcard/name/./"),
-            ".." to NodePath("/sdcard/name/.."),
-            ".." to NodePath("/sdcard/name/../"),
-            "" to NodePath(""),
-            "" to NodePath("/"),
-            "" to NodePath("//"),
+            "name" to NodeRef("/sdcard/name"),
+            "name" to NodeRef("/sdcard/name/"),
+            "name" to NodeRef("/sdcard/name//"),
+            "name" to NodeRef("name"),
+            "name" to NodeRef("name/"),
+            ".name" to NodeRef(".name"),
+            "." to NodeRef("/sdcard/name/."),
+            "." to NodeRef("/sdcard/name/./"),
+            ".." to NodeRef("/sdcard/name/.."),
+            ".." to NodeRef("/sdcard/name/../"),
+            "" to NodeRef(""),
+            "" to NodeRef("/"),
+            "" to NodeRef("//"),
         ).map { (expected, path) ->
             Triple(expected, path, path.name)
         }.filter { (expected, _, actual) ->
@@ -53,20 +53,20 @@ class NodePathTests {
     @Test
     fun ext() {
         listOf(
-            "ext" to NodePath("name.ext"),
-            "ext" to NodePath("/sdcard/name.ext"),
-            "ext" to NodePath("/sdcard/name.ext/"),
-            "ext" to NodePath("/sdcard/.ext"),
-            "" to NodePath("/sdcard/name.ext/."),
-            "" to NodePath("/sdcard/name.ext/./"),
-            "" to NodePath("/sdcard/name.ext/.."),
-            "" to NodePath("/sdcard/name.ext/../"),
-            "" to NodePath("/sdcard/name/"),
-            "" to NodePath("/sdcard/name.."),
-            "" to NodePath("name/"),
-            "" to NodePath("/"),
-            "" to NodePath("///"),
-            "" to NodePath(""),
+            "ext" to NodeRef("name.ext"),
+            "ext" to NodeRef("/sdcard/name.ext"),
+            "ext" to NodeRef("/sdcard/name.ext/"),
+            "ext" to NodeRef("/sdcard/.ext"),
+            "" to NodeRef("/sdcard/name.ext/."),
+            "" to NodeRef("/sdcard/name.ext/./"),
+            "" to NodeRef("/sdcard/name.ext/.."),
+            "" to NodeRef("/sdcard/name.ext/../"),
+            "" to NodeRef("/sdcard/name/"),
+            "" to NodeRef("/sdcard/name.."),
+            "" to NodeRef("name/"),
+            "" to NodeRef("/"),
+            "" to NodeRef("///"),
+            "" to NodeRef(""),
         ).map { (expected, path) ->
             Triple(expected, path, path.ext)
         }.filter { (expected, _, actual) ->

@@ -77,8 +77,8 @@ class ItemBorderDecorator(
             item.isOpened -> space
             item.isSeparator() -> space
             next == null -> space
-            item.parentPath != next.parentPath && item.parentPath == deepestDir?.path -> doubleSpace
-            item.parentPath != next.parentPath -> space
+            item.parentRef != next.parentRef && item.parentRef == deepestDir?.ref -> doubleSpace
+            item.parentRef != next.parentRef -> space
             else -> return
         }.toInt()
     }
@@ -121,16 +121,16 @@ class ItemBorderDecorator(
                 }
                 // под глубочайшей открытой директорией задаём с рассчётом на то,
                 // что дочерние айтемы может быть не видно
-                item.isOpened && item.path == deepestDir?.path -> {
+                item.isOpened && item.ref == deepestDir?.ref -> {
                     frameRect = rect
                     rect.top = child.bottom.toFloat()
                     rect.bottom = child.bottom + frameBottomOffset
                 }
-                item.parentPath == deepestDir?.path -> {
+                item.parentRef == deepestDir?.ref -> {
                     frameRect = rect
                     // верхняя граница рамки или у низа хедера текущей директории,
                     // или у низа айтема текущей директории
-                    if (item.parentPath != prev?.parentPath) {
+                    if (item.parentRef != prev?.parentRef) {
                         rect.top = child.top - space
                         rect.top = max(rect.top, headerBottom.toFloat())
                     }
@@ -139,7 +139,7 @@ class ItemBorderDecorator(
                     // которая не должна быть ниже области видимости,
                     // но только если айтем текущей директории не оказывается слишком низко,
                     // чтобы игнорировать область видимости
-                    if (item.parentPath != next?.parentPath) {
+                    if (item.parentRef != next?.parentRef) {
                         rect.top = min(rect.top, child.bottom + space)
                         rect.bottom = child.bottom + frameBottomOffset
                         rect.bottom = min(rect.bottom, parentBottom)

@@ -3,9 +3,9 @@ package app.atomofiron.searchboxapp.model.explorer
 import app.atomofiron.common.util.extension.debugRequire
 
 data class Node(
-    val path: NodePath,
-    val parentPath: NodePath = path.parent,
-    val uniqueId: Int = path.uniqueId,
+    val ref: NodeRef,
+    val parentRef: NodeRef = ref.parent,
+    val uniqueId: Int = ref.uniqueId,
     val rootId: Int = uniqueId,
     val children: NodeChildren? = null,
 
@@ -24,7 +24,7 @@ data class Node(
     companion object {
         val stateStub = NodeStateImpl(0)
     }
-    val name get() = path.name
+    val name get() = ref.name
     val isRoot: Boolean = uniqueId == rootId
 
     val isDirectory: Boolean = content is NodeContent.Directory
@@ -37,14 +37,14 @@ data class Node(
     val childCount: Int get() = children?.size ?: 0
 
     init {
-        debugRequire(uniqueId == path.uniqueId || uniqueId == -path.uniqueId) { path.toString() }
+        debugRequire(uniqueId == ref.uniqueId || uniqueId == -ref.uniqueId) { ref.toString() }
     }
 
     fun areContentsTheSame(other: Node?): Boolean = when {
         other == null -> false
         other === this -> true
         other.uniqueId != uniqueId -> false
-        other.path != path -> false
+        other.ref != ref -> false
         other.rootId != rootId -> false
         other.properties != properties -> false
         other.state.operation != state.operation -> false

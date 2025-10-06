@@ -115,7 +115,7 @@ class ExplorerItemBinderImpl private constructor(
         when (thumbnail) {
             is Thumbnail.FilePath -> Glide
                 .with(itemView.context)
-                .load(item.path.string)
+                .load(item.ref.string)
                 .placeholder(placeholder)
                 .error(LemonDrawable())
                 .into(binding.thumbnail)

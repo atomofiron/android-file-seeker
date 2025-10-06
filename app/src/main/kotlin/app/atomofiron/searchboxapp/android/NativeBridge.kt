@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.android
 
 import android.content.Context
-import app.atomofiron.searchboxapp.model.explorer.NodePath
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
 import uniffi.native_lib.CopyCollector
@@ -40,64 +40,64 @@ object NativeBridge {
         }
     }
 
-    fun createFile(path: NodePath, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.createFile(path.bytes, runAsSu = binPath.takeIf { asSu })
+    fun createFile(ref: NodeRef, asSu: Boolean): Rslt<Meta> {
+        val response = uniffi.native_lib.createFile(ref.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun createDir(path: NodePath, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.createDir(path.bytes, runAsSu = binPath.takeIf { asSu })
+    fun createDir(ref: NodeRef, asSu: Boolean): Rslt<Meta> {
+        val response = uniffi.native_lib.createDir(ref.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun type(path: NodePath, asSu: Boolean): Rslt<TypedMeta> {
-        val response = uniffi.native_lib.getFileType(path.bytes, runAsSu = binPath.takeIf { asSu })
+    fun type(ref: NodeRef, asSu: Boolean): Rslt<TypedMeta> {
+        val response = uniffi.native_lib.getFileType(ref.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is TypedMetaResult.Ok -> Rslt.Ok(response.v1)
             is TypedMetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun types(path: NodePath, asSu: Boolean): Rslt<List<TypedMeta>> {
-        val response = uniffi.native_lib.getFileTypes(path.bytes, runAsSu = binPath.takeIf { asSu })
+    fun types(ref: NodeRef, asSu: Boolean): Rslt<List<TypedMeta>> {
+        val response = uniffi.native_lib.getFileTypes(ref.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is TypedMetasResult.Ok -> Rslt.Ok(response.v1)
             is TypedMetasResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun meta(path: NodePath, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.getMeta(path.bytes, runAsSu = binPath.takeIf { asSu })
+    fun meta(ref: NodeRef, asSu: Boolean): Rslt<Meta> {
+        val response = uniffi.native_lib.getMeta(ref.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun metas(path: NodePath, asSu: Boolean): Rslt<List<Meta>> {
-        val response = uniffi.native_lib.getMetas(path.bytes, runAsSu = binPath.takeIf { asSu })
+    fun metas(ref: NodeRef, asSu: Boolean): Rslt<List<Meta>> {
+        val response = uniffi.native_lib.getMetas(ref.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is MetasResult.Ok -> Rslt.Ok(response.v1)
             is MetasResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun usage(path: NodePath, asSu: Boolean): Rslt<String> {
-        val response = uniffi.native_lib.getUsage(path.bytes, runAsSu = binPath.takeIf { asSu })
+    fun usage(ref: NodeRef, asSu: Boolean): Rslt<String> {
+        val response = uniffi.native_lib.getUsage(ref.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is UsageResult.Ok -> Rslt.Ok(response.v1)
             is UsageResult.Err -> Rslt.Err(response.v1)
         }
     }
 
-    fun delete(path: NodePath, asSu: Boolean): Rslt<UInt> {
-        val response = uniffi.native_lib.deleteBy(path.bytes, runAsSu = binPath.takeIf { asSu })
+    fun delete(ref: NodeRef, asSu: Boolean): Rslt<UInt> {
+        val response = uniffi.native_lib.deleteBy(ref.bytes, runAsSu = binPath.takeIf { asSu })
         return when (response) {
             is DeleteResult.Ok -> Rslt.Ok(0u)
             is DeleteResult.Err -> Rslt.Err(response.v1)
@@ -105,9 +105,9 @@ object NativeBridge {
         }
     }
 
-    fun copy(from: NodePath, to: NodePath, move: Boolean, asSu: Boolean, collector: (path: NodePath, Meta, moved: Boolean) -> Unit): Rslt<Unit> {
+    fun copy(from: NodeRef, to: NodeRef, move: Boolean, asSu: Boolean, collector: (part: CopyPart) -> Unit): Rslt<Unit> {
         val collector = object : CopyCollector {
-            override fun invoke(part: CopyPart) = collector(NodePath(part.path), part.meta, part.moved)
+            override fun invoke(part: CopyPart) = collector(part)
         }
         val response = uniffi.native_lib.copy(from.bytes, to.bytes, move, runAsSu = binPath.takeIf { asSu }, collector)
         return when (response) {

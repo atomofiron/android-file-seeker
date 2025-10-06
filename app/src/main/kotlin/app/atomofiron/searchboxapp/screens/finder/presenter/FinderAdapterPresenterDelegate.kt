@@ -18,7 +18,6 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolde
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRef
 
 class FinderAdapterPresenterDelegate(
     private val viewState: FinderViewState,
@@ -73,7 +72,7 @@ class FinderAdapterPresenterDelegate(
             .filter { it.isChecked }
             .run {
                 filter { checked ->
-                    !any { checked.parentPath.isChildOf(it.path) }
+                    !any { checked.parentRef.isChildOf(it.ref) }
                 }
             }
         if (targets.isNotEmpty()) {
@@ -81,7 +80,7 @@ class FinderAdapterPresenterDelegate(
                 .request(POST_NOTIFICATIONS)
                 .any {
                     storagePermissionDelegate.request(
-                        granted = { startSearch(value, targets.toRef()) },
+                        granted = { startSearch(value, targets.map { it.ref }) },
                         denied = { viewState.showPermissionRequiredWarning() }
                     )
                 }

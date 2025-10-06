@@ -28,7 +28,6 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeGarden
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
-import app.atomofiron.searchboxapp.model.explorer.NodePath
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
@@ -93,7 +92,7 @@ class ExplorerService(
 
     private var config = CacheConfig(asSu = false)
     private val garden = NodeGarden(store.firstTab, store.middleTab, store.lastTab)
-    private val internalStoragePath = store.internalStorage.value.path
+    private val internalStorageRef = store.internalStorage.value.ref
     private val updateRootTrigger = TriggerFlow()
 
     init {
@@ -123,7 +122,7 @@ class ExplorerService(
             context.resolveToybox(it)
         }
         store.currentNode.collect(appScope) {
-            preferences.setOpenedDirPath(it?.path?.string)
+            preferences.setOpenedDirPath(it?.ref?.string)
         }
     }
 
@@ -149,12 +148,12 @@ class ExplorerService(
 
     private fun NodeGarden.initRoots() {
         val roots = listOf(
-            NodeRoot(NodeRootType.Photos, NodeSorting.Date.Reversed, internalStoragePath + SUB_PATH_CAMERA),
-            NodeRoot(NodeRootType.Videos, NodeSorting.Date.Reversed, internalStoragePath + SUB_PATH_CAMERA),
-            NodeRoot(NodeRootType.Screenshots, NodeSorting.Date.Reversed, internalStoragePath + SUB_PATH_PIC_SCREENSHOTS, internalStoragePath + SUB_PATH_DCIM_SCREENSHOTS),
-            NodeRoot(NodeRootType.Bluetooth, NodeSorting.Date.Reversed, internalStoragePath + SUB_PATH_BLUETOOTH, internalStoragePath + SUB_PATH_DOWNLOAD_BLUETOOTH),
-            NodeRoot(NodeRootType.Downloads, NodeSorting.Date.Reversed, internalStoragePath + SUB_PATH_DOWNLOAD),
-            NodeRoot(NodeRootType.SystemRoot, NodeSorting.Name, NodePath.Root),
+            NodeRoot(NodeRootType.Photos, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_CAMERA),
+            NodeRoot(NodeRootType.Videos, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_CAMERA),
+            NodeRoot(NodeRootType.Screenshots, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_PIC_SCREENSHOTS, internalStorageRef + SUB_PATH_DCIM_SCREENSHOTS),
+            NodeRoot(NodeRootType.Bluetooth, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_BLUETOOTH, internalStorageRef + SUB_PATH_DOWNLOAD_BLUETOOTH),
+            NodeRoot(NodeRootType.Downloads, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_DOWNLOAD),
+            NodeRoot(NodeRootType.SystemRoot, NodeSorting.Name, NodeRef.Root),
         )
         this.roots.addAll(roots)
     }
@@ -187,9 +186,9 @@ class ExplorerService(
             } else if (index >= 0) {
                 tree.clear(from = index.inc())
             } else {
-                val index = tree.indexOfFirst { it.path == item.parentPath }
+                val index = tree.indexOfFirst { it.ref == item.parentRef }
                 rootItem = tree[index].children
-                    ?.find { it.path == item.path }
+                    ?.find { it.ref == item.ref }
                     ?.takeIf { it.hasChildren }
                     ?: return
                 tree.clear(from = index.inc())
@@ -252,17 +251,17 @@ class ExplorerService(
     }
 
     private fun NodeGarden.updateStats(storage: NodeStorage) {
-        val index = roots.indexOfFirst { it.type is NodeRootType.Storage && it.type.kind == storage.kind && it.item.path.string == storage.path }
+        val index = roots.indexOfFirst { it.type is NodeRootType.Storage && it.type.kind == storage.kind && it.item.ref.string == storage.path }
         var root = roots.getOrNull(index)
         var type = root?.type ?: NodeRootType.Storage(storage)
         type = (type as NodeRootType.Storage).copy(storage)
-        root = root ?: NodeRoot(type, NodeSorting.Name, NodePath(storage.path))
+        root = root ?: NodeRoot(type, NodeSorting.Name, NodeRef(storage.path))
         roots.replace(root) { it.stableId == root.stableId }
     }
 
     private fun NodeGarden.removeMissed(storage: List<NodeStorage>) {
         roots.removeAll { root ->
-            root.type.removable && storage.none { it.path == root.item.path.string }
+            root.type.removable && storage.none { it.path == root.item.ref.string }
         }
     }
 
@@ -291,8 +290,8 @@ class ExplorerService(
             ?.firstOrNull()
         return when {
             newestChild == null -> targetRoot.copy(item = updated, thumbnail = null, thumbnailPath = "")
-            targetRoot.thumbnailPath == newestChild.path.string -> targetRoot
-            else -> targetRoot.copy(item = updated, thumbnail = Thumbnail.FilePath, thumbnailPath = newestChild.path.string)
+            targetRoot.thumbnailPath == newestChild.ref.string -> targetRoot
+            else -> targetRoot.copy(item = updated, thumbnail = Thumbnail.FilePath, thumbnailPath = newestChild.ref.string)
         }
     }
 
@@ -309,7 +308,7 @@ class ExplorerService(
                     targetRoot.stableId -> {
                         val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sorting)
                         val type = root.type.takeIf<NodeRootType.Storage,_>()?.run {
-                            val stat = StatFs(root.item.path.string)
+                            val stat = StatFs(root.item.ref.string)
                             val info = info.copy(total = stat.totalBytes, used = stat.totalBytes - stat.freeBytes)
                             copy(info = info)
                         } ?: root.type
@@ -388,11 +387,11 @@ class ExplorerService(
         // todo change uniqueId in state, create the new one state instance
         val renamed = item.rename(name, config.asSu)
         renderTab(key) {
-            val level = tree.find(item.parentPath)
+            val level = tree.find(item.parentRef)
             val index = level?.children?.indexOfFirst { it.uniqueId == item.uniqueId }
             if (index == null || index < 0) return
             level.children.items[index] = renamed
-            val levelIndex = tree.indexOfFirst { it.path == target.path }
+            val levelIndex = tree.indexOfFirst { it.ref == target.ref }
             if (levelIndex >= 0) {
                 tree[levelIndex] = renamed
                 var prev = renamed
@@ -413,7 +412,7 @@ class ExplorerService(
         renderTab(key) {
             val children = tree.find(dir.uniqueId)
                 ?.children
-                ?: tree.find(dir.parentPath)
+                ?: tree.find(dir.parentRef)
                     ?.children
                     ?.find { it.uniqueId == dir.uniqueId }
                     ?.children
@@ -437,7 +436,7 @@ class ExplorerService(
             states.updateState(to.uniqueId) {
                 nextState(to.uniqueId, copying = NodeOperation.Copying(isSource = false))
             }
-            val parent = tree.find(to.parentPath)
+            val parent = tree.find(to.parentRef)
             parent?.children?.run {
                 var index = indexOfFirst { it.isFile }
                 if (index < 0) index = size
@@ -453,7 +452,7 @@ class ExplorerService(
             states.updateState(to.uniqueId) {
                 nextState(to.uniqueId, copying = null)
             }
-            tree.find(new.parentPath)?.children?.run {
+            tree.find(new.parentRef)?.children?.run {
                 val index = indexOfFirst { it.uniqueId == new.uniqueId }
                 if (index < 0) return@run
                 items[index] = new
@@ -583,7 +582,7 @@ class ExplorerService(
     private suspend fun Node.deleteIn(key: NodeTabKey) {
         val result = delete(config.asSu)
         garden(key) {
-            tree.replaceItem(uniqueId, parentPath, result)
+            tree.replaceItem(uniqueId, parentRef, result)
             states.updateState(uniqueId) { null }
             store.emitRemoved(copy(children = null))
             lazyRender()
@@ -778,8 +777,8 @@ class ExplorerService(
     private fun Node.defineDirKind(levelIndex: Int = -1): NodeContent = when {
         levelIndex > 0 -> content
         content !is NodeContent.Directory -> content
-        internalStoragePath.length != (path.length.dec() - name.length) -> content
-        !path.isChildOf(internalStoragePath) -> content
+        internalStorageRef.length != (ref.length.dec() - name.length) -> content
+        !ref.isChildOf(internalStorageRef) -> content
         else -> ExplorerUtils.getDirectoryType(name)
             .takeIf { it != DirectoryKind.Ordinary }
             ?.let { content.copy(kind = it) }
@@ -808,7 +807,7 @@ class ExplorerService(
             val current = tree.findNode(item.uniqueId)
             current ?: return
             if (updated.error is NodeError.NoSuchFile) {
-                tree.replaceItem(item.uniqueId, item.parentPath, null)
+                tree.replaceItem(item.uniqueId, item.parentRef, null)
                 return render()
             }
             updated = current.updateWith(updated)
@@ -826,7 +825,7 @@ class ExplorerService(
 
     private fun resolveSizeAsync(key: NodeTabKey, item: Node) {
         appScope.launch {
-            val size = NativeBridge.usage(item.path, config.asSu).unwrapOrNull()
+            val size = NativeBridge.usage(item.ref, config.asSu).unwrapOrNull()
             when (size) {
                 null, item.size -> return@launch
             }
@@ -888,10 +887,10 @@ class ExplorerService(
         }
     }
 
-    private fun MutableList<Node>.replaceItem(item: Node) = replaceItem(item.uniqueId, item.parentPath, item)
+    private fun MutableList<Node>.replaceItem(item: Node) = replaceItem(item.uniqueId, item.parentRef, item)
 
-    private fun MutableList<Node>.replaceItem(uniqueId: Int, parentPath: NodePath, item: Node?): Boolean {
-        val parent = find(parentPath)
+    private fun MutableList<Node>.replaceItem(uniqueId: Int, parentRef: NodeRef, item: Node?): Boolean {
+        val parent = find(parentRef)
         val parentChildren = parent?.children?.items
         val index = parentChildren?.indexOfFirst { it.uniqueId == uniqueId } ?: -1
         var fails = 0
@@ -928,9 +927,9 @@ class ExplorerService(
 
     private fun List<Node>.findIndexed(uniqueId: Int): Pair<Int, Node?> = findWithIndex { it.uniqueId == uniqueId }
 
-    private fun List<Node>.find(path: NodePath): Node? = find { it.path == path }
+    private fun List<Node>.find(ref: NodeRef): Node? = find { it.ref == ref }
 
-    private fun List<Node>.findIndexed(path: NodePath): Pair<Int, Node?> = findWithIndex { it.path == path }
+    private fun List<Node>.findIndexed(ref: NodeRef): Pair<Int, Node?> = findWithIndex { it.ref == ref }
 
     private fun List<NodeStateImpl>.findState(uniqueId: Int): Pair<Int, NodeStateImpl?> = findWithIndex { it.uniqueId == uniqueId }
 }

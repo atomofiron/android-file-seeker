@@ -52,12 +52,11 @@ pub enum DeleteResult {
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]
-#[derive(uniffi::Record)]
-pub struct CopyPart {
-    pub path: KPath,
-    pub meta: Meta,
-    pub moved: bool,
-    //Err(String),
+#[derive(uniffi::Enum)]
+pub enum CopyPart {
+    Count(u32),
+    Progress(f32),
+    Err(KPath),
 }
 
 #[derive(Debug, Encode, Decode, PartialEq, Clone)]

@@ -118,10 +118,10 @@ class StickyTopDelegate(
         // don't use item.children
         val fromIndex = sticky.position.inc()
         val limitIndex = items.indexOfFirst(fromIndex, orElse = items.size) {
-            it.isOpened || it.parentPath != sticky.item.path
+            it.isOpened || it.parentRef != sticky.item.ref
         }
         for (holder in this) {
-            items.takeIf { !holder.item.isSeparator() && holder.item.parentPath == sticky.item.path }
+            items.takeIf { !holder.item.isSeparator() && holder.item.parentRef == sticky.item.ref }
                 ?.indexOfFirst(fromIndex) { it.uniqueId == holder.item.uniqueId }
                 ?.takeIf { it in fromIndex..<limitIndex }
                 ?.let { return holder.view.top }
@@ -139,7 +139,7 @@ class StickyTopDelegate(
                 // next opened dir below
                 !sticky.item.isDeepest && info.item.isOpened -> info.view.top - space
                 // skip children
-                info.item.parentPath == sticky.item.path -> continue
+                info.item.parentRef == sticky.item.ref -> continue
                 // nothing above
                 i == 0 -> return null
                 // the last child

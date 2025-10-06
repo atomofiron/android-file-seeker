@@ -36,7 +36,7 @@ class FinderService(
         val maxDepth = preferenceStore.maxDepthForSearch.value
         val asSu = preferenceStore.asSu.value
 
-        val targets = where.map { it.path }.toTypedArray()
+        val targets = where.toTypedArray()
         val inputData = FinderWorker.inputData(query, asSu, config, maxSize, maxDepth, targets)
         val request = OneTimeWorkRequest.Builder(FinderWorker::class.java)
             .setInputData(inputData)

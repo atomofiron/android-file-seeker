@@ -5,7 +5,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.*
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.model.explorer.NodePath
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
@@ -30,7 +30,7 @@ class TextViewerService(
     private val finderStore: FinderStore,
 ) {
     companion object {
-        fun searchInside(params: SearchParams, path: NodePath, asSu: Boolean): Rslt<TextSearchResult> {
+        fun searchInside(params: SearchParams, ref: NodeRef, asSu: Boolean): Rslt<TextSearchResult> {
             val template = when {
                 params.useRegex && params.ignoreCase -> Shell.GREP_BONS_IE
                 params.useRegex -> Shell.GREP_BONS_E
@@ -38,7 +38,7 @@ class TextViewerService(
                 else -> Shell.GREP_BONS
             }
             var count = 0
-            val cmd = Shell[template].format(params.query.escapeQuotes(), path.string)
+            val cmd = Shell[template].format(params.query.escapeQuotes(), ref.string)
             val lineIndexToMatches = hashMapOf<Int, MutableList<TextLineMatch>>()
             val output = Shell.exec(cmd, asSu) { line ->
                 val lineByteOffset = line.split(':')
@@ -66,9 +66,9 @@ class TextViewerService(
 
     private val asSu: Boolean get() = preferences.asSu.value
 
-    fun getFileSession(path: NodePath): TextViewerSession {
-        val item = explorerStore.currentItems.find { it.path == path }
-            ?: Node(path, content = NodeContent.Undefined)
+    fun getFileSession(ref: NodeRef): TextViewerSession {
+        val item = explorerStore.currentItems.find { it.ref == ref }
+            ?: Node(ref, content = NodeContent.Undefined)
         var session = findSession(item)
         if (session == null) {
             session = TextViewerSession(item)
@@ -183,7 +183,7 @@ class TextViewerService(
     }
 
     private fun TextViewerSession.searchInside(task: SearchTask): SearchTask {
-        return when (val result = searchInside(task.params, item.value.path, asSu)) {
+        return when (val result = searchInside(task.params, item.value.ref, asSu)) {
             is Rslt.Ok -> task.toEnded(result = result.value)
             is Rslt.Err -> task.toEnded(error = result.message)
         }

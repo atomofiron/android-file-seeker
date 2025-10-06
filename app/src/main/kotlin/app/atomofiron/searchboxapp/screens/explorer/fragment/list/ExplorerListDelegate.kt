@@ -68,7 +68,7 @@ class ExplorerListDelegate(
     fun isDeepestDirVisible(): Boolean? = deepestDir?.let { isVisible(it) }?.takeIf { !it || deepestDir?.isRoot == false }
 
     fun isVisible(item: Node): Boolean {
-        val index = items.indexOfFirst { it.path == item.path }
+        val index = items.indexOfFirst { it.ref == item.ref }
         return isVisible(index + rootAdapter.itemCount)
     }
 
@@ -103,7 +103,7 @@ class ExplorerListDelegate(
     }
 
     fun scrollTo(item: Node) {
-        val nodePosition = items.indexOfFirst { it.path == item.path }
+        val nodePosition = items.indexOfFirst { it.ref == item.ref }
         val position = nodePosition + rootAdapter.itemCount
         recyclerView.findViewHolderForAdapterPosition(position)
             ?.takeIf { recyclerView.run { it.itemView.top > paddingTop && it.itemView.bottom < height - paddingBottom } }
@@ -137,8 +137,8 @@ class ExplorerListDelegate(
     }
 
     fun highlight(item: Node) {
-        debugRequire(item.uniqueId == -item.path.uniqueId) { item.path.toString() }
-        val dir = items.find { it.uniqueId == item.path.uniqueId }
+        debugRequire(item.uniqueId == -item.ref.uniqueId) { item.ref.toString() }
+        val dir = items.find { it.uniqueId == item.ref.uniqueId }
         dir ?: return
         val holder = recyclerView.findViewHolderForItemId(dir.uniqueId.toLong())
         if (holder is ExplorerHolder) {

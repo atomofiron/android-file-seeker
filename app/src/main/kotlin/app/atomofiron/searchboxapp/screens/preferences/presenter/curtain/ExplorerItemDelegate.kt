@@ -13,9 +13,8 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.model.explorer.NodePath
-import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
+import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
@@ -33,9 +32,9 @@ class ExplorerItemDelegate(
         val properties = NodeProperties("drwxrwx---", "owner", "group", "4K", "2038-01-19", "03:14")
         val dirContent = NodeContent.Directory()
         val fileContent = NodeContent.Unknown
-        val items = Array(17) { Node(NodePath.Stub, NodePath.Stub, content = if (it < 3) dirContent else fileContent) }.toList()
+        val items = Array(17) { Node(NodeRef.Stub, NodeRef.Stub, content = if (it < 3) dirContent else fileContent) }.toList()
         val children = NodeChildren(items.toMutableList())
-        Node(path = NodePath("Android"), properties = properties, content = dirContent, children = children)
+        Node(ref = NodeRef("Android"), properties = properties, content = dirContent, children = children)
     }
     private val file = run {
         val appName = resources.value.getString(R.string.app_name)
@@ -45,7 +44,7 @@ class ExplorerItemDelegate(
         val properties = NodeProperties("drwxrwx---", "owner", "group", "47K", "2038-01-19", "03:14")
         val apkInfo = ApkInfo(Thumbnail(R.mipmap.ic_launcher), "", VERSION_NAME, 0, "", 0, 0, null, 0, null)
         val content = NodeContent.AndroidApp.apk(NodeRef(""), apkInfo)
-        Node(path = NodePath(name), properties = properties, content = content)
+        Node(ref = NodeRef(name), properties = properties, content = content)
     }
 
     private var composition = preferenceStore.explorerItemComposition.value

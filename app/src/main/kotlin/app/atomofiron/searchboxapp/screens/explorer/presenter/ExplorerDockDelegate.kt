@@ -61,7 +61,7 @@ class ExplorerDockDelegate @Inject constructor(
     private fun receive(data: ActivityMode.Receive) {
         val destination = store.currentNode.value
         destination ?: return
-        val inputData = ReceiveData(data.subject, data.uris, data.texts.map { it.toString() }, destination.path)
+        val inputData = ReceiveData(data.subject, data.uris, data.texts.map { it.toString() }, destination.ref)
         val request = OneTimeWorkRequest.Builder(ReceiveWorker::class.java)
             .setInputData(inputData.toWorkerData())
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)

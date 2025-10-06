@@ -35,7 +35,7 @@ class ExplorerRouter(
 
     fun showFile(item: Node) {
         if (item.content is NodeContent.Text) {
-            val arguments = TextViewerParams.arguments(item.path)
+            val arguments = TextViewerParams.arguments(item.ref)
             navigate(R.id.textViewerFragment, arguments)
         } else {
             openWith(item)

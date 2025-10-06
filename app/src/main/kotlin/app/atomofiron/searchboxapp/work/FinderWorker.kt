@@ -29,7 +29,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.model.explorer.NodePath
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchParams
@@ -78,7 +78,7 @@ class FinderWorker(
         private const val KEY_MAX_DEPTH = "KEY_MAX_DEPTH"
         private const val KEY_WHERE_PATH = "KEY_WHERE_PATH_"
 
-        fun inputData(query: String, asSu: Boolean, config: SearchOptions, maxSize: Int, maxDepth: Int, targets: Array<NodePath>) = Data.Builder()
+        fun inputData(query: String, asSu: Boolean, config: SearchOptions, maxSize: Int, maxDepth: Int, targets: Array<NodeRef>) = Data.Builder()
             .putString(KEY_QUERY, query)
             .putBoolean(KEY_USE_SU, asSu)
             .putBoolean(KEY_USE_REGEX, config.useRegex)
@@ -151,8 +151,8 @@ class FinderWorker(
                 else -> Shell[Shell.GREP_HCS]
             }
             val command = when {
-                item.isDirectory -> template.format(item.path, maxDepth, query.escapeQuotes())
-                item.isFile -> template.format(query.escapeQuotes(), item.path)
+                item.isDirectory -> template.format(item.ref, maxDepth, query.escapeQuotes())
+                item.isFile -> template.format(query.escapeQuotes(), item.ref)
                 else -> continue@forLoop
             }
             val output = Shell.exec(command, asSu, processObserver, forContentLineListener)
@@ -182,7 +182,7 @@ class FinderWorker(
             }
             val path = line.substring(0, index)
             val item = newNode(path)
-            val itemMatch = when (val result = TextViewerService.searchInside(params, item.path, asSu)) {
+            val itemMatch = when (val result = TextViewerService.searchInside(params, item.ref, asSu)) {
                 is Rslt.Ok -> result.value.toItemMatchMultiply(item)
                 is Rslt.Err -> ItemMatch.MultiplyError(item, count, result.message)
             }
@@ -200,7 +200,7 @@ class FinderWorker(
                 excludeDirs -> Shell[Shell.FIND_F]
                 else -> Shell[Shell.FIND_FD]
             }
-            val command = template.format(item.path, maxDepth)
+            val command = template.format(item.ref, maxDepth)
             val output = Shell.exec(command, asSu, processObserver, forNameLineListener)
             if (output.handleErrors(checkPoint, item)) {
                 searchByName(listOf(item))
@@ -212,7 +212,7 @@ class FinderWorker(
     private suspend fun Shell.Output.handleErrors(checkPoint: FinderResult, item: Node): Boolean {
         if (killed && !isStopped) {
             if (BuildConfig.DEBUG) {
-                logE("killed on ${item.path}")
+                logE("killed on ${item.ref}")
             }
             updateTask {
                 copy(result = checkPoint.copy(retries = checkPoint.retries.inc()))
@@ -227,7 +227,7 @@ class FinderWorker(
         return false
     }
     private val forNameLineListener: (String) -> Unit = { path ->
-        val name = NodePath(path).name
+        val name = NodeRef(path).name
         when {
             useRegex && !pattern.matcher(name).find() -> Unit
             !useRegex && !name.contains(query, ignoreCase) -> Unit
@@ -287,7 +287,7 @@ class FinderWorker(
             for (i in 0..Int.MAX_VALUE) {
                 val path = inputData.getByteArray("$KEY_WHERE_PATH$i")
                 path ?: break
-                Node(NodePath(path), content = NodeContent.Unknown).update(cacheConfig)
+                Node(NodeRef(path), content = NodeContent.Unknown).update(cacheConfig)
             }
             when {
                 forContent -> searchForContent(targets)
@@ -319,7 +319,7 @@ class FinderWorker(
         return Result.success(dataBuilder.build())
     }
 
-    private fun newNode(path: String) = Node(NodePath(path), rootId = task.uniqueId, content = NodeContent.Unknown).update(cacheConfig)
+    private fun newNode(path: String) = Node(NodeRef(path), rootId = task.uniqueId, content = NodeContent.Unknown).update(cacheConfig)
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return ForegroundInfo(hashCode(), foregroundNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)

@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.isContent
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.launch
 import app.atomofiron.searchboxapp.utils.launchable
@@ -112,7 +113,7 @@ class ApkService(
     fun launchApk(packageName: String) = context.launch(packageName)
 
     private fun NodeRef.stream() = when {
-        isContent -> context.contentResolver.openInputStream(path.string.toUri())
-        else -> FileInputStream(path.string)
+        isContent() -> context.contentResolver.openInputStream(string.toUri())
+        else -> FileInputStream(string)
     }
 }

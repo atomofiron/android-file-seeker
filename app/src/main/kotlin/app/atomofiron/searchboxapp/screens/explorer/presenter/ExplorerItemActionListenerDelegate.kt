@@ -24,7 +24,7 @@ class ExplorerItemActionListenerDelegate(
         val nodes: List<Node> = if (item.isChecked) {
             val checked = explorerStore.checked.value
             explorerStore.currentItems.filter { node ->
-                checked.any { node.path == it.path }
+                checked.any { node.ref == it.ref }
             }
         } else {
             listOf(item)
@@ -46,7 +46,7 @@ class ExplorerItemActionListenerDelegate(
     override fun onItemCheck(item: Node, toChecked: Boolean): Boolean {
         if (item.isOpened && toChecked) {
             val checked = explorerStore.checked.value
-                .filter { it.path.isChildOf(item.path) }
+                .filter { it.ref.isChildOf(item.ref) }
             if (checked.isEmpty()) {
                 interactor.check(currentTab, item, true)
             } else {
@@ -61,7 +61,7 @@ class ExplorerItemActionListenerDelegate(
         } else {
             interactor.check(currentTab, item, toChecked)
             val checked = explorerStore.checked.value
-                .filter { item.path.isChildOf(it.path) }
+                .filter { item.ref.isChildOf(it.ref) }
             interactor.check(currentTab, checked, false)
         }
         return true

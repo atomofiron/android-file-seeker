@@ -96,7 +96,7 @@ class TextViewerModule {
     fun textViewerSession(
         params: TextViewerParams,
         interactor: TextViewerInteractor,
-    ): TextViewerSession = interactor.fetchFileSession(params.path)
+    ): TextViewerSession = interactor.fetchFileSession(params.ref)
 
     @Provides
     @TextViewerScope

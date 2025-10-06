@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodePath
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
@@ -17,7 +17,7 @@ class TextViewerInteractor(
 ) {
     private val context = Dispatchers.IO
 
-    fun fetchFileSession(path: NodePath): TextViewerSession = textViewerService.getFileSession(path)
+    fun fetchFileSession(ref: NodeRef): TextViewerSession = textViewerService.getFileSession(ref)
 
     /** invoke the callback after success */
     fun readFileToLine(item: Node, index: Int, callback: (() -> Unit)? = null) {

@@ -51,16 +51,16 @@ sealed class SearchResult {
                     continue
                 }
                 val name = if (item.item.isDirectory) item.item.name + Const.SLASH else item.item.name
-                val line = String.format("[%s](%s)\n", name, item.item.path.string.replace(" ", "\\ "))
+                val line = String.format("[%s](%s)\n", name, item.item.ref.string.replace(" ", "\\ "))
                 data.append(line)
             }
             return data.toString()
         }
 
         fun removeItem(removed: Node): SearchResult {
-            val nothing = !matches.any { it.item.path.isChildOf(removed.path) }
+            val nothing = !matches.any { it.item.ref.isChildOf(removed.ref) }
             if (nothing) return this
-            val left = matches.filter { !it.item.path.isChildOf(removed.path) }
+            val left = matches.filter { !it.item.ref.isChildOf(removed.ref) }
             val items = matches.toMutableList()
             val count = left.sumOf { it.count }
             return FinderResult(inContent, count, items, countTotal.dec())
@@ -97,7 +97,7 @@ sealed class ItemMatch {
     abstract val item: Node
     abstract val count: Int
 
-    val path get() = item.path
+    val path get() = item.ref
     val isDirectory: Boolean get() = item.isDirectory
     val isCached: Boolean get() = item.isCached
     val isDeleting: Boolean get() = item.state.isDeleting

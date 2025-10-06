@@ -26,7 +26,7 @@ class ExplorerStore {
     private val _storage = MutableStateFlow<List<NodeStorage>>(emptyList())
     private val _currentTab = MutableStateFlow(middleTab)
     private val _currentNode = MutableStateFlow<Node?>(null)
-    private val _internalRoot = MutableStateFlow(Node.asRoot(NodePath(internalStoragePath), NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
+    private val _internalRoot = MutableStateFlow(Node.asRoot(NodeRef(internalStoragePath), NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
     private val _checked = MutableStateFlow<List<Node>>(listOf())
     private val _alerts = EventFlow<NodeError>()
     private val _removed = EventFlow<Node>()

@@ -22,6 +22,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.model.other.UniText
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.isContent
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.merge
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.getApksContent
@@ -132,10 +133,10 @@ class FileOperationsDelegate(
 
     private fun NodeContent.AndroidApp.resolve(resolver: ContentResolver?, signature: Boolean): Rslt<NodeContent.AndroidApp> {
         val stream = when {
-            !splitApk -> return getApkContent(ref.path.string, signature)
-            !ref.isContent -> FileInputStream(ref.path.string)
+            !splitApk -> return getApkContent(ref.string, signature)
+            !ref.isContent() -> FileInputStream(ref.string)
             resolver == null -> throw UnreachableException()
-            else -> resolver.openInputStream(ref.path.string.toUri())
+            else -> resolver.openInputStream(ref.string.toUri())
         }
         return getApksContent(stream, signature)
     }
