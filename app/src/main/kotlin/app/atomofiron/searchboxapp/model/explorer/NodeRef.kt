@@ -59,6 +59,11 @@ class NodeRef(val bytes: ByteArray) {
     init {
         debug {
             require(bytes.size <= 1 || bytes.last() != SLASH_BYTE) { "why ending slash? $string" }
+            var slashes = 0
+            for (i in bytes.indices) {
+                if (bytes[i] == SLASH_BYTE) slashes++ else slashes = 0
+                require(slashes <= 1 || bytes.getOrNull(i - 2) == ':'.code.toByte()) { "too many slashes: $string" }
+            }
         }
     }
 
@@ -77,7 +82,7 @@ class NodeRef(val bytes: ByteArray) {
     fun theSame(path: ByteArray): Boolean = bytes.contentEquals(path)
 
     fun isChildOf(ref: NodeRef): Boolean {
-        if (ref.length > length - 2 || get(ref.length) != SLASH_BYTE) {
+        if (ref.length >= length || get(ref.length) != SLASH_BYTE) {
             return false
         }
         for (i in ref.bytes.indices) {
