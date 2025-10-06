@@ -1,18 +1,18 @@
 use bincode::{Decode, Encode};
-use crate::ext::kpath::KPath;
+use crate::ext::raw_path::RawPath;
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 pub enum Request {
-    GetUsage(KPath),
-    GetMeta(KPath),
-    GetMetas(KPath),
-    GetTypedMeta(KPath),
-    GetTypedMetas(KPath),
-    CreateDir(KPath),
-    CreateFile(KPath),
-    Delete(KPath),
+    GetUsage(RawPath),
+    GetMeta(RawPath),
+    GetMetas(RawPath),
+    GetTypedMeta(RawPath),
+    GetTypedMetas(RawPath),
+    CreateDir(RawPath),
+    CreateFile(RawPath),
+    Delete(RawPath),
     TryRun,
-    Copy(KPath, KPath, bool),
+    Copy(RawPath, RawPath, bool),
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]

@@ -1,5 +1,5 @@
 use bincode::{Decode, Encode};
-use crate::ext::kpath::KPath;
+use crate::ext::raw_path::RawPath;
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
@@ -56,13 +56,13 @@ pub enum DeleteResult {
 pub enum CopyPart {
     Count(u32),
     Progress(f32),
-    Err(KPath),
+    Err(RawPath),
 }
 
 #[derive(Debug, Encode, Decode, PartialEq, Clone)]
 #[derive(uniffi::Record)]
 pub struct Meta {
-    pub path: KPath,
+    pub path: RawPath,
     pub access: String,
     pub owner: String,
     pub group: String,
