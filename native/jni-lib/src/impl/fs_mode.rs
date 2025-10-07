@@ -6,9 +6,9 @@ pub trait HumanReadableMode {
 impl HumanReadableMode for u32 {
 
     fn to_hr_mode(&self) -> String {
-        #[cfg(all(target_os = "android", any(target_arch = "aarch64", target_arch = "x86_64")))]
+        #[cfg(any(target_arch = "aarch64", target_arch = "x86_64"))]
         let mode = *self;
-        #[cfg(not(all(target_os = "android", any(target_arch = "aarch64", target_arch = "x86_64"))))]
+        #[cfg(any(target_arch = "arm", target_arch = "x86"))]
         let mode = *self as u16;
         let file_type = match mode & libc::S_IFMT {
             libc::S_IFDIR => 'd',

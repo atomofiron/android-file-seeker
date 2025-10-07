@@ -1,4 +1,3 @@
-mod bindgen;
 mod su_bridge;
 pub mod bridge;
 pub mod protocol;

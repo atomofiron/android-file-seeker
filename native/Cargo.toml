@@ -2,5 +2,6 @@
 members = [
     "jni-lib",
     "cli-bin",
+    "uniffi-gen",
 ]
 resolver = "2"
