@@ -673,6 +673,7 @@ object ExplorerUtils {
         ref.name.hasExt(EXT_OLZ) -> ifNotCached { NodeContent.Osu.LazerMap() }
         ref.name.hasExt(EXT_OSR) -> ifNotCached { NodeContent.Osu.Replay() }
         ref.name.hasExt(EXT_OSB) -> ifNotCached { NodeContent.Osu.Storyboard() }
+        ref.name.hasExt(EXT_XPI) -> ifNotCached { NodeContent.Firefox }
         else -> NodeContent.Other
     }
 

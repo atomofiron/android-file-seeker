@@ -177,6 +177,7 @@ sealed class NodeContent(
     data object Flash : File()
     data object Cert : File()
     data object Dmg : File()
+    data object Firefox : File()
     data object Other : File()
     data object Unknown : File()
 }
