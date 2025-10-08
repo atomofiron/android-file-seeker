@@ -113,9 +113,9 @@ class ExplorerInteractor(
         }
     }
 
-    fun create(key: NodeTabKey, dir: Node, name: String, directory: Boolean) {
+    fun create(key: NodeTabKey, parent: Node, name: String, directory: Boolean) {
         scope.launch(context) {
-            service.tryCreate(key, dir, name, directory)
+            service.tryCreate(key, parent, name, directory)
         }
     }
 

@@ -406,15 +406,15 @@ class ExplorerService(
         }
     }
 
-    suspend fun tryCreate(key: NodeTabKey, dir: Node, name: String, directory: Boolean) {
-        val item = ExplorerUtils.create(dir, name, directory, config.asSu)
+    suspend fun tryCreate(key: NodeTabKey, parent: Node, name: String, directory: Boolean) {
+        val item = ExplorerUtils.create(parent, name, directory, config.asSu)
         item ?: return
         renderTab(key) {
-            val children = tree.find(dir.uniqueId)
+            val children = tree.find(parent.uniqueId)
                 ?.children
-                ?: tree.find(dir.parentRef)
+                ?: tree.find(parent.parentRef)
                     ?.children
-                    ?.find { it.uniqueId == dir.uniqueId }
+                    ?.find { it.uniqueId == parent.uniqueId }
                     ?.children
                 ?: return
             when {

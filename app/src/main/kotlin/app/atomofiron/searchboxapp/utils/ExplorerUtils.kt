@@ -153,10 +153,10 @@ object ExplorerUtils {
     }
 
     fun create(parent: Node, name: String, directory: Boolean, asSu: Boolean): Node? {
-        val targetRef = parent.ref + name
+        val target = parent.ref + name
         val output = when {
-            directory -> NativeBridge.createDir(targetRef, asSu)
-            else -> NativeBridge.createFile(targetRef, asSu)
+            directory -> NativeBridge.createDir(target, asSu)
+            else -> NativeBridge.createFile(target, asSu)
         }
         val content = when {
             directory -> NodeContent.Directory()
@@ -166,7 +166,7 @@ object ExplorerUtils {
             is Rslt.Ok -> output.value
             is Rslt.Err -> return null
         }
-        return Node(ref = targetRef, parentRef = parent.ref, rootId = parent.rootId, properties = meta.toProperties(), content = content)
+        return Node(ref = target, parentRef = parent.ref, rootId = parent.rootId, properties = meta.toProperties(), content = content)
     }
 
     fun Node.Companion.asRoot(ref: NodeRef, type: NodeRootType): Node {
