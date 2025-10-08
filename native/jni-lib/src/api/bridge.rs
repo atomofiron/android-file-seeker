@@ -1,10 +1,10 @@
 use std::sync::Arc;
-use crate::api::protocol::{CopyCollector, DeleteResult, MetaResult, MetasResult, SimpleResult, TypedMetaResult, TypedMetasResult, UsageResult};
-use crate::api::su_bridge::as_su;
+use crate::api::protocol::{ProgressCollector, DeleteResult, MetaResult, MetasResult, SimpleResult, TypedMetaResult, TypedMetasResult, UsageResult};
+use crate::api::su_bridge::{as_su, as_su_with_progress};
 use crate::api::su_protocol::Request;
 use crate::ext::raw_path::{RawPath, KPathExt};
 use crate::r#impl::copy::copy_impl;
-use crate::r#impl::delete::delete;
+use crate::r#impl::delete::delete_impl;
 use crate::r#impl::meta::{meta, meta_with_error, metas};
 use crate::r#impl::other::{new_dir, new_file, usage};
 use crate::r#impl::r#type::{file_type, file_types};
@@ -40,7 +40,7 @@ pub fn delete_by(path: RawPath, run_as_su: Option<String>) -> DeleteResult {
             .unwrap_or_else(|e| DeleteResult::Err(e.to_string(), None))
     }
     let path = path.buf();
-    match delete(&path) {
+    match delete_impl(&path) {
         Ok(0) => DeleteResult::Ok(meta(&path).ok()),
         Ok(err_count) => DeleteResult::ErrCount(err_count),
         Err(e) => DeleteResult::Err(e.to_string(), Some(meta_with_error(&path, e.to_string()))),
@@ -113,10 +113,10 @@ pub fn copy(
     to: RawPath,
     moving: bool,
     run_as_su: Option<String>,
-    collector: Arc<dyn CopyCollector>,
+    collector: Arc<dyn ProgressCollector>,
 ) -> SimpleResult {
     if let Some(bin_path) = run_as_su {
-        return as_su::<SimpleResult>(Request::Copy(from, to, moving), bin_path)
+        return as_su_with_progress::<SimpleResult>(Request::Copy(from, to, moving), bin_path, Some(collector))
             .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
     }
     match copy_impl(from.buf(), to.buf(), moving, collector) {

@@ -23,8 +23,8 @@ pub enum Response {
 
 pub type FrameLength = [u8; 4];
 
-#[allow(dead_code)]
-const FINAL_FRAME: FrameLength = [0; 4];
+pub const FINAL_FRAME: usize = 0;
+pub const FINAL_FRAME_BYTES: FrameLength = [0; 4];
 
 pub fn frame_length() -> FrameLength { [0; 4] }
 

@@ -14,9 +14,7 @@ object Shell {
     private const val TOYBOX = "{toybox}"
     var toyboxPath = ToyboxVariant.System.path
 
-    const val COPY = "{toybox} cp -r '%s' '%s'"
     const val VERSION = "{toybox} --version"
-    const val MV = "{toybox} mv '%s' '%s'"
 
     // grep: No 'E' with 'F'
     const val FIND_GREP_HCS = "{toybox} find '%s' -type f -maxdepth %d -print0 | xargs -0r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: -v ORS='\\0' '{print \$1}' | xargs -0r {toybox} grep -Hcs -e '%s'"

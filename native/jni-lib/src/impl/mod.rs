@@ -1,3 +1,4 @@
+mod copy_method;
 mod hr_size;
 mod fs_mode;
 mod hr_users;

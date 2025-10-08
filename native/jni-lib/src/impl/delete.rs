@@ -1,13 +1,14 @@
-use crate::common::Rslt;
+use crate::common::{Rslt, OKI};
 use libc::{c_int, closedir, dirent, mode_t, opendir, readdir, DT_DIR};
 use std::ffi::{CStr, CString};
 use std::io;
+use std::ops::Range;
 use std::os::unix::ffi::OsStrExt;
 use std::path::PathBuf;
+use std::sync::mpsc::{channel, Sender};
+use crate::ext::result::ResultExt;
 
 type ErrCount = u32;
-
-const OK: c_int = 0;
 
 /*#[cfg(all(target_os = "android", target_arch = "x86"))]
 const SYS_UNLINKAT2: c_int = 453;
@@ -17,16 +18,20 @@ const SYS_UNLINKAT2: libc::c_long = 437;
 const SYS_UNLINKAT2: c_int = 451;
 #[cfg(all(target_os = "android", target_arch = "aarch64"))]
 const SYS_UNLINKAT2: libc::c_long = 451;
-#[cfg(any(target_os = "macos", target_os = "windows"))]
-const SYS_UNLINKAT2: c_int = 281;
+
 const AT_RECURSIVE: c_int = 0x200;*/
 
-const CUR_DIR: &[u8; 1] = b".";
+const CURRENT_DIR: &[u8; 1] = b".";
 const PARENT_DIR: &[u8; 2] = b"..";
 
-pub fn delete(path: &PathBuf) -> Rslt<ErrCount> {
+pub fn delete_impl(path: &PathBuf) -> Rslt<ErrCount> {
+    let (tx, _rx) = channel::<(u32, f64)>();
+    delete(path, &tx, 0.0..1.0)
+}
+
+pub fn delete(path: &PathBuf, _tx: &Sender<(u32, f64)>, _range: Range<f64>) -> Rslt<ErrCount> {
     let c_path = CString::new(path.as_os_str().as_bytes())?;
-    let st_dev = get_dev(&c_path);
+    let st_dev = get_dev(&c_path)?;
     return match delete_recursively(&c_path, false, st_dev) {
         Ok(0) => Ok(0),
         Ok(_) => delete_recursively(&c_path, false, st_dev),
@@ -35,7 +40,7 @@ pub fn delete(path: &PathBuf) -> Rslt<ErrCount> {
 }
 
 pub fn delete_recursively(path: &CString, as_dir: bool, st_dev: mode_t) -> Rslt<ErrCount> {
-    if get_dev(path) != st_dev || call_delete(path, as_dir) == OK {
+    if get_dev(path)? != st_dev || call_delete(path, as_dir)? == OKI {
         return Ok(0);
     }
     let error = io::Error::last_os_error()
@@ -73,7 +78,7 @@ pub fn delete_children(path: &CString, st_dev: mode_t) -> Rslt<ErrCount> {
             }
             let name = CStr::from_ptr((*entry).d_name.as_ptr())
                 .to_bytes();
-            if name == CUR_DIR || name == PARENT_DIR {
+            if name == CURRENT_DIR || name == PARENT_DIR {
                 continue;
             }
             let parent = path.to_bytes();
@@ -94,24 +99,25 @@ pub fn delete_children(path: &CString, st_dev: mode_t) -> Rslt<ErrCount> {
     }
 }
 
-fn call_delete(path: &CString, as_dir: bool) -> c_int {
+fn call_delete(path: &CString, as_dir: bool) -> Rslt<c_int> {
     let flags = match as_dir {
         true => libc::AT_REMOVEDIR,
         false => 0,
     };
     unsafe {
-        let c_path = path.as_ptr() as *const libc::c_char;
-        libc::unlinkat(libc::AT_FDCWD, c_path, flags) as c_int
+        let c_path: *const libc::c_char = path.as_ptr().try_into()?;
+        let code: c_int = libc::unlinkat(libc::AT_FDCWD, c_path, flags).try_into()?;
+        return Ok(code)
     }
 }
 
-fn get_dev(path: &CString) -> mode_t {
+fn get_dev(path: &CString) -> Rslt<mode_t> {
     let mut stat: libc::stat = unsafe { std::mem::zeroed() };
     let result = unsafe {
         libc::stat(path.as_ptr(), &mut stat)
     };
     return match result {
-        0 => stat.st_mode as mode_t,
-        _ => 0,
+        OKI => stat.st_mode.try_into().boxed(),
+        _ => Err(format!("Dev stat result: {result}").into()),
     }
 }

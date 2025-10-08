@@ -1,7 +1,12 @@
 use std::error::Error;
 use bincode::config::Configuration;
+use libc::{c_int, c_long, ssize_t};
 
 pub type Rslt<T> = Result<T, Box<dyn Error>>;
+
+pub const OKI: c_int = 0;
+pub const OKL: c_long = 0;
+pub const OKS: ssize_t = 0;
 
 pub fn config() -> Configuration { bincode::config::standard() }
 

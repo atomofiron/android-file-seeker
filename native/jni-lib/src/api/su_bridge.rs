@@ -1,14 +1,14 @@
-use crate::api::protocol::SimpleResult;
-use crate::api::su_protocol::{frame_length, from_len_frame, to_len_frame, Request, Response};
+use crate::api::protocol::{Progress, ProgressCollector, SimpleResult};
+use crate::api::su_protocol::{frame_length, from_len_frame, to_len_frame, Request, Response, FINAL_FRAME};
 use crate::common::{config, Rslt};
 use crate::ext::option::OptionExt;
+use crate::ext::result::ResultExt;
 use bincode::{decode_from_slice, encode_to_vec, Decode};
 use once_cell::sync::Lazy;
 use std::io;
 use std::io::{Error, Read, Write};
 use std::process::{Child, Command, ExitStatus, Stdio};
-use std::sync::Mutex;
-use crate::ext::result::ResultExt;
+use std::sync::{Arc, Mutex};
 
 static CHILDREN: Lazy<Mutex<Vec<Child>>> = Lazy::new(|| {
     Mutex::new(Vec::new())
@@ -21,6 +21,14 @@ fn try_as_su(bin_path: String) -> SimpleResult {
 }
 
 pub fn as_su<D: Decode<()>>(request: Request, bin_path: String) -> Rslt<D> {
+    as_su_with_progress(request, bin_path, None)
+}
+
+pub fn as_su_with_progress<D: Decode<()>>(
+    request: Request,
+    bin_path: String,
+    collector: Option<Arc<dyn ProgressCollector>>,
+) -> Rslt<D> {
     let mut child = {
         CHILDREN.lock()?.pop()
     }.or_then(|| new_child(bin_path))?;
@@ -32,6 +40,10 @@ pub fn as_su<D: Decode<()>>(request: Request, bin_path: String) -> Rslt<D> {
     stdin.write_all(&len_buf)?;
     stdin.write_all(&bytes)?;
     stdin.flush()?;
+
+    if let Some(collector) = collector {
+        read_progress(&mut child, collector)?;
+    }
 
     let stdout = child.stdout
         .as_mut().ok_or("failed to open stdout")?;
@@ -60,6 +72,26 @@ fn new_child(bin_path: String) -> io::Result<Child> {
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
         .spawn()
+}
+
+fn read_progress(child: &mut Child, collector: Arc<dyn ProgressCollector>) -> Rslt<()> {
+    let stdout = child.stdout
+        .as_mut().ok_or("failed to open stdout for progress")?;
+    loop {
+        let mut len_buf = frame_length();
+        let read_result = stdout.read_exact(&mut len_buf);
+        if let Err(e) = read_result {
+            return Err(get_error(child, e))?;
+        }
+        let len = from_len_frame(len_buf);
+        if len == FINAL_FRAME {
+            return Ok(());
+        }
+        let mut bytes = vec![0u8; len];
+        stdout.read_exact(&mut bytes)?;
+        let (progress, _) = decode_from_slice::<Progress,_>(&bytes, config())?;
+        collector.invoke(progress)
+    }
 }
 
 fn get_error(child: &mut Child, error: Error) -> String {

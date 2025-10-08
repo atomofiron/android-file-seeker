@@ -53,9 +53,8 @@ pub enum DeleteResult {
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
-pub enum CopyPart {
-    Count(u32),
-    Progress(f32),
+pub enum Progress {
+    Step(u32, f64),
     Err(RawPath),
 }
 
@@ -81,6 +80,10 @@ pub struct TypedMeta {
 }
 
 #[uniffi::export(with_foreign)]
-pub trait CopyCollector: Send + Sync {
-    fn invoke(&self, part: CopyPart);
+pub trait ProgressCollector: Send + Sync {
+    fn invoke(&self, part: Progress);
+}
+
+impl ProgressCollector for () {
+    fn invoke(&self, _: Progress) { }
 }

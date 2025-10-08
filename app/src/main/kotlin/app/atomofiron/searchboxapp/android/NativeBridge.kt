@@ -4,12 +4,12 @@ import android.content.Context
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
-import uniffi.native_lib.CopyCollector
-import uniffi.native_lib.CopyPart
 import uniffi.native_lib.DeleteResult
 import uniffi.native_lib.Meta
 import uniffi.native_lib.MetaResult
 import uniffi.native_lib.MetasResult
+import uniffi.native_lib.Progress
+import uniffi.native_lib.ProgressCollector
 import uniffi.native_lib.SimpleResult
 import uniffi.native_lib.TypedMeta
 import uniffi.native_lib.TypedMetaResult
@@ -105,9 +105,9 @@ object NativeBridge {
         }
     }
 
-    fun copy(from: NodeRef, to: NodeRef, move: Boolean, asSu: Boolean, collector: (part: CopyPart) -> Unit): Rslt<Unit> {
-        val collector = object : CopyCollector {
-            override fun invoke(part: CopyPart) = collector(part)
+    fun copy(from: NodeRef, to: NodeRef, move: Boolean = false, asSu: Boolean, collector: (part: Progress) -> Unit): Rslt<Unit> {
+        val collector = object : ProgressCollector {
+            override fun invoke(part: Progress) = collector(part)
         }
         val response = uniffi.native_lib.copy(from.bytes, to.bytes, move, runAsSu = binPath.takeIf { asSu }, collector)
         return when (response) {

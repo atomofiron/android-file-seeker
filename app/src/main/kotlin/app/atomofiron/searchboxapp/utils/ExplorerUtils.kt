@@ -144,11 +144,13 @@ object ExplorerUtils {
     private const val EXT_OSB = ".osb" // osu storyboard
 
     fun copy(from: Node, to: Node, asSu: Boolean): Node {
-        val output = Shell.exec(Shell[Shell.COPY].format(from.ref, to.ref), asSu)
+        val result = NativeBridge.copy(from.ref, to.ref, asSu = asSu) {
+            // todo
+        }
         val new = to.update(CacheConfig(asSu), ensureCached = false)
-        return when {
-            output.success -> new
-            else -> from.copy(error = output.error.toNodeError())
+        return when (result) {
+            is Rslt.Ok -> new
+            is Rslt.Err -> from.copy(error = result.message.toNodeError())
         }
     }
 
@@ -567,10 +569,12 @@ object ExplorerUtils {
 
     fun Node.rename(name: String, asSu: Boolean): Node {
         val targetRef = parentRef + name
-        val output = Shell.exec(Shell[Shell.MV].format(ref, targetRef), asSu)
-        return when {
-            output.success -> move(name = name).copy(error = null)
-            else -> copy(error = output.error.toNodeError())
+        val result = NativeBridge.copy(from = ref, to = targetRef, asSu = asSu) {
+            // todo
+        }
+        return when (result) {
+            is Rslt.Ok -> move(name = name).copy(error = null)
+            is Rslt.Err -> copy(error = result.message.toNodeError())
         }
     }
 
