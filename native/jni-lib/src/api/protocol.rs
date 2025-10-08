@@ -51,11 +51,12 @@ pub enum DeleteResult {
     Err(String, Option<Meta>),
 }
 
-#[derive(Debug, Encode, Decode, PartialEq)]
-#[derive(uniffi::Enum)]
-pub enum Progress {
-    Step(u32, f64),
-    Err(RawPath),
+#[derive(Debug, Encode, Decode, PartialEq, Clone)]
+#[derive(uniffi::Record)]
+pub struct Progress {
+    pub count: u32,
+    pub errors: u32,
+    pub progress: f32,
 }
 
 #[derive(Debug, Encode, Decode, PartialEq, Clone)]
@@ -81,7 +82,7 @@ pub struct TypedMeta {
 
 #[uniffi::export(with_foreign)]
 pub trait ProgressCollector: Send + Sync {
-    fn invoke(&self, part: Progress);
+    fn invoke(&self, progress: Progress);
 }
 
 impl ProgressCollector for () {

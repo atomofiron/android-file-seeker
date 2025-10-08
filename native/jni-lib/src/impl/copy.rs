@@ -1,8 +1,12 @@
 // with the support of Sonnet 4.5
 
+use crate::api::protocol::{Progress, ProgressCollector};
 use crate::common::{Rslt, OKI};
+use crate::ext::raw_path::RawPath;
 use crate::r#impl::copy_method::CopyMethod;
 use crate::r#impl::delete::delete;
+use crate::r#impl::progress::ProgressChange;
+use libc::off_t;
 use std::ffi::CString;
 use std::fs::{self, DirEntry, File, Metadata};
 use std::io::{self, Read, Write};
@@ -11,10 +15,8 @@ use std::os::unix::ffi::OsStrExt;
 use std::os::unix::fs::{MetadataExt, PermissionsExt};
 use std::os::unix::io::AsRawFd;
 use std::path::{Path, PathBuf};
-use std::sync::Arc;
-use crate::api::protocol::{ProgressCollector, Progress};
 use std::sync::mpsc::{channel, Sender};
-use libc::off_t;
+use std::sync::Arc;
 
 const BYTES_LEFT: &str = "bytes left";
 const INVALID_PATH: &str = "Invalid path";
@@ -28,16 +30,23 @@ pub fn copy_impl(
     moving: bool,
     collector: Arc<dyn ProgressCollector>,
 ) -> Rslt<()> {
-    collector.invoke(Progress::Step(0, 0.0));
     let method = CopyMethod::detect();
-    let (tx, rx) = channel::<(u32, f64)>();
+    let (tx, rx) = channel::<ProgressChange>();
     let handle = std::thread::spawn(move || {
+        let mut progress = Progress::new();
+        collector.invoke(progress.clone());
+        let mut errors: Vec<RawPath> = Vec::new();
         loop {
-            if let Ok((count, range)) = rx.recv() {
-                collector.invoke(Progress::Step(count, range));
-                continue
+            match rx.recv() {
+                Err(_) => break,
+                Ok(ProgressChange::Increment(new)) => progress.inc(new),
+                Ok(ProgressChange::Update(new)) => progress.update(new),
+                Ok(ProgressChange::Err(path, new)) => {
+                    progress.inc_error(new);
+                    errors.push(path)
+                },
             }
-            break
+            collector.invoke(progress.clone());
         }
     });
     if moving {
@@ -61,27 +70,27 @@ fn copy_recursive(
     from: &Path,
     to: &Path,
     method: CopyMethod,
-    tx: &Sender<(u32, f64)>,
-    range: Range<f64>,
+    tx: &Sender<ProgressChange>,
+    range: Range<f32>,
 ) -> Rslt<()> {
     let metadata = fs::symlink_metadata(from)?;
     if metadata.is_symlink() {
         let target = fs::read_link(from)?;
         std::os::unix::fs::symlink(target, to)?;
         copy_symlink_metadata(&metadata, to)?;
-        tx.send((1, range.end))?;
+        tx.send(ProgressChange::Increment(range.end))?;
     } else if metadata.is_dir() {
         fs::create_dir_all(to)?;
 
         let children: Vec<DirEntry> = fs::read_dir(from)
             ?.collect::<Result<_, _>>()?;
         let child_count = children.len();
-        let step = (range.end - range.start) / child_count as f64;
+        let step = (range.end - range.start) / child_count as f32;
         for (i, entry) in children.into_iter().enumerate() {
             let from_path = entry.path();
             let to_path = to.join(entry.file_name());
 
-            let offset = step * i as f64;
+            let offset = step * i as f32;
             let start = range.start + offset;
             let range = start..(start + step);
             copy_recursive(&from_path, &to_path, method, tx, range)?;
@@ -98,8 +107,8 @@ fn copy_file(
     to: &Path,
     metadata: &Metadata,
     method: CopyMethod,
-    tx: &Sender<(u32, f64)>,
-    range: Range<f64>,
+    tx: &Sender<ProgressChange>,
+    range: Range<f32>,
 ) -> Rslt<()> {
     match method {
         CopyMethod::CopyFileRange => copy_file_range(from, to, metadata.len(), tx, range),
@@ -114,8 +123,8 @@ fn copy_file_range(
     from: &Path,
     to: &Path,
     len: u64,
-    tx: &Sender<(u32, f64)>,
-    range: Range<f64>,
+    tx: &Sender<ProgressChange>,
+    range: Range<f32>,
 ) -> Rslt<()> {
     let src = File::open(from)?;
     let dst = File::create(to)?;
@@ -157,8 +166,8 @@ fn sendfile(
     from: &Path,
     to: &Path,
     len: u64,
-    tx: &Sender<(u32, f64)>,
-    range: Range<f64>,
+    tx: &Sender<ProgressChange>,
+    range: Range<f32>,
 ) -> Rslt<()> {
     let src = File::open(from)?;
     let dst = File::create(to)?;
@@ -199,8 +208,8 @@ fn buffered(
     from: &Path,
     to: &Path,
     len: u64,
-    tx: &Sender<(u32, f64)>,
-    range: Range<f64>,
+    tx: &Sender<ProgressChange>,
+    range: Range<f32>,
 ) -> Rslt<()> {
     let mut src = File::open(from)?;
     let mut dst = File::create(to)?;
@@ -277,14 +286,17 @@ fn copy_symlink_metadata(metadata: &Metadata, to: &Path) -> Rslt<()> {
 fn send(
     remaining: u64,
     len: u64,
-    tx: &Sender<(u32, f64)>,
-    range: &Range<f64>,
+    tx: &Sender<ProgressChange>,
+    range: &Range<f32>,
 ) -> Rslt<()> {
-    let inc = if remaining == 0 { 1 } else { 0 };
     let step = range.end - range.start;
-    let copied = (len - remaining) as f64;
-    let progress = if len == 0 { 1.0 } else { copied / len as f64 };
+    let copied = (len - remaining) as f32;
+    let progress = if len == 0 { 1.0 } else { copied / len as f32 };
     let progress = range.start + step * progress;
-    tx.send((inc, progress))?;
+    let change = match remaining {
+        0 => ProgressChange::Increment(progress),
+        _ => ProgressChange::Update(progress),
+    };
+    tx.send(change)?;
     return Ok(());
 }

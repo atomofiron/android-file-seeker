@@ -105,9 +105,15 @@ object NativeBridge {
         }
     }
 
-    fun copy(from: NodeRef, to: NodeRef, move: Boolean = false, asSu: Boolean, collector: (part: Progress) -> Unit): Rslt<Unit> {
+    fun copy(
+        from: NodeRef,
+        to: NodeRef,
+        move: Boolean = false,
+        asSu: Boolean,
+        collector: (Progress) -> Unit,
+    ): Rslt<Unit> {
         val collector = object : ProgressCollector {
-            override fun invoke(part: Progress) = collector(part)
+            override fun invoke(progress: Progress) = collector(progress)
         }
         val response = uniffi.native_lib.copy(from.bytes, to.bytes, move, runAsSu = binPath.takeIf { asSu }, collector)
         return when (response) {

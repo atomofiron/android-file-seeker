@@ -7,6 +7,7 @@ use std::os::unix::ffi::OsStrExt;
 use std::path::PathBuf;
 use std::sync::mpsc::{channel, Sender};
 use crate::ext::result::ResultExt;
+use crate::r#impl::progress::ProgressChange;
 
 type ErrCount = u32;
 
@@ -25,11 +26,11 @@ const CURRENT_DIR: &[u8; 1] = b".";
 const PARENT_DIR: &[u8; 2] = b"..";
 
 pub fn delete_impl(path: &PathBuf) -> Rslt<ErrCount> {
-    let (tx, _rx) = channel::<(u32, f64)>();
+    let (tx, _rx) = channel::<ProgressChange>();
     delete(path, &tx, 0.0..1.0)
 }
 
-pub fn delete(path: &PathBuf, _tx: &Sender<(u32, f64)>, _range: Range<f64>) -> Rslt<ErrCount> {
+pub fn delete(path: &PathBuf, _tx: &Sender<ProgressChange>, _range: Range<f64>) -> Rslt<ErrCount> {
     let c_path = CString::new(path.as_os_str().as_bytes())?;
     let st_dev = get_dev(&c_path)?;
     return match delete_recursively(&c_path, false, st_dev) {

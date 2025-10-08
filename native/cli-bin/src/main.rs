@@ -71,7 +71,7 @@ fn write_the_end() {
 struct ProgressCollectorImpl;
 
 impl ProgressCollector for ProgressCollectorImpl {
-    fn invoke(&self, part: Progress) {
-        write_response(part)
+    fn invoke(&self, progress: Progress) {
+        write_response(progress)
     }
 }
