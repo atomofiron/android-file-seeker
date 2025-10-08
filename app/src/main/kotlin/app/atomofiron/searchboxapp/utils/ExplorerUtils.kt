@@ -38,8 +38,6 @@ object ExplorerUtils {
     // зато насколько всё становится проще
     val packageManager = MutableWeakProperty<PackageManager>()
 
-    private val ROOT_PARENT_REF = NodeRef(ByteArray(0))
-
     private const val DIR_CHAR = 'd'
     private const val LINK_CHAR = 'l'
     private const val FILE_CHAR = '-'
@@ -174,24 +172,20 @@ object ExplorerUtils {
     fun Node.Companion.asRoot(ref: NodeRef, type: NodeRootType): Node {
         return Node(
             ref = ref,
-            parentRef = ROOT_PARENT_REF,
             properties = NodeProperties(),
             content = NodeContent.Directory(rootType = type),
         )
     }
 
-    private fun Meta.toProperties(size: String = ""): NodeProperties {
-        val isFile = access.firstOrNull() == FILE_CHAR
-        return NodeProperties(
-            access = access,
-            owner = owner,
-            group = group,
-            date = date,
-            time = time,
-            length = if (!isFile) 0 else length.toLong(),
-            size = this.size.takeIf { it.isNotEmpty() } ?: size,
-        )
-    }
+    private fun Meta.toProperties(size: String = "") = NodeProperties(
+        access = access,
+        owner = owner,
+        group = group,
+        date = date,
+        time = time,
+        length = if (access.firstOrNull() == FILE_CHAR) length.toLong() else 0,
+        size = this.size.takeIf { it.isNotEmpty() } ?: size,
+    )
 
     private const val DIMENS = "BKMGTPEZYRQ"
     private fun Long.toSize(): String {
