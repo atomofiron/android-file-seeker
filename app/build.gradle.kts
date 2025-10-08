@@ -1,7 +1,5 @@
 import com.google.protobuf.gradle.id
-import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import java.io.File
 import org.gradle.api.tasks.Exec
 
 plugins {
@@ -121,6 +119,7 @@ val targets = arrayOf(
 
 tasks.register<Exec>(taskBuildNative) {
     group = "rust"
+    environment("CARGO_TERM_COLOR", "always")
     workingDir(nativeDirPath)
     commandLine(
         cargoPath, "ndk",
@@ -133,27 +132,32 @@ tasks.register<Exec>(taskBuildNative) {
         "build", "--release",
         "-p", nativeLib,
         "-p", nativeBin,
-    ).apply {
-        println("for manual use: cd $nativeDirPath && ${commandLine.joinToString(separator = " ")}\n")
-    }
+    )
+    print()
     isIgnoreExitValue = false
+    errorOutput = System.out
+    standardOutput = System.out
 }
 
 tasks.register<Exec>(taskGenerateUniffiBindings) {
     group = "rust"
+    environment("CARGO_TERM_COLOR", "always")
+    environment("DEVELOPER_DIR", "/Library/Developer/CommandLineTools") // for MacOS only
     workingDir(nativeDirPath)
     commandLine(
         cargoPath, "run",
-        "--bin", "uniffi-bindgen", "generate",
+        "--bin", "uniffi-gen", "generate",
         "--library", "target/aarch64-linux-android/release/lib$nativeLibName.so",
         "--language", "kotlin", "--no-format",
         "--out-dir", "../app/$kotlinDir",
-    ).apply {
-        println("for manual use: cd $nativeDirPath && ${commandLine.joinToString(separator = " ")}\n")
-    }
-    environment("DEVELOPER_DIR", "/Library/Developer/CommandLineTools")
+    )
+    print()
     isIgnoreExitValue = false
+    errorOutput = System.out
+    standardOutput = System.out
 }
+
+fun Exec.print() = println("for manual use: cd $workingDir && ${commandLine.joinToString(separator = " ")}")
 
 tasks.register<Copy>(taskCopyNativeBins) {
     group = "rust"
@@ -165,10 +169,11 @@ tasks.register<Copy>(taskCopyNativeBins) {
         }
     }
     into("src/main/assets/$nativeBin")
+    dependsOn(taskBuildNative)
 }
 
 tasks.named(taskPreBuild) {
-    dependsOn(taskBuildNative, taskGenerateUniffiBindings, taskCopyNativeBins)
+    dependsOn(taskGenerateUniffiBindings, taskCopyNativeBins)
 }
 
 fun prepare(vararg args: String) = ProcessBuilder(*args)
