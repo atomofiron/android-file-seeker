@@ -4,7 +4,7 @@ import android.content.Context
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
-import uniffi.native_lib.DeleteResult
+import uniffi.native_lib.ComplexResult
 import uniffi.native_lib.Meta
 import uniffi.native_lib.MetaResult
 import uniffi.native_lib.MetasResult
@@ -96,13 +96,11 @@ object NativeBridge {
         }
     }
 
-    fun delete(ref: NodeRef, asSu: Boolean): Rslt<UInt> {
-        val response = uniffi.native_lib.deleteBy(ref.bytes, runAsSu = binPath.takeIf { asSu })
-        return when (response) {
-            is DeleteResult.Ok -> Rslt.Ok(0u)
-            is DeleteResult.Err -> Rslt.Err(response.v1)
-            is DeleteResult.ErrCount -> Rslt.Ok(response.v1)
+    fun delete(ref: NodeRef, asSu: Boolean): ComplexResult {
+        val collector = object : ProgressCollector {
+            override fun emit(progress: Progress) = Unit
         }
+        return uniffi.native_lib.deleteBy(ref.bytes, runAsSu = binPath.takeIf { asSu }, collector)
     }
 
     fun copy(
@@ -111,15 +109,11 @@ object NativeBridge {
         move: Boolean = false,
         asSu: Boolean,
         collector: (Progress) -> Unit,
-    ): Rslt<Unit> {
+    ): ComplexResult {
         val collector = object : ProgressCollector {
-            override fun invoke(progress: Progress) = collector(progress)
+            override fun emit(progress: Progress) = collector(progress)
         }
-        val response = uniffi.native_lib.copy(from.bytes, to.bytes, move, runAsSu = binPath.takeIf { asSu }, collector)
-        return when (response) {
-            is SimpleResult.Ok -> Rslt.Ok
-            is SimpleResult.Err -> Rslt.Err(response.v1)
-        }
+        return uniffi.native_lib.copy(from.bytes, to.bytes, move, runAsSu = binPath.takeIf { asSu }, collector)
     }
 }
 

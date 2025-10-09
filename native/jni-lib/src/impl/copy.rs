@@ -1,13 +1,14 @@
 // with the support of Sonnet 4.5
 
-use crate::api::protocol::{Progress, ProgressCollector};
+use crate::api::protocol::{ComplexResult, ProgressCollector};
 use crate::common::{Rslt, OKI};
-use crate::ext::raw_path::RawPath;
+use crate::ext::result::ResultExt;
 use crate::r#impl::copy_method::CopyMethod;
 use crate::r#impl::delete::delete;
-use crate::r#impl::progress::ProgressChange;
+use crate::r#impl::progress::{convert_progress, send_inc, ProgressChange};
 use libc::off_t;
 use std::ffi::CString;
+use std::fmt::Display;
 use std::fs::{self, DirEntry, File, Metadata};
 use std::io::{self, Read, Write};
 use std::ops::Range;
@@ -25,45 +26,28 @@ const MAX_CHUNK: usize = 64 * 1024 * 1024;
 const BUFFER_SIZE: usize = 1024 * 1024;
 
 pub fn copy_impl(
-    from: PathBuf,
-    to: PathBuf,
+    from: &PathBuf,
+    to: &PathBuf,
     moving: bool,
     collector: Arc<dyn ProgressCollector>,
-) -> Rslt<()> {
+) -> Rslt<ComplexResult> {
     let method = CopyMethod::detect();
     let (tx, rx) = channel::<ProgressChange>();
-    let handle = std::thread::spawn(move || {
-        let mut progress = Progress::new();
-        collector.invoke(progress.clone());
-        let mut errors: Vec<RawPath> = Vec::new();
-        loop {
-            match rx.recv() {
-                Err(_) => break,
-                Ok(ProgressChange::Increment(new)) => progress.inc(new),
-                Ok(ProgressChange::Update(new)) => progress.update(new),
-                Ok(ProgressChange::Err(path, new)) => {
-                    progress.inc_error(new);
-                    errors.push(path)
-                },
-            }
-            collector.invoke(progress.clone());
-        }
-    });
+    let handle = convert_progress(rx, collector, Some(to.clone()));
     if moving {
-        match fs::rename(&from, &to) {
-            Ok(()) => (),
+        match fs::rename(from, to) {
+            Ok(()) => send_inc(&tx, &(0.0..1.0))?,
             Err(e) if e.raw_os_error() == Some(libc::EXDEV) => {
-                copy_recursive(&from, &to, method, &tx, 0.0..0.5)?;
-                delete(&from, &tx, 0.5..1.0)?;
+                copy_recursive(from, to, method, &tx, 0.0..0.5)?;
+                delete(from, &tx, 0.5..1.0)?;
             }
-            Err(e) => Err(e)?,
+            Err(e) => return Err(e.into()),
         }
     } else {
-        copy_recursive(&from, &to, method, &tx, 0.0..1.0)?;
+        copy_recursive(from, to, method, &tx, 0.0..1.0)?;
     }
     drop(tx);
-    handle.join().unwrap_or(());
-    return Ok(());
+    return handle.join().map_err(|_| "Joining thread failed".into());
 }
 
 fn copy_recursive(
@@ -78,7 +62,7 @@ fn copy_recursive(
         let target = fs::read_link(from)?;
         std::os::unix::fs::symlink(target, to)?;
         copy_symlink_metadata(&metadata, to)?;
-        tx.send(ProgressChange::Increment(range.end))?;
+        send_inc(tx, &range)?;
     } else if metadata.is_dir() {
         fs::create_dir_all(to)?;
 
@@ -138,7 +122,6 @@ fn copy_file_range(
 
     while remaining > 0 {
         let to_copy = remaining.min(MAX_CHUNK as u64) as usize;
-
         let copied = unsafe {
             libc::syscall(
                 libc::SYS_copy_file_range,
@@ -299,4 +282,15 @@ fn send(
     };
     tx.send(change)?;
     return Ok(());
+}
+
+pub fn send_err(
+    path: &Path,
+    error: impl Display,
+    tx: &Sender<ProgressChange>,
+    range: &Range<f32>,
+) -> Rslt<()> {
+    let path = path.as_os_str().as_encoded_bytes().to_vec();
+    let change = ProgressChange::Err(path, error.to_string(), range.end);
+    return tx.send(change).boxed();
 }

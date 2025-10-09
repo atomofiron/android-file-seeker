@@ -386,6 +386,7 @@ class ExplorerService(
         item ?: return
         // todo change uniqueId in state, create the new one state instance
         val renamed = item.rename(name, config.asSu)
+            ?: return // no source
         renderTab(key) {
             val level = tree.find(item.parentRef)
             val index = level?.children?.indexOfFirst { it.uniqueId == item.uniqueId }
@@ -452,6 +453,7 @@ class ExplorerService(
             states.updateState(to.uniqueId) {
                 nextState(to.uniqueId, copying = null)
             }
+            new ?: return@renderTab // no source
             tree.find(new.parentRef)?.children?.run {
                 val index = indexOfFirst { it.uniqueId == new.uniqueId }
                 if (index < 0) return@run

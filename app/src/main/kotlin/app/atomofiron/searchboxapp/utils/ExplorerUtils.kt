@@ -24,6 +24,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
 import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
+import uniffi.native_lib.ComplexResult
 import uniffi.native_lib.Meta
 import java.io.BufferedInputStream
 import java.io.FileInputStream
@@ -141,15 +142,11 @@ object ExplorerUtils {
     private const val EXT_OSR = ".osr" // osu replay
     private const val EXT_OSB = ".osb" // osu storyboard
 
-    fun copy(from: Node, to: Node, asSu: Boolean): Node {
+    fun copy(from: Node, to: Node, asSu: Boolean): Node? {
         val result = NativeBridge.copy(from.ref, to.ref, asSu = asSu) {
             // todo
         }
-        val new = to.update(CacheConfig(asSu), ensureCached = false)
-        return when (result) {
-            is Rslt.Ok -> new
-            is Rslt.Err -> from.copy(error = result.message.toNodeError())
-        }
+        return from.apply(result)?.update(CacheConfig(asSu), ensureCached = false)
     }
 
     fun create(parent: Node, name: String, directory: Boolean, asSu: Boolean): Node? {
@@ -551,25 +548,24 @@ object ExplorerUtils {
 
     fun Node.delete(asSu: Boolean): Node? {
         val result = NativeBridge.delete(ref, asSu)
-        val error = when (result) {
-            is Rslt.Ok -> when (result.value) {
-                0u -> return null
-                else -> "Has errors (${result.value})".toNodeError()
-            }
-            is Rslt.Err -> result.message.toNodeError()
-        }
-        return copy(error = error)
+        return apply(result)
     }
 
-    fun Node.rename(name: String, asSu: Boolean): Node {
+    fun Node.rename(name: String, asSu: Boolean): Node? {
         val targetRef = parentRef + name
         val result = NativeBridge.copy(from = ref, to = targetRef, asSu = asSu) {
             // todo
         }
-        return when (result) {
-            is Rslt.Ok -> move(name = name).copy(error = null)
-            is Rslt.Err -> copy(error = result.message.toNodeError())
+        return apply(result)
+    }
+
+    fun Node.apply(result: ComplexResult): Node? {
+        val meta = when (result) {
+            is ComplexResult.Ok -> result.meta
+            is ComplexResult.Err -> result.v1
         }
+        meta ?: return null
+        return copy(properties = meta.toProperties(size), error = meta.error.toNodeError())
     }
 
     fun Node.move(parent: NodeRef = parentRef, name: String = this.name): Node {

@@ -21,10 +21,18 @@ fn try_as_su(bin_path: String) -> SimpleResult {
 }
 
 pub fn as_su<D: Decode<()>>(request: Request, bin_path: String) -> Rslt<D> {
-    as_su_with_progress(request, bin_path, None)
+    as_su_impl(request, bin_path, None)
 }
 
 pub fn as_su_with_progress<D: Decode<()>>(
+    request: Request,
+    bin_path: String,
+    collector: Arc<dyn ProgressCollector>,
+) -> Rslt<D> {
+    as_su_impl(request, bin_path, Some(collector))
+}
+
+fn as_su_impl<D: Decode<()>>(
     request: Request,
     bin_path: String,
     collector: Option<Arc<dyn ProgressCollector>>,
@@ -90,7 +98,7 @@ fn read_progress(child: &mut Child, collector: Arc<dyn ProgressCollector>) -> Rs
         let mut bytes = vec![0u8; len];
         stdout.read_exact(&mut bytes)?;
         let (progress, _) = decode_from_slice::<Progress,_>(&bytes, config())?;
-        collector.invoke(progress)
+        collector.emit(progress)
     }
 }
 

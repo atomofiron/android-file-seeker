@@ -45,10 +45,13 @@ pub enum SimpleResult {
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
-pub enum DeleteResult {
-    Ok(Option<Meta>),
-    ErrCount(u32),
-    Err(String, Option<Meta>),
+pub enum ComplexResult {
+    Ok {
+        count: u32,
+        errors: Vec<String>,
+        meta: Option<Meta>,
+    },
+    Err(Meta),
 }
 
 #[derive(Debug, Encode, Decode, PartialEq, Clone)]
@@ -82,9 +85,9 @@ pub struct TypedMeta {
 
 #[uniffi::export(with_foreign)]
 pub trait ProgressCollector: Send + Sync {
-    fn invoke(&self, progress: Progress);
+    fn emit(&self, progress: Progress);
 }
 
 impl ProgressCollector for () {
-    fn invoke(&self, _: Progress) { }
+    fn emit(&self, _: Progress) { }
 }

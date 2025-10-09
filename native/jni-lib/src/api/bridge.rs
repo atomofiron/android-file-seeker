@@ -1,13 +1,13 @@
-use std::sync::Arc;
-use crate::api::protocol::{ProgressCollector, DeleteResult, MetaResult, MetasResult, SimpleResult, TypedMetaResult, TypedMetasResult, UsageResult};
+use crate::api::protocol::{ComplexResult, MetaResult, MetasResult, ProgressCollector, TypedMetaResult, TypedMetasResult, UsageResult};
 use crate::api::su_bridge::{as_su, as_su_with_progress};
 use crate::api::su_protocol::Request;
-use crate::ext::raw_path::{RawPath, KPathExt};
+use crate::ext::raw_path::{RawPath, RawPathExt};
 use crate::r#impl::copy::copy_impl;
 use crate::r#impl::delete::delete_impl;
 use crate::r#impl::meta::{meta, meta_with_error, metas};
 use crate::r#impl::other::{new_dir, new_file, usage};
 use crate::r#impl::r#type::{file_type, file_types};
+use std::sync::Arc;
 
 #[uniffi::export]
 pub fn create_file(path: RawPath, run_as_su: Option<String>) -> MetaResult {
@@ -34,16 +34,20 @@ pub fn create_dir(path: RawPath, run_as_su: Option<String>) -> MetaResult {
 }
 
 #[uniffi::export]
-pub fn delete_by(path: RawPath, run_as_su: Option<String>) -> DeleteResult {
+pub fn delete_by(
+    path: RawPath,
+    run_as_su: Option<String>,
+    collector: Arc<dyn ProgressCollector>,
+) -> ComplexResult {
     if let Some(bin_path) = run_as_su {
-        return as_su::<DeleteResult>(Request::Delete(path), bin_path)
-            .unwrap_or_else(|e| DeleteResult::Err(e.to_string(), None))
+        let from_buf = path.clone().buf();
+        return as_su_with_progress::<ComplexResult>(Request::Delete(path), bin_path, collector)
+            .unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)))
     }
     let path = path.buf();
-    match delete_impl(&path) {
-        Ok(0) => DeleteResult::Ok(meta(&path).ok()),
-        Ok(err_count) => DeleteResult::ErrCount(err_count),
-        Err(e) => DeleteResult::Err(e.to_string(), Some(meta_with_error(&path, e.to_string()))),
+    match delete_impl(&path, collector) {
+        Ok(result) => result,
+        Err(e) => ComplexResult::Err(meta_with_error(&path, &e)),
     }
 }
 
@@ -114,13 +118,15 @@ pub fn copy(
     moving: bool,
     run_as_su: Option<String>,
     collector: Arc<dyn ProgressCollector>,
-) -> SimpleResult {
+) -> ComplexResult {
     if let Some(bin_path) = run_as_su {
-        return as_su_with_progress::<SimpleResult>(Request::Copy(from, to, moving), bin_path, Some(collector))
-            .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
+        let from_buf = from.clone().buf();
+        return as_su_with_progress::<ComplexResult>(Request::Copy(from, to, moving), bin_path, collector)
+            .unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)))
     }
-    match copy_impl(from.buf(), to.buf(), moving, collector) {
-        Ok(_data) => SimpleResult::Ok,
-        Err(e) => SimpleResult::Err(e.to_string()),
+    let from = from.buf();
+    match copy_impl(&from, &to.buf(), moving, collector) {
+        Ok(result) => result,
+        Err(e) => ComplexResult::Err(meta_with_error(&from, &e)),
     }
 }

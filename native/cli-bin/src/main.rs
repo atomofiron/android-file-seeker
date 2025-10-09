@@ -41,9 +41,13 @@ fn run(request: Request) -> Result<Vec<u8>, EncodeError> {
         Request::GetTypedMetas(arg) => encode_to_vec(get_file_types(arg, None), config()),
         Request::CreateDir(arg) => encode_to_vec(create_dir(arg, None), config()),
         Request::CreateFile(arg) => encode_to_vec(create_file(arg, None), config()),
-        Request::Delete(arg) => encode_to_vec(delete_by(arg, None), config()),
+        Request::Delete(arg) => {
+            let result = delete_by(arg, None, StdoutProgressWriter::arc());
+            write_the_end();
+            encode_to_vec(result, config())
+        },
         Request::Copy(from, to, moving) => {
-            let result = copy(from, to, moving, None, Arc::new(ProgressCollectorImpl));
+            let result = copy(from, to, moving, None, StdoutProgressWriter::arc());
             write_the_end();
             encode_to_vec(result, config())
         },
@@ -68,10 +72,14 @@ fn write_the_end() {
         .expect("write_all final failed");
 }
 
-struct ProgressCollectorImpl;
+struct StdoutProgressWriter;
 
-impl ProgressCollector for ProgressCollectorImpl {
-    fn invoke(&self, progress: Progress) {
+impl StdoutProgressWriter {
+    pub fn arc() -> Arc<Self> { Arc::new(StdoutProgressWriter) }
+}
+
+impl ProgressCollector for StdoutProgressWriter {
+    fn emit(&self, progress: Progress) {
         write_response(progress)
     }
 }

@@ -1,22 +1,23 @@
 use crate::api::protocol::Meta;
+use crate::common::Rslt;
+use crate::kopy;
 use crate::r#impl::hr_meta::HumanReadableMeta;
 use crate::r#impl::meta_ext::MetaExt;
+use std::fmt::Display;
 use std::fs;
 use std::fs::File;
 use std::path::PathBuf;
-use crate::common::Rslt;
-use crate::kopy;
 
 pub fn meta(path: &PathBuf) -> Rslt<Meta> {
     let meta = File::open(path)?.metadata();
     return Ok(meta.to_hr(path));
 }
 
-pub fn meta_with_error(path: &PathBuf, error: String) -> Meta {
+pub fn meta_with_error(path: &PathBuf, error: &impl Display) -> Meta {
     let meta = File::open(path)
         .and_then(|f| f.metadata())
         .to_hr(path);
-    return kopy!(meta, error = error);
+    return kopy!(meta, error = error.to_string());
 }
 
 pub fn metas(path: &PathBuf) -> Rslt<Vec<Meta>> {
