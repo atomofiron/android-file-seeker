@@ -4,6 +4,7 @@ import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.move
@@ -107,9 +108,9 @@ class ExplorerInteractor(
         }
     }
 
-    fun rename(key: NodeTabKey, item: Node, name: String) {
+    fun rename(key: NodeTabKey, ref: NodeRef, name: String) {
         scope.launch(context) {
-            service.tryRename(key, item, name)
+            service.tryRename(key, ref, name)
         }
     }
 

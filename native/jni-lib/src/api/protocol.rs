@@ -73,7 +73,7 @@ pub struct Meta {
     pub size: String,
     pub date: String,
     pub time: String,
-    pub error: String,
+    pub error: Option<String>,
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]

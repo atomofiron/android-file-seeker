@@ -124,9 +124,9 @@ pub fn copy(
         return as_su_with_progress::<ComplexResult>(Request::Copy(from, to, moving), bin_path, collector)
             .unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)))
     }
-    let from = from.buf();
-    match copy_impl(&from, &to.buf(), moving, collector) {
+    let from_buf = from.buf();
+    match copy_impl(&from_buf, &to.buf(), moving, collector) {
         Ok(result) => result,
-        Err(e) => ComplexResult::Err(meta_with_error(&from, &e)),
+        Err(e) => ComplexResult::Err(meta_with_error(&from_buf, &e)),
     }
 }

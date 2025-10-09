@@ -17,7 +17,7 @@ pub fn meta_with_error(path: &PathBuf, error: &impl Display) -> Meta {
     let meta = File::open(path)
         .and_then(|f| f.metadata())
         .to_hr(path);
-    return kopy!(meta, error = error.to_string());
+    return kopy!(meta, error = Some(error.to_string()));
 }
 
 pub fn metas(path: &PathBuf) -> Rslt<Vec<Meta>> {

@@ -113,7 +113,7 @@ class ExplorerCurtainMenuDelegate(
 
     fun onRenameConfirm(item: Node, name: String) {
         controller?.close(irrevocably = true)
-        interactor.rename(currentTab, item, name)
+        interactor.rename(currentTab, item.ref, name)
     }
 
     private fun onRemoveConfirm(items: List<Node>) {

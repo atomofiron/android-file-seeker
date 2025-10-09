@@ -174,14 +174,14 @@ object ExplorerUtils {
         )
     }
 
-    private fun Meta.toProperties(size: String = "") = NodeProperties(
+    private fun Meta.toProperties(size: String? = null) = NodeProperties(
         access = access,
         owner = owner,
         group = group,
         date = date,
         time = time,
         length = if (access.firstOrNull() == FILE_CHAR) length.toLong() else 0,
-        size = this.size.takeIf { it.isNotEmpty() } ?: size,
+        size = this.size.takeIf { it.isNotEmpty() } ?: size ?: "",
     )
 
     private const val DIMENS = "BKMGTPEZYRQ"
@@ -553,7 +553,7 @@ object ExplorerUtils {
 
     fun Node.rename(name: String, asSu: Boolean): Node? {
         val targetRef = parentRef + name
-        val result = NativeBridge.copy(from = ref, to = targetRef, asSu = asSu) {
+        val result = NativeBridge.copy(from = ref, to = targetRef, asSu = asSu, move = true) {
             // todo
         }
         return apply(result)
@@ -565,7 +565,11 @@ object ExplorerUtils {
             is ComplexResult.Err -> result.v1
         }
         meta ?: return null
-        return copy(properties = meta.toProperties(size), error = meta.error.toNodeError())
+        var ref = NodeRef(meta.path)
+        val newRef = ref != this.ref
+        if (!newRef) ref = this.ref
+        val properties = meta.toProperties(size.takeIf { !newRef })
+        return copy(ref = ref, parentRef = ref.parent, uniqueId = ref.uniqueId, properties = properties, error = meta.error?.toNodeError())
     }
 
     fun Node.move(parent: NodeRef = parentRef, name: String = this.name): Node {

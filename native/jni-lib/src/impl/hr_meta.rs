@@ -38,7 +38,7 @@ impl HumanReadableMeta for io::Result<Metadata> {
                     time,
                     path,
                     length: meta.size(),
-                    error: empty_string(),
+                    error: None,
                 }
             },
             Err(e) => Meta {
@@ -50,7 +50,7 @@ impl HumanReadableMeta for io::Result<Metadata> {
                 time: empty_string(),
                 path,
                 length: 0,
-                error: e.to_string(),
+                error: Some(e.to_string()),
             }
         }
     }

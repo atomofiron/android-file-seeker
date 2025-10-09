@@ -38,10 +38,11 @@ pub fn delete_impl(path: &PathBuf, collector: Arc<dyn ProgressCollector>) -> Rsl
 pub fn delete(path: &PathBuf, tx: &Sender<ProgressChange>, range: Range<f32>) -> Rslt<()> {
     let c_path = CString::new(path.as_os_str().as_bytes())?;
     let st_dev = get_dev(&c_path)?;
-    return match delete_recursively(&c_path, false, st_dev, tx, range) {
-        Ok(_) => delete_recursively(&c_path, false, st_dev, tx, 1.0..1.0),
-        Err(e) => return Err(e),
-    };
+    delete_recursively(&c_path, false, st_dev, tx, range)?;
+    match path.exists() { // 1 retry
+        true => delete_recursively(&c_path, false, st_dev, tx, 1.0..1.0),
+        _ => Ok(()),
+    }
 }
 
 pub fn delete_recursively(
@@ -51,8 +52,15 @@ pub fn delete_recursively(
     tx: &Sender<ProgressChange>,
     range: Range<f32>,
 ) -> Rslt<()> {
-    if get_dev(path)? != st_dev || call_delete(path, as_dir)? == OKI {
-        return Ok(());
+    match get_dev(path) {
+        Ok(stat) if stat == st_dev => (),
+        Ok(_) => return Ok(()),
+        Err(e) => return send_err(path, e, tx, &range),
+    }
+    match call_delete(path, as_dir) {
+        Ok(OKI) => return Ok(()),
+        Ok(_) => (), // os error
+        Err(e) => return send_err(path, e, tx, &range),
     }
     let error = io::Error::last_os_error()
         .raw_os_error()
@@ -165,7 +173,7 @@ fn get_dev(path: &CString) -> Rslt<mode_t> {
     };
     return match result {
         OKI => stat.st_mode.try_into().boxed(),
-        _ => Err(format!("Dev stat result: {result}").into()),
+        _ => Err(io::Error::last_os_error().into()),
     }
 }
 

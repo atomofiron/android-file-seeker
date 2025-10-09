@@ -379,23 +379,23 @@ class ExplorerService(
         }
     }
 
-    suspend fun tryRename(key: NodeTabKey, target: Node, name: String) {
+    suspend fun tryRename(key: NodeTabKey, ref: NodeRef, name: String) {
         val item = garden(key) {
-            tree.findNode(target.uniqueId)
+            tree.findNode(ref.uniqueId)
         }
         item ?: return
         // todo change uniqueId in state, create the new one state instance
-        val renamed = item.rename(name, config.asSu)
-            ?: return // no source
+        val new = item.rename(name, config.asSu)
+            ?: return debugFail { "null after rename $ref to $name" }
         renderTab(key) {
             val level = tree.find(item.parentRef)
             val index = level?.children?.indexOfFirst { it.uniqueId == item.uniqueId }
             if (index == null || index < 0) return
-            level.children.items[index] = renamed
-            val levelIndex = tree.indexOfFirst { it.ref == target.ref }
+            level.children.items[index] = new
+            val levelIndex = tree.indexOfFirst { it.ref == item.ref }
             if (levelIndex >= 0) {
-                tree[levelIndex] = renamed
-                var prev = renamed
+                tree[levelIndex] = new
+                var prev = new
                 for (i in levelIndex.inc()..tree.lastIndex) {
                     val next = tree[i]
                     prev = prev.children?.find { it.name == next.name }
@@ -453,7 +453,7 @@ class ExplorerService(
             states.updateState(to.uniqueId) {
                 nextState(to.uniqueId, copying = null)
             }
-            new ?: return@renderTab // no source
+            new ?: return@renderTab debugFail { "null after copy ${from.ref} to ${to.ref}" }
             tree.find(new.parentRef)?.children?.run {
                 val index = indexOfFirst { it.uniqueId == new.uniqueId }
                 if (index < 0) return@run
