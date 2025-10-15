@@ -60,11 +60,8 @@ pub fn convert_progress(
         let errors = errors.iter()
             .map(|(path, msg)| format!("{}: {msg}", String::from_utf8_lossy(path)))
             .collect();
-        return ComplexResult::Ok {
-            count: progress.count,
-            errors,
-            meta: target.map(|t| t.metadata().to_hr(&t)),
-        }
+        let meta = target.map(|t| t.metadata().to_hr(&t));
+        return ComplexResult::Ok { count: progress.count, errors, meta }
     })
 }
 
