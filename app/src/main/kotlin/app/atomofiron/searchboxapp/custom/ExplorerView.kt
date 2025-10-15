@@ -89,7 +89,7 @@ class ExplorerView(
         rootAdapter.submitList(items.roots)
         val oldFirst = items.items.firstOrNull()
         val newFirst = items.items.firstOrNull()
-        val isNew = oldFirst == null || newFirst == null || !NodeCallback.areItemsTheSame(oldFirst, newFirst)
+        val isNew = oldFirst == null || newFirst == null || oldFirst.ref != newFirst
         explorerAdapter.submit(items.items, isNew)
     }
 

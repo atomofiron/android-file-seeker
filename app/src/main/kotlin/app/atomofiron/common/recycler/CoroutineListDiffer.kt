@@ -1,5 +1,6 @@
 package app.atomofiron.common.recycler
 
+import android.annotation.SuppressLint
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.extension.copy
@@ -29,6 +30,7 @@ class CoroutineListDiffer<I : Any>(
         listener?.let { listeners.add(it) }
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun submit(new: List<I>, isNew: Boolean) {
         if (isNew) {
             counter++
