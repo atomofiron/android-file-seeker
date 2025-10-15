@@ -53,10 +53,10 @@ class FileOperationsDelegate(
         val first = merged.firstOrNull() ?: return null
         val operations = when {
             merged.size > 1 -> forMany(count =  merged.count { it.isFile })
-            first.isFile -> oneFileOptions
+            first.isFile -> oneFileOptions.completeForSingle(first)
             first.isRoot -> rootOptions
             first.isDirectory -> directoryOptions
-            else -> oneFileOptions.completeForSingle(first)
+            else -> oneFileOptions
         }.filter {
             readWrite.takeIf { readOnly }?.contains(it) != true
         }
