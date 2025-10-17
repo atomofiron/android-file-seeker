@@ -4,6 +4,11 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 interface RoProperty<T> : ReadOnlyProperty<Any?, T> {
+    companion object {
+        fun <T : R, R> RoProperty<T>.map(): RoProperty<R> = object : RoProperty<R> {
+            override val value: R get() = this@map.value
+        }
+    }
 
     val value: T
 
