@@ -5,6 +5,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import app.atomofiron.common.util.Unreachable
+import app.atomofiron.common.util.extension.launchOnMain
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
@@ -17,7 +18,9 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerDockListene
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDockState
 import app.atomofiron.searchboxapp.work.ReceiveData
 import app.atomofiron.searchboxapp.work.ReceiveWorker
+import app.atomofiron.searchboxapp.work.ReceiveWorker.Companion.waitForDataRead
 import app.atomofiron.searchboxapp.work.toWorkerData
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
@@ -30,6 +33,7 @@ class ExplorerDockDelegate @Inject constructor(
     private val store: ExplorerStore,
     preferenceChannel: PreferenceChannel,
     private val workManager: WorkManager,
+    private val scope: CoroutineScope,
 ) : ExplorerDockListener {
 
     val dock: Flow<List<DockItem>> = combine(store.currentNode, preferenceChannel.notification, store.checked, transform = ::dockItems)
@@ -70,7 +74,10 @@ class ExplorerDockDelegate @Inject constructor(
             .request(POST_NOTIFICATIONS)
             .any {
                 workManager.beginWith(request).enqueue()
-                router.finish()
+                scope.launchOnMain {
+                    request.waitForDataRead()
+                    router.finish()
+                }
             }
     }
 

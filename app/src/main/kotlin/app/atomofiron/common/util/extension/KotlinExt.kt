@@ -1,16 +1,25 @@
 package app.atomofiron.common.util.extension
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.collections.ArrayList
 import kotlin.math.ceil
 
 inline fun <T> T.ctx(action: T.() -> Unit) = action()
 
+operator fun CoroutineDispatcher.invoke(parallelism: Int) = Dispatchers.IO.limitedParallelism(parallelism)
+
 inline fun CoroutineScope.launchOnIO(
     noinline action: suspend CoroutineScope.() -> Unit,
 ) = launch(Dispatchers.IO, block = action)
+
+inline fun CoroutineScope.launchOnMain(
+    immediate: Boolean = false,
+    noinline action: suspend CoroutineScope.() -> Unit,
+) = launch(if (immediate) Dispatchers.Main.immediate else Dispatchers.Main, block = action)
 
 suspend inline fun withMain(
     now: Boolean = false,
@@ -51,6 +60,18 @@ fun Long.pow(exp: Long): Long {
 }
 
 inline fun <reified T : O, O> Any.takeIf(): T? = this as? T
+
+inline fun <T, C : Iterable<T?>> C.onEachNotNull(action: (T) -> Unit): C {
+    return apply { for (element in this) action(element ?: continue) }
+}
+
+inline fun <T : Any, R : Any> Iterable<T?>.mapNullable(transform: (T) -> R): List<R?> {
+    return ArrayList<R?>().apply {
+        this@mapNullable.forEach { item ->
+            add(item?.let { transform(it) })
+        }
+    }
+}
 
 fun <T> List<T>.copy(): List<T> = mutableCopy()
 

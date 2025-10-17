@@ -10,8 +10,12 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ForegroundInfo
+import androidx.work.ListenableWorker
+import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkerParameters
 import app.atomofiron.common.util.extension.debugDelay
+import app.atomofiron.common.util.extension.invoke
+import app.atomofiron.common.util.flow.WaitingGate
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Notifications
 import app.atomofiron.searchboxapp.android.receivingNotificationBuilder
@@ -38,6 +42,7 @@ import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
 import java.io.File
 import java.io.FileOutputStream
+import java.util.UUID
 import kotlin.math.max
 
 private const val KEY_DATA_BYTES = "KEY_DATA_BYTES"
@@ -52,6 +57,18 @@ class ReceiveWorker(
     private val context: Context,
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
+    companion object {
+        private val gates = mutableMapOf<UUID, WaitingGate>()
+        private val lock = Mutex()
+
+        private suspend fun get(id: UUID): WaitingGate = lock.withLock {
+            gates.getOrPut(id) { WaitingGate() }
+        }
+
+        suspend fun OneTimeWorkRequest.waitForDataRead() = get(id).await()
+
+        private suspend fun ListenableWorker.dataRead() = get(id).finish()
+    }
 
     private val notifications = NotificationManagerCompat.from(context)
     private val notificationId = hashCode()
@@ -70,19 +87,20 @@ class ReceiveWorker(
             updateProgress(RECEIVED_UNKNOWN)
         }
         return coroutineScope {
-            withContext(Dispatchers.IO.limitedParallelism(threadLimit)) {
+            withContext(Dispatchers.IO(threadLimit)) {
                 work()
             }
         }
     }
 
+    //context(CoroutineScope) todo try in the future
     private suspend fun CoroutineScope.work(): Result {
         val bytes = inputData.getByteArray(KEY_DATA_BYTES)
         bytes ?: return Result.success()
-            .also { toast(UniText(R.string.unknown_error)) }
+            .also { toastLong(UniText(R.string.unknown_error)) }
         val data = ProtoBuf.decodeFromByteArray<ReceiveData>(bytes)
         val total = data.uris.size
-        toast(UniText(R.plurals.receiving_files, total, total))
+        toastShort(UniText(R.plurals.receiving_files, total, total))
         val files = data.uris.map { uri ->
             val projection = arrayOf(OpenableColumns.DISPLAY_NAME, OpenableColumns.SIZE)
             var name: String? = null
@@ -101,8 +119,14 @@ class ReceiveWorker(
             if (ext != null && !name.endsWith(".$ext", ignoreCase = true)) {
                 name = "$name.$ext"
             }
-            Triple(name, size, uri)
+            val stream = try {
+                context.contentResolver.openInputStream(uri)
+            } catch (_: SecurityException) {
+                null
+            }
+            Triple(name, size, stream)
         }
+        dataRead()
         val totalSize = files.sumOf { (_, size, _) -> size }
         if (totalSize > Int.MAX_VALUE.toLong()) {
             progressScale = Int.MAX_VALUE / totalSize.toDouble()
@@ -120,10 +144,9 @@ class ReceiveWorker(
                 updateProgress(received)
             }
         }
-        val deferred = files.map { (name, _, uri) ->
+        val deferred = files.map { (name, _, stream) ->
             async {
-                val input = context.contentResolver.openInputStream(uri)
-                input?.use { input ->
+                stream?.use { input ->
                     val output = FileOutputStream(File(data.destination.string, name))
                     val step = max(MB, input.available() / 100)
                     var read = 0L
@@ -139,20 +162,23 @@ class ReceiveWorker(
                     mutex.withLock {
                         received += read
                     }
-                }
-                input != null
+                } != null
             }
         }
         val success = awaitAll(*deferred.toTypedArray()).count { it }
-        toast(UniText(R.plurals.files_received, total, success, total))
+        toastLong(UniText(R.plurals.files_received, total, success, total))
         delay(Const.COMMON_DELAY)
         collecting.cancel()
         return Result.success()
     }
 
-    private suspend fun toast(message: UniText) {
-        withContext(Dispatchers.Main) {
-            Toast.makeText(context, context.resources[message], Toast.LENGTH_LONG).show()
+    private suspend fun toastShort(message: UniText) = toast(message, Toast.LENGTH_SHORT)
+
+    private suspend fun toastLong(message: UniText) = toast(message, Toast.LENGTH_LONG)
+
+    private suspend fun toast(message: UniText, duration: Int) {
+        withContext(Dispatchers.Main.immediate) {
+            Toast.makeText(context, context.resources[message], duration).show()
         }
     }
 

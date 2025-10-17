@@ -25,8 +25,8 @@
         <item quantity="other">Получение %d файлов…</item>
     </plurals>
     <plurals name="files_received">
-        <item quantity="one">Получен %d из %d файл</item>
-        <item quantity="few">Получено %d из %d файла</item>
+        <item quantity="one">Получен %d из %d файла</item>
+        <item quantity="few">Получено %d из %d файлов</item>
         <item quantity="many">Получено %d из %d файлов</item>
         <item quantity="other">Получено %d из %d файлов</item>
     </plurals>
