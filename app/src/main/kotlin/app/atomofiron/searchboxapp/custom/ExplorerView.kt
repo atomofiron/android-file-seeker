@@ -41,7 +41,7 @@ class ExplorerView(
 
     private val rootAdapter = RootAdapter(output)
     private val explorerAdapter = ExplorerAdapter(output, ::onSeparatorClick)
-    private val swipeMarker = SwipeMarkerDelegate(resources)
+    private val swipeMarker = SwipeMarkerDelegate(resources, binding.stickyBox)
 
     private val listDelegate: ExplorerListDelegate = ExplorerListDelegate(
         binding.recyclerView,

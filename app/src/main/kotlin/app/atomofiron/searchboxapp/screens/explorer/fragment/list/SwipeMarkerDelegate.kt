@@ -5,8 +5,10 @@ import android.content.res.Resources
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.FrameLayout
+import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.SCROLL_STATE_SETTLING
 import app.atomofiron.common.util.progressionTo
@@ -20,7 +22,10 @@ private data class State(
     val prevIndex: Int,
 )
 
-class SwipeMarkerDelegate(resources: Resources) {
+class SwipeMarkerDelegate(
+    resources: Resources,
+    private val stickyBox: ViewGroup? = null,
+) {
 
     private val isRtl = resources.isRtl()
     private val allowedAria = resources.getDimensionPixelSize(R.dimen.edge_size)
@@ -33,6 +38,11 @@ class SwipeMarkerDelegate(resources: Resources) {
         val itemView = rv.findChildViewUnder(x, y)
         if (itemView?.id != R.id.item_explorer) {
             return false
+        }
+        stickyBox?.children?.forEach {
+            if (it.y <= y && it.y + it.height >= y) {
+                return false
+            }
         }
         val area = when {
             isRtl -> rv.paddingLeft.let { it..(it + allowedAria) }
