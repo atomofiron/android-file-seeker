@@ -44,7 +44,7 @@ class ExplorerDockDelegate @Inject constructor(
 
     override fun onConfirmClick() {
         when (mode) {
-            ActivityMode.Default -> Unreachable
+            is ActivityMode.Default -> Unreachable
             is ActivityMode.Receive -> receive(mode)
             is ActivityMode.Share -> share(mode.multiple)
         }
