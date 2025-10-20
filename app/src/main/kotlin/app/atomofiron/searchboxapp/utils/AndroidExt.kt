@@ -27,6 +27,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
+import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -218,6 +219,10 @@ fun Context.getDisplayCompat(): Display? = when {
 fun Context.drawable(@DrawableRes resId: Int): Drawable = ContextCompat.getDrawable(this, resId)!!
 // todo replace everywhere
 fun Context.color(@ColorRes resId: Int): Int = ContextCompat.getColor(this, resId)
+
+fun Resources.pxs(@DimenRes resId: Int): Int = getDimensionPixelSize(resId)
+
+fun Resources.pxf(@DimenRes resId: Int): Float = getDimension(resId)
 
 fun Context.colorAttr(@AttrRes attrId: Int): Int {
     val typedValue = TypedValue()
