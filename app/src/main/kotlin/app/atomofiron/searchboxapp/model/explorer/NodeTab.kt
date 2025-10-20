@@ -1,12 +1,13 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+import app.atomofiron.common.util.extension.mutableCopy
 import app.atomofiron.common.util.flow.DataFlow
 import app.atomofiron.searchboxapp.utils.EmptyMutableList
 
 private const val UNSELECTED_ROOT_ID = 0
 private val EmptyMutableList = EmptyMutableList<Node>()
 
-class NodeTab(
+data class NodeTab(
     val key: NodeTabKey,
     val roots: List<NodeRoot>,
     val states: MutableList<NodeStateImpl>,
@@ -44,4 +45,13 @@ class NodeTab(
         ?.let { trees[it.stableId] }
         ?.any { it.uniqueId == uniqueId }
         .let { it == true }
+
+    fun clone(key: NodeTabKey): NodeTab {
+        val copy = copy(key = key)
+        copy.selectedRootId = selectedRootId
+        trees.forEach { (key, tree) ->
+            copy.trees[key] = tree.mutableCopy()
+        }
+        return copy
+    }
 }
