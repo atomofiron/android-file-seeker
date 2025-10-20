@@ -47,7 +47,6 @@ import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asSeparator
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.clearChildren
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
@@ -193,9 +192,6 @@ class ExplorerService(
                     ?: return
                 tree.clear(from = index.inc())
                 tree.add(rootItem)
-            }
-            if (tree.isEmpty()) {
-                root.item.children?.clearChildren()
             }
         }
         rootItem?.let { tryCache(key, it) }

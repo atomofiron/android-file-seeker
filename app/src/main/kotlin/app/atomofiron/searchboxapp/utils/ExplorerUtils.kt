@@ -523,17 +523,6 @@ object ExplorerUtils {
 
     fun Node.isSomeParentOf(other: Node): Boolean = ref.length <= other.ref.length && other.ref.isChildOf(ref)
 
-    fun NodeChildren.clearChildren() = update {
-        val iter = listIterator()
-        while (iter.hasNext()) {
-            val item = iter.next()
-            when {
-                item.error is NodeError.NoSuchFile -> iter.remove()
-                item.isCached -> iter.set(item.copy(children = null))
-            }
-        }
-    }
-
     fun NodeProperties.isFile(): Boolean = access.firstOrNull() == FILE_CHAR
 
     fun NodeProperties.isDirectory(): Boolean = access.firstOrNull() == DIR_CHAR
