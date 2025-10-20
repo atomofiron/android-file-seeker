@@ -58,6 +58,8 @@ class ExplorerInteractor(
 
     fun getFlow(key: NodeTabKey) = service.getFlow(key)
 
+    fun drop(vararg keys: NodeTabKey) = service.drop(*keys)
+
     fun copyToClipboard(item: Node) = utils.copyToClipboard(item)
 
     fun toggleRoot(key: NodeTabKey, item: NodeRoot) {

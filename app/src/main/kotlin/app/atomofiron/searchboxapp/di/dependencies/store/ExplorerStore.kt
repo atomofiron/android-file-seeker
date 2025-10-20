@@ -11,10 +11,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 class ExplorerStore {
 
-    val firstTab = NodeTabKey(index = 1)
-    val middleTab = NodeTabKey(index = 0)
-    val lastTab = NodeTabKey(index = 2)
-
     private val internalStoragePath: String = Environment
         .getExternalStorageDirectory()
         .absolutePath
@@ -24,7 +20,7 @@ class ExplorerStore {
     private val currentLists = mutableMapOf<NodeTabKey, List<Node>?>()
 
     private val _storage = MutableStateFlow<List<NodeStorage>>(emptyList())
-    private val _currentTab = MutableStateFlow(middleTab)
+    private val _currentTab = MutableStateFlow(NodeTabKey.Stub)
     private val _currentNode = MutableStateFlow<Node?>(null)
     private val _internalRoot = MutableStateFlow(Node.asRoot(NodeRef(internalStoragePath), NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
     private val _checked = MutableStateFlow<List<Node>>(listOf())

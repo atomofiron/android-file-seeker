@@ -68,6 +68,11 @@ class ExplorerPresenter(
         else -> resetChecked() || scrollToTop() || unselectRoot()
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        interactor.drop(viewState.firstTab, viewState.middleTab, viewState.lastTab)
+    }
+
     private fun resetChecked(): Boolean {
         return store.checked.value.isNotEmpty().also {
             if (it) interactor.resetChecked(viewState.currentTab.value)

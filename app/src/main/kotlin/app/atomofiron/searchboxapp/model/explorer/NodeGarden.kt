@@ -4,18 +4,24 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
-class NodeGarden(vararg keys: NodeTabKey) {
+class NodeGarden {
 
     val roots = mutableListOf<NodeRoot>()
     val states = mutableListOf<NodeStateImpl>()
     val mutex = Mutex()
-    val tabs = keys.associateWith { NodeTab(it, roots, states) }
+    val tabs = mutableMapOf<NodeTabKey, NodeTab>()
 
-    operator fun get(key: NodeTabKey): NodeTab = tabs[key]!!
+    fun has(key: NodeTabKey): Boolean = tabs.containsKey(key)
+
+    operator fun get(key: NodeTabKey): NodeTab = tabs.getOrPut(key) { NodeTab(key, roots, states) }
 
     operator fun get(item: Node): NodeStateImpl? = states.find { it.uniqueId == item.uniqueId }
 
-    fun getFlow(key: NodeTabKey): StateFlow<NodeTabItems> = tabs[key]!!.flow
+    fun getFlow(key: NodeTabKey): StateFlow<NodeTabItems> = get(key).flow
+
+    fun drop(vararg keys: NodeTabKey) = keys.forEach {
+        tabs.remove(it)
+    }
 
     suspend inline operator fun <R> invoke(action: NodeGarden.() -> R): R {
         return mutex.withLock { action() }

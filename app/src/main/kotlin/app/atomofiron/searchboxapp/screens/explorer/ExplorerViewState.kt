@@ -9,6 +9,7 @@ import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerDockDelegate
@@ -26,6 +27,10 @@ class ExplorerViewState(
     explorerInteractor: ExplorerInteractor,
     preferenceStore: PreferenceStore,
 ) {
+    val firstTab = NodeTabKey.Explorer(primary = mode.default, 0)
+    val middleTab = NodeTabKey.Explorer(primary = mode.default, 1)
+    val lastTab = NodeTabKey.Explorer(primary = mode.default, 2)
+
     val scrollTo = ChannelFlow<Node>()
     val itemComposition = preferenceStore.explorerItemComposition
     private val otherAlerts = ChannelFlow<AlertMessage>()
@@ -34,11 +39,11 @@ class ExplorerViewState(
         store.deleted.map { AlertMessage(ExplorerAlert.Deleted(it)) },
         otherAlerts,
     )
-    val tabs = listOf(store.middleTab, store.firstTab, store.lastTab)
-    val currentTab = MutableStateFlow(store.middleTab)
+    val tabs = listOf(firstTab, middleTab, lastTab)
+    val currentTab = MutableStateFlow(firstTab)
     val currentNode get() = store.currentNode.value
 
-    val currentTabFlow = explorerInteractor.getFlow(store.middleTab)
+    val currentTabFlow = explorerInteractor.getFlow(firstTab)
     val updates: Flow<Node> = store.updated
     val permissionRequiredWarning = ChannelFlow<Unit>()
     val dock: Flow<List<DockItem>> = explorerDockDelegate.dock

@@ -3,9 +3,8 @@ package app.atomofiron.searchboxapp.screens.common
 import android.net.Uri
 
 sealed class ActivityMode(
-    val default: Boolean,
+    val default: Boolean = false,
 ) {
-    constructor() : this(default = false)
 
     data object Default : ActivityMode(default = true)
 

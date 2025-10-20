@@ -90,7 +90,7 @@ class ExplorerService(
     private var delayedRender: Job? = null
 
     private var config = CacheConfig(asSu = false)
-    private val garden = NodeGarden(store.firstTab, store.middleTab, store.lastTab)
+    private val garden = NodeGarden()
     private val internalStorageRef = store.internalStorage.value.ref
     private val updateRootTrigger = TriggerFlow()
 
@@ -105,7 +105,6 @@ class ExplorerService(
                 context.resolveToybox(preferences.toyboxVariant.value)
                 if (config.asSu) checkSu()
                 initRoots()
-                get(store.currentTabKey.value).render()
             }
             combine(store.storage, preferences.asSu, updateRootTrigger) { volumes, asSu, _ ->
                 updateRootsAsync(volumes)
@@ -143,7 +142,18 @@ class ExplorerService(
         }
     }
 
-    fun getFlow(key: NodeTabKey): SharedFlow<NodeTabItems> = garden.getFlow(key)
+    fun getFlow(key: NodeTabKey): SharedFlow<NodeTabItems> {
+        if (!garden.has(key)) {
+            appScope.launchOnIO {
+                garden(key) {
+                    render()
+                }
+            }
+        }
+        return garden.getFlow(key) // concurrency? unlikely
+    }
+
+    fun drop(vararg keys: NodeTabKey) = garden.drop(*keys)
 
     private fun NodeGarden.initRoots() {
         val roots = listOf(
