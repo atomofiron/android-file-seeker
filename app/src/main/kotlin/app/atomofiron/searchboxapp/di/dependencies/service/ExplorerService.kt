@@ -48,6 +48,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortBy
@@ -72,7 +73,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import kotlin.math.min
 
 private const val SUB_PATH_CAMERA = "DCIM/Camera"
 private const val SUB_PATH_PIC_SCREENSHOTS = "Pictures/Screenshots"
@@ -703,7 +703,7 @@ class ExplorerService(
     private fun NodeTab.renderNodes(): List<Node> {
         val root = getSelectedRoot()
             ?: return emptyList()
-        val count = min(1, tree.size) + tree.sumOf { it.childCount }
+        val count = tree.sumOf { it.childCount }.inc()
         val items = MutableList<Node>(count)
         tree.firstOrNull()
             .let { it ?: root.item }
@@ -712,12 +712,21 @@ class ExplorerService(
             .takeIf { !it.isOpened }
             ?.let { return items }
         val openedIndexes = mutableListOf<Int>()
+        val filteredCounts = when {
+            mimeTypes.isEmpty() -> null
+            mimeTypes == NodeContent.Directory.mimeTypes -> null
+            else -> IntArray(tree.size)
+        }
         var parent = items.first()
         for (i in tree.indices) {
             val level = tree[i]
             val nextLevelId = tree.getOrNull(i.inc())?.uniqueId
             for (j in 0..<level.childCount) {
                 var item = level.children!![j]
+                if (dismatch(item)) {
+                    filteredCounts?.inc(i)
+                    continue
+                }
                 val isOpened = item.uniqueId == nextLevelId
                 item = renderNode(
                     item,
@@ -740,6 +749,10 @@ class ExplorerService(
             val opened = openedIndexes[i]
             for (j in opened.inc() until level.childCount) {
                 var item = level.children!![j]
+                if (dismatch(item)) {
+                    filteredCounts?.inc(i)
+                    continue
+                }
                 item = renderNode(item, content = item.defineDirKind(i))
                 items.add(item)
             }
@@ -749,8 +762,18 @@ class ExplorerService(
                     ?.let { items.add(it) }
             }
         }
+        var offset = 0
+        if (filteredCounts != null) items.forEachIndexed { i, it ->
+            if (!it.isOpened || it.isSeparator()) return@forEachIndexed
+            val offset = offset++
+            items[i] = it.copy(children = it.children?.copy(filteredOut = filteredCounts[offset]))
+        }
         return items
     }
+
+    private fun IntArray.inc(i: Int) = set(i, get(i).inc())
+
+    private fun NodeTab.dismatch(item: Node): Boolean = mimeTypes.isNotEmpty() && item.isFile && !item.content.matchesAny(mimeTypes)
 
     private suspend fun NodeTab.renderUpdate(new: Node) {
         store.emitUpdate(renderNode(new))
@@ -776,7 +799,7 @@ class ExplorerService(
             isChecked = checked.any { it == item.uniqueId },
             isDeepest = isDeepest,
             state = states.find { it.uniqueId == item.uniqueId } ?: item.state,
-            children = item.children?.fetch(isOpened = isOpened),
+            children = item.children?.fetch(isOpened),
             generation = generation,
             content = content,
         )

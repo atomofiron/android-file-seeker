@@ -25,4 +25,9 @@
         <item quantity="few">Примљене %d од %d датотеке</item>
         <item quantity="other">Примљено %d од %d датотека</item>
     </plurals>
+    <plurals name="files_filtered">
+        <item quantity="one">Скривен %d неприкладан фајл</item>
+        <item quantity="few">Скривена %d неприкладна фајла</item>
+        <item quantity="other">Скривено %d неприкладних фајлова</item>
+    </plurals>
 </resources>

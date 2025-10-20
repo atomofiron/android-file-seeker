@@ -73,7 +73,7 @@ class ItemBorderDecorator(
             outRect.top = space.toInt()
         }
         outRect.bottom = when {
-            item.isOpened && item.isEmpty == true -> tripleSpace
+            item.isOpenedAndEmpty(next) -> tripleSpace
             item.isOpened -> space
             item.isSeparator() -> space
             next == null -> space
@@ -114,7 +114,7 @@ class ItemBorderDecorator(
             val next = if (currentIndex == lastIndex) null else items[currentIndex.inc()]
             when {
                 // под открытой пустой папкой всё просто
-                item.isOpened && item.isEmpty == true -> {
+                item.isOpenedAndEmpty(next) -> {
                     frameRect = rect
                     rect.top = child.bottom.toFloat()
                     rect.bottom = child.bottom + doubleSpace
@@ -156,8 +156,7 @@ class ItemBorderDecorator(
     private fun RecyclerView.getFirstItemView(): Pair<ViewHolder, Int>? {
         var holder: ViewHolder? = null
         var count = 0
-        for (i in 0 until childCount) {
-            val view = getChildAt(i)
+        for (view in this) {
             if (view.id == R.id.item_explorer) {
                 count++
                 if (holder == null) {
@@ -187,4 +186,6 @@ class ItemBorderDecorator(
         framePath.addRoundRect(this, innerRadius, innerRadius, Direction.CW)
         canvas.drawPath(framePath, paint)
     }
+
+    private fun Node.isOpenedAndEmpty(next: Node?) = isOpened && (next == null || ref.isChildOf(next.parentRef)) && !isSeparator()
 }

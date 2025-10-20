@@ -25,6 +25,10 @@ sealed class NodeContent(
         val kind: DirectoryKind = DirectoryKind.Ordinary,
         override val rootType: NodeRootType? = null,
     ) : NodeContent() {
+        companion object {
+            const val MIME_TYPE = "inode/directory"
+            val mimeTypes = listOf(MIME_TYPE)
+        }
         override val isCached = rootType != null
     }
 
@@ -180,6 +184,17 @@ sealed class NodeContent(
     data object Firefox : File()
     data object Other : File()
     data object Unknown : File()
+
+    fun matchesAny(mimeType: List<String>): Boolean {
+        if (mimeType.isEmpty()) return true
+        val current = this.mimeType ?: return false
+        return mimeType.any {
+            when (it.endsWith("/*")) {
+                true -> current.startsWith(it.substring(0, it.length.dec()), ignoreCase = true)
+                false -> current.equals(it, ignoreCase = true)
+            }
+        }
+    }
 }
 
 fun NodeContent.isPicture(): Boolean = this is NodeContent.Picture

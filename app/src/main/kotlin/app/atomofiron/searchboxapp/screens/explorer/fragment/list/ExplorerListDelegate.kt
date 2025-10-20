@@ -29,11 +29,11 @@ class ExplorerListDelegate(
 ) : CoroutineListDiffer.ListListener<Node> {
 
     private val stickyDelegate = ExplorerStickyDelegate(recyclerView, rootAdapter, nodeAdapter, stickyBox, StickyListener())
-    private val rootMarginDecorator = RootItemPaddingDecorator(recyclerView.resources, rootAdapter)
+    private val rootPaddingDecorator = RootItemPaddingDecorator(recyclerView.resources, rootAdapter)
     private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = true)
     private val layoutManager = GridLayoutManager(recyclerView.context, EXPLORER_SPAN_COUNT)
     private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter, stickyDelegate::getDeepest)
-    private val spanSizeLookup = ExplorerSpanSizeLookup(recyclerView, rootAdapter, rootMarginDecorator)
+    private val spanSizeLookup = ExplorerSpanSizeLookup(recyclerView, rootAdapter, rootPaddingDecorator)
 
     private var deepestDir: Node? = null
     private val items get() = nodeAdapter.items
@@ -42,8 +42,8 @@ class ExplorerListDelegate(
         backgroundDecorator.init(recyclerView.resources)
         layoutManager.spanSizeLookup = spanSizeLookup
         recyclerView.layoutManager = layoutManager
-        recyclerView.attachInsetsListener(rootMarginDecorator)
-        recyclerView.addItemDecoration(rootMarginDecorator)
+        recyclerView.attachInsetsListener(rootPaddingDecorator)
+        recyclerView.addItemDecoration(rootPaddingDecorator)
         recyclerView.addItemDecoration(backgroundDecorator)
         recyclerView.addItemDecoration(borderDecorator)
         nodeAdapter.addListListener(this)

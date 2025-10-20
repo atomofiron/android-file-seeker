@@ -40,4 +40,10 @@
         <item quantity="many">%d of %d files received</item>
         <item quantity="other">%d of %d files received</item>
     </plurals>
+    <plurals name="files_filtered">
+        <item quantity="one">%d file filtered out</item>
+        <item quantity="few">%d files filtered out</item>
+        <item quantity="many">%d files filtered out</item>
+        <item quantity="other">%d files filtered out</item>
+    </plurals>
 </resources>

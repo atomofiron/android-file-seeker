@@ -9,6 +9,7 @@ import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
@@ -27,9 +28,14 @@ class ExplorerViewState(
     explorerInteractor: ExplorerInteractor,
     preferenceStore: PreferenceStore,
 ) {
-    val firstTab = NodeTabKey.Explorer(primary = mode.default, 0)
-    val middleTab = NodeTabKey.Explorer(primary = mode.default, 1)
-    val lastTab = NodeTabKey.Explorer(primary = mode.default, 2)
+    private val mimeTypes = when (mode) {
+        is ActivityMode.Default -> null
+        is ActivityMode.Share -> mode.mimes
+        is ActivityMode.Receive -> listOf(NodeContent.Directory.MIME_TYPE)
+    }
+    val firstTab = NodeTabKey.Explorer(0, mimeTypes)
+    val middleTab = NodeTabKey.Explorer(1, mimeTypes)
+    val lastTab = NodeTabKey.Explorer(2, mimeTypes)
 
     val scrollTo = ChannelFlow<Node>()
     val itemComposition = preferenceStore.explorerItemComposition

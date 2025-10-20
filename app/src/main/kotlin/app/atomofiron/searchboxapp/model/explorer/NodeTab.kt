@@ -11,6 +11,7 @@ data class NodeTab(
     val key: NodeTabKey,
     val roots: List<NodeRoot>,
     val states: MutableList<NodeStateImpl>,
+    val mimeTypes: List<String> = emptyList(),
 ) {
     val trees = mutableMapOf<Int, MutableList<Node>>()
     var selectedRootId = UNSELECTED_ROOT_ID
@@ -46,8 +47,8 @@ data class NodeTab(
         ?.any { it.uniqueId == uniqueId }
         .let { it == true }
 
-    fun clone(key: NodeTabKey): NodeTab {
-        val copy = copy(key = key)
+    fun clone(key: NodeTabKey, mimeTypes: List<String>): NodeTab {
+        val copy = copy(key = key, mimeTypes = mimeTypes)
         copy.selectedRootId = selectedRootId
         trees.forEach { (key, tree) ->
             copy.trees[key] = tree.mutableCopy()

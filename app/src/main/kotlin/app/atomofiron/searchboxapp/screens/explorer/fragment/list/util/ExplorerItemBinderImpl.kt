@@ -35,6 +35,7 @@ import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.isRtl
+import app.atomofiron.searchboxapp.utils.resources
 import com.bumptech.glide.Glide
 
 private const val SPACE = " "
@@ -184,13 +185,18 @@ class ExplorerItemBinderImpl private constructor(
     }
 
     override fun bindComposition(composition: ExplorerItemComposition) {
-        val string = StringBuilder()
-        if (composition.visibleDate) string.append(item.date).append(SPACE)
-        if (composition.visibleTime) string.append(item.time).append(SPACE)
-        if (composition.visibleAccess) string.append(item.access).append(SPACE)
-        if (composition.visibleOwner) string.append(item.owner).append(SPACE)
-        if (composition.visibleGroup) string.append(item.group).append(SPACE)
-        binding.description.text = string.toString()
+        val filteredOut = item.children?.filteredOut
+        binding.description.text = when (filteredOut) {
+            null, 0 -> StringBuilder().run {
+                if (composition.visibleDate) append(item.date).append(SPACE)
+                if (composition.visibleTime) append(item.time).append(SPACE)
+                if (composition.visibleAccess) append(item.access).append(SPACE)
+                if (composition.visibleOwner) append(item.owner).append(SPACE)
+                if (composition.visibleGroup) append(item.group).append(SPACE)
+                toString()
+            }
+            else -> binding.resources.getQuantityString(R.plurals.files_filtered, filteredOut, filteredOut)
+        }
         binding.details.text = item
             .takeIf { composition.visibleDetails }
             ?.getDetails()

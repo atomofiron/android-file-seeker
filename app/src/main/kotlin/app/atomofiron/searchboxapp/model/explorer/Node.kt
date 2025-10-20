@@ -31,7 +31,7 @@ data class Node(
     val isFile: Boolean = content is NodeContent.File
 
     val isCached: Boolean get() = children != null || !isDirectory && content.isCached
-    val isEmpty: Boolean? get() = children?.isEmpty()
+    val isEmpty: Boolean? get() = children?.run { size - (filteredOut ?: 0) == 0 }
     val isOpened: Boolean get() = children?.isOpened == true
     val hasChildren: Boolean get() = children != null
     val childCount: Int get() = children?.size ?: 0

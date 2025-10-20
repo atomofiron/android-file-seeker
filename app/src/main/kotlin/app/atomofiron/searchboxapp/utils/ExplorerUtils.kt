@@ -45,7 +45,7 @@ object ExplorerUtils {
     private const val LS_NO_SUCH_FILE = "No such file or directory"
     private const val LS_PERMISSION_DENIED = "Permission denied"
 
-    private const val DIRECTORY = "inode/directory"
+    private const val DIRECTORY = NodeContent.Directory.MIME_TYPE
     private const val FILE_PICTURE = "image/"
     private const val FILE_AUDIO = "audio/"
     private const val FILE_VIDEO = "video/"

@@ -30,4 +30,10 @@
         <item quantity="many">Получено %d из %d файлов</item>
         <item quantity="other">Получено %d из %d файлов</item>
     </plurals>
+    <plurals name="files_filtered">
+        <item quantity="one">Скрыт %d неподходящий файл</item>
+        <item quantity="few">Скрыто %d неподходящих файла</item>
+        <item quantity="many">Скрыто %d неподходящих файлов</item>
+        <item quantity="other">Скрыто %d неподходящих файлов</item>
+    </plurals>
 </resources>

@@ -1,13 +1,15 @@
 package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.extension.mutableCopy
-import java.util.*
+import java.util.Objects
 
 data class NodeChildren(
     // a copy is made during rendering by NodeChildren.fetch()
     val items: MutableList<Node>,
     // isOpened is always false in the garden
     val isOpened: Boolean = false,
+    // hidden is always 0 in the garden
+    val filteredOut: Int? = null,
 ) : List<Node> by items {
 
     private val names = items.map { it.name }.toMutableList()
@@ -39,5 +41,5 @@ data class NodeChildren(
         items.forEach { names.add(it.name) }
     }
 
-    fun fetch(isOpened: Boolean = this.isOpened) = NodeChildren(isOpened = isOpened, items = items.mutableCopy())
+    fun fetch(isOpened: Boolean = this.isOpened) = NodeChildren(isOpened = isOpened, items = items.mutableCopy(), filteredOut = filteredOut)
 }
