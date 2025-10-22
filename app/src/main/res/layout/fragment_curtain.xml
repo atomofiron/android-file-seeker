@@ -5,6 +5,8 @@
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:clipChildren="false"
     >
     <app.atomofiron.searchboxapp.custom.view.layout.LimitedWidthCoordinatorLayout
         android:id="@+id/curtain_parent"

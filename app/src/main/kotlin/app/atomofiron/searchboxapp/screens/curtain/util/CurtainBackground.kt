@@ -49,7 +49,7 @@ open class CurtainBackground(context: Context) : Drawable() {
     override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 
     override fun setBounds(left: Int, top: Int, right: Int, bottom: Int) {
-        super.setBounds(left, top, right, bottom + cornerRadius.toInt())
+        super.setBounds(left, top, right, 2 * bottom + cornerRadius.toInt())
         boundsF.set(bounds)
         outlineRect.set(bounds)
         outlineRect.left -= strokeWidth
