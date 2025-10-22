@@ -7,6 +7,7 @@ import android.provider.DocumentsContract
 import android.widget.Toast
 import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.model.explorer.NodeContent.Companion.AnyType
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 
@@ -33,7 +34,7 @@ class PickerActivity : MainActivity() {
         initialUri = getUriExtra(DocumentsContract.EXTRA_INITIAL_URI),
         multiple = getBooleanExtra(Intent.EXTRA_ALLOW_MULTIPLE, false),
         mimes = getStringArrayExtra(Intent.EXTRA_MIME_TYPES)?.toList()
-            ?: type?.let { listOf(it) }
+            ?: type?.takeIf { it != AnyType }?.let { listOf(it) }
             ?: emptyList(),
     )
 
