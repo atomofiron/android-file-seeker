@@ -66,7 +66,7 @@ class ResultViewState(
             val result = task.result as SearchResult.FinderResult
             val matches = result.matches.mapNotNull { match ->
                 when {
-                    mimeTypes.isNotEmpty() && !match.item.content.matchesAny(mimeTypes)-> null
+                    mimeTypes.isNotEmpty() && !match.item.content.matchesAny(mimeTypes) -> null
                     !checked.contains(match.item.uniqueId) -> match
                     else -> match.update(match.item.copy(isChecked = true))
                 }
@@ -80,20 +80,20 @@ class ResultViewState(
             matches.sortBy { !it.isDirectory }
             val newResult = result.copy(matches = matches)
             this.result.value = newResult
-            dock.reduce(task.inProgress, newResult, sorting, checked)
+            dock.reduce(task.inProgress, newResult, sorting, checked = checked.size)
         }
     }
 
     private fun MutableStateFlow<ResultDockState>.reduce(
         inProgress: Boolean,
         result: SearchResult.FinderResult,
-        new: NodeSorting,
-        checked: List<Int>,
+        newSorting: NodeSorting,
+        checked: Int,
     ) {
         value = value.run {
             val sorting = when {
-                sorting.children.selectionMatches(new) -> sorting
-                else -> new.toDockItem(sorting.id, sorting.label).copy(children = sorting.children.makeSelected(new))
+                sorting.children.selectionMatches(newSorting) -> sorting
+                else -> newSorting.toDockItem(sorting.id, sorting.label).copy(children = sorting.children.makeSelected(newSorting))
             }
             val status = if (status.clickable == inProgress) status else status.copy(
                 clickable = inProgress,
@@ -106,9 +106,9 @@ class ResultViewState(
                 share = share.copy(enabled = result.matches.isNotEmpty()),
                 export = export?.takeIf { mode.default }?.copy(enabled = result.matches.isNotEmpty()),
                 confirm = when (mode) {
-                    is ActivityMode.Default,
-                    is ActivityMode.Receive -> null
-                    is ActivityMode.Share -> confirm?.copy(enabled = checked.isNotEmpty() && (mode.multiple || checked.size == 1))
+                    is ActivityMode.Default -> null
+                    is ActivityMode.Receive -> confirm?.copy(enabled = checked == 1)
+                    is ActivityMode.Share -> confirm?.copy(enabled = checked > 0 && (mode.multiple || checked == 1))
                 },
             )
         }

@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.result
 
 import androidx.fragment.app.Fragment
+import androidx.work.WorkManager
 import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.module.DelegateModule
@@ -75,6 +76,7 @@ class ResultModule {
         resources: AppResources,
         itemActionDelegate: ResultItemActionDelegate,
         filePickingDelegate: FilePickingDelegate,
+        workManager: WorkManager,
     ): ResultPresenter {
         return ResultPresenter(
             params,
@@ -86,6 +88,7 @@ class ResultModule {
             resources,
             itemActionDelegate,
             filePickingDelegate,
+            workManager,
         )
     }
 
@@ -158,4 +161,5 @@ interface ResultDependencies {
     fun resultStore(): ResultStore
     fun resultChannel(): ResultChannel
     fun curtainChannel(): CurtainChannel
+    fun workManager(): WorkManager
 }

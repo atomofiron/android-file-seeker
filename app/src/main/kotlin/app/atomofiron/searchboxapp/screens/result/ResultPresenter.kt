@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.result
 
+import androidx.work.WorkManager
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.Unreachable
@@ -7,6 +8,7 @@ import app.atomofiron.common.util.extension.logE
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
+import app.atomofiron.searchboxapp.di.dependencies.router.startReceiveInto
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
@@ -29,6 +31,7 @@ class ResultPresenter(
     resources: AppResources,
     itemActionDelegate: ResultItemActionDelegate,
     private val sharing: FilePickingDelegate,
+    private val workManager: WorkManager,
 ) : BasePresenter<ResultViewModel, ResultRouter>(scope, router),
     ResultItemActionListener by itemActionDelegate {
     private val taskId = params.taskId
@@ -71,10 +74,19 @@ class ResultPresenter(
             .mapNotNull { uniqueId ->
                 matches.find { it.item.uniqueId == uniqueId }?.item
             }.ifEmpty { return }
+        val mode = viewState.mode
+        val first = items.firstOrNull() ?: return
         when {
-            viewState.mode !is ActivityMode.Share -> Unreachable
-            viewState.mode.multiple -> sharing.shareMultiplePicked(items)
-            else -> sharing.shareSinglePicked(items.first())
+            mode is ActivityMode.Default -> Unreachable
+            mode is ActivityMode.Receive -> {
+                scope.launch {
+                    workManager.startReceiveInto(first.ref, viewState.mode)
+                    router.finish()
+                }
+            }
+            mode !is ActivityMode.Share -> Unreachable
+            mode.multiple -> sharing.shareMultiplePicked(items)
+            else -> sharing.shareSinglePicked(first)
         }
     }
 

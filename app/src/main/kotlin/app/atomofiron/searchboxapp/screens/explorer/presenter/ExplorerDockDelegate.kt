@@ -1,14 +1,13 @@
 package app.atomofiron.searchboxapp.screens.explorer.presenter
 
 import android.Manifest.permission.POST_NOTIFICATIONS
-import androidx.work.OneTimeWorkRequest
-import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import app.atomofiron.common.util.Unreachable
 import app.atomofiron.common.util.extension.launchOnMain
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
+import app.atomofiron.searchboxapp.di.dependencies.router.startReceiveInto
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
@@ -16,10 +15,6 @@ import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerDockListener
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDockState
-import app.atomofiron.searchboxapp.work.ReceiveData
-import app.atomofiron.searchboxapp.work.ReceiveWorker
-import app.atomofiron.searchboxapp.work.ReceiveWorker.Companion.waitForDataRead
-import app.atomofiron.searchboxapp.work.toWorkerData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -62,20 +57,14 @@ class ExplorerDockDelegate @Inject constructor(
         }
     }
 
-    private fun receive(data: ActivityMode.Receive) {
-        val destination = store.currentNode.value
+    private fun receive(mode: ActivityMode.Receive) {
+        val destination = store.currentNode.value?.ref
         destination ?: return
-        val inputData = ReceiveData(data.subject, data.uris, data.texts.map { it.toString() }, destination.ref)
-        val request = OneTimeWorkRequest.Builder(ReceiveWorker::class.java)
-            .setInputData(inputData.toWorkerData())
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .build()
         router.permissions
             .request(POST_NOTIFICATIONS)
             .any {
-                workManager.beginWith(request).enqueue()
                 scope.launchOnMain {
-                    request.waitForDataRead()
+                    workManager.startReceiveInto(destination, mode)
                     router.finish()
                 }
             }

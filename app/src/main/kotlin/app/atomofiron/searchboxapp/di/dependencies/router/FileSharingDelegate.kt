@@ -6,13 +6,32 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.webkit.MimeTypeMap
+import androidx.work.OneTimeWorkRequest
+import androidx.work.OutOfQuotaPolicy
+import androidx.work.WorkManager
 import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
+import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.getUriForFile
+import app.atomofiron.searchboxapp.work.ReceiveData
+import app.atomofiron.searchboxapp.work.ReceiveWorker
+import app.atomofiron.searchboxapp.work.ReceiveWorker.Companion.waitForDataRead
+import app.atomofiron.searchboxapp.work.toWorkerData
 import java.io.File
+
+interface FileSharingDelegate {
+    fun openWith(item: Node)
+    fun shareWith(items: List<Node>)
+}
+
+interface FilePickingDelegate {
+    fun shareSinglePicked(item: Node)
+    fun shareMultiplePicked(items: List<Node>)
+}
 
 class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingDelegate, FilePickingDelegate {
 
@@ -101,12 +120,12 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
     }.unit()
 }
 
-interface FileSharingDelegate {
-    fun openWith(item: Node)
-    fun shareWith(items: List<Node>)
-}
-
-interface FilePickingDelegate {
-    fun shareSinglePicked(item: Node)
-    fun shareMultiplePicked(items: List<Node>)
+suspend fun WorkManager.startReceiveInto(dst: NodeRef, mode: ActivityMode.Receive) {
+    val inputData = ReceiveData(mode.subject, mode.uris, mode.texts.map { it.toString() }, dst)
+    val request = OneTimeWorkRequest.Builder(ReceiveWorker::class.java)
+        .setInputData(inputData.toWorkerData())
+        .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+        .build()
+    beginWith(request).enqueue()
+    request.waitForDataRead()
 }

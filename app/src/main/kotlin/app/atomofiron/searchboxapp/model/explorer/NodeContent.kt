@@ -26,7 +26,7 @@ sealed class NodeContent(
     data class Directory(
         val kind: DirectoryKind = DirectoryKind.Ordinary,
         override val rootType: NodeRootType? = null,
-    ) : NodeContent() {
+    ) : NodeContent(mimeType = MIME_TYPE) {
         companion object {
             const val MIME_TYPE = "inode/directory"
             val mimeTypes = listOf(MIME_TYPE)
