@@ -151,8 +151,8 @@ class FinderWorker(
                 else -> Shell[Shell.GREP_HCS]
             }
             val command = when {
-                item.isDirectory -> template.format(item.ref, maxDepth, query.escapeQuotes())
-                item.isFile -> template.format(query.escapeQuotes(), item.ref)
+                item.isDirectory -> template.format(item.ref.string, maxDepth, query.escapeQuotes())
+                item.isFile -> template.format(query.escapeQuotes(), item.ref.string)
                 else -> continue@forLoop
             }
             val output = Shell.exec(command, asSu, processObserver, forContentLineListener)
@@ -200,7 +200,7 @@ class FinderWorker(
                 excludeDirs -> Shell[Shell.FIND_F]
                 else -> Shell[Shell.FIND_FD]
             }
-            val command = template.format(item.ref, maxDepth)
+            val command = template.format(item.ref.string, maxDepth)
             val output = Shell.exec(command, asSu, processObserver, forNameLineListener)
             if (output.handleErrors(checkPoint, item)) {
                 searchByName(listOf(item))
@@ -287,7 +287,7 @@ class FinderWorker(
             for (i in 0..Int.MAX_VALUE) {
                 val path = inputData.getByteArray("$KEY_WHERE_PATH$i")
                 path ?: break
-                Node(NodeRef(path), content = NodeContent.Unknown).update(cacheConfig)
+                targets.add(Node(NodeRef(path), content = NodeContent.Unknown).update(cacheConfig))
             }
             when {
                 forContent -> searchForContent(targets)
