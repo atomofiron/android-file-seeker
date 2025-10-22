@@ -55,7 +55,7 @@ class ExplorerDockDelegate @Inject constructor(
         return ExplorerDockState {
             add(it.search)
             when (mode) {
-                ActivityMode.Default -> add(it.settings.copy(notice = notice))
+                is ActivityMode.Default -> add(it.settings.copy(notice = notice))
                 is ActivityMode.Receive -> add(it.confirm.copy(enabled = currentDir?.isDirectory == true))
                 is ActivityMode.Share -> add(it.confirm.copy(enabled = currentDir?.isFile == true || checked.isNotEmpty() && (mode.multiple || checked.size == 1)))
             }

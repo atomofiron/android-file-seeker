@@ -9,7 +9,6 @@ import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
@@ -23,22 +22,18 @@ import kotlinx.coroutines.flow.merge
 class ExplorerViewState(
     private val scope: CoroutineScope,
     val mode: ActivityMode,
-    explorerDockDelegate: ExplorerDockDelegate,
+    dockDelegate: ExplorerDockDelegate,
     private val store: ExplorerStore,
-    explorerInteractor: ExplorerInteractor,
-    preferenceStore: PreferenceStore,
+    interactor: ExplorerInteractor,
+    preferences: PreferenceStore,
 ) {
-    private val mimeTypes = when (mode) {
-        is ActivityMode.Default -> null
-        is ActivityMode.Share -> mode.mimes
-        is ActivityMode.Receive -> listOf(NodeContent.Directory.MIME_TYPE)
-    }
+    private val mimeTypes = mode.mimeFilters()
     val firstTab = NodeTabKey.Explorer(0, mimeTypes)
     val middleTab = NodeTabKey.Explorer(1, mimeTypes)
     val lastTab = NodeTabKey.Explorer(2, mimeTypes)
 
     val scrollTo = ChannelFlow<Node>()
-    val itemComposition = preferenceStore.explorerItemComposition
+    val itemComposition = preferences.explorerItemComposition
     private val otherAlerts = ChannelFlow<AlertMessage>()
     val alerts: Flow<AlertMessage> = merge(
         store.alerts.map { AlertMessage(it) },
@@ -49,10 +44,10 @@ class ExplorerViewState(
     val currentTab = MutableStateFlow(firstTab)
     val currentNode get() = store.currentNode.value
 
-    val currentTabFlow = explorerInteractor.getFlow(firstTab)
+    val currentTabFlow = interactor.getFlow(firstTab)
     val updates: Flow<Node> = store.updated
     val permissionRequiredWarning = ChannelFlow<Unit>()
-    val dock: Flow<List<DockItem>> = explorerDockDelegate.dock
+    val dock: Flow<List<DockItem>> = dockDelegate.dock
 
     fun showPermissionRequiredWarning() = permissionRequiredWarning(scope)
 

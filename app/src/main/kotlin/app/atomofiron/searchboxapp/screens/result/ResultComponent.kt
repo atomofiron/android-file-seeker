@@ -8,6 +8,8 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.ResultChannel
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
+import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
+import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegateImpl
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
@@ -15,6 +17,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.dependencies.store.ResultStore
+import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultCurtainMenuDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultItemActionDelegate
@@ -42,6 +45,8 @@ interface ResultComponent {
         fun bind(scope: CoroutineScope): Builder
         @BindsInstance
         fun bind(params: ResultPresenterParams): Builder
+        @BindsInstance
+        fun bind(mode: ActivityMode): Builder
         fun dependencies(dependencies: ResultDependencies): Builder
         fun build(): ResultComponent
     }
@@ -69,6 +74,7 @@ class ResultModule {
         router: ResultRouter,
         resources: AppResources,
         itemActionDelegate: ResultItemActionDelegate,
+        filePickingDelegate: FilePickingDelegate,
     ): ResultPresenter {
         return ResultPresenter(
             params,
@@ -79,6 +85,7 @@ class ResultModule {
             router,
             resources,
             itemActionDelegate,
+            filePickingDelegate,
         )
     }
 
@@ -125,12 +132,19 @@ class ResultModule {
     @ResultScope
     fun viewState(
         params: ResultPresenterParams,
+        mode: ActivityMode,
         scope: CoroutineScope,
         finderStore: FinderStore,
         preferenceStore: PreferenceStore,
     ): ResultViewState {
-        return ResultViewState(params, finderStore, scope, preferenceStore)
+        return ResultViewState(params, mode, finderStore, scope, preferenceStore)
     }
+
+    @Provides
+    @ResultScope
+    fun fileSharingDelegate(
+        activityProperty: ActivityProperty,
+    ): FilePickingDelegate = FileSharingDelegateImpl(activityProperty)
 }
 
 interface ResultDependencies {

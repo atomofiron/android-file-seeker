@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.common
 
 import android.net.Uri
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
 
 sealed class ActivityMode(
     val default: Boolean = false,
@@ -19,4 +20,10 @@ sealed class ActivityMode(
         val mimes: List<String>,
         val multiple: Boolean,
     ) : ActivityMode()
+
+    fun mimeFilters(): List<String>? = when (this) {
+        is Default -> null
+        is Share -> mimes
+        is Receive -> listOf(NodeContent.Directory.MIME_TYPE)
+    }
 }

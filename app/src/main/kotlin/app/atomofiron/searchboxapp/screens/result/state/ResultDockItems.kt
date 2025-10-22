@@ -10,8 +10,9 @@ data class ResultDockState(
     val status: DockItem,
     val sorting: DockItem,
     val share: DockItem,
-    val export: DockItem,
-) : List<DockItem> by listOf(status, sorting, share, export) {
+    val export: DockItem?,
+    val confirm: DockItem?,
+) : List<DockItem> by listOfNotNull(status, sorting, share, export, confirm) {
     companion object {
         val Default = ResultDockState(
             status = DockItem(
@@ -45,6 +46,12 @@ data class ResultDockState(
                 DockItem.Icon(R.drawable.ic_document_send),
                 DockItem.Label(R.string.export_btn),
                 enabled = false,
+            ),
+            confirm = DockItem(
+                DockItem.Id.Auto(),
+                DockItem.Icon(R.drawable.ic_circle_check),
+                DockItem.Label(R.string.confirm),
+                primary = true,
             ),
         )
         inline operator fun invoke(block: ResultDockState.() -> ResultDockState) = Default.run(block)

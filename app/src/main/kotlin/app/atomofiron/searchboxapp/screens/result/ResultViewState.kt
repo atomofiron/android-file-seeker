@@ -14,6 +14,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.toDockItem
+import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState
 import app.atomofiron.searchboxapp.utils.Const
@@ -22,15 +23,23 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combineTransform
+import java.util.UUID
+import kotlin.collections.isNotEmpty
 
 class ResultViewState(
     params: ResultPresenterParams,
+    val mode: ActivityMode,
     private val finderStore: FinderStore,
     private val scope: CoroutineScope,
     preferenceStore: PreferenceStore,
 ) {
+    private val mimeTypes = mode.mimeFilters() ?: emptyList()
     private val taskId = params.taskId
-    val task = DeferredStateFlow<SearchTask>()
+    lateinit var taskUuid: UUID
+        private set
+    var error: String? = null
+        private set
+    val result = DeferredStateFlow<SearchResult.FinderResult>()
     val composition = preferenceStore.explorerItemComposition
     val alerts = ChannelFlow<AlertMessage.Res>()
     val checked = MutableStateFlow(listOf<Int>())
@@ -46,20 +55,18 @@ class ResultViewState(
 
     private fun transformState() {
         if (taskId != Const.UNDEFINED) combineTransform(finderStore.tasksFlow, checked) { tasks, checked ->
-            val couple = tasks.task(checked)
-            couple ?: return@combineTransform
-            val (newTask, sorting) = couple
-            task.value = newTask
-            dock.value = dock(newTask, sorting)
-            emit(Unit)
+            emit(reduce(tasks, checked))
         }.launch(scope, Dispatchers.Default)
     }
 
-    private fun List<SearchTask>.task(checked: List<Int>): Pair<SearchTask,NodeSorting>? {
-        return find { it.uniqueId == taskId }?.let { task ->
+    private fun reduce(tasks: List<SearchTask>, checked: List<Int>) {
+        tasks.find { it.uniqueId == taskId }?.let { task ->
+            taskUuid = task.uuid
+            error = task.error
             val result = task.result as SearchResult.FinderResult
-            val matches = result.matches.map { match ->
+            val matches = result.matches.mapNotNull { match ->
                 when {
+                    mimeTypes.isNotEmpty() && !match.item.content.matchesAny(mimeTypes)-> null
                     !checked.contains(match.item.uniqueId) -> match
                     else -> match.update(match.item.copy(isChecked = true))
                 }
@@ -71,27 +78,38 @@ class ResultViewState(
                 is NodeSorting.Size -> matches.sortBy(sorting.reversed) { it.item.length }
             }
             matches.sortBy { !it.isDirectory }
-            val newTask = task.copy(result = result.copy(matches = matches))
-            newTask to sorting
+            val newResult = result.copy(matches = matches)
+            this.result.value = newResult
+            dock.reduce(task.inProgress, newResult, sorting, checked)
         }
     }
 
-    private fun dock(task: SearchTask, new: NodeSorting): ResultDockState {
-        return dock.value.run {
+    private fun MutableStateFlow<ResultDockState>.reduce(
+        inProgress: Boolean,
+        result: SearchResult.FinderResult,
+        new: NodeSorting,
+        checked: List<Int>,
+    ) {
+        value = value.run {
             val sorting = when  {
                 sorting.children.selectionMatches(new) -> sorting
                 else -> new.toDockItem(sorting.id, sorting.label).copy(children = sorting.children.makeSelected(new))
             }
-            val status = if (status.clickable == task.inProgress) status else status.copy(
-                clickable = task.inProgress,
-                icon = DockItem.Icon(if (task.inProgress) R.drawable.ic_circle_stop else R.drawable.ic_circle_check),
-                label = DockItem.Label(if (task.inProgress) R.string.stop else R.string.completed),
+            val status = if (status.clickable == inProgress) status else status.copy(
+                clickable = inProgress,
+                icon = DockItem.Icon(if (inProgress) R.drawable.ic_circle_stop else R.drawable.ic_circle_check),
+                label = DockItem.Label(if (inProgress) R.string.stop else R.string.completed),
             )
             copy(
                 status = status,
                 sorting = sorting,
-                share = share.copy(enabled = !task.result.isEmpty),
-                export = export.copy(enabled = !task.result.isEmpty),
+                share = share.copy(enabled = result.matches.isNotEmpty()),
+                export = export?.takeIf { mode.default }?.copy(enabled = result.matches.isNotEmpty()),
+                confirm = when (mode) {
+                    is ActivityMode.Default -> null
+                    is ActivityMode.Receive -> confirm?.copy(enabled = checked.isNotEmpty())
+                    is ActivityMode.Share -> confirm?.copy(enabled = checked.isNotEmpty() && (mode.multiple || checked.size == 1))
+                },
             )
         }
     }

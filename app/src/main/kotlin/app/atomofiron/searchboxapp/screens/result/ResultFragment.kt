@@ -19,7 +19,7 @@ import app.atomofiron.searchboxapp.custom.addExplorerFastScroll
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.screens.common.delegates.apply
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import com.google.android.material.snackbar.Snackbar
@@ -37,7 +37,6 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         binding.snackbarContainer.makeSnackbar("", Snackbar.LENGTH_INDEFINITE)
             .setAction(R.string.got_it) { }
     }
-    private var snackbarError: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,9 +66,10 @@ class ResultFragment : Fragment(R.layout.fragment_result),
 
     private fun onBottomMenuItemClick(item: DockItem) {
         when (val id = item.id) {
-            DefaultDockState.status.id -> presenter.onStopClick()
             DefaultDockState.sorting.id -> Unit
-            DefaultDockState.export.id -> presenter.onExportClick()
+            DefaultDockState.status.id -> presenter.onStopClick()
+            DefaultDockState.export?.id -> presenter.onExportClick()
+            DefaultDockState.confirm?.id -> presenter.onConfirmClick()
             DefaultDockState.share.id -> presenter.onShareClick()
             is NodeSorting -> presenter.onSortingSelected(id)
         }
@@ -77,12 +77,13 @@ class ResultFragment : Fragment(R.layout.fragment_result),
 
     override fun ResultViewState.onViewCollect() {
         viewCollect(composition, collector = resultAdapter::setComposition)
-        viewCollect(task, collector = ::onTaskChange)
+        viewCollect(result, collector = ::onTaskChange)
         viewCollect(alerts, collector = ::showSnackbar)
         viewCollect(dock, collector = binding.dockBar::submit)
     }
 
     override fun FragmentResultBinding.onApplyInsets() {
+        disclaimer.apply(viewState.mode, insetsBackground, root)
         root.apply(recyclerView = recyclerView, dockView = dockBar, snackbarContainer = snackbarContainer)
     }
 
@@ -91,17 +92,16 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         resultAdapter.notifyItemChanged(0)
     }
 
-    private fun onTaskChange(task: SearchTask) {
-        resultAdapter.setResult(task.result as SearchResult.FinderResult)
+    private fun onTaskChange(result: SearchResult.FinderResult) {
+        resultAdapter.setResult(result)
 
-        if (!task.result.isEmpty) {
+        if (!result.isEmpty) {
             // fix first item offset
             resultAdapter.notifyItemChanged(0)
         }
-        if (task.error != null) {
-            errorSnackbar.setText(task.error).show()
+        viewState.error?.let {
+            errorSnackbar.setText(it).show()
         }
-        snackbarError = task.error
     }
 
     private fun showSnackbar(message: AlertMessage.Res) {

@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.result
 import androidx.lifecycle.viewModelScope
 import app.atomofiron.common.arch.BaseViewModel
 import app.atomofiron.searchboxapp.di.DaggerInjector
+import app.atomofiron.searchboxapp.screens.common.activityMode
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import javax.inject.Inject
 
@@ -20,6 +21,7 @@ class ResultViewModel : BaseViewModel<ResultComponent, ResultFragment, ResultVie
             .bind(viewProperty)
             .bind(viewModelScope)
             .bind(params)
+            .bind(view.activityMode)
             .dependencies(DaggerInjector.appComponent)
             .build().apply {
                 inject(this@ResultViewModel)

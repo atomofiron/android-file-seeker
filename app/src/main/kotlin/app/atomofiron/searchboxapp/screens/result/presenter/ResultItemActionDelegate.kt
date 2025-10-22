@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.result.presenter
 
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
 import app.atomofiron.searchboxapp.screens.result.ResultViewState
@@ -18,14 +17,14 @@ class ResultItemActionDelegate(
     override fun onItemClick(item: Node) {
         when {
             item.isDirectory -> Unit // todo open dir
-            item.content is NodeContent.Text -> router.openFile(item.ref, viewState.task.value.uuid)
+            item.content is NodeContent.Text -> router.openFile(item.ref, viewState.taskUuid)
             item.content is NodeContent.AndroidApp -> operations.askForAndroidApp(item.content)
             else -> router.openWith(item)
         }
     }
 
     override fun onItemLongClick(item: Node) = viewState.run {
-        val matches = (task.value.result as SearchResult.FinderResult).matches
+        val matches = result.value.matches
         val items = when {
             item.isChecked -> matches.mapNotNull { it.item.takeIf { checked.value.contains(it.uniqueId) } }
             else -> listOf(item)
