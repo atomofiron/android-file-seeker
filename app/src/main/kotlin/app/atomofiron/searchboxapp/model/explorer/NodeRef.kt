@@ -72,6 +72,7 @@ class NodeRef(val bytes: ByteArray) {
     constructor(bytes: ByteArray, child: String) : this(bytes + child)
 
     operator fun plus(child: String) = NodeRef(bytes + child)
+        .also { it.parent = this }
 
     operator fun get(i: Int) = bytes[i]
 
@@ -110,6 +111,13 @@ class NodeRef(val bytes: ByteArray) {
 }
 
 private operator fun ByteArray.plus(child: String): ByteArray {
+    val child = when {
+        child.endsWith('/') -> child.substring(0, child.length.dec())
+        else -> child
+    }
+    if (child.isEmpty()) {
+        return this
+    }
     val new = ByteArray(size + child.length + 1)
     copyInto(new)
     new[size] = SLASH_BYTE

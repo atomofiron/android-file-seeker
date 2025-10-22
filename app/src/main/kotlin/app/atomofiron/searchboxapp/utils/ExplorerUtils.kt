@@ -414,9 +414,9 @@ object ExplorerUtils {
         ZipInputStream(BufferedInputStream(FileInputStream(ref.string))).use { stream ->
             var entry: ZipEntry? = stream.nextEntry
             while (entry != null) {
-                val ref = ref + when {
-                    entry.name.endsWith('/') -> entry.name.substring(0, entry.name.length.dec())
-                    else -> entry.name
+                if (entry.name.isEmpty()) {
+                    entry = stream.nextEntry
+                    continue
                 }
                 val content = when {
                     entry.isDirectory -> NodeContent.Directory()
@@ -426,8 +426,8 @@ object ExplorerUtils {
                     .format(Date(entry.time))
                     .split(NodeProperties.DATE_TIME_SEPARATOR)
                 val properties = NodeProperties(date = dateTime.first(), time = dateTime.last(), size = entry.size.toSize(), length = entry.size)
-                val node = Node(ref, parentRef = this.ref, rootId = uniqueId, properties = properties, content = content)
-                children.add(node)
+                val child = Node(ref + entry.name, parentRef = ref, rootId = uniqueId, properties = properties, content = content)
+                children.add(child)
                 entry = stream.nextEntry
             }
         }
