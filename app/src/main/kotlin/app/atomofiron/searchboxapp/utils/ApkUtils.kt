@@ -9,9 +9,11 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.signature
 import app.atomofiron.common.util.extension.then
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
+import app.atomofiron.searchboxapp.utils.Const.DOT_APK
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.packageManager
 import java.io.BufferedInputStream
 import java.io.File
@@ -24,7 +26,7 @@ import java.util.zip.ZipInputStream
 import kotlin.random.Random
 import kotlin.random.nextUInt
 
-const val BASE_APK = "base.apk"
+const val BASE_APK = "base$DOT_APK"
 const val TEMP_APKS_DIR = "apks"
 @Suppress("DEPRECATION") @SuppressLint("InlinedApi")
 private const val WITH_SIGNATURE = PackageManager.GET_SIGNATURES or PackageManager.GET_SIGNING_CERTIFICATES
@@ -75,16 +77,16 @@ fun AndroidApp.getApksContent(input: InputStream?, signature: Boolean = false): 
         ?.mkdir()
         ?.takeIf { tmp.createNewFile() }
         ?: return Rslt.Err("Can't create temp file")
-    var containsBaseApk = false
+    var containsMainApk = false
     try {
         ZipInputStream(BufferedInputStream(input)).use { stream ->
             var entry: ZipEntry? = stream.nextEntry
             while (entry != null) {
-                if (entry.name == BASE_APK) {
+                if (entry.name.possibleMainApk()) {
                     FileOutputStream(tmp).use {
                         stream.copyTo(it)
                     }
-                    containsBaseApk = true
+                    containsMainApk = true
                     break
                 }
                 entry = stream.nextEntry
@@ -94,7 +96,7 @@ fun AndroidApp.getApksContent(input: InputStream?, signature: Boolean = false): 
         return e.toRslt()
     }
     return when {
-        !containsBaseApk -> Rslt.Err("$BASE_APK not found")
+        !containsMainApk -> Rslt.Err("$BASE_APK not found")
         tmp.length() == 0L -> Rslt.Err("Temp file is empty")
         else -> getApkContent(tmp.absolutePath, signature)
     }.also { tmp.delete() }
@@ -104,5 +106,12 @@ fun AndroidApp.getApkContent(apkPath: String, signature: Boolean = false): Rslt<
     val packageManager = packageManager.value
         ?: return Rslt.Err("No package manager")
     val info = packageManager.apkInfo(apkPath, icon = true, signature)
-    return copy(info = info).toRslt()
+    return when (info) {
+        null -> Rslt.Err()
+        else -> copy(info = info, isCached = true).toOk()
+    }
 }
+
+private fun String.possibleMainApk() = this == BASE_APK || !startsWith("config.") && endsWith(DOT_APK)
+
+fun NodeChildren.possibleContainsMainApk() = any { it.name.possibleMainApk() }

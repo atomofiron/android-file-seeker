@@ -20,13 +20,14 @@ import app.atomofiron.searchboxapp.model.network.GithubRelease
 import app.atomofiron.searchboxapp.model.network.Loading
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
 import app.atomofiron.searchboxapp.model.other.UpdateType
+import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.Rslt.Err
 import app.atomofiron.searchboxapp.utils.Rslt.Ok
 import app.atomofiron.searchboxapp.utils.apkInfo
 import kotlinx.coroutines.launch
 import java.io.File
 
-private const val EXT_APK = ".apk"
+private const val EXT_APK = Const.DOT_APK
 private const val SUBDIR = "updates" // src/res/xml/provider_paths.xml
 
 class AppUpdateServiceGithubImpl(

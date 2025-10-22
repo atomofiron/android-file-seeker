@@ -8,7 +8,15 @@ sealed class NodeError {
     data object Unknown : NodeError()
     data class Multiply(val lines: List<String>) : NodeError()
     data class Message(val message: String) : NodeError() {
-        init { debugRequire(message.isNotBlank()) { "error message is empty" } }
+        companion object {
+            fun orUnknown(message: String?) = when {
+                message.isNullOrBlank() -> Unknown
+                else -> Message(message)
+            }
+        }
+        init {
+            debugRequire(message.isNotBlank()) { "error message is empty" }
+        }
     }
 
     override fun toString(): String {

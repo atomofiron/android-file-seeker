@@ -21,7 +21,7 @@ sealed class Rslt<T>(val isOk: Boolean) {
     }
 }
 
-fun <T> T.toRslt() = Rslt.Ok(this)
+fun <T> T.toOk() = Rslt.Ok(this)
 
 fun <T> String.toErr() = Rslt.Err<T>(this)
 

@@ -5,6 +5,7 @@ import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.extension.takeIfDebug
+import app.atomofiron.common.util.forHumans
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.model.CacheConfig
@@ -55,8 +56,8 @@ object ExplorerUtils {
     private const val FILE_UNKNOWN = "application/octet-stream"
     private const val FILE_XML = "application/xml"
     private const val FILE_RAR = "application/vnd.rar"
-    private const val FILE_ZIP = "application/zip"
-    private const val FILE_APK = "application/vnd.android.package-archive"
+    const val FILE_ZIP = "application/zip"
+    const val FILE_APK = "application/vnd.android.package-archive"
     private const val FILE_GZIP = "application/gzip"
     private const val FILE_JAVA = "application/java-vm"
     private const val FILE_XZ = "application/x-xz"
@@ -86,7 +87,7 @@ object ExplorerUtils {
     private const val EXT_GIF = ".gif"
     private const val EXT_WEBP = ".webp"
     private const val EXT_SVG = ".svg"
-    private const val EXT_APK = ".apk"
+    private const val EXT_APK = Const.DOT_APK
     private const val EXT_ZIP = ".zip"
     private const val EXT_XAPK = ".xapk"
     private const val EXT_APKS = ".apks"
@@ -374,31 +375,31 @@ object ExplorerUtils {
             is NodeContent.Picture,
             is NodeContent.Movie -> content
             is NodeContent.Music -> content.copy(thumbnail = ref.string.createAudioThumbnail(config)?.forNode)
-            is NodeContent.Zip -> cache(content).contentOrNodeError(this) { return it }.let { zip ->
-                when (zip.children?.any { it.name == BASE_APK }) {
-                    null, false -> zip
-                    true -> AndroidApp.apks(ref, children = zip.children).let { apks ->
+            is NodeContent.Zip -> cacheZip().let { item ->
+                when (children?.possibleContainsMainApk()) {
+                    null, false -> return item
+                    true -> AndroidApp.apks(ref).let { apks ->
                         apks.tryGetApksContent(ref.string)
-                            .contentOrNodeError(this, apks) { return it }
+                            .contentOrNodeError(this, apks.copy(isCached = true)) { return it }
                     }
                 }
             }
             is AndroidApp -> when {
                 content.splitApk -> content
                     .tryGetApksContent(ref.string)
-                    .contentOrNodeError(this) { return it }
+                    .contentOrNodeError(this, content.copy(isCached = true)) { return it }
                 else -> content
                     .getApkContent(ref.string)
-                    .contentOrNodeError(this) { return it }
+                    .contentOrNodeError(this, content.copy(isCached = true)) { return it }
             }
             else -> return this
         }
         return copy(content = content)
     }
 
-    private inline fun <C : NodeContent> Rslt<C>.contentOrNodeError(node: Node, content: NodeContent? = null, action: (withError: Node) -> Nothing): C {
+    private inline fun <C : NodeContent> Rslt<C>.contentOrNodeError(node: Node, content: NodeContent, action: (withError: Node) -> Nothing): C {
         return unwrapOrElse {
-            action(node.copy(content = content ?: node.content, error = NodeError.Message(it)))
+            action(node.copy(content = content, error = NodeError.Message.orUnknown(it)))
         }
     }
 
@@ -408,7 +409,7 @@ object ExplorerUtils {
         e.toRslt()
     }
 
-    private fun Node.cache(content: NodeContent.Zip): Rslt<NodeContent.Zip> = try {
+    private fun Node.cacheZip(): Node = try {
         val children = mutableListOf<Node>()
         ZipInputStream(BufferedInputStream(FileInputStream(ref.string))).use { stream ->
             var entry: ZipEntry? = stream.nextEntry
@@ -430,9 +431,10 @@ object ExplorerUtils {
                 entry = stream.nextEntry
             }
         }
-        content.copy(children = children).toRslt()
+        val content = (content as NodeContent.Zip).copy(isCached = true)
+        copy(children = NodeChildren(children), content = content)
     } catch (e: Exception) {
-        e.toRslt()
+        copy(error = NodeError.Message(e.forHumans()))
     }
 
     private inline fun <reified T : NodeContent> NodeContent?.ifNotCached(action: () -> T): T {
@@ -578,14 +580,14 @@ object ExplorerUtils {
     }
 
     private fun String.toNodeError(): NodeError {
-        val lines = split(LF)
-        val first = lines.find { it.isNotBlank() }
+        val lines = split(LF).filter { it.isNotBlank() }
+        val first = lines.firstOrNull()
         return when {
             lines.size > 1 -> NodeError.Multiply(lines)
-            first.isNullOrBlank() -> NodeError.Unknown
+            first == null -> NodeError.Unknown
             first.startsWith(LS_NO_SUCH_FILE) -> NodeError.NoSuchFile
             first.startsWith(LS_PERMISSION_DENIED) -> NodeError.PermissionDenied
-            else -> NodeError.Message(first)
+            else -> NodeError.Message.orUnknown(first)
         }
     }
 

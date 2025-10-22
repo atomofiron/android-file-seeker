@@ -56,7 +56,7 @@ class TextViewerService(
             return if (output.success || output.code == 1 && output.error.isEmpty()) {
                 val indexes = lineIndexToMatches.keys.sorted()
                 val result = TextSearchResult(count, lineIndexToMatches, indexes)
-                result.toRslt()
+                result.toOk()
             } else  {
                 logE("searchInFile !success, error: ${output.error}")
                 Rslt.Err(output.error)

@@ -3,6 +3,8 @@ package app.atomofiron.searchboxapp.model.explorer
 import app.atomofiron.common.util.unsafeLazy
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_APK
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_ZIP
 
 sealed class NodeContent(
     // '*/*' - значит тип неизвестен,
@@ -108,39 +110,35 @@ sealed class NodeContent(
         override val isCached = details != null
     }
 
-    sealed class Archive(mimeType: String) : File(mimeType) {
-        open val children: List<Node>? = null
-        override val isCached get() = children != null
-    }
+    sealed class Archive(mimeType: String) : File(mimeType)
 
     data class Zip(
-        override val children: List<Node>? = null,
-        override val mimeType: String = "application/zip",
+        override val mimeType: String = FILE_ZIP,
+        override val isCached: Boolean = false,
     ) : Archive(mimeType)
 
-    data class Bzip2(override val children: List<Node>? = null) : Archive("application/x-bzip2")
-    data class Gz(override val children: List<Node>? = null) : Archive("application/gzip")
-    data class Tar(override val children: List<Node>? = null) : Archive("application/x-tar")
-    data class Rar(override val children: List<Node>? = null) : Archive("application/vnd.rar")
+    data class Bzip2(override val isCached: Boolean = true) : Archive("application/x-bzip2")
+    data class Gz(override val isCached: Boolean = true) : Archive("application/gzip")
+    data class Tar(override val isCached: Boolean = true) : Archive("application/x-tar")
+    data class Rar(override val isCached: Boolean = true) : Archive("application/vnd.rar")
 
     data class AndroidApp(
         val ref: NodeRef,
         val splitApk: Boolean,
         val info: ApkInfo? = null,
-        override val children: List<Node>? = null,
-    ) : Archive(mimeType = if (splitApk) "application/zip" else "application/vnd.android.package-archive") {
+        override val isCached: Boolean = false,
+    ) : Archive(mimeType = if (splitApk) FILE_ZIP else FILE_APK) {
 
         override val details: String? = info?.versionName
 
-        override val isCached = thumbnail?.ready == true
-
-        override val thumbnail: Thumbnail? get() = when (info) {
-            null -> Thumbnail.Loading
-            else -> info.icon
+        override val thumbnail: Thumbnail? get() = when {
+            info != null -> info.icon
+            !isCached -> Thumbnail.Loading
+            else -> null
         }
         companion object {
-            fun apk(ref: NodeRef, info: ApkInfo? = null, children: List<Node>? = null) = AndroidApp(ref, splitApk = false, info, children)
-            fun apks(ref: NodeRef, info: ApkInfo? = null, children: List<Node>? = null) = AndroidApp(ref, splitApk = true, info, children)
+            fun apk(ref: NodeRef, info: ApkInfo? = null) = AndroidApp(ref, splitApk = false, info)
+            fun apks(ref: NodeRef, info: ApkInfo? = null) = AndroidApp(ref, splitApk = true, info)
         }
     }
 

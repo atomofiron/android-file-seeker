@@ -7,6 +7,7 @@ import app.atomofiron.searchboxapp.model.network.Loading
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.toErr
 import app.atomofiron.searchboxapp.utils.toRslt
+import app.atomofiron.searchboxapp.utils.toOk
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
@@ -48,7 +49,7 @@ class UpdateApi {
         val response = client.get(RELEASES)
         when {
             response.status.ok() -> response.body<List<GithubRelease>>()
-                .toRslt()
+                .toOk()
             else -> response.body<GithubError>()
                 .run { "[$status] $message" }
                 .toErr()

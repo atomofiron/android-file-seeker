@@ -21,6 +21,7 @@ import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.Const.DOT_APK
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 
@@ -40,7 +41,7 @@ class ExplorerItemDelegate(
         val appName = resources.value.getString(R.string.app_name)
         val versionName = resources.value.getString(R.string.version_name)
             .split(' ').first()
-        val name = "$appName $versionName.apk".replace(' ', '_')
+        val name = "$appName $versionName$DOT_APK".replace(' ', '_')
         val properties = NodeProperties("drwxrwx---", "owner", "group", "47K", "2038-01-19", "03:14")
         val apkInfo = ApkInfo(Thumbnail(R.mipmap.ic_launcher), "", VERSION_NAME, 0, "", 0, 0, null, 0, null)
         val content = NodeContent.AndroidApp.apk(NodeRef(""), apkInfo)
