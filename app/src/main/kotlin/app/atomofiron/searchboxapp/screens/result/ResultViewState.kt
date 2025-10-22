@@ -91,7 +91,7 @@ class ResultViewState(
         checked: List<Int>,
     ) {
         value = value.run {
-            val sorting = when  {
+            val sorting = when {
                 sorting.children.selectionMatches(new) -> sorting
                 else -> new.toDockItem(sorting.id, sorting.label).copy(children = sorting.children.makeSelected(new))
             }
@@ -106,8 +106,8 @@ class ResultViewState(
                 share = share.copy(enabled = result.matches.isNotEmpty()),
                 export = export?.takeIf { mode.default }?.copy(enabled = result.matches.isNotEmpty()),
                 confirm = when (mode) {
-                    is ActivityMode.Default -> null
-                    is ActivityMode.Receive -> confirm?.copy(enabled = checked.isNotEmpty())
+                    is ActivityMode.Default,
+                    is ActivityMode.Receive -> null
                     is ActivityMode.Share -> confirm?.copy(enabled = checked.isNotEmpty() && (mode.multiple || checked.size == 1))
                 },
             )
