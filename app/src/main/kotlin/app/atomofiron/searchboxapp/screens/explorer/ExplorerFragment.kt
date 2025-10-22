@@ -4,9 +4,6 @@ import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
 import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.core.graphics.Insets
-import androidx.core.view.isVisible
-import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -18,23 +15,18 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentExplorerBinding
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
-import app.atomofiron.searchboxapp.custom.view.calcStatusBarPadding
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeError
-import app.atomofiron.searchboxapp.screens.common.ActivityMode
+import app.atomofiron.searchboxapp.screens.common.delegates.apply
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock
 import app.atomofiron.searchboxapp.screens.main.util.KeyCodeConsumer
-import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.recyclerView
 import com.google.android.material.snackbar.Snackbar
-import lib.atomofiron.insets.InsetsSource
-import lib.atomofiron.insets.insetsSource
-import kotlin.math.max
 
 class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     BaseFragment<ExplorerFragment, ExplorerViewState, ExplorerPresenter, FragmentExplorerBinding> by BaseFragmentImpl(),
@@ -68,11 +60,6 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
                 presenter.onTabSelected(position)
             }
         })
-        when (viewState.mode) {
-            ActivityMode.Default -> binding.disclaimer.isVisible = false
-            is ActivityMode.Share -> binding.disclaimer.setText(R.string.disclaimer_pick_files)
-            is ActivityMode.Receive -> binding.disclaimer.setText(R.string.disclaimer_choose_directory)
-        }
     }
 
     private fun onNavigationItemSelected(item: DockItem) {
@@ -106,19 +93,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     }
 
     override fun FragmentExplorerBinding.onApplyInsets() {
-        if (disclaimer.isVisible) {
-            root.addInsetsListener {
-                val dock = it[ExtType.dock]
-                val statusBar = it[ExtType.statusBars]
-                val paddings = root.calcStatusBarPadding(it)
-                disclaimer.translationY = (statusBar.top - paddings.bottom).toFloat()
-                disclaimer.updatePadding(left = max(dock.left, paddings.left), right = max(dock.right, paddings.right))
-            }
-            insetsBackground += ExtType.topDisclaimer
-            disclaimer.insetsSource {
-                InsetsSource.submit(ExtType.topDisclaimer, Insets.of(0, it.height + it.y.toInt(), 0, 0))
-            }
-        }
+        disclaimer.apply(viewState.mode, insetsBackground, root)
         root.apply(dockView = binding.dockBar)
     }
 

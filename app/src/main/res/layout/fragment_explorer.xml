@@ -18,15 +18,11 @@
         android:layout_height="match_parent"
         app:navigationBar="none"
         />
-    <TextView
+    <include
         android:id="@+id/disclaimer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/status_bar_min_padding"
-        android:gravity="center"
-        android:textStyle="bold"
-        android:textSize="16sp"
-        tools:text="Please do something"
+        layout="@layout/disclaimer"
         />
     <app.atomofiron.searchboxapp.custom.view.SnackbarContainerLayout
         android:id="@+id/snackbar_container"

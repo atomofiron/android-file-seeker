@@ -23,6 +23,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
+    <include
+        android:id="@+id/disclaimer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        layout="@layout/disclaimer"
+        />
     <app.atomofiron.searchboxapp.custom.view.dock.DockBarView
         android:id="@+id/dock_bar"
         android:layout_width="@dimen/dock_width"
