@@ -203,7 +203,7 @@ class PreferenceStore(
     private fun <V> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {
         return data.mapNotNull { it[key] ?: key.default }
             .shareInOne(scope)
-            .asProperty()
+            .asProperty(initial = key.default)
     }
 
     private fun <V> getNullableFlow(key: PreferenceKey<V>): StateFlowProperty<V?> {
@@ -215,7 +215,7 @@ class PreferenceStore(
     private fun <V,E> getFlow(key: PreferenceKey<V>, transformation: (V) -> E): StateFlowProperty<E> {
         return data.mapNotNull { (it[key] ?: key.default).let(transformation) }
             .shareInOne(scope)
-            .asProperty()
+            .asProperty(initial = transformation(key.default))
     }
 
     private fun <T> Flow<T>.shareInOne(scope: CoroutineScope): SharedFlow<T> {

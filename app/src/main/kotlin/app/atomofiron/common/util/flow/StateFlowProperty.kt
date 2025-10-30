@@ -5,12 +5,16 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.reflect.KProperty
 
-class StateFlowProperty<T>(private val flow: SharedFlow<T>) : SharedFlow<T> by flow
-    , StateFlow<T>
-    , RoProperty<T>
-{
-    override val value: T get() = flow.replayCache.first()
+class StateFlowProperty<T>(
+    private val flow: SharedFlow<T>,
+    private var initial: T? = null,
+) : SharedFlow<T> by flow, StateFlow<T>, RoProperty<T> {
+
+    override val value: T get() = flow.replayCache.firstOrNull()
+        ?.also { initial = null }
+        ?: initial as T
+
     override operator fun getValue(thisRef: Any?, property: KProperty<*>): T = value
 }
 
-fun <T> SharedFlow<T>.asProperty(): StateFlowProperty<T> = StateFlowProperty(this)
+fun <T> SharedFlow<T>.asProperty(initial: T? = null): StateFlowProperty<T> = StateFlowProperty(this, initial)
