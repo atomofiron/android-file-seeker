@@ -38,6 +38,9 @@ sealed class SearchResult {
         val retries: Int = 0,
         val sorting: NodeSorting = NodeSorting.Date.Reversed,
     ) : SearchResult() {
+        companion object {
+            val Stub = Files(inContent = false)
+        }
 
         override fun getCounters(): IntArray = when {
             inContent -> intArrayOf(count, matches.size, countTotal)

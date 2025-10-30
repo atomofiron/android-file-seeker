@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.result
 
 import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.ChannelFlow
-import app.atomofiron.common.util.flow.DeferredStateFlow
 import app.atomofiron.common.util.flow.launch
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
@@ -39,7 +38,7 @@ class ResultViewState(
         private set
     var error: String? = null
         private set
-    val result = DeferredStateFlow<SearchResult.FinderResult>()
+    val result = MutableStateFlow(Files.Stub)
     val composition = preferenceStore.explorerItemComposition
     val alerts = ChannelFlow<AlertMessage.Res>()
     val checked = MutableStateFlow(listOf<Int>())
