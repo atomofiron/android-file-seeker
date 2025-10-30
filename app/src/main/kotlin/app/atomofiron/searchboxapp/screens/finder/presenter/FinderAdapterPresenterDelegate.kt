@@ -5,6 +5,7 @@ import app.atomofiron.searchboxapp.di.dependencies.interactor.FinderInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
+import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.finder.FinderRouter
 import app.atomofiron.searchboxapp.screens.finder.FinderViewState
@@ -34,7 +35,7 @@ class FinderAdapterPresenterDelegate(
     EditMaxSizeHolder.OnEditMaxSizeListener,
     TestHolder.OnTestChangeListener,
     ButtonsHolder.FinderButtonsListener,
-    TaskHolder.OnActionListener {
+    TaskHolder.OnActionListener<SearchResult> {
 
     override fun onConfigChange(options: SearchOptions) {
         preferences { setSearchOptions(options) }
@@ -52,15 +53,15 @@ class FinderAdapterPresenterDelegate(
 
     override fun onTestTextChange(value: String?) = preferences { setTestField(value) }
 
-    override fun onItemClick(item: FinderStateItem.Task) {
+    override fun onItemClick(item: FinderStateItem.Task<SearchResult>) {
         router.showResult(item.task.uniqueId)
     }
 
-    override fun onProgressStopClick(item: FinderStateItem.Task) {
+    override fun onProgressStopClick(item: FinderStateItem.Task<SearchResult>) {
         interactor.stop(item.task.uuid)
     }
 
-    override fun onProgressRemoveClick(item: FinderStateItem.Task) {
+    override fun onProgressRemoveClick(item: FinderStateItem.Task<SearchResult>) {
         interactor.drop(item.task)
     }
 

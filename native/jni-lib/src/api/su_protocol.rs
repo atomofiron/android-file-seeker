@@ -1,4 +1,6 @@
+use std::sync::Arc;
 use bincode::{Decode, Encode};
+use crate::api::protocol::{NameSearchCollector, NameSearchProgress, CommonProgress, CommonProgressCollector, SearchQuery, TextSearchCollector, TextSearchProgress};
 use crate::ext::raw_path::RawPath;
 
 #[derive(Debug, Encode, Decode, PartialEq)]
@@ -13,6 +15,18 @@ pub enum Request {
     Delete(RawPath),
     TryRun,
     Copy(RawPath, RawPath, bool),
+    FindNames {
+        query: SearchQuery,
+        targets: Vec<RawPath>,
+        max_depth: u32,
+        exclude_dirs: bool,
+    },
+    FindText {
+        query: SearchQuery,
+        targets: Vec<RawPath>,
+        max_depth: u32,
+        max_size: u64,
+    },
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]
@@ -34,4 +48,29 @@ pub fn to_len_frame(size: usize) -> FrameLength {
 
 pub fn from_len_frame(buf: FrameLength) -> usize {
     u32::from_le_bytes(buf) as usize
+}
+
+pub trait ProgressProxy<D> : Send + Sync {
+    fn emit(&self, progress: D);
+}
+
+impl ProgressProxy<CommonProgress> for Arc<dyn CommonProgressCollector> {
+
+    fn emit(&self, progress: CommonProgress) {
+        CommonProgressCollector::emit(self.as_ref(), progress)
+    }
+}
+
+impl ProgressProxy<NameSearchProgress> for Arc<dyn NameSearchCollector> {
+
+    fn emit(&self, progress: NameSearchProgress) {
+        NameSearchCollector::emit(self.as_ref(), progress)
+    }
+}
+
+impl ProgressProxy<TextSearchProgress> for Arc<dyn TextSearchCollector> {
+
+    fn emit(&self, progress: TextSearchProgress) {
+        TextSearchCollector::emit(self.as_ref(), progress)
+    }
 }

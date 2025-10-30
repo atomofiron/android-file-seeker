@@ -56,7 +56,34 @@ pub enum ComplexResult {
 
 #[derive(Debug, Encode, Decode, PartialEq, Clone)]
 #[derive(uniffi::Record)]
-pub struct Progress {
+pub struct SearchQuery {
+    pub query: String,
+    pub regex: bool,
+    pub case_insensitive: bool,
+}
+
+#[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(uniffi::Enum)]
+pub enum NameSearchProgress {
+    Ok(TypedMeta),
+    Err(Meta),
+}
+
+#[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(uniffi::Enum)]
+pub enum TextSearchProgress {
+    Ok {
+        path: RawPath,
+        offset: u64,
+        length: u32,
+        line: Option<u64>,
+    },
+    Err(Meta),
+}
+
+#[derive(Debug, Encode, Decode, PartialEq, Clone)]
+#[derive(uniffi::Record)]
+pub struct CommonProgress {
     pub count: u32,
     pub errors: u32,
     pub progress: f32,
@@ -84,10 +111,20 @@ pub struct TypedMeta {
 }
 
 #[uniffi::export(with_foreign)]
-pub trait ProgressCollector: Send + Sync {
-    fn emit(&self, progress: Progress);
+pub trait CommonProgressCollector: Send + Sync {
+    fn emit(&self, progress: CommonProgress);
 }
 
-impl ProgressCollector for () {
-    fn emit(&self, _: Progress) { }
+impl CommonProgressCollector for () {
+    fn emit(&self, _: CommonProgress) { }
+}
+
+#[uniffi::export(with_foreign)]
+pub trait NameSearchCollector: Send + Sync {
+    fn emit(&self, progress: NameSearchProgress);
+}
+
+#[uniffi::export(with_foreign)]
+pub trait TextSearchCollector: Send + Sync {
+    fn emit(&self, progress: TextSearchProgress);
 }

@@ -1,7 +1,7 @@
 use bincode::error::EncodeError;
 use bincode::{decode_from_slice, enc, encode_to_vec};
-use native_lib::api::bridge::{copy, create_dir, create_file, delete_by, get_file_type, get_file_types, get_meta, get_metas, get_usage};
-use native_lib::api::protocol::{Progress, ProgressCollector, SimpleResult};
+use native_lib::api::bridge::{copy, create_dir, create_file, delete_by, find_text, find_names, get_file_type, get_file_types, get_meta, get_metas, get_usage};
+use native_lib::api::protocol::{NameSearchCollector, NameSearchProgress, CommonProgress, CommonProgressCollector, SimpleResult, TextSearchCollector, TextSearchProgress};
 use native_lib::api::su_protocol::{frame_length, from_len_frame, to_len_frame, Request, Response, FINAL_FRAME_BYTES};
 use native_lib::common::{config, Rslt};
 use native_lib::ext::result::ResultExt;
@@ -51,6 +51,16 @@ fn run(request: Request) -> Result<Vec<u8>, EncodeError> {
             write_the_end();
             encode_to_vec(result, config())
         },
+        Request::FindNames { query, targets, max_depth, exclude_dirs: exclude_dir } => {
+            let result = find_names(query, targets, max_depth, exclude_dir, None, StdoutProgressWriter::arc());
+            write_the_end();
+            encode_to_vec(result, config())
+        }
+        Request::FindText { query, targets, max_depth, max_size } => {
+            let result = find_text(query, targets, max_depth, max_size, None, StdoutProgressWriter::arc());
+            write_the_end();
+            encode_to_vec(result, config())
+        }
     }
 }
 
@@ -75,11 +85,27 @@ fn write_the_end() {
 struct StdoutProgressWriter;
 
 impl StdoutProgressWriter {
+
     pub fn arc() -> Arc<Self> { Arc::new(StdoutProgressWriter) }
 }
 
-impl ProgressCollector for StdoutProgressWriter {
-    fn emit(&self, progress: Progress) {
+impl CommonProgressCollector for StdoutProgressWriter {
+
+    fn emit(&self, progress: CommonProgress) {
+        write_response(progress)
+    }
+}
+
+impl NameSearchCollector for StdoutProgressWriter {
+
+    fn emit(&self, progress: NameSearchProgress) {
+        write_response(progress)
+    }
+}
+
+impl TextSearchCollector for StdoutProgressWriter {
+
+    fn emit(&self, progress: TextSearchProgress) {
         write_response(progress)
     }
 }

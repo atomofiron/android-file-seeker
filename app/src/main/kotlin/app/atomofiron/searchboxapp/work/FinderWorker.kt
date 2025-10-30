@@ -15,15 +15,15 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import app.atomofiron.common.util.extension.debugDelay
+import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.logE
-import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.Notifications
 import app.atomofiron.searchboxapp.android.tryShow
 import app.atomofiron.searchboxapp.android.updateChannel
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
-import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.CacheConfig
@@ -33,17 +33,18 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchParams
-import app.atomofiron.searchboxapp.model.finder.SearchResult.FinderResult
+import app.atomofiron.searchboxapp.model.finder.SearchResult.Files
 import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.model.finder.SearchTask
-import app.atomofiron.searchboxapp.model.finder.toItemMatchMultiply
+import app.atomofiron.searchboxapp.model.finder.GenericSearchTask
+import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
+import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveType
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toProperties
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
-import app.atomofiron.searchboxapp.utils.Rslt
-import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.canForegroundService
-import app.atomofiron.searchboxapp.utils.escapeQuotes
 import app.atomofiron.searchboxapp.utils.ifCanNotice
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
@@ -52,6 +53,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import uniffi.native_lib.Meta
+import uniffi.native_lib.NameSearchProgress
+import uniffi.native_lib.SimpleResult
+import uniffi.native_lib.TextSearchProgress
+import uniffi.native_lib.TypedMeta
 import java.util.regex.Pattern
 import javax.inject.Inject
 
@@ -101,13 +107,13 @@ class FinderWorker(
     private val excludeDirs = inputData.getBoolean(KEY_EXCLUDE_DIRS, false)
     private val forContent = inputData.getBoolean(KEY_FOR_CONTENT, false)
     private val maxDepth = inputData.getInt(KEY_MAX_DEPTH, UNDEFINED)
-    private val params = SearchParams(query, useRegex, ignoreCase)
+    private val params = SearchParams(query, useRegex = useRegex, ignoreCase = ignoreCase)
 
     private val taskMutex = Mutex()
-    private var task: SearchTask = SearchTask(
-        id,
+    private var task: GenericSearchTask = SearchTask(
         SearchParams(query, useRegex, ignoreCase),
-        FinderResult(forContent),
+        Files(forContent),
+        id,
     )
     private var process: Process? = null
     private val cacheConfig = CacheConfig(asSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size))
@@ -132,121 +138,73 @@ class FinderWorker(
         DaggerInjector.appComponent.inject(this)
     }
 
-    private val processObserver: (Process) -> Unit = { process = it }
-
-    private suspend fun searchForContent(where: List<Node>) {
-        forLoop@for (item in where) {
-            if (isStopped) {
-                return
-            }
-            val checkPoint = task.result as FinderResult
-            val template = when {
-                item.isDirectory && useRegex && ignoreCase -> Shell[Shell.FIND_GREP_HCS_IE]
-                item.isDirectory && useRegex && !ignoreCase -> Shell[Shell.FIND_GREP_HCS_E]
-                item.isDirectory && !useRegex && ignoreCase -> Shell[Shell.FIND_GREP_HCS_I]
-                item.isDirectory && !useRegex && !ignoreCase -> Shell[Shell.FIND_GREP_HCS]
-                useRegex && ignoreCase -> Shell[Shell.GREP_HCS_IE]
-                useRegex && !ignoreCase -> Shell[Shell.GREP_HCS_E]
-                !useRegex && ignoreCase -> Shell[Shell.GREP_HCS_I]
-                else -> Shell[Shell.GREP_HCS]
-            }
-            val command = when {
-                item.isDirectory -> template.format(item.ref.string, maxDepth, query.escapeQuotes())
-                item.isFile -> template.format(query.escapeQuotes(), item.ref.string)
-                else -> continue@forLoop
-            }
-            val output = Shell.exec(command, asSu, processObserver, forContentLineListener)
-            if (output.handleErrors(checkPoint, item)) {
-                searchForContent(listOf(item))
-            }
+    private fun searchText(where: List<Node>) {
+        if (isStopped) {
+            return
         }
+        val targets = where.map { it.ref }
+        appScope.launch {
+            val result = NativeBridge.findText(params, targets, maxDepth = maxDepth, maxSize = maxSize, asSu) { match ->
+                when (match) {
+                    is TextSearchProgress.Ok -> {
+                        poop("match $match")
+                        val lineIndex = match.line?.toInt() ?: return@findText
+                        val result = task.result as Files
+                        val itemMatch = result.matches.find { it.item.ref.theSame(match.path) }
+                            ?.let { it as ItemMatch.Multiply }
+                            ?: NodeRef(match.path).let {
+                                val node = NativeBridge.type(it, asSu).value?.toNode() ?: it.toNode()
+                                ItemMatch.Multiply(node, 0, mutableMapOf())
+                            }
+                        val matchesMap = itemMatch.matchesMap as MutableMap<Int, MutableList<TextLineMatch>>
+                        val matches = matchesMap.getOrPut(lineIndex) { mutableListOf() }
+                        matches.add(TextLineMatch(match.offset.toLong(), match.length.toInt()))
+                        appScope {
+                            addToResult(itemMatch.copy(count = itemMatch.count.inc()))
+                        }
+                    }
+                    is TextSearchProgress.Err -> Unit.also { poop("err $match") } // todo
+                }
+            }
+            poop("result $result")
+            updateTask {
+                val error = (result as? SimpleResult.Err)?.v1
+                toEnded(error = error)
+            }
+        }.let { progressJobs.add(it) }
     }
 
     private suspend fun waitForJobs() = progressJobs.forEach { it.join() }
 
-    private suspend inline fun updateTask(transformation: SearchTask.() -> SearchTask) {
+    private suspend inline fun updateTask(transformation: GenericSearchTask.() -> GenericSearchTask) {
         taskMutex.withLock {
             task = task.transformation()
         }
         finderStore.addOrUpdate(task)
     }
 
-    private val forContentLineListener: (String) -> Unit = { line ->
-        appScope.launch {
-            // the file name can contain a ':'
-            val index = line.lastIndexOf(':')
-            val count = line.substring(index.inc()).toInt()
-            if (count <= 0) {
-                addToResult(null)
-                return@launch
+    private fun searchNames(where: List<Node>) {
+        if (isStopped) {
+            return
+        }
+        val targets = where.map { it.ref }
+        appScope {
+            NativeBridge.findNames(params, targets, maxDepth, excludeDirs, asSu) {
+                appScope {
+                    when (it) {
+                        is NameSearchProgress.Ok -> addToResult(ItemMatch.Single(it.v1.toNode()))
+                        is NameSearchProgress.Err -> Unit // todo
+                    }
+                }
             }
-            val path = line.substring(0, index)
-            val item = newNode(path)
-            val itemMatch = when (val result = TextViewerService.searchInside(params, item.ref, asSu)) {
-                is Rslt.Ok -> result.value.toItemMatchMultiply(item)
-                is Rslt.Err -> ItemMatch.MultiplyError(item, count, result.message)
-            }
-            addToResult(itemMatch)
         }.let { progressJobs.add(it) }
     }
 
-    private suspend fun searchByName(where: List<Node>) {
-        for (item in where) {
-            if (isStopped) {
-                return
-            }
-            val checkPoint = task.result as FinderResult
-            val template = when {
-                excludeDirs -> Shell[Shell.FIND_F]
-                else -> Shell[Shell.FIND_FD]
-            }
-            val command = template.format(item.ref.string, maxDepth)
-            val output = Shell.exec(command, asSu, processObserver, forNameLineListener)
-            if (output.handleErrors(checkPoint, item)) {
-                searchByName(listOf(item))
-            }
-        }
-    }
-
-    /** @return true if needed restart */
-    private suspend fun Shell.Output.handleErrors(checkPoint: FinderResult, item: Node): Boolean {
-        if (killed && !isStopped) {
-            if (BuildConfig.DEBUG) {
-                logE("killed on ${item.ref}")
-            }
-            updateTask {
-                copy(result = checkPoint.copy(retries = checkPoint.retries.inc()))
-            }
-            return true
-        } else if (!success && error.isNotBlank()) {
-            logE(error)
-            updateTask {
-                copy(error = error)
-            }
-        }
-        return false
-    }
-    private val forNameLineListener: (String) -> Unit = { path ->
-        val name = NodeRef(path).name
-        when {
-            useRegex && !pattern.matcher(name).find() -> Unit
-            !useRegex && !name.contains(query, ignoreCase) -> Unit
-            else -> appScope.launch {
-                addToResult(ItemMatch.Single(newNode(path)))
-            }.let { progressJobs.add(it) }
-        }
-    }
-
     // todo remove deleting files from results
-    private suspend fun addToResult(itemMatch: ItemMatch?) {
+    private suspend fun addToResult(itemMatch: ItemMatch) {
         updateTask {
-            var result = task.result as FinderResult
-            result = when {
-                itemMatch == null -> result.copy(countTotal = result.countTotal.inc())
-                !result.contains(itemMatch) -> result.add(itemMatch)
-                else -> return
-            }
-            copyWith(result)
+            val result = task.result as Files
+            copyWith(result.add(itemMatch))
         }
     }
 
@@ -290,8 +248,8 @@ class FinderWorker(
                 targets.add(Node(NodeRef(path), content = NodeContent.Unknown).update(cacheConfig))
             }
             when {
-                forContent -> searchForContent(targets)
-                else -> searchByName(targets)
+                forContent -> searchText(targets)
+                else -> searchNames(targets)
             }
             waitForJobs()
             debugDelay(5)
@@ -320,6 +278,12 @@ class FinderWorker(
     }
 
     private fun newNode(path: String) = Node(NodeRef(path), rootId = task.uniqueId, content = NodeContent.Unknown).update(cacheConfig)
+
+    private fun NodeRef.toNode() = Node(this, rootId = task.uniqueId, content = NodeContent.Unknown)
+
+    private fun Meta.toNode() = Node(NodeRef(path), rootId = task.uniqueId, content = NodeContent.Unknown, properties = toProperties())
+
+    private fun TypedMeta.toNode() = meta.toNode().resolveType(mime)
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return ForegroundInfo(hashCode(), foregroundNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)

@@ -13,7 +13,7 @@ private const val SEPARATOR = " "
 class EditCharactersHolder(
     parent: ViewGroup,
     private val output: OnEditCharactersListener,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_text_field), TextField.Listener {
+) : GeneralHolder<FinderStateItem.EditCharacters>(parent, R.layout.item_text_field), TextField.Listener {
 
     override val hungry = true
 
@@ -31,8 +31,7 @@ class EditCharactersHolder(
 
     override fun minWidth(): Float = delegate.minWidth()
 
-    override fun onBind(item: FinderStateItem, position: Int) {
-        item as FinderStateItem.EditCharacters
+    override fun onBind(item: FinderStateItem.EditCharacters, position: Int) {
         item.value
             .filter { it.isNotBlank() }
             .joinToString(separator = SEPARATOR)

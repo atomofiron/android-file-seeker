@@ -10,10 +10,10 @@ import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import com.google.android.material.card.MaterialCardView
 
-abstract class CardViewHolder(
+abstract class CardViewHolder<E : FinderStateItem>(
     parent: ViewGroup,
     layoutId: Int,
-) : GeneralHolder<FinderStateItem>(wrapWithCard(parent, layoutId)) {
+) : GeneralHolder<E>(wrapWithCard(parent, layoutId)) {
     companion object {
         fun wrapWithCard(parent: ViewGroup, id: Int): View {
             val inflater = LayoutInflater.from(parent.context)

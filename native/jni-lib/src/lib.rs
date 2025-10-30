@@ -1,3 +1,5 @@
+extern crate core;
+
 mod r#impl;
 pub mod api;
 pub mod common;

@@ -15,6 +15,7 @@ import app.atomofiron.common.util.showKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
+import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.common.SectionBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.history.adapter.HistoryAdapter
@@ -27,7 +28,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 {
 
     private lateinit var binding: FragmentFinderBinding
-    private lateinit var finderAdapter: FinderAdapter
+    private lateinit var finderAdapter: FinderAdapter<SearchResult>
     private lateinit var layoutManager: GridLayoutManager
     private lateinit var spanSizeLookup: FlexSpanSizeLookup
     private var animNextShow = false

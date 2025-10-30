@@ -1,0 +1,53 @@
+use crate::ext::raw_path::{RawPath, RawPathExt};
+use ignore::{DirEntry, WalkBuilder, WalkState};
+use std::sync::mpsc::Sender;
+use std::sync::Arc;
+
+pub fn walk<F, P: Send + Sync>(
+    targets: Vec<RawPath>,
+    sender: &Sender<P>,
+    max_depth: usize,
+    action: F,
+) where
+    F: Fn(DirEntry, &Sender<P>) + Send + Sync,
+{
+    if targets.is_empty() {
+        return;
+    }
+    let targets = targets.into_iter()
+        .map(|it| it.buf())
+        .collect::<Vec<_>>();
+    let mut builder = WalkBuilder::new(&targets[0]);
+    for path in targets.iter().skip(1) {
+        builder.add(path);
+    }
+    let walker = builder
+        .standard_filters(false)
+        .ignore(false)
+        .git_ignore(false)
+        .git_global(false)
+        .git_exclude(false)
+        .require_git(false)
+        .hidden(false)
+        .parents(false)
+        .follow_links(false)
+        .same_file_system(false)
+        .max_depth(Some(max_depth))
+        .threads(num_cpus::get())
+        .build_parallel();
+
+    let action = Arc::new(action);
+    let sender = Arc::new(sender);
+
+    walker.run(|| {
+        let action = Arc::clone(&action);
+        let sender = Arc::clone(&sender);
+        Box::new(move |result| {
+            match result {
+                Ok(entry) => action(entry, &sender),
+                Err(_) => (), // .gitignore errors
+            };
+            WalkState::Continue
+        })
+    });
+}

@@ -4,6 +4,7 @@ import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.viewer.presenter.SearchAdapterPresenterDelegate
@@ -21,7 +22,7 @@ class TextViewerPresenter(
     session: TextViewerSession,
 ) : BasePresenter<TextViewerViewModel, TextViewerRouter>(scope, router),
     TextViewerAdapter.TextViewerListener,
-    FinderAdapterOutput by searchDelegate
+    FinderAdapterOutput<SearchResult.Text> by searchDelegate
 {
 
     private val item: Node get() = viewState.item.value

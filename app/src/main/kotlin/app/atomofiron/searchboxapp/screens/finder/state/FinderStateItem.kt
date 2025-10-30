@@ -5,6 +5,7 @@ import app.atomofiron.common.recycler.GeneralItem
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.finder.ISearchConfig
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
+import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import java.util.Objects
 
@@ -55,8 +56,8 @@ sealed class FinderStateItem(
         val ignoreCase: Boolean = true,
     ) : FinderStateItem(FinderItemType.TEST)
 
-    data class Task(
-        val task: SearchTask,
+    data class Task<R : SearchResult>(
+        val task: SearchTask<R>,
         val clickableIfEmpty: Boolean,
     ) : FinderStateItem(FinderItemType.PROGRESS, task.uniqueId)
 

@@ -7,6 +7,7 @@ import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteract
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchParams
+import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerRouter
@@ -21,7 +22,7 @@ class SearchAdapterPresenterDelegate(
     private val interactor: TextViewerInteractor,
     private val preferences: PreferenceStore,
     curtainChannel: CurtainChannel,
-) : Recipient, FinderAdapterOutput {
+) : Recipient, FinderAdapterOutput<SearchResult.Text> {
 
     private val curtainDelegate = CurtainSearchDelegate(this, viewState, scope)
 
@@ -45,7 +46,7 @@ class SearchAdapterPresenterDelegate(
 
     override fun onSearchClick(value: String) {
         val config = viewState.toggles.value
-        val params = SearchParams(value, config.ignoreCase, config.useRegex)
+        val params = SearchParams(value, useRegex = config.useRegex, ignoreCase = config.ignoreCase)
         interactor.search(viewState.item.value, params)
     }
 
@@ -53,20 +54,20 @@ class SearchAdapterPresenterDelegate(
 
     override fun onEditMaxDepth(new: Int) = Unit
 
-    override fun onItemClick(item: FinderStateItem.Task) {
+    override fun onItemClick(item: FinderStateItem.Task<SearchResult.Text>) {
         if (viewState.trySelectTask(item.task)) {
             curtainDelegate.controller?.close()
         }
     }
 
-    override fun onProgressRemoveClick(item: FinderStateItem.Task) {
+    override fun onProgressRemoveClick(item: FinderStateItem.Task<SearchResult.Text>) {
         interactor.removeTask(viewState.item.value, item.task.uniqueId)
         viewState.dropTask()
     }
 
     override fun onReplaceClick(value: String) = Unit
 
-    override fun onProgressStopClick(item: FinderStateItem.Task) = Unit
+    override fun onProgressStopClick(item: FinderStateItem.Task<SearchResult.Text>) = Unit
 
     override fun onTestTextChange(value: String?) = Unit
 

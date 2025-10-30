@@ -25,7 +25,7 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
     private val spanPartFocus: RoundedBackgroundSpan
         get() = RoundedBackgroundSpan(
             backgroundColor = context.findColorByAttr(MaterialAttr.colorSecondary),
-            borderColor = context.findColorByAttr(MaterialAttr.colorPrimary),
+            borderColor = context.findColorByAttr(MaterialAttr.colorSecondary),
             textColor = context.findColorByAttr(MaterialAttr.colorOnSecondary),
             context.resources.getDimension(R.dimen.background_span_corner_radius),
             context.resources.getDimension(R.dimen.background_span_border_thickness),
@@ -55,12 +55,16 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
                 matches.forEachIndexed { index, match ->
                     val byteOffset = match.byteOffset - item.byteOffset
                     val bytes = item.text.toByteArray()
-                    val range = 0 until byteOffset.toInt().coerceAtMost(bytes.size)
-                    val start = bytes.slice(range)
+                    val offset = byteOffset.toInt()
+                    val start = bytes.slice(0 until offset)
                         .toByteArray()
                         .toString(charset = Charsets.UTF_8)
                         .length
-                    val end = start + match.length
+                    val length = bytes.slice(offset until (offset + match.length))
+                        .toByteArray()
+                        .toString(charset = Charsets.UTF_8)
+                        .length
+                    val end = start + length
                     val forTheEntireLine = start == 0 && end == item.text.length
                     val span: Any = when {
                         forTheEntireLine && index == indexFocus -> spanLineFocus

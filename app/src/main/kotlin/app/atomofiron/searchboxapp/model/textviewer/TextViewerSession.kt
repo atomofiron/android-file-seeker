@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.model.textviewer
 
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.sync.Mutex
 import java.io.File
@@ -20,7 +20,7 @@ class TextViewerSession(node: Node) {
     }
     val textLines = MutableStateFlow<List<TextLine>>(listOf())
     val textLoading = MutableStateFlow(false)
-    val tasks = MutableStateFlow<List<SearchTask>>(listOf())
+    val tasks = MutableStateFlow<List<TextSearchTask>>(listOf())
 
     var isFullyRead: Boolean = false
 }

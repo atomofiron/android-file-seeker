@@ -1,8 +1,9 @@
 package app.atomofiron.searchboxapp.screens.finder.adapter
 
+import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.*
 
-interface FinderAdapterOutput :
+interface FinderAdapterOutput<Result : SearchResult> :
         QueryFieldHolder.OnActionListener,
         CharactersHolder.OnActionListener,
         EditOptionsHolder.FinderConfigListener,
@@ -12,4 +13,4 @@ interface FinderAdapterOutput :
         EditMaxSizeHolder.OnEditMaxSizeListener,
         ButtonsHolder.FinderButtonsListener,
         TargetsHolder.FinderTargetsOutput,
-        TaskHolder.OnActionListener
+        TaskHolder.OnActionListener<Result>

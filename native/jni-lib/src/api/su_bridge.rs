@@ -1,5 +1,5 @@
-use crate::api::protocol::{Progress, ProgressCollector, SimpleResult};
-use crate::api::su_protocol::{frame_length, from_len_frame, to_len_frame, Request, Response, FINAL_FRAME};
+use crate::api::protocol::SimpleResult;
+use crate::api::su_protocol::{frame_length, from_len_frame, to_len_frame, ProgressProxy, Request, Response, FINAL_FRAME};
 use crate::common::{config, Rslt};
 use crate::ext::option::OptionExt;
 use crate::ext::result::ResultExt;
@@ -8,7 +8,7 @@ use once_cell::sync::Lazy;
 use std::io;
 use std::io::{Error, Read, Write};
 use std::process::{Child, Command, ExitStatus, Stdio};
-use std::sync::{Arc, Mutex};
+use std::sync::Mutex;
 
 static CHILDREN: Lazy<Mutex<Vec<Child>>> = Lazy::new(|| {
     Mutex::new(Vec::new())
@@ -20,23 +20,23 @@ fn try_as_su(bin_path: String) -> SimpleResult {
         .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
 }
 
-pub fn as_su<D: Decode<()>>(request: Request, bin_path: String) -> Rslt<D> {
-    as_su_impl(request, bin_path, None)
+pub fn as_su<R: Decode<()>>(request: Request, bin_path: String) -> Rslt<R> {
+    as_su_impl::<_, R>(request, bin_path, None)
 }
 
-pub fn as_su_with_progress<D: Decode<()>>(
+pub fn as_su_with_progress<P: Decode<()>, R: Decode<()>>(
     request: Request,
     bin_path: String,
-    collector: Arc<dyn ProgressCollector>,
-) -> Rslt<D> {
+    collector: Box<dyn ProgressProxy<P>>,
+) -> Rslt<R> {
     as_su_impl(request, bin_path, Some(collector))
 }
 
-fn as_su_impl<D: Decode<()>>(
+fn as_su_impl<R: Decode<()>, P: Decode<()>>(
     request: Request,
     bin_path: String,
-    collector: Option<Arc<dyn ProgressCollector>>,
-) -> Rslt<D> {
+    collector: Option<Box<dyn ProgressProxy<P>>>,
+) -> Rslt<R> {
     let mut child = {
         CHILDREN.lock()?.pop()
     }.or_then(|| new_child(bin_path))?;
@@ -68,7 +68,7 @@ fn as_su_impl<D: Decode<()>>(
     }
     let (response, _) = decode_from_slice::<Response,_>(&bytes, config())?;
     return match response {
-        Response::Ok(bytes) => decode_from_slice::<D,_>(&bytes, config())
+        Response::Ok(bytes) => decode_from_slice::<R,_>(&bytes, config())
             .map(|(r,_)| r).boxed(),
         Response::Err(e) => Err(e.into()),
     };
@@ -82,7 +82,7 @@ fn new_child(bin_path: String) -> io::Result<Child> {
         .spawn()
 }
 
-fn read_progress(child: &mut Child, collector: Arc<dyn ProgressCollector>) -> Rslt<()> {
+fn read_progress<P>(child: &mut Child, collector: Box<dyn ProgressProxy<P>>) -> Rslt<()> where P: Decode<()> {
     let stdout = child.stdout
         .as_mut().ok_or("failed to open stdout for progress")?;
     loop {
@@ -97,7 +97,7 @@ fn read_progress(child: &mut Child, collector: Arc<dyn ProgressCollector>) -> Rs
         }
         let mut bytes = vec![0u8; len];
         stdout.read_exact(&mut bytes)?;
-        let (progress, _) = decode_from_slice::<Progress,_>(&bytes, config())?;
+        let (progress, _) = decode_from_slice::<P,_>(&bytes, config())?;
         collector.emit(progress)
     }
 }

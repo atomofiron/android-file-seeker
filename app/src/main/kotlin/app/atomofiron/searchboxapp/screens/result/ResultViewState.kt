@@ -10,8 +10,8 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
-import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.finder.SearchResult.Files
+import app.atomofiron.searchboxapp.model.finder.GenericSearchTask
 import app.atomofiron.searchboxapp.model.toDockItem
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
@@ -23,7 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combineTransform
 import java.util.UUID
-import kotlin.collections.isNotEmpty
 
 class ResultViewState(
     params: ResultPresenterParams,
@@ -58,11 +57,11 @@ class ResultViewState(
         }.launch(scope, Dispatchers.Default)
     }
 
-    private fun reduce(tasks: List<SearchTask>, checked: List<Int>) {
+    private fun reduce(tasks: List<GenericSearchTask>, checked: List<Int>) {
         tasks.find { it.uniqueId == taskId }?.let { task ->
             taskUuid = task.uuid
             error = task.error
-            val result = task.result as SearchResult.FinderResult
+            val result = task.result as Files
             val matches = result.matches.mapNotNull { match ->
                 when {
                     mimeTypes.isNotEmpty() && !match.item.content.matchesAny(mimeTypes) -> null
@@ -85,7 +84,7 @@ class ResultViewState(
 
     private fun MutableStateFlow<ResultDockState>.reduce(
         inProgress: Boolean,
-        result: SearchResult.FinderResult,
+        result: Files,
         newSorting: NodeSorting,
         checked: Int,
     ) {

@@ -11,7 +11,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchState
-import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.finder.GenericSearchTask
 import app.atomofiron.searchboxapp.work.FinderWorker
 import kotlinx.coroutines.CoroutineScope
 import java.util.UUID
@@ -52,7 +52,7 @@ class FinderService(
         workManager.cancelWorkById(uuid)
     }
 
-    fun drop(task: SearchTask) {
+    fun drop(task: GenericSearchTask) {
         finderStore {
             drop(task)
         }

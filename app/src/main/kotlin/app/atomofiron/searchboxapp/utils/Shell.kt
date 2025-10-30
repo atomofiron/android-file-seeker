@@ -16,34 +16,6 @@ object Shell {
 
     const val VERSION = "{toybox} --version"
 
-    // grep: No 'E' with 'F'
-    const val FIND_GREP_HCS = "{toybox} find '%s' -type f -maxdepth %d -print0 | xargs -0r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: -v ORS='\\0' '{print \$1}' | xargs -0r {toybox} grep -Hcs -e '%s'"
-    const val FIND_GREP_HCS_I = "{toybox} find '%s' -type f -maxdepth %d -print0 | xargs -0r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: -v ORS='\\0' '{print \$1}' | xargs -0r {toybox} grep -Hcs -ie '%s'"
-    const val FIND_GREP_HCS_E = "{toybox} find '%s' -type f -maxdepth %d -print0 | xargs -0r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: -v ORS='\\0' '{print \$1}' | xargs -0r {toybox} grep -Hcs -E '%s'"
-    const val FIND_GREP_HCS_IE = "{toybox} find '%s' -type f -maxdepth %d -print0 | xargs -0r {toybox} file | {toybox} grep -E 'ASCII text$' | awk -F: -v ORS='\\0' '{print \$1}' | xargs -0r {toybox} grep -Hcs -iE '%s'"
-    // /storage/emulated/0/fadb/sba.txt:15
-
-    // -H is necessary
-    const val GREP_HCS = "{toybox} grep -Hcs -e '%s' '%s'"
-    const val GREP_HCS_I = "{toybox} grep -Hcs -ie '%s' '%s'"
-    const val GREP_HCS_E = "{toybox} grep -Hcs -E '%s' '%s'"
-    const val GREP_HCS_IE = "{toybox} grep -Hcs -iE '%s' '%s'"
-    // /storage/emulated/0/fadb/sba.txt:15
-
-    const val FIND_FD = "{toybox} find '%s' -maxdepth %d \\( -type f -o -type d \\)"
-    const val FIND_F = "{toybox} find '%s' -maxdepth %d -type f"
-
-    const val GREP_BONS = "{toybox} grep -bons -e '%s' '%s'"
-    const val GREP_BONS_I = "{toybox} grep -bons -ie '%s' '%s'"
-    const val GREP_BONS_E = "{toybox} grep -bons -E '%s' '%s'"
-    const val GREP_BONS_IE = "{toybox} grep -bons -iE '%s' '%s'"
-    // 241:6916:work
-
-    // %s grep -c -s -F -i -e "%s" "%s"
-
-    // FASTEST toybox find %s -name "*.%s" -type f | xargs grep "%s" -c
-    // find . -maxdepth 2 -exec grep -H -c -s "k[e]" {} \;
-
     private val oneByteNbps = String(byteArrayOf(0xA0.toByte()), Charsets.UTF_8)
     private const val twoBytesNbps = "\u00A0"
 

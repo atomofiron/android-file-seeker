@@ -7,6 +7,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
+import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Buttons
@@ -26,10 +27,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
-class FinderItemsStateDelegate(
+class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>(
     override val isLocal: Boolean,
     preferences: PreferenceStore,
-    tasks: Flow<List<SearchTask>>,
+    tasks: Flow<List<Task>>,
 ) : FinderItemsState {
 
     private val query = MutableStateFlow("")
@@ -76,7 +77,7 @@ class FinderItemsStateDelegate(
         }
     }
 
-    private fun composeAllItems(items: List<FinderStateItem>, targets: List<Node>, tasks: List<SearchTask>): List<FinderStateItem> {
+    private fun composeAllItems(items: List<FinderStateItem>, targets: List<Node>, tasks: List<Task>): List<FinderStateItem> {
         return buildList {
             addAll(items)
             replaceOne<Query, _> { copy(enabled = query.isNotEmpty() && (isLocal || targets.any { it.isChecked })) }

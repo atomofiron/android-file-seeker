@@ -14,7 +14,7 @@ import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 class EditMaxDepthHolder(
     parent: ViewGroup,
     private val output: OnEditMaxDepthListener,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_text_field), TextField.Listener, View.OnFocusChangeListener {
+) : GeneralHolder<FinderStateItem.MaxDepth>(parent, R.layout.item_text_field), TextField.Listener, View.OnFocusChangeListener {
 
     override val hungry = true
 
@@ -32,8 +32,7 @@ class EditMaxDepthHolder(
 
     override fun minWidth(): Float = delegate.minWidth()
 
-    override fun onBind(item: FinderStateItem, position: Int) {
-        item as FinderStateItem.MaxDepth
+    override fun onBind(item: FinderStateItem.MaxDepth, position: Int) {
         binding.field.setText(item.value.toString())
     }
 

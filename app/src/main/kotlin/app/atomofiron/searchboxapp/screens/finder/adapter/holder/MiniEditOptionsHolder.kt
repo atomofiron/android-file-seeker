@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 
 import android.view.ViewGroup
-import androidx.core.view.isGone
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemSearchEditOptionsMiniBinding
@@ -13,11 +12,9 @@ import app.atomofiron.searchboxapp.utils.Alpha
 class MiniEditOptionsHolder(
     parent: ViewGroup,
     private val listener: FinderConfigListener,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_search_edit_options_mini) {
+) : GeneralHolder<FinderStateItem.Options>(parent, R.layout.item_search_edit_options_mini) {
 
     override val hungry = true
-
-    override val item get() = super.item as FinderStateItem.Options
 
     private val binding = ItemSearchEditOptionsMiniBinding.bind(itemView)
 
@@ -42,9 +39,7 @@ class MiniEditOptionsHolder(
         }
     }
 
-    override fun onBind(item: FinderStateItem, position: Int) = binding.run {
-        item as FinderStateItem.Options
-
+    override fun onBind(item: FinderStateItem.Options, position: Int) = binding.run {
         caseSense.isChecked = !item.ignoreCase
         useRegexp.isChecked = item.useRegex
         contentSearch.isChecked = item.contentSearch

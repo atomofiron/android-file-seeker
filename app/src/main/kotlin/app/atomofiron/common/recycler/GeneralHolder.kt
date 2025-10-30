@@ -14,9 +14,9 @@ open class GeneralHolder<D : Any>(view: View) : RecyclerView.ViewHolder(view) {
     protected val context: Context = view.context
 
     private var _itemOrNull: D? = null
-    protected open val itemOrNull: D?
+    protected val itemOrNull: D?
         get() = _itemOrNull
-    protected open val item: D
+    protected val item: D
         get() = _itemOrNull!!
 
     open val hungry = true

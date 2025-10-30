@@ -11,7 +11,7 @@ import app.atomofiron.searchboxapp.utils.makeByteSize
 class EditMaxSizeHolder(
     parent: ViewGroup,
     private val output: OnEditMaxSizeListener,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_text_field) {
+) : GeneralHolder<FinderStateItem.MaxSize>(parent, R.layout.item_text_field) {
 
     override val hungry = true
 
@@ -27,8 +27,7 @@ class EditMaxSizeHolder(
 
     override fun minWidth(): Float = delegate.minWidth()
 
-    override fun onBind(item: FinderStateItem, position: Int) {
-        item as FinderStateItem.MaxSize
+    override fun onBind(item: FinderStateItem.MaxSize, position: Int) {
         binding.field.setText(item.value.toString())
     }
 

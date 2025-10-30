@@ -7,7 +7,7 @@ import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.SearchParams
-import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import java.util.UUID
 
@@ -28,7 +28,7 @@ class TextViewerInteractor(
         }
     }
 
-    fun fetchTask(item: Node, taskId: UUID, callback: (SearchTask) -> Unit) {
+    fun fetchTask(item: Node, taskId: UUID, callback: (TextSearchTask) -> Unit) {
         scope.launch {
             val task = textViewerService.fetchTask(item, taskId)
             task?.let(callback)

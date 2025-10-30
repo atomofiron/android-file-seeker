@@ -90,7 +90,7 @@ class DockItemHolder(
         button.isSelected = item.selected
         button.isActivated = item.primary
         button.isClickable = item.clickable ?: item.enabled
-        button.alpha = Alpha.enabled(!item.primary || item.enabled)
+        button.alpha = Alpha.enabled(item.enabled)
         popup.bind(item)
     }
 

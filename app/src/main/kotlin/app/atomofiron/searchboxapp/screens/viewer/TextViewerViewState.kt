@@ -6,10 +6,8 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
-import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
-import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsStateDelegate
 import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState
@@ -30,17 +28,16 @@ class TextViewerViewState(
 
     data class Status(
         val loading: Boolean = false,
-        val count: Int = 0,
-        val countMax: Int = 0,
+        val current: Int = 0,
+        val max: Int = 0,
     ) {
-        fun clear(): Status = copy(count = 0, countMax = 0)
+        fun clear(): Status = copy(current = 0, max = 0)
     }
 
     @JvmInline
-    value class MatchCursor(val value: Long = -1) {
-        val isEmpty get() = value < 0
-        val lineIndex get() = if (isEmpty) -1 else value.shr(32).toInt()
-        val lineMatchIndex get() = if (isEmpty) -1 else value.toInt()
+    value class MatchCursor(val value: Long = 0) {
+        val lineIndex get() = value.shr(32).toInt()
+        val lineMatchIndex get() = value.toInt()
 
         constructor(lineIndex: Int, matchIndex: Int = 0) : this(lineIndex.toLong().shl(32) + matchIndex.toLong())
 
@@ -53,20 +50,20 @@ class TextViewerViewState(
 
     private val status = MutableStateFlow(Status())
     /** line index -> line match index */
-    val matchesCursor = MutableStateFlow(MatchCursor())
+    val matchesCursor = MutableStateFlow<MatchCursor?>(null)
 
     val composition = preferenceStore.explorerItemComposition.value
     val item = session.item
     val tasks = session.tasks
     val textLines = session.textLines
-    val currentTask = MutableStateFlow<SearchTask?>(null)
+    val currentTask = MutableStateFlow<TextSearchTask?>(null)
 
     val dock = status.map { state ->
         var index: Int? = null
         var count: Int? = null
-        val label = if (state.countMax == 0) DockItem.Label.Empty else {
-            index = state.count
-            count = state.countMax
+        val label = if (state.max == 0) DockItem.Label.Empty else {
+            index = state.current
+            count = state.max
             DockItem.Label("$index / $count")
         }
         TextViewerDockState.Default.run {
@@ -76,8 +73,8 @@ class TextViewerViewState(
             }
             copy(
                 status = status.copy(label = label, progress = state.loading),
-                previous = previous.copy(enabled = !state.loading && index != null && index > 1),
-                next = next.copy(enabled = !state.loading && count != null && index != count),
+                previous = previous.copy(enabled = !state.loading),
+                next = next.copy(enabled = !state.loading),
             )
         }
     }
@@ -86,13 +83,13 @@ class TextViewerViewState(
     fun changeCursor(increment: Boolean): Int {
         val none = -1
         val cursor = matchesCursor.value
-        val result = currentTask.value?.result as SearchResult.TextSearchResult?
+        val result = currentTask.value?.result
         result ?: return none
         val matchesMap = result.matchesMap
         val indexes = result.indexes
-        if (cursor.isEmpty) {
+        if (cursor == null) {
             matchesCursor.value = MatchCursor(lineIndex = indexes.first(), matchIndex = 0)
-            status.value = status.value.copy(count = 1)
+            status.value = status.value.copy(current = 1)
             return none
         }
         var lineIndex = cursor.lineIndex
@@ -102,17 +99,18 @@ class TextViewerViewState(
             matchIndex++
             val matches = matchesMap[lineIndex] ?: return none
             if (matchIndex == matches.size) {
-                val index = indexes.indexOf(lineIndex)
-                if (index == indexes.lastIndex) return none
-                lineIndex = indexes[index.inc()]
+                var index = indexes.indexOf(lineIndex)
+                index = index.inc() % indexes.size
+                lineIndex = indexes[index]
                 matchIndex = 0
             }
         } else {
             matchIndex--
             if (matchIndex < 0) {
-                val index = indexes.indexOf(lineIndex)
-                if (index <= 0) return none
-                lineIndex = indexes[index.dec()]
+                var index = indexes.indexOf(lineIndex)
+                if (index < 0) return none
+                index = indexes.run { (size + index.dec()) % size }
+                lineIndex = indexes[index]
                 matchIndex = matchesMap[lineIndex]!!.lastIndex
             }
         }
@@ -121,7 +119,8 @@ class TextViewerViewState(
         }
         matchesCursor.value = MatchCursor(lineIndex, matchIndex)
         status.run {
-            value = value.copy(count = value.count + increment.toInt())
+            val count = value.run { (max + current + increment.toInt()) % max }
+            value = value.copy(current = count)
         }
         return none
     }
@@ -142,13 +141,13 @@ class TextViewerViewState(
         currentTask.value = null
     }
 
-    fun trySelectTask(task: SearchTask): Boolean {
+    fun trySelectTask(task: TextSearchTask): Boolean {
         return (task.isEnded && task.count > 0).also { isOk ->
             if (isOk) {
                 matchesCursor.value = MatchCursor()
                 currentTask.value = task
                 status.run {
-                    value = value.copy(count = 0, countMax = task.count)
+                    value = value.copy(current = 0, max = task.count)
                 }
             }
         }

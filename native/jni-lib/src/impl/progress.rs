@@ -1,4 +1,4 @@
-use crate::api::protocol::{ComplexResult, Progress, ProgressCollector};
+use crate::api::protocol::{ComplexResult, CommonProgress, CommonProgressCollector};
 use crate::common::Rslt;
 use crate::ext::raw_path::RawPath;
 use crate::ext::result::ResultExt;
@@ -15,10 +15,10 @@ pub enum ProgressChange {
     Err(RawPath, String, f32),
 }
 
-impl Progress {
+impl CommonProgress {
 
     pub fn new() -> Self {
-        Progress { count: 0, errors: 0, progress: 0.0 }
+        CommonProgress { count: 0, errors: 0, progress: 0.0 }
     }
 
     pub fn inc(&mut self, progress: f32) {
@@ -38,11 +38,11 @@ impl Progress {
 
 pub fn convert_progress(
     rx: Receiver<ProgressChange>,
-    collector: Arc<dyn ProgressCollector>,
-    target: Option<PathBuf>
+    collector: Arc<dyn CommonProgressCollector>,
+    target: Option<PathBuf>,
 ) -> JoinHandle<ComplexResult> {
     std::thread::spawn(move || {
-        let mut progress = Progress::new();
+        let mut progress = CommonProgress::new();
         collector.emit(progress.clone());
         let mut errors: Vec<(RawPath,String)> = Vec::new();
         loop {

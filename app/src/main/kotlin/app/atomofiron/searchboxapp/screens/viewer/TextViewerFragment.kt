@@ -12,20 +12,18 @@ import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.LayoutDelegate.setScreenSizeListener
 import app.atomofiron.fileseeker.databinding.FragmentTextViewerBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.setScreenSizeListener
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.ScreenSize
-import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.screens.viewer.recycler.TextViewerAdapter
-import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState
-import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState.Companion.Default as DefaultDockState
 import app.atomofiron.searchboxapp.utils.addFastScroll
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_NO_SCROLL
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState.Companion.Default as DefaultDockState
 
 class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
     BaseFragment<TextViewerFragment, TextViewerViewState, TextViewerPresenter, FragmentTextViewerBinding> by BaseFragmentImpl()
@@ -102,12 +100,12 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         }
     }
 
-    private fun onTaskChanged(task: SearchTask?) {
-        val matches = (task?.result as SearchResult.TextSearchResult?)?.matchesMap
+    private fun onTaskChanged(task: TextSearchTask?) {
+        val matches = task?.result?.matchesMap
         viewerAdapter.setMatches(matches)
         val iconId = if (task == null) R.drawable.ic_back else R.drawable.ic_cross
         binding.toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), iconId)
     }
 
-    private fun onMatchCursorChanged(cursor: TextViewerViewState.MatchCursor) = viewerAdapter.setCursor(cursor)
+    private fun onMatchCursorChanged(cursor: TextViewerViewState.MatchCursor?) = viewerAdapter.setCursor(cursor)
 }

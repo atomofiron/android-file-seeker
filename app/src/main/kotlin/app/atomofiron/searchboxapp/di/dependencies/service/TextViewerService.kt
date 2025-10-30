@@ -1,7 +1,13 @@
 package app.atomofiron.searchboxapp.di.dependencies.service
 
+import app.atomofiron.common.util.extension.indexOfFirst
+import app.atomofiron.common.util.extension.launchOnDefault
 import app.atomofiron.common.util.extension.logE
-import app.atomofiron.searchboxapp.di.dependencies.store.*
+import app.atomofiron.searchboxapp.android.NativeBridge
+import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
+import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.TextViewerStore
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -9,18 +15,25 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.SearchParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.finder.SearchResult.TextSearchResult
+import app.atomofiron.searchboxapp.model.finder.SearchResult.Text
 import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.model.finder.SearchTask
-import app.atomofiron.searchboxapp.model.textviewer.*
-import app.atomofiron.searchboxapp.utils.*
+import app.atomofiron.searchboxapp.model.finder.TextSearchTask
+import app.atomofiron.searchboxapp.model.textviewer.TextLine
+import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
+import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
+import app.atomofiron.searchboxapp.poop
+import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
+import app.atomofiron.searchboxapp.utils.mutate
+import app.atomofiron.searchboxapp.utils.removeOneIf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.withLock
-import java.util.*
-import kotlin.collections.ArrayList
+import uniffi.native_lib.SimpleResult
+import uniffi.native_lib.TextSearchProgress
+import java.util.UUID
 
 class TextViewerService(
     private val scope: CoroutineScope,
@@ -29,41 +42,6 @@ class TextViewerService(
     private val explorerStore: ExplorerStore,
     private val finderStore: FinderStore,
 ) {
-    companion object {
-        fun searchInside(params: SearchParams, ref: NodeRef, asSu: Boolean): Rslt<TextSearchResult> {
-            val template = when {
-                params.useRegex && params.ignoreCase -> Shell.GREP_BONS_IE
-                params.useRegex -> Shell.GREP_BONS_E
-                params.ignoreCase -> Shell.GREP_BONS_I
-                else -> Shell.GREP_BONS
-            }
-            var count = 0
-            val cmd = Shell[template].format(params.query.escapeQuotes(), ref.string)
-            val lineIndexToMatches = hashMapOf<Int, MutableList<TextLineMatch>>()
-            val output = Shell.exec(cmd, asSu) { line ->
-                val lineByteOffset = line.split(':')
-                val lineIndex = lineByteOffset[0].toInt().dec()
-                val byteOffset = lineByteOffset[1].toLong()
-                val text = lineByteOffset[2]
-                var list = lineIndexToMatches[lineIndex]
-                if (list == null) {
-                    list = mutableListOf()
-                    lineIndexToMatches[lineIndex] = list
-                }
-                list.add(TextLineMatch(byteOffset, text.length))
-                count++
-            }
-            return if (output.success || output.code == 1 && output.error.isEmpty()) {
-                val indexes = lineIndexToMatches.keys.sorted()
-                val result = TextSearchResult(count, lineIndexToMatches, indexes)
-                result.toOk()
-            } else  {
-                logE("searchInFile !success, error: ${output.error}")
-                Rslt.Err(output.error)
-            }
-        }
-    }
-
     private val asSu: Boolean get() = preferences.asSu.value
 
     fun getFileSession(ref: NodeRef): TextViewerSession {
@@ -84,23 +62,23 @@ class TextViewerService(
         return session
     }
 
-    suspend fun fetchTask(item: Node, taskId: UUID): SearchTask? {
+    suspend fun fetchTask(item: Node, taskId: UUID): TextSearchTask? {
         val finderTask = finderStore.tasks.find { it.uuid == taskId }
         finderTask ?: return null
         val session = findSession(item)
         session ?: return null
-        val result = finderTask.result as SearchResult.FinderResult
+        val result = finderTask.result as SearchResult.Files
         val itemMatch = result.matches.find {
             it.item.uniqueId == item.uniqueId
         } as? ItemMatch.Multiply
         itemMatch ?: return null
         val task = SearchTask(
-            finderTask.uuid,
             finderTask.params,
-            TextSearchResult(itemMatch.count, itemMatch.matchesMap, itemMatch.indexes),
+            Text(itemMatch.count, itemMatch.matchesMap),
+            finderTask.uuid,
             SearchState.Ended(removable = false),
         )
-        session.addProgressTask(task)
+        session.add(task)
         return task
     }
 
@@ -139,10 +117,32 @@ class TextViewerService(
 
     suspend fun search(item: Node, params: SearchParams) {
         val session = findSession(item) ?: return
-        val task = SearchTask(UUID.randomUUID(), params, TextSearchResult())
-        val taskProgress = session.addProgressTask(task)
-        val taskDone = session.searchInside(taskProgress)
-        session.finishTask(taskDone)
+        var task = SearchTask(params, Text())
+        scope.launchOnDefault {
+            session.add(task)
+        }
+        var count = 0
+        val matchesMap = hashMapOf<Int, MutableList<TextLineMatch>>()
+        val result = NativeBridge.findText(params, listOf(item.ref), asSu = asSu) { match ->
+            if (match !is TextSearchProgress.Ok) {
+                return@findText
+            }
+            match.line ?: return@findText poop("it.line == null!!!")
+            count++
+            val lineIndex = match.line.toInt().dec()
+            var list = matchesMap[lineIndex]
+            if (list == null) {
+                list = mutableListOf()
+                matchesMap[lineIndex] = list
+            }
+            list.add(TextLineMatch(match.offset.toLong(), match.length.toInt()))
+            task = task.copy(result = Text(count, matchesMap))
+            scope.launchOnDefault {
+                session.update(task)
+            }
+        }
+        val error = (result as? SimpleResult.Err)?.v1
+        session.finishTask(task.toEnded(error = error))
     }
 
     private fun findSession(item: Node): TextViewerSession? = store.sessions[item.uniqueId]
@@ -171,7 +171,7 @@ class TextViewerService(
         textLoading.value = false
     }
 
-    private suspend fun TextViewerSession.addProgressTask(task: SearchTask): SearchTask {
+    private suspend fun TextViewerSession.add(task: TextSearchTask) {
         mutex.withLock {
             tasks.run {
                 val tasks = value.toMutableList()
@@ -179,17 +179,20 @@ class TextViewerService(
                 value = tasks
             }
         }
-        return task
     }
 
-    private fun TextViewerSession.searchInside(task: SearchTask): SearchTask {
-        return when (val result = searchInside(task.params, item.value.ref, asSu)) {
-            is Rslt.Ok -> task.toEnded(result = result.value)
-            is Rslt.Err -> task.toEnded(error = result.message)
+    private suspend fun TextViewerSession.update(task: TextSearchTask) {
+        mutex.withLock {
+            tasks.run {
+                val index = value.indexOfFirst { it.uuid == task.uuid }
+                if (index >= 0) {
+                    value = value.mutate { set(index, task) }
+                }
+            }
         }
     }
 
-    private suspend fun TextViewerSession.finishTask(task: SearchTask) {
+    private suspend fun TextViewerSession.finishTask(task: TextSearchTask) {
         mutex.withLock {
             tasks.run {
                 val index = value.indexOfFirst { it.uuid == task.uuid }

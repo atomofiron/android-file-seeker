@@ -15,18 +15,16 @@ import app.atomofiron.fileseeker.databinding.ItemTextFieldBinding
 import app.atomofiron.searchboxapp.custom.drawable.makeHoled
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
-import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.TestField
 import java.util.regex.Pattern
 
 class TestHolder(
     parent: ViewGroup,
     private val output: OnTestChangeListener,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_text_field), TextWatcher {
+) : GeneralHolder<FinderStateItem.TestField>(parent, R.layout.item_text_field), TextWatcher {
 
     override val hungry = true
 
     private val binding = ItemTextFieldBinding.bind(itemView)
-    override val itemOrNull get() = super.itemOrNull as TestField?
     private val default = parent.resources.getString(R.string.pangram)
     private val span get() = RoundedBackgroundSpan(
         backgroundColor = context.findColorByAttr(MaterialAttr.colorSurfaceVariant),
@@ -51,15 +49,14 @@ class TestHolder(
 
     override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_test_field)
 
-    override fun onBind(item: FinderStateItem, position: Int) {
-        item as TestField
+    override fun onBind(item: FinderStateItem.TestField, position: Int) {
         val new = item.value ?: default
         if (new != binding.field.text?.toString()) {
             binding.field.setText(new)
         }
     }
 
-    private fun test(item: TestField) = binding.run {
+    private fun test(item: FinderStateItem.TestField) = binding.run {
         val text = SpannableStringBuilder(item.value)
         text.getSpans(0, text.length, RoundedBackgroundSpan::class.java).forEach {
             text.removeSpan(it)
@@ -71,7 +68,7 @@ class TestHolder(
         }
     }
 
-    private fun testSearch(item: TestField) = binding.run {
+    private fun testSearch(item: FinderStateItem.TestField) = binding.run {
         val text = field.text ?: return
         var offset = 0
         val length = item.query.length
@@ -83,7 +80,7 @@ class TestHolder(
         }
     }
 
-    private fun testSearchWithRegexp(item: TestField) {
+    private fun testSearchWithRegexp(item: FinderStateItem.TestField) {
         val text = binding.field.text ?: return
         var flags = 0
         if (item.ignoreCase) {

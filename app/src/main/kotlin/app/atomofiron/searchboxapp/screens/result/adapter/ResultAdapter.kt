@@ -22,7 +22,7 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCa
     private val gravityDecorator = ItemGravityDecorator()
     private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = false)
 
-    fun setResult(results: SearchResult.FinderResult) {
+    fun setResult(results: SearchResult.Files) {
         val dirCount = results.matches.count { it.item.isDirectory }
         val fileCount = results.matches.size - dirCount
         val items = buildList(results.matches.size.inc()) {

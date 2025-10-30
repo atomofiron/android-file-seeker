@@ -18,7 +18,10 @@ import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.utils.Alpha
 
-class TaskHolder(parent: ViewGroup, listener: OnActionListener) : CardViewHolder(parent, R.layout.item_progress) {
+class TaskHolder<Result : SearchResult>(
+    parent: ViewGroup,
+    listener: OnActionListener<Result>,
+) : CardViewHolder<FinderStateItem.Task<Result>>(parent, R.layout.item_progress) {
 
     override val hungry = false
 
@@ -26,11 +29,11 @@ class TaskHolder(parent: ViewGroup, listener: OnActionListener) : CardViewHolder
 
     init {
         itemView.setOnClickListener {
-            listener.onItemClick(item as FinderStateItem.Task)
+            listener.onItemClick(item)
         }
         binding.action.setOnClickListener { view ->
             view.isEnabled = false
-            val item = item as FinderStateItem.Task
+            val item = item
             when (item.task.state) {
                 is SearchState.Progress -> listener.onProgressStopClick(item)
                 is SearchState.Stopping -> Unreachable
@@ -43,8 +46,7 @@ class TaskHolder(parent: ViewGroup, listener: OnActionListener) : CardViewHolder
 
     override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_task)
 
-    override fun onBind(item: FinderStateItem, position: Int) = binding.run {
-        item as FinderStateItem.Task
+    override fun onBind(item: FinderStateItem.Task<Result>, position: Int) = binding.run {
         val task = item.task
         params.setParams(task.params)
         status.setStatus(task.result)
@@ -111,9 +113,9 @@ class TaskHolder(parent: ViewGroup, listener: OnActionListener) : CardViewHolder
         setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     }
 
-    interface OnActionListener {
-        fun onItemClick(item: FinderStateItem.Task)
-        fun onProgressStopClick(item: FinderStateItem.Task)
-        fun onProgressRemoveClick(item: FinderStateItem.Task)
+    interface OnActionListener<R : SearchResult> {
+        fun onItemClick(item: FinderStateItem.Task<R>)
+        fun onProgressStopClick(item: FinderStateItem.Task<R>)
+        fun onProgressRemoveClick(item: FinderStateItem.Task<R>)
     }
 }

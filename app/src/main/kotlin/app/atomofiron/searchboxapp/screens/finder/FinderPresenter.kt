@@ -4,6 +4,7 @@ import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
@@ -30,7 +31,7 @@ class FinderPresenter(
     private val preferenceStore: PreferenceStore,
     private val preferenceChannel: PreferenceChannel
 ) : BasePresenter<FinderViewModel, FinderRouter>(scope, router),
-    FinderAdapterOutput,
+    FinderAdapterOutput<SearchResult>,
     QueryFieldHolder.OnActionListener by finderAdapterDelegate,
     CharactersHolder.OnActionListener by finderAdapterDelegate,
     EditCharactersHolder.OnEditCharactersListener by finderAdapterDelegate,
@@ -39,7 +40,7 @@ class FinderPresenter(
     EditMaxSizeHolder.OnEditMaxSizeListener by finderAdapterDelegate,
     EditOptionsHolder.FinderConfigListener by finderAdapterDelegate,
     ButtonsHolder.FinderButtonsListener by finderAdapterDelegate,
-    TaskHolder.OnActionListener by finderAdapterDelegate,
+    TaskHolder.OnActionListener<SearchResult> by finderAdapterDelegate,
     TargetsHolder.FinderTargetsOutput by targetsDelegate
 {
 

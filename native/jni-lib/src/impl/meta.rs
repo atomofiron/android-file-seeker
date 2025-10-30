@@ -8,9 +8,15 @@ use std::fs;
 use std::fs::File;
 use std::path::PathBuf;
 
-pub fn meta(path: &PathBuf) -> Rslt<Meta> {
+pub fn try_meta(path: &PathBuf) -> Rslt<Meta> {
     let meta = File::open(path)?.metadata();
     return Ok(meta.to_hr(path));
+}
+
+pub fn meta(path: &PathBuf) -> Meta {
+    let meta = File::open(path)
+        .and_then(|f| f.metadata());
+    return meta.to_hr(path);
 }
 
 pub fn meta_with_error(path: &PathBuf, error: &impl Display) -> Meta {

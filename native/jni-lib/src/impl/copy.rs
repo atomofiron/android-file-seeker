@@ -1,14 +1,12 @@
-// with the support of Sonnet 4.5
+// Assisted-by: Sonnet 4.5
 
-use crate::api::protocol::{ComplexResult, ProgressCollector};
-use crate::common::{Rslt, OKI};
-use crate::ext::result::ResultExt;
+use crate::api::protocol::{CommonProgressCollector, ComplexResult};
+use crate::common::{Rslt, JOINING_ERROR, OKI};
 use crate::r#impl::copy_method::CopyMethod;
 use crate::r#impl::delete::delete;
 use crate::r#impl::progress::{convert_progress, send_inc, ProgressChange};
 use libc::off_t;
 use std::ffi::CString;
-use std::fmt::Display;
 use std::fs::{self, DirEntry, File, Metadata};
 use std::io::{self, Read, Write};
 use std::ops::Range;
@@ -29,7 +27,7 @@ pub fn copy_impl(
     from: &PathBuf,
     to: &PathBuf,
     moving: bool,
-    collector: Arc<dyn ProgressCollector>,
+    collector: Arc<dyn CommonProgressCollector>,
 ) -> Rslt<ComplexResult> {
     let method = CopyMethod::detect();
     let (tx, rx) = channel::<ProgressChange>();
@@ -47,7 +45,7 @@ pub fn copy_impl(
         copy_recursive(from, to, method, &tx, 0.0..1.0)?;
     }
     drop(tx);
-    return handle.join().map_err(|_| "Joining thread failed".into());
+    return handle.join().map_err(|_| JOINING_ERROR.into());
 }
 
 fn copy_recursive(
@@ -282,15 +280,4 @@ fn send(
     };
     tx.send(change)?;
     return Ok(());
-}
-
-pub fn send_err(
-    path: &Path,
-    error: impl Display,
-    tx: &Sender<ProgressChange>,
-    range: &Range<f32>,
-) -> Rslt<()> {
-    let path = path.as_os_str().as_encoded_bytes().to_vec();
-    let change = ProgressChange::Err(path, error.to_string(), range.end);
-    return tx.send(change).boxed();
 }

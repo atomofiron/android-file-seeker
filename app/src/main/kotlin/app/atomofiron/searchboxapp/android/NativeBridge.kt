@@ -2,15 +2,22 @@ package app.atomofiron.searchboxapp.android
 
 import android.content.Context
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
+import app.atomofiron.searchboxapp.model.finder.SearchParams
+import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
+import uniffi.native_lib.CommonProgress
+import uniffi.native_lib.CommonProgressCollector
 import uniffi.native_lib.ComplexResult
 import uniffi.native_lib.Meta
 import uniffi.native_lib.MetaResult
 import uniffi.native_lib.MetasResult
-import uniffi.native_lib.Progress
-import uniffi.native_lib.ProgressCollector
+import uniffi.native_lib.NameSearchCollector
+import uniffi.native_lib.NameSearchProgress
+import uniffi.native_lib.SearchQuery
 import uniffi.native_lib.SimpleResult
+import uniffi.native_lib.TextSearchCollector
+import uniffi.native_lib.TextSearchProgress
 import uniffi.native_lib.TypedMeta
 import uniffi.native_lib.TypedMetaResult
 import uniffi.native_lib.TypedMetasResult
@@ -97,10 +104,11 @@ object NativeBridge {
     }
 
     fun delete(ref: NodeRef, asSu: Boolean): ComplexResult {
-        val collector = object : ProgressCollector {
-            override fun emit(progress: Progress) = Unit
+        val collector = object : CommonProgressCollector {
+            override fun emit(progress: CommonProgress) = Unit.poop("progress: $progress")
         }
         return uniffi.native_lib.deleteBy(ref.bytes, runAsSu = binPath.takeIf { asSu }, collector)
+            .also { poop("return $it") }
     }
 
     fun copy(
@@ -108,12 +116,51 @@ object NativeBridge {
         to: NodeRef,
         move: Boolean = false,
         asSu: Boolean,
-        collector: (Progress) -> Unit,
+        collector: (CommonProgress) -> Unit,
     ): ComplexResult {
-        val collector = object : ProgressCollector {
-            override fun emit(progress: Progress) = collector(progress)
+        val collector = object : CommonProgressCollector {
+            override fun emit(progress: CommonProgress) = collector
+                .also { poop("progress: $progress") }
+                .invoke(progress)
         }
         return uniffi.native_lib.copy(from.bytes, to.bytes, move, runAsSu = binPath.takeIf { asSu }, collector)
+            .also { poop("return $it") }
+    }
+
+    fun findNames(
+        params: SearchParams,
+        targets: List<NodeRef>,
+        maxDepth: Int,
+        excludeDirs: Boolean,
+        asSu: Boolean,
+        collector: (NameSearchProgress) -> Unit,
+    ): SimpleResult {
+        val collector = object : NameSearchCollector {
+            override fun emit(progress: NameSearchProgress) = collector
+                .also { poop("progress: $progress") }
+                .invoke(progress)
+        }
+        val query = SearchQuery(params.query, params.useRegex, params.ignoreCase)
+        return uniffi.native_lib.findNames(query, targets.map { it.bytes }, maxDepth.toUInt(), excludeDirs, runAsSu = binPath.takeIf { asSu }, collector)
+            .also { poop("return $it") }
+    }
+
+    fun findText(
+        params: SearchParams,
+        targets: List<NodeRef>,
+        maxDepth: Int = 1,
+        maxSize: Long = Long.MAX_VALUE,
+        asSu: Boolean,
+        collector: (TextSearchProgress) -> Unit,
+    ): SimpleResult {
+        val collector = object : TextSearchCollector {
+            override fun emit(progress: TextSearchProgress) = collector
+                .also { poop("progress: $progress") }
+                .invoke(progress)
+        }
+        val query = SearchQuery(params.query, params.useRegex, params.ignoreCase)
+        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), maxSize.toULong(), runAsSu = binPath.takeIf { asSu }, collector)
+            .also { poop("return $it") }
     }
 }
 

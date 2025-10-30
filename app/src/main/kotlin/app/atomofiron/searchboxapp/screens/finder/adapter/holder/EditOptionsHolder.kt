@@ -25,11 +25,9 @@ class EditOptionsHolder(
     parent: ViewGroup,
     private val listener: FinderConfigListener,
     private val isLocal: Boolean,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_search_edit_options) {
+) : GeneralHolder<FinderStateItem.EditOptions>(parent, R.layout.item_search_edit_options) {
 
     override val hungry = true
-
-    override val item get() = super.item as FinderStateItem.EditOptions
 
     private val optionMinWidth = parent.resources.getDimensionPixelSize(R.dimen.option_width)
     private val binding = ItemSearchEditOptionsBinding.bind(itemView)
@@ -64,8 +62,7 @@ class EditOptionsHolder(
         }
     }
 
-    override fun onBind(item: FinderStateItem, position: Int) = binding.run {
-        item as FinderStateItem.EditOptions
+    override fun onBind(item: FinderStateItem.EditOptions, position: Int) = binding.run {
 
         val items = mutableListOf(Item(!item.toggles.ignoreCase), Item(item.toggles.useRegex))
         if (!isLocal) {

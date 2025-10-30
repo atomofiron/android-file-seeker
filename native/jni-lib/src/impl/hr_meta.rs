@@ -4,19 +4,19 @@ use crate::r#impl::hr_users::HumanReadableUsers;
 use crate::api::protocol::Meta;
 use std::fs::Metadata;
 use std::io;
-use std::os::unix::ffi::OsStrExt;
 use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 use chrono::{DateTime, Local};
 use crate::common::{empty_string, DATE, DATE_STUB, TIME, TIME_STUB};
+use crate::ext::raw_path::PathBufExt;
 
 pub trait HumanReadableMeta {
     fn to_hr(self, name: &PathBuf) -> Meta;
 }
 
 impl HumanReadableMeta for io::Result<Metadata> {
+
     fn to_hr(self, path: &PathBuf) -> Meta {
-        let path = path.as_os_str().as_bytes().to_vec();
         match self {
             Ok(meta) => {
                 let date_time = DateTime::from_timestamp(meta.mtime(), 0)
@@ -36,22 +36,12 @@ impl HumanReadableMeta for io::Result<Metadata> {
                     size,
                     date,
                     time,
-                    path,
+                    path: path.clone().raw(),
                     length: meta.size(),
                     error: None,
                 }
             },
-            Err(e) => Meta {
-                access: empty_string(),
-                owner: empty_string(),
-                group: empty_string(),
-                size: empty_string(),
-                date: empty_string(),
-                time: empty_string(),
-                path,
-                length: 0,
-                error: Some(e.to_string()),
-            }
+            Err(e) => Meta::with_error(path, &e),
         }
     }
 }

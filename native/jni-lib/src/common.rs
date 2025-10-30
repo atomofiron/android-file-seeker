@@ -16,3 +16,6 @@ pub const DATE: &str = "%Y-%m-%d";
 pub const TIME: &str = "%H:%M:%S";
 pub const DATE_STUB: &str = "????-??-??";
 pub const TIME_STUB: &str = "??:??:??";
+
+pub const JOINING_ERROR: &str = "Joining thread failed";
+pub const EMPTY_VALUE_ERROR: &str = "Value is empty";

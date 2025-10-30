@@ -16,20 +16,18 @@ import app.atomofiron.searchboxapp.custom.view.TextField
 import app.atomofiron.searchboxapp.custom.view.makeRegex
 import app.atomofiron.searchboxapp.custom.view.showError
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
-import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Query
 import app.atomofiron.searchboxapp.utils.updateLayoutParams
 import java.util.regex.Pattern
 
 class QueryFieldHolder(
     parent: ViewGroup,
     private val listener: OnActionListener,
-) : GeneralHolder<FinderStateItem>(parent, R.layout.item_query_field)
+) : GeneralHolder<FinderStateItem.Query>(parent, R.layout.item_query_field)
     , TextField.Listener
     , View.OnFocusChangeListener
     , View.OnLayoutChangeListener
 {
     override val hungry = true
-    override val item get() = super.item as Query
 
     private val binding = ItemQueryFieldBinding.bind(itemView)
     private val textLayout = binding.queryField.box
@@ -61,8 +59,7 @@ class QueryFieldHolder(
 
     override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_query_field)
 
-    override fun onBind(item: FinderStateItem, position: Int) {
-        item as Query
+    override fun onBind(item: FinderStateItem.Query, position: Int) {
         if (textField.text.toString() != item.query) {
             textField.setText(item.query)
             textField.setSelection(item.query.length)

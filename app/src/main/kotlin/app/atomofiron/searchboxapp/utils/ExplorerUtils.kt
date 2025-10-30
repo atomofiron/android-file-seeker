@@ -175,7 +175,7 @@ object ExplorerUtils {
         )
     }
 
-    private fun Meta.toProperties(size: String? = null) = NodeProperties(
+    fun Meta.toProperties(size: String? = null) = NodeProperties(
         access = access,
         owner = owner,
         group = group,
@@ -297,7 +297,7 @@ object ExplorerUtils {
         return entries.isNotEmpty()
     }
 
-    private fun Node.resolveType(mimeType: String): Node {
+    fun Node.resolveType(mimeType: String): Node {
         val content = when (true) {
             (access.firstOrNull() == DIR_CHAR),
             (mimeType == DIRECTORY),

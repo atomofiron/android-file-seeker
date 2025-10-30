@@ -10,7 +10,10 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
-class TargetsHolder(parent: ViewGroup, output: FinderTargetsOutput) : GeneralHolder<FinderStateItem>(parent, R.layout.item_finder_targets) {
+class TargetsHolder(
+    parent: ViewGroup,
+    output: FinderTargetsOutput,
+) : GeneralHolder<FinderStateItem.Targets>(parent, R.layout.item_finder_targets) {
 
     override val hungry = true
 
@@ -23,8 +26,7 @@ class TargetsHolder(parent: ViewGroup, output: FinderTargetsOutput) : GeneralHol
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
 
-    override fun onBind(item: FinderStateItem, position: Int) {
-        item as FinderStateItem.Targets
+    override fun onBind(item: FinderStateItem.Targets, position: Int) {
         adapter.submitList(item.targets)
     }
 

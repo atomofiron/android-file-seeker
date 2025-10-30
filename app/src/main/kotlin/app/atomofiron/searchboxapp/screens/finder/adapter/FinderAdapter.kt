@@ -4,6 +4,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import app.atomofiron.common.recycler.AdapterHolderListener
 import app.atomofiron.common.recycler.GeneralHolder
+import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.DisclaimerHolder
@@ -20,10 +21,10 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TitleHolder
 import app.atomofiron.searchboxapp.screens.finder.state.FinderItemType
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
-class FinderAdapter(
+class FinderAdapter<Result : SearchResult>(
     private val isLocal: Boolean,
-    private val output: FinderAdapterOutput,
-) : ListAdapter<FinderStateItem, GeneralHolder<FinderStateItem>>(FinderDiffUtilCallback()) {
+    private val output: FinderAdapterOutput<Result>,
+) : ListAdapter<FinderStateItem, GeneralHolder<out FinderStateItem>>(FinderDiffUtilCallback()) {
 
     var holderListener: AdapterHolderListener? = null
 
@@ -35,7 +36,7 @@ class FinderAdapter(
 
     override fun getItemViewType(position: Int): Int = getItem(position).viewType
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GeneralHolder<FinderStateItem> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GeneralHolder<out FinderStateItem> {
         return when (FinderItemType[viewType]) {
             FinderItemType.FIND -> QueryFieldHolder(parent, output)
             FinderItemType.CHARACTERS -> CharactersHolder(parent, output)
@@ -54,8 +55,8 @@ class FinderAdapter(
         }.also { holderListener?.onCreate(it, viewType) }
     }
 
-    override fun onBindViewHolder(holder: GeneralHolder<FinderStateItem>, position: Int) {
-        holder.bind(getItem(position), position)
+override fun onBindViewHolder(holder: GeneralHolder<out FinderStateItem>, position: Int) {
+        (holder as GeneralHolder<FinderStateItem>).bind(getItem(position), position)
         holderListener?.onBind(holder, position)
     }
 }

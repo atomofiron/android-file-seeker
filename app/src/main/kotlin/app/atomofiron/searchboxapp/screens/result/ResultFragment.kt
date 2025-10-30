@@ -92,7 +92,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         resultAdapter.notifyItemChanged(0)
     }
 
-    private fun onTaskChange(result: SearchResult.FinderResult) {
+    private fun onTaskChange(result: SearchResult.Files) {
         resultAdapter.setResult(result)
 
         if (!result.isEmpty) {

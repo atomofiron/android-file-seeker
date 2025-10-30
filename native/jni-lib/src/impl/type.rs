@@ -4,7 +4,7 @@ use crate::r#impl::hr_meta::HumanReadableMeta;
 use std::fs;
 use std::path::PathBuf;
 
-pub fn file_type(path: &PathBuf) -> Rslt<TypedMeta> {
+pub fn file_type_impl(path: &PathBuf) -> Rslt<TypedMeta> {
     let mime = tree_magic_mini::from_filepath(path);
     let mut metadata = path.metadata();
     if mime == None {

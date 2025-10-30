@@ -5,7 +5,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchState
-import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.finder.GenericSearchTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -17,15 +17,15 @@ class FinderStore(
     private val scope: CoroutineScope,
 ) {
     private val mutex = Mutex()
-    private val mutableTasks = MutableStateFlow(listOf<SearchTask>())
+    private val mutableTasks = MutableStateFlow(listOf<GenericSearchTask>())
     val tasksFlow = mutableTasks.throttleLatest(duration = 100L)
-    val tasks: List<SearchTask> get() = mutableTasks.value
+    val tasks: List<GenericSearchTask> get() = mutableTasks.value
 
     operator fun invoke(block: suspend FinderStore.() -> Unit) {
         scope.launch { block() }
     }
 
-    suspend fun add(item: SearchTask) {
+    suspend fun add(item: GenericSearchTask) {
         mutableTasks.updateList {
             add(item)
         }
@@ -43,13 +43,13 @@ class FinderStore(
         }
     }
 
-    suspend fun drop(item: SearchTask) {
+    suspend fun drop(item: GenericSearchTask) {
         mutableTasks.updateList {
             remove(item)
         }
     }
 
-    suspend fun addOrUpdate(item: SearchTask) {
+    suspend fun addOrUpdate(item: GenericSearchTask) {
         mutableTasks.updateList {
             when (val index = indexOfFirst { it.uuid == item.uuid }) {
                 -1 -> add(item)
@@ -61,19 +61,17 @@ class FinderStore(
     suspend fun setSorting(id: Int, sorting: NodeSorting) {
         mutableTasks.updateList {
             val index = indexOfFirst { it.uniqueId == id }
-            val task = getOrNull(index)
-            val result = task?.result as? SearchResult.FinderResult
-            when (null) {
-                task, result -> return
-                else -> set(index, task.copy(result = result.copy(sorting = sorting)))
-            }
+            val task = getOrNull(index) ?: return
+            val result = task.result as? SearchResult.Files
+            result ?: return
+            set(index, task.copy(result = result.copy(sorting = sorting)))
         }
     }
 
     suspend fun deleteResultFromTasks(item: Node) {
         mutableTasks.updateList {
             forEachIndexed { index, task ->
-                val result = task.result as? SearchResult.FinderResult
+                val result = task.result as? SearchResult.Files
                 result ?: return@forEachIndexed
                 val new = result.removeItem(item)
                 if (new !== result) {

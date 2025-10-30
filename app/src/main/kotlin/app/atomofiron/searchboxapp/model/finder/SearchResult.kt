@@ -1,10 +1,12 @@
 package app.atomofiron.searchboxapp.model.finder
 
+import app.atomofiron.common.util.extension.replace
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.utils.Const
 import java.util.Objects
+import kotlin.LazyThreadSafetyMode.NONE
 
 
 sealed class SearchResult {
@@ -16,26 +18,26 @@ sealed class SearchResult {
 
     abstract fun getCounters(): IntArray
 
-    data class TextSearchResult(
+    data class Text(
         override val count: Int,
         /** line index -> matches byteOffset+length */
         val matchesMap: Map<Int, List<TextLineMatch>>,
-        val indexes: List<Int>,
     ) : SearchResult() {
+
+        val indexes: List<Int> by lazy(NONE) { matchesMap.keys.sorted() }
 
         override val countTotal = 1
 
-        constructor() : this(0, mapOf(), listOf())
+        constructor() : this(0, mapOf())
 
         override fun getCounters(): IntArray = intArrayOf(count)
     }
 
-    data class FinderResult(
+    data class Files(
         private val inContent: Boolean,
         override val count: Int = 0,
         val matches: List<ItemMatch> = listOf(),
         override val countTotal: Int = 0,
-        val retries: Int = 0,
         val sorting: NodeSorting = NodeSorting.Date.Reversed,
     ) : SearchResult() {
         companion object {
@@ -66,16 +68,16 @@ sealed class SearchResult {
             val left = matches.filter { !it.item.ref.isChildOf(removed.ref) }
             val items = matches.toMutableList()
             val count = left.sumOf { it.count }
-            return FinderResult(inContent, count, items, countTotal.dec())
+            return Files(inContent, count, items, countTotal.dec())
         }
 
         fun contains(itemCounter: ItemMatch) = matches.contains(itemCounter)
 
-        fun add(itemCounter: ItemMatch): FinderResult {
+        fun add(itemMatch: ItemMatch): Files {
             val items = matches.toMutableList()
-            val count = count + itemCounter.count
-            items.add(itemCounter)
-            return FinderResult(inContent, count, items, countTotal.inc())
+            val count = count + itemMatch.count
+            items.replace(itemMatch) { it.path == itemMatch.path }
+            return Files(inContent, count, items, countTotal.inc())
         }
     }
 
@@ -88,10 +90,6 @@ sealed class SearchResult {
         other.countTotal != countTotal -> false
         else -> other::class == this::class
     }
-}
-
-fun SearchResult.TextSearchResult.toItemMatchMultiply(item: Node): ItemMatch {
-    return ItemMatch.Multiply(item, count, matchesMap, indexes)
 }
 
 @Suppress("LeakingThis")
@@ -120,8 +118,8 @@ sealed class ItemMatch {
         override val count: Int,
         /** line index -> matches byteOffset+length */
         val matchesMap: Map<Int, List<TextLineMatch>>,
-        val indexes: List<Int>,
     ) : ItemMatch() {
+        //val indexes: Set<Int> get() = matchesMap.keys
         override fun update(item: Node): ItemMatch = copy(item = item)
     }
 
