@@ -7,8 +7,7 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
-import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
-import app.atomofiron.searchboxapp.utils.Shell
+import app.atomofiron.searchboxapp.utils.Rslt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,11 +25,10 @@ class PreferenceViewState(
     private val _alerts = ChannelFlow<String>()
     val alerts = merge(preferenceChannel.appUpdateStatus, _alerts)
     val alertOutputSuccess = ChannelFlow<Int>()
-    val alertOutputError = ChannelFlow<Shell.Output>()
+    val alertOutputError = ChannelFlow<Rslt.Err<Unit>>()
     val showDeepBlack = MutableStateFlow(false)
     val asSu: StateFlow<Boolean> = preferenceStore.asSu
     val hapticFeedback: StateFlow<Boolean> = preferenceStore.hapticFeedback
-    val toybox: StateFlow<ToyboxVariant> = preferenceStore.toyboxVariant
     val withDebugGroup = appWatcher.isAvailable
     val appUpdate: StateFlow<AppUpdateState> = updateStore.state
     // todo zip and share the backup
@@ -44,7 +42,7 @@ class PreferenceViewState(
         alertOutputSuccess[scope] = value
     }
 
-    fun sendAlertOutputError(value: Shell.Output) {
+    fun sendAlertOutputError(value: Rslt.Err<Unit>) {
         alertOutputError[scope] = value
     }
 }

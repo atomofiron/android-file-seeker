@@ -26,7 +26,6 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyOpenedDir
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShowSearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySpecialCharacters
-import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyToybox
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyUseSu
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShownNotificationUpdateCode
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTestField
@@ -192,12 +191,6 @@ class PreferenceStore(
 
     suspend fun setHapticFeedback(value: Boolean) {
         edit { it[KeyHapticFeedback] = value }
-    }
-
-    val toyboxVariant = getFlow(KeyToybox, ToyboxVariant.Companion::invoke)
-
-    suspend fun setEmbeddedToybox(value: ToyboxVariant) {
-        edit { it[KeyToybox] = value.path }
     }
 
     private fun <V> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {

@@ -155,7 +155,6 @@
     <string name="root">Koren</string>
     <string name="copy_path">Kopiraj putanju</string>
     <string name="pref_category_system">Sistem</string>
-    <string name="pref_embedded_toybox">Koristi ugrađeni toybox</string>
     <string name="disclaimer_pick_files">Označite datoteku(e) i pritisnite Potvrdi</string>
     <string name="disclaimer_choose_directory">Izaberite fasciklu za čuvanje datoteke(a) i pritisnite Potvrdi</string>
     <string name="dismiss">Sakrij</string>

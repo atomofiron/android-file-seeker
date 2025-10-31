@@ -155,7 +155,6 @@
     <string name="root">Корен</string>
     <string name="copy_path">Копирај путању</string>
     <string name="pref_category_system">Систем</string>
-    <string name="pref_embedded_toybox">Користи уграђени toybox</string>
     <string name="disclaimer_pick_files">Означите датотеку(е) и притисните Потврди</string>
     <string name="disclaimer_choose_directory">Изаберите фасциклу за чување датотеке(а) и притисните Потврди</string>
     <string name="dismiss">Сакриј</string>

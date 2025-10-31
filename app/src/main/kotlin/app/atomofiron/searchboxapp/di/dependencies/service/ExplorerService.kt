@@ -42,7 +42,6 @@ import app.atomofiron.searchboxapp.model.explorer.isMovie
 import app.atomofiron.searchboxapp.model.explorer.isPicture
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.other.toUni
-import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
@@ -57,14 +56,12 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateWith
 import app.atomofiron.searchboxapp.utils.Rslt
-import app.atomofiron.searchboxapp.utils.Shell
 import app.atomofiron.searchboxapp.utils.findWithIndex
 import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.searchboxapp.utils.removeOneIf
 import app.atomofiron.searchboxapp.utils.replaceEach
 import app.atomofiron.searchboxapp.utils.showLongToast
 import app.atomofiron.searchboxapp.utils.unwrapOrNull
-import app.atomofiron.searchboxapp.utils.verify
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
@@ -95,14 +92,11 @@ class ExplorerService(
     private val updateRootTrigger = TriggerFlow()
 
     init {
-        val asSuDefined = Job()
-        val toyboxDefined = Job()
+        val suDefined = Job()
         NativeBridge.setBinDir(context.filesDir.absolutePath)
         appScope.launchOnIO {
             garden {
-                asSuDefined.join()
-                toyboxDefined.join()
-                context.resolveToybox(preferences.toyboxVariant.value)
+                suDefined.join()
                 if (config.asSu) checkSu()
                 initRoots()
             }
@@ -112,22 +106,12 @@ class ExplorerService(
         }
         val thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size)
         preferences.asSu.collect(appScope) {
-            asSuDefined.complete()
+            suDefined.complete()
             config = CacheConfig(it, thumbnailSize)
-        }
-        preferences.toyboxVariant.collect(appScope) {
-            toyboxDefined.complete()
-            context.resolveToybox(it)
         }
         store.currentNode.collect(appScope) {
             preferences.setOpenedDirPath(it?.ref?.string)
         }
-    }
-
-    private fun Context.resolveToybox(embedded: ToyboxVariant) {
-        val variant = verify(embedded)
-        Shell.toyboxPath = variant.path
-        preferences { setEmbeddedToybox(variant) }
     }
 
     private suspend fun checkSu() {

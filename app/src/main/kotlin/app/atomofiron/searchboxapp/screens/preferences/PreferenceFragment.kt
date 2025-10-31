@@ -26,10 +26,9 @@ import app.atomofiron.fileseeker.databinding.FragmentPreferenceBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.addLayoutListener
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.custom.preference.DropDownPreference
-import app.atomofiron.searchboxapp.model.preference.ToyboxVariant
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
-import app.atomofiron.searchboxapp.utils.Shell
+import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.performHapticLite
@@ -75,10 +74,6 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         val asSu = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyUseSu.name)!!
         viewState.asSu.collect(lifecycleScope) {
             asSu.isChecked = it
-        }
-        val toybox = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyToybox.name)!!
-        viewState.toybox.collect(lifecycleScope) {
-            toybox.isChecked = it is ToyboxVariant.Embedded
         }
         val debugGroup = findPreference<PreferenceGroup>(PreferenceKeys.PREF_CATEGORY_DEBUG)!!
         debugGroup.isVisible = viewState.withDebugGroup
@@ -161,13 +156,13 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         binding.snackbarContainer.makeSnackbar(message, duration).show()
     }
 
-    private fun showOutputError(output: Shell.Output) {
+    private fun showOutputError(output: Rslt.Err<Unit>) {
         binding.snackbarContainer.makeSnackbar(R.string.error, Snackbar.LENGTH_SHORT).apply {
-            if (output.error.isNotEmpty()) {
+            if (output.message.isNotEmpty()) {
                 setAction(R.string.more) {
                     MaterialAlertDialogBuilder(context)
                         .setTitle(R.string.error)
-                        .setMessage(output.error)
+                        .setMessage(output.message)
                         .setPositiveButton(R.string.ok) { _, _ -> }
                         .show()
                 }

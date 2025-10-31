@@ -67,11 +67,6 @@
             app:icon="@drawable/ic_export_import"
             app:isPreferenceVisible="false"
             />
-        <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
-            app:title="@string/pref_embedded_toybox"
-            app:key="pref_toybox_path"
-            app:icon="@drawable/ic_shell"
-            />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_category_debug"
