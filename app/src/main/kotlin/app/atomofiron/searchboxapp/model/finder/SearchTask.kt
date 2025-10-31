@@ -15,7 +15,6 @@ data class SearchTask<Result : SearchResult>(
 ) {
     val uniqueId: Int get() = uuid.hashCode()
     val count: Int = result.count
-    val withRetries: Boolean get() = false // todo remove
 
     val inProgress: Boolean get() = state == SearchState.Progress
     val isEnded: Boolean get() = state is SearchState.Ended

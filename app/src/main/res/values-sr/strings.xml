@@ -186,7 +186,6 @@
     <string name="channel_name_updates">Ажурирања</string>
     <string name="search_here">Претрага овде:</string>
     <string name="by_default">Врати на подразумевано</string>
-    <string name="fix_android_12">Од Android 12 претрага може бити прекинута од стране система, што може довести до делимичног или потпуног поновног покретања</string>
     <string name="fetching">Добављање метаподатака…</string>
     <string name="and">\u0020и\u0020</string>
     <string name="nothing_was_deleted">Ништа није обрисано</string>

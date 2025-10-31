@@ -2,12 +2,13 @@ package app.atomofiron.searchboxapp.screens.finder.adapter
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.AdapterHolderListener
 import app.atomofiron.common.recycler.GeneralHolder
+import app.atomofiron.common.util.noClip
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.DisclaimerHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
@@ -50,13 +51,17 @@ class FinderAdapter<Result : SearchResult>(
             FinderItemType.MAX_SIZE -> EditMaxSizeHolder(parent, output)
             FinderItemType.EDIT_CHARS -> EditCharactersHolder(parent, output)
             FinderItemType.TARGETS -> TargetsHolder(parent, output)
-            FinderItemType.DISCLAIMER -> DisclaimerHolder(parent)
             null -> throw IllegalArgumentException("viewType = $viewType")
         }.also { holderListener?.onCreate(it, viewType) }
     }
 
-override fun onBindViewHolder(holder: GeneralHolder<out FinderStateItem>, position: Int) {
+    override fun onBindViewHolder(holder: GeneralHolder<out FinderStateItem>, position: Int) {
         (holder as GeneralHolder<FinderStateItem>).bind(getItem(position), position)
         holderListener?.onBind(holder, position)
+    }
+
+    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+        super.onAttachedToRecyclerView(recyclerView)
+        recyclerView.noClip()
     }
 }

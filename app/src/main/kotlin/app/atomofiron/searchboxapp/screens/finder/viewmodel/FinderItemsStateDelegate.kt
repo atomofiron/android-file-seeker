@@ -1,7 +1,5 @@
 package app.atomofiron.searchboxapp.screens.finder.viewmodel
 
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.S
 import app.atomofiron.common.util.flow.mapState
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -11,7 +9,6 @@ import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Buttons
-import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Disclaimer
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.EditCharacters
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.MaxDepth
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.MaxSize
@@ -86,11 +83,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
                 add(index, Title(R.string.search_here))
                 add(index, Targets(targets.toList()))
             }
-            val index = tasks.indexOfLast { it.withRetries }
             addAll(tasks.reversed().map { FinderStateItem.Task(it, clickableIfEmpty = !isLocal) })
-            if (SDK_INT >= S && !isLocal && index >= 0) {
-                add(tasks.lastIndex - index, Disclaimer)
-            }
         }
     }
 

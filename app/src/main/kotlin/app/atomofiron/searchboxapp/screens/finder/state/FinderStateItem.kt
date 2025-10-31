@@ -13,6 +13,7 @@ sealed class FinderStateItem(
     val type: FinderItemType,
     override val stableId: Long = type.id.toLong(),
 ) : GeneralItem {
+
     val viewType = type.id
 
     constructor(type: FinderItemType, stableId: Int) : this(type, stableId.toLong())
@@ -62,8 +63,6 @@ sealed class FinderStateItem(
     ) : FinderStateItem(FinderItemType.PROGRESS, task.uniqueId)
 
     data class Targets(val targets: List<Node>) : FinderStateItem(FinderItemType.TARGETS)
-
-    data object Disclaimer : FinderStateItem(FinderItemType.DISCLAIMER)
 
     companion object {
         val groups = listOf(

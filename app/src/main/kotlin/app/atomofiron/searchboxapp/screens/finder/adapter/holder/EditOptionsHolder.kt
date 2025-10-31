@@ -37,7 +37,6 @@ class EditOptionsHolder(
     init {
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
-        recyclerView.noClip()
         recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
         recyclerView.addMeasureListener { width, _ ->
             val available = recyclerView.run { width - paddingStart - paddingEnd }

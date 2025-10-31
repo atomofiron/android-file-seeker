@@ -17,7 +17,7 @@ enum class FinderItemType(val id: Int) {
     TITLE(ids()),
     PROGRESS(ids()),
     TARGETS(ids()),
-    DISCLAIMER(ids());
+    ;
 
     companion object {
         operator fun get(id: Int): FinderItemType? = entries.find { it.id == id }

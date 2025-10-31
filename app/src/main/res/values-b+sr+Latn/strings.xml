@@ -186,7 +186,6 @@
     <string name="channel_name_updates">Ažuriranja</string>
     <string name="search_here">Pretraga ovde:</string>
     <string name="by_default">Vrati na podrazumevano</string>
-    <string name="fix_android_12">Od Android 12 pretraga može biti prekinuta od strane sistema, što može dovesti do delimičnog ili potpunog ponovnog pokretanja</string>
     <string name="fetching">Dobavljanje metapodataka…</string>
     <string name="and">\u0020i\u0020</string>
     <string name="nothing_was_deleted">Ništa nije obrisano</string>
