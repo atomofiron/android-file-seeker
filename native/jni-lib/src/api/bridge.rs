@@ -14,7 +14,7 @@ use std::sync::Arc;
 #[uniffi::export]
 pub fn create_file(path: RawPath, run_as_su: Option<String>) -> MetaResult {
     if let Some(bin_path) = run_as_su {
-        return as_su::<MetaResult>(Request::GetMeta(path), bin_path)
+        return as_su::<MetaResult>(Request::CreateFile(path), bin_path)
             .unwrap_or_else(|e| MetaResult::Err(e.to_string()))
     }
     match new_file(&path.buf()) {
@@ -26,7 +26,7 @@ pub fn create_file(path: RawPath, run_as_su: Option<String>) -> MetaResult {
 #[uniffi::export]
 pub fn create_dir(path: RawPath, run_as_su: Option<String>) -> MetaResult {
     if let Some(bin_path) = run_as_su {
-        return as_su::<MetaResult>(Request::GetMeta(path), bin_path)
+        return as_su::<MetaResult>(Request::CreateDir(path), bin_path)
             .unwrap_or_else(|e| MetaResult::Err(e.to_string()))
     }
     match new_dir(&path.buf()) {
