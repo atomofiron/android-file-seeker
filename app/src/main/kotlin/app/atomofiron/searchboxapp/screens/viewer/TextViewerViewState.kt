@@ -32,6 +32,7 @@ class TextViewerViewState(
         val max: Int = 0,
     ) {
         fun clear(): Status = copy(current = 0, max = 0)
+        fun go(forward: Boolean): Status = copy(current = ((max + current.dec() + forward.toInt()) % max).inc())
     }
 
     @JvmInline
@@ -119,8 +120,7 @@ class TextViewerViewState(
         }
         matchesCursor.value = MatchCursor(lineIndex, matchIndex)
         status.run {
-            val count = value.run { (max + current + increment.toInt()) % max }
-            value = value.copy(current = count)
+            value = value.go(forward = increment)
         }
         return none
     }
@@ -136,15 +136,14 @@ class TextViewerViewState(
     }
 
     fun dropTask() {
-        matchesCursor.value = MatchCursor()
         status.value = status.value.clear()
         currentTask.value = null
+        matchesCursor.value = null
     }
 
     fun trySelectTask(task: TextSearchTask): Boolean {
         return (task.isEnded && task.count > 0).also { isOk ->
             if (isOk) {
-                matchesCursor.value = MatchCursor()
                 currentTask.value = task
                 status.run {
                     value = value.copy(current = 0, max = task.count)
