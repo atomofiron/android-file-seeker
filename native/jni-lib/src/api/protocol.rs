@@ -78,7 +78,15 @@ pub enum TextSearchProgress {
         length: u32,
         line: Option<u64>,
     },
+    End(RawPath),
     Err(Meta),
+}
+
+#[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(uniffi::Enum)]
+pub enum Check {
+    Yes(u64), // txt + file size
+    No,
 }
 
 #[derive(Debug, Encode, Decode, PartialEq, Clone)]

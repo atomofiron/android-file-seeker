@@ -56,7 +56,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
     )
     override val items = combine(uniqueItems, targets, tasks, ::composeAllItems)
 
-    private fun composeOptions(config: EditOptions, chars: Array<String>, depth: Int, size: Int, show: Boolean) = when {
+    private fun composeOptions(config: EditOptions, chars: Array<String>, depth: Int, size: Long, show: Boolean) = when {
         show -> listOf(
             config,
             MaxSize(size),
@@ -69,10 +69,10 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
 
     private fun composeUniqueItems(query: String, test: String?, chars: Array<String>, options: List<FinderStateItem>, config: EditOptions): List<FinderStateItem> {
         return buildList {
-            add(Query(query, useRegex = config.useRegex))
+            add(Query(query, regex = config.regex))
             add(SpecialCharacters(chars))
             if (!isLocal) add(Buttons)
-            add(TestField(value = test, query = query, useRegex = config.useRegex, ignoreCase = config.ignoreCase))
+            add(TestField(value = test, query = query, regex = config.regex, ignoreCase = config.ignoreCase))
             addAll(options)
         }
     }

@@ -77,7 +77,7 @@ class QueryFieldHolder(
 
     private fun bindState(query: String) {
         try {
-            if (item.useRegex) Pattern.compile(query)
+            if (item.regex) Pattern.compile(query)
             textLayout.showError(false)
         } catch (e: Exception) {
             textLayout.showError(e.message?.lineSequence()?.first())

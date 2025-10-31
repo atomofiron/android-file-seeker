@@ -17,6 +17,7 @@ import androidx.work.WorkerParameters
 import app.atomofiron.common.util.extension.debugDelay
 import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.logE
+import app.atomofiron.common.util.extension.replace
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.Notifications
@@ -30,15 +31,13 @@ import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
+import app.atomofiron.searchboxapp.model.finder.FilesSearchTask
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
-import app.atomofiron.searchboxapp.model.finder.SearchOptions
-import app.atomofiron.searchboxapp.model.finder.SearchParams
+import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult.Files
 import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.model.finder.SearchTask
-import app.atomofiron.searchboxapp.model.finder.GenericSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveType
@@ -46,6 +45,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.toProperties
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.ifCanNotice
+import app.atomofiron.searchboxapp.utils.mutate
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -53,71 +53,56 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromByteArray
+import kotlinx.serialization.encodeToByteArray
+import kotlinx.serialization.protobuf.ProtoBuf
 import uniffi.native_lib.Meta
 import uniffi.native_lib.NameSearchProgress
 import uniffi.native_lib.SimpleResult
 import uniffi.native_lib.TextSearchProgress
 import uniffi.native_lib.TypedMeta
-import java.util.regex.Pattern
 import javax.inject.Inject
+
+@SuppressLint("InlinedApi")
+private const val UPDATING_FLAG = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+
+private const val KEY_PARAMS = "KEY_PARAMS"
+private const val KEY_EXCEPTION = "KEY_EXCEPTION"
+private const val KEY_CANCELLED = "KEY_CANCELLED"
 
 class FinderWorker(
     private val context: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(context, workerParams) {
-    companion object {
-        @SuppressLint("InlinedApi")
-        private const val UPDATING_FLAG = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-
-        private const val UNDEFINED = -1
-
-        private const val KEY_EXCEPTION = "KEY_EXCEPTION"
-        private const val KEY_CANCELLED = "KEY_CANCELLED"
-
-        private const val KEY_QUERY = "KEY_QUERY"
-        private const val KEY_USE_SU = "KEY_USE_SU"
-        private const val KEY_USE_REGEX = "KEY_USE_REGEX"
-        private const val KEY_MAX_SIZE = "KEY_MAX_SIZE"
-        private const val KEY_CASE_INSENSITIVE = "KEY_CASE_INSENSITIVE"
-        private const val KEY_EXCLUDE_DIRS = "KEY_EXCLUDE_DIRS"
-        private const val KEY_FOR_CONTENT = "KEY_FOR_CONTENT"
-        private const val KEY_MAX_DEPTH = "KEY_MAX_DEPTH"
-        private const val KEY_WHERE_PATH = "KEY_WHERE_PATH_"
-
-        fun inputData(query: String, asSu: Boolean, config: SearchOptions, maxSize: Int, maxDepth: Int, targets: Array<NodeRef>) = Data.Builder()
-            .putString(KEY_QUERY, query)
-            .putBoolean(KEY_USE_SU, asSu)
-            .putBoolean(KEY_USE_REGEX, config.useRegex)
-            .putInt(KEY_MAX_SIZE, maxSize)
-            .putBoolean(KEY_CASE_INSENSITIVE, config.ignoreCase)
-            .putBoolean(KEY_EXCLUDE_DIRS, config.excludeDirs)
-            .putBoolean(KEY_FOR_CONTENT, config.contentSearch)
-            .putInt(KEY_MAX_DEPTH, maxDepth)
-            .apply {
-                for (i in targets.indices) putByteArray("$KEY_WHERE_PATH$i", targets[i].bytes)
-            }
+    @Serializable
+    data class Params(
+        val query: QueryParams,
+        val type: Type,
+        val maxDepth: Int,
+        val targets: List<ByteArray>,
+        val asSu: Boolean,
+    ) {
+        companion object {
+            operator fun invoke(bytes: ByteArray) = ProtoBuf.decodeFromByteArray<Params>(bytes)
+        }
+        @Serializable
+        sealed interface Type {
+            @Serializable
+            data class Names(val excludeDirs: Boolean) : Type
+            @Serializable
+            data class Text(val maxSize: Long) : Type
+        }
+        fun refs() = targets.map { NodeRef(it) }
+        fun toData() = Data.Builder()
+            .putByteArray(KEY_PARAMS, ProtoBuf.encodeToByteArray(this))
             .build()
     }
-    private val asSu = inputData.getBoolean(KEY_USE_SU, false)
-    private val useRegex = inputData.getBoolean(KEY_USE_REGEX, false)
-    private val query: String = inputData.getString(KEY_QUERY) ?: ""
-    private lateinit var pattern: Pattern
-    private val maxSize = inputData.getLong(KEY_MAX_SIZE, 0L)
-    private val ignoreCase = inputData.getBoolean(KEY_CASE_INSENSITIVE, false)
-    private val excludeDirs = inputData.getBoolean(KEY_EXCLUDE_DIRS, false)
-    private val forContent = inputData.getBoolean(KEY_FOR_CONTENT, false)
-    private val maxDepth = inputData.getInt(KEY_MAX_DEPTH, UNDEFINED)
-    private val params = SearchParams(query, useRegex = useRegex, ignoreCase = ignoreCase)
 
     private val taskMutex = Mutex()
-    private var task: GenericSearchTask = SearchTask(
-        SearchParams(query, useRegex, ignoreCase),
-        Files(forContent),
-        id,
-    )
-    private var process: Process? = null
-    private val cacheConfig = CacheConfig(asSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size))
-    private val progressJobs = mutableListOf<Job>()
+    // todo remove deleting files from results
+    private lateinit var task: FilesSearchTask
+    private lateinit var cacheConfig: CacheConfig
 
     @Inject
     lateinit var finderStore: FinderStore
@@ -131,85 +116,87 @@ class FinderWorker(
     lateinit var workManager: WorkManager
 
     init {
-        if (useRegex && !forContent) {
-            val flags = if (ignoreCase) Pattern.CASE_INSENSITIVE else 0
-            pattern = Pattern.compile(query, flags)
-        }
         DaggerInjector.appComponent.inject(this)
     }
 
-    private fun searchText(where: List<Node>) {
-        if (isStopped) {
-            return
-        }
-        val targets = where.map { it.ref }
-        appScope.launch {
-            val result = NativeBridge.findText(params, targets, maxDepth = maxDepth, maxSize = maxSize, asSu) { match ->
-                when (match) {
-                    is TextSearchProgress.Ok -> {
-                        poop("match $match")
-                        val lineIndex = match.line?.toInt() ?: return@findText
-                        val result = task.result as Files
-                        val itemMatch = result.matches.find { it.item.ref.theSame(match.path) }
-                            ?.let { it as ItemMatch.Multiply }
-                            ?: NodeRef(match.path).let {
-                                val node = NativeBridge.type(it, asSu).value?.toNode() ?: it.toNode()
-                                ItemMatch.Multiply(node, 0, mutableMapOf())
+    private fun Params.searchText(type: Params.Type.Text) = appScope.launch {
+        val result = NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, asSu) { match ->
+            appScope {
+                updateTask {
+                    val new = when (match) {
+                        is TextSearchProgress.Ok -> {
+                            val lineIndex = match.line?.toInt()?.dec() ?: return@appScope
+                            val lineMatch = TextLineMatch(match.offset.toLong(), match.length.toInt())
+                            var itemMatch = result.matches
+                                .find { it.item.ref.theSame(match.path) }
+                                ?.let { it as ItemMatch.Multiply }
+                            val countTotal = when (itemMatch) {
+                                null -> result.countTotal.inc()
+                                else -> result.countTotal
                             }
-                        val matchesMap = itemMatch.matchesMap as MutableMap<Int, MutableList<TextLineMatch>>
-                        val matches = matchesMap.getOrPut(lineIndex) { mutableListOf() }
-                        matches.add(TextLineMatch(match.offset.toLong(), match.length.toInt()))
-                        appScope {
-                            addToResult(itemMatch.copy(count = itemMatch.count.inc()))
+                            itemMatch = itemMatch ?: NodeRef(match.path).let {
+                                val node = NativeBridge.type(it, asSu).value?.toNode() ?: it.toNode()
+                                ItemMatch.Multiply(node)
+                            }
+                            val matches = itemMatch.matchesMap.getOrPut(lineIndex) { mutableListOf() }
+                            matches.add(lineMatch)
+                            val new = result.matches.mutate {
+                                replace(itemMatch.copy(count = itemMatch.count.inc())) {
+                                    it.path == itemMatch.path
+                                }
+                            }
+                            result.copy(count = result.count.inc(), matches = new, countTotal = countTotal)
                         }
+                        is TextSearchProgress.End -> {
+                            val itemMatch = result.matches.find { it.item.ref.theSame(match.v1) }
+                            if (itemMatch != null) {
+                                return@appScope
+                            }
+                            result.copy(countTotal = result.countTotal.inc())
+                        }
+                        is TextSearchProgress.Err -> return@appScope // todo
                     }
-                    is TextSearchProgress.Err -> Unit.also { poop("err $match") } // todo
+                    copyWith(result = new)
                 }
             }
-            poop("result $result")
-            updateTask {
-                val error = (result as? SimpleResult.Err)?.v1
-                toEnded(error = error)
-            }
-        }.let { progressJobs.add(it) }
-    }
-
-    private suspend fun waitForJobs() = progressJobs.forEach { it.join() }
-
-    private suspend inline fun updateTask(transformation: GenericSearchTask.() -> GenericSearchTask) {
-        taskMutex.withLock {
-            task = task.transformation()
         }
-        finderStore.addOrUpdate(task)
-    }
-
-    private fun searchNames(where: List<Node>) {
-        if (isStopped) {
-            return
-        }
-        val targets = where.map { it.ref }
-        appScope {
-            NativeBridge.findNames(params, targets, maxDepth, excludeDirs, asSu) {
-                appScope {
-                    when (it) {
-                        is NameSearchProgress.Ok -> addToResult(ItemMatch.Single(it.v1.toNode()))
-                        is NameSearchProgress.Err -> Unit // todo
-                    }
-                }
-            }
-        }.let { progressJobs.add(it) }
-    }
-
-    // todo remove deleting files from results
-    private suspend fun addToResult(itemMatch: ItemMatch) {
         updateTask {
-            val result = task.result as Files
-            copyWith(result.add(itemMatch))
+            val error = (result as? SimpleResult.Err)?.v1
+            toEnded(error = error)
+        }
+    }
+
+    private suspend inline fun updateTask(transform: FilesSearchTask.() -> FilesSearchTask) {
+        taskMutex.withLock {
+            task = task.transform()
+        }
+        finderStore.addOrUpdate(task.cast())
+    }
+
+    private fun Params.searchNames(type: Params.Type.Names) = appScope {
+        NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu) { match ->
+            appScope {
+                when (match) {
+                    is NameSearchProgress.Ok -> updateTask {
+                        val itemMatch = ItemMatch.Single(match.v1.toNode())
+                        val matches = result.matches.toMutableList()
+                        matches.replace(itemMatch) { it.path == itemMatch.path }
+                        copyWith(result.copy(count = count.inc(), matches = matches, countTotal = result.countTotal.inc()))
+                    }
+                    is NameSearchProgress.Err -> Unit // todo
+                }
+            }
         }
     }
 
     override suspend fun doWork(): Result {
-        if (query.isEmpty()) {
+        val bytes = inputData.getByteArray(KEY_PARAMS)
+        if (bytes == null) {
+            logE("Bytes is null")
+            return Result.success()
+        }
+        val params = Params(bytes)
+        if (params.query.query.isEmpty()) {
             logE("Query is empty")
             return Result.success()
         }
@@ -220,7 +207,9 @@ class FinderWorker(
             )
             setForeground(getForegroundInfo())
         }
-        return handleCancellation(::work)
+        task = SearchTask(params.query, result = Files(params.type is Params.Type.Text), id)
+        cacheConfig = CacheConfig(params.asSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size))
+        return handleCancellation { work(params) }
     }
 
     private suspend fun <R> handleCancellation(action: suspend () -> R): R {
@@ -229,7 +218,6 @@ class FinderWorker(
                 try {
                     while (true) delay(1000)
                 } catch (e: CancellationException) {
-                    process?.destroy()
                 }
             }
             action()
@@ -237,21 +225,16 @@ class FinderWorker(
         }
     }
 
-    private suspend fun work(): Result {
+    private suspend fun work(params: Params): Result {
         val dataBuilder = Data.Builder()
+        var job: Job? = null
         try {
-            finderStore.addOrUpdate(task)
-            val targets = mutableListOf<Node>()
-            for (i in 0..Int.MAX_VALUE) {
-                val path = inputData.getByteArray("$KEY_WHERE_PATH$i")
-                path ?: break
-                targets.add(Node(NodeRef(path), content = NodeContent.Unknown).update(cacheConfig))
+            finderStore.addOrUpdate(task.cast())
+            job = when (val type = params.type) {
+                is Params.Type.Text -> params.searchText(type)
+                is Params.Type.Names -> params.searchNames(type)
             }
-            when {
-                forContent -> searchText(targets)
-                else -> searchNames(targets)
-            }
-            waitForJobs()
+            job.join()
             debugDelay(5)
             updateTask {
                 toEnded()
@@ -261,11 +244,10 @@ class FinderWorker(
             finderStore {
                 update(task.uuid, SearchState.Stopped())
             }
-            process?.destroy()
             dataBuilder.putBoolean(KEY_CANCELLED, true)
         } catch (e: Exception) {
             logE(e.toString())
-            waitForJobs()
+            job?.join()
             task = task.copy(state = SearchState.Ended(), error = e.toString())
             finderStore {
                 update(task.uuid, SearchState.Ended(), error = e.toString())

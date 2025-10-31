@@ -12,7 +12,7 @@ import app.atomofiron.common.util.Unreachable
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemProgressBinding
-import app.atomofiron.searchboxapp.model.finder.SearchParams
+import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -48,7 +48,7 @@ class TaskHolder<Result : SearchResult>(
 
     override fun onBind(item: FinderStateItem.Task<Result>, position: Int) = binding.run {
         val task = item.task
-        params.setParams(task.params)
+        params.setParams(task.query)
         status.setStatus(task.result)
         action.isActivated = !task.inProgress
         progress.isInvisible = !task.state.running
@@ -75,7 +75,7 @@ class TaskHolder<Result : SearchResult>(
         itemView.isEnabled = item.clickableIfEmpty || !task.result.isEmpty
     }
 
-    private fun TextView.setParams(params: SearchParams) {
+    private fun TextView.setParams(params: QueryParams) {
         val status = SpannableStringBuilder("* * ").append(params.query)
         when {
             params.ignoreCase -> R.drawable.ic_params_case_off
@@ -84,7 +84,7 @@ class TaskHolder<Result : SearchResult>(
             status.setIcon(it, 0, 1)
         }
         when {
-            params.useRegex -> R.drawable.ic_params_regex_on
+            params.regex -> R.drawable.ic_params_regex_on
             else -> R.drawable.ic_params_regex_off
         }.let {
             status.setIcon(it, 2, 3)
@@ -94,11 +94,13 @@ class TaskHolder<Result : SearchResult>(
 
     private fun TextView.setStatus(result: SearchResult) {
         val status = SpannableStringBuilder()
+        val counters = result.getCounters()
         result.getCounters().forEachIndexed { index, it ->
             status.append("*$it  ")
-            val resId = when (index) {
-                0 -> R.drawable.ic_status_match
-                1 -> R.drawable.ic_status_file_match
+            val resId = when {
+                counters.size == 1 -> R.drawable.ic_status_file_match
+                index == 0 -> R.drawable.ic_status_match
+                index == 1 -> R.drawable.ic_status_file_match
                 else -> R.drawable.ic_status_file_all
             }
             val star = status.lastIndexOf('*')

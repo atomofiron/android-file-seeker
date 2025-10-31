@@ -6,7 +6,7 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
-import app.atomofiron.searchboxapp.model.finder.SearchParams
+import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -46,7 +46,7 @@ class SearchAdapterPresenterDelegate(
 
     override fun onSearchClick(value: String) {
         val config = viewState.toggles.value
-        val params = SearchParams(value, useRegex = config.useRegex, ignoreCase = config.ignoreCase)
+        val params = QueryParams(value, regex = config.regex, ignoreCase = config.ignoreCase)
         interactor.search(viewState.item.value, params)
     }
 
@@ -71,5 +71,5 @@ class SearchAdapterPresenterDelegate(
 
     override fun onTestTextChange(value: String?) = Unit
 
-    override fun onEditMaxSize(new: Int) = Unit
+    override fun onEditMaxSize(new: Long) = Unit
 }

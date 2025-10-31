@@ -29,7 +29,7 @@ class MiniEditOptionsHolder(
             update { it.copy(ignoreCase = !it.ignoreCase) }
         }
         useRegexp.setOnClickListener {
-            update { it.copy(useRegex = !it.useRegex) }
+            update { it.copy(regex = !it.regex) }
         }
         contentSearch.setOnClickListener {
             update { it.copy(contentSearch = !it.contentSearch) }
@@ -41,7 +41,7 @@ class MiniEditOptionsHolder(
 
     override fun onBind(item: FinderStateItem.Options, position: Int) = binding.run {
         caseSense.isChecked = !item.ignoreCase
-        useRegexp.isChecked = item.useRegex
+        useRegexp.isChecked = item.regex
         contentSearch.isChecked = item.contentSearch
         excludeDirs.isChecked = item.excludeDirs
         excludeDirs.isEnabled = !item.contentSearch

@@ -8,7 +8,7 @@ use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
 use chrono::{DateTime, Local};
 use crate::common::{empty_string, DATE, DATE_STUB, TIME, TIME_STUB};
-use crate::ext::raw_path::PathBufExt;
+use crate::ext::raw_path::RawPathExt;
 
 pub trait HumanReadableMeta {
     fn to_hr(self, name: &PathBuf) -> Meta;

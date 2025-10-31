@@ -2,10 +2,12 @@ package app.atomofiron.searchboxapp.model.finder
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
 @Parcelize
-data class SearchParams(
+@Serializable
+data class QueryParams(
     val query: String,
-    val useRegex: Boolean,
+    val regex: Boolean,
     val ignoreCase: Boolean,
 ) : Parcelable

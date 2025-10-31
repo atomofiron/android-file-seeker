@@ -1,6 +1,6 @@
 use std::sync::Arc;
 use bincode::{Decode, Encode};
-use crate::api::protocol::{NameSearchCollector, NameSearchProgress, CommonProgress, CommonProgressCollector, SearchQuery, TextSearchCollector, TextSearchProgress};
+use crate::api::protocol::{NameSearchCollector, NameSearchProgress, CommonProgress, CommonProgressCollector, SearchQuery, TextSearchCollector, TextSearchProgress, Check};
 use crate::ext::raw_path::RawPath;
 
 #[derive(Debug, Encode, Decode, PartialEq)]
@@ -25,7 +25,7 @@ pub enum Request {
         query: SearchQuery,
         targets: Vec<RawPath>,
         max_depth: u32,
-        max_size: u64,
+        check: Check,
     },
 }
 

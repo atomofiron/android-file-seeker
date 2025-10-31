@@ -21,7 +21,7 @@ class EditMaxSizeHolder(
     init {
         binding.box.setHint(R.string.pref_max_size)
         binding.field.maxLines = 1
-        binding.field.makeByteSize { output.onEditMaxSize(it) }
+        binding.field.makeByteSize { output.onEditMaxSize(it.toLong()) }
         binding.field.makeHoled(binding.box)
     }
 
@@ -32,6 +32,6 @@ class EditMaxSizeHolder(
     }
 
     interface OnEditMaxSizeListener {
-        fun onEditMaxSize(new: Int)
+        fun onEditMaxSize(new: Long)
     }
 }

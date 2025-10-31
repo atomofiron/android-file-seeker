@@ -57,8 +57,8 @@ fn run(request: Request) -> Result<Vec<u8>, EncodeError> {
             write_the_end();
             result.to_bytes()
         }
-        Request::FindText { query, targets, max_depth, max_size, check_txt } => {
-            let result = find_text(query, targets, max_depth, max_size, check_txt, None, StdoutProgressWriter::arc());
+        Request::FindText { query, targets, max_depth, check } => {
+            let result = find_text(query, targets, max_depth, check, None, StdoutProgressWriter::arc());
             write_the_end();
             result.to_bytes()
         }

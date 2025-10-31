@@ -13,7 +13,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
-import app.atomofiron.searchboxapp.model.finder.SearchParams
+import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchResult.Text
 import app.atomofiron.searchboxapp.model.finder.SearchState
@@ -22,7 +22,6 @@ import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.mutate
@@ -73,7 +72,7 @@ class TextViewerService(
         } as? ItemMatch.Multiply
         itemMatch ?: return null
         val task = SearchTask(
-            finderTask.params,
+            finderTask.query,
             Text(itemMatch.count, itemMatch.matchesMap),
             finderTask.uuid,
             SearchState.Ended(removable = false),
@@ -115,7 +114,7 @@ class TextViewerService(
         }
     }
 
-    suspend fun search(item: Node, params: SearchParams) {
+    suspend fun search(item: Node, params: QueryParams) {
         val session = findSession(item) ?: return
         var task = SearchTask(params, Text())
         scope.launchOnDefault {
@@ -123,11 +122,11 @@ class TextViewerService(
         }
         var count = 0
         val matchesMap = hashMapOf<Int, MutableList<TextLineMatch>>()
-        val result = NativeBridge.findText(params, listOf(item.ref), asSu = asSu) { match ->
+        val result = NativeBridge.findLocalText(params, item.ref, asSu) { match ->
             if (match !is TextSearchProgress.Ok) {
-                return@findText
+                return@findLocalText
             }
-            match.line ?: return@findText poop("it.line == null!!!")
+            match.line ?: return@findLocalText
             count++
             val lineIndex = match.line.toInt().dec()
             var list = matchesMap[lineIndex]
@@ -196,7 +195,7 @@ class TextViewerService(
         mutex.withLock {
             tasks.run {
                 val index = value.indexOfFirst { it.uuid == task.uuid }
-                if (index < 0) return@run logE("No Progress task with query ${task.params.query}")
+                if (index < 0) return@run logE("No Progress task with query ${task.query.query}")
                 val tasks = value.toMutableList()
                 tasks[index] = task
                 value = tasks

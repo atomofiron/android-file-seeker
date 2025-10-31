@@ -3,10 +3,11 @@ package app.atomofiron.searchboxapp.model.finder
 import java.util.UUID
 
 typealias TextSearchTask = SearchTask<SearchResult.Text>
+typealias FilesSearchTask = SearchTask<SearchResult.Files>
 typealias GenericSearchTask = SearchTask<SearchResult>
 
 data class SearchTask<Result : SearchResult>(
-    val params: SearchParams,
+    val query: QueryParams,
     val result: Result,
     val uuid: UUID = UUID.randomUUID(),
     val state: SearchState = SearchState.Progress,
@@ -32,4 +33,7 @@ data class SearchTask<Result : SearchResult>(
         val state = if (isStopped) SearchState.Stopped(isRemovable) else SearchState.Ended(isRemovable)
         return copy(state = state, result = result, error = error)
     }
+
+    @Suppress("UNCHECKED_CAST")
+    fun cast() = this as GenericSearchTask
 }

@@ -63,7 +63,7 @@ class TestHolder(
         }
         when {
             item.query.isEmpty() -> Unit
-            item.useRegex -> testSearchWithRegexp(item)
+            item.regex -> testSearchWithRegexp(item)
             else -> testSearch(item)
         }
     }

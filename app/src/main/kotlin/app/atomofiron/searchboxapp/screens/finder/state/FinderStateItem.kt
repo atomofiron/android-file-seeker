@@ -19,7 +19,7 @@ sealed class FinderStateItem(
 
     data class Query(
         val query: String = "",
-        val useRegex: Boolean = false,
+        val regex: Boolean = false,
         val withReplace: Boolean = false,
         val enabled: Boolean = false,
     ) : FinderStateItem(FinderItemType.FIND)
@@ -43,7 +43,7 @@ sealed class FinderStateItem(
 
     data class MaxDepth(val value: Int) : FinderStateItem(FinderItemType.MAX_DEPTH)
 
-    data class MaxSize(val value: Int) : FinderStateItem(FinderItemType.MAX_SIZE)
+    data class MaxSize(val value: Long) : FinderStateItem(FinderItemType.MAX_SIZE)
 
     data class EditCharacters(val value: List<String>) : FinderStateItem(FinderItemType.EDIT_CHARS)
 
@@ -52,7 +52,7 @@ sealed class FinderStateItem(
     data class TestField(
         val value: String? = null,
         val query: String = "",
-        val useRegex: Boolean = false,
+        val regex: Boolean = false,
         val ignoreCase: Boolean = true,
     ) : FinderStateItem(FinderItemType.TEST)
 

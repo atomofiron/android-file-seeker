@@ -1,5 +1,5 @@
 use crate::api::protocol::TextSearchProgress;
-use crate::ext::raw_path::PathBufExt;
+use crate::ext::raw_path::PathExt;
 use crate::r#impl::meta::meta_with_error;
 use grep_matcher::Matcher;
 use grep_searcher::{Searcher, Sink, SinkMatch};

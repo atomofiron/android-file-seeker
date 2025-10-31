@@ -116,8 +116,8 @@ class PreferenceStore(
 
     val maxFileSizeForSearch = getFlow(KeyMaxSize)
 
-    suspend fun setMaxFileSizeForSearch(value: Int) {
-        edit { it[KeyMaxSize] = value }
+    suspend fun setMaxFileSizeForSearch(value: Long) {
+        edit { it[KeyMaxSize as PreferenceKey<Long>] = value }
     }
 
     val appUpdateCode = getFlow(KeyAppUpdateCode)

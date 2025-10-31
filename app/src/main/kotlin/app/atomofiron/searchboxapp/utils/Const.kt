@@ -10,7 +10,7 @@ object Const {
     const val QUOTE = "\""
 
     const val DEFAULT_SPECIAL_CHARACTERS = "\\ [ { ? + * ^ $"
-    const val DEFAULT_MAX_SIZE = 10485760
+    const val DEFAULT_MAX_SIZE = 10485760L
     const val DEFAULT_MAX_DEPTH = 1024
 
     const val SCHEME_PACKAGE = "package"

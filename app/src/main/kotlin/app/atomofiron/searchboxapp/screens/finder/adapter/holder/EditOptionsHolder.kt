@@ -1,16 +1,15 @@
 package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 
-import android.graphics.Outline
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.ViewOutlineProvider
 import androidx.core.view.marginLeft
 import androidx.core.view.marginRight
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.common.recycler.GeneralHolder
+import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemSearchEditOptionsBinding
 import app.atomofiron.searchboxapp.custom.view.layout.MeasuringRecyclerView
@@ -36,10 +35,9 @@ class EditOptionsHolder(
     private val layoutManager = GridLayoutManager(parent.context, 1, GridLayoutManager.HORIZONTAL, false)
 
     init {
-        recyclerView.outlineProvider = Clipping(parent.resources.getDimension(R.dimen.corner_extra))
-        recyclerView.clipToOutline = true
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = adapter
+        recyclerView.noClip()
         recyclerView.overScrollMode = RecyclerView.OVER_SCROLL_NEVER
         recyclerView.addMeasureListener { width, _ ->
             val available = recyclerView.run { width - paddingStart - paddingEnd }
@@ -63,8 +61,7 @@ class EditOptionsHolder(
     }
 
     override fun onBind(item: FinderStateItem.EditOptions, position: Int) = binding.run {
-
-        val items = mutableListOf(Item(!item.toggles.ignoreCase), Item(item.toggles.useRegex))
+        val items = mutableListOf(Item(!item.toggles.ignoreCase), Item(item.toggles.regex))
         if (!isLocal) {
             items.add(Item(isChecked = item.contentSearch))
             items.add(Item(isChecked = item.excludeDirs, isEnabled = !item.contentSearch))
@@ -76,15 +73,11 @@ class EditOptionsHolder(
         var options = item.toggles
         options = when (position) {
             0 -> options.copy(ignoreCase = !toChecked)
-            1 -> options.copy(useRegex = toChecked)
+            1 -> options.copy(regex = toChecked)
             2 -> options.copy(contentSearch = toChecked)
             else -> options.copy(excludeDirs = toChecked)
         }
         listener.onConfigChange(options)
-    }
-
-    private class Clipping(private val radius: Float) : ViewOutlineProvider() {
-        override fun getOutline(view: View, outline: Outline) = outline.setRoundRect(0, -radius.toInt(), view.width, view.height, radius)
     }
 
     interface FinderConfigListener {

@@ -1,10 +1,11 @@
+use crate::api::protocol::Check;
 use crate::api::protocol::{CommonProgressCollector, ComplexResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
 use crate::api::su_bridge::{as_su, as_su_with_progress};
 use crate::api::su_protocol::Request;
 use crate::ext::raw_path::{RawPath, RawPathExt};
 use crate::r#impl::copy::copy_impl;
 use crate::r#impl::delete::delete_impl;
-use crate::r#impl::meta::{try_meta, meta_with_error, metas};
+use crate::r#impl::meta::{meta_with_error, metas, try_meta};
 use crate::r#impl::other::{new_dir, new_file, usage};
 use crate::r#impl::r#type::{file_type_impl, file_types};
 use crate::r#impl::search_by_name::find_names_impl;
@@ -154,13 +155,13 @@ pub fn find_text(
     query: SearchQuery,
     targets: Vec<RawPath>,
     max_depth: u32,
-    max_size: u64,
+    check: Check,
     run_as_su: Option<String>,
     collector: Arc<dyn TextSearchCollector>,
 ) -> SimpleResult {
     if let Some(bin_path) = run_as_su {
-        return as_su_with_progress(Request::FindText { query, targets, max_depth, max_size }, bin_path, Box::new(collector))
+        return as_su_with_progress(Request::FindText { query, targets, max_depth, check }, bin_path, Box::new(collector))
             .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
     }
-    return find_text_impl(query, targets, max_depth as usize, max_size, collector);
+    return find_text_impl(query, targets, max_depth as usize, check, collector);
 }

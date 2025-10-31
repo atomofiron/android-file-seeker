@@ -98,5 +98,5 @@ class FinderAdapterPresenterDelegate(
 
     override fun onEditMaxDepth(new: Int) = preferences { setMaxDepthForSearch(new) }
 
-    override fun onEditMaxSize(new: Int) = preferences { setMaxFileSizeForSearch(new) }
+    override fun onEditMaxSize(new: Long) = preferences { setMaxFileSizeForSearch(new) }
 }

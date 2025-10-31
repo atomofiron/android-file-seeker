@@ -2,10 +2,10 @@ package app.atomofiron.searchboxapp.android
 
 import android.content.Context
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
-import app.atomofiron.searchboxapp.model.finder.SearchParams
-import app.atomofiron.searchboxapp.poop
+import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
+import uniffi.native_lib.Check
 import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CommonProgressCollector
 import uniffi.native_lib.ComplexResult
@@ -105,10 +105,9 @@ object NativeBridge {
 
     fun delete(ref: NodeRef, asSu: Boolean): ComplexResult {
         val collector = object : CommonProgressCollector {
-            override fun emit(progress: CommonProgress) = Unit.poop("progress: $progress")
+            override fun emit(progress: CommonProgress) = Unit
         }
         return uniffi.native_lib.deleteBy(ref.bytes, runAsSu = binPath.takeIf { asSu }, collector)
-            .also { poop("return $it") }
     }
 
     fun copy(
@@ -119,16 +118,13 @@ object NativeBridge {
         collector: (CommonProgress) -> Unit,
     ): ComplexResult {
         val collector = object : CommonProgressCollector {
-            override fun emit(progress: CommonProgress) = collector
-                .also { poop("progress: $progress") }
-                .invoke(progress)
+            override fun emit(progress: CommonProgress) = collector(progress)
         }
         return uniffi.native_lib.copy(from.bytes, to.bytes, move, runAsSu = binPath.takeIf { asSu }, collector)
-            .also { poop("return $it") }
     }
 
     fun findNames(
-        params: SearchParams,
+        params: QueryParams,
         targets: List<NodeRef>,
         maxDepth: Int,
         excludeDirs: Boolean,
@@ -136,31 +132,41 @@ object NativeBridge {
         collector: (NameSearchProgress) -> Unit,
     ): SimpleResult {
         val collector = object : NameSearchCollector {
-            override fun emit(progress: NameSearchProgress) = collector
-                .also { poop("progress: $progress") }
-                .invoke(progress)
+            override fun emit(progress: NameSearchProgress) = collector(progress)
         }
-        val query = SearchQuery(params.query, params.useRegex, params.ignoreCase)
+        val query = SearchQuery(params.query, params.regex, params.ignoreCase)
         return uniffi.native_lib.findNames(query, targets.map { it.bytes }, maxDepth.toUInt(), excludeDirs, runAsSu = binPath.takeIf { asSu }, collector)
-            .also { poop("return $it") }
     }
 
+    fun findLocalText(
+        params: QueryParams,
+        target: NodeRef,
+        asSu: Boolean,
+        collector: (TextSearchProgress) -> Unit,
+    ): SimpleResult = findText(params, listOf(target), maxDepth = 1, Check.No, asSu, collector)
+
     fun findText(
-        params: SearchParams,
+        params: QueryParams,
         targets: List<NodeRef>,
-        maxDepth: Int = 1,
-        maxSize: Long = Long.MAX_VALUE,
+        maxDepth: Int,
+        maxSize: Long,
+        asSu: Boolean,
+        collector: (TextSearchProgress) -> Unit,
+    ): SimpleResult = findText(params, targets, maxDepth, Check.Yes(maxSize.toULong()), asSu, collector)
+
+    private fun findText(
+        params: QueryParams,
+        targets: List<NodeRef>,
+        maxDepth: Int,
+        check: Check,
         asSu: Boolean,
         collector: (TextSearchProgress) -> Unit,
     ): SimpleResult {
         val collector = object : TextSearchCollector {
-            override fun emit(progress: TextSearchProgress) = collector
-                .also { poop("progress: $progress") }
-                .invoke(progress)
+            override fun emit(progress: TextSearchProgress) = collector.invoke(progress)
         }
-        val query = SearchQuery(params.query, params.useRegex, params.ignoreCase)
-        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), maxSize.toULong(), runAsSu = binPath.takeIf { asSu }, collector)
-            .also { poop("return $it") }
+        val query = SearchQuery(params.query, params.regex, params.ignoreCase)
+        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), check, runAsSu = binPath.takeIf { asSu }, collector)
     }
 }
 

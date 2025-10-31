@@ -6,7 +6,7 @@ import kotlinx.coroutines.launch
 import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
-import app.atomofiron.searchboxapp.model.finder.SearchParams
+import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import java.util.UUID
@@ -35,7 +35,7 @@ class TextViewerInteractor(
         }
     }
 
-    fun search(item: Node, params: SearchParams) {
+    fun search(item: Node, params: QueryParams) {
         scope.launch(Dispatchers.IO) {
             textViewerService.search(item, params)
         }

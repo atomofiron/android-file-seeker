@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.model.finder
 
-import app.atomofiron.common.util.extension.replace
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
@@ -46,7 +45,7 @@ sealed class SearchResult {
 
         override fun getCounters(): IntArray = when {
             inContent -> intArrayOf(count, matches.size, countTotal)
-            else -> intArrayOf(matches.size, matches.size)
+            else -> intArrayOf(matches.size)
         }
 
         fun toMarkdown(checkedOnly: Boolean): String {
@@ -72,13 +71,6 @@ sealed class SearchResult {
         }
 
         fun contains(itemCounter: ItemMatch) = matches.contains(itemCounter)
-
-        fun add(itemMatch: ItemMatch): Files {
-            val items = matches.toMutableList()
-            val count = count + itemMatch.count
-            items.replace(itemMatch) { it.path == itemMatch.path }
-            return Files(inContent, count, items, countTotal.inc())
-        }
     }
 
     override fun hashCode(): Int = Objects.hash(this::class, count, countTotal)
@@ -108,6 +100,7 @@ sealed class ItemMatch {
     abstract fun update(item: Node): ItemMatch
 
     data class Single(override val item: Node) : ItemMatch() {
+
         override val count = 1
 
         override fun update(item: Node): ItemMatch = copy(item = item)
@@ -115,11 +108,10 @@ sealed class ItemMatch {
 
     data class Multiply(
         override val item: Node,
-        override val count: Int,
+        override val count: Int = 0,
         /** line index -> matches byteOffset+length */
-        val matchesMap: Map<Int, List<TextLineMatch>>,
+        val matchesMap: MutableMap<Int, MutableList<TextLineMatch>> = mutableMapOf(),
     ) : ItemMatch() {
-        //val indexes: Set<Int> get() = matchesMap.keys
         override fun update(item: Node): ItemMatch = copy(item = item)
     }
 
