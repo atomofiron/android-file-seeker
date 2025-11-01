@@ -9,7 +9,8 @@ use native_lib::ext::result::ResultExt;
 use std::io::{stdin, stdout, Read, Write};
 use std::sync::Arc;
 
-fn main() {
+#[no_mangle]
+pub extern "C" fn lib_main() {
     loop {
         let result = get_request()
             .and_then(|r| run(r).boxed());
