@@ -123,20 +123,17 @@ class TextViewerService(
         var count = 0
         val matchesMap = hashMapOf<Int, MutableList<TextLineMatch>>()
         val result = NativeBridge.findLocalText(params, item.ref, asSu) { match ->
-            if (match !is TextSearchProgress.Ok) {
-                return@findLocalText
-            }
-            match.line ?: return@findLocalText
-            count++
-            val lineIndex = match.line.toInt()
-            var list = matchesMap[lineIndex]
-            if (list == null) {
-                list = mutableListOf()
-                matchesMap[lineIndex] = list
-            }
-            list.add(TextLineMatch(match.offset.toLong(), match.length.toInt()))
-            task = task.copy(result = Text(count, matchesMap))
             scope.launchOnDefault {
+                task = when (match) {
+                    is TextSearchProgress.Ok -> {
+                        val lineIndex = match.line?.toInt() ?: return@launchOnDefault
+                        val list = matchesMap.getOrPut(lineIndex) { mutableListOf() }
+                        list.add(TextLineMatch(match.offset.toLong(), match.length.toInt()))
+                        task.copy(result = Text(++count, matchesMap))
+                    }
+                    is TextSearchProgress.Err -> task.toEnded(error = match.v1.error)
+                    is TextSearchProgress.End -> task.toEnded()
+                }
                 session.update(task)
             }
         }
@@ -146,7 +143,7 @@ class TextViewerService(
 
     private fun findSession(item: Node): TextViewerSession? = store.sessions[item.uniqueId]
 
-    private suspend fun TextViewerSession.readNextLines() {
+    private fun TextViewerSession.readNextLines() {
         val reader = reader ?: return
         textLoading.value = true
         val lines = ArrayList<TextLine>(Const.TEXT_FILE_PAGINATION_STEP)
