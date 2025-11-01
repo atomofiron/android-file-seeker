@@ -17,6 +17,8 @@ class NodeRef(val bytes: ByteArray) {
         val Root = NodeRef(byteArrayOf(SLASH_BYTE))
     }
 
+    val isRoot: Boolean get() = bytes.isNotEmpty() && bytes.all { it == SLASH_BYTE }
+
     var string: String = STUB_STRING
         private set
         get() {
@@ -83,8 +85,10 @@ class NodeRef(val bytes: ByteArray) {
     fun theSame(path: ByteArray): Boolean = bytes.contentEquals(path)
 
     fun isChildOf(ref: NodeRef): Boolean {
-        if (ref.length >= length || get(ref.length) != SLASH_BYTE) {
-            return false
+        when {
+            ref.length >= length -> return false
+            ref.isRoot -> Unit
+            get(ref.length) != SLASH_BYTE -> return false
         }
         for (i in ref.bytes.indices) {
             if (ref[i] != bytes[i]) {
