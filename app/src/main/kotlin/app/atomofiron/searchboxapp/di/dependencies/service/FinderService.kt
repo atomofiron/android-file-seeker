@@ -1,9 +1,11 @@
 package app.atomofiron.searchboxapp.di.dependencies.service
 
 import androidx.core.app.NotificationManagerCompat
+import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
+import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
@@ -43,7 +45,7 @@ class FinderService(
         }
         val params = FinderWorker.Params(query, type, maxDepth = maxDepth, targets = where.map { it.bytes }, asSu = asSu)
         val request = OneTimeWorkRequest.Builder(FinderWorker::class.java)
-            .setInputData(params.toData())
+            .setInputData(Data(params))
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .build()
         workManager.beginWith(request).enqueue()

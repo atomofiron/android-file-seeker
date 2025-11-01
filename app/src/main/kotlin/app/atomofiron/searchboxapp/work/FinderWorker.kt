@@ -15,6 +15,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import app.atomofiron.common.util.extension.debugDelay
+import app.atomofiron.common.util.extension.get
 import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.extension.replace
@@ -42,7 +43,6 @@ import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toProperties
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.ifCanNotice
 import app.atomofiron.searchboxapp.utils.mutate
@@ -54,9 +54,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
-import kotlinx.serialization.protobuf.ProtoBuf
 import uniffi.native_lib.Meta
 import uniffi.native_lib.NameSearchProgress
 import uniffi.native_lib.SimpleResult
@@ -67,7 +64,6 @@ import javax.inject.Inject
 @SuppressLint("InlinedApi")
 private const val UPDATING_FLAG = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
 
-private const val KEY_PARAMS = "KEY_PARAMS"
 private const val KEY_EXCEPTION = "KEY_EXCEPTION"
 private const val KEY_CANCELLED = "KEY_CANCELLED"
 
@@ -83,20 +79,12 @@ class FinderWorker(
         val targets: List<ByteArray>,
         val asSu: Boolean,
     ) {
-        companion object {
-            operator fun invoke(bytes: ByteArray) = ProtoBuf.decodeFromByteArray<Params>(bytes)
-        }
         @Serializable
         sealed interface Type
         @Serializable
         data class Names(val excludeDirs: Boolean) : Type
         @Serializable
         data class Text(val maxSize: Long) : Type
-
-        fun refs() = targets.map { NodeRef(it) }
-        fun toData() = Data.Builder()
-            .putByteArray(KEY_PARAMS, ProtoBuf.encodeToByteArray(this))
-            .build()
     }
 
     private val taskMutex = Mutex()
@@ -190,12 +178,11 @@ class FinderWorker(
     }
 
     override suspend fun doWork(): Result {
-        val bytes = inputData.getByteArray(KEY_PARAMS)
-        if (bytes == null) {
-            logE("Bytes is null")
+        val params = inputData.get<Params>()
+        if (params == null) {
+            logE("Query is null")
             return Result.success()
         }
-        val params = Params(bytes)
         if (params.query.query.isEmpty()) {
             logE("Query is empty")
             return Result.success()
@@ -335,4 +322,6 @@ class FinderWorker(
             .setContentIntent(pendingIntent)
             .build()
     }
+
+    private fun Params.refs() = targets.map { NodeRef(it) }
 }
