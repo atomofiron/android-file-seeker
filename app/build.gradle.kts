@@ -100,10 +100,11 @@ dependencies {
     implementation(libs.jna) { artifact { type = "aar" } }
 }
 
+val groupUniffi = "uniffi"
 val taskPreBuild = "preBuild"
 val taskBuildNative = "buildNative"
 val taskBuildNativeDebug = "buildNativeDebug"
-val taskGenerateUniffiBindings = "generateUniffiBindings"
+val taskGenerateNativeBindings = "generateNativeBindings"
 val taskCopyNativeBins = "copyNativeBins"
 val nativeLib = "native-lib"
 val nativeBin = "native-bin"
@@ -119,7 +120,7 @@ val targets = arrayOf(
 )
 
 tasks.register<Exec>(taskBuildNative) {
-    group = "rust"
+    group = groupUniffi
     environment("CARGO_TERM_COLOR", "always")
     workingDir(nativeDirPath)
     commandLine(
@@ -141,7 +142,7 @@ tasks.register<Exec>(taskBuildNative) {
 }
 
 tasks.register<Exec>(taskBuildNativeDebug) {
-    group = "rust"
+    group = groupUniffi
     environment("CARGO_TERM_COLOR", "always")
     workingDir(nativeDirPath)
     commandLine(
@@ -157,8 +158,8 @@ tasks.register<Exec>(taskBuildNativeDebug) {
     standardOutput = System.out
 }
 
-tasks.register<Exec>(taskGenerateUniffiBindings) {
-    group = "rust"
+tasks.register<Exec>(taskGenerateNativeBindings) {
+    group = groupUniffi
     environment("CARGO_TERM_COLOR", "always")
     environment("DEVELOPER_DIR", "/Library/Developer/CommandLineTools") // for MacOS only
     workingDir(nativeDirPath)
@@ -179,7 +180,7 @@ tasks.register<Exec>(taskGenerateUniffiBindings) {
 fun Exec.print() = println("for manual use: cd $workingDir && ${commandLine.joinToString(separator = " ")}")
 
 tasks.register<Copy>(taskCopyNativeBins) {
-    group = "rust"
+    group = groupUniffi
     targets.associate {
         it.split('-', limit = 2).first() to "$nativeDirPath/target/$it/release/$nativeBin"
     }.forEach { (abi, sourcePath) ->
@@ -192,7 +193,7 @@ tasks.register<Copy>(taskCopyNativeBins) {
 }
 
 tasks.named(taskPreBuild) {
-    dependsOn(taskGenerateUniffiBindings, taskCopyNativeBins)
+    dependsOn(taskGenerateNativeBindings, taskCopyNativeBins)
 }
 
 fun prepare(vararg args: String) = ProcessBuilder(*args)
