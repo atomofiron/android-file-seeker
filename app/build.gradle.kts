@@ -102,6 +102,7 @@ dependencies {
 
 val taskPreBuild = "preBuild"
 val taskBuildNative = "buildNative"
+val taskBuildNativeDebug = "buildNativeDebug"
 val taskGenerateUniffiBindings = "generateUniffiBindings"
 val taskCopyNativeBins = "copyNativeBins"
 val nativeLib = "native-lib"
@@ -139,6 +140,23 @@ tasks.register<Exec>(taskBuildNative) {
     standardOutput = System.out
 }
 
+tasks.register<Exec>(taskBuildNativeDebug) {
+    group = "rust"
+    environment("CARGO_TERM_COLOR", "always")
+    workingDir(nativeDirPath)
+    commandLine(
+        cargoPath, "ndk",
+        "-t", "arm64-v8a",
+        "-P", "$ndkApi",
+        "build",
+        "-p", nativeLib,
+    )
+    print()
+    isIgnoreExitValue = false
+    errorOutput = System.out
+    standardOutput = System.out
+}
+
 tasks.register<Exec>(taskGenerateUniffiBindings) {
     group = "rust"
     environment("CARGO_TERM_COLOR", "always")
@@ -147,7 +165,7 @@ tasks.register<Exec>(taskGenerateUniffiBindings) {
     commandLine(
         cargoPath, "run",
         "--bin", "uniffi-gen", "generate",
-        "--library", "target/aarch64-linux-android/release/lib$nativeLibName.so",
+        "--library", "target/aarch64-linux-android/debug/lib$nativeLibName.so",
         "--language", "kotlin", "--no-format",
         "--out-dir", "../app/$kotlinDir",
     )
@@ -155,6 +173,7 @@ tasks.register<Exec>(taskGenerateUniffiBindings) {
     isIgnoreExitValue = false
     errorOutput = System.out
     standardOutput = System.out
+    dependsOn(taskBuildNativeDebug)
 }
 
 fun Exec.print() = println("for manual use: cd $workingDir && ${commandLine.joinToString(separator = " ")}")
