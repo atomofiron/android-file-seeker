@@ -128,7 +128,7 @@ class TextViewerService(
             }
             match.line ?: return@findLocalText
             count++
-            val lineIndex = match.line.toInt().dec()
+            val lineIndex = match.line.toInt()
             var list = matchesMap[lineIndex]
             if (list == null) {
                 list = mutableListOf()

@@ -87,12 +87,12 @@ class FinderWorker(
             operator fun invoke(bytes: ByteArray) = ProtoBuf.decodeFromByteArray<Params>(bytes)
         }
         @Serializable
-        sealed interface Type {
-            @Serializable
-            data class Names(val excludeDirs: Boolean) : Type
-            @Serializable
-            data class Text(val maxSize: Long) : Type
-        }
+        sealed interface Type
+        @Serializable
+        data class Names(val excludeDirs: Boolean) : Type
+        @Serializable
+        data class Text(val maxSize: Long) : Type
+
         fun refs() = targets.map { NodeRef(it) }
         fun toData() = Data.Builder()
             .putByteArray(KEY_PARAMS, ProtoBuf.encodeToByteArray(this))
@@ -119,13 +119,13 @@ class FinderWorker(
         DaggerInjector.appComponent.inject(this)
     }
 
-    private fun Params.searchText(type: Params.Type.Text) = appScope.launch {
+    private fun Params.searchText(type: Params.Text) = appScope.launch {
         val result = NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, asSu) { match ->
             appScope {
                 updateTask {
                     val new = when (match) {
                         is TextSearchProgress.Ok -> {
-                            val lineIndex = match.line?.toInt()?.dec() ?: return@appScope
+                            val lineIndex = match.line?.toInt() ?: return@appScope
                             val lineMatch = TextLineMatch(match.offset.toLong(), match.length.toInt())
                             var itemMatch = result.matches
                                 .find { it.item.ref.theSame(match.path) }
@@ -173,7 +173,7 @@ class FinderWorker(
         finderStore.addOrUpdate(task.cast())
     }
 
-    private fun Params.searchNames(type: Params.Type.Names) = appScope {
+    private fun Params.searchNames(type: Params.Names) = appScope {
         NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu) { match ->
             appScope {
                 when (match) {
@@ -207,7 +207,7 @@ class FinderWorker(
             )
             setForeground(getForegroundInfo())
         }
-        task = SearchTask(params.query, result = Files(params.type is Params.Type.Text), id)
+        task = SearchTask(params.query, result = Files(params.type is Params.Text), id)
         cacheConfig = CacheConfig(params.asSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size))
         return handleCancellation { work(params) }
     }
@@ -231,8 +231,8 @@ class FinderWorker(
         try {
             finderStore.addOrUpdate(task.cast())
             job = when (val type = params.type) {
-                is Params.Type.Text -> params.searchText(type)
-                is Params.Type.Names -> params.searchNames(type)
+                is Params.Text -> params.searchText(type)
+                is Params.Names -> params.searchNames(type)
             }
             job.join()
             debugDelay(5)
@@ -258,8 +258,6 @@ class FinderWorker(
         }
         return Result.success(dataBuilder.build())
     }
-
-    private fun newNode(path: String) = Node(NodeRef(path), rootId = task.uniqueId, content = NodeContent.Unknown).update(cacheConfig)
 
     private fun NodeRef.toNode() = Node(this, rootId = task.uniqueId, content = NodeContent.Unknown)
 

@@ -22,7 +22,7 @@ impl <'l, M: Matcher>Sink for TextSink<'l, M> {
                 path: self.path.to_path_buf().raw(),
                 offset: mat.absolute_byte_offset() + m.start() as u64,
                 length: (m.end() - m.start()) as u32,
-                line: mat.line_number(),
+                line: mat.line_number().map(|n| n - 1),
             };
             let _ = self.sender.send(progress);
             true
