@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.android
 
 import android.content.Context
+import android.os.Build
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -24,15 +25,19 @@ import uniffi.native_lib.TypedMetasResult
 import uniffi.native_lib.UsageResult
 import java.io.File
 import java.io.FileOutputStream
+import java.util.Enumeration
+import java.util.zip.ZipFile
 
 private const val NATIVE_BIN = "native-bin"
+private const val NATIVE_LIB = "native_lib"
+private const val NATIVE_LIB_SO = "lib$NATIVE_LIB.so"
 
-private var binPath = ""
+private lateinit var binPath: String
 
 object NativeBridge {
 
     init {
-        System.loadLibrary("native_lib")
+        System.loadLibrary(NATIVE_LIB)
     }
 
     fun setBinDir(path: String) {
@@ -48,7 +53,7 @@ object NativeBridge {
     }
 
     fun createFile(ref: NodeRef, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.createFile(ref.bytes, runAsSu = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.createFile(ref.bytes, binPath = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
@@ -56,7 +61,7 @@ object NativeBridge {
     }
 
     fun createDir(ref: NodeRef, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.createDir(ref.bytes, runAsSu = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.createDir(ref.bytes, binPath = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
@@ -64,7 +69,7 @@ object NativeBridge {
     }
 
     fun type(ref: NodeRef, asSu: Boolean): Rslt<TypedMeta> {
-        val response = uniffi.native_lib.getFileType(ref.bytes, runAsSu = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.getFileType(ref.bytes, binPath = binPath.takeIf { asSu })
         return when (response) {
             is TypedMetaResult.Ok -> Rslt.Ok(response.v1)
             is TypedMetaResult.Err -> Rslt.Err(response.v1)
@@ -72,7 +77,7 @@ object NativeBridge {
     }
 
     fun types(ref: NodeRef, asSu: Boolean): Rslt<List<TypedMeta>> {
-        val response = uniffi.native_lib.getFileTypes(ref.bytes, runAsSu = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.getFileTypes(ref.bytes, binPath = binPath.takeIf { asSu })
         return when (response) {
             is TypedMetasResult.Ok -> Rslt.Ok(response.v1)
             is TypedMetasResult.Err -> Rslt.Err(response.v1)
@@ -80,7 +85,7 @@ object NativeBridge {
     }
 
     fun meta(ref: NodeRef, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.getMeta(ref.bytes, runAsSu = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.getMeta(ref.bytes, binPath = binPath.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
@@ -88,7 +93,7 @@ object NativeBridge {
     }
 
     fun metas(ref: NodeRef, asSu: Boolean): Rslt<List<Meta>> {
-        val response = uniffi.native_lib.getMetas(ref.bytes, runAsSu = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.getMetas(ref.bytes, binPath = binPath.takeIf { asSu })
         return when (response) {
             is MetasResult.Ok -> Rslt.Ok(response.v1)
             is MetasResult.Err -> Rslt.Err(response.v1)
@@ -96,7 +101,7 @@ object NativeBridge {
     }
 
     fun usage(ref: NodeRef, asSu: Boolean): Rslt<String> {
-        val response = uniffi.native_lib.getUsage(ref.bytes, runAsSu = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.getUsage(ref.bytes, binPath = binPath.takeIf { asSu })
         return when (response) {
             is UsageResult.Ok -> Rslt.Ok(response.v1)
             is UsageResult.Err -> Rslt.Err(response.v1)
@@ -107,7 +112,7 @@ object NativeBridge {
         val collector = object : CommonProgressCollector {
             override fun emit(progress: CommonProgress) = Unit
         }
-        return uniffi.native_lib.deleteBy(ref.bytes, runAsSu = binPath.takeIf { asSu }, collector)
+        return uniffi.native_lib.deleteBy(ref.bytes, binPath = binPath.takeIf { asSu }, collector)
     }
 
     fun copy(
@@ -120,7 +125,7 @@ object NativeBridge {
         val collector = object : CommonProgressCollector {
             override fun emit(progress: CommonProgress) = collector(progress)
         }
-        return uniffi.native_lib.copy(from.bytes, to.bytes, move, runAsSu = binPath.takeIf { asSu }, collector)
+        return uniffi.native_lib.copy(from.bytes, to.bytes, move, binPath = binPath.takeIf { asSu }, collector)
     }
 
     fun findNames(
@@ -135,7 +140,7 @@ object NativeBridge {
             override fun emit(progress: NameSearchProgress) = collector(progress)
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
-        return uniffi.native_lib.findNames(query, targets.map { it.bytes }, maxDepth.toUInt(), excludeDirs, runAsSu = binPath.takeIf { asSu }, collector)
+        return uniffi.native_lib.findNames(query, targets.map { it.bytes }, maxDepth.toUInt(), excludeDirs, binPath = binPath.takeIf { asSu }, collector)
     }
 
     fun findLocalText(
@@ -166,11 +171,15 @@ object NativeBridge {
             override fun emit(progress: TextSearchProgress) = collector.invoke(progress)
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
-        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), check, runAsSu = binPath.takeIf { asSu }, collector)
+        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), check, binPath = binPath.takeIf { asSu }, collector)
     }
 }
 
 fun Context.verifyNativeBin(): Rslt<Unit> {
+    when (val lib = verifyNativeLib()) {
+        is Rslt.Ok -> Unit
+        is Rslt.Err -> return lib
+    }
     val file = File(binPath)
     file.parentFile?.mkdirs()
     val embedded = assets.list(NATIVE_BIN)
@@ -212,5 +221,31 @@ fun Context.verifyNativeBin(): Rslt<Unit> {
     return when {
         message.isEmpty() -> Rslt.Ok
         else -> Rslt.Err(message)
+    }
+}
+
+fun Context.verifyNativeLib(): Rslt<Unit> {
+    val abi = Build.SUPPORTED_ABIS.firstOrNull()
+    buildList {
+        add(applicationInfo.sourceDir)
+        applicationInfo.splitSourceDirs?.let { addAll(it) }
+    }.forEach { path ->
+        ZipFile(path).use { zip ->
+            abi?.let { zip.getEntry("lib/$it/$NATIVE_LIB_SO") }
+                ?.let { zip.getInputStream(it) }
+                ?.use { input ->
+                    val dest = File(filesDir, NATIVE_LIB_SO)
+                    FileOutputStream(dest).use { input.copyTo(it) }
+                    dest.setExecutable(true, true)
+                    return Rslt.Ok
+                }
+        }
+    }
+    return Rslt.Err("no $NATIVE_LIB_SO found for abi=$abi")
+}
+
+fun <E> Enumeration<E>.foo(): List<E> {
+    return buildList {
+        for (e in this@foo) add(e)
     }
 }

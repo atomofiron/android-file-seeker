@@ -1,11 +1,11 @@
 use bincode::error::EncodeError;
 use bincode::{decode_from_slice, enc, encode_to_vec};
-use native_lib::api::bridge::{copy, create_dir, create_file, delete_by, find_names, find_text, get_file_type, get_file_types, get_meta, get_metas, get_usage};
-use native_lib::api::protocol::{CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SimpleResult, TextSearchCollector, TextSearchProgress};
-use native_lib::api::su_protocol::{frame_length, from_len_frame, to_len_frame, Request, Response, FINAL_FRAME_BYTES};
-use native_lib::common::{config, Rslt};
-use native_lib::ext::encode::EncodeExt;
-use native_lib::ext::result::ResultExt;
+use crate::api::bridge::{copy, create_dir, create_file, delete_by, find_names, find_text, get_file_type, get_file_types, get_meta, get_metas, get_usage};
+use crate::api::protocol::{CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SimpleResult, TextSearchCollector, TextSearchProgress};
+use crate::api::su_protocol::{frame_length, from_len_frame, to_len_frame, Request, Response, FINAL_FRAME_BYTES};
+use crate::common::{config, Rslt};
+use crate::ext::encode::EncodeExt;
+use crate::ext::result::ResultExt;
 use std::io::{stdin, stdout, Read, Write};
 use std::sync::Arc;
 

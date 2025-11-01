@@ -38,8 +38,8 @@ class FinderService(
         val asSu = preferenceStore.asSu.value
         val query = QueryParams(query, regex = config.regex, ignoreCase = config.ignoreCase)
         val type = when {
-            config.contentSearch -> FinderWorker.Params.Type.Text(maxSize = maxSize)
-            else -> FinderWorker.Params.Type.Names(excludeDirs = config.excludeDirs)
+            config.contentSearch -> FinderWorker.Params.Text(maxSize = maxSize)
+            else -> FinderWorker.Params.Names(excludeDirs = config.excludeDirs)
         }
         val params = FinderWorker.Params(query, type, maxDepth = maxDepth, targets = where.map { it.bytes }, asSu = asSu)
         val request = OneTimeWorkRequest.Builder(FinderWorker::class.java)

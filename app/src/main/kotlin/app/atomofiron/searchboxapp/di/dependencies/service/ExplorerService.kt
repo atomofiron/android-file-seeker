@@ -18,6 +18,7 @@ import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.verifyNativeBin
+import app.atomofiron.searchboxapp.android.verifyNativeLib
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -95,7 +96,7 @@ class ExplorerService(
         val suDefined = Job()
         NativeBridge.setBinDir(context.filesDir.absolutePath)
         appScope.launchOnIO {
-            garden {
+            garden { // lock due configuration
                 suDefined.join()
                 if (config.asSu) checkSu()
                 initRoots()

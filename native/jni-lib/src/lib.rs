@@ -1,5 +1,6 @@
 extern crate core;
 
+mod lib_main;
 mod r#impl;
 pub mod api;
 pub mod common;

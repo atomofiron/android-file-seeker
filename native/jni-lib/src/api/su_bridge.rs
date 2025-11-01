@@ -16,12 +16,12 @@ static CHILDREN: Lazy<Mutex<Vec<Child>>> = Lazy::new(|| {
 
 #[uniffi::export]
 fn try_as_su(bin_path: String) -> SimpleResult {
-    return as_su::<SimpleResult>(Request::TryRun, bin_path)
+    return as_su_impl::<(), SimpleResult>(Request::TryRun, bin_path, None)
         .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
 }
 
 pub fn as_su<R: Decode<()>>(request: Request, bin_path: String) -> Rslt<R> {
-    as_su_impl::<_, R>(request, bin_path, None)
+    as_su_impl::<(), R>(request, bin_path, None)
 }
 
 pub fn as_su_with_progress<P: Decode<()>, R: Decode<()>>(
@@ -32,7 +32,7 @@ pub fn as_su_with_progress<P: Decode<()>, R: Decode<()>>(
     as_su_impl(request, bin_path, Some(collector))
 }
 
-fn as_su_impl<R: Decode<()>, P: Decode<()>>(
+fn as_su_impl<P: Decode<()>, R: Decode<()>>(
     request: Request,
     bin_path: String,
     collector: Option<Box<dyn ProgressProxy<P>>>,

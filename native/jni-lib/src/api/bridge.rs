@@ -13,8 +13,8 @@ use crate::r#impl::search_by_text::find_text_impl;
 use std::sync::Arc;
 
 #[uniffi::export]
-pub fn create_file(path: RawPath, run_as_su: Option<String>) -> MetaResult {
-    if let Some(bin_path) = run_as_su {
+pub fn create_file(path: RawPath, bin_path: Option<String>) -> MetaResult {
+    if let Some(bin_path) = bin_path {
         return as_su::<MetaResult>(Request::CreateFile(path), bin_path)
             .unwrap_or_else(|e| MetaResult::Err(e.to_string()))
     }
@@ -25,8 +25,8 @@ pub fn create_file(path: RawPath, run_as_su: Option<String>) -> MetaResult {
 }
 
 #[uniffi::export]
-pub fn create_dir(path: RawPath, run_as_su: Option<String>) -> MetaResult {
-    if let Some(bin_path) = run_as_su {
+pub fn create_dir(path: RawPath, bin_path: Option<String>) -> MetaResult {
+    if let Some(bin_path) = bin_path {
         return as_su::<MetaResult>(Request::CreateDir(path), bin_path)
             .unwrap_or_else(|e| MetaResult::Err(e.to_string()))
     }
@@ -39,10 +39,10 @@ pub fn create_dir(path: RawPath, run_as_su: Option<String>) -> MetaResult {
 #[uniffi::export]
 pub fn delete_by(
     path: RawPath,
-    run_as_su: Option<String>,
+    bin_path: Option<String>,
     collector: Arc<dyn CommonProgressCollector>,
 ) -> ComplexResult {
-    if let Some(bin_path) = run_as_su {
+    if let Some(bin_path) = bin_path {
         let from_buf = path.clone().buf();
         return as_su_with_progress(Request::Delete(path), bin_path, Box::new(collector))
             .unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)));
@@ -55,8 +55,8 @@ pub fn delete_by(
 }
 
 #[uniffi::export]
-pub fn get_usage(path: RawPath, run_as_su: Option<String>) -> UsageResult {
-    if let Some(bin_path) = run_as_su {
+pub fn get_usage(path: RawPath, bin_path: Option<String>) -> UsageResult {
+    if let Some(bin_path) = bin_path {
         return as_su::<UsageResult>(Request::GetUsage(path), bin_path)
             .unwrap_or_else(|e| UsageResult::Err(e.to_string()))
     }
@@ -67,8 +67,8 @@ pub fn get_usage(path: RawPath, run_as_su: Option<String>) -> UsageResult {
 }
 
 #[uniffi::export]
-pub fn get_meta(path: RawPath, run_as_su: Option<String>) -> MetaResult {
-    if let Some(bin_path) = run_as_su {
+pub fn get_meta(path: RawPath, bin_path: Option<String>) -> MetaResult {
+    if let Some(bin_path) = bin_path {
         return as_su::<MetaResult>(Request::GetMeta(path), bin_path)
             .unwrap_or_else(|e| MetaResult::Err(e.to_string()))
     }
@@ -79,8 +79,8 @@ pub fn get_meta(path: RawPath, run_as_su: Option<String>) -> MetaResult {
 }
 
 #[uniffi::export]
-pub fn get_metas(path: RawPath, run_as_su: Option<String>) -> MetasResult {
-    if let Some(bin_path) = run_as_su {
+pub fn get_metas(path: RawPath, bin_path: Option<String>) -> MetasResult {
+    if let Some(bin_path) = bin_path {
         return as_su::<MetasResult>(Request::GetMetas(path), bin_path)
             .unwrap_or_else(|e| MetasResult::Err(e.to_string()))
     }
@@ -91,8 +91,8 @@ pub fn get_metas(path: RawPath, run_as_su: Option<String>) -> MetasResult {
 }
 
 #[uniffi::export]
-pub fn get_file_type(path: RawPath, run_as_su: Option<String>) -> TypedMetaResult {
-    if let Some(bin_path) = run_as_su {
+pub fn get_file_type(path: RawPath, bin_path: Option<String>) -> TypedMetaResult {
+    if let Some(bin_path) = bin_path {
         return as_su::<TypedMetaResult>(Request::GetTypedMeta(path), bin_path)
             .unwrap_or_else(|e| TypedMetaResult::Err(e.to_string()))
     }
@@ -103,8 +103,8 @@ pub fn get_file_type(path: RawPath, run_as_su: Option<String>) -> TypedMetaResul
 }
 
 #[uniffi::export]
-pub fn get_file_types(path: RawPath, run_as_su: Option<String>) -> TypedMetasResult {
-    if let Some(bin_path) = run_as_su {
+pub fn get_file_types(path: RawPath, bin_path: Option<String>) -> TypedMetasResult {
+    if let Some(bin_path) = bin_path {
         return as_su::<TypedMetasResult>(Request::GetTypedMetas(path), bin_path)
             .unwrap_or_else(|e| TypedMetasResult::Err(e.to_string()))
     }
@@ -119,10 +119,10 @@ pub fn copy(
     from: RawPath,
     to: RawPath,
     moving: bool,
-    run_as_su: Option<String>,
+    bin_path: Option<String>,
     collector: Arc<dyn CommonProgressCollector>,
 ) -> ComplexResult {
-    if let Some(bin_path) = run_as_su {
+    if let Some(bin_path) = bin_path {
         let from_buf = from.clone().buf();
         return as_su_with_progress(Request::Copy(from, to, moving), bin_path, Box::new(collector))
             .unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)))
@@ -140,10 +140,10 @@ pub fn find_names(
     targets: Vec<RawPath>,
     max_depth: u32,
     exclude_dirs: bool,
-    run_as_su: Option<String>,
+    bin_path: Option<String>,
     collector: Arc<dyn NameSearchCollector>,
 ) -> SimpleResult {
-    if let Some(bin_path) = run_as_su {
+    if let Some(bin_path) = bin_path {
         return as_su_with_progress(Request::FindNames { query, targets, max_depth, exclude_dirs }, bin_path, Box::new(collector))
             .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
     }
@@ -156,10 +156,10 @@ pub fn find_text(
     targets: Vec<RawPath>,
     max_depth: u32,
     check: Check,
-    run_as_su: Option<String>,
+    bin_path: Option<String>,
     collector: Arc<dyn TextSearchCollector>,
 ) -> SimpleResult {
-    if let Some(bin_path) = run_as_su {
+    if let Some(bin_path) = bin_path {
         return as_su_with_progress(Request::FindText { query, targets, max_depth, check }, bin_path, Box::new(collector))
             .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
     }
