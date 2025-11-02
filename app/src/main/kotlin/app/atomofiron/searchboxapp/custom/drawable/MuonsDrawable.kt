@@ -28,7 +28,6 @@ import kotlin.math.sin
 private const val PI = Math.PI.toFloat()
 private const val START = PI / 2
 private const val END = START + PI
-private const val DURATION = 512L
 private const val EPSILON = 0.05f
 private const val ARC_60 = 60f
 private const val ROTATE_90 = 90f
@@ -60,6 +59,13 @@ class MuonsDrawable private constructor(
             return drawable
         }
     }
+    enum class Speed(rpm: Int) {
+        Fast(60),
+        Medium(30),
+        Slow(15),
+        ;
+        val duration = 60 * 1000L / rpm / 2 // PI is the half
+    }
 
     private val paint = Paint()
     private var animValue = START
@@ -78,10 +84,10 @@ class MuonsDrawable private constructor(
         paint.isAntiAlias = true
         paint.strokeCap = Paint.Cap.ROUND
         path.fillType = Path.FillType.EVEN_ODD
-        animator.duration = DURATION * if (fillCenter) 1 else 2
         animator.repeatCount = ValueAnimator.INFINITE
         animator.repeatMode = ValueAnimator.RESTART
         animator.interpolator = LinearInterpolator()
+        setSpeed(if (fillCenter) Speed.Fast else Speed.Medium)
     }
 
     override fun getIntrinsicWidth(): Int = intrinsicSize
@@ -125,6 +131,10 @@ class MuonsDrawable private constructor(
             this.padding = padding
             updateSize()
         }
+    }
+
+    fun setSpeed(speed: Speed) {
+        animator.duration = speed.duration
     }
 
     private fun updateSize() {

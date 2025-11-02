@@ -12,6 +12,7 @@ import app.atomofiron.common.util.Unreachable
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemProgressBinding
+import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Speed
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
@@ -52,6 +53,7 @@ class TaskHolder<Result : SearchResult>(
         status.setStatus(task.result)
         action.isActivated = !task.inProgress
         progress.isInvisible = !task.status.running
+        progress.setSpeed(if (task.inProgress) Speed.Medium else Speed.Slow)
 
         val idLabel = if (task.isError) R.string.error else when (task.status) {
             is SearchStatus.Progress -> R.string.started
