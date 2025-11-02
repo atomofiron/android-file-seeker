@@ -55,7 +55,11 @@ pub fn convert_progress(
                 },
                 Err(_) => break,
             }
-            collector.emit(progress.clone());
+            let keep_doing = collector.emit(progress.clone());
+            if !keep_doing {
+                drop(rx);
+                break;
+            }
         }
         let errors = errors.iter()
             .map(|(path, msg)| format!("{}: {msg}", String::from_utf8_lossy(path)))

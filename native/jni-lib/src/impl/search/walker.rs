@@ -9,7 +9,7 @@ pub fn walk<F, P: Send + Sync>(
     max_depth: usize,
     action: F,
 ) where
-    F: Fn(DirEntry, &Sender<P>) + Send + Sync,
+    F: Fn(DirEntry, &Sender<P>) -> WalkState + Send + Sync,
 {
     if targets.is_empty() {
         return;
@@ -45,9 +45,8 @@ pub fn walk<F, P: Send + Sync>(
         Box::new(move |result| {
             match result {
                 Ok(entry) => action(entry, &sender),
-                Err(_) => (), // .gitignore errors
-            };
-            WalkState::Continue
+                Err(_) => WalkState::Continue, // .gitignore errors (unreachable)
+            }
         })
     });
 }

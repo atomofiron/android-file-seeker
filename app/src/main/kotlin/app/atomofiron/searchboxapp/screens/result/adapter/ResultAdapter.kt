@@ -15,7 +15,7 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCa
         private const val POSITION_HEADER = 0
         private const val TYPE_HEADER = 2
     }
-    lateinit var itemActionListener: ResultItemActionListener
+    var itemActionListener: ResultItemActionListener? = null
 
     private lateinit var composition: ExplorerItemComposition
 
@@ -64,15 +64,16 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCa
         }
     }
 
-    override fun onBindViewHolder(holder: ResultsHolder, position: Int) = when (position) {
-        POSITION_HEADER -> holder.bind(items[position], position)
-        else -> {
+    override fun onBindViewHolder(holder: ResultsHolder, position: Int) {
+        if (position == POSITION_HEADER) {
+            holder.bind(items[position], position)
+        } else {
             holder as ResultsItemHolder
             holder.setOnItemActionListener(itemActionListener)
             super.onBindViewHolder(holder, position)
             holder.bindComposition(composition)
             val item = items[position] as ResultItem.Item
-            itemActionListener.onItemVisible(item)
+            itemActionListener?.onItemVisible(item)
         }
     }
 }

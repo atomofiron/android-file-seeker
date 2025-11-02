@@ -7,7 +7,7 @@ use crate::r#impl::copy::copy_impl;
 use crate::r#impl::delete::delete_impl;
 use crate::r#impl::meta::{meta_with_error, metas, try_meta};
 use crate::r#impl::other::{new_dir, new_file, usage};
-use crate::r#impl::r#type::{file_type_impl, file_types};
+use crate::r#impl::r#type::{file_type, file_types};
 use crate::r#impl::search_by_name::find_names_impl;
 use crate::r#impl::search_by_text::find_text_impl;
 use std::sync::Arc;
@@ -96,7 +96,7 @@ pub fn get_file_type(path: RawPath, bin_path: Option<String>) -> TypedMetaResult
         return as_su::<TypedMetaResult>(Request::GetTypedMeta(path), bin_path)
             .unwrap_or_else(|e| TypedMetaResult::Err(e.to_string()))
     }
-    match file_type_impl(&path.buf()) {
+    match file_type(&path.buf()) {
         Ok(data) => TypedMetaResult::Ok(data),
         Err(e) => TypedMetaResult::Err(e.to_string()),
     }

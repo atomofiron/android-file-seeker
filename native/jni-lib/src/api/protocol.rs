@@ -1,5 +1,5 @@
-use bincode::{Decode, Encode};
 use crate::ext::raw_path::RawPath;
+use bincode::{Decode, Encode};
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
@@ -66,6 +66,7 @@ pub struct SearchQuery {
 #[derive(uniffi::Enum)]
 pub enum NameSearchProgress {
     Ok(TypedMeta),
+    Skip,
     Err(Meta),
 }
 
@@ -120,19 +121,19 @@ pub struct TypedMeta {
 
 #[uniffi::export(with_foreign)]
 pub trait CommonProgressCollector: Send + Sync {
-    fn emit(&self, progress: CommonProgress);
+    fn emit(&self, progress: CommonProgress) -> bool;
 }
 
 impl CommonProgressCollector for () {
-    fn emit(&self, _: CommonProgress) { }
+    fn emit(&self, _: CommonProgress) -> bool { true }
 }
 
 #[uniffi::export(with_foreign)]
 pub trait NameSearchCollector: Send + Sync {
-    fn emit(&self, progress: NameSearchProgress);
+    fn emit(&self, progress: NameSearchProgress) -> bool;
 }
 
 #[uniffi::export(with_foreign)]
 pub trait TextSearchCollector: Send + Sync {
-    fn emit(&self, progress: TextSearchProgress);
+    fn emit(&self, progress: TextSearchProgress) -> bool;
 }

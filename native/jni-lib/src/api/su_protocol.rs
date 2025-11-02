@@ -35,12 +35,12 @@ pub enum Response {
     Err(String),
 }
 
-pub type FrameLength = [u8; 4];
+const CONTROL_FRAME_LEN: usize = 4;
+pub type FrameLength = [u8; CONTROL_FRAME_LEN];
 
-pub const FINAL_FRAME: usize = 0;
-pub const FINAL_FRAME_BYTES: FrameLength = [0; 4];
+pub const FINAL_FRAME: FrameLength = [0; CONTROL_FRAME_LEN];
 
-pub fn frame_length() -> FrameLength { [0; 4] }
+pub fn frame_length() -> FrameLength { [0; CONTROL_FRAME_LEN] }
 
 pub fn to_len_frame(size: usize) -> FrameLength {
     (size as u32).to_le_bytes()
@@ -51,26 +51,26 @@ pub fn from_len_frame(buf: FrameLength) -> usize {
 }
 
 pub trait ProgressProxy<D> : Send + Sync {
-    fn emit(&self, progress: D);
+    fn emit(&self, progress: D) -> bool;
 }
 
 impl ProgressProxy<CommonProgress> for Arc<dyn CommonProgressCollector> {
 
-    fn emit(&self, progress: CommonProgress) {
+    fn emit(&self, progress: CommonProgress) -> bool {
         CommonProgressCollector::emit(self.as_ref(), progress)
     }
 }
 
 impl ProgressProxy<NameSearchProgress> for Arc<dyn NameSearchCollector> {
 
-    fn emit(&self, progress: NameSearchProgress) {
+    fn emit(&self, progress: NameSearchProgress) -> bool {
         NameSearchCollector::emit(self.as_ref(), progress)
     }
 }
 
 impl ProgressProxy<TextSearchProgress> for Arc<dyn TextSearchCollector> {
 
-    fn emit(&self, progress: TextSearchProgress) {
+    fn emit(&self, progress: TextSearchProgress) -> bool {
         TextSearchCollector::emit(self.as_ref(), progress)
     }
 }

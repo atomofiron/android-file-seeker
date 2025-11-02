@@ -127,6 +127,7 @@ class TextViewerService(
                     is TextSearchProgress.End -> toEnded()
                 }
             }
+            true
         }
         session.update(uuid) {
             toEnded(error = (result as? SimpleResult.Err)?.v1)

@@ -11,6 +11,7 @@ use std::io::Read;
 use std::path::Path;
 use std::sync::mpsc::{channel, Sender};
 use std::sync::Arc;
+use ignore::WalkState;
 
 pub fn find_text_impl(
     query: SearchQuery,
@@ -20,7 +21,10 @@ pub fn find_text_impl(
     collector: Arc<dyn TextSearchCollector>,
 ) -> SimpleResult {
     let (tx, rx) = channel::<TextSearchProgress>();
-    let handle = proxy_progress(rx, Box::new(collector));
+    let handle = match proxy_progress(rx, Box::new(collector)) {
+        Ok(handle) => handle,
+        Err(e) => return SimpleResult::Err(e.to_string()),
+    };
     let matcher = match TextMatcher::new(query) {
         Ok(m) => m,
         Err(e) => return SimpleResult::Err(e.to_string())
@@ -45,10 +49,10 @@ pub fn find_text_recursively(
         if let Check::Yes(max_size) = check {
             match entry.metadata() {
                 Err(e) => error = Some(e.to_string()),
-                Ok(meta) if !meta.is_file() || meta.len() > max_size || meta.len() == 0 => return,
+                Ok(meta) if !meta.is_file() || meta.len() > max_size || meta.len() == 0 => return WalkState::Continue,
                 _ => match is_text_file(path) {
                     Err(e) => error = Some(e.to_string()),
-                    Ok(txt) if !txt => return,
+                    Ok(txt) if !txt => return WalkState::Continue,
                     _ => (),
                 },
             }
@@ -62,7 +66,10 @@ pub fn find_text_recursively(
             Some(error) => TextSearchProgress::Err(Meta::with_error(&path.into(), &error)),
             None => TextSearchProgress::End(path.raw()),
         };
-        let _ = sender.send(last);
+        return match sender.send(last) {
+            Ok(_) => WalkState::Continue,
+            Err(_) => WalkState::Quit,
+        };
     });
 }
 

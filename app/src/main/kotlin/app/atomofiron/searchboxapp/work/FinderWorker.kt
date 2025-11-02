@@ -129,14 +129,15 @@ class FinderWorker(
                         }
                         result.copy(count = result.count.inc(), matches = new, countTotal = countTotal)
                     }
-                    is TextSearchProgress.End -> result.copy(countTotal = result.countTotal.inc())
                     is TextSearchProgress.Err -> {
                         errors.add(match.v1.toNode())
                         result.copy(errors = errors.fetch())
                     }
+                    is TextSearchProgress.End -> result.copy(countTotal = result.countTotal.inc())
                 }
                 copyWith(result = new)
             }
+            task.inProgress
         }.apply()
     }
 
@@ -154,9 +155,12 @@ class FinderWorker(
                     is NameSearchProgress.Err -> {
                         errors.add(match.v1.toNode())
                         copy(result = result.copy(errors = errors.fetch()))
+
                     }
+                    is NameSearchProgress.Skip -> this
                 }
             }
+            task.inProgress
         }.apply()
     }
 

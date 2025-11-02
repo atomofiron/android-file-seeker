@@ -146,7 +146,7 @@ object ExplorerUtils {
 
     fun copy(from: Node, to: Node, asSu: Boolean): Node? {
         val result = NativeBridge.copy(from.ref, to.ref, asSu = asSu) {
-            // todo
+            true // todo
         }
         return from.apply(result)?.update(CacheConfig(asSu), ensureCached = false)
     }
@@ -550,7 +550,7 @@ object ExplorerUtils {
     fun Node.rename(name: String, asSu: Boolean): Node? {
         val targetRef = parentRef + name
         val result = NativeBridge.copy(from = ref, to = targetRef, asSu = asSu, move = true) {
-            // todo
+            true // todo
         }
         return apply(result)
     }

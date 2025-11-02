@@ -3,8 +3,9 @@ use crate::common::{empty_string, Rslt};
 use crate::r#impl::hr_meta::HumanReadableMeta;
 use std::fs;
 use std::path::PathBuf;
+use crate::r#impl::meta::meta_with_error;
 
-pub fn file_type_impl(path: &PathBuf) -> Rslt<TypedMeta> {
+pub fn file_type(path: &PathBuf) -> Rslt<TypedMeta> {
     let mime = tree_magic_mini::from_filepath(path);
     let mut metadata = path.metadata();
     if mime == None {
@@ -15,6 +16,16 @@ pub fn file_type_impl(path: &PathBuf) -> Rslt<TypedMeta> {
         mime: mime.map(|m| m.to_string()).unwrap_or(empty_string()),
     };
     return Ok(entry)
+}
+
+pub fn file_type_or_error(path: &PathBuf) -> TypedMeta {
+    match file_type(path) {
+        Ok(file_type) => file_type,
+        Err(e) => TypedMeta {
+            meta: meta_with_error(path, &e),
+            mime: empty_string(),
+        },
+    }
 }
 
 pub fn file_types(path: &PathBuf) -> Rslt<Vec<TypedMeta>> {

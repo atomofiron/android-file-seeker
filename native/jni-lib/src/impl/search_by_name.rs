@@ -2,12 +2,13 @@ use crate::api::protocol::{NameSearchCollector, NameSearchProgress, SearchQuery,
 use crate::common::{Rslt, JOINING_ERROR};
 use crate::ext::raw_path::RawPath;
 use crate::r#impl::meta::{meta, meta_with_error};
-use crate::r#impl::r#type::file_type_impl;
+use crate::r#impl::r#type::{file_type, file_type_or_error};
 use crate::r#impl::search::progress::proxy_progress;
 use crate::r#impl::search::walker::walk;
 use std::sync::mpsc::channel;
 use std::sync::mpsc::Sender;
 use std::sync::Arc;
+use ignore::WalkState;
 use crate::r#impl::search::matcher::build_matcher;
 
 pub fn find_names_impl(
@@ -18,7 +19,10 @@ pub fn find_names_impl(
     collector: Arc<dyn NameSearchCollector>,
 ) -> SimpleResult {
     let (tx, rx) = channel::<NameSearchProgress>();
-    let handle = proxy_progress(rx, Box::new(collector));
+    let handle = match proxy_progress(rx, Box::new(collector)) {
+        Ok(handle) => handle,
+        Err(e) => return SimpleResult::Err(e.to_string()),
+    };
     if let Err(e) = find_names_recursively(query, targets, max_depth, exclude_dirs, &tx) {
         return SimpleResult::Err(e.to_string())
     }
@@ -39,14 +43,14 @@ pub fn find_names_recursively(
     walk(targets, sender, max_depth, |entry, sender| {
         let progress = match entry.file_type() {
             None => NameSearchProgress::Err(meta(&entry.path().into())),
-            Some(file_type) if exclude_dirs && file_type.is_dir() => return,
-            _ if matcher.matches(entry.file_name()) => match file_type_impl(&entry.path().into()) {
-                Ok(typed) => NameSearchProgress::Ok(typed),
-                Err(e) => NameSearchProgress::Err(meta_with_error(&entry.path().into(), &e)),
-            },
-            _ => return,
+            Some(file_type) if exclude_dirs && file_type.is_dir() => NameSearchProgress::Skip,
+            _ if matcher.matches(entry.file_name()) => NameSearchProgress::Ok(file_type_or_error(&entry.path().into())),
+            _ => NameSearchProgress::Skip,
         };
-        let _ = sender.send(progress); // unwrap?
+        return match sender.send(progress) {
+            Ok(_) => WalkState::Continue,
+            Err(_) => WalkState::Quit,
+        };
     });
     return Ok(());
 }

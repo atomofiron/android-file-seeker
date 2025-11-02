@@ -1,6 +1,6 @@
 use crate::api::protocol::SimpleResult;
 use crate::api::su_protocol::{frame_length, from_len_frame, to_len_frame, ProgressProxy, Request, Response, FINAL_FRAME};
-use crate::common::{config, Rslt};
+use crate::common::{config, Rslt, OKI};
 use crate::ext::option::OptionExt;
 use crate::ext::result::ResultExt;
 use bincode::{decode_from_slice, encode_to_vec, Decode};
@@ -91,21 +91,24 @@ fn read_progress<P>(child: &mut Child, collector: Box<dyn ProgressProxy<P>>) -> 
         if let Err(e) = read_result {
             return Err(get_error(child, e))?;
         }
-        let len = from_len_frame(len_buf);
-        if len == FINAL_FRAME {
+        if len_buf == FINAL_FRAME {
             return Ok(());
         }
+        let len = from_len_frame(len_buf);
         let mut bytes = vec![0u8; len];
         stdout.read_exact(&mut bytes)?;
         let (progress, _) = decode_from_slice::<P,_>(&bytes, config())?;
-        collector.emit(progress)
+        let keep_doing = collector.emit(progress);
+        if !keep_doing {
+            return sigint(child);
+        }
     }
 }
 
 fn get_error(child: &mut Child, error: Error) -> String {
     let another = read_error(child)
         .unwrap_or_else(|e| e.to_string());
-    return format!("{error}\n++++++++++++++++{another}");
+    return format!("{error}\n++++++++++++++++ {another}");
 }
 
 fn read_error(child: &mut Child) -> Rslt<String> {
@@ -130,4 +133,15 @@ fn get_exit_code(status: io::Result<Option<ExitStatus>>) -> Rslt<String> {
         .and_then(|it| it.code())
         .map(|it| it.to_string())
         .ok_or_else(|| "null".into())
+}
+
+fn sigint(child: &Child) -> Rslt<()> {
+    let pid = child.id() as i32;
+    let result = unsafe {
+        libc::kill(pid, libc::SIGINT)
+    };
+    return match result {
+        OKI => Ok(()),
+        _ => Err("failed to open stdin for stop signal".into()),
+    };
 }

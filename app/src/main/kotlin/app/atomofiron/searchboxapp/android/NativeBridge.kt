@@ -110,7 +110,7 @@ object NativeBridge {
 
     fun delete(ref: NodeRef, asSu: Boolean): ComplexResult {
         val collector = object : CommonProgressCollector {
-            override fun emit(progress: CommonProgress) = Unit
+            override fun emit(progress: CommonProgress) = true
         }
         return uniffi.native_lib.deleteBy(ref.bytes, binPath = binPath.takeIf { asSu }, collector)
     }
@@ -120,7 +120,7 @@ object NativeBridge {
         to: NodeRef,
         move: Boolean = false,
         asSu: Boolean,
-        collector: (CommonProgress) -> Unit,
+        collector: (CommonProgress) -> Boolean,
     ): ComplexResult {
         val collector = object : CommonProgressCollector {
             override fun emit(progress: CommonProgress) = collector(progress)
@@ -134,7 +134,7 @@ object NativeBridge {
         maxDepth: Int,
         excludeDirs: Boolean,
         asSu: Boolean,
-        collector: (NameSearchProgress) -> Unit,
+        collector: (NameSearchProgress) -> Boolean,
     ): SimpleResult {
         val collector = object : NameSearchCollector {
             override fun emit(progress: NameSearchProgress) = collector(progress)
@@ -147,7 +147,7 @@ object NativeBridge {
         params: QueryParams,
         target: NodeRef,
         asSu: Boolean,
-        collector: (TextSearchProgress) -> Unit,
+        collector: (TextSearchProgress) -> Boolean,
     ): SimpleResult = findText(params, listOf(target), maxDepth = 1, Check.No, asSu, collector)
 
     fun findText(
@@ -156,7 +156,7 @@ object NativeBridge {
         maxDepth: Int,
         maxSize: Long,
         asSu: Boolean,
-        collector: (TextSearchProgress) -> Unit,
+        collector: (TextSearchProgress) -> Boolean,
     ): SimpleResult = findText(params, targets, maxDepth, Check.Yes(maxSize.toULong()), asSu, collector)
 
     private fun findText(
@@ -165,10 +165,10 @@ object NativeBridge {
         maxDepth: Int,
         check: Check,
         asSu: Boolean,
-        collector: (TextSearchProgress) -> Unit,
+        collector: (TextSearchProgress) -> Boolean,
     ): SimpleResult {
         val collector = object : TextSearchCollector {
-            override fun emit(progress: TextSearchProgress) = collector.invoke(progress)
+            override fun emit(progress: TextSearchProgress) = collector(progress)
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
         return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), check, binPath = binPath.takeIf { asSu }, collector)

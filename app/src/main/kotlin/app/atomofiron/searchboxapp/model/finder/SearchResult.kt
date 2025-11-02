@@ -7,7 +7,6 @@ import app.atomofiron.searchboxapp.utils.Const
 import java.util.Objects
 import kotlin.LazyThreadSafetyMode.NONE
 
-
 sealed class SearchResult {
 
     abstract val count: Int
@@ -30,9 +29,14 @@ sealed class SearchResult {
 
         override fun getCounters(): IntArray = intArrayOf(count)
 
-        override fun hashCode(): Int = super.hashCode()
+        override fun hashCode(): Int = Objects.hash(this::class, count)
 
-        override fun equals(other: Any?): Boolean = super.equals(other)
+        override fun equals(other: Any?): Boolean = when {
+            other === this -> true
+            other !is Text -> false
+            other.count != count -> false
+            else -> other::class == this::class
+        }
     }
 
     data class Files(
@@ -76,18 +80,16 @@ sealed class SearchResult {
 
         fun contains(match: ItemMatch) = matches.contains(match)
 
-        override fun hashCode(): Int = super.hashCode()
+        override fun hashCode(): Int = Objects.hash(this::class, count, countTotal, errors.size, sorting)
 
-        override fun equals(other: Any?): Boolean = super.equals(other)
-    }
-
-    override fun hashCode(): Int = Objects.hash(this::class, count, countTotal)
-
-    override fun equals(other: Any?): Boolean = when {
-        other === this -> true
-        other !is SearchResult -> false
-        other.count != count -> false
-        other.countTotal != countTotal -> false
-        else -> other::class == this::class
+        override fun equals(other: Any?): Boolean = when {
+            other === this -> true
+            other !is Files -> false
+            other.count != count -> false
+            other.countTotal != countTotal -> false
+            other.sorting != sorting -> false
+            other.errors.size != errors.size -> false
+            else -> other::class == this::class
+        }
     }
 }
