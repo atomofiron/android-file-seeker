@@ -56,7 +56,7 @@ class TextViewerViewState(
     val composition = preferenceStore.explorerItemComposition.value
     val item = session.item
     val tasks = session.tasks
-    val textLines = session.textLines
+    val textLines = session.lines
     val currentTask = MutableStateFlow<TextSearchTask?>(null)
 
     val dock = status.map { state ->
