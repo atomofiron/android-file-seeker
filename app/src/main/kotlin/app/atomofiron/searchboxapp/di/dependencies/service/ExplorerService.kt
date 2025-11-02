@@ -18,7 +18,6 @@ import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.verifyNativeBin
-import app.atomofiron.searchboxapp.android.verifyNativeLib
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -102,7 +101,7 @@ class ExplorerService(
                 initRoots()
             }
             combine(store.storage, preferences.asSu, updateRootTrigger) { volumes, asSu, _ ->
-                updateRootsAsync(volumes)
+                updateRootsAsync(volumes, asSu)
             }.collect()
         }
         val thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size)
@@ -194,18 +193,22 @@ class ExplorerService(
 
     suspend fun updateRootsAsync() = updateRootTrigger()
 
-    suspend fun updateRootsAsync(volumes: List<NodeStorage>) {
+    suspend fun updateRootsAsync(volumes: List<NodeStorage>, withSu: Boolean) {
         garden {
             volumes.forEach { updateStats(it) }
             removeMissed(volumes)
             val key = store.currentTabKey.value
             val tab = get(key)
-            if (roots.none { it.stableId == tab.selectedRootId }) {
-                tab.deselectRoot()
+            when {
+                roots.none { it.stableId == tab.selectedRootId } -> tab.deselectRoot()
+                withSu -> Unit
+                tab.selectedRootId == NodeRootType.SystemRoot.stableId -> tab.deselectRoot()
             }
             tab.render()
             roots.forEach { root ->
-                updateRootAsync(key, root)
+                if (withSu || root.stableId != NodeRootType.SystemRoot.stableId) {
+                    updateRootAsync(key, root)
+                }
             }
         }
     }
@@ -213,7 +216,7 @@ class ExplorerService(
     private fun updateRootAsync(key: NodeTabKey, root: NodeRoot) {
         when {
             preferences.asSu.value -> Unit
-            root.type != NodeRootType.SystemRoot -> Unit
+            root.type !is NodeRootType.SystemRoot -> Unit
             else -> return
         }
         appScope.launch {
