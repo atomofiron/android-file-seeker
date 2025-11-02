@@ -79,6 +79,7 @@ object ExplorerUtils {
     private const val FILE_TORRENT = "application/x-bittorrent"
     private const val FILE_ODT = "application/vnd.oasis.opendocument.text"
     private const val FILE_XRIFF = "application/x-riff" // +webp
+    // 'xml' unknown type: application/x-dia-shape
 
     private const val EXT_APNG = ".apng"
     private const val EXT_PNG = ".png"

@@ -9,15 +9,15 @@ import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.model.textviewer.MatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
-import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState.MatchCursor
 import app.atomofiron.searchboxapp.utils.Const
 
 class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
 
     var textViewerListener: TextViewerListener? = null
-    private var matches: Map<Int, List<TextLineMatch>> = mapOf()
+    private var matches: MatchMap = mapOf()
 
     private var cursor: MatchCursor? = null
 
@@ -27,7 +27,7 @@ class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
         setHasStableIds(true)
     }
 
-    fun setMatches(items: Map<Int, List<TextLineMatch>>?) {
+    fun setMatches(items: MatchMap?) {
         matches = items ?: mapOf()
         cursor = null
         notifyDataSetChanged()

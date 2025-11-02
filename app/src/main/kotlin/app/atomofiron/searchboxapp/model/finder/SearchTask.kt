@@ -10,29 +10,31 @@ data class SearchTask<Result : SearchResult>(
     val query: QueryParams,
     val result: Result,
     val uuid: UUID = UUID.randomUUID(),
-    val state: SearchState = SearchState.Progress,
+    val status: SearchStatus = SearchStatus.Progress,
     val error: String? = null,
 ) {
     val uniqueId: Int get() = uuid.hashCode()
     val count: Int = result.count
 
-    val inProgress: Boolean get() = state == SearchState.Progress
-    val isEnded: Boolean get() = state is SearchState.Ended
-    val isStopped: Boolean get() = state is SearchState.Stopped
-    val isError: Boolean get() = state is SearchState.Ended && error != null
+    val inProgress: Boolean get() = status is SearchStatus.Progress
+    val isEnded: Boolean get() = status is SearchStatus.Ended
+    val isStopped: Boolean get() = status is SearchStatus.Stopped
+    val isError: Boolean get() = status is SearchStatus.Ended && error != null
 
     fun copyWith(result: Result): SearchTask<Result> = copy(result = result)
 
     fun toEnded(
-        isStopped: Boolean = false,
-        isRemovable: Boolean = true,
+        isStopped: Boolean = this.status is SearchStatus.Stopping,
         result: Result = this.result,
         error: String? = this.error,
     ): SearchTask<Result> {
-        val state = if (isStopped) SearchState.Stopped(isRemovable) else SearchState.Ended(isRemovable)
-        return copy(state = state, result = result, error = error)
+        val state = when {
+            isStopped -> SearchStatus.Stopped()
+            else -> SearchStatus.Ended()
+        }
+        return copy(status = state, result = result, error = error)
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun cast() = this as GenericSearchTask
+    fun upcast() = this as GenericSearchTask
 }

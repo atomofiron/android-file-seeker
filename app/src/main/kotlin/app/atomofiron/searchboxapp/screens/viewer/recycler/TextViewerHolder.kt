@@ -9,8 +9,8 @@ import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.style.EntireLineSpan
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
+import app.atomofiron.searchboxapp.model.textviewer.MatchList
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
-import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 
 class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>(textView) {
     private val spanPart: RoundedBackgroundSpan
@@ -47,7 +47,7 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
 
     override fun onBind(item: TextLine, position: Int) = Unit
 
-    fun onBind(item: TextLine, matches: List<TextLineMatch>?, indexFocus: Int) {
+    fun onBind(item: TextLine, matches: MatchList?, indexFocus: Int) {
         when {
             matches.isNullOrEmpty() -> textView.text = item.text
             else -> {

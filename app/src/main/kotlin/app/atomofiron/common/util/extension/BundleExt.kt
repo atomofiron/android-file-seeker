@@ -13,7 +13,7 @@ inline fun <reified T : Any> Bundle.put(data: T): Bundle {
 }
 
 inline operator fun <reified T : Any> Data.Companion.invoke(data: T): Data {
-    return Data.Builder().put(this).build()
+    return Data.Builder().put(data).build()
 }
 
 inline fun <reified T : Any> Data.get(): T? = getByteArray(protobufBytesKey<T>())?.decode()

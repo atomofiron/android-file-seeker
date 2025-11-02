@@ -15,9 +15,10 @@ import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchResult.Text
-import app.atomofiron.searchboxapp.model.finder.SearchState
+import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.finder.TextSearchTask
+import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
@@ -66,13 +67,13 @@ class TextViewerService(
         val result = finderTask.result as SearchResult.Files
         val itemMatch = result.matches.find {
             it.item.uniqueId == item.uniqueId
-        } as? ItemMatch.Multiply
+        } as? ItemMatch.Many
         itemMatch ?: return null
         val task = SearchTask(
             finderTask.query,
-            Text(itemMatch.count, itemMatch.matchesMap),
+            Text(itemMatch.count, itemMatch.matches),
             finderTask.uuid,
-            SearchState.Ended(removable = false),
+            SearchStatus.Ended(removable = false),
         )
         session.tasks { add(task) }
         return task
@@ -112,15 +113,15 @@ class TextViewerService(
             session.tasks { add(it) }
         }.uuid
         var count = 0
-        val matchesMap = hashMapOf<Int, MutableList<TextLineMatch>>()
+        val matches: MutableMatchMap = hashMapOf()
         val result = NativeBridge.findLocalText(params, item.ref, asSu) { match ->
             session.update(uuid) {
                 when (match) {
                     is TextSearchProgress.Ok -> {
                         val lineIndex = match.line?.toInt() ?: return@update this
-                        val list = matchesMap.getOrPut(lineIndex) { mutableListOf() }
+                        val list = matches.getOrPut(lineIndex) { mutableListOf() }
                         list.add(TextLineMatch(match.offset.toLong(), match.length.toInt()))
-                        copy(result = Text(++count, matchesMap))
+                        copy(result = Text(++count, matches))
                     }
                     is TextSearchProgress.Err -> toEnded(error = match.v1.error)
                     is TextSearchProgress.End -> toEnded()

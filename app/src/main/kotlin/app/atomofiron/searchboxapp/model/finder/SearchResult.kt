@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.model.finder
 
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
-import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
+import app.atomofiron.searchboxapp.model.textviewer.MatchMap
 import app.atomofiron.searchboxapp.utils.Const
 import java.util.Objects
 import kotlin.LazyThreadSafetyMode.NONE
@@ -19,32 +19,36 @@ sealed class SearchResult {
 
     data class Text(
         override val count: Int,
-        /** line index -> matches byteOffset+length */
-        val matchesMap: Map<Int, List<TextLineMatch>>,
+        val matches: MatchMap,
     ) : SearchResult() {
 
-        val indexes: List<Int> by lazy(NONE) { matchesMap.keys.sorted() }
+        val indexes: List<Int> by lazy(NONE) { matches.keys.sorted() }
 
         override val countTotal = 1
 
         constructor() : this(0, mapOf())
 
         override fun getCounters(): IntArray = intArrayOf(count)
+
+        override fun hashCode(): Int = super.hashCode()
+
+        override fun equals(other: Any?): Boolean = super.equals(other)
     }
 
     data class Files(
-        private val inContent: Boolean,
+        private val forText: Boolean,
         override val count: Int = 0,
-        val matches: List<ItemMatch> = listOf(),
         override val countTotal: Int = 0,
+        val matches: List<ItemMatch> = listOf(),
+        val errors: List<Node> = listOf(),
         val sorting: NodeSorting = NodeSorting.Date.Reversed,
     ) : SearchResult() {
         companion object {
-            val Stub = Files(inContent = false)
+            val Stub = Files(forText = false)
         }
 
         override fun getCounters(): IntArray = when {
-            inContent -> intArrayOf(count, matches.size, countTotal)
+            forText -> intArrayOf(count, matches.size, countTotal)
             else -> intArrayOf(matches.size)
         }
 
@@ -55,8 +59,8 @@ sealed class SearchResult {
                     continue
                 }
                 val name = if (item.item.isDirectory) item.item.name + Const.SLASH else item.item.name
-                val line = String.format("[%s](%s)\n", name, item.item.ref.string.replace(" ", "\\ "))
-                data.append(line)
+                val path = item.item.ref.string.replace(" ", "\\ ")
+                data.append("[$name]($path)\n")
             }
             return data.toString()
         }
@@ -67,10 +71,14 @@ sealed class SearchResult {
             val left = matches.filter { !it.item.ref.isChildOf(removed.ref) }
             val items = matches.toMutableList()
             val count = left.sumOf { it.count }
-            return Files(inContent, count, items, countTotal.dec())
+            return Files(forText, count = count, countTotal = countTotal.dec(), items)
         }
 
-        fun contains(itemCounter: ItemMatch) = matches.contains(itemCounter)
+        fun contains(match: ItemMatch) = matches.contains(match)
+
+        override fun hashCode(): Int = super.hashCode()
+
+        override fun equals(other: Any?): Boolean = super.equals(other)
     }
 
     override fun hashCode(): Int = Objects.hash(this::class, count, countTotal)
@@ -81,45 +89,5 @@ sealed class SearchResult {
         other.count != count -> false
         other.countTotal != countTotal -> false
         else -> other::class == this::class
-    }
-}
-
-@Suppress("LeakingThis")
-sealed class ItemMatch {
-
-    abstract val item: Node
-    abstract val count: Int
-
-    val path get() = item.ref
-    val isDirectory: Boolean get() = item.isDirectory
-    val isCached: Boolean get() = item.isCached
-    val isDeleting: Boolean get() = item.state.isDeleting
-    val isChecked: Boolean get() = item.isChecked
-    val withCounter: Boolean get() = this !is Single
-
-    abstract fun update(item: Node): ItemMatch
-
-    data class Single(override val item: Node) : ItemMatch() {
-
-        override val count = 1
-
-        override fun update(item: Node): ItemMatch = copy(item = item)
-    }
-
-    data class Multiply(
-        override val item: Node,
-        override val count: Int = 0,
-        /** line index -> matches byteOffset+length */
-        val matchesMap: MutableMap<Int, MutableList<TextLineMatch>> = mutableMapOf(),
-    ) : ItemMatch() {
-        override fun update(item: Node): ItemMatch = copy(item = item)
-    }
-
-    data class MultiplyError(
-        override val item: Node,
-        override val count: Int,
-        val error: String,
-    ) : ItemMatch() {
-        override fun update(item: Node): ItemMatch = copy(item = item)
     }
 }

@@ -101,7 +101,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
     }
 
     private fun onTaskChanged(task: TextSearchTask?) {
-        val matches = task?.result?.matchesMap
+        val matches = task?.result?.matches
         viewerAdapter.setMatches(matches)
         val iconId = if (task == null) R.drawable.ic_back else R.drawable.ic_cross
         binding.toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), iconId)

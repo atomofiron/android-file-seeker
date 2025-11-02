@@ -14,7 +14,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemProgressBinding
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.finder.SearchState
+import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.utils.Alpha
 
@@ -34,11 +34,11 @@ class TaskHolder<Result : SearchResult>(
         binding.action.setOnClickListener { view ->
             view.isEnabled = false
             val item = item
-            when (item.task.state) {
-                is SearchState.Progress -> listener.onProgressStopClick(item)
-                is SearchState.Stopping -> Unreachable
-                is SearchState.Stopped,
-                is SearchState.Ended -> listener.onProgressRemoveClick(item)
+            when (item.task.status) {
+                is SearchStatus.Progress -> listener.onProgressStopClick(item)
+                is SearchStatus.Stopping -> Unreachable
+                is SearchStatus.Stopped,
+                is SearchStatus.Ended -> listener.onProgressRemoveClick(item)
             }
         }
         binding.params.setSingleLine()
@@ -51,13 +51,13 @@ class TaskHolder<Result : SearchResult>(
         params.setParams(task.query)
         status.setStatus(task.result)
         action.isActivated = !task.inProgress
-        progress.isInvisible = !task.state.running
+        progress.isInvisible = !task.status.running
 
-        val idLabel = if (task.isError) R.string.error else when (task.state) {
-            is SearchState.Progress -> R.string.started
-            is SearchState.Stopping -> R.string.stopping
-            is SearchState.Stopped -> R.string.stopped
-            is SearchState.Ended -> R.string.completed
+        val idLabel = if (task.isError) R.string.error else when (task.status) {
+            is SearchStatus.Progress -> R.string.started
+            is SearchStatus.Stopping -> R.string.stopping
+            is SearchStatus.Stopped -> R.string.stopped
+            is SearchStatus.Ended -> R.string.completed
         }
         val colorLabel = when {
             task.isError -> context.findColorByAttr(MaterialAttr.colorError)
@@ -67,11 +67,11 @@ class TaskHolder<Result : SearchResult>(
         label.setTextColor(colorLabel)
 
         val idAction = when {
-            task.state.running -> R.string.stop
+            task.status.running -> R.string.stop
             else -> R.string.remove
         }
         action.setText(idAction)
-        action.isEnabled = task.inProgress || task.state.removable
+        action.isEnabled = task.inProgress || task.status.removable
         itemView.isEnabled = item.clickableIfEmpty || !task.result.isEmpty
     }
 

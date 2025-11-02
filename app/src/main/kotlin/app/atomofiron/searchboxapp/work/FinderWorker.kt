@@ -14,9 +14,8 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import app.atomofiron.common.util.extension.debugDelay
+import app.atomofiron.common.util.GrowingList
 import app.atomofiron.common.util.extension.get
-import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.extension.replace
 import app.atomofiron.fileseeker.R
@@ -25,7 +24,6 @@ import app.atomofiron.searchboxapp.android.Notifications
 import app.atomofiron.searchboxapp.android.tryShow
 import app.atomofiron.searchboxapp.android.updateChannel
 import app.atomofiron.searchboxapp.di.DaggerInjector
-import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.CacheConfig
@@ -36,7 +34,7 @@ import app.atomofiron.searchboxapp.model.finder.FilesSearchTask
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult.Files
-import app.atomofiron.searchboxapp.model.finder.SearchState
+import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.screens.main.MainActivity
@@ -47,10 +45,6 @@ import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.ifCanNotice
 import app.atomofiron.searchboxapp.utils.mutate
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
@@ -67,6 +61,7 @@ private const val UPDATING_FLAG = PendingIntent.FLAG_UPDATE_CURRENT or PendingIn
 private const val KEY_EXCEPTION = "KEY_EXCEPTION"
 private const val KEY_CANCELLED = "KEY_CANCELLED"
 
+// todo stop native calls?
 class FinderWorker(
     private val context: Context,
     workerParams: WorkerParameters,
@@ -90,14 +85,13 @@ class FinderWorker(
     private val taskMutex = Mutex()
     // todo remove deleting files from results
     private lateinit var task: FilesSearchTask
+    private val taskId = id
     private lateinit var cacheConfig: CacheConfig
 
     @Inject
     lateinit var finderStore: FinderStore
     @Inject
     lateinit var notifications: NotificationManagerCompat
-    @Inject
-    lateinit var appScope: AppScope
     @Inject
     lateinit var preferenceStore: PreferenceStore
     @Inject
@@ -107,74 +101,63 @@ class FinderWorker(
         DaggerInjector.appComponent.inject(this)
     }
 
-    private fun Params.searchText(type: Params.Text) = appScope.launch {
-        val result = NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, asSu) { match ->
-            appScope {
-                updateTask {
-                    val new = when (match) {
-                        is TextSearchProgress.Ok -> {
-                            val lineIndex = match.line?.toInt() ?: return@appScope
-                            val lineMatch = TextLineMatch(match.offset.toLong(), match.length.toInt())
-                            var itemMatch = result.matches
-                                .find { it.item.ref.theSame(match.path) }
-                                ?.let { it as ItemMatch.Multiply }
-                            val countTotal = when (itemMatch) {
-                                null -> result.countTotal.inc()
-                                else -> result.countTotal
-                            }
-                            itemMatch = itemMatch ?: NodeRef(match.path).let {
-                                val node = NativeBridge.type(it, asSu).value?.toNode() ?: it.toNode()
-                                ItemMatch.Multiply(node)
-                            }
-                            val matches = itemMatch.matchesMap.getOrPut(lineIndex) { mutableListOf() }
-                            matches.add(lineMatch)
-                            val new = result.matches.mutate {
-                                replace(itemMatch.copy(count = itemMatch.count.inc())) {
-                                    it.path == itemMatch.path
-                                }
-                            }
-                            result.copy(count = result.count.inc(), matches = new, countTotal = countTotal)
+    private fun Params.searchText(type: Params.Text) {
+        val errors = GrowingList<Node>()
+        NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, asSu) { match ->
+            updateAsync {
+                val new = when (match) {
+                    is TextSearchProgress.Ok -> {
+                        val lineIndex = match.line?.toInt() ?: return@updateAsync this
+                        val lineMatch = TextLineMatch(match.offset.toLong(), match.length.toInt())
+                        var itemMatch = result.matches
+                            .find { it.item.ref.theSame(match.path) }
+                            ?.let { it as ItemMatch.Many }
+                        val countTotal = when (itemMatch) {
+                            null -> result.countTotal.inc()
+                            else -> result.countTotal
                         }
-                        is TextSearchProgress.End -> {
-                            val itemMatch = result.matches.find { it.item.ref.theSame(match.v1) }
-                            if (itemMatch != null) {
-                                return@appScope
-                            }
-                            result.copy(countTotal = result.countTotal.inc())
+                        itemMatch = itemMatch ?: NodeRef(match.path).let {
+                            val node = NativeBridge.type(it, asSu).value?.toNode() ?: it.toNode()
+                            ItemMatch.Many(node)
                         }
-                        is TextSearchProgress.Err -> return@appScope // todo
+                        val matches = itemMatch.matches.getOrPut(lineIndex) { mutableListOf() }
+                        matches.add(lineMatch)
+                        val new = result.matches.mutate {
+                            replace(itemMatch.copy(count = itemMatch.count.inc())) {
+                                it.path == itemMatch.path
+                            }
+                        }
+                        result.copy(count = result.count.inc(), matches = new, countTotal = countTotal)
                     }
-                    copyWith(result = new)
+                    is TextSearchProgress.End -> result.copy(countTotal = result.countTotal.inc())
+                    is TextSearchProgress.Err -> {
+                        errors.add(match.v1.toNode())
+                        result.copy(errors = errors.fetch())
+                    }
                 }
+                copyWith(result = new)
             }
-        }
-        updateTask {
-            val error = (result as? SimpleResult.Err)?.v1
-            toEnded(error = error)
-        }
+        }.apply()
     }
 
-    private suspend inline fun updateTask(transform: FilesSearchTask.() -> FilesSearchTask) {
-        taskMutex.withLock {
-            task = task.transform()
-        }
-        finderStore.addOrUpdate(task.cast())
-    }
-
-    private fun Params.searchNames(type: Params.Names) = appScope {
+    private fun Params.searchNames(type: Params.Names) {
+        val errors = GrowingList<Node>()
         NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu) { match ->
-            appScope {
+            updateAsync {
                 when (match) {
-                    is NameSearchProgress.Ok -> updateTask {
+                    is NameSearchProgress.Ok -> {
                         val itemMatch = ItemMatch.Single(match.v1.toNode())
                         val matches = result.matches.toMutableList()
                         matches.replace(itemMatch) { it.path == itemMatch.path }
                         copyWith(result.copy(count = count.inc(), matches = matches, countTotal = result.countTotal.inc()))
                     }
-                    is NameSearchProgress.Err -> Unit // todo
+                    is NameSearchProgress.Err -> {
+                        errors.add(match.v1.toNode())
+                        copy(result = result.copy(errors = errors.fetch()))
+                    }
                 }
             }
-        }
+        }.apply()
     }
 
     override suspend fun doWork(): Result {
@@ -194,50 +177,51 @@ class FinderWorker(
             )
             setForeground(getForegroundInfo())
         }
-        task = SearchTask(params.query, result = Files(params.type is Params.Text), id)
+        task = SearchTask(params.query, result = Files(params.type is Params.Text), taskId)
         cacheConfig = CacheConfig(params.asSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size))
-        return handleCancellation { work(params) }
+        finderStore.addOrUpdate(task.upcast())
+        return work(params)
     }
 
-    private suspend fun <R> handleCancellation(action: suspend () -> R): R {
-        return coroutineScope {
-            val hook = launch {
-                try {
-                    while (true) delay(1000)
-                } catch (e: CancellationException) {
-                }
-            }
-            action()
-                .also { hook.cancel() }
+    private suspend inline fun update(transform: FilesSearchTask.() -> FilesSearchTask) {
+        taskMutex.withLock {
+            task = task.transform()
         }
+        finderStore.addOrUpdate(task.upcast())
+    }
+
+    private fun updateAsync(transform: FilesSearchTask.() -> FilesSearchTask) {
+        finderStore {
+            update(transform)
+        }
+    }
+
+    private fun SimpleResult.apply() = updateAsync {
+        val error = (this@apply as? SimpleResult.Err)?.v1
+        toEnded(error = error)
     }
 
     private suspend fun work(params: Params): Result {
         val dataBuilder = Data.Builder()
-        var job: Job? = null
         try {
-            finderStore.addOrUpdate(task.cast())
-            job = when (val type = params.type) {
-                is Params.Text -> params.searchText(type)
-                is Params.Names -> params.searchNames(type)
-            }
-            job.join()
-            debugDelay(5)
-            updateTask {
-                toEnded()
-            }
-        } catch (e: CancellationException) {
-            task = task.copy(state = SearchState.Stopped())
             finderStore {
-                update(task.uuid, SearchState.Stopped())
+                when (val type = params.type) {
+                    is Params.Text -> params.searchText(type)
+                    is Params.Names -> params.searchNames(type)
+                }
+            }.join()
+        } catch (e: CancellationException) {
+            updateAsync {
+                when {
+                    task.inProgress -> copy(status = SearchStatus.Stopping)
+                    else -> task
+                }
             }
             dataBuilder.putBoolean(KEY_CANCELLED, true)
         } catch (e: Exception) {
             logE(e.toString())
-            job?.join()
-            task = task.copy(state = SearchState.Ended(), error = e.toString())
-            finderStore {
-                update(task.uuid, SearchState.Ended(), error = e.toString())
+            updateAsync {
+                copy(error = e.toString())
             }
             dataBuilder.putString(KEY_EXCEPTION, e.toString())
         } finally {
@@ -268,7 +252,7 @@ class FinderWorker(
         }
         val titleId = when {
             task.error != null -> R.string.search_failed
-            task.state is SearchState.Stopped -> R.string.search_stopped
+            task.status is SearchStatus.Stopped -> R.string.search_stopped
             task.result.isEmpty -> R.string.search_empty
             else -> R.string.search_succeed
         }

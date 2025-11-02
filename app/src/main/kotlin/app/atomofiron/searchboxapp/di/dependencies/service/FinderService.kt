@@ -14,7 +14,6 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.GenericSearchTask
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
-import app.atomofiron.searchboxapp.model.finder.SearchState
 import app.atomofiron.searchboxapp.work.FinderWorker
 import kotlinx.coroutines.CoroutineScope
 import java.util.UUID
@@ -52,9 +51,6 @@ class FinderService(
     }
 
     fun stop(uuid: UUID) {
-        finderStore {
-            update(uuid, SearchState.Stopping)
-        }
         workManager.cancelWorkById(uuid)
     }
 

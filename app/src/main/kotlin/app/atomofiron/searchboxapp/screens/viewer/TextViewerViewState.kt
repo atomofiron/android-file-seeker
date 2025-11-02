@@ -86,7 +86,7 @@ class TextViewerViewState(
         val cursor = matchesCursor.value
         val result = currentTask.value?.result
         result ?: return none
-        val matchesMap = result.matchesMap
+        val matches = result.matches
         val indexes = result.indexes
         if (cursor == null) {
             matchesCursor.value = MatchCursor(lineIndex = indexes.first(), matchIndex = 0)
@@ -98,7 +98,7 @@ class TextViewerViewState(
 
         if (increment) {
             matchIndex++
-            val matches = matchesMap[lineIndex] ?: return none
+            val matches = matches[lineIndex] ?: return none
             if (matchIndex == matches.size) {
                 var index = indexes.indexOf(lineIndex)
                 index = index.inc() % indexes.size
@@ -112,7 +112,7 @@ class TextViewerViewState(
                 if (index < 0) return none
                 index = indexes.run { (size + index.dec()) % size }
                 lineIndex = indexes[index]
-                matchIndex = matchesMap[lineIndex]!!.lastIndex
+                matchIndex = matches[lineIndex]!!.lastIndex
             }
         }
         if (lineIndex > textLines.value.lastIndex) {
