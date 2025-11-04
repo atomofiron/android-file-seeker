@@ -7,7 +7,6 @@ edition = "2021"
 name = "native_lib"
 crate-type = [
     "cdylib", # for lib.so
-    "rlib", # for binary
     #"staticlib", for ios?
 ]
 
