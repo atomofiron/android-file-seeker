@@ -39,15 +39,18 @@ import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
+import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toProperties
 import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.ifCanNotice
 import app.atomofiron.searchboxapp.utils.mutate
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
+import uniffi.native_lib.CancellationState
 import uniffi.native_lib.Meta
 import uniffi.native_lib.NameSearchProgress
 import uniffi.native_lib.SimpleResult
@@ -87,6 +90,9 @@ class FinderWorker(
     private lateinit var task: FilesSearchTask
     private val taskId = id
     private lateinit var cacheConfig: CacheConfig
+    private val cancellation = object : CancellationState {
+        override fun cancelled(): Boolean = !task.isProgress
+    }
 
     @Inject
     lateinit var finderStore: FinderStore
@@ -103,7 +109,7 @@ class FinderWorker(
 
     private fun Params.searchText(type: Params.Text) {
         val errors = GrowingList<Node>()
-        NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, asSu) { match ->
+        NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, asSu, cancellation) { match ->
             updateAsync {
                 val new = when (match) {
                     is TextSearchProgress.Ok -> {
@@ -137,13 +143,12 @@ class FinderWorker(
                 }
                 copyWith(result = new)
             }
-            task.inProgress
         }.apply()
     }
 
     private fun Params.searchNames(type: Params.Names) {
         val errors = GrowingList<Node>()
-        NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu) { match ->
+        NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu, cancellation) { match ->
             updateAsync {
                 when (match) {
                     is NameSearchProgress.Ok -> {
@@ -160,7 +165,7 @@ class FinderWorker(
                     is NameSearchProgress.Skip -> this
                 }
             }
-            task.inProgress
+            task.isProgress
         }.apply()
     }
 
@@ -202,7 +207,15 @@ class FinderWorker(
 
     private fun SimpleResult.apply() = updateAsync {
         val error = (this@apply as? SimpleResult.Err)?.v1
-        toEnded(error = error)
+        val stopped = isStopping
+        val ended = toEnded(error = error, removable = isStopping, stopped = stopped)
+        if (!isStopping) finderStore {
+            delay(Const.LONG_DELAY)
+            update {
+                toEnded(removable = true, stopped = stopped)
+            }
+        }
+        ended
     }
 
     private suspend fun work(params: Params): Result {
@@ -217,7 +230,7 @@ class FinderWorker(
         } catch (e: CancellationException) {
             updateAsync {
                 when {
-                    task.inProgress -> copy(status = SearchStatus.Stopping)
+                    task.isProgress -> copy(status = SearchStatus.Stopping)
                     else -> task
                 }
             }
@@ -256,7 +269,7 @@ class FinderWorker(
         }
         val titleId = when {
             task.error != null -> R.string.search_failed
-            task.status is SearchStatus.Stopped -> R.string.search_stopped
+            task.isStopped -> R.string.search_stopped
             task.result.isEmpty -> R.string.search_empty
             else -> R.string.search_succeed
         }

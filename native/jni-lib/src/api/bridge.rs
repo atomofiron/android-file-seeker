@@ -1,3 +1,4 @@
+use crate::api::cancellation::CancellationState;
 use crate::api::protocol::Check;
 use crate::api::protocol::{CommonProgressCollector, ComplexResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
 use crate::api::su_bridge::{as_su, as_su_with_progress};
@@ -44,8 +45,12 @@ pub fn delete_by(
 ) -> ComplexResult {
     if let Some(bin_path) = bin_path {
         let from_buf = path.clone().buf();
-        return as_su_with_progress(Request::Delete(path), bin_path, Box::new(collector))
-            .unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)));
+        return as_su_with_progress(
+            Request::Delete(path),
+            bin_path,
+            Arc::new(()),
+            Box::new(collector),
+        ).unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)));
     }
     let path = path.buf();
     match delete_impl(&path, collector) {
@@ -124,8 +129,12 @@ pub fn copy(
 ) -> ComplexResult {
     if let Some(bin_path) = bin_path {
         let from_buf = from.clone().buf();
-        return as_su_with_progress(Request::Copy(from, to, moving), bin_path, Box::new(collector))
-            .unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)))
+        return as_su_with_progress(
+            Request::Copy(from, to, moving),
+            bin_path,
+            Arc::new(()),
+            Box::new(collector),
+        ).unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)))
     }
     let from_buf = from.buf();
     match copy_impl(&from_buf, &to.buf(), moving, collector) {
@@ -141,13 +150,18 @@ pub fn find_names(
     max_depth: u32,
     exclude_dirs: bool,
     bin_path: Option<String>,
+    cancellation: Arc<dyn CancellationState>,
     collector: Arc<dyn NameSearchCollector>,
 ) -> SimpleResult {
     if let Some(bin_path) = bin_path {
-        return as_su_with_progress(Request::FindNames { query, targets, max_depth, exclude_dirs }, bin_path, Box::new(collector))
-            .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
+        return as_su_with_progress(
+            Request::FindNames { query, targets, max_depth, exclude_dirs },
+            bin_path,
+            cancellation,
+            Box::new(collector),
+        ).unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
     }
-    return find_names_impl(query, targets, max_depth as usize, exclude_dirs, collector);
+    return find_names_impl(query, targets, max_depth as usize, exclude_dirs, cancellation, collector);
 }
 
 #[uniffi::export]
@@ -157,11 +171,16 @@ pub fn find_text(
     max_depth: u32,
     check: Check,
     bin_path: Option<String>,
+    cancellation: Arc<dyn CancellationState>,
     collector: Arc<dyn TextSearchCollector>,
 ) -> SimpleResult {
     if let Some(bin_path) = bin_path {
-        return as_su_with_progress(Request::FindText { query, targets, max_depth, check }, bin_path, Box::new(collector))
-            .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
+        return as_su_with_progress(
+            Request::FindText { query, targets, max_depth, check },
+            bin_path,
+            cancellation,
+            Box::new(collector),
+        ).unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
     }
-    return find_text_impl(query, targets, max_depth as usize, check, collector);
+    return find_text_impl(query, targets, max_depth as usize, check, cancellation, collector);
 }

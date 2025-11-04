@@ -6,7 +6,11 @@ sealed class SearchStatus(
     val order: Int,
 ) {
     data object Progress : SearchStatus(running = true, removable = false, order = 0)
+
     data object Stopping : SearchStatus(running = true, removable = false, order = 1)
-    data class Stopped(override val removable: Boolean = true) : SearchStatus(running = false, removable = removable, order = 2)
-    data class Ended(override val removable: Boolean = true) : SearchStatus(running = false, removable = removable, order = 3)
+
+    data class Ended(
+        override val removable: Boolean = true,
+        val stopped: Boolean = false,
+    ) : SearchStatus(running = false, removable = removable, order = if (stopped) 2 else 3)
 }

@@ -78,7 +78,7 @@ class ResultViewState(
             matches.sortBy { !it.isDirectory }
             val newResult = result.copy(matches = matches)
             this.result.value = newResult
-            dock.reduce(task.inProgress, newResult, sorting, checked = checked.size)
+            dock.reduce(task.isProgress, newResult, sorting, checked = checked.size)
         }
     }
 

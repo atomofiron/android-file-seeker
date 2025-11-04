@@ -1,14 +1,14 @@
+use crate::api::cancellation::CancellationState;
 use crate::api::protocol::SimpleResult;
 use crate::api::su_protocol::{frame_length, from_len_frame, to_len_frame, ProgressProxy, Request, Response, FINAL_FRAME};
 use crate::common::{config, Rslt, OKI};
 use crate::ext::option::OptionExt;
-use crate::ext::result::ResultExt;
 use bincode::{decode_from_slice, encode_to_vec, Decode};
 use once_cell::sync::Lazy;
 use std::io;
 use std::io::{Error, Read, Write};
 use std::process::{Child, Command, ExitStatus, Stdio};
-use std::sync::Mutex;
+use std::sync::{Arc, Mutex};
 
 static CHILDREN: Lazy<Mutex<Vec<Child>>> = Lazy::new(|| {
     Mutex::new(Vec::new())
@@ -16,25 +16,30 @@ static CHILDREN: Lazy<Mutex<Vec<Child>>> = Lazy::new(|| {
 
 #[uniffi::export]
 fn try_as_su(bin_path: String) -> SimpleResult {
-    return as_su_impl::<(), SimpleResult>(Request::TryRun, bin_path, None)
+    return as_su_impl::<(), SimpleResult>(Request::TryRun, bin_path, Arc::new(()), None)
         .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
 }
 
-pub fn as_su<R: Decode<()>>(request: Request, bin_path: String) -> Rslt<R> {
-    as_su_impl::<(), R>(request, bin_path, None)
+pub fn as_su<R: Decode<()>>(
+    request: Request,
+    bin_path: String,
+) -> Rslt<R> {
+    as_su_impl::<(), R>(request, bin_path, Arc::new(()), None)
 }
 
 pub fn as_su_with_progress<P: Decode<()>, R: Decode<()>>(
     request: Request,
     bin_path: String,
+    cancellation: Arc<dyn CancellationState>,
     collector: Box<dyn ProgressProxy<P>>,
 ) -> Rslt<R> {
-    as_su_impl(request, bin_path, Some(collector))
+    as_su_impl(request, bin_path, cancellation, Some(collector))
 }
 
 fn as_su_impl<P: Decode<()>, R: Decode<()>>(
     request: Request,
     bin_path: String,
+    cancellation: Arc<dyn CancellationState>,
     collector: Option<Box<dyn ProgressProxy<P>>>,
 ) -> Rslt<R> {
     let mut child = {
@@ -50,7 +55,7 @@ fn as_su_impl<P: Decode<()>, R: Decode<()>>(
     stdin.flush()?;
 
     if let Some(collector) = collector {
-        read_progress(&mut child, collector)?;
+        read_progress(&mut child, cancellation, collector)?;
     }
 
     let stdout = child.stdout
@@ -69,7 +74,7 @@ fn as_su_impl<P: Decode<()>, R: Decode<()>>(
     let (response, _) = decode_from_slice::<Response,_>(&bytes, config())?;
     return match response {
         Response::Ok(bytes) => decode_from_slice::<R,_>(&bytes, config())
-            .map(|(r,_)| r).boxed(),
+            .map(|(r,_)| r).map_err(|e| e.into()),
         Response::Err(e) => Err(e.into()),
     };
 }
@@ -82,9 +87,16 @@ fn new_child(bin_path: String) -> io::Result<Child> {
         .spawn()
 }
 
-fn read_progress<P>(child: &mut Child, collector: Box<dyn ProgressProxy<P>>) -> Rslt<()> where P: Decode<()> {
+fn read_progress<P>(
+    child: &mut Child,
+    cancellation: Arc<dyn CancellationState>,
+    collector: Box<dyn ProgressProxy<P>>,
+) -> Rslt<()> where P: Decode<()> {
+    let pid = child.id() as i32;
+    let mut stopped = false;
     let stdout = child.stdout
-        .as_mut().ok_or("failed to open stdout for progress")?;
+        .as_mut()
+        .ok_or("failed to open stdout for progress")?;
     loop {
         let mut len_buf = frame_length();
         let read_result = stdout.read_exact(&mut len_buf);
@@ -98,9 +110,10 @@ fn read_progress<P>(child: &mut Child, collector: Box<dyn ProgressProxy<P>>) -> 
         let mut bytes = vec![0u8; len];
         stdout.read_exact(&mut bytes)?;
         let (progress, _) = decode_from_slice::<P,_>(&bytes, config())?;
-        let keep_doing = collector.emit(progress);
-        if !keep_doing {
-            return sigint(child);
+        collector.emit(progress);
+        if !stopped && cancellation.cancelled() {
+            stopped = true;
+            sigint(pid)?; // don't return, read until get FINAL_FRAME
         }
     }
 }
@@ -135,8 +148,7 @@ fn get_exit_code(status: io::Result<Option<ExitStatus>>) -> Rslt<String> {
         .ok_or_else(|| "null".into())
 }
 
-fn sigint(child: &Child) -> Rslt<()> {
-    let pid = child.id() as i32;
+fn sigint(pid: i32) -> Rslt<()> {
     let result = unsafe {
         libc::kill(pid, libc::SIGINT)
     };

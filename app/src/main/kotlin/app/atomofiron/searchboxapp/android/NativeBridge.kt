@@ -6,6 +6,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
+import uniffi.native_lib.CancellationState
 import uniffi.native_lib.Check
 import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CommonProgressCollector
@@ -110,7 +111,7 @@ object NativeBridge {
 
     fun delete(ref: NodeRef, asSu: Boolean): ComplexResult {
         val collector = object : CommonProgressCollector {
-            override fun emit(progress: CommonProgress) = true
+            override fun emit(progress: CommonProgress) = Unit
         }
         return uniffi.native_lib.deleteBy(ref.bytes, binPath = binPath.takeIf { asSu }, collector)
     }
@@ -120,7 +121,7 @@ object NativeBridge {
         to: NodeRef,
         move: Boolean = false,
         asSu: Boolean,
-        collector: (CommonProgress) -> Boolean,
+        collector: (CommonProgress) -> Unit,
     ): ComplexResult {
         val collector = object : CommonProgressCollector {
             override fun emit(progress: CommonProgress) = collector(progress)
@@ -134,21 +135,23 @@ object NativeBridge {
         maxDepth: Int,
         excludeDirs: Boolean,
         asSu: Boolean,
-        collector: (NameSearchProgress) -> Boolean,
+        cancellation: CancellationState,
+        collector: (NameSearchProgress) -> Unit,
     ): SimpleResult {
         val collector = object : NameSearchCollector {
             override fun emit(progress: NameSearchProgress) = collector(progress)
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
-        return uniffi.native_lib.findNames(query, targets.map { it.bytes }, maxDepth.toUInt(), excludeDirs, binPath = binPath.takeIf { asSu }, collector)
+        return uniffi.native_lib.findNames(query, targets.map { it.bytes }, maxDepth.toUInt(), excludeDirs, binPath = binPath.takeIf { asSu }, cancellation, collector)
     }
 
     fun findLocalText(
         params: QueryParams,
         target: NodeRef,
         asSu: Boolean,
-        collector: (TextSearchProgress) -> Boolean,
-    ): SimpleResult = findText(params, listOf(target), maxDepth = 1, Check.No, asSu, collector)
+        cancellation: CancellationState,
+        collector: (TextSearchProgress) -> Unit,
+    ): SimpleResult = findText(params, listOf(target), maxDepth = 1, Check.No, asSu, cancellation, collector)
 
     fun findText(
         params: QueryParams,
@@ -156,8 +159,9 @@ object NativeBridge {
         maxDepth: Int,
         maxSize: Long,
         asSu: Boolean,
-        collector: (TextSearchProgress) -> Boolean,
-    ): SimpleResult = findText(params, targets, maxDepth, Check.Yes(maxSize.toULong()), asSu, collector)
+        cancellation: CancellationState,
+        collector: (TextSearchProgress) -> Unit,
+    ): SimpleResult = findText(params, targets, maxDepth, Check.Yes(maxSize.toULong()), asSu, cancellation, collector)
 
     private fun findText(
         params: QueryParams,
@@ -165,13 +169,14 @@ object NativeBridge {
         maxDepth: Int,
         check: Check,
         asSu: Boolean,
-        collector: (TextSearchProgress) -> Boolean,
+        cancellation: CancellationState,
+        collector: (TextSearchProgress) -> Unit,
     ): SimpleResult {
         val collector = object : TextSearchCollector {
             override fun emit(progress: TextSearchProgress) = collector(progress)
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
-        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), check, binPath = binPath.takeIf { asSu }, collector)
+        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), check, binPath = binPath.takeIf { asSu }, cancellation, collector)
     }
 }
 

@@ -47,7 +47,7 @@ class SearchAdapterPresenterDelegate(
     override fun onSearchClick(value: String) {
         val config = viewState.toggles.value
         val params = QueryParams(value, regex = config.regex, ignoreCase = config.ignoreCase)
-        interactor.search(viewState.item.value, params)
+        interactor.search(viewState.item.value.ref, params)
     }
 
     override fun onEditCharacters(new: List<String>) = preferences { setSpecialCharacters(new.toTypedArray()) }
@@ -61,7 +61,7 @@ class SearchAdapterPresenterDelegate(
     }
 
     override fun onProgressRemoveClick(item: FinderStateItem.Task<SearchResult.Text>) {
-        interactor.removeTask(viewState.item.value, item.task.uniqueId)
+        interactor.removeTask(viewState.item.value.ref, item.task.uniqueId)
         viewState.dropTask()
     }
 

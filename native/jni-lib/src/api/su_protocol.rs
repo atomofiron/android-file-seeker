@@ -51,26 +51,26 @@ pub fn from_len_frame(buf: FrameLength) -> usize {
 }
 
 pub trait ProgressProxy<D> : Send + Sync {
-    fn emit(&self, progress: D) -> bool;
+    fn emit(&self, progress: D);
 }
 
 impl ProgressProxy<CommonProgress> for Arc<dyn CommonProgressCollector> {
 
-    fn emit(&self, progress: CommonProgress) -> bool {
+    fn emit(&self, progress: CommonProgress) {
         CommonProgressCollector::emit(self.as_ref(), progress)
     }
 }
 
 impl ProgressProxy<NameSearchProgress> for Arc<dyn NameSearchCollector> {
 
-    fn emit(&self, progress: NameSearchProgress) -> bool {
+    fn emit(&self, progress: NameSearchProgress) {
         NameSearchCollector::emit(self.as_ref(), progress)
     }
 }
 
 impl ProgressProxy<TextSearchProgress> for Arc<dyn TextSearchCollector> {
 
-    fn emit(&self, progress: TextSearchProgress) -> bool {
+    fn emit(&self, progress: TextSearchProgress) {
         TextSearchCollector::emit(self.as_ref(), progress)
     }
 }

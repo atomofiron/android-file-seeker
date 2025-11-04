@@ -1,3 +1,4 @@
+use crate::api::cancellation::CancellationState;
 use crate::ext::raw_path::{RawPath, RawPathExt};
 use ignore::{DirEntry, WalkBuilder, WalkState};
 use std::sync::mpsc::Sender;
@@ -7,6 +8,7 @@ pub fn walk<F, P: Send + Sync>(
     targets: Vec<RawPath>,
     sender: &Sender<P>,
     max_depth: usize,
+    cancellation: Arc<dyn CancellationState>,
     action: F,
 ) where
     F: Fn(DirEntry, &Sender<P>) -> WalkState + Send + Sync,
@@ -42,7 +44,11 @@ pub fn walk<F, P: Send + Sync>(
     walker.run(|| {
         let action = Arc::clone(&action);
         let sender = Arc::clone(&sender);
+        let cancellation = cancellation.clone();
         Box::new(move |result| {
+            if cancellation.cancelled() {
+                return WalkState::Quit;
+            }
             match result {
                 Ok(entry) => action(entry, &sender),
                 Err(_) => WalkState::Continue, // .gitignore errors (unreachable)

@@ -2,23 +2,22 @@ use crate::api::bridge::{copy, create_dir, create_file, delete_by, find_names, f
 use crate::api::protocol::{CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SimpleResult, TextSearchCollector, TextSearchProgress};
 use crate::api::su_protocol::{frame_length, from_len_frame, to_len_frame, Request, Response, FINAL_FRAME};
 use crate::common::{config, Rslt};
-use crate::ext::encode::EncodeExt;
+use crate::ext::encode::{EncodeExt, EncodedResult};
 use crate::ext::result::ResultExt;
-use bincode::error::EncodeError;
 use bincode::{decode_from_slice, enc, encode_to_vec};
 use std::io::{stdin, stdout, Read, Write};
 use std::sync::Arc;
-use std::sync::atomic::{AtomicBool, Ordering};
+use crate::api::cancellation::{CancellationHandle, CancellationState};
 
 #[no_mangle]
 pub extern "C" fn lib_main() {
-    let flag = Arc::new(AtomicBool::new(true));
-    let toggle = flag.clone();
-    ctrlc::set_handler(move || toggle.store(false, Ordering::Relaxed))
+    let cancellation = Arc::new(CancellationHandle::new());
+    let canceller = cancellation.clone();
+    ctrlc::set_handler(move || canceller.cancel()) // todo doesn't work?
         .expect("error setting SIGINT handler");
     loop {
         let result = get_request()
-            .and_then(|r| run(r, flag.clone()).boxed());
+            .and_then(|r| run(r, cancellation.clone()).boxed());
         let response = match result {
             Ok(bytes) => Response::Ok(bytes),
             Err(e) => Response::Err(e.to_string()),
@@ -38,7 +37,7 @@ fn get_request() -> Rslt<Request> {
         .map(|(r,_)| r).boxed()
 }
 
-fn run(request: Request, flag: Arc<AtomicBool>) -> Result<Vec<u8>, EncodeError> {
+fn run(request: Request, cancellation: Arc<dyn CancellationState>) -> EncodedResult {
     match request {
         Request::TryRun => SimpleResult::Ok.to_bytes(),
         Request::GetUsage(arg) => get_usage(arg, None).to_bytes(),
@@ -49,22 +48,22 @@ fn run(request: Request, flag: Arc<AtomicBool>) -> Result<Vec<u8>, EncodeError> 
         Request::CreateDir(arg) => create_dir(arg, None).to_bytes(),
         Request::CreateFile(arg) => create_file(arg, None).to_bytes(),
         Request::Delete(arg) => {
-            let result = delete_by(arg, None, StdoutProgressWriter::arc(flag));
+            let result = delete_by(arg, None, StdoutProgressWriter::arc());
             write_the_end();
             result.to_bytes()
         },
         Request::Copy(from, to, moving) => {
-            let result = copy(from, to, moving, None, StdoutProgressWriter::arc(flag));
+            let result = copy(from, to, moving, None, StdoutProgressWriter::arc());
             write_the_end();
             result.to_bytes()
         },
         Request::FindNames { query, targets, max_depth, exclude_dirs: exclude_dir } => {
-            let result = find_names(query, targets, max_depth, exclude_dir, None, StdoutProgressWriter::arc(flag));
+            let result = find_names(query, targets, max_depth, exclude_dir, None, cancellation, StdoutProgressWriter::arc());
             write_the_end();
             result.to_bytes()
         }
         Request::FindText { query, targets, max_depth, check } => {
-            let result = find_text(query, targets, max_depth, check, None, StdoutProgressWriter::arc(flag));
+            let result = find_text(query, targets, max_depth, check, None, cancellation, StdoutProgressWriter::arc());
             write_the_end();
             result.to_bytes()
         }
@@ -85,41 +84,39 @@ fn write_response<E>(response: E) where E: enc::Encode {
 }
 
 fn write_the_end() {
-    stdout().write_all(&FINAL_FRAME)
+    let mut stdout = stdout();
+    stdout.write_all(&FINAL_FRAME)
         .expect("write_all final failed");
+    stdout.flush()
+        .expect("flush failed");
 }
 
-struct StdoutProgressWriter {
-    flag: Arc<AtomicBool>,
-}
+struct StdoutProgressWriter;
 
 impl StdoutProgressWriter {
 
-    pub fn arc(flag: Arc<AtomicBool>) -> Arc<Self> {
-        Arc::new(StdoutProgressWriter { flag })
+    pub fn arc() -> Arc<Self> {
+        Arc::new(StdoutProgressWriter { })
     }
 }
 
 impl <'l>CommonProgressCollector for StdoutProgressWriter {
 
-    fn emit(&self, progress: CommonProgress) -> bool {
+    fn emit(&self, progress: CommonProgress) {
         write_response(progress);
-        self.flag.load(Ordering::Relaxed)
     }
 }
 
 impl <'l>NameSearchCollector for StdoutProgressWriter {
 
-    fn emit(&self, progress: NameSearchProgress) -> bool {
+    fn emit(&self, progress: NameSearchProgress) {
         write_response(progress);
-        self.flag.load(Ordering::Relaxed)
     }
 }
 
 impl <'l>TextSearchCollector for StdoutProgressWriter {
 
-    fn emit(&self, progress: TextSearchProgress) -> bool {
+    fn emit(&self, progress: TextSearchProgress) {
         write_response(progress);
-        self.flag.load(Ordering::Relaxed)
     }
 }

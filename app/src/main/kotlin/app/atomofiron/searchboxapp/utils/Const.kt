@@ -22,6 +22,7 @@ object Const {
 
     const val UNDEFINED = -1
     const val COMMON_DURATION = 512L
+    const val LONG_DELAY = 512L
     const val COMMON_DELAY = 256L
     const val SMALL_DELAY = 128L
     const val MINI_DELAY = 64L

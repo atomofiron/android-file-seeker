@@ -20,32 +20,32 @@ class TextViewerInteractor(
     fun fetchFileSession(ref: NodeRef): TextViewerSession = textViewerService.getFileSession(ref)
 
     /** invoke the callback after success */
-    fun readFileToLine(item: Node, index: Int, callback: (() -> Unit)? = null) {
+    fun readFileToLine(ref: NodeRef, index: Int, callback: (() -> Unit)? = null) {
         scope.launch(context) {
-            textViewerService.readFile(item, index) { success ->
+            textViewerService.readFile(ref, index) { success ->
                 if (success) callback?.invoke()
             }
         }
     }
 
-    fun fetchTask(item: Node, taskId: UUID, callback: (TextSearchTask) -> Unit) {
+    fun fetchTask(ref: NodeRef, taskId: UUID, callback: (TextSearchTask) -> Unit) {
         scope.launch {
-            val task = textViewerService.fetchTask(item, taskId)
+            val task = textViewerService.fetchTask(ref, taskId)
             task?.let(callback)
         }
     }
 
-    fun search(item: Node, params: QueryParams) {
+    fun search(ref: NodeRef, params: QueryParams) {
         scope.launch(Dispatchers.IO) {
-            textViewerService.search(item, params)
+            textViewerService.search(ref, params)
         }
     }
 
-    fun removeTask(item: Node, taskId: Int) {
+    fun removeTask(ref: NodeRef, taskId: Int) {
         scope.launch {
-            textViewerService.removeTask(item, taskId)
+            textViewerService.removeTask(ref, taskId)
         }
     }
 
-    fun closeSession(item: Node) = textViewerService.closeSession(item)
+    fun closeSession(ref: NodeRef) = textViewerService.closeSession(ref)
 }

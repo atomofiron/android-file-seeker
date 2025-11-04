@@ -9,13 +9,10 @@ pub fn proxy_progress<D : Send + Sync + 'static>(
 ) -> Rslt<JoinHandle<()>> {
     let handle = std::thread::spawn(move || {
         loop {
-            let keep_doing = match rx.recv() {
+            match rx.recv() {
                 Ok(progress) => collector.emit(progress),
                 Err(_) => break,
             };
-            if !keep_doing {
-                break;
-            }
         }
     });
     return Ok(handle);

@@ -28,6 +28,7 @@ import app.atomofiron.searchboxapp.utils.removeOneIf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import uniffi.native_lib.CancellationState
 import uniffi.native_lib.SimpleResult
 import uniffi.native_lib.TextSearchProgress
 import java.util.UUID
@@ -39,16 +40,19 @@ class TextViewerService(
     private val explorerStore: ExplorerStore,
     private val finderStore: FinderStore,
 ) {
+    private val NotCancelable = object : CancellationState { // todo make cancelable
+        override fun cancelled(): Boolean = false
+    }
     private val asSu: Boolean get() = preferences.asSu.value
 
     fun getFileSession(ref: NodeRef): TextViewerSession {
         val item = explorerStore.currentItems.find { it.ref == ref }
             ?: Node(ref, content = NodeContent.Undefined)
-        var session = findSession(item)
+        var session = findSession(item.ref)
         if (session == null) {
             session = TextViewerSession(item)
             store.sessions[item.uniqueId] = session
-            scope.launch(Dispatchers.IO) { readFile(item) }
+            scope.launch(Dispatchers.IO) { readFile(item.ref) }
         }
         if (!item.isCached) {
             scope.launch(Dispatchers.IO) {
@@ -59,29 +63,34 @@ class TextViewerService(
         return session
     }
 
-    suspend fun fetchTask(item: Node, taskId: UUID): TextSearchTask? {
+    suspend fun fetchTask(ref: NodeRef, taskId: UUID): TextSearchTask? {
         val finderTask = finderStore.tasks.find { it.uuid == taskId }
         finderTask ?: return null
-        val session = findSession(item)
+        val session = findSession(ref)
         session ?: return null
         val result = finderTask.result as SearchResult.Files
         val itemMatch = result.matches.find {
-            it.item.uniqueId == item.uniqueId
+            it.item.uniqueId == ref.uniqueId
         } as? ItemMatch.Many
         itemMatch ?: return null
-        val task = SearchTask(
+        val task = finderTask.copy(
             finderTask.query,
             Text(itemMatch.count, itemMatch.matches),
             finderTask.uuid,
-            SearchStatus.Ended(removable = false),
-        )
+            finderTask.status.toLocal(),
+        ) as TextSearchTask
         session.tasks { add(task) }
         return task
     }
 
+    private fun SearchStatus.toLocal() = when (this) {
+        is SearchStatus.Ended -> copy(removable = false)
+        else -> this
+    }
+
     /** @return true if success */
-    suspend fun readFile(item: Node, targetLineIndex: Int = 0, callback: ((Boolean) -> Unit)? = null) {
-        val session = findSession(item)
+    suspend fun readFile(ref: NodeRef, targetLineIndex: Int = 0, callback: ((Boolean) -> Unit)? = null) {
+        val session = findSession(ref)
         if (session == null) {
             callback?.invoke(false)
             return
@@ -96,25 +105,25 @@ class TextViewerService(
         callback?.invoke(true)
     }
 
-    fun closeSession(item: Node) {
-        val session = store.sessions.remove(item.uniqueId)
+    fun closeSession(ref: NodeRef) {
+        val session = store.sessions.remove(ref.uniqueId)
         session?.reader?.close()
     }
 
-    suspend fun removeTask(item: Node, taskId: Int) {
-        findSession(item)?.tasks {
+    suspend fun removeTask(ref: NodeRef, taskId: Int) {
+        findSession(ref)?.tasks {
             removeOneIf { it.uniqueId == taskId }
         }
     }
 
-    suspend fun search(item: Node, params: QueryParams) {
-        val session = findSession(item) ?: return
+    suspend fun search(ref: NodeRef, params: QueryParams) {
+        val session = findSession(ref) ?: return
         val uuid = SearchTask(params, Text()).also {
             session.tasks { add(it) }
         }.uuid
         var count = 0
         val matches: MutableMatchMap = hashMapOf()
-        val result = NativeBridge.findLocalText(params, item.ref, asSu) { match ->
+        val result = NativeBridge.findLocalText(params, ref, asSu, NotCancelable) { match ->
             session.update(uuid) {
                 when (match) {
                     is TextSearchProgress.Ok -> {
@@ -134,7 +143,7 @@ class TextViewerService(
         }
     }
 
-    private fun findSession(item: Node): TextViewerSession? = store.sessions[item.uniqueId]
+    private fun findSession(ref: NodeRef): TextViewerSession? = store.sessions[ref.uniqueId]
 
     private suspend fun TextViewerSession.readNextLines() {
         val reader = reader ?: return

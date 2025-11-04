@@ -37,9 +37,8 @@ class TaskHolder<Result : SearchResult>(
             val item = item
             when (item.task.status) {
                 is SearchStatus.Progress -> listener.onProgressStopClick(item)
-                is SearchStatus.Stopping -> Unreachable
-                is SearchStatus.Stopped,
                 is SearchStatus.Ended -> listener.onProgressRemoveClick(item)
+                is SearchStatus.Stopping -> Unreachable
             }
         }
         binding.params.setSingleLine()
@@ -51,15 +50,14 @@ class TaskHolder<Result : SearchResult>(
         val task = item.task
         params.setParams(task.query)
         status.setStatus(task.result)
-        action.isActivated = !task.inProgress
+        action.isActivated = !task.isProgress
         progress.isInvisible = !task.status.running
-        progress.setSpeed(if (task.inProgress) Speed.Medium else Speed.Slow)
+        progress.setSpeed(if (task.isProgress) Speed.Medium else Speed.Slow)
 
         val idLabel = if (task.isError) R.string.error else when (task.status) {
             is SearchStatus.Progress -> R.string.started
             is SearchStatus.Stopping -> R.string.stopping
-            is SearchStatus.Stopped -> R.string.stopped
-            is SearchStatus.Ended -> R.string.completed
+            is SearchStatus.Ended -> if (task.status.stopped) R.string.stopped else R.string.completed
         }
         val colorLabel = when {
             task.isError -> context.findColorByAttr(MaterialAttr.colorError)
@@ -73,7 +71,7 @@ class TaskHolder<Result : SearchResult>(
             else -> R.string.remove
         }
         action.setText(idAction)
-        action.isEnabled = task.inProgress || task.status.removable
+        action.isEnabled = task.isProgress || task.status.removable
         itemView.isEnabled = item.clickableIfEmpty || !task.result.isEmpty
     }
 

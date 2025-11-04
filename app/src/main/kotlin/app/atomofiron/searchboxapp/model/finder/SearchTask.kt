@@ -16,22 +16,21 @@ data class SearchTask<Result : SearchResult>(
     val uniqueId: Int get() = uuid.hashCode()
     val count: Int = result.count
 
-    val inProgress: Boolean get() = status is SearchStatus.Progress
+    val isProgress: Boolean get() = status is SearchStatus.Progress
+    val isStopping: Boolean get() = status is SearchStatus.Stopping
     val isEnded: Boolean get() = status is SearchStatus.Ended
-    val isStopped: Boolean get() = status is SearchStatus.Stopped
+    val isStopped: Boolean get() = status is SearchStatus.Ended && status.stopped
     val isError: Boolean get() = status is SearchStatus.Ended && error != null
 
     fun copyWith(result: Result): SearchTask<Result> = copy(result = result)
 
     fun toEnded(
-        isStopped: Boolean = this.status is SearchStatus.Stopping,
         result: Result = this.result,
         error: String? = this.error,
+        stopped: Boolean = false,
+        removable: Boolean = true,
     ): SearchTask<Result> {
-        val state = when {
-            isStopped -> SearchStatus.Stopped()
-            else -> SearchStatus.Ended()
-        }
+        val state = SearchStatus.Ended(removable = removable, stopped = stopped)
         return copy(status = state, result = result, error = error)
     }
 

@@ -121,19 +121,19 @@ pub struct TypedMeta {
 
 #[uniffi::export(with_foreign)]
 pub trait CommonProgressCollector: Send + Sync {
-    fn emit(&self, progress: CommonProgress) -> bool;
+    fn emit(&self, progress: CommonProgress);
 }
 
 impl CommonProgressCollector for () {
-    fn emit(&self, _: CommonProgress) -> bool { true }
+    fn emit(&self, _: CommonProgress) { }
 }
 
 #[uniffi::export(with_foreign)]
 pub trait NameSearchCollector: Send + Sync {
-    fn emit(&self, progress: NameSearchProgress) -> bool;
+    fn emit(&self, progress: NameSearchProgress);
 }
 
 #[uniffi::export(with_foreign)]
 pub trait TextSearchCollector: Send + Sync {
-    fn emit(&self, progress: TextSearchProgress) -> bool;
+    fn emit(&self, progress: TextSearchProgress);
 }

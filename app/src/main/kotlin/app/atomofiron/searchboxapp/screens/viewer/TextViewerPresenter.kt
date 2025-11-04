@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.viewer
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteractor
-import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
@@ -25,12 +25,12 @@ class TextViewerPresenter(
     FinderAdapterOutput<SearchResult.Text> by searchDelegate
 {
 
-    private val item: Node get() = viewState.item.value
+    private val itemRef: NodeRef get() = viewState.item.value.ref
 
     init {
         session.loading.collect(scope, viewState::setLoading)
         params.initialTaskId?.let { taskId ->
-            interactor.fetchTask(item, taskId) { task ->
+            interactor.fetchTask(itemRef, taskId) { task ->
                 viewState.trySelectTask(task)
             }
         }
@@ -38,12 +38,12 @@ class TextViewerPresenter(
 
     override fun onCleared() {
         super.onCleared()
-        interactor.closeSession(item)
+        interactor.closeSession(itemRef)
     }
 
     override fun onSubscribeData() = Unit
 
-    override fun onLineVisible(index: Int) = interactor.readFileToLine(item, index)
+    override fun onLineVisible(index: Int) = interactor.readFileToLine(itemRef, index)
 
     override fun onNavigationClick(): Boolean = when (viewState.currentTask.value) {
         null -> super.onNavigationClick()
@@ -65,7 +65,7 @@ class TextViewerPresenter(
     fun onNextClick() {
         val requiredLineIndex = viewState.changeCursor(increment = true)
         if (requiredLineIndex >= 0) {
-            interactor.readFileToLine(item, requiredLineIndex) {
+            interactor.readFileToLine(itemRef, requiredLineIndex) {
                 viewState.changeCursor(increment = true)
             }
         }
