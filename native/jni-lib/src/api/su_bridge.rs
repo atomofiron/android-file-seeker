@@ -154,6 +154,6 @@ fn sigint(pid: i32) -> Rslt<()> {
     };
     return match result {
         OKI => Ok(()),
-        _ => Err("failed to open stdin for stop signal".into()),
+        _ => Err("failed to send SIGINT".into()),
     };
 }

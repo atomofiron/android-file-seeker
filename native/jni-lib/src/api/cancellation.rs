@@ -19,6 +19,10 @@ impl CancellationHandle {
         self.cancelled.store(true, Ordering::Relaxed);
     }
 
+    pub fn reset(&self) {
+        self.cancelled.store(false, Ordering::Relaxed);
+    }
+
     pub fn is_cancelled(&self) -> bool {
         self.cancelled.load(Ordering::Relaxed)
     }

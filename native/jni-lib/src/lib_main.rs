@@ -18,6 +18,7 @@ pub extern "C" fn lib_main() {
     loop {
         let result = get_request()
             .and_then(|r| run(r, cancellation.clone()).boxed());
+        cancellation.reset();
         let response = match result {
             Ok(bytes) => Response::Ok(bytes),
             Err(e) => Response::Err(e.to_string()),
