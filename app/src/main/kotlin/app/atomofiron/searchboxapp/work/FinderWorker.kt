@@ -139,7 +139,13 @@ class FinderWorker(
                         errors.add(match.v1.toNode())
                         result.copy(errors = errors.fetch())
                     }
-                    is TextSearchProgress.End -> result.copy(countTotal = result.countTotal.inc())
+                    is TextSearchProgress.End -> {
+                        val contains = result.matches.any { it.item.ref.theSame(match.v1) }
+                        when {
+                            contains -> return@updateAsync this
+                            else -> result.copy(countTotal = result.countTotal.inc())
+                        }
+                    }
                 }
                 copyWith(result = new)
             }
