@@ -1,7 +1,7 @@
-use std::sync::Arc;
-use bincode::{Decode, Encode};
-use crate::api::protocol::{NameSearchCollector, NameSearchProgress, CommonProgress, CommonProgressCollector, SearchQuery, TextSearchCollector, TextSearchProgress, Check};
+use crate::api::protocol::{Check, CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SearchQuery, TextSearchCollector, TextSearchProgress};
 use crate::ext::raw_path::RawPath;
+use bincode::{Decode, Encode};
+use std::sync::Arc;
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 pub enum Request {
@@ -35,19 +35,26 @@ pub enum Response {
     Err(String),
 }
 
-const CONTROL_FRAME_LEN: usize = 4;
-pub type FrameLength = [u8; CONTROL_FRAME_LEN];
+pub const CONTROL_FRAME_LEN: usize = 4;
+pub type ControlFrame = [u8; CONTROL_FRAME_LEN];
 
-pub const FINAL_FRAME: FrameLength = [0; CONTROL_FRAME_LEN];
+pub const PID_FRAME: ControlFrame = [0; CONTROL_FRAME_LEN];
+pub const FINAL_FRAME: ControlFrame = [0; CONTROL_FRAME_LEN];
 
-pub fn frame_length() -> FrameLength { [0; CONTROL_FRAME_LEN] }
+pub fn control_frame() -> ControlFrame {
+    [0; CONTROL_FRAME_LEN]
+}
 
-pub fn to_len_frame(size: usize) -> FrameLength {
+pub fn len_to_frame(size: usize) -> ControlFrame {
     (size as u32).to_le_bytes()
 }
 
-pub fn from_len_frame(buf: FrameLength) -> usize {
-    u32::from_le_bytes(buf) as usize
+pub fn pid_to_frame(size: u32) -> ControlFrame {
+    size.to_le_bytes()
+}
+
+pub fn from_control_frame(buf: ControlFrame) -> u32 {
+    u32::from_le_bytes(buf)
 }
 
 pub trait ProgressProxy<D> : Send + Sync {

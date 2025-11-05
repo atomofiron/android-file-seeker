@@ -1,19 +1,24 @@
 use crate::api::bridge::{copy, create_dir, create_file, delete_by, find_names, find_text, get_file_type, get_file_types, get_meta, get_metas, get_usage};
+use crate::api::cancellation::{CancellationHandle, CancellationState};
 use crate::api::protocol::{CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SimpleResult, TextSearchCollector, TextSearchProgress};
-use crate::api::su_protocol::{frame_length, from_len_frame, to_len_frame, Request, Response, FINAL_FRAME};
+use crate::api::su_protocol::{control_frame, from_control_frame, len_to_frame, pid_to_frame, Request, Response, FINAL_FRAME};
 use crate::common::{config, Rslt};
 use crate::ext::encode::{EncodeExt, EncodedResult};
 use crate::ext::result::ResultExt;
 use bincode::{decode_from_slice, enc, encode_to_vec};
 use std::io::{stdin, stdout, Read, Write};
 use std::sync::Arc;
-use crate::api::cancellation::{CancellationHandle, CancellationState};
 
 #[no_mangle]
 pub extern "C" fn lib_main() {
+    let pid_frame = pid_to_frame(std::process::id());
+    stdout().write_all(&pid_frame)
+        .expect("write pid failed");
+    stdout().flush()
+        .expect("flush pid failed");
     let cancellation = Arc::new(CancellationHandle::new());
     let canceller = cancellation.clone();
-    ctrlc::set_handler(move || canceller.cancel()) // todo doesn't work?
+    ctrlc::set_handler(move || canceller.cancel())
         .expect("error setting SIGINT handler");
     loop {
         let result = get_request()
@@ -29,9 +34,9 @@ pub extern "C" fn lib_main() {
 
 fn get_request() -> Rslt<Request> {
     let mut stdin = stdin();
-    let mut len_buf = frame_length();
+    let mut len_buf = control_frame();
     stdin.read_exact(&mut len_buf)?;
-    let len = from_len_frame(len_buf);
+    let len = from_control_frame(len_buf) as usize;
     let mut bytes = vec![0u8; len];
     stdin.read_exact(&mut bytes)?;
     return decode_from_slice::<Request, _>(&bytes, config())
@@ -73,23 +78,23 @@ fn run(request: Request, cancellation: Arc<dyn CancellationState>) -> EncodedRes
 
 fn write_response<E>(response: E) where E: enc::Encode {
     let bytes = encode_to_vec(response, config())
-        .expect("encode_to_vec failed");
+        .expect("encode response failed");
     let mut stdout = stdout();
-    let len_buf = to_len_frame(bytes.len());
+    let len_buf = len_to_frame(bytes.len());
     stdout.write_all(&len_buf)
-        .expect("write_all len failed");
+        .expect("write len failed");
     stdout.write_all(&bytes)
-        .expect("write_all bytes failed");
+        .expect("write bytes failed");
     stdout.flush()
-        .expect("flush failed");
+        .expect("flush response failed");
 }
 
 fn write_the_end() {
     let mut stdout = stdout();
     stdout.write_all(&FINAL_FRAME)
-        .expect("write_all final failed");
+        .expect("write final failed");
     stdout.flush()
-        .expect("flush failed");
+        .expect("flush final frame failed");
 }
 
 struct StdoutProgressWriter;

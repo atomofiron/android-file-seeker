@@ -1,7 +1,7 @@
 use crate::api::cancellation::CancellationState;
 use crate::api::protocol::SimpleResult;
-use crate::api::su_protocol::{frame_length, from_len_frame, to_len_frame, ProgressProxy, Request, Response, FINAL_FRAME};
-use crate::common::{config, Rslt, OKI};
+use crate::api::su_protocol::{control_frame, from_control_frame, len_to_frame, ProgressProxy, Request, Response, FINAL_FRAME};
+use crate::common::{config, Rslt};
 use crate::ext::option::OptionExt;
 use bincode::{decode_from_slice, encode_to_vec, Decode};
 use once_cell::sync::Lazy;
@@ -10,7 +10,7 @@ use std::io::{Error, Read, Write};
 use std::process::{Child, Command, ExitStatus, Stdio};
 use std::sync::{Arc, Mutex};
 
-static CHILDREN: Lazy<Mutex<Vec<Child>>> = Lazy::new(|| {
+static CHILDREN: Lazy<Mutex<Vec<(Child, u32)>>> = Lazy::new(|| {
     Mutex::new(Vec::new())
 });
 
@@ -42,34 +42,34 @@ fn as_su_impl<P: Decode<()>, R: Decode<()>>(
     cancellation: Arc<dyn CancellationState>,
     collector: Option<Box<dyn ProgressProxy<P>>>,
 ) -> Rslt<R> {
-    let mut child = {
+    let (mut child, pid) = {
         CHILDREN.lock()?.pop()
     }.or_then(|| new_child(bin_path))?;
 
     let bytes = encode_to_vec(request, config())?;
     let stdin = child.stdin
         .as_mut().ok_or("failed to open stdin")?;
-    let len_buf = to_len_frame(bytes.len());
+    let len_buf = len_to_frame(bytes.len());
     stdin.write_all(&len_buf)?;
     stdin.write_all(&bytes)?;
     stdin.flush()?;
 
     if let Some(collector) = collector {
-        read_progress(&mut child, cancellation, collector)?;
+        read_progress(&mut child, pid as i32, cancellation, collector)?;
     }
 
     let stdout = child.stdout
         .as_mut().ok_or("failed to open stdout")?;
-    let mut len_buf = frame_length();
+    let mut len_buf = control_frame();
     let read_result = stdout.read_exact(&mut len_buf);
     if let Err(e) = read_result {
         return Err(get_error(&mut child, e))?;
     }
-    let len = from_len_frame(len_buf);
+    let len = from_control_frame(len_buf) as usize;
     let mut bytes = vec![0u8; len];
     stdout.read_exact(&mut bytes)?;
     {
-        CHILDREN.lock()?.push(child)
+        CHILDREN.lock()?.push((child, pid))
     }
     let (response, _) = decode_from_slice::<Response,_>(&bytes, config())?;
     return match response {
@@ -79,26 +79,33 @@ fn as_su_impl<P: Decode<()>, R: Decode<()>>(
     };
 }
 
-fn new_child(bin_path: String) -> io::Result<Child> {
-    Command::new("su").arg("-c").arg(bin_path)
+fn new_child(bin_path: String) -> Rslt<(Child, u32)> {
+    let mut child = su_command(bin_path)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
-        .spawn()
+        .spawn()?;
+    let mut pid_bytes = control_frame();
+    child.stdout.as_mut()
+        .ok_or("failed to open stdin")?
+        .read_exact(&mut pid_bytes)
+        .expect("read pid failed");
+    let pid = from_control_frame(pid_bytes);
+    return Ok((child, pid));
 }
 
 fn read_progress<P>(
     child: &mut Child,
+    pid: i32,
     cancellation: Arc<dyn CancellationState>,
     collector: Box<dyn ProgressProxy<P>>,
 ) -> Rslt<()> where P: Decode<()> {
-    let pid = child.id() as i32;
     let mut stopped = false;
     let stdout = child.stdout
         .as_mut()
         .ok_or("failed to open stdout for progress")?;
     loop {
-        let mut len_buf = frame_length();
+        let mut len_buf = control_frame();
         let read_result = stdout.read_exact(&mut len_buf);
         if let Err(e) = read_result {
             return Err(get_error(child, e))?;
@@ -106,14 +113,15 @@ fn read_progress<P>(
         if len_buf == FINAL_FRAME {
             return Ok(());
         }
-        let len = from_len_frame(len_buf);
+        let len = from_control_frame(len_buf) as usize;
         let mut bytes = vec![0u8; len];
         stdout.read_exact(&mut bytes)?;
         let (progress, _) = decode_from_slice::<P,_>(&bytes, config())?;
         collector.emit(progress);
         if !stopped && cancellation.cancelled() {
             stopped = true;
-            sigint(pid)?; // don't return, read until get FINAL_FRAME
+            su_command(format!("kill -SIGINT {pid}")).spawn()?;
+            // don't return, read until get FINAL_FRAME
         }
     }
 }
@@ -148,12 +156,8 @@ fn get_exit_code(status: io::Result<Option<ExitStatus>>) -> Rslt<String> {
         .ok_or_else(|| "null".into())
 }
 
-fn sigint(pid: i32) -> Rslt<()> {
-    let result = unsafe {
-        libc::kill(pid, libc::SIGINT)
-    };
-    return match result {
-        OKI => Ok(()),
-        _ => Err("failed to send SIGINT".into()),
-    };
+fn su_command(arg: String) -> Command {
+    let mut command = Command::new("su");
+    command.arg("-c").arg(arg);
+    return command;
 }
