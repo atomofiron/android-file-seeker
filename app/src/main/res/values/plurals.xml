@@ -16,6 +16,12 @@
         <item quantity="many">%d files</item>
         <item quantity="other">%d files</item>
     </plurals>
+    <plurals name="x_errors">
+        <item quantity="one">%d error</item>
+        <item quantity="few">%d errors</item>
+        <item quantity="many">%d errors</item>
+        <item quantity="other">%d errors</item>
+    </plurals>
     <plurals name="x_deleted">
         <item quantity="zero">%s was deleted</item>
         <item quantity="one">%s was deleted</item>

@@ -32,7 +32,12 @@ class DialogDelegateImpl(activity: ActivityProperty) : DialogDelegate {
 
     override fun showError(message: UniText?) {
         val text = resources?.get(message)
-        show(errorDialogConfig(text, ::copy))
+        show(errorDialogConfig(text, onCopyClick = ::copy))
+    }
+
+    override fun showErrors(message: UniText?) {
+        val text = resources?.get(message)
+        show(errorDialogConfig(text, many = true, onCopyClick = ::copy))
     }
 
     override fun show(config: DialogConfig): DialogUpdater? {
@@ -88,7 +93,7 @@ class DialogDelegateImpl(activity: ActivityProperty) : DialogDelegate {
         }
 
         override fun showError(message: String?) = update {
-            errorDialogConfig(message, onCopyClick)
+            errorDialogConfig(message, onCopyClick = onCopyClick)
         }
 
         private fun update() = dialog.run {

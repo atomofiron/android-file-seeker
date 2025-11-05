@@ -1,7 +1,9 @@
 package app.atomofiron.searchboxapp.screens.result.presenter
 
+import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
+import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
 import app.atomofiron.searchboxapp.screens.result.ResultViewState
@@ -13,6 +15,7 @@ class ResultItemActionDelegate(
     private val operations: FileOperationsDelegate,
     private val router: ResultRouter,
     private val curtainDelegate: ResultCurtainMenuDelegate,
+    private val dialogs: DialogDelegate,
 ) : ResultItemActionListener {
     override fun onItemClick(item: Node) {
         when {
@@ -44,4 +47,9 @@ class ResultItemActionDelegate(
     }
 
     override fun onItemVisible(item: ResultItem.Item) = Unit
+
+    override fun onErrorsClick() {
+        val error = viewState.result.value.errors.joinToString(separator = "\n")
+        dialogs.showErrors(error.toUni())
+    }
 }

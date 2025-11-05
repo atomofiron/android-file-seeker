@@ -4,4 +4,5 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerI
 
 interface ResultItemActionListener : ExplorerItemBinderImpl.ExplorerItemBinderActionListener {
     fun onItemVisible(item: ResultItem.Item)
+    fun onErrorsClick()
 }

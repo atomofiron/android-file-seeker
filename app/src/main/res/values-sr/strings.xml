@@ -12,6 +12,7 @@
     <string name="search_for_names_result">Датотека: %1$d, укупно датотека: %2$d</string>
     <string name="search_error">Грешка: %s</string>
     <string name="error">Грешка</string>
+    <string name="errors">Грешке</string>
     <string name="wrong_value">Нетачна вредност</string>
     <string name="wrong_intent">Нетачна намера</string>
     <string name="nothing">Ништа није пронађено</string>
@@ -163,6 +164,7 @@
     <string name="previous">Претходно</string>
     <string name="edit">Уреди</string>
     <string name="save">Сачувај</string>
+    <string name="show">Прикажи</string>
     <string name="update_available">Доступно је ажурирање</string>
     <string name="failed_check_updates">Није успело проверавање ажурирања</string>
     <string name="update_loading">Ажурирање се преузима</string>

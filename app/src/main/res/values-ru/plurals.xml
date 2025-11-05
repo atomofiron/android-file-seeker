@@ -12,6 +12,12 @@
         <item quantity="many">%d файлов</item>
         <item quantity="other">%d файлов</item>
     </plurals>
+    <plurals name="x_errors">
+        <item quantity="one">%d ошибка</item>
+        <item quantity="few">%d ошибки</item>
+        <item quantity="many">%d ошибок</item>
+        <item quantity="other">%d ошибок</item>
+    </plurals>
     <plurals name="x_deleted">
         <item quantity="one">Было удалено: %s</item>
         <item quantity="few">Были удалены: %s</item>

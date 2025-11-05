@@ -108,7 +108,7 @@ class FinderWorker(
     }
 
     private fun Params.searchText(type: Params.Text) {
-        val errors = GrowingList<Node>()
+        val errors = GrowingList<String>()
         NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, asSu, cancellation) { match ->
             updateAsync {
                 val new = when (match) {
@@ -136,7 +136,7 @@ class FinderWorker(
                         result.copy(count = result.count.inc(), matches = new, countTotal = countTotal)
                     }
                     is TextSearchProgress.Err -> {
-                        errors.add(match.v1.toNode())
+                        errors.addFormatedError(match.v1)
                         result.copy(errors = errors.fetch())
                     }
                     is TextSearchProgress.End -> {
@@ -153,7 +153,7 @@ class FinderWorker(
     }
 
     private fun Params.searchNames(type: Params.Names) {
-        val errors = GrowingList<Node>()
+        val errors = GrowingList<String>()
         NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu, cancellation) { match ->
             updateAsync {
                 when (match) {
@@ -164,9 +164,8 @@ class FinderWorker(
                         copyWith(result.copy(count = count.inc(), matches = matches, countTotal = result.countTotal.inc()))
                     }
                     is NameSearchProgress.Err -> {
-                        errors.add(match.v1.toNode())
+                        errors.addFormatedError(match.v1)
                         copy(result = result.copy(errors = errors.fetch()))
-
                     }
                     is NameSearchProgress.Skip -> this
                 }
@@ -196,6 +195,11 @@ class FinderWorker(
         cacheConfig = CacheConfig(params.asSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size))
         finderStore.addOrUpdate(task.upcast())
         return work(params)
+    }
+
+    private fun GrowingList<String>.addFormatedError(meta: Meta) {
+        val ref = NodeRef(meta.path)
+        add("${ref.string}: ${meta.error}")
     }
 
     private suspend inline fun update(transform: FilesSearchTask.() -> FilesSearchTask) {

@@ -44,7 +44,7 @@ sealed class SearchResult {
         override val count: Int = 0,
         override val countTotal: Int = 0,
         val matches: List<ItemMatch> = listOf(),
-        val errors: List<Node> = listOf(),
+        val errors: List<String> = listOf(),
         val sorting: NodeSorting = NodeSorting.Date.Reversed,
     ) : SearchResult() {
         companion object {

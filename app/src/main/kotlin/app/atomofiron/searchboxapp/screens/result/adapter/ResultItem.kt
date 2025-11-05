@@ -2,7 +2,15 @@ package app.atomofiron.searchboxapp.screens.result.adapter
 
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 
-sealed class ResultItem(val uniqueId: Int) {
-    data class Header(val dirsCount: Int, val filesCount: Int) : ResultItem(1)
-    data class Item(val item: ItemMatch) : ResultItem(item.count)
+sealed class ResultItem(
+    val uniqueId: Int,
+    val viewType: Int,
+) {
+    data class Header(
+        val dirCount: Int,
+        val fileCount: Int,
+        val errorCount: Int,
+    ) : ResultItem(1, ResultViewType.Header.viewType)
+
+    data class Item(val item: ItemMatch) : ResultItem(item.count, ResultViewType.Item.viewType)
 }

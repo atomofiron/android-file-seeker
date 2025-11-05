@@ -2,20 +2,13 @@ package app.atomofiron.searchboxapp.screens.result.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter
-import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
-import app.atomofiron.fileseeker.databinding.ItemHeaderBinding
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
 
-class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCallback) {
-    companion object {
-        private const val POSITION_HEADER = 0
-        private const val TYPE_HEADER = 2
-    }
-    var itemActionListener: ResultItemActionListener? = null
+class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder<ResultItem>>(ResultDiffUtilCallback) {
+
+    lateinit var itemActionListener: ResultItemActionListener
 
     private lateinit var composition: ExplorerItemComposition
 
@@ -23,7 +16,7 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCa
         val dirCount = results.matches.count { it.item.isDirectory }
         val fileCount = results.matches.size - dirCount
         val items = buildList(results.matches.size.inc()) {
-            add(ResultItem.Header(dirCount, fileCount))
+            add(ResultItem.Header(dirCount, fileCount, results.errors.size))
             results.matches.forEach {
                 add(ResultItem.Item(it))
             }
@@ -35,28 +28,18 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCa
         this.composition = composition
     }
 
-    override fun getItemViewType(position: Int): Int = when (position) {
-        POSITION_HEADER -> TYPE_HEADER
-        else -> super.getItemViewType(position)
+    override fun getItemViewType(position: Int): Int = get(position).viewType
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, inflater: LayoutInflater): ResultsHolder<ResultItem> {
+        return ResultViewType(viewType).createHolder(parent, inflater) as ResultsHolder<ResultItem>
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, inflater: LayoutInflater): ResultsHolder {
-        return when (viewType) {
-            TYPE_HEADER -> ResultsHeaderHolder(ItemHeaderBinding.inflate(inflater, parent, false))
-            else -> ResultsItemHolder(ItemExplorerBinding.inflate(inflater, parent, false))
-        }
-    }
-
-    override fun onBindViewHolder(holder: ResultsHolder, position: Int) {
-        if (position == POSITION_HEADER) {
-            holder.bind(items[position], position)
-        } else {
-            holder as ResultsItemHolder
+    override fun onBindViewHolder(holder: ResultsHolder<ResultItem>, position: Int) {
+        holder.listener = itemActionListener
+        super.onBindViewHolder(holder, position)
+        if (holder is ResultsItemHolder) {
             holder.setOnItemActionListener(itemActionListener)
-            super.onBindViewHolder(holder, position)
             holder.bindComposition(composition)
-            val item = items[position] as ResultItem.Item
-            itemActionListener?.onItemVisible(item)
         }
     }
 }

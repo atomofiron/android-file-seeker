@@ -12,6 +12,7 @@
     <string name="search_for_names_result">"файлов: %1$d, файлов всего: %2$d"</string>
     <string name="search_error">Ошибка: %s</string>
     <string name="error">Ошибка</string>
+    <string name="errors">Ошибки</string>
     <string name="wrong_value">Неверное значение</string>
     <string name="wrong_intent">Неверное намерение</string>
     <string name="nothing">Ничего не найдено</string>
@@ -163,6 +164,7 @@
     <string name="previous">Previous</string>
     <string name="edit">Редактировать</string>
     <string name="save">Сохранить</string>
+    <string name="show">Показать</string>
     <string name="update_available">Доступно обновление</string>
     <string name="update_choice">Желаете загрезить обновление в фоне или прямо сейчас?</string>
     <string name="update_in_background">В фоне</string>

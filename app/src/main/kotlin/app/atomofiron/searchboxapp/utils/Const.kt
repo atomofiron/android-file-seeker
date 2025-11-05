@@ -8,6 +8,7 @@ object Const {
     const val SPACE = ' '
     const val EMPTY = ""
     const val QUOTE = "\""
+    const val NBSP = "\u00A0"
 
     const val DEFAULT_SPECIAL_CHARACTERS = "\\ [ { ? + * ^ $"
     const val DEFAULT_MAX_SIZE = 10485760L

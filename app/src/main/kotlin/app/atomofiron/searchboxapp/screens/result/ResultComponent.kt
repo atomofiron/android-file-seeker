@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.result
 import androidx.fragment.app.Fragment
 import androidx.work.WorkManager
 import app.atomofiron.common.util.ActivityProperty
+import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
@@ -99,8 +100,9 @@ class ResultModule {
         operations: FileOperationsDelegate,
         router: ResultRouter,
         menuListenerDelegate: ResultCurtainMenuDelegate,
+        dialogs: DialogDelegate,
     ): ResultItemActionDelegate {
-        return ResultItemActionDelegate(viewModel, operations, router, menuListenerDelegate)
+        return ResultItemActionDelegate(viewModel, operations, router, menuListenerDelegate, dialogs)
     }
 
     @Provides

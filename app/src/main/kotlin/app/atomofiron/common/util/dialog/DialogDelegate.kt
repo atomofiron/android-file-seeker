@@ -15,6 +15,8 @@ interface DialogDelegate {
 
     fun showError(message: UniText? = null)
 
+    fun showErrors(message: UniText? = null)
+
     infix fun show(config: DialogConfig): DialogUpdater?
 
     enum class CheckBox(@StringRes val label: Int) {

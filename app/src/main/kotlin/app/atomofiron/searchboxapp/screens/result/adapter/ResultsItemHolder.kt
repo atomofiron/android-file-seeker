@@ -8,7 +8,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerI
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.utils.attach
 
-class ResultsItemHolder(binding: ItemExplorerBinding) : ResultsHolder(binding.root) {
+class ResultsItemHolder(binding: ItemExplorerBinding) : ResultsHolder<ResultItem.Item>(binding.root) {
 
     private val binder = ExplorerItemBinderImpl(binding)
 
@@ -18,12 +18,12 @@ class ResultsItemHolder(binding: ItemExplorerBinding) : ResultsHolder(binding.ro
         binder.setOnItemActionListener(listener)
     }
 
-    override fun onBind(item: ResultItem, position: Int) {
-        item as ResultItem.Item
+    override fun onBind(item: ResultItem.Item, position: Int) {
         val result = item.item
         binder.bind(result.item)
         tvCounter.isVisible = result.withCounter
         tvCounter.text = result.count.toString()
+        listener.onItemVisible(item)
     }
 
     fun bindComposition(composition: ExplorerItemComposition) = binder.bindComposition(composition)

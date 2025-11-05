@@ -10,6 +10,11 @@
         <item quantity="few">%d datoteke</item>
         <item quantity="other">%d datoteka</item>
     </plurals>
+    <plurals name="x_errors">
+        <item quantity="one">%d greška</item>
+        <item quantity="few">%d greške</item>
+        <item quantity="other">%d grešaka</item>
+    </plurals>
     <plurals name="x_deleted">
         <item quantity="one">%s je obrisan(a)</item>
         <item quantity="few">%s su obrisana</item>
