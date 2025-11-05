@@ -14,7 +14,6 @@ class ItemGravityDecorator : RecyclerView.ItemDecoration() {
             position != 0 -> return
             parent.height <= parent.width -> return
         }
-        val offset = parent.height - parent.paddingTop - parent.paddingBottom
-        outRect.top += offset / 3 * 2
+        outRect.top = parent.run { height - paddingTop - paddingBottom } / 2
     }
 }

@@ -19,9 +19,6 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCa
 
     private lateinit var composition: ExplorerItemComposition
 
-    private val gravityDecorator = ItemGravityDecorator()
-    private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = false)
-
     fun setResult(results: SearchResult.Files) {
         val dirCount = results.matches.count { it.item.isDirectory }
         val fileCount = results.matches.size - dirCount
@@ -36,25 +33,11 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder>(ResultDiffUtilCa
 
     fun setComposition(composition: ExplorerItemComposition) {
         this.composition = composition
-        backgroundDecorator.enabled = composition.visibleBg
     }
 
     override fun getItemViewType(position: Int): Int = when (position) {
         POSITION_HEADER -> TYPE_HEADER
         else -> super.getItemViewType(position)
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        super.onAttachedToRecyclerView(recyclerView)
-        recyclerView.addItemDecoration(gravityDecorator)
-        recyclerView.addItemDecoration(backgroundDecorator)
-        backgroundDecorator.init(recyclerView.resources)
-    }
-
-    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
-        super.onDetachedFromRecyclerView(recyclerView)
-        recyclerView.removeItemDecoration(gravityDecorator)
-        recyclerView.removeItemDecoration(backgroundDecorator)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, inflater: LayoutInflater): ResultsHolder {

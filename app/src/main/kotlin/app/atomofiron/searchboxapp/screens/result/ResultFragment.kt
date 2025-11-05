@@ -20,6 +20,8 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.common.delegates.apply
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
+import app.atomofiron.searchboxapp.screens.result.adapter.ItemGravityDecorator
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import com.google.android.material.snackbar.Snackbar
@@ -37,6 +39,8 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         binding.snackbarContainer.makeSnackbar("", Snackbar.LENGTH_INDEFINITE)
             .setAction(R.string.got_it) { }
     }
+    private val gravityDecorator = ItemGravityDecorator()
+    private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +61,9 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             layoutManager = LinearLayoutManager(requireContext())
             adapter = resultAdapter
             addExplorerFastScroll()
+            addItemDecoration(gravityDecorator)
+            addItemDecoration(backgroundDecorator)
+            backgroundDecorator.init(resources)
         }
         binding.dockBar.submit(DefaultDockState)
         binding.dockBar.setListener(::onBottomMenuItemClick)
@@ -76,7 +83,10 @@ class ResultFragment : Fragment(R.layout.fragment_result),
     }
 
     override fun ResultViewState.onViewCollect() {
-        viewCollect(composition, collector = resultAdapter::setComposition)
+        viewCollect(composition) {
+            backgroundDecorator.enabled = it.visibleBg
+            resultAdapter.setComposition(it)
+        }
         viewCollect(result, collector = ::onTaskChange)
         viewCollect(alerts, collector = ::showSnackbar)
         viewCollect(dock, collector = binding.dockBar::submit)
