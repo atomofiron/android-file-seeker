@@ -21,13 +21,3 @@ impl TextMatches {
         self.matches.into_inner()
     }
 }
-
-trait RoTextMatches {
-    fn take(self) -> Vec<TextMatch>;
-}
-
-impl RoTextMatches for TextMatches {
-    fn take(self) -> Vec<TextMatch> {
-        self.matches.into_inner()
-    }
-}
