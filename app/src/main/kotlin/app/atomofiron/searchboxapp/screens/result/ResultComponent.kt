@@ -101,8 +101,9 @@ class ResultModule {
         router: ResultRouter,
         menuListenerDelegate: ResultCurtainMenuDelegate,
         dialogs: DialogDelegate,
+        interactor: ResultInteractor,
     ): ResultItemActionDelegate {
-        return ResultItemActionDelegate(viewModel, operations, router, menuListenerDelegate, dialogs)
+        return ResultItemActionDelegate(viewModel, operations, router, menuListenerDelegate, dialogs, interactor)
     }
 
     @Provides
@@ -125,8 +126,9 @@ class ResultModule {
         utilService: UtilService,
         explorerService: ExplorerService,
         finderService: FinderService,
+        finderStore: FinderStore,
     ): ResultInteractor {
-        return ResultInteractor(scope, utilService, explorerService, finderService)
+        return ResultInteractor(scope, utilService, explorerService, finderService, finderStore)
     }
 
     @Provides

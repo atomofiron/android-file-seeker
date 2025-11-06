@@ -50,7 +50,8 @@ open class ServiceModule {
         context: Context,
         resources: AppResources,
         clipboardManager: ClipboardManager,
-    ): UtilService = UtilService(context, resources, clipboardManager)
+        preference: PreferenceStore,
+    ): UtilService = UtilService(context, resources, clipboardManager, preference)
 
     @Provides
     @Singleton

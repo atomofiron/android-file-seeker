@@ -17,7 +17,7 @@ import androidx.work.WorkerParameters
 import app.atomofiron.common.util.GrowingList
 import app.atomofiron.common.util.extension.get
 import app.atomofiron.common.util.extension.logE
-import app.atomofiron.common.util.extension.replace
+import app.atomofiron.common.util.extension.set
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.Notifications
@@ -36,7 +36,7 @@ import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult.Files
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.model.finder.SearchTask
-import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
+import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
 import app.atomofiron.searchboxapp.utils.Const
@@ -112,42 +112,23 @@ class FinderWorker(
         NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, asSu, cancellation) { match ->
             updateAsync {
                 val new = when (match) {
-                    is TextSearchProgress.Ok -> {
-                        val lineIndex = match.line?.toInt() ?: return@updateAsync this
-                        val lineMatch = TextLineMatch(match.offset.toLong(), match.length.toInt())
-                        var itemMatch = result.matches
-                            .find { it.item.ref.theSame(match.path) }
-                            ?.let { it as ItemMatch.Many }
-                        val countTotal = when (itemMatch) {
-                            null -> result.countTotal.inc()
-                            else -> result.countTotal
+                    is TextSearchProgress.Skip -> result.copy(countTotal = result.countTotal.inc())
+                    is TextSearchProgress.Match -> {
+                        val map: MutableMatchMap = hashMapOf()
+                        match.v2.forEach {
+                            val index = it.line.toInt()
+                            map.getOrPut(index) { mutableListOf() }.add(it)
                         }
-                        itemMatch = itemMatch ?: NodeRef(match.path).let {
-                            val node = NativeBridge.type(it, asSu).value?.toNode() ?: it.toNode()
-                            ItemMatch.Many(node)
-                        }
-                        val matches = itemMatch.matches.getOrPut(lineIndex) { mutableListOf() }
-                        matches.add(lineMatch)
-                        val new = result.matches.mutate {
-                            replace(itemMatch.copy(count = itemMatch.count.inc())) {
-                                it.path == itemMatch.path
-                            }
-                        }
-                        result.copy(count = result.count.inc(), matches = new, countTotal = countTotal)
+                        val many = ItemMatch.Many(match.v1.toNode(), count = match.v2.size, map)
+                        val matches = result.matches.mutate { add(many) }
+                        result.copy(count = result.count + many.count, matches = matches, countTotal = result.countTotal.inc())
                     }
                     is TextSearchProgress.Err -> {
                         errors.addFormatedError(match.v1)
                         result.copy(errors = errors.fetch())
                     }
-                    is TextSearchProgress.End -> {
-                        val contains = result.matches.any { it.item.ref.theSame(match.v1) }
-                        when {
-                            contains -> return@updateAsync this
-                            else -> result.copy(countTotal = result.countTotal.inc())
-                        }
-                    }
                 }
-                copyWith(result = new)
+                copy(result = new)
             }
         }.apply()
     }
@@ -157,20 +138,19 @@ class FinderWorker(
         NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu, cancellation) { match ->
             updateAsync {
                 when (match) {
-                    is NameSearchProgress.Ok -> {
+                    is NameSearchProgress.Skip -> copy(result = result.copy(countTotal = result.countTotal.inc()))
+                    is NameSearchProgress.Match -> {
                         val itemMatch = ItemMatch.Single(match.v1.toNode())
                         val matches = result.matches.toMutableList()
-                        matches.replace(itemMatch) { it.path == itemMatch.path }
-                        copyWith(result.copy(count = count.inc(), matches = matches, countTotal = result.countTotal.inc()))
+                        matches.set(itemMatch) { it.path == itemMatch.path }
+                        copy(result = result.copy(count = count.inc(), matches = matches, countTotal = result.countTotal.inc()))
                     }
                     is NameSearchProgress.Err -> {
                         errors.addFormatedError(match.v1)
                         copy(result = result.copy(errors = errors.fetch()))
                     }
-                    is NameSearchProgress.Skip -> this
                 }
             }
-            task.isProgress
         }.apply()
     }
 

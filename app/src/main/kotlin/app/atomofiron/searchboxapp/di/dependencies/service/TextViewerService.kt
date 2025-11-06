@@ -20,7 +20,6 @@ import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
-import app.atomofiron.searchboxapp.model.textviewer.TextLineMatch
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
@@ -29,7 +28,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import uniffi.native_lib.CancellationState
-import uniffi.native_lib.SimpleResult
 import uniffi.native_lib.TextSearchProgress
 import java.util.UUID
 
@@ -118,28 +116,23 @@ class TextViewerService(
 
     suspend fun search(ref: NodeRef, params: QueryParams) {
         val session = findSession(ref) ?: return
-        val uuid = SearchTask(params, Text()).also {
-            session.tasks { add(it) }
-        }.uuid
-        var count = 0
-        val matches: MutableMatchMap = hashMapOf()
-        val result = NativeBridge.findLocalText(params, ref, asSu, NotCancelable) { match ->
-            session.update(uuid) {
-                when (match) {
-                    is TextSearchProgress.Ok -> {
-                        val lineIndex = match.line?.toInt() ?: return@update this
-                        val list = matches.getOrPut(lineIndex) { mutableListOf() }
-                        list.add(TextLineMatch(match.offset.toLong(), match.length.toInt()))
-                        copy(result = Text(++count, matches))
-                    }
-                    is TextSearchProgress.Err -> toEnded(error = match.v1.error)
-                    is TextSearchProgress.End -> toEnded()
-                }
-            }
-            true
-        }
+        val uuid = SearchTask(params, Text())
+            .also { session.tasks { add(it) } }
+            .uuid
+        val result = NativeBridge.findLocalText(params, ref, asSu, NotCancelable)
         session.update(uuid) {
-            toEnded(error = (result as? SimpleResult.Err)?.v1)
+            when (result) {
+                is TextSearchProgress.Match -> {
+                    val map: MutableMatchMap = hashMapOf()
+                    result.v2.forEach {
+                        val index = it.line.toInt()
+                        map.getOrPut(index) { mutableListOf() }.add(it)
+                    }
+                    toEnded(result = Text(result.v2.size, map))
+                }
+                is TextSearchProgress.Skip -> toEnded()
+                is TextSearchProgress.Err -> toEnded(error = result.v1.error)
+            }
         }
     }
 

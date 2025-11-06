@@ -22,6 +22,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.mapNotNull
 import java.util.UUID
 
 class ResultViewState(
@@ -52,34 +53,37 @@ class ResultViewState(
     }
 
     private fun transformState() {
-        if (taskId != Const.UNDEFINED) combineTransform(finderStore.tasksFlow, checked) { tasks, checked ->
-            emit(reduce(tasks, checked))
-        }.launch(scope, Dispatchers.Default)
+        if (taskId != Const.UNDEFINED) {
+            val task = finderStore.tasksFlow.mapNotNull { tasks ->
+                tasks.find { it.uniqueId == taskId }
+            }
+            combineTransform(task, checked) { task, checked ->
+                emit(reduce(task, checked))
+            }.launch(scope, Dispatchers.Default)
+        }
     }
 
-    private fun reduce(tasks: List<GenericSearchTask>, checked: List<Int>) {
-        tasks.find { it.uniqueId == taskId }?.let { task ->
-            taskUuid = task.uuid
-            error = task.error
-            val result = task.result as Files
-            val matches = result.matches.mapNotNull { match ->
-                when {
-                    mimeTypes.isNotEmpty() && !match.item.content.matchesAny(mimeTypes) -> null
-                    !checked.contains(match.item.uniqueId) -> match
-                    else -> match.update(match.item.copy(isChecked = true))
-                }
-            }.toMutableList()
-            val sorting = result.sorting
-            when (sorting) {
-                is NodeSorting.Date -> matches.sortBy(sorting.reversed) { it.item.date }
-                is NodeSorting.Name -> matches.sortBy(sorting.reversed) { it.item.name }
-                is NodeSorting.Size -> matches.sortBy(sorting.reversed) { it.item.length }
+    private fun reduce(task: GenericSearchTask, checked: List<Int>) {
+        taskUuid = task.uuid
+        error = task.error
+        val result = task.result as Files
+        val matches = result.matches.mapNotNull { match ->
+            when {
+                mimeTypes.isNotEmpty() && !match.item.content.matchesAny(mimeTypes) -> null
+                !checked.contains(match.item.uniqueId) -> match
+                else -> match.update(match.item.copy(isChecked = true))
             }
-            matches.sortBy { !it.isDirectory }
-            val newResult = result.copy(matches = matches)
-            this.result.value = newResult
-            dock.reduce(task.isProgress, newResult, sorting, checked = checked.size)
+        }.toMutableList()
+        val sorting = result.sorting
+        when (sorting) {
+            is NodeSorting.Date -> matches.sortBy(sorting.reversed) { it.item.date }
+            is NodeSorting.Name -> matches.sortBy(sorting.reversed) { it.item.name }
+            is NodeSorting.Size -> matches.sortBy(sorting.reversed) { it.item.length }
         }
+        matches.sortBy { !it.isDirectory }
+        val newResult = result.copy(matches = matches)
+        this.result.value = newResult
+        dock.reduce(task.isProgress, newResult, sorting, checked = checked.size)
     }
 
     private fun MutableStateFlow<ResultDockState>.reduce(

@@ -65,7 +65,7 @@ pub struct SearchQuery {
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum NameSearchProgress {
-    Ok(TypedMeta),
+    Match(Meta),
     Skip,
     Err(Meta),
 }
@@ -73,14 +73,17 @@ pub enum NameSearchProgress {
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum TextSearchProgress {
-    Ok {
-        path: RawPath,
-        offset: u64,
-        length: u32,
-        line: Option<u64>,
-    },
-    End(RawPath),
+    Match(Meta, Vec<TextMatch>),
+    Skip,
     Err(Meta),
+}
+
+#[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(uniffi::Record)]
+pub struct TextMatch {
+    pub offset: u64,
+    pub length: u32,
+    pub line: u64,
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]

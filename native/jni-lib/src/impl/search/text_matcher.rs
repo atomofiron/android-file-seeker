@@ -1,11 +1,11 @@
-use std::path::Path;
-use std::sync::mpsc::Sender;
-use crate::api::protocol::{SearchQuery, TextSearchProgress};
+use crate::api::protocol::{SearchQuery, TextMatch};
 use crate::common::{Rslt, EMPTY_VALUE_ERROR};
-use grep_regex::{RegexMatcher, RegexMatcherBuilder};
-use grep_searcher::Searcher;
 use crate::r#impl::search::literal_matcher::LiteralMatcher;
+use crate::r#impl::search::text_matches::TextMatches;
 use crate::r#impl::search::text_sink::TextSink;
+use grep_regex::{RegexMatcher, RegexMatcherBuilder};
+use grep_searcher::SearcherBuilder;
+use std::path::Path;
 
 pub enum TextMatcher {
     Literal(LiteralMatcher),
@@ -30,17 +30,15 @@ impl TextMatcher {
         return Ok(matcher);
     }
 
-    pub fn search(&self, path: &Path, sender: &Sender<TextSearchProgress>) -> Rslt<()> {
-        let mut searcher = Searcher::new();
-        return match &self {
-            TextMatcher::Literal(matcher) => {
-                let sink = TextSink { matcher, path, sender };
-                searcher.search_path(&matcher, path, sink)
-            },
-            TextMatcher::Regex(matcher) => {
-                let sink = TextSink { matcher, path, sender };
-                searcher.search_path(&matcher, path, sink)
-            },
+    pub fn search(&self, path: &Path) -> Rslt<Vec<TextMatch>> {
+        let mut searcher = SearcherBuilder::new()
+            .line_number(true)
+            .build();
+        let matches = TextMatches::new();
+        match &self {
+            TextMatcher::Literal(matcher) => searcher.search_path(matcher, path, TextSink::new(&matcher, &matches))?,
+            TextMatcher::Regex(matcher) => searcher.search_path(matcher, path, TextSink::new(&matcher, &matches))?,
         };
+        return Ok(matches.take());
     }
 }

@@ -10,6 +10,7 @@ import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.indexOfFirst
 import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.common.util.extension.replace
+import app.atomofiron.common.util.extension.set
 import app.atomofiron.common.util.extension.takeIf
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.common.util.flow.TriggerFlow
@@ -250,7 +251,7 @@ class ExplorerService(
         var type = root?.type ?: NodeRootType.Storage(storage)
         type = (type as NodeRootType.Storage).copy(storage)
         root = root ?: NodeRoot(type, NodeSorting.Name, NodeRef(storage.path))
-        roots.replace(root) { it.stableId == root.stableId }
+        roots.set(root) { it.stableId == root.stableId }
     }
 
     private fun NodeGarden.removeMissed(storage: List<NodeStorage>) {

@@ -26,7 +26,6 @@ import uniffi.native_lib.TypedMetasResult
 import uniffi.native_lib.UsageResult
 import java.io.File
 import java.io.FileOutputStream
-import java.util.Enumeration
 import java.util.zip.ZipFile
 
 private const val NATIVE_BIN = "native-bin"
@@ -150,8 +149,16 @@ object NativeBridge {
         target: NodeRef,
         asSu: Boolean,
         cancellation: CancellationState,
-        collector: (TextSearchProgress) -> Unit,
-    ): SimpleResult = findText(params, listOf(target), maxDepth = 1, Check.No, asSu, cancellation, collector)
+    ): TextSearchProgress {
+        var matches: TextSearchProgress = TextSearchProgress.Skip
+        val result = findText(params, listOf(target), maxDepth = 1, Check.No, asSu, cancellation) {
+            matches = it
+        }
+        return when (result) {
+            is SimpleResult.Ok -> matches
+            is SimpleResult.Err -> TextSearchProgress.Err(Meta(target.bytes, result.v1))
+        }
+    }
 
     fun findText(
         params: QueryParams,
@@ -249,8 +256,6 @@ fun Context.verifyNativeLib(): Rslt<Unit> {
     return Rslt.Err("no $NATIVE_LIB_SO found for abi=$abi")
 }
 
-fun <E> Enumeration<E>.foo(): List<E> {
-    return buildList {
-        for (e in this@foo) add(e)
-    }
+private operator fun Meta.Companion.invoke(path: ByteArray, error: String): Meta {
+    return Meta(path = path, access = "", owner = "", group = "", length = 0u, size = "", date = "", time = "", error = error)
 }

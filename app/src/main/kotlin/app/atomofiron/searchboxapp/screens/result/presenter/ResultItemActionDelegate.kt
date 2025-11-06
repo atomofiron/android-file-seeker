@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.result.presenter
 
 import app.atomofiron.common.util.dialog.DialogDelegate
+import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.other.toUni
@@ -16,6 +17,7 @@ class ResultItemActionDelegate(
     private val router: ResultRouter,
     private val curtainDelegate: ResultCurtainMenuDelegate,
     private val dialogs: DialogDelegate,
+    private val interactor: ResultInteractor,
 ) : ResultItemActionListener {
     override fun onItemClick(item: Node) {
         when {
@@ -46,7 +48,7 @@ class ResultItemActionDelegate(
         return true
     }
 
-    override fun onItemVisible(item: ResultItem.Item) = Unit
+    override fun onItemVisible(item: ResultItem.Item) = interactor.update(viewState.taskUuid, item.match)
 
     override fun onErrorsClick() {
         val error = viewState.result.value.errors.joinToString(separator = "\n")

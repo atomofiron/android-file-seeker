@@ -112,7 +112,7 @@ inline fun <T> List<T>.indexOfFirst(fromIndex: Int = 0, orElse: Int = -1, predic
     return orElse
 }
 
-inline fun <T> MutableList<T>.replace(new: T?, predicate: (T) -> Boolean) {
+inline fun <T> MutableList<T>.set(new: T?, predicate: (T) -> Boolean): MutableList<T> {
     val iterator = listIterator()
     while (iterator.hasNext()) {
         val next = iterator.next()
@@ -121,9 +121,10 @@ inline fun <T> MutableList<T>.replace(new: T?, predicate: (T) -> Boolean) {
             new == null -> iterator.remove()
             else -> iterator.set(new)
         }
-        return
+        return this
     }
     new?.let { add(new) }
+    return this
 }
 
 inline fun <T> MutableList<T>.replace(action: (T) -> T?) {

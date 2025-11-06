@@ -46,6 +46,7 @@ sealed class SearchResult {
         val matches: List<ItemMatch> = listOf(),
         val errors: List<String> = listOf(),
         val sorting: NodeSorting = NodeSorting.Date.Reversed,
+        val generation: Int = 0,
     ) : SearchResult() {
         companion object {
             val Stub = Files(forText = false)
@@ -87,6 +88,7 @@ sealed class SearchResult {
             other !is Files -> false
             other.count != count -> false
             other.countTotal != countTotal -> false
+            other.generation != generation -> false
             other.sorting != sorting -> false
             other.errors.size != errors.size -> false
             else -> other::class == this::class

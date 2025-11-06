@@ -12,5 +12,5 @@ sealed class ResultItem(
         val errorCount: Int,
     ) : ResultItem(1, ResultViewType.Header.viewType)
 
-    data class Item(val item: ItemMatch) : ResultItem(item.count, ResultViewType.Item.viewType)
+    data class Item(val match: ItemMatch) : ResultItem(match.count, ResultViewType.Item.viewType)
 }

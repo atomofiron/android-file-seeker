@@ -22,8 +22,6 @@ data class SearchTask<Result : SearchResult>(
     val isStopped: Boolean get() = status is SearchStatus.Ended && status.stopped
     val isError: Boolean get() = status is SearchStatus.Ended && error != null
 
-    fun copyWith(result: Result): SearchTask<Result> = copy(result = result)
-
     fun toEnded(
         result: Result = this.result,
         error: String? = this.error,

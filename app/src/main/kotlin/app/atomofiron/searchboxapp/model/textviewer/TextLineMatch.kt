@@ -1,16 +1,13 @@
 package app.atomofiron.searchboxapp.model.textviewer
 
-// line index -> byteOffset + length
+import uniffi.native_lib.TextMatch
+
+// line index -> byte offset + length
 
 typealias MutableMatchMap = MutableMap<Int, MutableMatchList>
 
-typealias MutableMatchList = MutableList<TextLineMatch>
+typealias MutableMatchList = MutableList<TextMatch>
 
 typealias MatchMap = Map<Int, MatchList>
 
-typealias MatchList = List<TextLineMatch>
-
-data class TextLineMatch(
-    val byteOffset: Long,
-    val length: Int,
-)
+typealias MatchList = List<TextMatch>

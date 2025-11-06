@@ -1,36 +1,33 @@
-use crate::api::protocol::TextSearchProgress;
-use crate::ext::raw_path::PathExt;
-use crate::r#impl::meta::meta_with_error;
+use crate::api::protocol::TextMatch;
+use crate::r#impl::search::text_matches::TextMatches;
 use grep_matcher::Matcher;
 use grep_searcher::{Searcher, Sink, SinkMatch};
-use std::path::Path;
-use std::sync::mpsc::Sender;
 
 pub struct TextSink<'l, M: Matcher> {
     pub matcher: &'l M,
-    pub path: &'l Path,
-    pub sender: &'l Sender<TextSearchProgress>,
+    pub matches: &'l TextMatches,
 }
 
-impl <'l, M: Matcher>Sink for TextSink<'l, M> {
+impl<'l, M: Matcher> TextSink<'l, M> {
+    pub fn new(matcher: &'l M, matches: &'l TextMatches) -> Self {
+        TextSink { matcher, matches }
+    }
+}
+
+impl<'l, M: Matcher> Sink for TextSink<'l, M> {
     type Error = Box<dyn std::error::Error>;
 
     fn matched(&mut self, _searcher: &Searcher, mat: &SinkMatch) -> Result<bool, Self::Error> {
         let line = mat.bytes();
-        let result = self.matcher.find_iter(line, |m| {
-            let progress = TextSearchProgress::Ok {
-                path: self.path.to_path_buf().raw(),
+        let _ = self.matcher.find_iter(line, |m| {
+            let the_match = TextMatch {
                 offset: mat.absolute_byte_offset() + m.start() as u64,
                 length: (m.end() - m.start()) as u32,
-                line: mat.line_number().map(|n| n - 1),
+                line: mat.line_number().expect("SearcherBuilder::line_number = false") - 1,
             };
-            let _ = self.sender.send(progress);
+            self.matches.push(the_match);
             true
-        });
-        if let Err(e) = result {
-            let err = TextSearchProgress::Err(meta_with_error(&self.path.to_path_buf(), &e));
-            self.sender.send(err)?;
-        }
+        }); // no way for Error, because of matched = |m| Ok(matched(m)
         Ok(true)
     }
 }

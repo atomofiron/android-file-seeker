@@ -19,7 +19,7 @@ class ResultsItemHolder(binding: ItemExplorerBinding) : ResultsHolder<ResultItem
     }
 
     override fun onBind(item: ResultItem.Item, position: Int) {
-        val result = item.item
+        val result = item.match
         binder.bind(result.item)
         tvCounter.isVisible = result.withCounter
         tvCounter.text = result.count.toString()

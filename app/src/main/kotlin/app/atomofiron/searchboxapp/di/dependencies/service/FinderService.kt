@@ -56,7 +56,7 @@ class FinderService(
 
     fun drop(task: GenericSearchTask) {
         finderStore {
-            drop(task)
+            drop(task.uuid)
         }
         notificationManager.cancel(task.uniqueId)
     }

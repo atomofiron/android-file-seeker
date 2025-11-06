@@ -1,8 +1,9 @@
 use crate::api::cancellation::CancellationState;
 use crate::api::protocol::Check;
-use crate::api::protocol::{Meta, SearchQuery, SimpleResult, TextSearchCollector, TextSearchProgress};
+use crate::api::protocol::{SearchQuery, SimpleResult, TextSearchCollector, TextSearchProgress};
 use crate::common::{Rslt, JOINING_ERROR};
-use crate::ext::raw_path::{PathExt, RawPath};
+use crate::ext::raw_path::RawPath;
+use crate::r#impl::meta::{meta, meta_with_error};
 use crate::r#impl::search::progress::proxy_progress;
 use crate::r#impl::search::text_matcher::TextMatcher;
 use crate::r#impl::search::walker::walk;
@@ -48,28 +49,25 @@ pub fn find_text_recursively(
 ) {
     walk(targets, sender, max_depth, cancellation, |entry, sender| {
         let path = entry.path();
-        let mut error: Option<String> = None;
-        if let Check::Yes(max_size) = check {
-            match entry.metadata() {
-                Err(e) => error = Some(e.to_string()),
-                Ok(meta) if !meta.is_file() || meta.len() > max_size || meta.len() == 0 => return WalkState::Continue,
-                _ => match is_text_file(path) {
-                    Err(e) => error = Some(e.to_string()),
-                    Ok(txt) if !txt => return WalkState::Continue,
-                    _ => (),
-                },
+        let progress = match check {
+            Check::Yes(max_size) => {
+                match entry.metadata() {
+                    Err(e) => Err(e.into()),
+                    Ok(meta) if !meta.is_file() || meta.len() > max_size || meta.len() == 0 => return WalkState::Continue,
+                    _ => match is_text_file(path) {
+                        Err(e) => Err(e.into()),
+                        Ok(txt) if !txt => return WalkState::Continue,
+                        _ => Ok(()),
+                    },
+                }
             }
-        }
-        if let None = error {
-            if let Err(e) = matcher.search(path, sender) {
-                error = Some(e.to_string());
-            }
-        }
-        let last = match error {
-            Some(error) => TextSearchProgress::Err(Meta::with_error(&path.into(), &error)),
-            None => TextSearchProgress::End(path.raw()),
-        };
-        return match sender.send(last) {
+            _ => Ok(())
+        }.and_then(|_| matcher.search(path))
+            .map(|matches| match matches.is_empty() {
+                true => TextSearchProgress::Skip,
+                false => TextSearchProgress::Match(meta(&path.into()), matches),
+            }).unwrap_or_else(|e| TextSearchProgress::Err(meta_with_error(&path.into(), &e)));
+        return match sender.send(progress) {
             Ok(_) => WalkState::Continue,
             Err(_) => WalkState::Quit,
         };
