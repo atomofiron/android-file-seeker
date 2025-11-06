@@ -15,6 +15,7 @@ import app.atomofiron.searchboxapp.utils.toInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 
 class TextViewerViewState(
     private val scope: CoroutineScope,
@@ -89,8 +90,17 @@ class TextViewerViewState(
         val matches = result.matches
         val indexes = result.indexes
         if (cursor == null) {
-            matchesCursor.value = MatchCursor(lineIndex = indexes.first(), matchIndex = 0)
-            status.value = status.value.copy(current = 1)
+            val statusIndex = when {
+                increment -> 1
+                indexes.last() < textLines.value.size -> status.value.max
+                else -> return indexes.last()
+            }
+            status.update {
+                it.copy(current = statusIndex)
+            }
+            val lineIndex = if (increment) indexes.first() else indexes.last()
+            val matchIndex = if (increment) 0 else matches[lineIndex]?.lastIndex ?: 0
+            matchesCursor.value = MatchCursor(lineIndex = lineIndex, matchIndex = matchIndex)
             return none
         }
         var lineIndex = cursor.lineIndex

@@ -30,6 +30,7 @@ import kotlinx.coroutines.launch
 import uniffi.native_lib.CancellationState
 import uniffi.native_lib.TextSearchProgress
 import java.util.UUID
+import kotlin.math.max
 
 class TextViewerService(
     private val scope: CoroutineScope,
@@ -93,12 +94,13 @@ class TextViewerService(
             callback?.invoke(false)
             return
         }
+        val count = max(Const.TEXT_FILE_PAGINATION_STEP, targetLineIndex.inc() - session.lines.value.size)
         val paginationThreshold = session.lines.value.size - Const.TEXT_FILE_PAGINATION_STEP_OFFSET
         when {
             session.loading.value -> callback?.invoke(false)
             session.isFullyRead -> callback?.invoke(false)
             targetLineIndex < paginationThreshold -> callback?.invoke(false)
-            else -> session.readNextLines()
+            else -> session.readNextLines(count)
         }
         callback?.invoke(true)
     }
@@ -138,14 +140,14 @@ class TextViewerService(
 
     private fun findSession(ref: NodeRef): TextViewerSession? = store.sessions[ref.uniqueId]
 
-    private suspend fun TextViewerSession.readNextLines() {
+    private suspend fun TextViewerSession.readNextLines(count: Int) {
         val reader = reader ?: return
         textLines {
             loading.value = true
             var isFullyRead = isFullyRead
-            val lines = ArrayList<TextLine>(Const.TEXT_FILE_PAGINATION_STEP)
+            val lines = ArrayList<TextLine>(count)
             var byteOffset = lastOrNull()?.run { byteOffset + byteCount.inc() } ?: 0
-            while (lines.size < Const.TEXT_FILE_PAGINATION_STEP) {
+            while (lines.size < count) {
                 when (val stringOrNull = reader.readLine()) {
                     null -> {
                         isFullyRead = true

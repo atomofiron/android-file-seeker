@@ -58,15 +58,15 @@ class TextViewerPresenter(
 
     fun onSearchClick() = searchDelegate.show()
 
-    fun onPreviousClick() {
-        viewState.changeCursor(increment = false)
-    }
+    fun onPreviousClick() = onMoveClick(increment = false)
 
-    fun onNextClick() {
-        val requiredLineIndex = viewState.changeCursor(increment = true)
+    fun onNextClick() = onMoveClick(increment = true)
+
+    private fun onMoveClick(increment: Boolean) {
+        val requiredLineIndex = viewState.changeCursor(increment)
         if (requiredLineIndex >= 0) {
             interactor.readFileToLine(itemRef, requiredLineIndex) {
-                viewState.changeCursor(increment = true)
+                viewState.changeCursor(increment)
             }
         }
     }
