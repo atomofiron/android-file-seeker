@@ -14,7 +14,7 @@ data class TextViewerDockState(
             status = DockItem(
                 DockItem.Id(0),
                 DockItem.Icon(R.drawable.ic_circle_check),
-                DockItem.Label.Empty,
+                DockItem.Label(R.string.status),
                 clickable = false,
             ),
             search = DockItem(
