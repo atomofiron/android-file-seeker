@@ -1,10 +1,10 @@
 // Assisted-by: Sonnet 4.5
 
-use crate::api::protocol::{ComplexResult, CommonProgressCollector};
+use crate::api::protocol::{CommonProgressCollector, ComplexResult};
 use crate::common::{Rslt, OKI};
 use crate::ext::result::ResultExt;
 use crate::r#impl::progress::{convert_progress, send_inc, ProgressChange};
-use libc::{c_int, closedir, dirent, mode_t, opendir, readdir, DT_DIR};
+use libc::{c_int, c_uint, closedir, dev_t, mode_t, opendir, readdir};
 use std::ffi::{CStr, CString};
 use std::fmt::Display;
 use std::io;
@@ -39,26 +39,26 @@ pub fn delete_impl(path: &PathBuf, collector: Arc<dyn CommonProgressCollector>) 
 
 pub fn delete(path: &PathBuf, tx: &Sender<ProgressChange>, range: Range<f32>) -> Rslt<()> {
     let c_path = CString::new(path.as_os_str().as_bytes())?;
-    let st_dev = get_dev(&c_path)?;
-    delete_recursively(&c_path, false, st_dev, tx, range)?;
+    let (dev, _) = get_dev_mode(&c_path)?;
+    delete_recursively(&c_path, dev, tx, range)?;
     match path.exists() { // 1 retry
-        true => delete_recursively(&c_path, false, st_dev, tx, 1.0..1.0),
+        true => delete_recursively(&c_path, dev, tx, 1.0..1.0),
         _ => Ok(()),
     }
 }
 
 pub fn delete_recursively(
     path: &CString,
-    as_dir: bool,
-    st_dev: mode_t,
+    root_dev: dev_t,
     tx: &Sender<ProgressChange>,
     range: Range<f32>,
 ) -> Rslt<()> {
-    match get_dev(path) {
-        Ok(stat) if stat == st_dev => (),
+    let mode = match get_dev_mode(path) {
+        Ok((dev, mode)) if dev == root_dev => mode,
         Ok(_) => return Ok(()),
         Err(e) => return send_err(path, e, tx, &range),
-    }
+    };
+    let as_dir = (mode as mode_t & libc::S_IFMT) == libc::S_IFDIR;
     match call_delete(path, as_dir) {
         Ok(OKI) => return Ok(()),
         Ok(_) => (), // os error
@@ -68,13 +68,14 @@ pub fn delete_recursively(
         .raw_os_error()
         .unwrap_or(0);
     return if error == libc::ENOENT {
-        Ok(()) //            vvvvvv - no AT_REMOVEDIR  vvvvvvvvv - no AT_RECURSIVE
+        Ok(()) //            vvvvvv - no AT_REMOVEDIR
     } else if error == libc::EISDIR {
-        delete_recursively(path, true, st_dev, tx, range)
+        delete_recursively(path, root_dev, tx, range)
     } else if error == libc::ENOTDIR {
-        delete_recursively(path, false, st_dev, tx, range)
+        delete_recursively(path, root_dev, tx, range)
+        //                   vvvvvvvvv - no AT_RECURSIVE
     } else if error == libc::ENOTEMPTY {
-        delete_children(path, st_dev, tx, range)
+        delete_children(path, root_dev, tx, range)
     } else if error == libc::EPERM || error == libc::EBUSY { // retry
         Ok(())
     /* SYS_UNLINKAT2 => Fatal signal 31 (SIGSYS), code 1 (SYS_SECCOMP), syscall 451
@@ -87,7 +88,7 @@ pub fn delete_recursively(
 
 pub fn delete_children(
     path: &CString,
-    st_dev: mode_t,
+    root_dev: dev_t,
     tx: &Sender<ProgressChange>,
     range: Range<f32>,
 ) -> Rslt<()> {
@@ -118,14 +119,12 @@ pub fn delete_children(
             buf.push(b'/');
             buf.extend_from_slice(name);
             buf.push(0); // end
-            let dent: &dirent = &*entry;
-            let is_dir = dent.d_type == DT_DIR;
             let range_start = range.start;
             let result = CString::from_vec_with_nul(buf).boxed().and_then(|it| {
                 let offset = step * i;
                 let start = range_start + offset;
                 let range = start..(start + step);
-                delete_recursively(&it, is_dir, st_dev, tx, range)
+                delete_recursively(&it, root_dev, tx, range)
             });
             match result {
                 Ok(_) => send_inc(tx, &range)?,
@@ -168,13 +167,13 @@ fn call_delete(path: &CString, as_dir: bool) -> Rslt<c_int> {
     }
 }
 
-fn get_dev(path: &CString) -> Rslt<mode_t> {
+fn get_dev_mode(path: &CString) -> Rslt<(dev_t, c_uint)> {
     let mut stat: libc::stat = unsafe { std::mem::zeroed() };
     let result = unsafe {
-        libc::stat(path.as_ptr(), &mut stat)
+        libc::lstat(path.as_ptr(), &mut stat)
     };
     return match result {
-        OKI => stat.st_mode.try_into().boxed(),
+        OKI => Ok((stat.st_dev as dev_t, stat.st_mode)),
         _ => Err(io::Error::last_os_error().into()),
     }
 }
