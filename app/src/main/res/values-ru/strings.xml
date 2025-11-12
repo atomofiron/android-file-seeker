@@ -77,6 +77,7 @@
     <string name="pref_exclude_dirs">Исключить папки</string>
     <string name="exclude_dirs_summary">Из результатов поиска</string>
     <string name="pref_use_su">Использовать root</string>
+    <string name="pref_su_cmd">Root команда</string>
     <string name="pref_about">О Приложении</string>
     <string name="look_github">GitHub репозиторий</string>
     <string name="faq_4pda">FAQ / Обсудить</string>

@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.utils.preferences
 
 import android.view.Gravity
+import androidx.datastore.preferences.core.Preferences
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.preference.AppLocale
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
@@ -34,14 +35,19 @@ object PreferenceKeys {
     val KeyMaxSize = PreferenceKey("pref_max_size", Const.DEFAULT_MAX_SIZE)
     val KeyMaxDepth = PreferenceKey("pref_max_depth", Const.DEFAULT_MAX_DEPTH)
     val KeyUseSu = PreferenceKey("pref_use_su", false)
+    val KeySuCmd = PreferenceKey("pref_su_cmd", "su -c", resetValue = "")
     val KeyExplorerItem = PreferenceKey("pref_explorer_item", ExplorerItemComposition.DEFAULT)
     val KeyJoystick = PreferenceKey("pref_joystick", JoystickComposition.DEFAULT)
     val KeyHapticFeedback = PreferenceKey("pref_haptic_feedback", true)
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
-        arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyShownNotificationUpdateCode, KeySpecialCharacters, KeyAppOrientation, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeyExplorerItem, KeyJoystick, KeyHapticFeedback)
+        arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyAppUpdateCode, KeyShownNotificationUpdateCode, KeyTestField, KeyShowSearchOptions, KeySearchOptions, KeySpecialCharacters, KeyAppOrientation, KeyLocale, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeySuCmd, KeyExplorerItem, KeyJoystick, KeyHapticFeedback)
     }
 
     @Suppress("UNCHECKED_CAST") // omg it's an error in Kotlin 2.2
     fun <T> default(key: String): T = keys.find { it.key.name == key }?.default as T
+
+    operator fun <T> get(key: Preferences.Key<T>): PreferenceKey<T> = keys.find { it.key == key } as PreferenceKey<T>
+
+    fun <T> get(key: String): PreferenceKey<T> = keys.find { it.name == key } as PreferenceKey<T>
 }

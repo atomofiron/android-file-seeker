@@ -95,7 +95,6 @@ class ExplorerService(
 
     init {
         val suDefined = Job()
-        NativeBridge.setBinDir(context.filesDir.absolutePath)
         appScope.launchOnIO {
             garden { // lock due configuration
                 suDefined.join()
@@ -107,10 +106,11 @@ class ExplorerService(
             }.collect()
         }
         val thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size)
-        preferences.asSu.collect(appScope) {
+        combine(preferences.asSu, preferences.suCmd) { asSu, suCmd ->
+            NativeBridge.setSuCmd(suCmd, binDir = context.filesDir.absolutePath)
+            config = CacheConfig(asSu, thumbnailSize)
             suDefined.complete()
-            config = CacheConfig(it, thumbnailSize)
-        }
+        }.collect(appScope)
         store.currentNode.collect(appScope) {
             preferences.setOpenedDirPath(it?.ref?.string)
         }

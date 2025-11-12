@@ -1,5 +1,5 @@
 use crate::api::cancellation::CancellationState;
-use crate::api::protocol::SimpleResult;
+use crate::api::protocol::{SimpleResult, SuCmd};
 use crate::api::su_protocol::{control_frame, from_control_frame, len_to_frame, ProgressProxy, Request, Response, FINAL_FRAME};
 use crate::common::{config, Rslt};
 use crate::ext::option::OptionExt;
@@ -7,7 +7,7 @@ use bincode::{decode_from_slice, encode_to_vec, Decode};
 use once_cell::sync::Lazy;
 use std::io;
 use std::io::{Error, Read, Write};
-use std::process::{Child, Command, ExitStatus, Stdio};
+use std::process::{Child, ExitStatus, Stdio};
 use std::sync::{Arc, Mutex};
 
 static CHILDREN: Lazy<Mutex<Vec<(Child, u32)>>> = Lazy::new(|| {
@@ -15,36 +15,36 @@ static CHILDREN: Lazy<Mutex<Vec<(Child, u32)>>> = Lazy::new(|| {
 });
 
 #[uniffi::export]
-fn try_as_su(bin_path: String) -> SimpleResult {
-    return as_su_impl::<(), SimpleResult>(Request::TryRun, bin_path, Arc::new(()), None)
+fn try_as_su(su_cmd: SuCmd) -> SimpleResult {
+    return as_su_impl::<(), SimpleResult>(Request::TryRun, su_cmd, Arc::new(()), None)
         .unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
 }
 
 pub fn as_su<R: Decode<()>>(
     request: Request,
-    bin_path: String,
+    su_cmd: SuCmd,
 ) -> Rslt<R> {
-    as_su_impl::<(), R>(request, bin_path, Arc::new(()), None)
+    as_su_impl::<(), R>(request, su_cmd, Arc::new(()), None)
 }
 
 pub fn as_su_with_progress<P: Decode<()>, R: Decode<()>>(
     request: Request,
-    bin_path: String,
+    su_cmd: SuCmd,
     cancellation: Arc<dyn CancellationState>,
     collector: Box<dyn ProgressProxy<P>>,
 ) -> Rslt<R> {
-    as_su_impl(request, bin_path, cancellation, Some(collector))
+    as_su_impl(request, su_cmd, cancellation, Some(collector))
 }
 
 fn as_su_impl<P: Decode<()>, R: Decode<()>>(
     request: Request,
-    bin_path: String,
+    su_cmd: SuCmd,
     cancellation: Arc<dyn CancellationState>,
     collector: Option<Box<dyn ProgressProxy<P>>>,
 ) -> Rslt<R> {
     let (mut child, pid) = {
         CHILDREN.lock()?.pop()
-    }.or_then(|| new_child(bin_path))?;
+    }.or_then(|| new_child(&su_cmd))?;
 
     let bytes = encode_to_vec(request, config())?;
     let stdin = child.stdin
@@ -55,7 +55,7 @@ fn as_su_impl<P: Decode<()>, R: Decode<()>>(
     stdin.flush()?;
 
     if let Some(collector) = collector {
-        read_progress(&mut child, pid as i32, cancellation, collector)?;
+        read_progress(&mut child, pid as i32, su_cmd, cancellation, collector)?;
     }
 
     let stdout = child.stdout
@@ -79,8 +79,8 @@ fn as_su_impl<P: Decode<()>, R: Decode<()>>(
     };
 }
 
-fn new_child(bin_path: String) -> Rslt<(Child, u32)> {
-    let mut child = su_command(bin_path)
+fn new_child(su_cmd: &SuCmd) -> Rslt<(Child, u32)> {
+    let mut child = su_cmd.command(&su_cmd.bin_path)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -97,6 +97,7 @@ fn new_child(bin_path: String) -> Rslt<(Child, u32)> {
 fn read_progress<P>(
     child: &mut Child,
     pid: i32,
+    su_cmd: SuCmd,
     cancellation: Arc<dyn CancellationState>,
     collector: Box<dyn ProgressProxy<P>>,
 ) -> Rslt<()> where P: Decode<()> {
@@ -120,7 +121,7 @@ fn read_progress<P>(
         collector.emit(progress);
         if !stopped && cancellation.cancelled() {
             stopped = true;
-            su_command(format!("kill -SIGINT {pid}")).spawn()?;
+            su_cmd.command(&format!("kill -SIGINT {pid}")).spawn()?;
             // don't return, read until get FINAL_FRAME
         }
     }
@@ -154,10 +155,4 @@ fn get_exit_code(status: io::Result<Option<ExitStatus>>) -> Rslt<String> {
         .and_then(|it| it.code())
         .map(|it| it.to_string())
         .ok_or_else(|| "null".into())
-}
-
-fn su_command(arg: String) -> Command {
-    let mut command = Command::new("su");
-    command.arg("-c").arg(arg);
-    return command;
 }

@@ -9,8 +9,12 @@
     <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
         app:title="@string/pref_use_su"
         app:key="pref_use_su"
-        app:defaultValue="false"
         app:icon="@drawable/ic_hash"
+        />
+    <app.atomofiron.searchboxapp.custom.preference.TextFieldPreference
+        app:title="@string/pref_su_cmd"
+        app:key="pref_su_cmd"
+        app:icon="@drawable/ic_shell"
         />
     <PreferenceCategory
         app:title="@string/user_interface"
@@ -25,7 +29,6 @@
         <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
             app:title="@string/pref_deep_black"
             app:key="pref_deep_black"
-            app:defaultValue="false"
             />
         <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
             app:title="@string/pref_orientation"
@@ -37,7 +40,6 @@
         <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
             app:title="@string/pref_haptic_feedback"
             app:key="pref_haptic_feedback"
-            app:defaultValue="true"
             />
         <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
             app:title="@string/pref_locale"

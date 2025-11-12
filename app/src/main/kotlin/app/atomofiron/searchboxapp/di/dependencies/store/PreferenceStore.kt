@@ -28,6 +28,7 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShowSearc
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySpecialCharacters
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyUseSu
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShownNotificationUpdateCode
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySuCmd
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTestField
 import app.atomofiron.searchboxapp.utils.preferences.get
 import app.atomofiron.searchboxapp.utils.preferences.remove
@@ -68,6 +69,12 @@ class PreferenceStore(
 
     suspend fun setUseSu(value: Boolean) {
         edit { it[KeyUseSu] = value }
+    }
+
+    val suCmd = getFlow(KeySuCmd)
+
+    suspend fun setSuCmd(value: String) {
+        edit { it[KeySuCmd] = KeySuCmd.check(value) }
     }
 
     val openedDirPath = getFlow(KeyOpenedDirPath)

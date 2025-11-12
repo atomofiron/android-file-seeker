@@ -55,31 +55,35 @@ class LegacyPreferenceDataStore(
         when (key) {
             PreferenceKeys.PREF_LEAK_CANARY -> watcher.isEnabled = value
             else -> launchImmediately {
-                edit { it[booleanPreferencesKey(key)] = value }
+                val pKey = booleanPreferencesKey(key)
+                edit { it[pKey] = PreferenceKeys[pKey].check(value) }
             }
         }
     }
 
     override fun putInt(key: String, value: Int) {
         launchImmediately {
+            val pKey = intPreferencesKey(key)
             edit {
-                it[intPreferencesKey(key)] = value
+                it[pKey] = PreferenceKeys[pKey].check(value)
             }
         }
     }
 
     override fun putFloat(key: String, value: Float) {
         launchImmediately {
+            val pKey = floatPreferencesKey(key)
             edit {
-                it[floatPreferencesKey(key)] = value
+                it[pKey] = PreferenceKeys[pKey].check(value)
             }
         }
     }
 
     override fun putLong(key: String, value: Long) {
         launchImmediately {
+            val pKey = longPreferencesKey(key)
             edit {
-                it[longPreferencesKey(key)] = value
+                it[pKey] = PreferenceKeys[pKey].check(value)
             }
         }
     }
@@ -90,7 +94,7 @@ class LegacyPreferenceDataStore(
             edit {
                 when (value) {
                     null -> it.remove(pKey)
-                    else -> it[pKey] = value
+                    else -> it[pKey] = PreferenceKeys[pKey].check(value)
                 }
             }
         }
@@ -102,7 +106,7 @@ class LegacyPreferenceDataStore(
             edit {
                 when (values) {
                     null -> it.remove(pKey)
-                    else -> it[pKey] = values
+                    else -> it[pKey] = PreferenceKeys[pKey].check(values)
                 }
             }
         }

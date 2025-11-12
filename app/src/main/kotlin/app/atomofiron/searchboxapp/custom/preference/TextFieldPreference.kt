@@ -15,16 +15,26 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import app.atomofiron.searchboxapp.custom.view.TextField
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 
-class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(context, attrs), TextField.Listener {
+class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(context, attrs)
+    , Preference.SummaryProvider<TextFieldPreference>
+    , TextField.Listener
+{
 
     private val editText = TextField(context)
-    private var value = ""
     private var filter: ((String) -> String?)? = null
+    private var value = ""
 
-    fun setFilter(filter: (String) -> String?) {
+    init {
+        summaryProvider = this
+    }
+
+    fun transform(filter: (String) -> String?) {
         this.filter = filter
     }
+
+    override fun provideSummary(preference: TextFieldPreference): CharSequence? = value
 
     override fun onGetDefaultValue(array: TypedArray, index: Int): String? = array.getString(index)
 
@@ -62,10 +72,14 @@ class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(co
     }
 
     override fun onSubmit(value: String) {
+        val value = PreferenceKeys.get<String>(key).check(value)
         val filtered = filter?.invoke(value) ?: value
         if (callChangeListener(filtered)) {
             persistString(filtered)
-            this.value = value
+            if (filtered != this.value) {
+                this.value = filtered
+                notifyChanged()
+            }
         }
     }
 }

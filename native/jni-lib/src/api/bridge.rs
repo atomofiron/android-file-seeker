@@ -1,5 +1,5 @@
 use crate::api::cancellation::CancellationState;
-use crate::api::protocol::Check;
+use crate::api::protocol::{Check, SuCmd};
 use crate::api::protocol::{CommonProgressCollector, ComplexResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
 use crate::api::su_bridge::{as_su, as_su_with_progress};
 use crate::api::su_protocol::Request;
@@ -14,9 +14,9 @@ use crate::r#impl::search_by_text::find_text_impl;
 use std::sync::Arc;
 
 #[uniffi::export]
-pub fn create_file(path: RawPath, bin_path: Option<String>) -> MetaResult {
-    if let Some(bin_path) = bin_path {
-        return as_su::<MetaResult>(Request::CreateFile(path), bin_path)
+pub fn create_file(path: RawPath, su_cmd: Option<SuCmd>) -> MetaResult {
+    if let Some(su_cmd) = su_cmd {
+        return as_su::<MetaResult>(Request::CreateFile(path), su_cmd)
             .unwrap_or_else(|e| MetaResult::Err(e.to_string()))
     }
     match new_file(&path.buf()) {
@@ -26,9 +26,9 @@ pub fn create_file(path: RawPath, bin_path: Option<String>) -> MetaResult {
 }
 
 #[uniffi::export]
-pub fn create_dir(path: RawPath, bin_path: Option<String>) -> MetaResult {
-    if let Some(bin_path) = bin_path {
-        return as_su::<MetaResult>(Request::CreateDir(path), bin_path)
+pub fn create_dir(path: RawPath, su_cmd: Option<SuCmd>) -> MetaResult {
+    if let Some(su_cmd) = su_cmd {
+        return as_su::<MetaResult>(Request::CreateDir(path), su_cmd)
             .unwrap_or_else(|e| MetaResult::Err(e.to_string()))
     }
     match new_dir(&path.buf()) {
@@ -40,14 +40,14 @@ pub fn create_dir(path: RawPath, bin_path: Option<String>) -> MetaResult {
 #[uniffi::export]
 pub fn delete_by(
     path: RawPath,
-    bin_path: Option<String>,
+    su_cmd: Option<SuCmd>,
     collector: Arc<dyn CommonProgressCollector>,
 ) -> ComplexResult {
-    if let Some(bin_path) = bin_path {
+    if let Some(su_cmd) = su_cmd {
         let from_buf = path.clone().buf();
         return as_su_with_progress(
             Request::Delete(path),
-            bin_path,
+            su_cmd,
             Arc::new(()),
             Box::new(collector),
         ).unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)));
@@ -60,9 +60,9 @@ pub fn delete_by(
 }
 
 #[uniffi::export]
-pub fn get_usage(path: RawPath, bin_path: Option<String>) -> UsageResult {
-    if let Some(bin_path) = bin_path {
-        return as_su::<UsageResult>(Request::GetUsage(path), bin_path)
+pub fn get_usage(path: RawPath, su_cmd: Option<SuCmd>) -> UsageResult {
+    if let Some(su_cmd) = su_cmd {
+        return as_su::<UsageResult>(Request::GetUsage(path), su_cmd)
             .unwrap_or_else(|e| UsageResult::Err(e.to_string()))
     }
     match usage(&path.buf()) {
@@ -72,9 +72,9 @@ pub fn get_usage(path: RawPath, bin_path: Option<String>) -> UsageResult {
 }
 
 #[uniffi::export]
-pub fn get_meta(path: RawPath, bin_path: Option<String>) -> MetaResult {
-    if let Some(bin_path) = bin_path {
-        return as_su::<MetaResult>(Request::GetMeta(path), bin_path)
+pub fn get_meta(path: RawPath, su_cmd: Option<SuCmd>) -> MetaResult {
+    if let Some(su_cmd) = su_cmd {
+        return as_su::<MetaResult>(Request::GetMeta(path), su_cmd)
             .unwrap_or_else(|e| MetaResult::Err(e.to_string()))
     }
     match try_meta(&path.buf()) {
@@ -84,9 +84,9 @@ pub fn get_meta(path: RawPath, bin_path: Option<String>) -> MetaResult {
 }
 
 #[uniffi::export]
-pub fn get_metas(path: RawPath, bin_path: Option<String>) -> MetasResult {
-    if let Some(bin_path) = bin_path {
-        return as_su::<MetasResult>(Request::GetMetas(path), bin_path)
+pub fn get_metas(path: RawPath, su_cmd: Option<SuCmd>) -> MetasResult {
+    if let Some(su_cmd) = su_cmd {
+        return as_su::<MetasResult>(Request::GetMetas(path), su_cmd)
             .unwrap_or_else(|e| MetasResult::Err(e.to_string()))
     }
     match metas(&path.buf()) {
@@ -96,9 +96,9 @@ pub fn get_metas(path: RawPath, bin_path: Option<String>) -> MetasResult {
 }
 
 #[uniffi::export]
-pub fn get_file_type(path: RawPath, bin_path: Option<String>) -> TypedMetaResult {
-    if let Some(bin_path) = bin_path {
-        return as_su::<TypedMetaResult>(Request::GetTypedMeta(path), bin_path)
+pub fn get_file_type(path: RawPath, su_cmd: Option<SuCmd>) -> TypedMetaResult {
+    if let Some(su_cmd) = su_cmd {
+        return as_su::<TypedMetaResult>(Request::GetTypedMeta(path), su_cmd)
             .unwrap_or_else(|e| TypedMetaResult::Err(e.to_string()))
     }
     match file_type(&path.buf()) {
@@ -108,9 +108,9 @@ pub fn get_file_type(path: RawPath, bin_path: Option<String>) -> TypedMetaResult
 }
 
 #[uniffi::export]
-pub fn get_file_types(path: RawPath, bin_path: Option<String>) -> TypedMetasResult {
-    if let Some(bin_path) = bin_path {
-        return as_su::<TypedMetasResult>(Request::GetTypedMetas(path), bin_path)
+pub fn get_file_types(path: RawPath, su_cmd: Option<SuCmd>) -> TypedMetasResult {
+    if let Some(su_cmd) = su_cmd {
+        return as_su::<TypedMetasResult>(Request::GetTypedMetas(path), su_cmd)
             .unwrap_or_else(|e| TypedMetasResult::Err(e.to_string()))
     }
     match file_types(&path.buf()) {
@@ -124,14 +124,14 @@ pub fn copy(
     from: RawPath,
     to: RawPath,
     moving: bool,
-    bin_path: Option<String>,
+    su_cmd: Option<SuCmd>,
     collector: Arc<dyn CommonProgressCollector>,
 ) -> ComplexResult {
-    if let Some(bin_path) = bin_path {
+    if let Some(su_cmd) = su_cmd {
         let from_buf = from.clone().buf();
         return as_su_with_progress(
             Request::Copy(from, to, moving),
-            bin_path,
+            su_cmd,
             Arc::new(()),
             Box::new(collector),
         ).unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)))
@@ -149,14 +149,14 @@ pub fn find_names(
     targets: Vec<RawPath>,
     max_depth: u32,
     exclude_dirs: bool,
-    bin_path: Option<String>,
+    su_cmd: Option<SuCmd>,
     cancellation: Arc<dyn CancellationState>,
     collector: Arc<dyn NameSearchCollector>,
 ) -> SimpleResult {
-    if let Some(bin_path) = bin_path {
+    if let Some(su_cmd) = su_cmd {
         return as_su_with_progress(
             Request::FindNames { query, targets, max_depth, exclude_dirs },
-            bin_path,
+            su_cmd,
             cancellation,
             Box::new(collector),
         ).unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
@@ -170,14 +170,14 @@ pub fn find_text(
     targets: Vec<RawPath>,
     max_depth: u32,
     check: Check,
-    bin_path: Option<String>,
+    su_cmd: Option<SuCmd>,
     cancellation: Arc<dyn CancellationState>,
     collector: Arc<dyn TextSearchCollector>,
 ) -> SimpleResult {
-    if let Some(bin_path) = bin_path {
+    if let Some(su_cmd) = su_cmd {
         return as_su_with_progress(
             Request::FindText { query, targets, max_depth, check },
-            bin_path,
+            su_cmd,
             cancellation,
             Box::new(collector),
         ).unwrap_or_else(|e| SimpleResult::Err(e.to_string()))

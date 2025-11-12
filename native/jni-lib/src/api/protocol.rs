@@ -2,6 +2,13 @@ use crate::ext::raw_path::RawPath;
 use bincode::{Decode, Encode};
 
 #[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(uniffi::Record)]
+pub struct SuCmd {
+    pub cmd: String,
+    pub bin_path: String,
+}
+
+#[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum MetaResult {
     Ok(Meta),

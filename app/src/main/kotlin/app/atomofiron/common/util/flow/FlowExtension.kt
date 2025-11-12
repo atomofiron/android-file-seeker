@@ -7,6 +7,10 @@ import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
+internal object NopCollector : FlowCollector<Any?> {
+    override suspend fun emit(value: Any?) = Unit // does nothing
+}
+
 val <T> SharedFlow<T>.value: T get() = replayCache.last()
 
 val <T> SharedFlow<T>.valueOrNull: T? get() = replayCache.lastOrNull()
@@ -31,9 +35,10 @@ fun <T> MutableStateFlow<T>.set(value: T) {
 
 operator fun MutableStateFlow<Unit>.invoke() = set(Unit)
 
-fun <T> Flow<T>.collect(scope: CoroutineScope, collector: FlowCollector<T>) {
+fun <T> Flow<T>.collect(scope: CoroutineScope, collector: FlowCollector<T> = NopCollector) {
     scope.launch { collect(collector) }
 }
+
 fun <T> Flow<T>.first(scope: CoroutineScope, collector: FlowCollector<T>) {
     scope.launch { collector.emit(first()) }
 }
@@ -41,7 +46,7 @@ fun <T> Flow<T>.first(scope: CoroutineScope, collector: FlowCollector<T>) {
 fun <T> Flow<T>.collect(
     scope: CoroutineScope,
     context: CoroutineContext,
-    collector: FlowCollector<T>,
+    collector: FlowCollector<T> = NopCollector,
 ) {
     scope.launch(context) { collect(collector) }
 }

@@ -18,6 +18,7 @@ import uniffi.native_lib.NameSearchCollector
 import uniffi.native_lib.NameSearchProgress
 import uniffi.native_lib.SearchQuery
 import uniffi.native_lib.SimpleResult
+import uniffi.native_lib.SuCmd
 import uniffi.native_lib.TextSearchCollector
 import uniffi.native_lib.TextSearchProgress
 import uniffi.native_lib.TypedMeta
@@ -32,7 +33,7 @@ private const val NATIVE_BIN = "native-bin"
 private const val NATIVE_LIB = "native_lib"
 private const val NATIVE_LIB_SO = "lib$NATIVE_LIB.so"
 
-private lateinit var binPath: String
+private lateinit var suCmd: SuCmd
 
 object NativeBridge {
 
@@ -40,12 +41,12 @@ object NativeBridge {
         System.loadLibrary(NATIVE_LIB)
     }
 
-    fun setBinDir(path: String) {
-        binPath = "$path/$NATIVE_BIN"
+    fun setSuCmd(cmd: String, binDir: String) {
+        suCmd = SuCmd(cmd = cmd, binPath = "$binDir/$NATIVE_BIN")
     }
 
     fun trySu(): Rslt<Unit> {
-        val response = uniffi.native_lib.tryAsSu(binPath)
+        val response = uniffi.native_lib.tryAsSu(suCmd)
         return when (response) {
             is SimpleResult.Ok -> Rslt.Ok
             is SimpleResult.Err -> Rslt.Err(response.v1)
@@ -53,7 +54,7 @@ object NativeBridge {
     }
 
     fun createFile(ref: NodeRef, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.createFile(ref.bytes, binPath = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.createFile(ref.bytes, suCmd = suCmd.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
@@ -61,7 +62,7 @@ object NativeBridge {
     }
 
     fun createDir(ref: NodeRef, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.createDir(ref.bytes, binPath = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.createDir(ref.bytes, suCmd = suCmd.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
@@ -69,7 +70,7 @@ object NativeBridge {
     }
 
     fun type(ref: NodeRef, asSu: Boolean): Rslt<TypedMeta> {
-        val response = uniffi.native_lib.getFileType(ref.bytes, binPath = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.getFileType(ref.bytes, suCmd = suCmd.takeIf { asSu })
         return when (response) {
             is TypedMetaResult.Ok -> Rslt.Ok(response.v1)
             is TypedMetaResult.Err -> Rslt.Err(response.v1)
@@ -77,7 +78,7 @@ object NativeBridge {
     }
 
     fun types(ref: NodeRef, asSu: Boolean): Rslt<List<TypedMeta>> {
-        val response = uniffi.native_lib.getFileTypes(ref.bytes, binPath = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.getFileTypes(ref.bytes, suCmd = suCmd.takeIf { asSu })
         return when (response) {
             is TypedMetasResult.Ok -> Rslt.Ok(response.v1)
             is TypedMetasResult.Err -> Rslt.Err(response.v1)
@@ -85,7 +86,7 @@ object NativeBridge {
     }
 
     fun meta(ref: NodeRef, asSu: Boolean): Rslt<Meta> {
-        val response = uniffi.native_lib.getMeta(ref.bytes, binPath = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.getMeta(ref.bytes, suCmd = suCmd.takeIf { asSu })
         return when (response) {
             is MetaResult.Ok -> Rslt.Ok(response.v1)
             is MetaResult.Err -> Rslt.Err(response.v1)
@@ -93,7 +94,7 @@ object NativeBridge {
     }
 
     fun metas(ref: NodeRef, asSu: Boolean): Rslt<List<Meta>> {
-        val response = uniffi.native_lib.getMetas(ref.bytes, binPath = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.getMetas(ref.bytes, suCmd = suCmd.takeIf { asSu })
         return when (response) {
             is MetasResult.Ok -> Rslt.Ok(response.v1)
             is MetasResult.Err -> Rslt.Err(response.v1)
@@ -101,7 +102,7 @@ object NativeBridge {
     }
 
     fun usage(ref: NodeRef, asSu: Boolean): Rslt<String> {
-        val response = uniffi.native_lib.getUsage(ref.bytes, binPath = binPath.takeIf { asSu })
+        val response = uniffi.native_lib.getUsage(ref.bytes, suCmd = suCmd.takeIf { asSu })
         return when (response) {
             is UsageResult.Ok -> Rslt.Ok(response.v1)
             is UsageResult.Err -> Rslt.Err(response.v1)
@@ -112,7 +113,7 @@ object NativeBridge {
         val collector = object : CommonProgressCollector {
             override fun emit(progress: CommonProgress) = Unit
         }
-        return uniffi.native_lib.deleteBy(ref.bytes, binPath = binPath.takeIf { asSu }, collector)
+        return uniffi.native_lib.deleteBy(ref.bytes, suCmd = suCmd.takeIf { asSu }, collector)
     }
 
     fun copy(
@@ -125,7 +126,7 @@ object NativeBridge {
         val collector = object : CommonProgressCollector {
             override fun emit(progress: CommonProgress) = collector(progress)
         }
-        return uniffi.native_lib.copy(from.bytes, to.bytes, move, binPath = binPath.takeIf { asSu }, collector)
+        return uniffi.native_lib.copy(from.bytes, to.bytes, move, suCmd = suCmd.takeIf { asSu }, collector)
     }
 
     fun findNames(
@@ -141,7 +142,7 @@ object NativeBridge {
             override fun emit(progress: NameSearchProgress) = collector(progress)
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
-        return uniffi.native_lib.findNames(query, targets.map { it.bytes }, maxDepth.toUInt(), excludeDirs, binPath = binPath.takeIf { asSu }, cancellation, collector)
+        return uniffi.native_lib.findNames(query, targets.map { it.bytes }, maxDepth.toUInt(), excludeDirs, suCmd = suCmd.takeIf { asSu }, cancellation, collector)
     }
 
     fun findLocalText(
@@ -183,7 +184,7 @@ object NativeBridge {
             override fun emit(progress: TextSearchProgress) = collector(progress)
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
-        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), check, binPath = binPath.takeIf { asSu }, cancellation, collector)
+        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), check, suCmd = suCmd.takeIf { asSu }, cancellation, collector)
     }
 }
 
@@ -192,7 +193,7 @@ fun Context.verifyNativeBin(): Rslt<Unit> {
         is Rslt.Ok -> Unit
         is Rslt.Err -> return lib
     }
-    val file = File(binPath)
+    val file = File(suCmd.binPath)
     file.parentFile?.mkdirs()
     val embedded = assets.list(NATIVE_BIN)
         ?.sortedBy { !it.endsWith("64") }

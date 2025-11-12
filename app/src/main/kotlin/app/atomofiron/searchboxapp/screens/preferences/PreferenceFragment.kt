@@ -26,6 +26,7 @@ import app.atomofiron.fileseeker.databinding.FragmentPreferenceBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.addLayoutListener
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.custom.preference.DropDownPreference
+import app.atomofiron.searchboxapp.custom.preference.TextFieldPreference
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -58,29 +59,33 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         setPreferencesFromResource(R.xml.preferences, rootKey)
         preferenceDelegate.onCreatePreference(preferenceScreen)
 
-        val deepBlack = findPreference<Preference>(PreferenceKeys.KeyDeepBlack.name)!!
+        val deepBlack = findPreference<Preference>(PreferenceKeys.KeyDeepBlack.name)
         viewState.showDeepBlack.collect(lifecycleScope) {
             deepBlack.isVisible = it
         }
-        val hapticFeedback = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyHapticFeedback.name)!!
+        val hapticFeedback = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyHapticFeedback.name)
         viewState.hapticFeedback.collect(lifecycleScope) {
             hapticFeedback.isChecked = it
         }
-        val uppUpdate = findPreference<AppUpdatePreference>(PreferenceKeys.PREF_APP_UPDATE)!!
+        val uppUpdate = findPreference<AppUpdatePreference>(PreferenceKeys.PREF_APP_UPDATE)
         uppUpdate.listener = presenter
         viewState.appUpdate.collect(lifecycleScope) {
             uppUpdate.bind(it)
         }
-        val asSu = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyUseSu.name)!!
+        val asSu = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyUseSu.name)
+        val suCmd = findPreference<TextFieldPreference>(PreferenceKeys.KeySuCmd.name)
         viewState.asSu.collect(lifecycleScope) {
             asSu.isChecked = it
+            suCmd.isVisible = it
         }
-        val debugGroup = findPreference<PreferenceGroup>(PreferenceKeys.PREF_CATEGORY_DEBUG)!!
+        val debugGroup = findPreference<PreferenceGroup>(PreferenceKeys.PREF_CATEGORY_DEBUG)
         debugGroup.isVisible = viewState.withDebugGroup
 
-        joystickPreference = findPreference(PreferenceKeys.KeyJoystick.name)!!
-        if (Android.T) findPreference<DropDownPreference>(PreferenceKeys.KeyLocale.name)!!.interceptClicks()
+        joystickPreference = findPreference(PreferenceKeys.KeyJoystick.name)
+        if (Android.T) findPreference<DropDownPreference>(PreferenceKeys.KeyLocale.name).interceptClicks()
     }
+
+    override fun <T : Preference> findPreference(key: CharSequence): T = super.findPreference(key)!!
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val binding = FragmentPreferenceBinding.inflate(inflater, container, false)
