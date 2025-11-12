@@ -75,13 +75,12 @@ sealed class NodeContent(
             val Aac = Music("audio/aac")
             val M4a = Music("audio/mp4")
             val Ogg = Music("audio/ogg")
-            val Opus = Music("audio/opus")
             val Flac = Music("audio/flac")
             val Wma = Music("audio/x-ms-wma")
             val Wav = Music("audio/wav")
             val Xwav = Music("audio/x-wav")
 
-            private val popular = listOf(Mp3, Aac, M4a, Ogg, Opus, Flac, Wma, Wav, Xwav)
+            private val popular = listOf(Mp3, Aac, M4a, Ogg, Flac, Wma, Wav, Xwav)
                 .associateBy { it.mimeType }
 
             fun resolve(mimeType: String) = popular[mimeType] ?: Music(mimeType = mimeType)
