@@ -6,16 +6,6 @@
     <app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
         app:key="pref_app_update"
         />
-    <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
-        app:title="@string/pref_use_su"
-        app:key="pref_use_su"
-        app:icon="@drawable/ic_hash"
-        />
-    <app.atomofiron.searchboxapp.custom.preference.TextFieldPreference
-        app:title="@string/pref_su_cmd"
-        app:key="pref_su_cmd"
-        app:icon="@drawable/ic_shell"
-        />
     <PreferenceCategory
         app:title="@string/user_interface"
         >
@@ -68,6 +58,16 @@
             app:key="pref_export_import"
             app:icon="@drawable/ic_export_import"
             app:isPreferenceVisible="false"
+            />
+        <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
+            app:title="@string/pref_use_su"
+            app:key="pref_use_su"
+            app:icon="@drawable/ic_hash"
+            />
+        <app.atomofiron.searchboxapp.custom.preference.TextFieldPreference
+            app:title="@string/pref_su_cmd"
+            app:key="pref_su_cmd"
+            app:icon="@drawable/ic_shell"
             />
     </PreferenceCategory>
     <PreferenceCategory

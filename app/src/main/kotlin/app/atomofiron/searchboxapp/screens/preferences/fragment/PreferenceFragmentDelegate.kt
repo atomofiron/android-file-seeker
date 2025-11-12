@@ -61,7 +61,6 @@ class PreferenceFragmentDelegate(
                 preference.summary = resources.getStringArray(R.array.orientation_var)[i]
             }
             PreferenceKeys.PREF_EXPORT_IMPORT -> preference.isEnabled = viewState.isExportImportAvailable
-            PreferenceKeys.PREF_CATEGORY_SYSTEM -> preference.isVisible = Android.Below.Q
             PreferenceKeys.KeyLocale.name -> (newValue as String?)?.toInt()?.let { index ->
                 view()?.post { // let persist the new value
                     val locales = LocaleListCompat.forLanguageTags(AppLocale.entries[index].tag)

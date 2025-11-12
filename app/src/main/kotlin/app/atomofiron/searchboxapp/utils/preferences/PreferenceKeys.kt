@@ -14,7 +14,6 @@ object PreferenceKeys {
     const val PREF_APP_UPDATE = "pref_app_update"
     const val PREF_EXPORT_IMPORT = "pref_export_import"
     const val PREF_LEAK_CANARY = "pref_leak_canary"
-    const val PREF_CATEGORY_SYSTEM = "pref_category_system"
     const val PREF_CATEGORY_DEBUG = "pref_category_debug"
     const val PREF_COLOR_SCHEME = "pref_color_scheme"
 
