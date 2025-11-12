@@ -18,17 +18,17 @@ data class NodeChildren(
 
     override fun hashCode(): Int = Objects.hash(isOpened, items.map { it.ref })
 
-    override fun equals(other: Any?): Boolean {
-        return when {
-            other !is NodeChildren -> false
-            other.isOpened != isOpened -> false
-            other.items.size != items.size -> false
-            other.names.containsAll(names) -> false
-            names.containsAll(other.names) -> false
-            // do not compare the children because of ConcurrentModificationException
-            else -> true
-        }
+    override fun equals(other: Any?): Boolean = when {
+        other !is NodeChildren -> false
+        other.isOpened != isOpened -> false
+        other.items.size != items.size -> false
+        other.names.containsAll(names) -> false
+        names.containsAll(other.names) -> false
+        // do not compare the children because of ConcurrentModificationException
+        else -> true
     }
+
+    override fun toString() = "NodeChildren(items=[${items.size}], isOpened=$isOpened, filteredOut=$filteredOut)"
 
     inline fun update(updateMetadata: Boolean = true, action: MutableList<Node>.() -> Unit) {
         items.action()
