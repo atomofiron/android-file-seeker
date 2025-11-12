@@ -118,14 +118,14 @@ private operator fun ByteArray.plus(child: String): ByteArray {
     val child = when {
         child.endsWith('/') -> child.substring(0, child.length.dec())
         else -> child
-    }
+    }.toByteArray()
     if (child.isEmpty()) {
         return this
     }
-    val new = ByteArray(size + child.length + 1)
+    val new = ByteArray(size + child.size + 1)
     copyInto(new)
     new[size] = SLASH_BYTE
-    child.toByteArray().copyInto(new, new.size - child.length)
+    child.copyInto(new, new.size - child.size)
     return new
 }
 
