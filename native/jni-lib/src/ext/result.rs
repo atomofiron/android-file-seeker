@@ -3,6 +3,8 @@ use std::error::Error;
 pub trait ResultExt<T, E> {
     #[allow(dead_code)]
     fn or_then<F: FnOnce(E) -> Result<T, E>>(self, op: F) -> Result<T, E>;
+    #[allow(dead_code)]
+    fn map_on<F: FnOnce(T) -> Option<R>, R>(self, op: F) -> Option<R>;
     fn boxed(self) -> Result<T, Box<dyn Error>> where E: Error + Send + Sync + 'static;
 }
 
@@ -14,6 +16,15 @@ impl<T, E> ResultExt<T, E> for Result<T, E> {
         match self {
             Ok(t) => Ok(t),
             Err(e) => op(e),
+        }
+    }
+
+    fn map_on<F: FnOnce(T) -> Option<R>, R>(self, op: F) -> Option<R> {
+        // Result.Ok + Some = Some
+        // Result.Err + Some = None
+        match self {
+            Ok(t) => op(t),
+            Err(_) => None,
         }
     }
 
