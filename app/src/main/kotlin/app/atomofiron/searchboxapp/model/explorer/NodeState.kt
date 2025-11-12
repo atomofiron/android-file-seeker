@@ -10,9 +10,9 @@ data class NodeStateImpl(
 ) : NodeState {
     val empty: Boolean = cachingJob == null && operation is NodeOperation.None
 
-    val isCaching: Boolean = cachingJob != null
-    val isDeleting: Boolean = operation is NodeOperation.Deleting
-    val isCopying: Boolean = operation is NodeOperation.Copying
+    override val isCaching: Boolean = cachingJob != null
+    override val isDeleting: Boolean = operation is NodeOperation.Deleting
+    override val isCopying: Boolean = operation is NodeOperation.Copying
     override val withOperation: Boolean = operation !is NodeOperation.None
 
     override fun toString(): String = "NodeState{caching=${cachingJob != null},operation=${operation.javaClass.simpleName}}"
@@ -21,4 +21,7 @@ data class NodeStateImpl(
 interface NodeState {
     val operation: NodeOperation?
     val withOperation: Boolean
+    val isCaching: Boolean
+    val isDeleting: Boolean
+    val isCopying: Boolean
 }

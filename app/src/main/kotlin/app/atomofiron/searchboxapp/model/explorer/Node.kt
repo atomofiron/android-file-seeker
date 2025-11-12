@@ -13,7 +13,7 @@ data class Node(
     val content: NodeContent,
     val error: NodeError? = null,
     // state is always stateStub in the garden
-    val state: NodeStateImpl = stateStub,
+    val state: NodeState = stateStub,
     // isChecked is always false in the garden
     val isChecked: Boolean = false,
     // isDeepest is always false in the garden
