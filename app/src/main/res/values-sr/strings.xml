@@ -101,6 +101,7 @@
     <string name="no_such_directory">Фасцикла не постоји</string>
     <string name="no_such_file_or_directory">Датотека или фасцикла не постоји</string>
     <string name="permission_denied">Приступ одбијен</string>
+    <string name="resource_busy">Ресурс заузет</string>
     <string name="unknown_error">Непозната грешка</string>
     <string name="unknown">непознато</string>
     <string name="unavailable">недоступно</string>
@@ -191,6 +192,7 @@
     <string name="fetching">Добављање метаподатака…</string>
     <string name="and">\u0020и\u0020</string>
     <string name="nothing_was_deleted">Ништа није обрисано</string>
+    <string name="something_wasnt_deleted">Нешто није уклоњено</string>
     <string name="none">Нема</string>
     <string name="lite">Лаган</string>
     <string name="twice">Дупло</string>

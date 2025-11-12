@@ -45,6 +45,7 @@ object ExplorerUtils {
     private const val FILE_CHAR = '-'
     private const val LS_NO_SUCH_FILE = "No such file or directory"
     private const val LS_PERMISSION_DENIED = "Permission denied"
+    private const val RESOURCE_BUSY = "Device or resource busy"
 
     private const val DIRECTORY = NodeContent.Directory.MIME_TYPE
     private const val FILE_PICTURE = "image/"
@@ -561,11 +562,17 @@ object ExplorerUtils {
             is ComplexResult.Err -> result.v1
         }
         meta ?: return null
-        var ref = NodeRef(meta.path)
-        val newRef = ref != this.ref
-        if (!newRef) ref = this.ref
-        val properties = meta.toProperties(size.takeIf { !newRef })
-        return copy(ref = ref, parentRef = ref.parent, uniqueId = ref.uniqueId, properties = properties, error = meta.error?.toNodeError())
+        val ref = when {
+            ref.theSame(meta.path) -> ref
+            else -> NodeRef(meta.path)
+        }
+        val properties = meta.toProperties(size.takeIf { ref == this.ref })
+        val error = meta.error
+            ?.toNodeError()
+            ?: (result as? ComplexResult.Ok)
+                ?.errors
+                ?.toNodeError()
+        return copy(ref = ref, parentRef = ref.parent, uniqueId = ref.uniqueId, properties = properties, error = error)
     }
 
     fun Node.move(parent: NodeRef = parentRef, name: String = this.name): Node {
@@ -588,9 +595,13 @@ object ExplorerUtils {
             first == null -> NodeError.Unknown
             first.startsWith(LS_NO_SUCH_FILE) -> NodeError.NoSuchFile
             first.startsWith(LS_PERMISSION_DENIED) -> NodeError.PermissionDenied
+            first.startsWith(RESOURCE_BUSY) -> NodeError.ResourceBusy
             else -> NodeError.Message.orUnknown(first)
         }
     }
+
+    private fun List<String>.toNodeError(): NodeError? = takeIf { it.isNotEmpty() }
+        ?.let { NodeError.Multiply(it) }
 
     fun NodeStateImpl?.theSame(cachingJob: Job?, operation: NodeOperation): Boolean {
         val currentOperation = this?.operation ?: NodeOperation.None

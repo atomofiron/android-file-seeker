@@ -19,3 +19,5 @@ pub const TIME_STUB: &str = "??:??:??";
 
 pub const JOINING_ERROR: &str = "Joining thread failed";
 pub const EMPTY_VALUE_ERROR: &str = "Value is empty";
+pub const PERMISSION_DENIED: &str = "Permission denied";
+pub const RESOURCE_BUSY: &str = "Device or resource busy";

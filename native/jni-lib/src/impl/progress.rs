@@ -1,4 +1,4 @@
-use crate::api::protocol::{ComplexResult, CommonProgress, CommonProgressCollector};
+use crate::api::protocol::{CommonProgress, CommonProgressCollector, ComplexResult};
 use crate::common::Rslt;
 use crate::ext::raw_path::RawPath;
 use crate::ext::result::ResultExt;
@@ -39,7 +39,7 @@ impl CommonProgress {
 pub fn convert_progress(
     rx: Receiver<ProgressChange>,
     collector: Arc<dyn CommonProgressCollector>,
-    target: Option<PathBuf>,
+    target: PathBuf,
 ) -> JoinHandle<ComplexResult> {
     std::thread::spawn(move || {
         let mut progress = CommonProgress::new();
@@ -60,7 +60,9 @@ pub fn convert_progress(
         let errors = errors.iter()
             .map(|(path, msg)| format!("{}: {msg}", String::from_utf8_lossy(path)))
             .collect();
-        let meta = target.map(|t| t.metadata().to_hr(&t));
+        let meta = target.metadata()
+            .map(|m| Ok(m).to_hr(&target))
+            .ok();
         return ComplexResult::Ok { count: progress.count, errors, meta }
     })
 }

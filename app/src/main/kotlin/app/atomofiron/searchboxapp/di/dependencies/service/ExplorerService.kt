@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.di.dependencies.service
 
 import android.content.Context
 import android.os.StatFs
+import app.atomofiron.common.util.CoroutineSafeList
 import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.dropLast
 import app.atomofiron.common.util.extension.clear
@@ -520,13 +521,13 @@ class ExplorerService(
         val fileJob = appScope.launch {
             for (file in files) {
                 file.delete(config.asSu)
-                store.emitRemoved(file.copy(children = null))
+                store.emitDeleted(file.copy(children = null))
             }
         }
         val dirJobs = dirs.map { dir ->
             appScope.launch {
                 dir.delete(config.asSu)
-                store.emitRemoved(dir.copy(children = null))
+                store.emitDeleted(dir.copy(children = null))
             }
         }
         fileJob.join()
@@ -555,20 +556,25 @@ class ExplorerService(
         }
         val files = items.filter { !it.isDirectory }
         val dirs = items.filter { it.isDirectory }
+        val deleted = CoroutineSafeList<Node>()
         debugDelay(1)
         val fileJob = appScope.launch {
             for (file in files) {
-                file.deleteIn(key)
+                if (file.deleteIn(key)) {
+                    deleted.add(file)
+                }
             }
         }
         val dirJobs = dirs.map { dir ->
             appScope.launch {
-                dir.deleteIn(key)
+                if (dir.deleteIn(key)) {
+                    deleted.add(dir)
+                }
             }
         }
         fileJob.join()
         dirJobs.forEach { it.join() }
-        store.emitDeleted(items)
+        store.emitDeleted(deleted)
         mediaRootAffected?.let { mediaRoot ->
             garden {
                 updateRootAsync(key, mediaRoot)
@@ -576,14 +582,17 @@ class ExplorerService(
         }
     }
 
-    private suspend fun Node.deleteIn(key: NodeTabKey) {
+    private suspend fun Node.deleteIn(key: NodeTabKey): Boolean {
         val result = delete(config.asSu)
         garden(key) {
             tree.replaceItem(uniqueId, parentRef, result)
             states.updateState(uniqueId) { null }
-            store.emitRemoved(copy(children = null))
             lazyRender()
         }
+        result?.let {
+            tryCache(key, it)
+        }
+        return result == null
     }
 
     suspend fun resetChecked(key: NodeTabKey) {

@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 
 class ExplorerViewState(
@@ -37,7 +38,11 @@ class ExplorerViewState(
     private val otherAlerts = ChannelFlow<AlertMessage>()
     val alerts: Flow<AlertMessage> = merge(
         store.alerts.map { AlertMessage(it) },
-        store.deleted.map { AlertMessage(ExplorerAlert.Deleted(it)) },
+        store.deleted.mapNotNull { deleted ->
+            deleted.takeIf { it.isNotEmpty() }
+                ?.let { ExplorerAlert.Deleted(it) }
+                ?.let { AlertMessage(it) }
+        },
         otherAlerts,
     )
     val tabs = listOf(firstTab, middleTab, lastTab)

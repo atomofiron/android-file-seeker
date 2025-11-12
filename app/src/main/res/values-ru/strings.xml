@@ -101,6 +101,7 @@
     <string name="no_such_directory">Папки не существует</string>
     <string name="no_such_file_or_directory">Файла или папка не существует</string>
     <string name="permission_denied">Нет доступа</string>
+    <string name="resource_busy">Ресурс занят</string>
     <string name="unknown_error">Неизвестная ошибка</string>
     <string name="unknown">неизвестно</string>
     <string name="unavailable">недоступно</string>
@@ -191,6 +192,7 @@
     <string name="fetching">Получение метаданных…</string>
     <string name="and">\u0020и\u0020</string>
     <string name="nothing_was_deleted">Ничего не было удалено</string>
+    <string name="something_wasnt_deleted">Что-то не было удалено</string>
     <string name="none">Нет</string>
     <string name="lite">Лёгкий</string>
     <string name="twice">Двойной</string>

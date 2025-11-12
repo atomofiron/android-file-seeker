@@ -5,6 +5,7 @@ import app.atomofiron.common.util.extension.debugRequire
 sealed class NodeError {
     data object NoSuchFile : NodeError()
     data object PermissionDenied : NodeError()
+    data object ResourceBusy : NodeError()
     data object Unknown : NodeError()
     data class Multiply(val lines: List<String>) : NodeError()
     data class Message(val message: String) : NodeError() {

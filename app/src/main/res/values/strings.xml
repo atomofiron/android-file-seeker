@@ -104,6 +104,7 @@
     <string name="no_such_directory">No such folder</string>
     <string name="no_such_file_or_directory">No such file or folder</string>
     <string name="permission_denied">Permission denied</string>
+    <string name="resource_busy">Resource busy</string>
     <string name="unknown_error">Unknown error</string>
     <string name="unknown">unknown</string>
     <string name="unavailable">unavailable</string>
@@ -201,6 +202,7 @@
     <string name="fetching">Fetching metadata…</string>
     <string name="and">\u0020and\u0020</string>
     <string name="nothing_was_deleted">Nothing was deleted</string>
+    <string name="something_wasnt_deleted">Something wasn\'t deleted</string>
     <string name="none">None</string>
     <string name="lite">Lite</string>
     <string name="twice">Double</string>

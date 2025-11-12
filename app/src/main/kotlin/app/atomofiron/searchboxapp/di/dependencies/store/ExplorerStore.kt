@@ -25,7 +25,6 @@ class ExplorerStore {
     private val _internalRoot = MutableStateFlow(Node.asRoot(NodeRef(internalStoragePath), NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
     private val _checked = MutableStateFlow<List<Node>>(listOf())
     private val _alerts = EventFlow<NodeError>()
-    private val _removed = EventFlow<Node>()
     private val _deleted = EventFlow<List<Node>>()
     private val _updated = EventFlow<Node>()
     var currentItems = listOf<Node>()
@@ -37,7 +36,6 @@ class ExplorerStore {
     val internalStorage: StateFlow<Node> = _internalRoot
     val checked: StateFlow<List<Node>> = _checked
     val alerts: Flow<NodeError> = _alerts
-    val removed: Flow<Node> = _removed
     val deleted: Flow<List<Node>> = _deleted
     val updated: Flow<Node> = _updated
 
@@ -75,7 +73,7 @@ class ExplorerStore {
 
     suspend fun emitUpdate(item: Node) = _updated.emit(item)
 
-    suspend fun emitRemoved(item: Node) = _removed.emit(item)
+    suspend fun emitDeleted(item: Node) = _deleted.emit(listOf(item))
 
     suspend fun emitDeleted(items: List<Node>) = _deleted.emit(items)
 

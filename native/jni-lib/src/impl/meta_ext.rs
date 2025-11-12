@@ -17,7 +17,7 @@ impl MetaExt for Meta {
 
 impl Meta {
 
-    pub fn with_error(path: &PathBuf, error: &impl Display) -> Meta {
+    fn new(path: &PathBuf, error: Option<&impl Display>) -> Meta {
         Meta {
             access: empty_string(),
             owner: empty_string(),
@@ -27,7 +27,11 @@ impl Meta {
             time: empty_string(),
             path: path.clone().raw(),
             length: 0,
-            error: Some(error.to_string()),
+            error: error.map(|e| e.to_string()),
         }
+    }
+
+    pub fn with_error(path: &PathBuf, error: &impl Display) -> Meta {
+        Self::new(path, Some(error))
     }
 }

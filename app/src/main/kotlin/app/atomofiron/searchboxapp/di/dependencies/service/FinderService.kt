@@ -28,7 +28,7 @@ class FinderService(
 ) {
     init {
         workManager.cancelAllWork()
-        explorerStore.removed.collect(scope) {
+        explorerStore.deleted.collect(scope) {
             finderStore.deleteResultFromTasks(it)
         }
     }

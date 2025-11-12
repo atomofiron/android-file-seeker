@@ -70,13 +70,18 @@ sealed class SearchResult {
             return data.toString()
         }
 
-        fun removeItem(removed: Node): SearchResult {
-            val nothing = !matches.any { it.item.ref.isChildOf(removed.ref) }
-            if (nothing) return this
-            val left = matches.filter { !it.item.ref.isChildOf(removed.ref) }
-            val items = matches.toMutableList()
+        fun removeItems(removed: List<Node>): SearchResult {
+            val nothing = matches.none { match ->
+                removed.any { match.item.ref.isChildOf(it.ref) }
+            }
+            if (nothing) {
+                return this
+            }
+            val left = matches.filter { match ->
+                removed.none { match.item.ref.isChildOf(it.ref) }
+            }
             val count = left.sumOf { it.count }
-            return Files(forText, count = count, countTotal = countTotal.dec(), items)
+            return Files(forText, count = count, countTotal = left.size, left)
         }
 
         fun contains(match: ItemMatch) = matches.contains(match)

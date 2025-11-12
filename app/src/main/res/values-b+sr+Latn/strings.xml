@@ -101,6 +101,7 @@
     <string name="no_such_directory">Fascikla ne postoji</string>
     <string name="no_such_file_or_directory">Datoteka ili fascikla ne postoji</string>
     <string name="permission_denied">Pristup odbijen</string>
+    <string name="resource_busy">Resurs zauzet</string>
     <string name="unknown_error">Nepoznata greška</string>
     <string name="unknown">nepoznato</string>
     <string name="unavailable">nedostupno</string>
@@ -191,6 +192,7 @@
     <string name="fetching">Dobavljanje metapodataka…</string>
     <string name="and">\u0020i\u0020</string>
     <string name="nothing_was_deleted">Ništa nije obrisano</string>
+    <string name="something_wasnt_deleted">Nešto nije uklonjeno</string>
     <string name="none">Nema</string>
     <string name="lite">Lagan</string>
     <string name="twice">Duplo</string>

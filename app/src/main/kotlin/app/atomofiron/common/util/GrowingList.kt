@@ -3,7 +3,9 @@ package app.atomofiron.common.util
 import java.util.Spliterator
 import java.util.Spliterators
 
-class GrowingList<E> private constructor(private val mutable: MutableList<E>) : List<E> by mutable {
+class GrowingList<E> private constructor(
+    private val mutable: MutableList<E>,
+) : List<E> by mutable {
 
     constructor() : this(mutableListOf())
 

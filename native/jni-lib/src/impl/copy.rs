@@ -31,7 +31,7 @@ pub fn copy_impl(
 ) -> Rslt<ComplexResult> {
     let method = CopyMethod::detect();
     let (tx, rx) = channel::<ProgressChange>();
-    let handle = convert_progress(rx, collector, Some(to.clone()));
+    let handle = convert_progress(rx, collector, to.clone());
     if moving {
         match fs::rename(from, to) {
             Ok(()) => send_inc(&tx, &(0.0..1.0))?,

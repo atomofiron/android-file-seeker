@@ -56,12 +56,15 @@ class FinderStore(
         }
     }
 
-    suspend fun deleteResultFromTasks(item: Node) {
+    suspend fun deleteResultFromTasks(items: List<Node>) {
+        if (items.isEmpty()) {
+            return
+        }
         updateTasks {
             forEachIndexed { index, task ->
                 val result = task.result as? SearchResult.Files
                 result ?: return@forEachIndexed
-                val new = result.removeItem(item)
+                val new = result.removeItems(items)
                 if (new !== result) {
                     this[index] = task.copy(result = new)
                 }

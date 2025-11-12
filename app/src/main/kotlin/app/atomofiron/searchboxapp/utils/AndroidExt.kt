@@ -106,6 +106,7 @@ fun Resources.getString(error: NodeError, content: NodeContent? = null): String 
             else -> getString(R.string.no_such_file_or_directory)
         }
         is NodeError.PermissionDenied -> getString(R.string.permission_denied)
+        is NodeError.ResourceBusy -> getString(R.string.resource_busy)
         is NodeError.Unknown -> getString(R.string.unknown_error)
         is NodeError.Multiply -> getString(R.string.a_lot_of_errors)
         is NodeError.Message -> error.message

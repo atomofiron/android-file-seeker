@@ -137,7 +137,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
                 resources.takeIf { files > 0 }?.getQuantityString(R.plurals.x_files, files, files),
             ).joinToString(separator = resources.getString(R.string.and))
             resources.getQuantityString(R.plurals.x_deleted, items.size, what)
-        } ?: resources.getString(R.string.nothing_was_deleted)
+        } ?: resources.getString(R.string.something_wasnt_deleted)
         return makeSnackbar(message, Snackbar.LENGTH_LONG)
     }
 
