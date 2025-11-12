@@ -381,24 +381,24 @@ class ExplorerService(
         }
         item ?: return
         // todo change uniqueId in state, create the new one state instance
-        val new = item.rename(name, config.asSu)
+        var new = item.rename(name, config.asSu)
             ?: return debugFail { "null after rename $ref to $name" }
         renderTab(key) {
-            val level = tree.find(item.parentRef)
-            val index = level?.children?.indexOfFirst { it.uniqueId == item.uniqueId }
-            if (index == null || index < 0) return
+            var (levelIndex, level) = tree.findIndexed(item.parentRef)
+            level?.children ?: return
+            val index = level.children.indexOfFirst { it.uniqueId == item.uniqueId }
+            if (index < 0) return
             level.children.items[index] = new
-            val levelIndex = tree.indexOfFirst { it.ref == item.ref }
-            if (levelIndex >= 0) {
+
+            var parent = level
+            level = tree.getOrNull(++levelIndex)
+            while (parent != null && level != null) {
                 tree[levelIndex] = new
-                var prev = new
-                for (i in levelIndex.inc()..tree.lastIndex) {
-                    val next = tree[i]
-                    prev = prev.children?.find { it.name == next.name }
-                        ?.also { tree[i] = it }
-                        ?: debugFail { "No ${next.name} in ${prev.name} (children=${prev.children?.map { it.name }})" }
-                            .let { break }
-                }
+                parent = level
+                level = tree.getOrNull(++levelIndex) ?: break
+                new = parent.children
+                    ?.find { it.name == level.name }
+                    ?: break
             }
         }
     }

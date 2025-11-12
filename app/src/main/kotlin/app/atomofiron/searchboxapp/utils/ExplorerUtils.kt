@@ -572,19 +572,12 @@ object ExplorerUtils {
             ?: (result as? ComplexResult.Ok)
                 ?.errors
                 ?.toNodeError()
-        return copy(ref = ref, parentRef = ref.parent, uniqueId = ref.uniqueId, properties = properties, error = error)
+        return mutate(ref = ref, parentRef = ref.parent, properties = properties, error = error)
     }
 
     fun Node.move(parent: NodeRef = parentRef, name: String = this.name): Node {
         val ref = parent + name
-        children?.move(ref)
-        return copy(ref = ref, parentRef = parent, uniqueId = ref.uniqueId, properties = properties, state = stateStub)
-    }
-
-    private fun NodeChildren.move(parent: NodeRef) {
-        for (i in indices) {
-            items[i] = get(i).move(parent = parent)
-        }
+        return mutate(ref = ref, parentRef = parent, properties = properties, state = stateStub)
     }
 
     private fun String.toNodeError(): NodeError {

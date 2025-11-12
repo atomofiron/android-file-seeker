@@ -78,4 +78,22 @@ data class Node(
         isOpened -> copy(children = children.copy(isOpened = false), isDeepest = false)
         else -> this
     }
+
+    fun mutate(
+        ref: NodeRef,
+        parentRef: NodeRef = ref.parent,
+        properties: NodeProperties = this.properties,
+        state: NodeState = this.state,
+        error: NodeError? = this.error,
+    ): Node {
+        val new = copy(ref = ref, parentRef = parentRef, uniqueId = ref.uniqueId, properties = properties, state = state, error = error)
+        val children = new.children?.items
+        children?.forEachIndexed { i, it ->
+            val item = children[i]
+            if (item.parentRef != ref) {
+                children[i] = item.mutate(ref = ref + item.name)
+            }
+        }
+        return new
+    }
 }
