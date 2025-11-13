@@ -4,7 +4,6 @@ import app.atomofiron.common.util.flow.mapState
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -32,8 +31,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
 
     private val query = MutableStateFlow("")
     override val targets = MutableStateFlow<List<Node>>(mutableListOf())
-    private val localToggles = MutableStateFlow(EditOptions(SearchOptions()))
-    override val toggles = if (isLocal) localToggles else preferences.searchOptions.mapState(::EditOptions)
+    override val toggles = (if (isLocal) preferences.localSearchOptions else preferences.searchOptions).mapState(::EditOptions)
     private val localOptions = toggles.map { listOf(it) }
     private val globalOptions = combine(
         toggles,
@@ -89,12 +87,6 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
 
     override fun updateSearchQuery(value: String) {
         query.value = value
-    }
-
-    override fun updateConfig(options: SearchOptions) {
-        localToggles.run {
-            value = value.copy(toggles = options)
-        }
     }
 
     override fun updateTargets(items: List<Node>) {

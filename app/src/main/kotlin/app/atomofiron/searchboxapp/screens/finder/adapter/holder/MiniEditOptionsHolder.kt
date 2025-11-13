@@ -26,16 +26,16 @@ class MiniEditOptionsHolder(
         root.isFocusable = false
         root.isClickable = false
         caseSense.setOnClickListener {
-            update { it.copy(ignoreCase = !it.ignoreCase) }
+            update { it.edit(ignoreCase = !it.ignoreCase) }
         }
         useRegexp.setOnClickListener {
-            update { it.copy(regex = !it.regex) }
+            update { it.edit(regex = !it.regex) }
         }
         contentSearch.setOnClickListener {
-            update { it.copy(contentSearch = !it.contentSearch) }
+            update { it.edit(contentSearch = !it.contentSearch) }
         }
         excludeDirs.setOnClickListener {
-            update { it.copy(excludeDirs = !it.excludeDirs) }
+            update { it.edit(excludeDirs = !it.excludeDirs) }
         }
     }
 
@@ -48,5 +48,5 @@ class MiniEditOptionsHolder(
         excludeDirs.chipIcon?.alpha = Alpha.enabledInt(!item.excludeDirs || !item.contentSearch)
     }
 
-    private fun update(block: (SearchOptions) -> SearchOptions) = listener.onConfigChange(block(item.toggles))
+    private fun update(block: (SearchOptions) -> SearchOptions) = listener.onOptionsChange(block(item.toggles))
 }

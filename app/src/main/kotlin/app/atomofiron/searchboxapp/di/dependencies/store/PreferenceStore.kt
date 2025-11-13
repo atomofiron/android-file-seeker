@@ -8,7 +8,10 @@ import androidx.datastore.preferences.preferencesDataStore
 import app.atomofiron.common.util.flow.StateFlowProperty
 import app.atomofiron.common.util.flow.asProperty
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
+import app.atomofiron.searchboxapp.model.finder.SearchOptionsImpl
+import app.atomofiron.searchboxapp.model.finder.toInt
 import app.atomofiron.searchboxapp.model.preference.*
+import app.atomofiron.searchboxapp.model.textviewer.LocalSearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKey
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyAppOrientation
@@ -19,6 +22,7 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyDrawerGra
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyExplorerItem
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyHapticFeedback
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyJoystick
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyLocalSearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyLocale
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxDepth
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxSize
@@ -106,10 +110,16 @@ class PreferenceStore(
         edit { it[KeyShowSearchOptions] = value }
     }
 
-    val searchOptions = getFlow(KeySearchOptions, ::SearchOptions)
+    val searchOptions = getFlow(KeySearchOptions, ::SearchOptionsImpl)
 
     suspend fun setSearchOptions(value: SearchOptions) {
         edit { it[KeySearchOptions] = value.toInt() }
+    }
+
+    val localSearchOptions = getFlow(KeyLocalSearchOptions, ::LocalSearchOptions)
+
+    suspend fun setLocalSearchOptions(value: LocalSearchOptions) {
+        edit { it[KeyLocalSearchOptions] = value.toInt() }
     }
 
     val specialCharacters = getFlow(KeySpecialCharacters) {
@@ -123,7 +133,7 @@ class PreferenceStore(
     val maxFileSizeForSearch = getFlow(KeyMaxSize)
 
     suspend fun setMaxFileSizeForSearch(value: Long) {
-        edit { it[KeyMaxSize as PreferenceKey<Long>] = value }
+        edit { it[KeyMaxSize] = value }
     }
 
     val appUpdateCode = getFlow(KeyAppUpdateCode)

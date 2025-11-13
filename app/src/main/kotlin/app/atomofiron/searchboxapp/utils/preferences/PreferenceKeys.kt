@@ -8,6 +8,7 @@ import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
+import app.atomofiron.searchboxapp.model.textviewer.LocalSearchOptions
 import app.atomofiron.searchboxapp.utils.Const
 
 object PreferenceKeys {
@@ -24,6 +25,7 @@ object PreferenceKeys {
     val KeyTestField = PreferenceKey("pref_test_field", "")
     val KeyShowSearchOptions = PreferenceKey("pref_show_search_options", true)
     val KeySearchOptions = PreferenceKey("pref_search_options", SearchOptions.DEFAULT)
+    val KeyLocalSearchOptions = PreferenceKey("pref_local_search_options", LocalSearchOptions.DEFAULT)
     val KeySpecialCharacters = PreferenceKey("pref_special_characters", Const.DEFAULT_SPECIAL_CHARACTERS)
     val KeyAppOrientation = PreferenceKey("pref_app_orientation", AppOrientation.UNDEFINED.ordinal.toString())
     val KeyLocale = PreferenceKey("pref_locale", AppLocale.System.ordinal.toString())
@@ -40,7 +42,7 @@ object PreferenceKeys {
     val KeyHapticFeedback = PreferenceKey("pref_haptic_feedback", true)
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
-        arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyAppUpdateCode, KeyShownNotificationUpdateCode, KeyTestField, KeyShowSearchOptions, KeySearchOptions, KeySpecialCharacters, KeyAppOrientation, KeyLocale, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeySuCmd, KeyExplorerItem, KeyJoystick, KeyHapticFeedback)
+        arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyAppUpdateCode, KeyShownNotificationUpdateCode, KeyTestField, KeyShowSearchOptions, KeySearchOptions, KeyLocalSearchOptions, KeySpecialCharacters, KeyAppOrientation, KeyLocale, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeySuCmd, KeyExplorerItem, KeyJoystick, KeyHapticFeedback)
     }
 
     @Suppress("UNCHECKED_CAST") // omg it's an error in Kotlin 2.2

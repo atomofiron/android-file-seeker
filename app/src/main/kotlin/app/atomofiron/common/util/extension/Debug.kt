@@ -12,16 +12,18 @@ import java.lang.ref.WeakReference
 
 var debugContext = WeakReference<Context>(null)
 
+fun stub() { "check the stack trace" }
+
 inline fun debug(action: () -> Unit) = when {
     BuildConfig.DEBUG -> action()
     else -> Unit
 }
 
-inline fun Any.debugFail(lazyMessage: () -> Any) = debugRequire(false, lazyMessage)
+inline fun Any.debugFail(lazyMessage: () -> Any = ::stub) = debugRequire(false, lazyMessage)
 
-inline fun Any.debugRequireNotNull(any: Any?, lazyMessage: () -> Any) = debugRequire(any != null, lazyMessage)
+inline fun Any.debugRequireNotNull(any: Any?, lazyMessage: () -> Any = ::stub) = debugRequire(any != null, lazyMessage)
 
-inline fun Any.debugRequire(value: Boolean, lazyMessage: () -> Any)  {
+inline fun Any.debugRequire(value: Boolean, lazyMessage: () -> Any = ::stub)  {
     if (BuildConfig.DEBUG_BUILD) require(value) {
         val message = "$simpleName: ${lazyMessage()}"
         debugContext.get()?.let {

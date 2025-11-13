@@ -14,6 +14,5 @@ interface FinderItemsState {
     val items: Flow<List<FinderStateItem>>
 
     fun updateSearchQuery(value: String)
-    fun updateConfig(options: SearchOptions)
     fun updateTargets(items: List<Node>)
 }

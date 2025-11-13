@@ -9,9 +9,9 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.common.recycler.GeneralHolder
-import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemSearchEditOptionsBinding
+import app.atomofiron.fileseeker.databinding.ItemSearchOptionBinding
 import app.atomofiron.searchboxapp.custom.view.layout.MeasuringRecyclerView
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -71,16 +71,16 @@ class EditOptionsHolder(
     private fun onClick(position: Int, toChecked: Boolean) {
         var options = item.toggles
         options = when (position) {
-            0 -> options.copy(ignoreCase = !toChecked)
-            1 -> options.copy(regex = toChecked)
-            2 -> options.copy(contentSearch = toChecked)
-            else -> options.copy(excludeDirs = toChecked)
+            0 -> options.edit(ignoreCase = !toChecked)
+            1 -> options.edit(regex = toChecked)
+            2 -> options.edit(contentSearch = toChecked)
+            else -> options.edit(excludeDirs = toChecked)
         }
-        listener.onConfigChange(options)
+        listener.onOptionsChange(options)
     }
 
     interface FinderConfigListener {
-        fun onConfigChange(options: SearchOptions)
+        fun onOptionsChange(options: SearchOptions)
     }
 }
 
@@ -91,11 +91,10 @@ private data class Item(
 
 private class Adapter(private val listener: (Int, Boolean) -> Unit) : GeneralAdapter<Item, GeneralHolder<Item>>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, inflater: LayoutInflater): GeneralHolder<Item> {
-        val chip = inflater.inflate(R.layout.item_search_option, parent, false)
-        val holder = Holder(chip)
-        chip.setOnClickListener {
-            val item = get(holder.bindingAdapterPosition)
-            listener(holder.bindingAdapterPosition, !item.isChecked)
+        val binding = ItemSearchOptionBinding.inflate(inflater, parent, false)
+        val holder = Holder(binding.root)
+        binding.root.setOnCheckedChangeListener { _, checked ->
+            listener(holder.bindingAdapterPosition, checked)
         }
         return holder
     }

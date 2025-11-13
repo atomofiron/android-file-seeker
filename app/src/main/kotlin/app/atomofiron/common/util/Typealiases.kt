@@ -18,6 +18,8 @@ typealias Unreachable = Unit
 typealias UnreachableException = Exception
 typealias ActivityProperty = RoProperty<out Activity?>
 
+const val DoesNotMatterFalse = false
+
 fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NONE, initializer)
 
 fun <T> MutableList(size: Int): MutableList<T> = ArrayList(size)

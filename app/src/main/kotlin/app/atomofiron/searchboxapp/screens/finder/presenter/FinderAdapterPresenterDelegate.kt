@@ -37,7 +37,7 @@ class FinderAdapterPresenterDelegate(
     ButtonsHolder.FinderButtonsListener,
     TaskHolder.OnActionListener<SearchResult> {
 
-    override fun onConfigChange(options: SearchOptions) {
+    override fun onOptionsChange(options: SearchOptions) {
         preferences { setSearchOptions(options) }
     }
 
