@@ -26,7 +26,6 @@ import app.atomofiron.fileseeker.databinding.FragmentPreferenceBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.addLayoutListener
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.custom.preference.DropDownPreference
-import app.atomofiron.searchboxapp.custom.preference.TextFieldPreference
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -73,10 +72,8 @@ class PreferenceFragment : PreferenceFragmentCompat(),
             uppUpdate.bind(it)
         }
         val asSu = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyUseSu.name)
-        val suCmd = findPreference<TextFieldPreference>(PreferenceKeys.KeySuCmd.name)
         viewState.asSu.collect(lifecycleScope) {
             asSu.isChecked = it
-            suCmd.isVisible = it
         }
         val debugGroup = findPreference<PreferenceGroup>(PreferenceKeys.PREF_CATEGORY_DEBUG)
         debugGroup.isVisible = viewState.withDebugGroup
