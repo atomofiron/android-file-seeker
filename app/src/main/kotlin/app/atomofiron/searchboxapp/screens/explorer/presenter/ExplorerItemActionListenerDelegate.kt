@@ -1,5 +1,7 @@
 package app.atomofiron.searchboxapp.screens.explorer.presenter
 
+import app.atomofiron.common.util.AlertMessage
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -8,6 +10,7 @@ import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelega
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerViewState
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
+import app.atomofiron.searchboxapp.utils.Rslt
 
 class ExplorerItemActionListenerDelegate(
     private val viewState: ExplorerViewState,
@@ -29,8 +32,14 @@ class ExplorerItemActionListenerDelegate(
         } else {
             listOf(item)
         }
-        val options = operations.operations(nodes) ?: return
-        menuListenerDelegate.showOptions(options)
+        val options = operations.operations(nodes)
+        when (options) {
+            is Rslt.Ok -> menuListenerDelegate.showOptions(options.value)
+            is Rslt.Err -> when {
+                options.isEmpty -> AlertMessage(R.string.unknown_error)
+                else -> AlertMessage(options.message)
+            }.let { viewState.showAlert(it) }
+        }
     }
 
     override fun onItemClick(item: Node) = openItem(item)

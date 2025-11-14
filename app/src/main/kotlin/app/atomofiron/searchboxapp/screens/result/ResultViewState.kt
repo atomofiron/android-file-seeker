@@ -40,7 +40,7 @@ class ResultViewState(
         private set
     val result = MutableStateFlow(Files.Stub)
     val composition = preferenceStore.explorerItemComposition
-    val alerts = ChannelFlow<AlertMessage.Res>()
+    val alerts = ChannelFlow<AlertMessage.Uni>()
     val checked = MutableStateFlow(listOf<Int>())
     val dock = MutableStateFlow(ResultDockState.Default)
 
@@ -48,7 +48,7 @@ class ResultViewState(
         transformState()
     }
 
-    fun showAlert(message: AlertMessage.Res) {
+    fun showAlert(message: AlertMessage.Uni) {
         alerts[scope] = message
     }
 

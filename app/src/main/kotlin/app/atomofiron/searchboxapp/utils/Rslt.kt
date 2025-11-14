@@ -13,12 +13,8 @@ sealed class Rslt<T>(val isOk: Boolean) {
         }
         abstract override val value: T
     }
-    open class Err<T> : Rslt<T>(isOk = false) {
-        companion object {
-            private data class Err<T>(override val message: String) : Rslt.Err<T>()
-            operator fun <T> invoke(message: String): Rslt.Err<T> = Err(message)
-        }
-        open val message: String get() = ""
+    open class Err<T>(open val message: String = "") : Rslt<T>(isOk = false) {
+        val isEmpty: Boolean get() = message.isEmpty()
     }
 }
 
@@ -41,5 +37,5 @@ inline fun <T> Rslt<T>.unwrapOr(value: T): T = when (this) {
 
 inline fun <T> Rslt<T>.unwrapOrElse(action: (message: String) -> T): T = when (this) {
     is Rslt.Ok -> value
-    is Rslt.Err -> action(message)
+    is Rslt.Err -> action(message.toString())
 }

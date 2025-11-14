@@ -8,6 +8,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents.useAs
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.Strings
 import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -19,7 +20,8 @@ class UtilService(
     resources: AppResources,
     private val clipboardManager: ClipboardManager,
     preference: PreferenceStore,
-) {
+) : Strings by resources {
+
     private val resources by resources
     private val asSu by preference.asSu
 

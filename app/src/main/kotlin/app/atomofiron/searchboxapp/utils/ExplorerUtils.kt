@@ -593,6 +593,8 @@ object ExplorerUtils {
         }
     }
 
+    fun Node.isInaccessible() = error is NodeError.NoSuchFile || error is NodeError.PermissionDenied
+
     private fun List<String>.toNodeError(): NodeError? = takeIf { it.isNotEmpty() }
         ?.let { NodeError.Multiply(it) }
 

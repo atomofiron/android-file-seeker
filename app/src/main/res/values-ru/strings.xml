@@ -104,6 +104,7 @@
     <string name="permission_denied">Нет доступа</string>
     <string name="resource_busy">Ресурс занят</string>
     <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="inaccessible">Недоступно</string>
     <string name="unknown">неизвестно</string>
     <string name="unavailable">недоступно</string>
     <string name="a_lot_of_errors">Много ошибок</string>

@@ -18,6 +18,7 @@ import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.screens.common.delegates.apply
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapter
@@ -117,8 +118,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     private fun showSnackbar(message: AlertMessage) {
         binding.snackbarContainer.run {
             when (message) {
-                is AlertMessage.Str -> makeSnackbar(message.message, Snackbar.LENGTH_LONG)
-                is AlertMessage.Res -> makeSnackbar(message.message, Snackbar.LENGTH_LONG)
+                is AlertMessage.Uni -> makeSnackbar(resources[message.message], Snackbar.LENGTH_LONG)
                 is AlertMessage.Other<*> -> when (message.message) {
                     is NodeError -> makeSnackbar(resources.getString(message.message), Snackbar.LENGTH_LONG)
                     is ExplorerAlert.Deleted -> deletedSnackbar(message.message.items)

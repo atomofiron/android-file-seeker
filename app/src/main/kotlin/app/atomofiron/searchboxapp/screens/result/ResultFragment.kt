@@ -19,6 +19,7 @@ import app.atomofiron.searchboxapp.custom.addExplorerFastScroll
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResult
+import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.screens.common.delegates.apply
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.result.adapter.ItemGravityDecorator
@@ -114,9 +115,9 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         }
     }
 
-    private fun showSnackbar(message: AlertMessage.Res) {
+    private fun showSnackbar(message: AlertMessage.Uni) {
         val length = if (message.important) Snackbar.LENGTH_INDEFINITE else Snackbar.LENGTH_LONG
-        binding.snackbarContainer.makeSnackbar(message.message, length)
+        binding.snackbarContainer.makeSnackbar(resources[message.message], length)
             .apply { if (message.important) setAction(R.string.got_it) { } }
             .show()
     }

@@ -23,11 +23,13 @@ import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isContent
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.isInaccessible
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.merge
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.getApksContent
 import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.searchboxapp.utils.getApkContent
+import app.atomofiron.searchboxapp.utils.toOk
 import app.atomofiron.searchboxapp.utils.unwrapOrElse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -48,9 +50,12 @@ class FileOperationsDelegate(
 ) {
     private val itemComposition by preferences.explorerItemComposition
 
-    fun operations(items: List<Node>, readOnly: Boolean = false): ExplorerItemOptions? {
+    fun operations(items: List<Node>, readOnly: Boolean = false): Rslt<ExplorerItemOptions> {
         val merged = items.merge()
-        val first = merged.firstOrNull() ?: return null
+        if (merged.all { it.isInaccessible() }) {
+            return Rslt.Err(utils[R.string.inaccessible])
+        }
+        val first = merged.firstOrNull() ?: return Rslt.Err()
         val operations = when {
             merged.size > 1 -> forMany(count =  merged.count { it.isFile })
             first.isFile -> oneFileOptions.completeForSingle(first)
@@ -60,7 +65,7 @@ class FileOperationsDelegate(
         }.filter {
             readWrite.takeIf { readOnly }?.contains(it) != true
         }
-        return ExplorerItemOptions(operations, merged, itemComposition)
+        return ExplorerItemOptions(operations, merged, itemComposition).toOk()
     }
 
     fun askForAndroidApp(content: NodeContent.AndroidApp, tab: NodeTabKey? = null) = askForAndroidApp(content, contentResolver = null, tab)

@@ -1,6 +1,8 @@
 package app.atomofiron.searchboxapp.screens.result.presenter
 
+import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.dialog.DialogDelegate
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -10,6 +12,7 @@ import app.atomofiron.searchboxapp.screens.result.ResultRouter
 import app.atomofiron.searchboxapp.screens.result.ResultViewState
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
+import app.atomofiron.searchboxapp.utils.Rslt
 
 class ResultItemActionDelegate(
     private val viewState: ResultViewState,
@@ -34,8 +37,14 @@ class ResultItemActionDelegate(
             item.isChecked -> matches.mapNotNull { it.item.takeIf { checked.value.contains(it.uniqueId) } }
             else -> listOf(item)
         }
-        val options = operations.operations(items, readOnly = true) ?: return
-        curtainDelegate.showOptions(options)
+        val options = operations.operations(items, readOnly = true)
+        when (options) {
+            is Rslt.Ok -> curtainDelegate.showOptions(options.value)
+            is Rslt.Err -> when {
+                options.isEmpty -> AlertMessage(R.string.unknown_error)
+                else -> AlertMessage(options.message)
+            }.let { viewState.showAlert(it) }
+        }
     }
 
     override fun onItemCheck(item: Node, toChecked: Boolean): Boolean {
