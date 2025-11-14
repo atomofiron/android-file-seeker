@@ -40,4 +40,7 @@ object Const {
 
     const val PLACEHOLDER = "{}"
     const val HEX_BYTE = "%02x"
+
+    const val PATH_INVALID_CHAR = '/' // windows + '\\', ':', '*', '?', '"', '<', '>', '|'
+    const val CHAR_REPLACEMENT = '_'
 }

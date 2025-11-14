@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.custom.drawable.makeToned
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMenuDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.PathNameCharacterFilter
 import lib.atomofiron.insets.insetsPadding
 
 class CloneDelegate(
@@ -27,6 +28,7 @@ class CloneDelegate(
         root.insetsPadding(ExtType.curtain, vertical = true)
         textField.makeToned(textLayout)
         textField.setText(target.name)
+        textField.filters += PathNameCharacterFilter()
         val textListener = ButtonState(dirFiles, submit)
         textField.addTextChangedListener(textListener)
         submit.setOnClickListener {

@@ -13,7 +13,9 @@ import app.atomofiron.searchboxapp.custom.drawable.makeToned
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMenuDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.PathNameCharacterFilter
 import lib.atomofiron.insets.insetsPadding
+import kotlin.collections.plus
 
 class CreateDelegate(
     private val output: ExplorerCurtainMenuDelegate,
@@ -30,6 +32,7 @@ class CreateDelegate(
         root.insetsPadding(ExtType.curtain, vertical = true)
         textField.makeToned(textLayout)
         textField.text?.clear()
+        textField.filters += PathNameCharacterFilter()
         textField.inputType = EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         val textListener = ButtonState(dirFiles, arrayOf(explorerCreateDirBtn, explorerCreateFileBtn))
         textField.addTextChangedListener(textListener)
