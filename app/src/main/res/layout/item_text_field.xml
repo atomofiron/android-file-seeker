@@ -17,7 +17,6 @@
         android:layout_height="wrap_content"
         android:inputType="textMultiLine|textNoSuggestions"
         android:imeOptions="flagNoFullscreen|flagNoExtractUi"
-        android:clipToOutline="false"
         app:hideKeyboardOnFocusLost="false"
         />
 </com.google.android.material.textfield.TextInputLayout>

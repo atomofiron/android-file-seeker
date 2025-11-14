@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 import android.text.Editable
 import android.text.InputType
 import android.text.Spannable
-import android.text.SpannableStringBuilder
 import android.text.TextWatcher
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
@@ -14,13 +13,13 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemTextFieldBinding
 import app.atomofiron.searchboxapp.custom.drawable.makeHoled
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
-import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.TestField
 import java.util.regex.Pattern
 
 class TestHolder(
     parent: ViewGroup,
     private val output: OnTestChangeListener,
-) : GeneralHolder<FinderStateItem.TestField>(parent, R.layout.item_text_field), TextWatcher {
+) : GeneralHolder<TestField>(parent, R.layout.item_text_field), TextWatcher {
 
     override val hungry = true
 
@@ -49,39 +48,38 @@ class TestHolder(
 
     override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_test_field)
 
-    override fun onBind(item: FinderStateItem.TestField, position: Int) {
+    override fun onBind(item: TestField, position: Int) {
         val new = item.value ?: default
         if (new != binding.field.text?.toString()) {
             binding.field.setText(new)
         }
+        test(item)
     }
 
-    private fun test(item: FinderStateItem.TestField) = binding.run {
-        val text = SpannableStringBuilder(item.value)
+    private fun test(item: TestField) = binding.run {
+        val text = field.text ?: return@run
         text.getSpans(0, text.length, RoundedBackgroundSpan::class.java).forEach {
             text.removeSpan(it)
         }
         when {
             item.query.isEmpty() -> Unit
-            item.regex -> testSearchWithRegexp(item)
-            else -> testSearch(item)
+            item.regex -> text.testSearchWithRegexp(item)
+            else -> text.testSearch(item)
         }
     }
 
-    private fun testSearch(item: FinderStateItem.TestField) = binding.run {
-        val text = field.text ?: return
+    private fun Spannable.testSearch(item: TestField) = binding.run {
         var offset = 0
         val length = item.query.length
-        var index = text.indexOf(item.query, offset, item.ignoreCase)
+        var index = indexOf(item.query, offset, item.ignoreCase)
         while (index != -1) {
-            text.setSpan(span, index, index + length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            setSpan(span, index, index + length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
             offset = index + length
-            index = text.indexOf(item.query, offset, item.ignoreCase)
+            index = indexOf(item.query, offset, item.ignoreCase)
         }
     }
 
-    private fun testSearchWithRegexp(item: FinderStateItem.TestField) {
-        val text = binding.field.text ?: return
+    private fun Spannable.testSearchWithRegexp(item: TestField) {
         var flags = 0
         if (item.ignoreCase) {
             flags = flags or Pattern.CASE_INSENSITIVE
@@ -91,12 +89,12 @@ class TestHolder(
             pattern = Pattern.compile(item.query, flags)
 
             var offset = 0
-            val lines = text.toString().split('\n')
+            val lines = toString().split('\n')
             for (line in lines) {
                 val matcher = pattern.matcher(line)
 
                 while (matcher.find() && matcher.start() != matcher.end()) {
-                    text.setSpan(span, offset + matcher.start(), offset + matcher.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                    setSpan(span, offset + matcher.start(), offset + matcher.end(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
                 }
                 offset += line.length.inc()
             }

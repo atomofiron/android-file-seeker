@@ -5,6 +5,7 @@ import android.graphics.Paint
 import android.graphics.Paint.FontMetricsInt
 import android.graphics.RectF
 import android.text.style.ReplacementSpan
+import kotlin.math.max
 
 class RoundedBackgroundSpan(
     private val backgroundColor: Int,
@@ -23,7 +24,7 @@ class RoundedBackgroundSpan(
 
     override fun draw(canvas: Canvas, text: CharSequence, start: Int, end: Int, x: Float, top: Int, y: Int, bottom: Int, paint: Paint) {
         val width = paint.measureText(text.subSequence(start, end).toString())
-        rect.set(x, top.toFloat() + 3, x + width, bottom.toFloat() + 1)
+        rect.set(max(x, borderInset), top.toFloat() + 3, x + width, bottom.toFloat() + 1)
         paint.color = backgroundColor
         paint.style = Paint.Style.FILL
         canvas.drawRoundRect(rect, radius, radius, paint)
