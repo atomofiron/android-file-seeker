@@ -32,8 +32,9 @@ class RenameDelegate(
         root.insetsPadding(ExtType.curtain, vertical = true)
         textField.makeToned(textLayout)
         textField.inputType = EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
-        textField.filters += PathNameCharacterFilter()
-        textField.setText(data.item.name)
+        textField.filters += PathNameCharacterFilter().apply {
+            textField.setText(filter(data.item.name))
+        }
         textField.addTextChangedListener(ButtonClick(data, explorerRenameBtn))
         explorerRenameBtn.setOnClickListener {
             output.onRenameConfirm(data.item, textField.text.toString())

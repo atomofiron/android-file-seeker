@@ -4,7 +4,6 @@ object Const {
     const val SLASH = '/'
     const val LF = '\n'
     const val TAB = '\t'
-    const val DOT = '.'
     const val SPACE = ' '
     const val EMPTY = ""
     const val QUOTE = "\""
@@ -30,7 +29,6 @@ object Const {
 
     const val MIME_TYPE = "mimeType"
     const val DATE_PATTERN = "yyyy-MM-dd_HH-mm-ss"
-    const val MIME_TEXT = "text/"
     const val MIME_TEXT_PLAIN = "text/plain"
     const val GITHUB_URL = "https://github.com/atomofiron/android-file-seeker"
     const val FORPDA_URL = "https://4pda.to/forum/index.php?showtopic=1000070&view=findpost&p=98557921"
@@ -41,6 +39,6 @@ object Const {
     const val PLACEHOLDER = "{}"
     const val HEX_BYTE = "%02x"
 
-    const val PATH_INVALID_CHAR = '/' // windows + '\\', ':', '*', '?', '"', '<', '>', '|'
-    const val CHAR_REPLACEMENT = '_'
+    const val PATH_INVALID_CHARS = "/\"\\?:<*>|"
+    const val CHAR_REPLACEMENT = "_"
 }

@@ -27,8 +27,9 @@ class CloneDelegate(
     private fun CurtainExplorerCloneBinding.init(target: Node, dirFiles: List<String>) {
         root.insetsPadding(ExtType.curtain, vertical = true)
         textField.makeToned(textLayout)
-        textField.setText(target.name)
-        textField.filters += PathNameCharacterFilter()
+        textField.filters += PathNameCharacterFilter().apply {
+            textField.setText(filter(target.name))
+        }
         val textListener = ButtonState(dirFiles, submit)
         textField.addTextChangedListener(textListener)
         submit.setOnClickListener {

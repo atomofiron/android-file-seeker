@@ -80,7 +80,7 @@ class NodeRef(val bytes: ByteArray) {
 
     fun getOrNull(i: Int) = bytes.getOrNull(i)
 
-    override fun toString(): String = "NodePath($string)"
+    override fun toString(): String = "${this::class.java.simpleName}($string)"
 
     fun theSame(path: ByteArray): Boolean = bytes.contentEquals(path)
 
