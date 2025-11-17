@@ -14,6 +14,7 @@ import app.atomofiron.common.util.withNotNull
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.DialogCheckboxBinding
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
+import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.get
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -46,7 +47,8 @@ class DialogDelegateImpl(activity: ActivityProperty) : DialogDelegate {
         val resources = activity.resources
         return MaterialAlertDialogBuilder(activity)
             .setCancelable(false)
-            // don't remove views on the build
+            .apply { background?.setTint(activity.colorSurfaceContainer()) }
+            // stubs prevent removing of views on the build step
             .setTitle(STUB)
             .setMessage(STUB)
             .setPositiveButton(STUB, null)
