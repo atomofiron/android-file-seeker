@@ -19,6 +19,7 @@
         <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
             app:title="@string/pref_deep_black"
             app:key="pref_deep_black"
+            android:icon="@drawable/ic_black_hole"
             />
         <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
             app:title="@string/pref_orientation"
@@ -26,10 +27,6 @@
             app:entries="@array/orientation_var"
             app:entryValues="@array/orientation_val"
             app:icon="@drawable/ic_screen_rotation"
-            />
-        <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
-            app:title="@string/pref_haptic_feedback"
-            app:key="pref_haptic_feedback"
             />
         <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
             app:title="@string/pref_locale"
@@ -47,6 +44,11 @@
             app:title="@string/pref_joystick"
             app:key="pref_joystick"
             app:icon="@drawable/ic_esc_circle"
+            />
+        <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
+            app:title="@string/pref_haptic_feedback"
+            app:key="pref_haptic_feedback"
+            app:icon="@drawable/ic_vibrate"
             />
     </PreferenceCategory>
     <PreferenceCategory
