@@ -13,8 +13,8 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.utils.attach
 
 @SuppressLint("ViewConstructor")
@@ -24,7 +24,7 @@ class ExplorerStickyTopView(
 ) : FrameLayout(context) {
 
     private val cornerRadius = resources.getDimension(R.dimen.explorer_border_corner_radius)
-    private val binder = ExplorerItemBinderImpl(attach(ItemExplorerBinding::inflate), isOpened = true)
+    private val binder = ExplorerItemBinder(attach(ItemExplorerBinding::inflate), isOpened = true)
 
     private var composition: ExplorerItemComposition? = null
     private var item: Node? = null

@@ -6,12 +6,12 @@ import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
 import app.atomofiron.searchboxapp.utils.Const
 
 class ExplorerHolder(itemView: View, isOpened: Boolean) : GeneralHolder<Node>(itemView) {
 
-    private val binder = ExplorerItemBinderImpl(itemView, isOpened)
+    private val binder = ExplorerItemBinder(itemView, isOpened)
 
     override fun onBind(item: Node, position: Int) = binder.bind(item)
 

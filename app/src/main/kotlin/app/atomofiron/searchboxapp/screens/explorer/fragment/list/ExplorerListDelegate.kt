@@ -13,7 +13,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.Item
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBorderDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.RootItemPaddingDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.ExplorerStickyDelegate
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator

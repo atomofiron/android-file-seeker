@@ -8,7 +8,7 @@ import app.atomofiron.fileseeker.databinding.CurtainExplorerOptionsBinding
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 
@@ -31,7 +31,7 @@ class OptionsDelegate(private val output: MenuListener) {
         itemView.root.isVisible = single
         title.isVisible = !single
         if (single) {
-            val binder = ExplorerItemBinderImpl(itemView)
+            val binder = ExplorerItemBinder(itemView)
             binder.bind(options.items.first().closed())
             binder.bindComposition(options.composition)
             binder.disableClicks()

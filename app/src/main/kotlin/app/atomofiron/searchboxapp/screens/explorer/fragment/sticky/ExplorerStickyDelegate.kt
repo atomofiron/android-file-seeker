@@ -9,7 +9,7 @@ import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.common.util.noClip
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderInfo
 

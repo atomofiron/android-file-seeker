@@ -11,7 +11,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerStickyTopView
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl.ExplorerItemBinderActionListener
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderInfo
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.StickyInfo
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator

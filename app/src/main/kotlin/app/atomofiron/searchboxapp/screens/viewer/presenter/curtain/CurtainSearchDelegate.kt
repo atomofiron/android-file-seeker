@@ -14,7 +14,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.common.SectionBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -42,7 +42,7 @@ class CurtainSearchDelegate(
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
         val binding = CurtainTextViewerSearchBinding.inflate(inflater, null, false)
 
-        val holder = ExplorerItemBinderImpl(binding.itemExplorer)
+        val holder = ExplorerItemBinder(binding.itemExplorer)
         holder.bind(node)
         holder.bindComposition(composition)
         holder.disableClicks()

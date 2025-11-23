@@ -41,12 +41,11 @@ import com.bumptech.glide.Glide
 private const val SPACE = " "
 private const val EMPTY = ""
 
-class ExplorerItemBinderImpl private constructor(
+class ExplorerItemBinder private constructor(
     private val itemView: View,
     private val binding: ItemExplorerBinding,
     private val isOpened: Boolean,
 ) {
-
     private lateinit var item: Node
     private var isDeepest: Boolean? = null
 

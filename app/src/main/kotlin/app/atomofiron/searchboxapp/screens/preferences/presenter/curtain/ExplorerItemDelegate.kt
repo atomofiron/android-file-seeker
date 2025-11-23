@@ -18,7 +18,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const.DOT_APK
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -68,8 +68,8 @@ class ExplorerItemDelegate(
         chipAlternating.isChecked = composition.visibleBg
 
         demoItems.setStrokedBackground(vertical = R.dimen.padding_half)
-        val dirBinder = ExplorerItemBinderImpl(explorerDir)
-        val fileBinder = ExplorerItemBinderImpl(explorerFile)
+        val dirBinder = ExplorerItemBinder(explorerDir)
+        val fileBinder = ExplorerItemBinder(explorerFile)
         val holders = arrayOf(dirBinder, fileBinder)
         val onClickListener = Listener(*holders)
         chipDetails.setOnClickListener(onClickListener)
@@ -90,7 +90,7 @@ class ExplorerItemDelegate(
         explorerDir.size.text = dir.size
     }
 
-    private fun Array<out ExplorerItemBinderImpl>.bind() {
+    private fun Array<out ExplorerItemBinder>.bind() {
         forEachIndexed { index, holder ->
             holder.disableClicks()
             holder.bindComposition(composition)
@@ -99,7 +99,7 @@ class ExplorerItemDelegate(
     }
 
     private inner class Listener(
-        private vararg val binders: ExplorerItemBinderImpl,
+        private vararg val binders: ExplorerItemBinder,
     ) : View.OnClickListener {
 
         override fun onClick(view: View) {
