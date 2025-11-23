@@ -4,15 +4,19 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.widget.TextView
 import app.atomofiron.common.recycler.GeneralHolder
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.style.EntireLineSpan
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
 import app.atomofiron.searchboxapp.model.textviewer.MatchList
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
+import app.atomofiron.searchboxapp.utils.countChars
 
 class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>(textView) {
+
+    private val charset = Charsets.UTF_8
+
     private val spanPart: RoundedBackgroundSpan
         get() = RoundedBackgroundSpan(
             backgroundColor = context.findColorByAttr(MaterialAttr.colorSurfaceVariant),
@@ -45,37 +49,33 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
             context.resources.getDimension(R.dimen.background_span_corner_radius)
     )
 
-    override fun onBind(item: TextLine, position: Int) = Unit
-
-    fun onBind(item: TextLine, matches: MatchList?, indexFocus: Int) {
-        when {
-            matches.isNullOrEmpty() -> textView.text = item.text
-            else -> {
-                val spannable = SpannableString(item.text)
-                matches.forEachIndexed { index, match ->
-                    val byteOffset = match.offset.toInt() - item.byteOffset
-                    val bytes = item.text.toByteArray()
-                    val offset = byteOffset.toInt()
-                    val start = bytes.slice(0 until offset)
-                        .toByteArray()
-                        .toString(charset = Charsets.UTF_8)
-                        .length
-                    val length = bytes.slice(offset until (offset + match.length.toInt()))
-                        .toByteArray()
-                        .toString(charset = Charsets.UTF_8)
-                        .length
-                    val end = start + length
-                    val forTheEntireLine = start == 0 && end == item.text.length
-                    val span: Any = when {
-                        forTheEntireLine && index == indexFocus -> spanLineFocus
-                        forTheEntireLine -> spanLine
-                        index == indexFocus -> spanPartFocus
-                        else -> spanPart
-                    }
-                    spannable.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
-                }
-                textView.text = spannable
-            }
-        }
+    override fun onBind(item: TextLine, position: Int) {
+        textView.text = item.text.decode()
     }
+
+    fun bindMatches(item: TextLine, position: Int, matches: MatchList, indexFocus: Int) {
+        truePosition = position
+        val spannable = SpannableString(item.text.decode())
+        matches.forEachIndexed { index, match ->
+            val bytesStart = match.offset.toInt() - item.offset
+            val bytesEnd = (bytesStart + match.length.toInt())
+            val start = item.text.countChars(charset, 0..<bytesStart)
+            if (bytesStart < 0 || bytesEnd < 0) {
+                return bind(item, position)
+            }
+            val length = item.text.countChars(charset, bytesStart..<bytesEnd)
+            val end = start + length
+            val forTheEntireLine = start == 0 && end == item.length
+            val span: Any = when {
+                forTheEntireLine && index == indexFocus -> spanLineFocus
+                forTheEntireLine -> spanLine
+                index == indexFocus -> spanPartFocus
+                else -> spanPart
+            }
+            spannable.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+        textView.text = spannable
+    }
+
+    private fun ByteArray.decode() = String(this, charset)
 }

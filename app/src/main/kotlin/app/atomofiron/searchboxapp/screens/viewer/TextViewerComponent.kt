@@ -54,7 +54,7 @@ class TextViewerModule {
         router: TextViewerRouter,
         searchAdapterPresenterDelegate: SearchAdapterPresenterDelegate,
         textViewerInteractor: TextViewerInteractor,
-        session: TextViewerSession,
+        session: TextViewerSession?,
     ): TextViewerPresenter {
         return TextViewerPresenter(
             params,
@@ -84,8 +84,10 @@ class TextViewerModule {
     @TextViewerScope
     fun textViewerInteractor(
         scope: CoroutineScope,
-        textViewerService: TextViewerService,
-    ): TextViewerInteractor = TextViewerInteractor(scope, textViewerService)
+        service: TextViewerService,
+        explorerStore: ExplorerStore,
+        preferenceStore: PreferenceStore,
+    ): TextViewerInteractor = TextViewerInteractor(scope, service, explorerStore, preferenceStore)
 
     @Provides
     @TextViewerScope
@@ -96,15 +98,16 @@ class TextViewerModule {
     fun textViewerSession(
         params: TextViewerParams,
         interactor: TextViewerInteractor,
-    ): TextViewerSession = interactor.fetchFileSession(params.ref)
+    ): TextViewerSession? = interactor.fetchFileSession(params.ref)
 
     @Provides
     @TextViewerScope
     fun viewerViewState(
+        params: TextViewerParams,
         scope: CoroutineScope,
-        session: TextViewerSession,
+        session: TextViewerSession?,
         preferenceStore: PreferenceStore,
-    ): TextViewerViewState = TextViewerViewState(scope, session, preferenceStore)
+    ): TextViewerViewState = TextViewerViewState(params.ref, scope, session, preferenceStore)
 
     @Provides
     @TextViewerScope
@@ -112,9 +115,8 @@ class TextViewerModule {
         scope: CoroutineScope,
         preferenceStore: PreferenceStore,
         textViewerStore: TextViewerStore,
-        explorerStore: ExplorerStore,
         finderStore: FinderStore,
-    ): TextViewerService = TextViewerService(scope, preferenceStore, textViewerStore, explorerStore, finderStore)
+    ): TextViewerService = TextViewerService(scope, preferenceStore, textViewerStore, finderStore)
 }
 
 interface TextViewerDependencies {

@@ -535,6 +535,8 @@ object ExplorerUtils {
 
     fun NodeRef.isContent() = string.startsWith(Const.SCHEME_CONTENT)
 
+    fun NodeRef.toNode(rootId: Int = uniqueId) = Node(this, rootId = rootId, content = NodeContent.Unknown)
+
     // means this node the fake, may be is a visual separating item, isn't a dir
     fun Node.isSeparator(): Boolean = ref.uniqueId == -uniqueId
 

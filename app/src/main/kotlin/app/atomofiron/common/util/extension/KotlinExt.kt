@@ -140,3 +140,5 @@ inline fun <T> MutableList<T>.replace(action: (T) -> T?) {
         }
     }
 }
+
+val IntRange.size: Int get() = if (isEmpty()) 0 else last - first + 1

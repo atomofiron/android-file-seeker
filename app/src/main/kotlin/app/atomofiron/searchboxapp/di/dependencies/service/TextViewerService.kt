@@ -3,13 +3,9 @@ package app.atomofiron.searchboxapp.di.dependencies.service
 import app.atomofiron.common.util.extension.indexOfFirst
 import app.atomofiron.common.util.extension.launchOnDefault
 import app.atomofiron.searchboxapp.android.NativeBridge
-import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.dependencies.store.TextViewerStore
-import app.atomofiron.searchboxapp.model.CacheConfig
-import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.QueryParams
@@ -22,7 +18,6 @@ import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.utils.Const
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.removeOneIf
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +31,6 @@ class TextViewerService(
     private val scope: CoroutineScope,
     private val preferences: PreferenceStore,
     private val store: TextViewerStore,
-    private val explorerStore: ExplorerStore,
     private val finderStore: FinderStore,
 ) {
     private val NotCancelable = object : CancellationState { // todo make cancelable
@@ -44,20 +38,13 @@ class TextViewerService(
     }
     private val asSu: Boolean get() = preferences.asSu.value
 
-    fun getFileSession(ref: NodeRef): TextViewerSession {
-        val item = explorerStore.currentItems.find { it.ref == ref }
-            ?: Node(ref, content = NodeContent.Undefined)
-        var session = findSession(item.ref)
+    fun getFileSession(ref: NodeRef): TextViewerSession? {
+        var session = findSession(ref)
         if (session == null) {
-            session = TextViewerSession(item)
-            store.sessions[item.uniqueId] = session
-            scope.launch(Dispatchers.IO) { readFile(item.ref) }
-        }
-        if (!item.isCached) {
-            scope.launch(Dispatchers.IO) {
-                val config = CacheConfig(asSu, thumbnailSize = 0)
-                session.item.value = item.update(config)
-            }
+            session = TextViewerSession(ref)
+            session ?: return null
+            store.sessions[ref.uniqueId] = session
+            scope.launch(Dispatchers.IO) { readFile(ref) }
         }
         return session
     }
@@ -107,7 +94,7 @@ class TextViewerService(
 
     fun closeSession(ref: NodeRef) {
         val session = store.sessions.remove(ref.uniqueId)
-        session?.reader?.close()
+        session?.close()
     }
 
     suspend fun removeTask(ref: NodeRef, taskId: Int) {
@@ -141,28 +128,15 @@ class TextViewerService(
     private fun findSession(ref: NodeRef): TextViewerSession? = store.sessions[ref.uniqueId]
 
     private suspend fun TextViewerSession.readNextLines(count: Int) {
-        val reader = reader ?: return
         textLines {
             loading.value = true
-            var isFullyRead = isFullyRead
             val lines = ArrayList<TextLine>(count)
-            var byteOffset = lastOrNull()?.run { byteOffset + byteCount.inc() } ?: 0
             while (lines.size < count) {
-                when (val stringOrNull = reader.readLine()) {
-                    null -> {
-                        isFullyRead = true
-                        break
-                    }
-                    else -> {
-                        val byteCount = stringOrNull.toByteArray().size
-                        lines.add(TextLine(byteOffset, byteCount, stringOrNull))
-                        byteOffset += byteCount.inc() // \n
-                    }
-                }
+                val line = readLine() ?: break
+                lines.add(line)
             }
             addAll(lines)
             loading.value = false
-            isFullyRead
         }
     }
 

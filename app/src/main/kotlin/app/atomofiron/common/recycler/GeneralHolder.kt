@@ -20,13 +20,13 @@ open class GeneralHolder<D : Any>(view: View) : RecyclerView.ViewHolder(view) {
         get() = _itemOrNull!!
 
     open val hungry = true
-    var trueBindingAdapterPosition = NO_POSITION
-        private set
+    var truePosition = NO_POSITION
+        protected set
 
     constructor(parent: ViewGroup, layoutId: Int) : this(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
 
     fun bind(item: D, position: Int) {
-        trueBindingAdapterPosition = position
+        truePosition = position
         _itemOrNull = item
         onBind(item, position)
     }

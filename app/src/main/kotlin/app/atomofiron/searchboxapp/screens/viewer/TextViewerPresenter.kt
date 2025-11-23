@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.viewer
 
 import app.atomofiron.common.arch.BasePresenter
+import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -19,7 +20,7 @@ class TextViewerPresenter(
     router: TextViewerRouter,
     private val searchDelegate: SearchAdapterPresenterDelegate,
     private val interactor: TextViewerInteractor,
-    session: TextViewerSession,
+    session: TextViewerSession?,
 ) : BasePresenter<TextViewerViewModel, TextViewerRouter>(scope, router),
     TextViewerAdapter.TextViewerListener,
     FinderAdapterOutput<SearchResult.Text> by searchDelegate
@@ -28,11 +29,16 @@ class TextViewerPresenter(
     private val itemRef: NodeRef get() = viewState.item.value.ref
 
     init {
-        session.loading.collect(scope, viewState::setLoading)
+        session?.loading?.collect(scope, viewState::setLoading)
         params.initialTaskId?.let { taskId ->
             interactor.fetchTask(itemRef, taskId) { task ->
                 viewState.trySelectTask(task)
             }
+        }
+        scope.launchOnIO {
+            session ?: return@launchOnIO
+            val item = interactor.fetchItem(itemRef)
+            session.updateItem(item)
         }
     }
 

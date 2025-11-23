@@ -6,25 +6,32 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.TextSearchTask
+import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsStateDelegate
 import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.toInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
 class TextViewerViewState(
+    ref: NodeRef,
     private val scope: CoroutineScope,
-    private val session: TextViewerSession,
+    private val session: TextViewerSession?,
     preferenceStore: PreferenceStore,
 ) : FinderItemsState by FinderItemsStateDelegate(
     isLocal = true,
     preferenceStore,
-    session.tasks,
+    session?.tasks ?: emptyFlow(),
 ) {
 
     data class Status(
@@ -55,9 +62,9 @@ class TextViewerViewState(
     val matchesCursor = MutableStateFlow<MatchCursor?>(null)
 
     val composition = preferenceStore.explorerItemComposition.value
-    val item = session.item
-    val tasks = session.tasks
-    val textLines = session.lines
+    val item: StateFlow<Node> = session?.item ?: MutableStateFlow(ref.toNode())
+    val tasks: StateFlow<List<TextSearchTask>> = session?.tasks ?: MutableStateFlow(emptyList())
+    val textLines: StateFlow<List<TextLine>> = session?.lines ?: MutableStateFlow(emptyList())
     val currentTask = MutableStateFlow<TextSearchTask?>(null)
 
     val dock = status.map { state ->

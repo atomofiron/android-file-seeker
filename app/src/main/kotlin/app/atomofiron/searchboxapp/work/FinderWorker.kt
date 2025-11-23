@@ -237,8 +237,6 @@ class FinderWorker(
         return Result.success(dataBuilder.build())
     }
 
-    private fun NodeRef.toNode() = Node(this, rootId = task.uniqueId, content = NodeContent.Unknown)
-
     private fun Meta.toNode() = Node(NodeRef(path), rootId = task.uniqueId, content = NodeContent.Unknown, properties = toProperties())
 
     private fun TypedMeta.toNode() = meta.toNode().resolveType(mime)
