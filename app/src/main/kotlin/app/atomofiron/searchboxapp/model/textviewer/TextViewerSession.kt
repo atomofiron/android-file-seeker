@@ -76,17 +76,16 @@ class TextViewerSession private constructor(
     override fun close() = input.close()
 
     fun readLine(): TextLine? {
-        var offset = byteCount
+        val offset = byteCount
         if (isFullyRead) {
             return null
         }
-        while (true) {
-            offset += skipCrLf()
-            when {
-                isFullyRead -> break
-                !byteBuf.hasRemaining() -> isFullyRead = fillBuffer()
-                collect() -> break
-            }
+        while (true) when {
+            isFullyRead -> break
+            !byteBuf.hasRemaining() -> fillBuffer()
+                .also { isFullyRead = it }
+            collect() -> skipCrLf()
+                .also { break }
         }
         val text = lineBuilder.toByteArray()
         lineBuilder.clear()
@@ -117,9 +116,9 @@ class TextViewerSession private constructor(
         }
         val skip = when {
             next != LF && next != CR -> 0
-            byteBuf.remaining() == 1 -> 1
-            afterNext == LF || afterNext == CR -> 2
-            else -> 1
+            byteBuf.remaining() == 1 -> 1 // todo process the case when previous chunk ends with \r, and next chunk starts with \n
+            next == CR && afterNext == LF -> 2 // skip \r\n
+            else -> 1 // skip \r or \n
         }
         byteCount += skip
         byteBuf.position(byteBuf.position() + skip)
@@ -128,9 +127,13 @@ class TextViewerSession private constructor(
 
     /** @return true end of line reached */
     private fun collect(): Boolean {
-        val limit = byteBuf.limit()
         val endOfLine = byteBuf.findEndOfLine()
-        val end = if (endOfLine < 0) byteBuf.limit() else endOfLine
+        val end = when {
+            endOfLine == 0 -> return true
+            endOfLine < 0 -> byteBuf.limit()
+            else -> endOfLine
+        }
+        val limit = byteBuf.limit()
         byteBuf.limit(end)
         byteCount += lineBuilder.append(byteBuf)
         byteBuf.limit(limit)

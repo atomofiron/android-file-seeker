@@ -5,6 +5,7 @@ import android.text.SpannableString
 import android.widget.TextView
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.style.EntireLineSpan
@@ -61,6 +62,7 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
             val bytesEnd = (bytesStart + match.length.toInt())
             val start = item.text.countChars(charset, 0..<bytesStart)
             if (bytesStart < 0 || bytesEnd < 0) {
+                debugFail { "$bytesStart < 0 || $bytesEnd < 0, text ${item.text.decode()}" }
                 return bind(item, position)
             }
             val length = item.text.countChars(charset, bytesStart..<bytesEnd)

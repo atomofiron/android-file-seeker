@@ -72,8 +72,9 @@ class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
             position == cursor.lineIndex -> cursor.lineMatchIndex
             else -> Const.UNDEFINED
         }
-        when (val matches = matches[position]) {
-            null -> holder.bind(items[position], position)
+        val matches = matches[position]
+        when {
+            matches.isNullOrEmpty() -> holder.bind(items[position], position)
             else -> holder.bindMatches(items[position], position, matches, indexFocus)
         }
         textViewerListener?.onLineVisible(position)
