@@ -45,7 +45,7 @@ class ExplorerItemBinderImpl private constructor(
     private val itemView: View,
     private val binding: ItemExplorerBinding,
     private val isOpened: Boolean,
-) : ExplorerItemBinder {
+) {
 
     private lateinit var item: Node
     private var isDeepest: Boolean? = null
@@ -105,7 +105,7 @@ class ExplorerItemBinderImpl private constructor(
         binding.thumbnail.clipToOutline = true
     }
 
-    override fun bind(item: Node) {
+    fun bind(item: Node) {
         this.item = item
 
         itemView.setOnClickListener(onClickListener)
@@ -180,11 +180,11 @@ class ExplorerItemBinderImpl private constructor(
         this.isDeepest = isDeepest.takeIf { isOpened }
     }
 
-    override fun setOnItemActionListener(listener: ExplorerItemBinderActionListener?) {
+    fun setOnItemActionListener(listener: ExplorerItemBinderActionListener?) {
         onItemActionListener = listener
     }
 
-    override fun bindComposition(composition: ExplorerItemComposition) {
+    fun bindComposition(composition: ExplorerItemComposition) {
         val filteredOut = item.children?.filteredOut
         binding.description.text = when (filteredOut) {
             null, 0 -> StringBuilder().run {
@@ -205,7 +205,7 @@ class ExplorerItemBinderImpl private constructor(
         binding.checkBox.buttonTintList = if (composition.visibleBox) defaultBoxTintList else transparentBoxTintList
     }
 
-    override fun disableClicks() {
+    fun disableClicks() {
         binding.checkBox.isEnabled = false
         itemView.setOnClickListener(null)
         itemView.setOnLongClickListener(null)
@@ -215,11 +215,11 @@ class ExplorerItemBinderImpl private constructor(
         itemView.isLongClickable = false
     }
 
-    override fun hideCheckBox() {
+    fun hideCheckBox() {
         binding.checkBox.isVisible = false
     }
 
-    override fun showAlternatingBackground(visible: Boolean) {
+    fun showAlternatingBackground(visible: Boolean) {
         val color = when {
             visible -> itemView.context.colorSurfaceContainer()
             else -> Color.TRANSPARENT

@@ -13,12 +13,11 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinderImpl
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const.DOT_APK
@@ -91,7 +90,7 @@ class ExplorerItemDelegate(
         explorerDir.size.text = dir.size
     }
 
-    private fun Array<out ExplorerItemBinder>.bind() {
+    private fun Array<out ExplorerItemBinderImpl>.bind() {
         forEachIndexed { index, holder ->
             holder.disableClicks()
             holder.bindComposition(composition)
@@ -100,7 +99,7 @@ class ExplorerItemDelegate(
     }
 
     private inner class Listener(
-        private vararg val binders: ExplorerItemBinder,
+        private vararg val binders: ExplorerItemBinderImpl,
     ) : View.OnClickListener {
 
         override fun onClick(view: View) {
