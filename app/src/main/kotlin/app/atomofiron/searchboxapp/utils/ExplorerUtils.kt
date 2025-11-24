@@ -8,8 +8,6 @@ import app.atomofiron.common.util.extension.takeIfDebug
 import app.atomofiron.common.util.forHumans
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.searchboxapp.android.NativeBridge
-import app.atomofiron.searchboxapp.model.CacheConfig
-import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.Node.Companion.stateStub
@@ -19,10 +17,10 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
-import app.atomofiron.searchboxapp.model.explorer.other.forNode
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
 import uniffi.native_lib.ComplexResult
@@ -149,7 +147,7 @@ object ExplorerUtils {
         val result = NativeBridge.copy(from.ref, to.ref, asSu = asSu) {
             // todo
         }
-        return from.apply(result)?.update(CacheConfig(asSu), ensureCached = false)
+        return from.apply(result)?.update(asSu, ensureCached = false)
     }
 
     fun create(parent: Node, name: String, directory: Boolean, asSu: Boolean): Node? {
@@ -248,23 +246,23 @@ object ExplorerUtils {
         }
     }
 
-    fun Node.update(config: CacheConfig, ensureCached: Boolean = true): Node {
-        val type = NativeBridge.type(ref, config.asSu)
+    fun Node.update(asSu: Boolean, ensureCached: Boolean = true): Node {
+        val type = NativeBridge.type(ref, asSu)
         return when (type) {
             is Rslt.Ok -> parseNode(type.value.meta).resolveType(type.value.mime)
-                .run { if (ensureCached) ensureCached(config, oldProps = properties) else this }
+                .run { if (ensureCached) ensureCached(asSu, oldProps = properties) else this }
             is Rslt.Err -> copy(error = type.message.toNodeError())
         }
     }
 
-    private fun Node.ensureCached(config: CacheConfig, oldProps: NodeProperties): Node = when {
-        isDirectory -> cacheDir(config.asSu)
+    private fun Node.ensureCached(asSu: Boolean, oldProps: NodeProperties): Node = when {
+        isDirectory -> cacheDir(asSu)
         length == 0L && oldProps.size != size -> resolveFileType()
         length == 0L -> this
         isCached && oldProps.size == size -> this
         // if size changed -> cache again
         else -> try {
-            cacheFile(config)
+            cacheFile()
         } catch (e: Exception) {
             this.copy(error = NodeError.Message(e.toString()))
         }
@@ -372,11 +370,11 @@ object ExplorerUtils {
         return copy(content = content)
     }
 
-    private fun Node.cacheFile(config: CacheConfig): Node {
+    private fun Node.cacheFile(): Node {
         val content = when (content) {
             is NodeContent.Picture,
             is NodeContent.Movie -> content
-            is NodeContent.Music -> content.copy(thumbnail = ref.string.createAudioThumbnail(config)?.forNode)
+            is NodeContent.Music -> content
             is NodeContent.Zip -> cacheZip().let { item ->
                 when (children?.possibleContainsMainApk()) {
                     null, false -> return item

@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.di.dependencies.interactor
 import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
-import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.QueryParams
@@ -30,8 +29,7 @@ class TextViewerInteractor(
             .find { it.ref == ref }
             ?.let { return it }
         val item = ref.toNode()
-        val config = CacheConfig(asSu, thumbnailSize = 0)
-        return item.update(config)
+        return item.update(asSu)
     }
 
     fun fetchFileSession(ref: NodeRef): TextViewerSession? = service.getFileSession(ref)

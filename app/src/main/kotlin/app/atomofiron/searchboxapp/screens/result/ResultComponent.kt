@@ -127,8 +127,9 @@ class ResultModule {
         explorerService: ExplorerService,
         finderService: FinderService,
         finderStore: FinderStore,
+        preferences: PreferenceStore,
     ): ResultInteractor {
-        return ResultInteractor(scope, utilService, explorerService, finderService, finderStore)
+        return ResultInteractor(scope, utilService, explorerService, finderService, finderStore, preferences)
     }
 
     @Provides

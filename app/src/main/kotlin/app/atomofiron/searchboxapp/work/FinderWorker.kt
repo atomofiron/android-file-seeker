@@ -26,7 +26,6 @@ import app.atomofiron.searchboxapp.android.updateChannel
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
-import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -89,7 +88,6 @@ class FinderWorker(
     // todo remove deleting files from results
     private lateinit var task: FilesSearchTask
     private val taskId = id
-    private lateinit var cacheConfig: CacheConfig
     private val cancellation = object : CancellationState {
         override fun cancelled(): Boolean = !task.isProgress
     }
@@ -172,7 +170,6 @@ class FinderWorker(
             setForeground(getForegroundInfo())
         }
         task = SearchTask(params.query, result = Files(params.type is Params.Text), taskId)
-        cacheConfig = CacheConfig(params.asSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size))
         finderStore.addOrUpdate(task.upcast())
         return work(params)
     }

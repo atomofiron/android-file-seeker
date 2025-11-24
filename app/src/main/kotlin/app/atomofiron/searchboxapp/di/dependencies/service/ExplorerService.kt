@@ -23,7 +23,6 @@ import app.atomofiron.searchboxapp.android.verifyNativeBin
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
-import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -88,7 +87,7 @@ class ExplorerService(
 ) {
     private var delayedRender: Job? = null
 
-    private var config = CacheConfig(asSu = false)
+    private val asSu by preferences.asSu
     private val garden = NodeGarden()
     private val internalStorageRef = store.internalStorage.value.ref
     private val updateRootTrigger = TriggerFlow()
@@ -98,7 +97,7 @@ class ExplorerService(
         appScope.launchOnIO {
             garden { // lock due configuration
                 suDefined.join()
-                if (config.asSu) checkSu()
+                if (asSu) checkSu()
                 initRoots()
             }
             combine(store.storage, preferences.asSu, updateRootTrigger) { volumes, asSu, _ ->
@@ -108,7 +107,6 @@ class ExplorerService(
         val thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size)
         combine(preferences.asSu, preferences.suCmd) { asSu, suCmd ->
             NativeBridge.setSuCmd(suCmd, binDir = context.filesDir.absolutePath)
-            config = CacheConfig(asSu, thumbnailSize)
             suDefined.complete()
         }.collect(appScope)
         store.currentNode.collect(appScope) {
@@ -224,7 +222,7 @@ class ExplorerService(
         appScope.launch {
             garden(key) {
                 withCachingState(root.stableId) {
-                    var updated = root.item.update(config)
+                    var updated = root.item.update(asSu)
                     updated = when (updated.error) {
                         is NodeError.NoSuchFile -> tryAlternative(root, updated)
                         else -> updated
@@ -239,7 +237,7 @@ class ExplorerService(
         val variants = root.pathVariants?.takeIf { it.isNotEmpty() }
         variants ?: return missing
         val items = variants.map { path ->
-            Node.asRoot(path, root.type).update(config)
+            Node.asRoot(path, root.type).update(asSu)
         }
         val alt = items.find { it.error == null }
             ?: items.find { it.error !is NodeError.NoSuchFile }
@@ -351,7 +349,7 @@ class ExplorerService(
         val children = it.children?.fetch() ?: return
         withCachingState(it.uniqueId) {
             val done = it.copy(children = children)
-                .resolveDirChildren(config.asSu)
+                .resolveDirChildren(asSu)
             garden {
                 states.updateState(it.uniqueId) {
                     nextState(it.uniqueId, cachingJob = null)
@@ -381,7 +379,7 @@ class ExplorerService(
         }
         item ?: return
         // todo change uniqueId in state, create the new one state instance
-        var new = item.rename(name, config.asSu)
+        var new = item.rename(name, asSu)
             ?: return debugFail { "null after rename $ref to $name" }
         renderTab(key) {
             var (levelIndex, level) = tree.findIndexed(item.parentRef)
@@ -404,7 +402,7 @@ class ExplorerService(
     }
 
     suspend fun tryCreate(key: NodeTabKey, parent: Node, name: String, directory: Boolean) {
-        val item = ExplorerUtils.create(parent, name, directory, config.asSu)
+        val item = ExplorerUtils.create(parent, name, directory, asSu)
         item ?: return
         renderTab(key) {
             val children = tree.find(parent.uniqueId)
@@ -441,7 +439,7 @@ class ExplorerService(
                 parent.sortByName()
             }
         }
-        val new = ExplorerUtils.copy(from, to, config.asSu)
+        val new = ExplorerUtils.copy(from, to, asSu)
         renderTab(key) {
             states.updateState(from.uniqueId) {
                 nextState(from.uniqueId, copying = null)
@@ -520,13 +518,13 @@ class ExplorerService(
         val dirs = items.filter { it.isDirectory }
         val fileJob = appScope.launch {
             for (file in files) {
-                file.delete(config.asSu)
+                file.delete(asSu)
                 store.emitDeleted(file.copy(children = null))
             }
         }
         val dirJobs = dirs.map { dir ->
             appScope.launch {
-                dir.delete(config.asSu)
+                dir.delete(asSu)
                 store.emitDeleted(dir.copy(children = null))
             }
         }
@@ -583,7 +581,7 @@ class ExplorerService(
     }
 
     private suspend fun Node.deleteIn(key: NodeTabKey): Boolean {
-        val result = delete(config.asSu)
+        val result = delete(asSu)
         garden(key) {
             tree.replaceItem(uniqueId, parentRef, result)
             states.updateState(uniqueId) { null }
@@ -828,7 +826,7 @@ class ExplorerService(
     }
 
     private suspend fun cacheSync(key: NodeTabKey, item: Node) {
-        var updated = item.update(config).sortByName()
+        var updated = item.update(asSu).sortByName()
         garden(key) {
             states.updateState(item.uniqueId) {
                 nextState(item.uniqueId, cachingJob = null)
@@ -854,7 +852,7 @@ class ExplorerService(
 
     private fun resolveSizeAsync(key: NodeTabKey, item: Node) {
         appScope.launch {
-            val size = NativeBridge.usage(item.ref, config.asSu).unwrapOrNull()
+            val size = NativeBridge.usage(item.ref, asSu).unwrapOrNull()
             when (size) {
                 null, item.size -> return@launch
             }

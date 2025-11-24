@@ -6,6 +6,7 @@ import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.SearchResult
@@ -21,8 +22,10 @@ class ResultInteractor(
     private val explorerService: ExplorerService,
     private val finderService: FinderService,
     private val finderStore: FinderStore,
+    preferences: PreferenceStore,
 ) {
     private val dispatcher = Dispatchers.IO
+    private val asSu by preferences.asSu
 
     fun stop(uuid: UUID) = finderService.stop(uuid)
 
@@ -35,7 +38,7 @@ class ResultInteractor(
     }
 
     fun update(uuid: UUID, match: ItemMatch) {
-        val updated = match.item.update(utilService.config())
+        val updated = match.item.update(asSu)
         val match = match.update(updated)
         finderStore {
             update(uuid) {

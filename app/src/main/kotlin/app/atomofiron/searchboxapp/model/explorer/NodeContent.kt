@@ -67,9 +67,8 @@ sealed class NodeContent(
 
     data class Music(
         override val mimeType: String,
-        override val thumbnail: Thumbnail? = null,
         val duration: Int = 0, // todo
-    ) : File(mimeType = mimeType) {
+    ) : File(mimeType = mimeType, thumbnail = Thumbnail.FilePath) {
         companion object {
             val Mp3 = Music("audio/mpeg")
             val Aac = Music("audio/aac")

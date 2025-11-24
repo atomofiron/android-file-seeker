@@ -27,5 +27,3 @@ sealed interface Thumbnail {
         operator fun invoke(@DrawableRes value: Int) = Res(value)
     }
 }
-
-val AndroidBitmap.forNode: Thumbnail get() = Thumbnail.Bitmap(this)

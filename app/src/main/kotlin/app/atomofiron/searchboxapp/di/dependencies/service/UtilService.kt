@@ -4,12 +4,10 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import app.atomofiron.common.util.extension.copy
-import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents.useAs
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.dependencies.store.Strings
-import app.atomofiron.searchboxapp.model.CacheConfig
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.utils.getUriForFile
@@ -35,8 +33,6 @@ class UtilService(
         val intent = getUseAs(item) ?: return
         context.startActivity(intent)
     }
-
-    fun config() = CacheConfig(asSu, thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size))
 
     private fun getUseAs(item: Node): Intent? {
         val mimeType = item.content.mimeType

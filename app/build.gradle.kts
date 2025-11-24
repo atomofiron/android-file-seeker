@@ -93,6 +93,7 @@ dependencies {
     implementation(libs.ktor.cio)
     implementation(libs.insets)
     implementation(libs.glide)
+    ksp(libs.glide.ksp)
     debugImplementation(libs.leakcanary)
     testImplementation(libs.junit)
     testImplementation(kotlin("test"))

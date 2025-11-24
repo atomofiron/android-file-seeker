@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.util
 
 import android.content.res.ColorStateList
+import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
 import android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -32,11 +33,18 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeOpe
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.audio.AudioCover
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.resources
 import com.bumptech.glide.Glide
+import com.bumptech.glide.RequestBuilder
+import com.bumptech.glide.RequestManager
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 
 private const val SPACE = " "
 private const val EMPTY = ""
@@ -72,6 +80,7 @@ class ExplorerItemBinder private constructor(
             view.isChecked = item.isChecked
         }
     }
+    private val foo = Foo()
 
     constructor(itemView: View, isOpened: Boolean) : this(itemView, ItemExplorerBinding.bind(itemView), isOpened)
 
@@ -111,11 +120,12 @@ class ExplorerItemBinder private constructor(
         itemView.setOnLongClickListener(onLongClickListener)
         binding.checkBox.setOnCheckedChangeListener(onCheckListener)
 
+        apply(hasThumbnail = item.content.instantThumbnail())
         val thumbnail = (item.content as? NodeContent.File)?.thumbnail
         when (thumbnail) {
             is Thumbnail.FilePath -> Glide
                 .with(itemView.context)
-                .load(item.ref.string)
+                .loadFor(item)
                 .placeholder(placeholder)
                 .error(LemonDrawable())
                 .into(binding.thumbnail)
@@ -137,9 +147,6 @@ class ExplorerItemBinder private constructor(
 
         binding.checkBox.isChecked = item.isChecked
 
-        val withThumbnail = thumbnail != null
-        binding.icon.isVisible = !withThumbnail
-        binding.thumbnail.isVisible = withThumbnail
         binding.error.isVisible = error?.isNotBlank() == true
         binding.progress.isVisible = item.withOperation
         binding.checkBox.isInvisible = item.withOperation
@@ -151,7 +158,6 @@ class ExplorerItemBinder private constructor(
             binding.icon.imageTintList = iconTint
             binding.icon.alpha = Alpha.enabled(!item.isDirectory || item.isCached)
         }
-        binding.title.setCompoundDrawablesRelativeWithIntrinsicBounds(if (withThumbnail) item.getIcon() else 0, 0, 0, 0)
         TextViewCompat.setCompoundDrawableTintList(binding.title, iconTint)
         debugRequire(item.isOpened == isOpened) { "${item.name} isOpened change: $isOpened -> ${item.isOpened}, isDeepest=$isDeepest" }
         bindState(item.isOpened, item.isDeepest)
@@ -255,10 +261,75 @@ class ExplorerItemBinder private constructor(
         return builder
     }
 
+    private fun RequestManager.loadFor(item: Node): RequestBuilder<out Any> {
+        return when (item.content) {
+            is NodeContent.Music -> asBitmap()
+                .load(AudioCover(item.ref.string))
+                .addListener(foo)
+            else -> load(item.ref.string)
+        }
+    }
+
+    private fun NodeContent?.instantThumbnail() = when {
+        this == null -> false
+        this !is NodeContent.File -> false
+        thumbnail == null -> false
+        thumbnail !is Thumbnail.FilePath -> true
+        item.content is NodeContent.Music -> false
+        else -> true
+    }
+
+    private fun apply(hasThumbnail: Boolean) {
+        binding.icon.isVisible = !hasThumbnail
+        binding.thumbnail.isVisible = hasThumbnail
+        binding.title.setCompoundDrawablesRelativeWithIntrinsicBounds(if (hasThumbnail) item.getIcon() else 0, 0, 0, 0)
+    }
+
     interface ExplorerItemBinderActionListener {
         fun onItemClick(item: Node)
         fun onItemLongClick(item: Node)
         /** @return false if is not allowed */
         fun onItemCheck(item: Node, toChecked: Boolean): Boolean
     }
+
+    private inner class Foo : RequestListener<Bitmap> {
+
+        override fun onLoadFailed(
+            e: GlideException?,
+            model: Any?,
+            target: Target<Bitmap?>,
+            isFirstResource: Boolean,
+        ): Boolean {
+            apply(hasThumbnail = false)
+            return false
+        }
+
+        override fun onResourceReady(
+            resource: Bitmap,
+            model: Any,
+            target: Target<Bitmap?>?,
+            dataSource: DataSource,
+            isFirstResource: Boolean,
+        ): Boolean {
+            apply(hasThumbnail = true)
+            return false
+        }
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
