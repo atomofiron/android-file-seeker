@@ -101,6 +101,7 @@ object ExplorerUtils {
     private const val EXT_GZ = ".gz"
     private const val EXT_RAR = ".rar"
     private const val EXT_TXT = ".txt"
+    private const val EXT_GIT = ".gitignore"
     private const val EXT_INI = ".ini"
     private const val EXT_CPP = ".cpp"
     private const val EXT_INO = ".ino"
@@ -332,6 +333,7 @@ object ExplorerUtils {
             mimeType.startsWith(FILE_MESSAGE) -> NodeContent.Text.Plain
             mimeType.startsWith(FILE_TEXT) -> when {
                 name.hasExt(EXT_SVG) -> content.ifNotCached { NodeContent.Text.Svg }
+                name == EXT_GIT -> content.ifNotCached { NodeContent.Text.Gitignore }
                 name.hasExt(EXT_OSU) -> content.ifNotCached { NodeContent.Text.Osu }
                 name.hasExt(EXT_CPP) -> content.ifNotCached { NodeContent.Text.Cpp }
                 name.hasExt(EXT_INO) -> content.ifNotCached { NodeContent.Text.Ino }
@@ -638,6 +640,7 @@ object ExplorerUtils {
         ref.name.hasExt(EXT_SH) -> NodeContent.Text.ShellScript
         ref.name.hasExt(EXT_BAT) -> NodeContent.Text.BatScript
         ref.name.hasExt(EXT_TXT),
+        ref.name.hasExt(EXT_GIT),
         ref.name.hasExt(EXT_INI),
         ref.name.hasExt(EXT_JAVA),
         ref.name.hasExt(EXT_KT),

@@ -154,7 +154,8 @@ sealed class NodeContent(
     sealed class Text(mimeType: String = "text/plain") : File(mimeType) {
         data object Plain : Text()
         data object ShellScript : Text("text/x-shellscript")
-        data object BatScript : Text("text/plain")
+        data object BatScript : Text()
+        data object Gitignore : Text()
         data object Osu : Text("application/x-osu-beatmap")
         data object Svg : Text("image/svg+xml")
         data object Cpp : Text("text/x-c++src")

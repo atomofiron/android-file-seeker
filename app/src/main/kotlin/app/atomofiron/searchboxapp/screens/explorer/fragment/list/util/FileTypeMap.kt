@@ -17,6 +17,7 @@ fun Node.getIcon(): Int {
 fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.Music -> R.drawable.ic_music
     is NodeContent.Text.Svg -> R.drawable.ic_vector
+    is NodeContent.Text.Gitignore -> R.drawable.ic_git
     is NodeContent.Picture -> R.drawable.ic_picture
     is NodeContent.Movie -> R.drawable.ic_movie
     is NodeContent.AndroidApp -> R.drawable.ic_apk
