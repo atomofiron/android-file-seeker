@@ -166,6 +166,7 @@
     <string name="next">Sledeće</string>
     <string name="previous">Prethodno</string>
     <string name="status">Status</string>
+    <string name="loading">Preuzimanje</string>
     <string name="edit">Uredi</string>
     <string name="save">Sačuvaj</string>
     <string name="show">Prikaži</string>

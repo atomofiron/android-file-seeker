@@ -70,20 +70,25 @@ class TextViewerViewState(
     val dock = status.map { state ->
         var index: Int? = null
         var count: Int? = null
-        val label = if (state.max == 0) DockItem.Label.Empty else {
-            index = state.current
-            count = state.max
-            DockItem.Label("$index / $count")
-        }
         TextViewerDockState.Default.run {
+            val navigation = state.max > 0
+            val label = if (navigation) {
+                index = state.current
+                count = state.max
+                DockItem.Label("$index / $count")
+            } else if (state.loading) {
+                DockItem.Label(R.string.loading)
+            } else {
+                DockItem.Label(R.string.status)
+            }
             val status = when {
                 state.loading -> status.with(MuonsDrawable())
                 else -> status.with(R.drawable.ic_circle_check)
             }
             copy(
                 status = status.copy(label = label, progress = state.loading),
-                previous = previous.copy(enabled = !state.loading),
-                next = next.copy(enabled = !state.loading),
+                previous = previous.copy(enabled = !state.loading && navigation),
+                next = next.copy(enabled = !state.loading && navigation),
             )
         }
     }
