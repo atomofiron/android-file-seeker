@@ -17,7 +17,6 @@ import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.common.util.flow.TriggerFlow
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.invoke
-import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.verifyNativeBin
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
@@ -104,7 +103,6 @@ class ExplorerService(
                 updateRootsAsync(volumes, asSu)
             }.collect()
         }
-        val thumbnailSize = context.resources.getDimensionPixelSize(R.dimen.thumbnail_size)
         combine(preferences.asSu, preferences.suCmd) { asSu, suCmd ->
             NativeBridge.setSuCmd(suCmd, binDir = context.filesDir.absolutePath)
             suDefined.complete()

@@ -28,7 +28,6 @@
     <dimen name="joystick_padding">16dp</dimen>
 	<dimen name="joystick_elevation">@dimen/dock_elevation</dimen>
     <dimen name="edge_size">48dp</dimen>
-    <dimen name="thumbnail_size">48dp</dimen>
     <dimen name="preview_size">192dp</dimen>
 	<dimen name="title_size">20sp</dimen>
 	<dimen name="title_margin">36dp</dimen>
