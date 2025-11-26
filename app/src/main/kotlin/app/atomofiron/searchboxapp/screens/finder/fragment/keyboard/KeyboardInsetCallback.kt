@@ -15,7 +15,8 @@ class KeyboardInsetCallback(
 
     private var max = 0
     private var isPrepareCalled = false
-    private var isControlling = false
+    var isControlling = false
+        private set
     var isControllable = Android.R
         private set
     var visible = false

@@ -67,7 +67,6 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private lateinit var controller: WindowInsetsControllerCompat
     private val delegate = InsetsAnimator(anyFocused = { focusedView != null }, gesture = { tracking.vertical })
     private val keyboardCallback = KeyboardInsetCallback(KeyboardListener(), delegate.keyboardListener)
-    private var isControlling = false // onReady is too slow
 
     private var neighbourView: View? = null
     private lateinit var recyclerView: RecyclerView
@@ -411,13 +410,11 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private fun cancelControlKeyboard(visible: Boolean) {
         tracking = Tracking.Skipping
-        isControlling = false
         delegate.finish(visible)
     }
 
     private fun ensureControlKeyboard() {
-        if (!isControlling) {
-            isControlling = true
+        if (!keyboardCallback.isControlling) {
             controller.controlWindowInsetsAnimation(Type.ime(), -1, null, null, delegate)
         }
     }
@@ -483,7 +480,6 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
         override fun onImeEnd(visible: Boolean) {
             if (!visible) focusedView?.clearFocus()
-            isControlling = false
         }
 
         override fun onImeBroke(visible: Boolean) = cancelControlKeyboard(visible)
