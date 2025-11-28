@@ -213,7 +213,7 @@ class ExplorerService(
 
     private fun updateRootAsync(key: NodeTabKey, root: NodeRoot) {
         when {
-            preferences.asSu.value -> Unit
+            asSu -> Unit
             root.type !is NodeRootType.SystemRoot -> Unit
             else -> return
         }
@@ -653,7 +653,7 @@ class ExplorerService(
                     else -> it
                 }
             }
-            if (!preferences.asSu.value) {
+            if (!asSu) {
                 removeOneIf { it.type is NodeRootType.SystemRoot }
             }
         }
