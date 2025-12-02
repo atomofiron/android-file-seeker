@@ -32,6 +32,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeDee
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeOpened
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.BindingCache
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.audio.AudioCover
 import app.atomofiron.searchboxapp.utils.colorAttr
@@ -53,7 +54,8 @@ class ExplorerItemBinder private constructor(
     private val itemView: View,
     private val binding: ItemExplorerBinding,
     private val isOpened: Boolean,
-) {
+) : BindingCache() {
+
     private lateinit var item: Node
     private var isDeepest: Boolean? = null
 
@@ -80,7 +82,7 @@ class ExplorerItemBinder private constructor(
             view.isChecked = item.isChecked
         }
     }
-    private val foo = Foo()
+    private val bitmapListener = BitmapListener()
 
     constructor(itemView: View, isOpened: Boolean) : this(itemView, ItemExplorerBinding.bind(itemView), isOpened)
 
@@ -113,52 +115,54 @@ class ExplorerItemBinder private constructor(
         binding.thumbnail.clipToOutline = true
     }
 
-    fun bind(item: Node) {
-        this.item = item
+    fun bind(item: Node) = binding.run {
+        this@ExplorerItemBinder.item = item
 
         itemView.setOnClickListener(onClickListener)
         itemView.setOnLongClickListener(onLongClickListener)
-        binding.checkBox.setOnCheckedChangeListener(onCheckListener)
+        checkBox.setOnCheckedChangeListener(onCheckListener)
 
-        apply(hasThumbnail = item.content.instantThumbnail())
-        val thumbnail = (item.content as? NodeContent.File)?.thumbnail
-        when (thumbnail) {
-            is Thumbnail.FilePath -> Glide
-                .with(itemView.context)
-                .loadFor(item)
-                .placeholder(placeholder)
-                .error(LemonDrawable())
-                .into(binding.thumbnail)
-            is Thumbnail.Bitmap -> binding.thumbnail.setImageBitmap(thumbnail.value)
-            is Thumbnail.Drawable -> binding.thumbnail.setImageDrawable(thumbnail.value)
-            is Thumbnail.Res -> binding.thumbnail.setImageResource(thumbnail.value)
-            is Thumbnail.Loading -> binding.thumbnail.setImageDrawable(placeholder)
-            null -> binding.thumbnail.setImageDrawable(null)
+        thumbnail.bind(item.content) { content ->
+            apply(hasThumbnail = content.instantThumbnail())
+            val thumbnail = (content as? NodeContent.File)?.thumbnail
+            when (thumbnail) {
+                is Thumbnail.FilePath -> Glide
+                    .with(context)
+                    .loadFor(item)
+                    .placeholder(placeholder)
+                    .error(LemonDrawable())
+                    .into(this)
+                is Thumbnail.Bitmap -> setImageBitmap(thumbnail.value)
+                is Thumbnail.Drawable -> setImageDrawable(thumbnail.value)
+                is Thumbnail.Res -> setImageResource(thumbnail.value)
+                is Thumbnail.Loading -> setImageDrawable(placeholder)
+                null -> setImageDrawable(null)
+            }
         }
 
-        binding.title.text = when {
+        title.text = when {
             item.isRoot -> item.getTitle(itemView.resources)
             else -> item.name
         }
-        binding.title.typeface = if (item.isDirectory) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
+        title.typeface = if (item.isDirectory) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
 
-        val error = item.error?.let { itemView.resources.getString(it, item.content) }
-        binding.error.text = error
+        val errorText = item.error?.let { itemView.resources.getString(it, item.content) }
+        error.text = errorText
 
-        binding.checkBox.isChecked = item.isChecked
+        checkBox.isChecked = item.isChecked
 
-        binding.error.isVisible = error?.isNotBlank() == true
-        binding.progress.isVisible = item.withOperation
-        binding.checkBox.isInvisible = item.withOperation
-        binding.details.maxWidth = itemView.resources.displayMetrics.widthPixels / 3
+        error.isVisible = errorText?.isNotBlank() == true
+        progress.isVisible = item.withOperation
+        checkBox.isInvisible = item.withOperation
+        details.maxWidth = itemView.resources.displayMetrics.widthPixels / 3
 
         val iconTint = if (item.isDirectory) dirTint else fileTint
-        binding.icon.ifVisible {
-            binding.icon.setImageResource(item.getIcon())
-            binding.icon.imageTintList = iconTint
-            binding.icon.alpha = Alpha.enabled(!item.isDirectory || item.isCached)
+        icon.ifVisible {
+            icon.setImageResource(item.getIcon())
+            icon.imageTintList = iconTint
+            icon.alpha = Alpha.enabled(!item.isDirectory || item.isCached)
         }
-        TextViewCompat.setCompoundDrawableTintList(binding.title, iconTint)
+        TextViewCompat.setCompoundDrawableTintList(title, iconTint)
         debugRequire(item.isOpened == isOpened) { "${item.name} isOpened change: $isOpened -> ${item.isOpened}, isDeepest=$isDeepest" }
         bindState(item.isOpened, item.isDeepest)
     }
@@ -265,7 +269,7 @@ class ExplorerItemBinder private constructor(
         return when (item.content) {
             is NodeContent.Music -> asBitmap()
                 .load(AudioCover(item.ref.string))
-                .addListener(foo)
+                .addListener(bitmapListener)
             else -> load(item.ref.string)
         }
     }
@@ -292,7 +296,7 @@ class ExplorerItemBinder private constructor(
         fun onItemCheck(item: Node, toChecked: Boolean): Boolean
     }
 
-    private inner class Foo : RequestListener<Bitmap> {
+    private inner class BitmapListener : RequestListener<Bitmap> {
 
         override fun onLoadFailed(
             e: GlideException?,
@@ -316,20 +320,3 @@ class ExplorerItemBinder private constructor(
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
