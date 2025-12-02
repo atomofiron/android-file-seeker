@@ -23,8 +23,9 @@ inline fun Any.debugFail(lazyMessage: () -> Any = ::stub) = debugRequire(false, 
 
 inline fun Any.debugRequireNotNull(any: Any?, lazyMessage: () -> Any = ::stub) = debugRequire(any != null, lazyMessage)
 
+@Suppress("OPT_IN_USAGE")
 inline fun Any.debugRequire(value: Boolean, lazyMessage: () -> Any = ::stub)  {
-    if (BuildConfig.DEBUG_BUILD) require(value) {
+    if (BuildConfig.DEBUG) require(value) {
         val message = "$simpleName: ${lazyMessage()}"
         debugContext.get()?.let {
             GlobalScope.launch(Dispatchers.Main) {
@@ -49,9 +50,13 @@ val Any?.className: String get() = when {
 
 fun <T> T.takeIfDebug(): T? = if (BuildConfig.DEBUG) this else null
 
+fun Any.logD(s: String) {
+    if (BuildConfig.DEBUG) Log.d("searchboxapp", "[$simpleName] $s")
+}
+
 fun Any.logE(s: String) {
-    if (!BuildConfig.DEBUG) {
-        // reportError(s, null)
-    }
-    Log.e("searchboxapp", "[ERROR in ${this.simpleName}] $s")
+    /*if (!BuildConfig.DEBUG) {
+        reportError(s, null)
+    }*/
+    Log.e("searchboxapp", "[ERROR in $simpleName] $s")
 }
