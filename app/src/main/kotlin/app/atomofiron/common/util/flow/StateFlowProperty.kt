@@ -1,15 +1,18 @@
 package app.atomofiron.common.util.flow
 
 import app.atomofiron.common.util.property.RoProperty
+import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.reflect.KProperty
 
+@OptIn(ExperimentalForInheritanceCoroutinesApi::class)
 class StateFlowProperty<T>(
     private val flow: SharedFlow<T>,
     private var initial: T? = null,
 ) : SharedFlow<T> by flow, StateFlow<T>, RoProperty<T> {
 
+    @Suppress("UNCHECKED_CAST")
     override val value: T get() = flow.replayCache.firstOrNull()
         ?.also { initial = null }
         ?: initial as T
@@ -18,3 +21,5 @@ class StateFlowProperty<T>(
 }
 
 fun <T> SharedFlow<T>.asProperty(initial: T? = null): StateFlowProperty<T> = StateFlowProperty(this, initial)
+
+fun <T> StateFlow<T>.asProperty(): StateFlowProperty<T> = StateFlowProperty(this, value)
