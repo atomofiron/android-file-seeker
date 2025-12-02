@@ -17,8 +17,6 @@ import app.atomofiron.searchboxapp.utils.getAttr
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.progressindicator.CircularProgressIndicator
 
-private const val MAX = 100
-
 class AppUpdatePreference @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
@@ -31,7 +29,7 @@ class AppUpdatePreference @JvmOverloads constructor(
     private val buttonStyle = ButtonStyle(context)
     private lateinit var button: Button
     private lateinit var progress: CircularProgressIndicator
-    var listener: UpdateActionListener = UpdateActionListener { }
+    var listener: UpdateActionListener? = null
 
     init {
         widgetLayoutResource = R.layout.widget_button_with_progress
@@ -45,7 +43,7 @@ class AppUpdatePreference @JvmOverloads constructor(
         button = holder.itemView.findViewById(R.id.widgetButton)
         progress = holder.itemView.findViewById(R.id.widgetProgress)
         button.setOnClickListener(this)
-        progress.max = MAX
+        progress.max = 100
         state.bindButton()
         state.bindProgress()
     }
@@ -116,7 +114,7 @@ class AppUpdatePreference @JvmOverloads constructor(
         }
         progress.isVisible = true
         progress.isIndeterminate = value == null
-        value?.let { progress.setProgress((MAX * value).toInt()) }
+        value?.let { progress.setProgress((progress.max * value).toInt()) }
     }
 
     override fun onClick(v: View) {
@@ -131,7 +129,7 @@ class AppUpdatePreference @JvmOverloads constructor(
             is AppUpdateState.Completable -> AppUpdateAction.Install
             is AppUpdateState.Downloading,
             is AppUpdateState.Installing -> null
-        }?.let { listener(it) }
+        }?.let { listener?.invoke(it) }
     }
 
     private fun showChoice() {
@@ -139,9 +137,9 @@ class AppUpdatePreference @JvmOverloads constructor(
             .setCancelable(false)
             .setTitle(R.string.update_choice)
             .setPositiveButton(R.string.update_now) { _, _ ->
-                listener(AppUpdateAction.Download(UpdateType.Immediate))
+                listener?.invoke(AppUpdateAction.Download(UpdateType.Immediate))
             }.setNegativeButton(R.string.update_in_background) { _, _ ->
-                listener(AppUpdateAction.Download(UpdateType.Flexible))
+                listener?.invoke(AppUpdateAction.Download(UpdateType.Flexible))
             }.show()
     }
 }

@@ -1,14 +1,14 @@
+use crate::api::protocol::Meta;
+use crate::common::{empty_string, DATE, DATE_STUB, TIME, TIME_STUB};
+use crate::ext::raw_path::PathExt;
 use crate::r#impl::fs_mode::HumanReadableMode;
 use crate::r#impl::hr_size::HumanReadableSize;
 use crate::r#impl::hr_users::HumanReadableUsers;
-use crate::api::protocol::Meta;
+use chrono::{DateTime, Local};
 use std::fs::Metadata;
 use std::io;
 use std::os::unix::fs::MetadataExt;
 use std::path::PathBuf;
-use chrono::{DateTime, Local};
-use crate::common::{empty_string, DATE, DATE_STUB, TIME, TIME_STUB};
-use crate::ext::raw_path::RawPathExt;
 
 pub trait HumanReadableMeta {
     fn to_hr(self, name: &PathBuf) -> Meta;

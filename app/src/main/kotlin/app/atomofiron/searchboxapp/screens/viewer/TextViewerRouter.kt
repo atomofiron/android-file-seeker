@@ -6,5 +6,6 @@ import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 
 class TextViewerRouter(property: WeakProperty<out Fragment>) : BaseRouter(property) {
+
     override val currentDestinationId = R.id.textViewerFragment
 }

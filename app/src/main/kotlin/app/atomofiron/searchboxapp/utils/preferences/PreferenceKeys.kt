@@ -31,8 +31,6 @@ object PreferenceKeys {
     val KeyLocale = PreferenceKey("pref_locale", AppLocale.System.ordinal.toString())
     val KeyAppTheme = PreferenceKey("pref_app_theme", AppTheme.defaultName())
     val KeyDeepBlack = PreferenceKey("pref_deep_black", false)
-    // todo pack KeyMaxSize and KeyMaxDepth with other in one
-    // it was long but DataStore made it int
     val KeyMaxSize = PreferenceKey("pref_max_size", Const.DEFAULT_MAX_SIZE)
     val KeyMaxDepth = PreferenceKey("pref_max_depth", Const.DEFAULT_MAX_DEPTH)
     val KeyUseSu = PreferenceKey("pref_use_su", false)
@@ -40,9 +38,10 @@ object PreferenceKeys {
     val KeyExplorerItem = PreferenceKey("pref_explorer_item", ExplorerItemComposition.DEFAULT)
     val KeyJoystick = PreferenceKey("pref_joystick", JoystickComposition.DEFAULT)
     val KeyHapticFeedback = PreferenceKey("pref_haptic_feedback", true)
+    val KeyScreenshotOperations = PreferenceKey("pref_screenshot_operations", true)
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
-        arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyAppUpdateCode, KeyShownNotificationUpdateCode, KeyTestField, KeyShowSearchOptions, KeySearchOptions, KeyLocalSearchOptions, KeySpecialCharacters, KeyAppOrientation, KeyLocale, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeySuCmd, KeyExplorerItem, KeyJoystick, KeyHapticFeedback)
+        arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyAppUpdateCode, KeyShownNotificationUpdateCode, KeyTestField, KeyShowSearchOptions, KeySearchOptions, KeyLocalSearchOptions, KeySpecialCharacters, KeyAppOrientation, KeyLocale, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeySuCmd, KeyExplorerItem, KeyJoystick, KeyHapticFeedback, KeyScreenshotOperations)
     }
 
     @Suppress("UNCHECKED_CAST") // omg it's an error in Kotlin 2.2

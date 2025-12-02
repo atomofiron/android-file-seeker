@@ -1,9 +1,11 @@
 package app.atomofiron.searchboxapp.screens.preferences.presenter
 
+import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.service.PreferenceService
+import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState
 import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExportImportDelegate
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -14,6 +16,7 @@ class ExportImportPresenterDelegate(
     private val viewState: PreferenceViewState,
     private val preferenceService: PreferenceService,
     private val preferenceChannel: PreferenceChannel,
+    private val dialogs: DialogDelegate,
 ) : ExportImportDelegate.ExportImportOutput {
 
     override fun exportPreferences() {
@@ -42,7 +45,7 @@ class ExportImportPresenterDelegate(
     private fun showOutput(result: Rslt<Unit>, successMessage: Int) {
         when (result) {
             is Rslt.Ok -> viewState.sendAlertOutputSuccess(successMessage)
-            is Rslt.Err -> viewState.sendAlertOutputError(result)
+            is Rslt.Err -> dialogs.showError(result.message.toUni())
         }
     }
 }

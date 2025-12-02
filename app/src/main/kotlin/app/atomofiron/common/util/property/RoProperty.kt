@@ -4,11 +4,6 @@ import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
 interface RoProperty<T> : ReadOnlyProperty<Any?, T> {
-    companion object {
-        fun <T : R, R> RoProperty<T>.map(): RoProperty<R> = object : RoProperty<R> {
-            override val value: R get() = this@map.value
-        }
-    }
 
     val value: T
 
@@ -17,4 +12,10 @@ interface RoProperty<T> : ReadOnlyProperty<Any?, T> {
     fun <R> map(map: (T) -> R): RoProperty<R> = object : RoProperty<R> {
         override val value: R get() = this@RoProperty.value.let(map)
     }
+}
+
+inline operator fun <T, R> RoProperty<T>.invoke(action: T.() -> R?) = value?.action()
+
+fun <T : R, R> RoProperty<T>.map(): RoProperty<R> = object : RoProperty<R> {
+    override val value: R get() = this@map.value
 }

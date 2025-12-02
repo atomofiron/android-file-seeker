@@ -1,8 +1,8 @@
 use crate::api::protocol::Meta;
 use crate::common::empty_string;
+use crate::ext::raw_path::PathExt;
 use std::fmt::Display;
 use std::path::PathBuf;
-use crate::ext::raw_path::RawPathExt;
 
 pub trait MetaExt {
     fn is_dir(&self) -> bool;

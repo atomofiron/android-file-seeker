@@ -1,22 +1,15 @@
 package app.atomofiron.common.util.permission
 
-import android.content.pm.PackageManager
 import androidx.activity.ComponentActivity
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.util.property.RoProperty
+import app.atomofiron.searchboxapp.utils.granted
 
-class PermissionDelegate private constructor(
-    activityProperty: RoProperty<out ComponentActivity?>,
-) : PermissionDelegateApi {
-    companion object {
-        private val contract = ActivityResultContracts.RequestMultiplePermissions()
+private val contract = ActivityResultContracts.RequestMultiplePermissions()
 
-        fun create(activityProperty: RoProperty<out ComponentActivity?>): PermissionDelegateApi {
-            return PermissionDelegate(activityProperty)
-        }
-    }
+class PermissionDelegate(activityProperty: RoProperty<out ComponentActivity?>) : PermissionDelegateApi {
 
     private sealed class Status(val permission: String) {
         class Granted(permission: String) : Status(permission)
@@ -84,8 +77,8 @@ class PermissionDelegate private constructor(
         val notGranted = mutableListOf<String>()
         for (permission in permissions) {
             when {
-                isGranted(permission) -> Unit
-                checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED -> rememberStatus(Status.Granted(permission))
+                wasGranted(permission) -> Unit
+                granted(permission) -> rememberStatus(Status.Granted(permission))
                 else -> notGranted.add(permission)
             }
         }
@@ -95,7 +88,7 @@ class PermissionDelegate private constructor(
     override fun granted(callback: GrantedCallback): PermissionDelegateApi {
         requestedPermissions.forEach { permission ->
             when {
-                isGranted(permission) -> callback(permission)
+                wasGranted(permission) -> callback(permission)
                 requestedPermissions.contains(permission) -> grantedCallbacks.add(permission, callback)
             }
         }
@@ -105,7 +98,7 @@ class PermissionDelegate private constructor(
     override fun denied(callback: DeniedCallback): PermissionDelegateApi {
         requestedPermissions.forEach { permission ->
             when {
-                isGranted(permission) -> Unit
+                wasGranted(permission) -> Unit
                 requestedPermissions.contains(permission) -> deniedCallbacks.add(permission, callback)
                 else -> when (val status = getStatus(permission)) {
                     is Status.Denied -> callback(permission, status.shouldShowRequestPermissionRationale)
@@ -124,7 +117,7 @@ class PermissionDelegate private constructor(
 
     override fun granted(permission: String, callback: ExactGrantedCallback): PermissionDelegateApi {
         when {
-            isGranted(permission) -> callback()
+            wasGranted(permission) -> callback()
             requestedPermissions.contains(permission) -> grantedCallbacks.add(permission, callback)
         }
         return this
@@ -132,7 +125,7 @@ class PermissionDelegate private constructor(
 
     override fun denied(permission: String, callback: ExactDeniedCallback): PermissionDelegateApi {
         when {
-            isGranted(permission) -> Unit
+            wasGranted(permission) -> Unit
             requestedPermissions.contains(permission) -> deniedCallbacks.add(permission, callback)
             else -> when (val status = getStatus(permission)) {
                 is Status.Denied -> callback(status.shouldShowRequestPermissionRationale)
@@ -144,7 +137,7 @@ class PermissionDelegate private constructor(
 
     private fun getStatus(permission: String): Status? = permissionStatuses.find { it.permission == permission }
 
-    private fun isGranted(permission: String): Boolean = getStatus(permission) is Status.Granted
+    private fun wasGranted(permission: String): Boolean = getStatus(permission) is Status.Granted
 
     private fun rememberStatus(status: Status) {
         val index = permissionStatuses.indexOfFirst { it.permission == status.permission }

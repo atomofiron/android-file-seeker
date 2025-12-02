@@ -23,6 +23,7 @@ class ExplorerStore {
     private val _currentTab = MutableStateFlow(NodeTabKey.Stub)
     private val _currentNode = MutableStateFlow<Node?>(null)
     private val _internalRoot = MutableStateFlow(Node.asRoot(NodeRef(internalStoragePath), NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
+    private val _screenshots = MutableStateFlow<NodeRef?>(null)
     private val _checked = MutableStateFlow<List<Node>>(listOf())
     private val _alerts = EventFlow<NodeError>()
     private val _deleted = EventFlow<List<Node>>()
@@ -34,6 +35,7 @@ class ExplorerStore {
     val currentNode: StateFlow<Node?> = _currentNode
     val storage: StateFlow<List<NodeStorage>> = _storage
     val internalStorage: StateFlow<Node> = _internalRoot
+    val screenshots: StateFlow<NodeRef?> = _screenshots
     val checked: StateFlow<List<Node>> = _checked
     val alerts: Flow<NodeError> = _alerts
     val deleted: Flow<List<Node>> = _deleted
@@ -65,6 +67,10 @@ class ExplorerStore {
         _internalRoot.run {
             value = value.action()
         }
+    }
+
+    fun updateScreenshots(ref: NodeRef) {
+        _screenshots.value = ref
     }
 
     fun setStorage(item: List<NodeStorage>) {

@@ -1,26 +1,33 @@
 package app.atomofiron.searchboxapp.screens.preferences.fragment
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.content.res.Resources
-import android.view.View
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
+import androidx.fragment.app.Fragment
 import androidx.preference.Preference
 import androidx.preference.PreferenceGroup
 import androidx.preference.get
+import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.preference.AppLocale
 import app.atomofiron.searchboxapp.model.preference.AppTheme
+import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState
 import app.atomofiron.searchboxapp.utils.performHapticLite
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.setHapticEffect
 
 class PreferenceFragmentDelegate(
-    private val view: () -> View?,
+    private val fragment: Fragment,
     private val resources: Resources,
     private val viewState: PreferenceViewState,
     private val clickOutput: PreferenceClickOutput,
 ) : Preference.OnPreferenceChangeListener, Preference.OnPreferenceClickListener {
+
+    private val view get() = fragment.view
+    private val permissions = StoragePermissionDelegate(WeakProperty(fragment))
+        .apply { register() }
 
     override fun onPreferenceChange(preference: Preference, newValue: Any?): Boolean {
         return updatePreference(preference, newValue)
@@ -47,7 +54,7 @@ class PreferenceFragmentDelegate(
                 return clickOutput.onUseSuChanged(newValue as Boolean)
             }
             PreferenceKeys.KeyHapticFeedback.name -> newValue?.let {
-                view()?.setHapticEffect(newValue as Boolean)
+                view?.setHapticEffect(newValue as Boolean)
             }
             PreferenceKeys.KeyAppTheme.name -> {
                 var name = newValue?.toString() ?: preference.preferenceDataStore?.getString(key, null)
@@ -59,9 +66,12 @@ class PreferenceFragmentDelegate(
                 val i = (newValue?.toString() ?: preference.preferenceDataStore?.getString(key, null))?.toInt() ?: 0
                 preference.summary = resources.getStringArray(R.array.orientation_var)[i]
             }
+            PreferenceKeys.KeyScreenshotOperations.name -> {
+                if (newValue == true) requestScreenshotOperationPermissions()
+            }
             PreferenceKeys.PREF_EXPORT_IMPORT -> preference.isEnabled = viewState.isExportImportAvailable
             PreferenceKeys.KeyLocale.name -> (newValue as String?)?.toInt()?.let { index ->
-                view()?.post { // let persist the new value
+                view?.post { // let persist the new value
                     val locales = LocaleListCompat.forLanguageTags(AppLocale.entries[index].tag)
                     AppCompatDelegate.setApplicationLocales(locales)
                 }
@@ -79,7 +89,16 @@ class PreferenceFragmentDelegate(
             PreferenceKeys.KeyLocale.name -> clickOutput.onLocaleClick()
             else -> return false
         }
-        view()?.performHapticLite()
+        view?.performHapticLite()
         return true
+    }
+
+    private fun requestScreenshotOperationPermissions() {
+        permissions.request(
+            granted = {
+                permissions { request(POST_NOTIFICATIONS) }
+            },
+            denied = { },
+        )
     }
 }

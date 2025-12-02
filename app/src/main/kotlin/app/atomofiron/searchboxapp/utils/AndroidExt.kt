@@ -1,20 +1,21 @@
 package app.atomofiron.searchboxapp.utils
 
+import android.Manifest.permission.FOREGROUND_SERVICE
+import android.Manifest.permission.POST_NOTIFICATIONS
+import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.P
 import android.os.Build.VERSION_CODES.TIRAMISU
 import android.os.Bundle
-import android.os.Parcelable
+import android.os.Environment
 import android.provider.OpenableColumns
 import android.util.LayoutDirection
 import android.util.TypedValue
@@ -188,27 +189,26 @@ fun RecyclerView.scrollToTop(): Boolean {
 val ViewPager2.recyclerView: RecyclerView get() = getChildAt(0) as RecyclerView
 
 @Suppress("DEPRECATION")
-inline fun <reified T : Parcelable> Bundle.getParcelableCompat(key: String, clazz: Class<T>): T? = when {
-    SDK_INT >= TIRAMISU -> getParcelable(key, clazz)
-    else -> getParcelable(key)
-}
-
-@Suppress("DEPRECATION")
 inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String, clazz: Class<T>): T? = when {
     SDK_INT >= TIRAMISU -> getSerializable(key, clazz)
     else -> getSerializable(key) as T?
 }
 
-fun Context.canNotice(): Boolean {
-    return SDK_INT < TIRAMISU || checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == PERMISSION_GRANTED
+fun Context.granted(permission: String) = checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+
+fun Context.canPostNotifications() = Android.Below.T || granted(POST_NOTIFICATIONS)
+
+fun Context.canManageFiles() = when {
+    Android.R -> Environment.isExternalStorageManager()
+    else -> granted(WRITE_EXTERNAL_STORAGE)
 }
 
 inline fun Context.ifCanNotice(action: () -> Unit): Boolean {
-    return canNotice().also { if (it) action() }
+    return canPostNotifications().also { if (it) action() }
 }
 
 fun Context.canForegroundService(): Boolean {
-    return SDK_INT < P || checkSelfPermission(android.Manifest.permission.FOREGROUND_SERVICE) == PERMISSION_GRANTED
+    return (Android.Below.O || granted(FOREGROUND_SERVICE)) && (Android.Below.P || granted(FOREGROUND_SERVICE))
 }
 
 @Suppress("DEPRECATION")

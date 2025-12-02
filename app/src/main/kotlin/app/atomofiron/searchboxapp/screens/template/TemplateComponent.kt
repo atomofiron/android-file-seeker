@@ -48,8 +48,7 @@ class TemplateModule {
     @TemplateScope
     fun router(
         fragment: WeakProperty<out Fragment>,
-        preferenceStore: PreferenceStore,
-    ): TemplateRouter = TemplateRouter(fragment, preferenceStore)
+    ): TemplateRouter = TemplateRouter(fragment)
 
     @Provides
     @TemplateScope

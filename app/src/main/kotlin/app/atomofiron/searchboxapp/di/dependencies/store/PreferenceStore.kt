@@ -27,6 +27,7 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyLocale
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxDepth
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxSize
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyOpenedDirPath
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyScreenshotOperations
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShowSearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySpecialCharacters
@@ -208,6 +209,12 @@ class PreferenceStore(
 
     suspend fun setHapticFeedback(value: Boolean) {
         edit { it[KeyHapticFeedback] = value }
+    }
+
+    val screenshotOperations = getFlow(KeyScreenshotOperations)
+
+    suspend fun setScreenshotOperations(value: Boolean) {
+        edit { it[KeyScreenshotOperations] = value }
     }
 
     private fun <V> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {

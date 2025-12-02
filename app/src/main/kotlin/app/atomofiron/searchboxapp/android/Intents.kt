@@ -5,13 +5,19 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import app.atomofiron.common.util.AndroidSdk
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Const
 import androidx.core.net.toUri
+import app.atomofiron.common.util.extension.put
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
+import app.atomofiron.searchboxapp.utils.getUriForFile
+import java.io.File
 
 object Intents {
     const val ACTION_UPDATE = "ACTION_UPDATE"
@@ -40,6 +46,8 @@ object Intents {
         .setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         .setType(Const.MIME_TYPE_ANY)
         .putExtra(Intent.EXTRA_STREAM, uri)
+
+    fun deleteScreenshot(context: Context, ref: NodeRef) = Intent(context, DeleteScreenshotReceiver::class.java).put(ref)
 
     val settingsIntent: Intent
         get() {
@@ -71,5 +79,26 @@ object Intents {
         intent.resolveActivity(packageManager) ?: return null
         return Intent.createChooser(intent, resources.getString(R.string.use_as))
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+
+    fun openWith(context: Context, ref: NodeRef, content: NodeContent? = null): Intent {
+        return chooser(context, Intent.ACTION_VIEW, ref, content)
+    }
+
+    fun shareWith(context: Context, ref: NodeRef, content: NodeContent? = null): Intent {
+        return chooser(context, Intent.ACTION_SEND, ref, content)
+    }
+
+    private fun chooser(context: Context, action: String, ref: NodeRef, content: NodeContent?): Intent {
+        val file = File(ref.string)
+        val contentUri = context.getUriForFile(file)
+        val type = content?.mimeType
+            ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(ref.ext)
+            ?: NodeContent.AnyType
+        val intent = Intent(action)
+        intent.putExtra(Intent.EXTRA_STREAM, contentUri)
+        intent.setDataAndType(contentUri, type)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        return Intent.createChooser(intent, null)
     }
 }

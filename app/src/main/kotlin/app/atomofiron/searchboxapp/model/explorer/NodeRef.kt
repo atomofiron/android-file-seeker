@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.extension.debug
 import kotlinx.serialization.Serializable
+import kotlin.text.contains
 
 private const val SLASH_BYTE = '/'.code.toByte()
 private const val DOT_BYTE = '.'.code.toByte()
@@ -74,7 +75,10 @@ class NodeRef(val bytes: ByteArray) {
     constructor(bytes: ByteArray, child: String) : this(bytes + child)
 
     operator fun plus(child: String) = NodeRef(bytes + child)
-        .also { it.parent = this }
+        .also { if (!child.contains(SLASH_BYTE.toInt().toChar())) it.parent = this }
+
+    operator fun plus(child: ByteArray) = NodeRef(bytes + child)
+        .also { if (!child.contains(SLASH_BYTE)) it.parent = this }
 
     operator fun get(i: Int) = bytes[i]
 
@@ -114,18 +118,20 @@ class NodeRef(val bytes: ByteArray) {
     }
 }
 
-private operator fun ByteArray.plus(child: String): ByteArray {
-    val child = when {
-        child.endsWith('/') -> child.substring(0, child.length.dec())
-        else -> child
-    }.toByteArray()
-    if (child.isEmpty()) {
+private operator fun ByteArray.plus(child: String): ByteArray = this + child.toByteArray()
+
+private operator fun ByteArray.plus(child: ByteArray): ByteArray {
+    var endIndex = child.size
+    while (child.getOrNull(endIndex.dec()) == SLASH_BYTE) {
+        endIndex--
+    }
+    if (endIndex == 0) {
         return this
     }
-    val new = ByteArray(size + child.size + 1)
+    val new = ByteArray(size + endIndex + 1)
     copyInto(new)
     new[size] = SLASH_BYTE
-    child.copyInto(new, new.size - child.size)
+    child.copyInto(new, new.size - endIndex, endIndex = endIndex)
     return new
 }
 

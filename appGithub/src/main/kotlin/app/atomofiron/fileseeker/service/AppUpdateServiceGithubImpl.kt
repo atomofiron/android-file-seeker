@@ -3,7 +3,6 @@ package app.atomofiron.fileseeker.service
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
-import app.atomofiron.common.util.isGranted
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.common.util.Unreachable
 import app.atomofiron.fileseeker.R
@@ -24,6 +23,7 @@ import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.Rslt.Err
 import app.atomofiron.searchboxapp.utils.Rslt.Ok
 import app.atomofiron.searchboxapp.utils.apkInfo
+import app.atomofiron.searchboxapp.utils.granted
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -100,7 +100,7 @@ class AppUpdateServiceGithubImpl(
                 scope.launch {
                     val rslt = apks.installApk(NodeRef(file.path), Intents.ACTION_INSTALL_UPDATE, silently = true)
                     if (rslt is Err) AppUpdateState.Error(rslt.message)
-                    if (!context.isGranted(REQUEST_INSTALL_PACKAGES)) {
+                    if (!context.granted(REQUEST_INSTALL_PACKAGES)) {
                         store.set(state)
                     }
                 }

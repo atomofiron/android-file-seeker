@@ -79,12 +79,8 @@ class AppUpdateServiceGoogleImpl(
         when (status) {
             InstallStatus.UNKNOWN -> AppUpdateState.Unknown
             // PENDING before DOWNLOADING
-            InstallStatus.PENDING -> AppUpdateState.Downloading(
-                null
-            )
-            InstallStatus.DOWNLOADING -> AppUpdateState.Downloading(
-                downloadingProgress
-            )
+            InstallStatus.PENDING -> AppUpdateState.Downloading(null)
+            InstallStatus.DOWNLOADING -> AppUpdateState.Downloading(downloadingProgress)
             InstallStatus.FAILED,
             InstallStatus.CANCELED -> return onFailure()
             InstallStatus.DOWNLOADED -> AppUpdateState.Completable

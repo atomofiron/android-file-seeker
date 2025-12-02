@@ -8,7 +8,6 @@ import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
-import app.atomofiron.searchboxapp.di.dependencies.channel.MainChannel
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
@@ -88,11 +87,10 @@ class MainModule {
         appStoreConsumer: AppStoreConsumer,
         preferenceStore: PreferenceStore,
         updateStore: AppUpdateStore,
-        mainChannel: MainChannel,
         apkChannel: ApkChannel,
         updateService: AppUpdateService,
     ): AppEventDelegate {
-        return AppEventDelegate(context, scope, router, appStoreConsumer, operations, dialogs, preferenceStore, updateStore, mainChannel, apkChannel, updateService)
+        return AppEventDelegate(context, scope, router, appStoreConsumer, operations, dialogs, preferenceStore, updateStore, apkChannel, updateService)
     }
 
     @Provides
@@ -135,7 +133,6 @@ class MainModule {
 interface MainDependencies {
     fun context(): Context
     fun preferenceStore(): PreferenceStore
-    fun mainChannel(): MainChannel
     fun apkChannel (): ApkChannel
     fun initialDelegate(): InitialDelegate
     fun appUpdateService(): AppUpdateService

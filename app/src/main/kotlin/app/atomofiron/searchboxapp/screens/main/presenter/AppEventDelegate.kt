@@ -12,14 +12,11 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.dialog.DialogConfig
 import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.common.util.flow.invoke
-import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.android.dismissUpdateNotification
 import app.atomofiron.searchboxapp.android.showUpdateNotification
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
-import app.atomofiron.searchboxapp.di.dependencies.channel.MainChannel
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppStoreConsumer
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
@@ -41,20 +38,18 @@ interface AppEventDelegateApi {
     fun onActivityCreate(activity: AppCompatActivity)
     fun onActivityDestroy()
     fun onIntent(intent: Intent)
-    fun onMaximize()
     fun onActivityFinish()
 }
 
 class AppEventDelegate(
     private val context: Context,
-    private val scope: CoroutineScope,
+    scope: CoroutineScope,
     private val router: MainRouter,
     private val appStoreConsumer: AppStoreConsumer,
     private val operations: FileOperationsDelegate,
     private val dialogs: DialogDelegate,
     private val preferences: PreferenceStore,
     updateStore: AppUpdateStore,
-    private val mainChannel: MainChannel,
     apkChannel: ApkChannel,
     private val updateService: AppUpdateService,
 ) : AppEventDelegateApi {
@@ -79,23 +74,12 @@ class AppEventDelegate(
     override fun onIntent(intent: Intent) {
         when (intent.action) {
             Intent.ACTION_VIEW -> intent.data?.viewFile()
-            Intent.ACTION_SEND -> {
-                val uri = when {
-                    Android.T -> intent.getParcelableExtra(Intent.EXTRA_STREAM, Uri::class.java)
-                    else -> intent.getParcelableExtra(Intent.EXTRA_STREAM) as Uri?
-                }
-                // todo alerts
-                uri ?: return
-                mainChannel.fileToReceive[scope] = uri
-            }
             Intents.ACTION_UPDATE -> {
                 context.dismissUpdateNotification()
                 router.showSettings()
             }
         }
     }
-
-    override fun onMaximize() = mainChannel.maximized.invoke(scope)
 
     override fun onActivityDestroy() = appStoreConsumer.onActivityDestroy()
 

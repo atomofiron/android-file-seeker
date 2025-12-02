@@ -1,5 +1,6 @@
 package app.atomofiron.common.util.extension
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.work.Data
 
@@ -9,6 +10,13 @@ inline fun <reified T : Any> Bundle.get(): T? = getByteArray(protobufBytesKey<T>
 
 inline fun <reified T : Any> Bundle.put(data: T): Bundle {
     putByteArray(protobufBytesKey<T>(), data.encode())
+    return this
+}
+
+inline fun <reified T : Any> Intent.get(): T? = getByteArrayExtra(protobufBytesKey<T>())?.decode()
+
+inline fun <reified T : Any> Intent.put(data: T): Intent {
+    putExtra(protobufBytesKey<T>(), data.encode())
     return this
 }
 

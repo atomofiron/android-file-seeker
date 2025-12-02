@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROCESSING"/>
 
     <!--
     tools:remove="android:appComponentFactory"
@@ -339,10 +340,19 @@
             android:name="app.atomofiron.searchboxapp.android.InstallReceiver"
             android:exported="false"
             />
+        <receiver
+            android:name="app.atomofiron.searchboxapp.android.DeleteScreenshotReceiver"
+            android:exported="false"
+            />
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:exported="false"
             android:foregroundServiceType="dataSync"
+            />
+        <service
+            android:name="app.atomofiron.searchboxapp.android.ScreenshotService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProcessing"
             />
     </application>
 

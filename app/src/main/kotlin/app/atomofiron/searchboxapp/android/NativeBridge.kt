@@ -11,6 +11,8 @@ import uniffi.native_lib.Check
 import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CommonProgressCollector
 import uniffi.native_lib.ComplexResult
+import uniffi.native_lib.FileEvent
+import uniffi.native_lib.FileEventCollector
 import uniffi.native_lib.Meta
 import uniffi.native_lib.MetaResult
 import uniffi.native_lib.MetasResult
@@ -25,6 +27,7 @@ import uniffi.native_lib.TypedMeta
 import uniffi.native_lib.TypedMetaResult
 import uniffi.native_lib.TypedMetasResult
 import uniffi.native_lib.UsageResult
+import uniffi.native_lib.ValueResult
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipFile
@@ -185,6 +188,17 @@ object NativeBridge {
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
         return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), check, suCmd = suCmd.takeIf { asSu }, cancellation, collector)
+    }
+
+    fun observeDir(
+        target: NodeRef,
+        collector: (Rslt<FileEvent>) -> Unit,
+    ): ValueResult {
+        val collector = object : FileEventCollector {
+            override fun emit(event: FileEvent) = collector(Rslt.Ok(event))
+            override fun error(message: String) = collector(Rslt.Err(message))
+        }
+        return uniffi.native_lib.observeDir(target.bytes,  collector)
     }
 }
 

@@ -87,7 +87,7 @@ open class FixedHideBottomViewOnScrollBehavior @JvmOverloads constructor(
             return
         }
         if (currentAnimator != null) {
-            currentAnimator!!.cancel()
+            currentAnimator?.cancel()
             child.clearAnimation()
         }
         currentState = STATE_SCROLLED_START
@@ -103,7 +103,7 @@ open class FixedHideBottomViewOnScrollBehavior @JvmOverloads constructor(
             return
         }
         if (currentAnimator != null) {
-            currentAnimator!!.cancel()
+            currentAnimator?.cancel()
             child.clearAnimation()
         }
         currentState = STATE_SCROLLED_OFF

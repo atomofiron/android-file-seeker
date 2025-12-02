@@ -74,6 +74,8 @@
     <string name="pref_theme">App theme</string>
     <string name="pref_deep_black">Deep black</string>
     <string name="pref_haptic_feedback">Haptic feedback</string>
+    <string name="pref_screenshot_operations">Screenshot operations</string>
+    <string name="screenshot_operations_active">Screenshot operations active</string>
     <string name="pref_max_depth">Max depth</string>
     <string name="pref_max_size">Max file size</string>
     <string name="max_size_sum">If search in the content</string>
@@ -105,6 +107,8 @@
     <string name="no_such_directory">No such folder</string>
     <string name="no_such_file_or_directory">No such file or folder</string>
     <string name="permission_denied">Permission denied</string>
+    <string name="no_notification_permission">No notification permission</string>
+    <string name="no_storage_permission">No storage permission</string>
     <string name="resource_busy">Resource busy</string>
     <string name="unknown_error">Unknown error</string>
     <string name="inaccessible">Inaccessible</string>
@@ -163,9 +167,11 @@
     <string name="pref_leak_canary" translatable="false">Leak Canary</string>
     <string name="pref_color_scheme" translatable="false">Color scheme</string>
     <string name="root">Root</string>
-    <string name="search_notification_name" translatable="false">Search notifications</string>
-    <string name="result_notification_name" translatable="false">Search result notifications</string>
-    <string name="receive_notification_name" translatable="false">File receiving notifications</string>
+    <string name="channel_name_search">Search</string>
+    <string name="channel_name_result">Search results</string>
+    <string name="channel_name_receive">File receiving</string>
+    <string name="channel_name_updates">App updates</string>
+    <string name="channel_name_screenshot_operations" translatable="false">@string/pref_screenshot_operations</string>
     <string name="copy_path">Copy path</string>
     <string name="pref_category_system">System</string>
     <string name="disclaimer_pick_files">Mark file(s) and\u00A0press\u00A0Confirm</string>
@@ -198,7 +204,6 @@
     <string name="launch">Launch</string>
     <string name="apk_info">Package: %1$s\nVersion: %2$s\nMin SDK: %3$s\nTarget SDK: %4$s\nCompile SDK: %5$s\nSignature: %6$s</string>
     <string name="update">Update</string>
-    <string name="channel_name_updates">Updates</string>
     <string name="search_here">Search here:</string>
     <string name="by_default">Reset to defaults</string>
     <string name="dash" translatable="false">—</string>

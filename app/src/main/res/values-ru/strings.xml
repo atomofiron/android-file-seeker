@@ -71,6 +71,8 @@
     <string name="pref_theme">Тема оформления</string>
     <string name="pref_deep_black">Глубокий чёрный</string>
     <string name="pref_haptic_feedback">Тактильный отклик</string>
+    <string name="pref_screenshot_operations">Операции со скриншотами</string>
+    <string name="screenshot_operations_active">Операции со скриншотами активны</string>
     <string name="pref_max_depth">Макс. глубина</string>
     <string name="pref_max_size">Макс. размер файла</string>
     <string name="max_size_sum">При поиске по содержимому</string>
@@ -102,6 +104,8 @@
     <string name="no_such_directory">Папки не существует</string>
     <string name="no_such_file_or_directory">Файла или папка не существует</string>
     <string name="permission_denied">Нет доступа</string>
+    <string name="no_notification_permission">Разрешение на уведомления не выдано</string>
+    <string name="no_storage_permission">Нет доступа к файлам</string>
     <string name="resource_busy">Ресурс занят</string>
     <string name="unknown_error">Неизвестная ошибка</string>
     <string name="inaccessible">Недоступно</string>
@@ -157,6 +161,10 @@
     <string name="inverse_for_dark">Инвертировать на тёмной теме</string>
     <string name="pref_category_debug">Отладка</string>
     <string name="root">Корень</string>
+    <string name="channel_name_search">Поиск</string>
+    <string name="channel_name_result">Результаты поиска</string>
+    <string name="channel_name_receive">Получение файлов</string>
+    <string name="channel_name_updates">Обновления приложения</string>
     <string name="copy_path">Скопировать путь</string>
     <string name="pref_category_system">Системные</string>
     <string name="disclaimer_pick_files">Пометьте файл(ы) и\u00A0Подтвердите</string>
@@ -189,7 +197,6 @@
     <string name="launch">Запустить</string>
     <string name="apk_info">Имя пакета: %1$s\nВерсия: %2$s\nМинимальная SDK: %3$s\nЦелевая SDK: %4$s\nСборочная SDK: %5$s\nПодпись: %6$s</string>
     <string name="update">Обновить</string>
-    <string name="channel_name_updates">Обновления</string>
     <string name="search_here">Места поиска:</string>
     <string name="by_default">Восстановить по умолчанию</string>
     <string name="fetching">Получение метаданных…</string>

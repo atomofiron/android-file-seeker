@@ -60,8 +60,9 @@ class PreferenceModule {
         viewState: PreferenceViewState,
         preferenceService: PreferenceService,
         preferenceChannel: PreferenceChannel,
+        dialogs: DialogDelegate,
     ): ExportImportDelegate.ExportImportOutput {
-        return ExportImportPresenterDelegate(scope, viewState, preferenceService, preferenceChannel)
+        return ExportImportPresenterDelegate(scope, viewState, preferenceService, preferenceChannel, dialogs)
     }
 
     @Provides

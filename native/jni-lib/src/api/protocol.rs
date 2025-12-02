@@ -1,5 +1,7 @@
+use std::sync::Arc;
 use crate::ext::raw_path::RawPath;
 use bincode::{Decode, Encode};
+use crate::r#impl::inotify::api::WatchHandle;
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Record)]
@@ -47,6 +49,12 @@ pub enum UsageResult {
 #[derive(uniffi::Enum)]
 pub enum SimpleResult {
     Ok,
+    Err(String),
+}
+
+#[derive(uniffi::Enum)]
+pub enum ValueResult {
+    Ok(Arc<WatchHandle>),
     Err(String),
 }
 
@@ -147,3 +155,21 @@ pub trait NameSearchCollector: Send + Sync {
 pub trait TextSearchCollector: Send + Sync {
     fn emit(&self, progress: TextSearchProgress);
 }
+
+#[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(uniffi::Enum)]
+pub enum FileEvent {
+    Create(RawPath),
+    Delete(RawPath),
+    Move {
+        from: RawPath,
+        to: RawPath,
+    },
+}
+
+#[uniffi::export(with_foreign)]
+pub trait FileEventCollector: Send + Sync {
+    fn emit(&self, event: FileEvent);
+    fn error(&self, message: String);
+}
+

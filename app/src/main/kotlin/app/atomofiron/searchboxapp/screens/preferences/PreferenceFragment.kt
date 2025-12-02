@@ -28,14 +28,12 @@ import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.custom.preference.DropDownPreference
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
-import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.performHapticLite
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.InsetsListener
@@ -54,7 +52,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         initViewModel(this, PreferenceViewModel::class, savedInstanceState)
 
         preferenceManager.preferenceDataStore = viewState.preferenceDataStore
-        preferenceDelegate = PreferenceFragmentDelegate(::getView, resources, viewState, presenter)
+        preferenceDelegate = PreferenceFragmentDelegate(this, resources, viewState, presenter)
         setPreferencesFromResource(R.xml.preferences, rootKey)
         preferenceDelegate.onCreatePreference(preferenceScreen)
 
@@ -65,6 +63,10 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         val hapticFeedback = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyHapticFeedback.name)
         viewState.hapticFeedback.collect(lifecycleScope) {
             hapticFeedback.isChecked = it
+        }
+        val screenshotOps = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyScreenshotOperations.name)
+        viewState.screenshotOpsError.collect(lifecycleScope) {
+            screenshotOps.summary = it
         }
         val uppUpdate = findPreference<AppUpdatePreference>(PreferenceKeys.PREF_APP_UPDATE)
         uppUpdate.listener = presenter
@@ -134,7 +136,6 @@ class PreferenceFragment : PreferenceFragmentCompat(),
     override fun PreferenceViewState.onViewCollect() {
         viewCollect(alerts, collector = ::onAlert)
         viewCollect(alertOutputSuccess, collector = ::showOutputSuccess)
-        viewCollect(alertOutputError, collector = ::showOutputError)
     }
 
     private fun PreferenceGroup.fixIcons() {
@@ -156,21 +157,6 @@ class PreferenceFragment : PreferenceFragmentCompat(),
             else -> Snackbar.LENGTH_SHORT
         }
         binding.snackbarContainer.makeSnackbar(message, duration).show()
-    }
-
-    private fun showOutputError(output: Rslt.Err<Unit>) {
-        binding.snackbarContainer.makeSnackbar(R.string.error, Snackbar.LENGTH_SHORT).apply {
-            if (output.message.isNotEmpty()) {
-                setAction(R.string.more) {
-                    MaterialAlertDialogBuilder(context)
-                        .setTitle(R.string.error)
-                        .setMessage(output.message)
-                        .setPositiveButton(R.string.ok) { _, _ -> }
-                        .show()
-                }
-            }
-            show()
-        }
     }
 
     private fun CollapsingToolbarLayout.fixInsets() = object : InsetsListener {

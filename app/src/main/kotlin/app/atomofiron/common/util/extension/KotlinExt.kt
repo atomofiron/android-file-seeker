@@ -3,7 +3,6 @@ package app.atomofiron.common.util.extension
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.collections.ArrayList
@@ -46,6 +45,9 @@ inline infix fun <T> Boolean.then(value: T): T? {
 
 @Suppress("NOTHING_TO_INLINE")
 inline fun Any?.unit() = Unit
+
+@Suppress("NOTHING_TO_INLINE")
+inline fun Any?.nil() = null
 
 fun Float.ceilToInt(): Int = ceil(this).toInt()
 

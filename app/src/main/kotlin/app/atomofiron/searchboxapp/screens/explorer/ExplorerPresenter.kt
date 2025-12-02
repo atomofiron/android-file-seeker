@@ -4,7 +4,7 @@ import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.valueOrNull
 import app.atomofiron.searchboxapp.custom.ExplorerView
-import app.atomofiron.searchboxapp.di.dependencies.channel.MainChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -25,7 +25,7 @@ class ExplorerPresenter(
     private val interactor: ExplorerInteractor,
     private val store: ExplorerStore,
     itemListener: ExplorerItemActionListenerDelegate,
-    mainChannel: MainChannel,
+    commonChannel: CommonChannel,
     dockDelegate: ExplorerDockDelegate,
 ) : BasePresenter<ExplorerViewModel, ExplorerRouter>(scope, router),
     ExplorerView.ExplorerViewOutput,
@@ -36,8 +36,10 @@ class ExplorerPresenter(
     private val currentTab get() = viewState.currentTab.value
 
     init {
-        mainChannel.maximized.collect(scope) {
-            interactor.updateRoots()
+        commonChannel.appState.collect(scope) {
+            if (it.started && it.rise) {
+                interactor.updateRoots()
+            }
         }
     }
 

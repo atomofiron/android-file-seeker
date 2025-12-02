@@ -9,7 +9,7 @@ import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
-import app.atomofiron.searchboxapp.di.dependencies.channel.MainChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
@@ -118,7 +118,7 @@ class ExplorerModule {
         interactor: ExplorerInteractor,
         store: ExplorerStore,
         itemListener: ExplorerItemActionListenerDelegate,
-        mainChannel: MainChannel,
+        commonChannel: CommonChannel,
         dockDelegate: ExplorerDockDelegate,
     ): ExplorerPresenter {
         return ExplorerPresenter(
@@ -129,7 +129,7 @@ class ExplorerModule {
             interactor,
             store,
             itemListener,
-            mainChannel,
+            commonChannel,
             dockDelegate,
         )
     }
@@ -193,7 +193,7 @@ interface ExplorerDependencies {
     fun preferenceStore(): PreferenceStore
     fun curtainChannel(): CurtainChannel
     fun apkInteractor(): ApkInteractor
-    fun mainChannel(): MainChannel
+    fun mainChannel(): CommonChannel
     fun preferenceChannel(): PreferenceChannel
     fun workManager(): WorkManager
 }

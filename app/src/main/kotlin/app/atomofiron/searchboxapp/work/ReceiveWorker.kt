@@ -6,20 +6,17 @@ import android.provider.OpenableColumns
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
-import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.ListenableWorker
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkerParameters
 import app.atomofiron.common.util.extension.debugDelay
+import app.atomofiron.common.util.extension.get
 import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.flow.WaitingGate
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.android.Notifications
 import app.atomofiron.searchboxapp.android.receivingNotificationBuilder
-import app.atomofiron.searchboxapp.android.updateChannel
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.utils.Const
@@ -37,21 +34,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.decodeFromByteArray
-import kotlinx.serialization.encodeToByteArray
-import kotlinx.serialization.protobuf.ProtoBuf
 import java.io.File
 import java.io.FileOutputStream
 import java.util.UUID
 import kotlin.math.max
 
-private const val KEY_DATA_BYTES = "KEY_DATA_BYTES"
 private const val RECEIVED_UNKNOWN = -1L
 private const val MB = 1024 * 1024
-
-fun ReceiveData.toWorkerData() = Data.Builder()
-    .putByteArray(KEY_DATA_BYTES, ProtoBuf.encodeToByteArray(this))
-    .build()
 
 class ReceiveWorker(
     private val context: Context,
@@ -70,7 +59,6 @@ class ReceiveWorker(
         private suspend fun ListenableWorker.dataRead() = get(id).finish()
     }
 
-    private val notifications = NotificationManagerCompat.from(context)
     private val notificationId = hashCode()
     private val progressStyle = NotificationCompat.ProgressStyle()
     private var progressScale = 1.0
@@ -80,10 +68,6 @@ class ReceiveWorker(
 
     override suspend fun doWork(): Result {
         if (withNotification) {
-            notifications.updateChannel(
-                Notifications.CHANNEL_ID_RECEIVE,
-                context.getString(R.string.receive_notification_name),
-            )
             updateProgress(RECEIVED_UNKNOWN)
         }
         return coroutineScope {
@@ -95,10 +79,9 @@ class ReceiveWorker(
 
     //context(CoroutineScope) todo try in the future
     private suspend fun CoroutineScope.work(): Result {
-        val bytes = inputData.getByteArray(KEY_DATA_BYTES)
-        bytes ?: return Result.success()
+        val data = inputData.get<ReceiveData>()
+        data ?: return Result.success()
             .also { toastLong(UniText(R.string.unknown_error)) }
-        val data = ProtoBuf.decodeFromByteArray<ReceiveData>(bytes)
         val total = data.uris.size
         toastShort(UniText(R.plurals.receiving_files, total, total))
         val files = data.uris.map { uri ->

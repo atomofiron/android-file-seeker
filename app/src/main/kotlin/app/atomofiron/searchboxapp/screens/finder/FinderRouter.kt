@@ -15,7 +15,7 @@ class FinderRouter(property: WeakProperty<out Fragment>) : BaseRouter(property),
 
     private val routingModel = property.value?.let { RootRoutingModel(it) }
 
-    val permissions = PermissionDelegate.create(activityProperty)
+    val permissions = PermissionDelegate(activityProperty)
 
     override fun register() {
         fragment {

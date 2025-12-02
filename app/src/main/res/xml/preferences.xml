@@ -62,6 +62,11 @@
             app:isPreferenceVisible="false"
             />
         <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
+            app:title="@string/pref_screenshot_operations"
+            app:key="pref_screenshot_operations"
+            app:icon="@drawable/ic_screenshot_operations"
+            />
+        <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
             app:title="@string/pref_use_su"
             app:key="pref_use_su"
             app:icon="@drawable/ic_hash"

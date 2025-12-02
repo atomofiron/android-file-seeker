@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.di.module
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
-import app.atomofiron.searchboxapp.di.dependencies.channel.MainChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
 import dagger.Module
 import dagger.Provides
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
@@ -30,7 +30,7 @@ open class ChannelModule {
 
     @Provides
     @Singleton
-    open fun provideMainChannel(): MainChannel = MainChannel()
+    open fun provideMainChannel(): CommonChannel = CommonChannel()
 
     @Provides
     @Singleton

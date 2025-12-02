@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.common.delegates
 
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.content.Intent
-import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.os.Environment
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultCallback
@@ -14,12 +13,13 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.permission.PermissionDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.android.Intents
+import app.atomofiron.searchboxapp.utils.canManageFiles
 
 class StoragePermissionDelegate(
     private val fragment: WeakProperty<out Fragment>,
 ) : ActivityResultCallback<ActivityResult>, Registerable {
 
-    private val permissions = PermissionDelegate.create(fragment.map { it?.activity })
+    val permissions = PermissionDelegate(fragment.map { it?.activity })
     private var contractLauncher: ActivityResultLauncher<Intent>? = null
     private var callback: (() -> Unit)? = null
 
@@ -33,10 +33,7 @@ class StoragePermissionDelegate(
     }
 
     override fun onActivityResult(result: ActivityResult) {
-        val granted = when {
-            Android.Below.R -> fragment { requireContext().checkSelfPermission(WRITE_EXTERNAL_STORAGE) == PERMISSION_GRANTED }
-            else -> Environment.isExternalStorageManager()
-        }
+        val granted = fragment { requireContext().canManageFiles() }
         callback?.takeIf { granted == true }?.invoke()
     }
 
@@ -59,4 +56,6 @@ class StoragePermissionDelegate(
         contractLauncher?.launch(intent)
             ?: fragment { startActivity(intent) }
     }
+
+    inline operator fun <R> invoke(action: PermissionDelegate.() -> R) = permissions.action()
 }

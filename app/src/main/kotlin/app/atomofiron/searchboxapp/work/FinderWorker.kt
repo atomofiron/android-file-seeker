@@ -22,7 +22,8 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.Notifications
 import app.atomofiron.searchboxapp.android.tryShow
-import app.atomofiron.searchboxapp.android.updateChannel
+import app.atomofiron.searchboxapp.android.flags
+import app.atomofiron.searchboxapp.android.notification
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -163,10 +164,6 @@ class FinderWorker(
             return Result.success()
         }
         if (context.canForegroundService()) {
-            notifications.updateChannel(
-                Notifications.CHANNEL_ID_SEARCH,
-                context.getString(R.string.search_notification_name),
-            )
             setForeground(getForegroundInfo())
         }
         task = SearchTask(params.query, result = Files(params.type is Params.Text), taskId)
@@ -269,44 +266,38 @@ class FinderWorker(
         } ?: (null to null)
         val error = task.error?.let { context.getString(R.string.search_error, it) }
         text = arrayOf(text, error).filterNotNull().joinToString(separator = ".\n")
-        context.tryShow {
-            val notification = NotificationCompat.Builder(context, Notifications.CHANNEL_ID_RESULT)
-                .setDefaults(Notification.DEFAULT_ALL)
-                .setContentTitle(context.getString(titleId))
-                .setSubText(subText)
-                .apply { if (error != null) setStyle(NotificationCompat.BigTextStyle()) }
-                .setContentText(text)
-                .setSmallIcon(icon)
-                .setColor(ContextCompat.getColor(context, R.color.day_night_primary))
-                .setContentIntent(pendingIntent)
-                .build()
-
-            notification.flags = notification.flags or NotificationCompat.FLAG_AUTO_CANCEL
-
-            notifications.updateChannel(
-                Notifications.CHANNEL_ID_RESULT,
-                context.getString(R.string.result_notification_name),
-                NotificationManagerCompat.IMPORTANCE_DEFAULT,
-            )
-            notification to id
-        }
+        context.notification(
+            Notifications.CHANNEL_ID_RESULT,
+            R.string.channel_name_result,
+            NotificationManagerCompat.IMPORTANCE_DEFAULT,
+        ) {
+            setDefaults(Notification.DEFAULT_ALL)
+            setContentTitle(context.getString(titleId))
+            setSubText(subText)
+            if (error != null) setStyle(NotificationCompat.BigTextStyle())
+            setContentText(text)
+            setSmallIcon(icon)
+            setColor(ContextCompat.getColor(context, R.color.day_night_primary))
+            setContentIntent(pendingIntent)
+            build()
+        }.flags {
+            it or NotificationCompat.FLAG_AUTO_CANCEL
+        }.tryShow(id, context)
     }
 
-    private fun foregroundNotification(): Notification {
+    private fun foregroundNotification(): Notification = context.notification(
+        Notifications.CHANNEL_ID_SEARCH,
+        R.string.channel_name_search,
+        NotificationManagerCompat.IMPORTANCE_DEFAULT,
+    ) {
         val intent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(context, Codes.FOREGROUND, intent, UPDATING_FLAG)
-        notifications.updateChannel(
-            Notifications.CHANNEL_ID_SEARCH,
-            context.getString(R.string.search_notification_name),
-            NotificationManagerCompat.IMPORTANCE_DEFAULT,
-        )
-        return NotificationCompat.Builder(context, Notifications.CHANNEL_ID_SEARCH)
-            .setDefaults(Notification.DEFAULT_ALL)
-            .setContentTitle(context.getString(R.string.searching))
-            .setSmallIcon(R.drawable.ic_notification)
-            .setColor(ContextCompat.getColor(context, R.color.day_night_primary))
-            .setContentIntent(pendingIntent)
-            .build()
+        setDefaults(Notification.DEFAULT_ALL)
+        setContentTitle(context.getString(R.string.searching))
+        setSmallIcon(R.drawable.ic_notification)
+        setColor(ContextCompat.getColor(context, R.color.day_night_primary))
+        setContentIntent(pendingIntent)
+        build()
     }
 
     private fun Params.refs() = targets.map { NodeRef(it) }

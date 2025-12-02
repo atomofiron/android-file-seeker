@@ -226,6 +226,9 @@ class ExplorerService(
                         else -> updated
                     }
                     updateRootSync(updated, key, root)
+                    if (root.type is NodeRootType.Screenshots) {
+                        store.updateScreenshots(root.item.ref)
+                    }
                 }
             }
         }

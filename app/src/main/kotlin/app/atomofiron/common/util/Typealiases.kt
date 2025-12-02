@@ -19,6 +19,7 @@ typealias UnreachableException = Exception
 typealias ActivityProperty = RoProperty<out Activity?>
 
 const val DoesNotMatterFalse = false
+const val NoIcon = 0
 
 fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NONE, initializer)
 

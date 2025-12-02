@@ -71,6 +71,8 @@
     <string name="pref_theme">Тема апликације</string>
     <string name="pref_deep_black">Дубока црна</string>
     <string name="pref_haptic_feedback">Тактилни одзив</string>
+    <string name="pref_screenshot_operations">Операције са скриншотовима</string>
+    <string name="screenshot_operations_active">Операције екрана су активне</string>
     <string name="pref_max_depth">Макс. дубина</string>
     <string name="pref_max_size">Макс. величина датотеке</string>
     <string name="max_size_sum">При претрази по садржају</string>
@@ -102,6 +104,8 @@
     <string name="no_such_directory">Фасцикла не постоји</string>
     <string name="no_such_file_or_directory">Датотека или фасцикла не постоји</string>
     <string name="permission_denied">Приступ одбијен</string>
+    <string name="no_notification_permission">Дозвола за обавештења није издата</string>
+    <string name="no_storage_permission">Нема приступа датотекама</string>
     <string name="resource_busy">Ресурс заузет</string>
     <string name="unknown_error">Непозната грешка</string>
     <string name="inaccessible">Недоступно</string>
@@ -157,6 +161,10 @@
     <string name="inverse_for_dark">Инвертуј у тамној теми</string>
     <string name="pref_category_debug">Дебаг</string>
     <string name="root">Корен</string>
+    <string name="channel_name_search">Претрага</string>
+    <string name="channel_name_result">Резултати претраге</string>
+    <string name="channel_name_receive">Преузимање датотека</string>
+    <string name="channel_name_updates">Ажурирања апликација</string>
     <string name="copy_path">Копирај путању</string>
     <string name="pref_category_system">Систем</string>
     <string name="disclaimer_pick_files">Означите датотеку(е) и притисните Потврди</string>
@@ -189,7 +197,6 @@
     <string name="launch">Покрени</string>
     <string name="apk_info">Пакет: %1$s\nВерзија: %2$s\nМин. SDK: %3$s\nЦиљна SDK: %4$s\nКомпил. SDK: %5$s\nПотпис: %6$s</string>
     <string name="update">Ажурирај</string>
-    <string name="channel_name_updates">Ажурирања</string>
     <string name="search_here">Претрага овде:</string>
     <string name="by_default">Врати на подразумевано</string>
     <string name="fetching">Добављање метаподатака…</string>

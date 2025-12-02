@@ -52,7 +52,7 @@ import lib.atomofiron.insets.insetsSource
 open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModeProvider {
 
     private lateinit var binding: ActivityMainBinding
-    private val rooFragment: Fragment get() = binding.navHostFragment.getFragment()
+    private val rootFragment: Fragment get() = binding.navHostFragment.getFragment()
 
     private lateinit var viewState: MainViewState
     private lateinit var presenter: MainPresenter
@@ -122,7 +122,7 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
         super.onStart()
         when {
             isFirstStart -> isFirstStart = false
-            else -> presenter.onMaximize()
+            //else -> presenter.onState()
         }
     }
 
@@ -177,7 +177,7 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
         when  {
             super.onKeyDown(keyCode, event) -> Unit
             keyCode == KeyEvent.KEYCODE_ESCAPE -> onEscClick()
-            rooFragment.offerKeyCodeToChildren(keyCode) -> Unit
+            rootFragment.offerKeyCodeToChildren(keyCode) -> Unit
             else -> return false
         }
         return true

@@ -71,6 +71,8 @@
     <string name="pref_theme">Tema aplikacije</string>
     <string name="pref_deep_black">Duboka crna</string>
     <string name="pref_haptic_feedback">Taktilni odziv</string>
+    <string name="pref_screenshot_operations">Operacije sa screenshotovima</string>
+    <string name="screenshot_operations_active">Operacije ekrana su aktivne</string>
     <string name="pref_max_depth">Maks. dubina</string>
     <string name="pref_max_size">Maks. veličina datoteke</string>
     <string name="max_size_sum">Pri pretrazi po sadržaju</string>
@@ -102,6 +104,8 @@
     <string name="no_such_directory">Fascikla ne postoji</string>
     <string name="no_such_file_or_directory">Datoteka ili fascikla ne postoji</string>
     <string name="permission_denied">Pristup odbijen</string>
+    <string name="no_notification_permission">Dozvola za obaveštenja nije izdata</string>
+    <string name="no_storage_permission">Nema pristupa datotekama</string>
     <string name="resource_busy">Resurs zauzet</string>
     <string name="unknown_error">Nepoznata greška</string>
     <string name="inaccessible">Nedostupno</string>
@@ -157,6 +161,10 @@
     <string name="inverse_for_dark">Invertuj u tamnoj temi</string>
     <string name="pref_category_debug">Debug</string>
     <string name="root">Koren</string>
+    <string name="channel_name_search">Pretraga</string>
+    <string name="channel_name_result">Rezultati pretrage</string>
+    <string name="channel_name_receive">Preuzimanje datoteka</string>
+    <string name="channel_name_updates">Ažuriranja aplikacija</string>
     <string name="copy_path">Kopiraj putanju</string>
     <string name="pref_category_system">Sistem</string>
     <string name="disclaimer_pick_files">Označite datoteku(e) i pritisnite Potvrdi</string>
@@ -189,7 +197,6 @@
     <string name="launch">Pokreni</string>
     <string name="apk_info">Paket: %1$s\nVerzija: %2$s\nMin. SDK: %3$s\nCiljna SDK: %4$s\nKompil. SDK: %5$s\nPotpis: %6$s</string>
     <string name="update">Ažuriraj</string>
-    <string name="channel_name_updates">Ažuriranja</string>
     <string name="search_here">Pretraga ovde:</string>
     <string name="by_default">Vrati na podrazumevano</string>
     <string name="fetching">Dobavljanje metapodataka…</string>

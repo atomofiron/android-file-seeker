@@ -2,15 +2,16 @@ package app.atomofiron.searchboxapp.di.dependencies.router
 
 import android.app.Activity.RESULT_OK
 import android.content.ClipData
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.webkit.MimeTypeMap
+import androidx.work.Data
 import androidx.work.OneTimeWorkRequest
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import app.atomofiron.common.util.ActivityProperty
+import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.unit
+import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -20,7 +21,6 @@ import app.atomofiron.searchboxapp.utils.getUriForFile
 import app.atomofiron.searchboxapp.work.ReceiveData
 import app.atomofiron.searchboxapp.work.ReceiveWorker
 import app.atomofiron.searchboxapp.work.ReceiveWorker.Companion.waitForDataRead
-import app.atomofiron.searchboxapp.work.toWorkerData
 import java.io.File
 
 interface FileSharingDelegate {
@@ -38,14 +38,19 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
     private val activity by activityProperty
 
     override fun openWith(item: Node) {
-        activity?.startForFile(Intent.ACTION_VIEW, item)
+        val activity = activity ?: return
+        val chooser = Intents.openWith(activity, item.ref, item.content)
+        activity.startActivity(chooser)
     }
 
     override fun shareWith(items: List<Node>) {
         val context = activity ?: return
         if (items.isEmpty()) return
         if (items.size == 1) {
-            activity?.startForFile(Intent.ACTION_SEND, items.first())
+            val activity = activity ?: return
+            val item = items.first()
+            val chooser = Intents.shareWith(activity, item.ref, item.content)
+            activity.startActivity(chooser)
             return
         }
         val intent = Intent(Intent.ACTION_SEND_MULTIPLE)
@@ -73,21 +78,6 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         val chooser = Intent.createChooser(intent, null)
         context.startActivity(chooser)
-    }
-
-    private fun Context.startForFile(action: String, item: Node) {
-        val file = File(item.ref.string)
-        val contentUri = getUriForFile(file)
-        val type = item.content.mimeType ?: let {
-            val ext = MimeTypeMap.getFileExtensionFromUrl(file.name)
-            MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext)
-        } ?: NodeContent.AnyType
-        val intent = Intent(action)
-        intent.putExtra(Intent.EXTRA_STREAM, contentUri)
-        intent.setDataAndType(contentUri, type)
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        val chooser = Intent.createChooser(intent, null)
-        startActivity(chooser)
     }
 
     override fun shareSinglePicked(item: Node) = activity?.run {
@@ -123,7 +113,7 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
 suspend fun WorkManager.startReceiveInto(dst: NodeRef, mode: ActivityMode.Receive) {
     val inputData = ReceiveData(mode.subject, mode.uris, mode.texts.map { it.toString() }, dst)
     val request = OneTimeWorkRequest.Builder(ReceiveWorker::class.java)
-        .setInputData(inputData.toWorkerData())
+        .setInputData(Data(inputData))
         .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
         .build()
     beginWith(request).enqueue()

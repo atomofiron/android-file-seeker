@@ -7,6 +7,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
 
 class PreferenceRouter(fragmentProperty: WeakProperty<out Fragment>) : BaseRouter(fragmentProperty) {
+
     override val currentDestinationId = R.id.preferenceFragment
 
     fun goToGithub() = context { startActivity(Intents.github) }
