@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.viewbinding.ViewBinding
+import app.atomofiron.common.util.extension.debugFail
 
 val ViewBinding.context: Context get() = root.context
 
@@ -23,4 +24,15 @@ inline fun <B : ViewBinding> ViewGroup.attach(action: (LayoutInflater, ViewGroup
 
 inline fun <B : ViewBinding> ViewGroup.attach(action: (LayoutInflater, ViewGroup) -> B): B {
     return action(LayoutInflater.from(context), this)
+}
+
+inline fun <V : View, reified T> V.remember(data: T, action: V.(T) -> Unit) {
+    when {
+        tag === data -> return
+        tag == null -> Unit
+        tag !is T -> debugFail { "why does tag contain something else? $tag" }
+        tag == data -> return
+    }
+    tag = data
+    action(data)
 }

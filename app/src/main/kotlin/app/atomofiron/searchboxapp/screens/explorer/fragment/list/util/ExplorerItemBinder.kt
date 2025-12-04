@@ -32,12 +32,12 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeDee
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeOpened
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.Alpha
-import app.atomofiron.searchboxapp.utils.BindingCache
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.audio.AudioCover
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.isRtl
+import app.atomofiron.searchboxapp.utils.remember
 import app.atomofiron.searchboxapp.utils.resources
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
@@ -54,8 +54,7 @@ class ExplorerItemBinder private constructor(
     private val itemView: View,
     private val binding: ItemExplorerBinding,
     private val isOpened: Boolean,
-) : BindingCache() {
-
+) {
     private lateinit var item: Node
     private var isDeepest: Boolean? = null
 
@@ -64,6 +63,7 @@ class ExplorerItemBinder private constructor(
     private val placeholder = MuonsDrawable(itemView.context)
     private val dirTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorPrimary))
     private val fileTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorAccent))
+    private val lemon = LemonDrawable()
 
     private var onItemActionListener: ExplorerItemBinderActionListener? = null
 
@@ -122,23 +122,21 @@ class ExplorerItemBinder private constructor(
         itemView.setOnLongClickListener(onLongClickListener)
         checkBox.setOnCheckedChangeListener(onCheckListener)
 
-        thumbnail.bind(item.content) { content ->
-            apply(hasThumbnail = content.instantThumbnail())
-            val thumbnail = (content as? NodeContent.File)?.thumbnail
-            when (thumbnail) {
-                is Thumbnail.FilePath -> Glide
-                    .with(context)
+        when (val tn = (item.content as? NodeContent.File)?.thumbnail) {
+            is Thumbnail.FilePath -> thumbnail.remember(item.ref) {
+                Glide.with(context)
                     .loadFor(item)
                     .placeholder(placeholder)
-                    .error(LemonDrawable())
-                    .into(this)
-                is Thumbnail.Bitmap -> setImageBitmap(thumbnail.value)
-                is Thumbnail.Drawable -> setImageDrawable(thumbnail.value)
-                is Thumbnail.Res -> setImageResource(thumbnail.value)
-                is Thumbnail.Loading -> setImageDrawable(placeholder)
-                null -> setImageDrawable(null)
+                    .error(lemon)
+                    .into(thumbnail)
             }
+            is Thumbnail.Bitmap -> thumbnail.setImageBitmap(tn.value)
+            is Thumbnail.Drawable -> thumbnail.setImageDrawable(tn.value)
+            is Thumbnail.Res -> thumbnail.setImageResource(tn.value)
+            is Thumbnail.Loading -> thumbnail.setImageDrawable(placeholder)
+            null -> thumbnail.setImageDrawable(null)
         }
+        apply(hasThumbnail = item.content.instantThumbnail())
 
         title.text = when {
             item.isRoot -> item.getTitle(itemView.resources)
