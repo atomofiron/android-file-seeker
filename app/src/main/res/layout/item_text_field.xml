@@ -15,7 +15,7 @@
         android:id="@+id/field"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:inputType="textMultiLine|textNoSuggestions"
+        android:inputType="textNoSuggestions"
         android:imeOptions="flagNoFullscreen|flagNoExtractUi"
         app:hideKeyboardOnFocusLost="false"
         />
