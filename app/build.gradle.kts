@@ -80,6 +80,7 @@ dependencies {
     implementation(libs.androidx.exif)
     implementation(libs.androidx.async.inflater)
     implementation(libs.androidx.room)
+    implementation(libs.androidx.documentfile)
     ksp(libs.androidx.room.compiler)
     implementation(libs.dagger)
     kapt(libs.dagger.compiler)
