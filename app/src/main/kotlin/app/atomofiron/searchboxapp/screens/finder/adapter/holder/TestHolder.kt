@@ -51,7 +51,9 @@ class TestHolder(
     override fun onBind(item: TestField, position: Int) {
         val new = item.value ?: default
         if (new != binding.field.text?.toString()) {
+            val index = binding.field.selectionStart
             binding.field.setText(new)
+            binding.field.setSelection(index.coerceAtMost(new.length))
         }
         test(item)
     }
@@ -110,7 +112,7 @@ class TestHolder(
         val string = s?.toString()
         when (string) {
             null, item.value -> Unit
-            default -> output.onTestTextChange(null)
+            default, "" -> output.onTestTextChange(null)
             else -> output.onTestTextChange(string)
         }
         test(item.copy(value = string ?: ""))
