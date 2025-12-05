@@ -1,6 +1,6 @@
 // Assisted-by: Sonnet 4.5
 
-use crate::api::protocol::{CommonProgressCollector, ComplexResult};
+use crate::api::protocol::{CommonProgressCollector, CountingResult};
 use crate::common::{Rslt, JOINING_ERROR, OKI};
 use crate::r#impl::copy_method::CopyMethod;
 use crate::r#impl::delete::delete;
@@ -28,7 +28,7 @@ pub fn copy_impl(
     to: &PathBuf,
     moving: bool,
     collector: Arc<dyn CommonProgressCollector>,
-) -> Rslt<ComplexResult> {
+) -> Rslt<CountingResult> {
     let method = CopyMethod::detect();
     let (tx, rx) = channel::<ProgressChange>();
     let handle = convert_progress(rx, collector, to.clone());

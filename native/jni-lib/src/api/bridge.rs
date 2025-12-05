@@ -1,6 +1,6 @@
 use crate::api::cancellation::CancellationState;
 use crate::api::protocol::{Check, FileEventCollector, SuCmd, ValueResult};
-use crate::api::protocol::{CommonProgressCollector, ComplexResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
+use crate::api::protocol::{CommonProgressCollector, CountingResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
 use crate::api::su_bridge::{as_su, as_su_with_progress};
 use crate::api::su_protocol::Request;
 use crate::ext::raw_path::{RawPath, RawPathExt};
@@ -43,7 +43,7 @@ pub fn delete_by(
     path: RawPath,
     su_cmd: Option<SuCmd>,
     collector: Arc<dyn CommonProgressCollector>,
-) -> ComplexResult {
+) -> CountingResult {
     if let Some(su_cmd) = su_cmd {
         let from_buf = path.clone().buf();
         return as_su_with_progress(
@@ -51,12 +51,12 @@ pub fn delete_by(
             su_cmd,
             Arc::new(()),
             Box::new(collector),
-        ).unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)));
+        ).unwrap_or_else(|e| CountingResult::Err(meta_with_error(&from_buf, &e)));
     }
     let path = path.buf();
     match delete_impl(&path, collector) {
         Ok(result) => result,
-        Err(e) => ComplexResult::Err(meta_with_error(&path, &e)),
+        Err(e) => CountingResult::Err(meta_with_error(&path, &e)),
     }
 }
 
@@ -127,7 +127,7 @@ pub fn copy(
     moving: bool,
     su_cmd: Option<SuCmd>,
     collector: Arc<dyn CommonProgressCollector>,
-) -> ComplexResult {
+) -> CountingResult {
     if let Some(su_cmd) = su_cmd {
         let from_buf = from.clone().buf();
         return as_su_with_progress(
@@ -135,12 +135,12 @@ pub fn copy(
             su_cmd,
             Arc::new(()),
             Box::new(collector),
-        ).unwrap_or_else(|e| ComplexResult::Err(meta_with_error(&from_buf, &e)))
+        ).unwrap_or_else(|e| CountingResult::Err(meta_with_error(&from_buf, &e)))
     }
     let from_buf = from.buf();
     match copy_impl(&from_buf, &to.buf(), moving, collector) {
         Ok(result) => result,
-        Err(e) => ComplexResult::Err(meta_with_error(&from_buf, &e)),
+        Err(e) => CountingResult::Err(meta_with_error(&from_buf, &e)),
     }
 }
 

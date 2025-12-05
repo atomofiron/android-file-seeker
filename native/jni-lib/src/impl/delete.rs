@@ -1,6 +1,6 @@
 // Assisted-by: Sonnet 4.5
 
-use crate::api::protocol::{CommonProgressCollector, ComplexResult};
+use crate::api::protocol::{CommonProgressCollector, CountingResult};
 use crate::common::{Rslt, OKI, PERMISSION_DENIED, RESOURCE_BUSY};
 use crate::ext::result::ResultExt;
 use crate::r#impl::progress::{convert_progress, send_inc, ProgressChange};
@@ -28,7 +28,7 @@ const AT_RECURSIVE: c_int = 0x200;*/
 const CURRENT_DIR: &[u8; 1] = b".";
 const PARENT_DIR: &[u8; 2] = b"..";
 
-pub fn delete_impl(path: &PathBuf, collector: Arc<dyn CommonProgressCollector>) -> Rslt<ComplexResult> {
+pub fn delete_impl(path: &PathBuf, collector: Arc<dyn CommonProgressCollector>) -> Rslt<CountingResult> {
     let (tx, rx) = channel::<ProgressChange>();
     let handle = convert_progress(rx, collector, path.clone());
     let result = delete(path, &tx, 0.0..1.0);

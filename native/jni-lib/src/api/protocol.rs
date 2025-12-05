@@ -60,7 +60,7 @@ pub enum ValueResult {
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
-pub enum ComplexResult {
+pub enum CountingResult {
     Ok {
         count: u32,
         errors: Vec<String>,
