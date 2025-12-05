@@ -53,7 +53,7 @@ pub enum SimpleResult {
 }
 
 #[derive(uniffi::Enum)]
-pub enum ValueResult {
+pub enum HandleResult {
     Ok(Arc<WatchHandle>),
     Err(String),
 }

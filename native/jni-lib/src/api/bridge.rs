@@ -1,5 +1,5 @@
 use crate::api::cancellation::CancellationState;
-use crate::api::protocol::{Check, FileEventCollector, SuCmd, ValueResult};
+use crate::api::protocol::{Check, FileEventCollector, SuCmd, HandleResult};
 use crate::api::protocol::{CommonProgressCollector, CountingResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
 use crate::api::su_bridge::{as_su, as_su_with_progress};
 use crate::api::su_protocol::Request;
@@ -187,9 +187,9 @@ pub fn find_text(
 }
 
 #[uniffi::export]
-pub fn observe_dir(target: RawPath, collector: Arc<dyn FileEventCollector>) -> ValueResult {
+pub fn observe_dir(target: RawPath, collector: Arc<dyn FileEventCollector>) -> HandleResult {
     match try_observe_dir(target, collector) {
-        Ok(handle) => ValueResult::Ok(handle),
-        Err(e) => ValueResult::Err(e.to_string()),
+        Ok(handle) => HandleResult::Ok(handle),
+        Err(e) => HandleResult::Err(e.to_string()),
     }
 }
