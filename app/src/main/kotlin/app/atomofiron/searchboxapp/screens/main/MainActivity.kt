@@ -74,9 +74,6 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
         viewModel.setView(this)
         presenter = viewModel.presenter
         viewState = viewModel.viewState
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() = presenter.onBackButtonClick()
-        })
 
         updateTheme(viewState.setTheme.value)
         presenter.onActivityCreate(this)
@@ -111,6 +108,10 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
         val childFragmentManager = supportFragmentManager.fragments.first().childFragmentManager
         childFragmentManager.addOnBackStackChangedListener(onBackStackChangedListener)
         supportFragmentManager.addOnBackStackChangedListener(onBackStackChangedListener)
+        // since 2025.Q4 the later the registration of the callback, the greater it's priority?
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() = presenter.onBackButtonClick()
+        })
 
         presenter.updateLightNavigationBar(isDarkTheme())
         presenter.updateLightStatusBar(isDarkTheme())
