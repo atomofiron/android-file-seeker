@@ -13,9 +13,22 @@ plugins {
     id("app.fileseeker.convention.library")
 }
 
+val ndkApi = android.defaultConfig.minSdk
+val cargoPath = "${System.getProperty("user.home")}/.cargo/bin/cargo"
 val kotlinDir = "src/main/kotlin"
 val jniLibsDir = "src/main/jniLibs"
+val nativeDir = "$projectDir/../native" // todo
 val nativeLibName = "native_lib"
+val nativeLib = "native-lib"
+val nativeBin = "native-bin"
+val targets = arrayOf(
+    "aarch64-linux-android",
+    "armv7-linux-androideabi",
+    "x86_64-linux-android",
+    "i686-linux-android",
+)
+val soBindingFile = "target/${targets.first()}/debug/lib$nativeLibName.so"
+val ktBindingFile = "$kotlinDir/uniffi/$nativeLibName/$nativeLibName.kt"
 
 android {
     namespace = "app.atomofiron.fileseeker"
@@ -103,28 +116,33 @@ dependencies {
 }
 
 val groupUniffi = "uniffi"
+
 val taskPreBuild = "preBuild"
-val taskBuildNative = "buildNative"
 val taskBuildNativeDebug = "buildNativeDebug"
 val taskGenerateNativeBindings = "generateNativeBindings"
+val taskBuildNative = "buildNative"
 val taskCopyNativeBins = "copyNativeBins"
-val nativeLib = "native-lib"
-val nativeBin = "native-bin"
 
-val ndkApi = android.defaultConfig.minSdk
-val nativeDirPath = "$projectDir/../native"
-val cargoPath = "${System.getProperty("user.home")}/.cargo/bin/cargo"
-val targets = arrayOf(
-    "aarch64-linux-android",
-    "armv7-linux-androideabi",
-    "x86_64-linux-android",
-    "i686-linux-android",
-)
+afterEvaluate {
+    taskGenerateNativeBindings {
+        dependsOn(taskBuildNativeDebug)
+    }
+    taskBuildNative {
+        mustRunAfter(taskGenerateNativeBindings)
+    }
+    taskCopyNativeBins {
+        dependsOn(taskBuildNative)
+    }
+    taskPreBuild {
+        dependsOn(taskGenerateNativeBindings)
+        dependsOn(taskCopyNativeBins)
+    }
+}
 
 tasks.register<Exec>(taskBuildNative) {
     group = groupUniffi
-    environment("CARGO_TERM_COLOR", "always")
-    workingDir(nativeDirPath)
+    cargoTermColor()
+    workingDir(nativeDir)
     commandLine(
         cargoPath, "ndk",
         "-t", "arm64-v8a",
@@ -145,8 +163,8 @@ tasks.register<Exec>(taskBuildNative) {
 
 tasks.register<Exec>(taskBuildNativeDebug) {
     group = groupUniffi
-    environment("CARGO_TERM_COLOR", "always")
-    workingDir(nativeDirPath)
+    cargoTermColor()
+    workingDir(nativeDir)
     commandLine(
         cargoPath, "ndk",
         "-t", "arm64-v8a",
@@ -162,13 +180,17 @@ tasks.register<Exec>(taskBuildNativeDebug) {
 
 tasks.register<Exec>(taskGenerateNativeBindings) {
     group = groupUniffi
-    environment("CARGO_TERM_COLOR", "always")
+    inputs.file("$nativeDir/$soBindingFile")
+    outputs.file(ktBindingFile)
+    outputs.upToDateWhen { true } // ignore outputs
+
+    cargoTermColor()
     environment("DEVELOPER_DIR", "/Library/Developer/CommandLineTools") // for MacOS only
-    workingDir(nativeDirPath)
+    workingDir(nativeDir)
     commandLine(
         cargoPath, "run",
         "--bin", "uniffi-gen", "generate",
-        "--library", "target/aarch64-linux-android/debug/lib$nativeLibName.so",
+        "--library", soBindingFile,
         "--language", "kotlin", "--no-format",
         "--out-dir", "../app/$kotlinDir",
     )
@@ -176,27 +198,37 @@ tasks.register<Exec>(taskGenerateNativeBindings) {
     isIgnoreExitValue = false
     errorOutput = System.out
     standardOutput = System.out
-    dependsOn(taskBuildNativeDebug)
+    doLast {
+        val emptyCompanion = "    companion object\n"
+        val cleaner = "interface UniffiCleaner {"
+        val file = File(projectDir, ktBindingFile)
+        file.readText()
+            .replace("    object", "    data object")
+            .replace(emptyCompanion, "")
+            .replace(cleaner, "$cleaner\n$emptyCompanion") // put it back
+            .let { file.writeText(it) }
+    }
 }
-
-fun Exec.print() = println("for manual use: cd $workingDir && ${commandLine.joinToString(separator = " ")}")
 
 tasks.register<Copy>(taskCopyNativeBins) {
     group = groupUniffi
+    inputs.file("$nativeDir/$soBindingFile")
+
     targets.associate {
-        it.split('-', limit = 2).first() to "$nativeDirPath/target/$it/release/$nativeBin"
+        it.split('-', limit = 2).first() to "$nativeDir/target/$it/release/$nativeBin"
     }.forEach { (abi, sourcePath) ->
         from(sourcePath) {
             rename { _ -> abi }
         }
     }
     into("src/main/assets/$nativeBin")
-    dependsOn(taskBuildNative)
 }
 
-tasks.named(taskPreBuild) {
-    dependsOn(taskGenerateNativeBindings, taskCopyNativeBins)
-}
+operator fun String.invoke(action: Task.() -> Unit) = tasks.named(this).configure(action)
+
+fun Exec.cargoTermColor() = environment("CARGO_TERM_COLOR", "always")
+
+fun Exec.print() = println("for manual use: cd $workingDir && ${commandLine.joinToString(separator = " ")}")
 
 fun prepare(vararg args: String) = ProcessBuilder(*args)
     .redirectErrorStream(true)
