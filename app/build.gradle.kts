@@ -119,8 +119,6 @@ dependencies {
     implementation(libs.jna) { artifact { type = "aar" } }
 }
 
-val groupUniffi = "uniffi"
-
 val taskPreBuild = "preBuild"
 val taskBuildNativeDebug = "buildNativeDebug"
 val taskGenerateNativeBindings = "generateNativeBindings"
@@ -133,6 +131,7 @@ afterEvaluate {
     }
     taskBuildNative {
         mustRunAfter(taskGenerateNativeBindings)
+        dependsOn(taskBuildNativeDebug) // don't run if failed
     }
     taskCopyNativeBins {
         dependsOn(taskBuildNative)
@@ -142,6 +141,8 @@ afterEvaluate {
         dependsOn(taskCopyNativeBins)
     }
 }
+
+val groupUniffi = "uniffi"
 
 tasks.register<Exec>(taskBuildNative) {
     group = groupUniffi
