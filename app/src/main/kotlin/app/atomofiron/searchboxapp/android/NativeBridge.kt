@@ -10,9 +10,10 @@ import uniffi.native_lib.CancellationState
 import uniffi.native_lib.Check
 import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CommonProgressCollector
-import uniffi.native_lib.ComplexResult
+import uniffi.native_lib.CountingResult
 import uniffi.native_lib.FileEvent
 import uniffi.native_lib.FileEventCollector
+import uniffi.native_lib.HandleResult
 import uniffi.native_lib.Meta
 import uniffi.native_lib.MetaResult
 import uniffi.native_lib.MetasResult
@@ -27,7 +28,7 @@ import uniffi.native_lib.TypedMeta
 import uniffi.native_lib.TypedMetaResult
 import uniffi.native_lib.TypedMetasResult
 import uniffi.native_lib.UsageResult
-import uniffi.native_lib.ValueResult
+import uniffi.native_lib.WatchHandle
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipFile
@@ -48,13 +49,7 @@ object NativeBridge {
         suCmd = SuCmd(cmd = cmd, binPath = "$binDir/$NATIVE_BIN")
     }
 
-    fun trySu(): Rslt<Unit> {
-        val response = uniffi.native_lib.tryAsSu(suCmd)
-        return when (response) {
-            is SimpleResult.Ok -> Rslt.Ok
-            is SimpleResult.Err -> Rslt.Err(response.v1)
-        }
-    }
+    fun trySu(): Rslt<Unit> = uniffi.native_lib.tryAsSu(suCmd).toRslt()
 
     fun createFile(ref: NodeRef, asSu: Boolean): Rslt<Meta> {
         val response = uniffi.native_lib.createFile(ref.bytes, suCmd = suCmd.takeIf { asSu })
@@ -112,7 +107,7 @@ object NativeBridge {
         }
     }
 
-    fun delete(ref: NodeRef, asSu: Boolean): ComplexResult {
+    fun delete(ref: NodeRef, asSu: Boolean): CountingResult {
         val collector = object : CommonProgressCollector {
             override fun emit(progress: CommonProgress) = Unit
         }
@@ -125,7 +120,7 @@ object NativeBridge {
         move: Boolean = false,
         asSu: Boolean,
         collector: (CommonProgress) -> Unit,
-    ): ComplexResult {
+    ): CountingResult {
         val collector = object : CommonProgressCollector {
             override fun emit(progress: CommonProgress) = collector(progress)
         }
@@ -140,12 +135,13 @@ object NativeBridge {
         asSu: Boolean,
         cancellation: CancellationState,
         collector: (NameSearchProgress) -> Unit,
-    ): SimpleResult {
+    ): Rslt<Unit> {
         val collector = object : NameSearchCollector {
             override fun emit(progress: NameSearchProgress) = collector(progress)
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
         return uniffi.native_lib.findNames(query, targets.map { it.bytes }, maxDepth.toUInt(), excludeDirs, suCmd = suCmd.takeIf { asSu }, cancellation, collector)
+            .toRslt()
     }
 
     fun findLocalText(
@@ -159,8 +155,8 @@ object NativeBridge {
             matches = it
         }
         return when (result) {
-            is SimpleResult.Ok -> matches
-            is SimpleResult.Err -> TextSearchProgress.Err(Meta(target.bytes, result.v1))
+            is Rslt.Ok -> matches
+            is Rslt.Err -> TextSearchProgress.Err(Meta(target.bytes, result.message))
         }
     }
 
@@ -172,7 +168,7 @@ object NativeBridge {
         asSu: Boolean,
         cancellation: CancellationState,
         collector: (TextSearchProgress) -> Unit,
-    ): SimpleResult = findText(params, targets, maxDepth, Check.Yes(maxSize.toULong()), asSu, cancellation, collector)
+    ): Rslt<Unit> = findText(params, targets, maxDepth, Check.Yes(maxSize.toULong()), asSu, cancellation, collector)
 
     private fun findText(
         params: QueryParams,
@@ -182,23 +178,28 @@ object NativeBridge {
         asSu: Boolean,
         cancellation: CancellationState,
         collector: (TextSearchProgress) -> Unit,
-    ): SimpleResult {
+    ): Rslt<Unit> {
         val collector = object : TextSearchCollector {
             override fun emit(progress: TextSearchProgress) = collector(progress)
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
         return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), check, suCmd = suCmd.takeIf { asSu }, cancellation, collector)
+            .toRslt()
     }
 
     fun observeDir(
         target: NodeRef,
         collector: (Rslt<FileEvent>) -> Unit,
-    ): ValueResult {
+    ): Rslt<WatchHandle> {
         val collector = object : FileEventCollector {
             override fun emit(event: FileEvent) = collector(Rslt.Ok(event))
             override fun error(message: String) = collector(Rslt.Err(message))
         }
-        return uniffi.native_lib.observeDir(target.bytes,  collector)
+        val result = uniffi.native_lib.observeDir(target.bytes,  collector)
+        return when (result) {
+            is HandleResult.Ok -> Rslt.Ok(result.v1)
+            is HandleResult.Err -> Rslt.Err(result.v1)
+        }
     }
 }
 
@@ -273,4 +274,9 @@ fun Context.verifyNativeLib(): Rslt<Unit> {
 
 private operator fun Meta.Companion.invoke(path: ByteArray, error: String): Meta {
     return Meta(path = path, access = "", owner = "", group = "", length = 0u, size = "", date = "", time = "", error = error)
+}
+
+private fun SimpleResult.toRslt(): Rslt<Unit> = when (this) {
+    is SimpleResult.Ok -> Rslt.Ok
+    is SimpleResult.Err -> Rslt.Err(v1)
 }

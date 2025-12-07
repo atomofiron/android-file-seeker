@@ -42,6 +42,7 @@ import app.atomofiron.searchboxapp.utils.Codes
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toProperties
+import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.ifCanNotice
 import app.atomofiron.searchboxapp.utils.mutate
@@ -53,7 +54,6 @@ import kotlinx.serialization.Serializable
 import uniffi.native_lib.CancellationState
 import uniffi.native_lib.Meta
 import uniffi.native_lib.NameSearchProgress
-import uniffi.native_lib.SimpleResult
 import uniffi.native_lib.TextSearchProgress
 import uniffi.native_lib.TypedMeta
 import javax.inject.Inject
@@ -189,8 +189,8 @@ class FinderWorker(
         }
     }
 
-    private fun SimpleResult.apply() = updateAsync {
-        val error = (this@apply as? SimpleResult.Err)?.v1
+    private fun Rslt<Unit>.apply() = updateAsync {
+        val error = (this@apply as? Rslt.Err)?.message
         val stopped = isStopping
         val ended = toEnded(error = error, removable = isStopping, stopped = stopped)
         if (!isStopping) finderStore {

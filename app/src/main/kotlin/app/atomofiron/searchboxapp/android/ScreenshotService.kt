@@ -26,7 +26,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import uniffi.native_lib.FileEvent
-import uniffi.native_lib.ValueResult
 import uniffi.native_lib.WatchHandle
 import javax.inject.Inject
 
@@ -86,14 +85,12 @@ class ScreenshotService : Service() {
         val result = NativeBridge.observeDir(target) {
             onEventResult(it, target)
         }
+        handle = result.value
         _error.value = when (result) {
-            is ValueResult.Ok -> {
-                handle = result.v1
-                null
-            }
-            is ValueResult.Err -> {
+            is Rslt.Ok -> null
+            is Rslt.Err -> {
                 stopSelf()
-                result.v1
+                result.message
             }
         }
     }

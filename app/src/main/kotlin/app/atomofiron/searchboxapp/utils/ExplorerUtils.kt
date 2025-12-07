@@ -23,7 +23,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
-import uniffi.native_lib.ComplexResult
+import uniffi.native_lib.CountingResult
 import uniffi.native_lib.Meta
 import java.io.BufferedInputStream
 import java.io.FileInputStream
@@ -558,10 +558,10 @@ object ExplorerUtils {
         return apply(result)
     }
 
-    fun Node.apply(result: ComplexResult): Node? {
+    fun Node.apply(result: CountingResult): Node? {
         val meta = when (result) {
-            is ComplexResult.Ok -> result.meta
-            is ComplexResult.Err -> result.v1
+            is CountingResult.Ok -> result.meta
+            is CountingResult.Err -> result.v1
         }
         meta ?: return null
         val ref = when {
@@ -571,7 +571,7 @@ object ExplorerUtils {
         val properties = meta.toProperties(size.takeIf { ref == this.ref })
         val error = meta.error
             ?.toNodeError()
-            ?: (result as? ComplexResult.Ok)
+            ?: (result as? CountingResult.Ok)
                 ?.errors
                 ?.toNodeError()
         return mutate(ref = ref, parentRef = ref.parent, properties = properties, error = error)
