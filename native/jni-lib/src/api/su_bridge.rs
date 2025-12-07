@@ -1,6 +1,6 @@
 use crate::api::cancellation::CancellationState;
-use crate::api::protocol::{SimpleResult, SuCmd};
-use crate::api::su_protocol::{control_frame, from_control_frame, len_to_frame, ProgressProxy, Request, Response, FINAL_FRAME};
+use crate::api::api::{SimpleResult, SuCmd};
+use crate::api::su_api::{control_frame, from_control_frame, len_to_frame, ProgressProxy, Request, Response, FINAL_FRAME};
 use crate::common::{config, Rslt};
 use crate::ext::option::OptionExt;
 use bincode::{decode_from_slice, encode_to_vec, Decode};

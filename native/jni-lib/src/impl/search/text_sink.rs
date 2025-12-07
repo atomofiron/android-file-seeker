@@ -1,4 +1,4 @@
-use crate::api::protocol::TextMatch;
+use crate::api::api::TextMatch;
 use crate::r#impl::search::text_matches::TextMatches;
 use grep_matcher::Matcher;
 use grep_searcher::{Searcher, Sink, SinkMatch};

@@ -1,6 +1,6 @@
 // Assisted-by: Sonnet 4.5
 
-use crate::api::protocol::{CommonProgressCollector, CountingResult};
+use crate::api::api::{CommonProgressCollector, CountingResult};
 use crate::common::{Rslt, OKI, PERMISSION_DENIED, RESOURCE_BUSY};
 use crate::ext::result::ResultExt;
 use crate::r#impl::progress::{convert_progress, send_inc, ProgressChange};

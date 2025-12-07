@@ -1,4 +1,4 @@
-use crate::api::protocol::SearchQuery;
+use crate::api::api::SearchQuery;
 use crate::common::Rslt;
 use crate::r#impl::search::regex_matcher::RegexMatcher;
 use crate::r#impl::search::simple_matcher::SimpleMatcher;

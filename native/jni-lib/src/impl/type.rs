@@ -1,4 +1,4 @@
-use crate::api::protocol::TypedMeta;
+use crate::api::api::TypedMeta;
 use crate::common::{empty_string, Rslt, AUDIO_OGG, VIDEO_OGG};
 use crate::r#impl::hr_meta::HumanReadableMeta;
 use ogg::PacketReader;

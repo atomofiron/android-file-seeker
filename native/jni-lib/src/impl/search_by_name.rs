@@ -1,5 +1,5 @@
 use crate::api::cancellation::CancellationState;
-use crate::api::protocol::{NameSearchCollector, NameSearchProgress, SearchQuery, SimpleResult};
+use crate::api::api::{NameSearchCollector, NameSearchProgress, SearchQuery, SimpleResult};
 use crate::common::{Rslt, JOINING_ERROR};
 use crate::ext::raw_path::RawPath;
 use crate::r#impl::meta::meta;

@@ -1,4 +1,4 @@
-use crate::api::protocol::{SearchQuery, TextMatch};
+use crate::api::api::{SearchQuery, TextMatch};
 use crate::common::{Rslt, EMPTY_VALUE_ERROR};
 use crate::r#impl::search::literal_matcher::LiteralMatcher;
 use crate::r#impl::search::text_matches::TextMatches;

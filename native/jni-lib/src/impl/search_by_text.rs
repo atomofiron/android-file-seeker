@@ -1,6 +1,6 @@
 use crate::api::cancellation::CancellationState;
-use crate::api::protocol::Check;
-use crate::api::protocol::{SearchQuery, SimpleResult, TextSearchCollector, TextSearchProgress};
+use crate::api::api::Check;
+use crate::api::api::{SearchQuery, SimpleResult, TextSearchCollector, TextSearchProgress};
 use crate::common::{Rslt, JOINING_ERROR};
 use crate::ext::raw_path::RawPath;
 use crate::r#impl::meta::{meta, meta_with_error};

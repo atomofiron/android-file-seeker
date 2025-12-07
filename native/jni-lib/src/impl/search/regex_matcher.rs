@@ -1,5 +1,5 @@
 use regex::{Regex, RegexBuilder};
-use crate::api::protocol::SearchQuery;
+use crate::api::api::SearchQuery;
 use crate::common::Rslt;
 use crate::r#impl::search::matcher::NameMatcher;
 

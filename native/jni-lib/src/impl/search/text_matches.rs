@@ -1,4 +1,4 @@
-use crate::api::protocol::TextMatch;
+use crate::api::api::TextMatch;
 use std::cell::RefCell;
 
 pub struct TextMatches {

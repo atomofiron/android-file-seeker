@@ -1,4 +1,4 @@
-use crate::api::protocol::{CommonProgress, CommonProgressCollector, CountingResult};
+use crate::api::api::{CommonProgress, CommonProgressCollector, CountingResult};
 use crate::common::Rslt;
 use crate::ext::raw_path::RawPath;
 use crate::ext::result::ResultExt;

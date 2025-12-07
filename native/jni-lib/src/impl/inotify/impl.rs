@@ -1,4 +1,4 @@
-use crate::api::protocol::{FileEvent, FileEventCollector};
+use crate::api::api::{FileEvent, FileEventCollector};
 use crate::common::Rslt;
 use crate::ext::option::OptionExt;
 use crate::ext::raw_path::{PathExt, RawPath, RawPathExt};

@@ -1,5 +1,5 @@
 use std::sync::mpsc::{channel, Receiver, Sender};
-use crate::api::protocol::SimpleResult;
+use crate::api::api::SimpleResult;
 
 #[derive(uniffi::Object)]
 pub struct WatchHandle {

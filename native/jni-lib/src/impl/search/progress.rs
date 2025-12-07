@@ -1,4 +1,4 @@
-use crate::api::su_protocol::ProgressProxy;
+use crate::api::su_api::ProgressProxy;
 use crate::common::Rslt;
 use std::sync::mpsc::Receiver;
 use std::thread::JoinHandle;

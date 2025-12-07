@@ -1,6 +1,6 @@
 // Assisted-by: Sonnet 4.5
 
-use crate::api::protocol::{CommonProgressCollector, CountingResult};
+use crate::api::api::{CommonProgressCollector, CountingResult};
 use crate::common::{Rslt, JOINING_ERROR, OKI};
 use crate::r#impl::copy_method::CopyMethod;
 use crate::r#impl::delete::delete;

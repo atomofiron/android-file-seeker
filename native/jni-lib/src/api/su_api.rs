@@ -1,4 +1,4 @@
-use crate::api::protocol::{Check, CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SearchQuery, TextSearchCollector, TextSearchProgress};
+use crate::api::api::{Check, CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SearchQuery, TextSearchCollector, TextSearchProgress};
 use crate::ext::raw_path::RawPath;
 use bincode::{Decode, Encode};
 use std::sync::Arc;

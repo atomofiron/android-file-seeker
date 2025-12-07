@@ -1,8 +1,8 @@
 use crate::api::cancellation::CancellationState;
-use crate::api::protocol::{Check, FileEventCollector, SuCmd, HandleResult};
-use crate::api::protocol::{CommonProgressCollector, CountingResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
+use crate::api::api::{Check, FileEventCollector, SuCmd, HandleResult};
+use crate::api::api::{CommonProgressCollector, CountingResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
 use crate::api::su_bridge::{as_su, as_su_with_progress};
-use crate::api::su_protocol::Request;
+use crate::api::su_api::Request;
 use crate::ext::raw_path::{RawPath, RawPathExt};
 use crate::r#impl::copy::copy_impl;
 use crate::r#impl::delete::delete_impl;
