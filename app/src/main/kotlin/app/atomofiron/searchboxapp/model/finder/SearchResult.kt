@@ -43,7 +43,7 @@ sealed class SearchResult {
         private val forText: Boolean,
         override val count: Int = 0,
         override val countTotal: Int = 0,
-        val matches: List<ItemMatch> = listOf(),
+        val matches: List<ItemMatch> = listOf(), // todo make List<T : ItemMatch>?
         val errors: List<String> = listOf(),
         val sorting: NodeSorting = NodeSorting.Date.Reversed,
         val generation: Int = 0,

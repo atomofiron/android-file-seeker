@@ -77,6 +77,7 @@ object ExplorerUtils {
     private const val FILE_APL_EXE = "application/x-mach-binary"
     private const val FILE_TORRENT = "application/x-bittorrent"
     private const val FILE_ODT = "application/vnd.oasis.opendocument.text"
+    private const val FILE_TTF = "font/ttf"
     private const val FILE_XRIFF = "application/x-riff" // +webp
     // 'xml' unknown type: application/x-dia-shape
 
@@ -135,6 +136,8 @@ object ExplorerUtils {
     private const val EXT_P12 = ".p12"
     private const val EXT_CRT = ".crt"
     private const val EXT_TORRENT = ".torrent"
+    private const val EXT_TTF = ".ttf"
+    private const val EXT_OTF = ".otf"
     private const val EXT_EXE = ".exe"
     private const val EXT_XPI = ".xpi" // Mozilla extension
     private const val EXT_OSZ = ".osz" // osu map
@@ -358,6 +361,7 @@ object ExplorerUtils {
             (mimeType == FILE_CA_CERT) -> content.ifNotCached { NodeContent.Cert }
             (mimeType == FILE_TORRENT) -> content.ifNotCached { NodeContent.Torrent }
             (mimeType == FILE_ODT) -> content.ifNotCached { NodeContent.Document }
+            (mimeType == FILE_TTF) -> content.ifNotCached { NodeContent.Font }
             (mimeType == FILE_ELF_SO) -> content.ifNotCached { NodeContent.ElfSo }
             (mimeType == FILE_MS_EXE) -> content.ifNotCached { NodeContent.ExeMs }
             (mimeType == FILE_APL_EXE) -> content.ifNotCached { NodeContent.ExeApl }
@@ -668,6 +672,8 @@ object ExplorerUtils {
         ref.name.hasExt(EXT_FAP) -> ifNotCached { NodeContent.Fap }
         ref.name.hasExt(EXT_EXE) -> ifNotCached { NodeContent.ExeMs }
         ref.name.hasExt(EXT_SWF) -> ifNotCached { NodeContent.Flash }
+        ref.name.hasExt(EXT_TTF),
+        ref.name.hasExt(EXT_OTF) -> ifNotCached { NodeContent.Font }
         ref.name.hasExt(EXT_PEM),
         ref.name.hasExt(EXT_P12),
         ref.name.hasExt(EXT_CRT) -> ifNotCached { NodeContent.Cert }

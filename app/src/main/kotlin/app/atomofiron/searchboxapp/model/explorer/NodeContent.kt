@@ -176,6 +176,7 @@ sealed class NodeContent(
     data object ExeApls : File()
     data object Java : File()
     data object Flash : File()
+    data object Font : File()
     data object Cert : File()
     data object Dmg : File()
     data object Firefox : File()
