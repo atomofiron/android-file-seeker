@@ -19,6 +19,7 @@ val kotlinDir = "src/main/kotlin"
 val jniLibsDir = "src/main/jniLibs"
 val nativeDir = "$projectDir/../native" // todo
 val nativeLibName = "native_lib"
+val nativeLibSo = "lib$nativeLibName.so"
 val nativeLib = "native-lib"
 val nativeBin = "native-bin"
 val targets = arrayOf(
@@ -27,7 +28,7 @@ val targets = arrayOf(
     "x86_64-linux-android",
     "i686-linux-android",
 )
-val soBindingFile = "target/${targets.first()}/debug/lib$nativeLibName.so"
+val soBindingFile = "target/${targets.first()}/debug/$nativeLibSo"
 val ktBindingFile = "$kotlinDir/uniffi/$nativeLibName/$nativeLibName.kt"
 
 android {
@@ -35,6 +36,9 @@ android {
 
     defaultConfig {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("String", "NATIVE_BIN", "\"$nativeBin\"")
+        buildConfigField("String", "NATIVE_LIB", "\"$nativeLibName\"")
+        buildConfigField("String", "NATIVE_LIB_SO", "\"$nativeLibSo\"")
     }
     kotlin {
         compilerOptions {

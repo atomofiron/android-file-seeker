@@ -2,6 +2,9 @@ package app.atomofiron.searchboxapp.android
 
 import android.content.Context
 import android.os.Build
+import app.atomofiron.fileseeker.BuildConfig.NATIVE_BIN
+import app.atomofiron.fileseeker.BuildConfig.NATIVE_LIB
+import app.atomofiron.fileseeker.BuildConfig.NATIVE_LIB_SO
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -32,10 +35,6 @@ import uniffi.native_lib.WatchHandle
 import java.io.File
 import java.io.FileOutputStream
 import java.util.zip.ZipFile
-
-private const val NATIVE_BIN = "native-bin"
-private const val NATIVE_LIB = "native_lib"
-private const val NATIVE_LIB_SO = "lib$NATIVE_LIB.so"
 
 private lateinit var suCmd: SuCmd
 
