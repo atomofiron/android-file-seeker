@@ -27,6 +27,7 @@ pub enum Request {
         max_depth: u32,
         check: Check,
     },
+    ReadFile(RawPath),
 }
 
 #[derive(Debug, Encode, Decode, PartialEq)]

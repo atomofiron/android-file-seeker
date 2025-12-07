@@ -1,18 +1,21 @@
 package app.atomofiron.searchboxapp.model.textviewer
 
 import app.atomofiron.common.util.GrowingList
+import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.utils.ByteArrayBuilder
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
+import app.atomofiron.searchboxapp.utils.Rslt
+import app.atomofiron.searchboxapp.utils.map
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import uniffi.native_lib.FileReader
+import uniffi.native_lib.ReadResult
 import java.io.Closeable
-import java.io.File
-import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
 
@@ -21,15 +24,13 @@ private const val CR: Byte = 0x0D
 private const val LF: Byte = 0x0A
 
 class TextViewerSession private constructor(
-    val input: FileInputStream,
+    private val input: FileReader,
     ref: NodeRef,
 ) : Closeable {
     companion object {
-        operator fun invoke(ref: NodeRef): TextViewerSession? = try {
-            val input = FileInputStream(File(ref.string))
-            TextViewerSession(input, ref)
-        } catch (_: Exception) { // FileNotFoundException, ...
-            null
+        operator fun invoke(ref: NodeRef, asSu: Boolean): Rslt<TextViewerSession> {
+            return NativeBridge.readFile(ref, asSu)
+                .map { TextViewerSession(it, ref) }
         }
     }
 
@@ -43,6 +44,8 @@ class TextViewerSession private constructor(
     val mutex = Mutex()
     private val _item = MutableStateFlow(ref.toNode())
     val item: StateFlow<Node> = _item
+    private val _error = MutableStateFlow<String?>(null)
+    val error: StateFlow<String?> = _error
     private val lineList = GrowingList<TextLine>()
     private val _lines = MutableStateFlow<List<TextLine>>(listOf())
     val lines: StateFlow<List<TextLine>> = _lines
@@ -95,11 +98,15 @@ class TextViewerSession private constructor(
     /** @return true if EOF */
     private fun fillBuffer(): Boolean {
         byteBuf.clear()
-        val read = input.read(byteBuf.array(), 0, byteBuf.capacity())
-        return (read < 0).also {
-            when {
-                it -> byteBuf.limit(0)
-                else -> byteBuf.limit(read)
+        return when (val result = input.next()) {
+            is ReadResult.Ok -> byteBuf.put(result.v1).flip()
+                .let { false }
+            is ReadResult.End -> byteBuf.limit(0)
+                .let { true }
+            is ReadResult.Err -> {
+                byteBuf.limit(0)
+                _error.value = result.v1
+                true
             }
         }
     }

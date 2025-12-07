@@ -8,6 +8,8 @@ pub const OKI: c_int = 0;
 pub const OKL: c_long = 0;
 pub const OKS: ssize_t = 0;
 
+pub const CHUNK_SIZE: usize = 8192;
+
 pub fn config() -> Configuration { bincode::config::standard() }
 
 pub fn empty_string() -> String { String::new() }

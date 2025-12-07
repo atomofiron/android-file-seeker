@@ -37,5 +37,17 @@ inline fun <T> Rslt<T>.unwrapOr(value: T): T = when (this) {
 
 inline fun <T> Rslt<T>.unwrapOrElse(action: (message: String) -> T): T = when (this) {
     is Rslt.Ok -> value
-    is Rslt.Err -> action(message.toString())
+    is Rslt.Err -> action(message)
+}
+
+inline fun <T, R> Rslt<T>.map(map: (T) -> R): Rslt<R> = when (this) {
+    is Rslt.Ok -> Rslt.Ok(map(value))
+    is Rslt.Err -> Rslt.Err(message)
+}
+
+inline fun <T> Rslt<T>.ifErr(action: (String) -> Unit): Rslt<T> {
+    if (this is Rslt.Err) {
+        action(message)
+    }
+    return this
 }

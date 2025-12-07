@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.di.dependencies.service
 
 import app.atomofiron.common.util.extension.indexOfFirst
 import app.atomofiron.common.util.extension.launchOnDefault
+import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -18,10 +19,9 @@ import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.removeOneIf
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import uniffi.native_lib.CancellationState
 import uniffi.native_lib.TextSearchProgress
 import java.util.UUID
@@ -38,15 +38,13 @@ class TextViewerService(
     }
     private val asSu: Boolean get() = preferences.asSu.value
 
-    fun getFileSession(ref: NodeRef): TextViewerSession? {
-        var session = findSession(ref)
-        if (session == null) {
-            session = TextViewerSession(ref)
-            session ?: return null
-            store.sessions[ref.uniqueId] = session
-            scope.launch(Dispatchers.IO) { readFile(ref) }
-        }
-        return session
+    fun getFileSession(ref: NodeRef): Rslt<TextViewerSession> {
+        val session = findSession(ref)
+            ?: return TextViewerSession(ref, asSu).also {
+                store.sessions[ref.uniqueId] = it.value ?: return@also
+                scope.launchOnIO { readFile(ref) }
+            }
+        return Rslt.Ok(session)
     }
 
     suspend fun fetchTask(ref: NodeRef, taskId: UUID): TextSearchTask? {
@@ -59,12 +57,9 @@ class TextViewerService(
             it.item.uniqueId == ref.uniqueId
         } as? ItemMatch.Many
         itemMatch ?: return null
-        val task = finderTask.copy(
-            finderTask.query,
-            Text(itemMatch.count, itemMatch.matches),
-            finderTask.uuid,
-            finderTask.status.toLocal(),
-        ) as TextSearchTask
+        val task = finderTask.copy(result = Text(itemMatch.count, itemMatch.matches))
+        @Suppress("UNCHECKED_CAST")
+        task as TextSearchTask
         session.tasks { add(task) }
         return task
     }

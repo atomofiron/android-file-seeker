@@ -1,18 +1,21 @@
-use crate::api::cancellation::CancellationState;
-use crate::api::api::{Check, FileEventCollector, SuCmd, HandleResult};
+use crate::api::api::{Check, FileEventCollector, HandleResult, SuCmd};
 use crate::api::api::{CommonProgressCollector, CountingResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
-use crate::api::su_bridge::{as_su, as_su_with_progress};
+use crate::api::cancellation::CancellationState;
 use crate::api::su_api::Request;
+use crate::api::su_bridge::{as_su, as_su_with_progress, get_child, write_request};
 use crate::ext::raw_path::{RawPath, RawPathExt};
+use crate::ext::result::ResultExt;
 use crate::r#impl::copy::copy_impl;
 use crate::r#impl::delete::delete_impl;
+use crate::r#impl::inotify::r#impl::try_observe_dir;
 use crate::r#impl::meta::{meta_with_error, metas, try_meta};
 use crate::r#impl::other::{new_dir, new_file, usage};
 use crate::r#impl::r#type::{file_type, file_types};
+use crate::r#impl::reader::api::{FileReader, ReaderResult};
 use crate::r#impl::search_by_name::find_names_impl;
 use crate::r#impl::search_by_text::find_text_impl;
+use std::fs::File;
 use std::sync::Arc;
-use crate::r#impl::inotify::r#impl::try_observe_dir;
 
 #[uniffi::export]
 pub fn create_file(path: RawPath, su_cmd: Option<SuCmd>) -> MetaResult {
@@ -191,5 +194,23 @@ pub fn observe_dir(target: RawPath, collector: Arc<dyn FileEventCollector>) -> H
     match try_observe_dir(target, collector) {
         Ok(handle) => HandleResult::Ok(handle),
         Err(e) => HandleResult::Err(e.to_string()),
+    }
+}
+
+#[uniffi::export]
+pub fn read_file(path: RawPath, su_cmd: Option<SuCmd>) -> ReaderResult {
+    let reader = match su_cmd {
+        Some(su_cmd) => get_child(&su_cmd).and_then(|(mut child, pid)| {
+            let request = Request::ReadFile(path);
+            write_request(&mut child, request)?;
+            Ok(FileReader::with(child, pid))
+        }),
+        None => File::open(path.buf())
+            .map(|p| FileReader::new(p))
+            .boxed(),
+    };
+    return match reader {
+        Ok(r) => ReaderResult::Ok(Arc::new(r)),
+        Err(e) => ReaderResult::Err(e.to_string()),
     }
 }

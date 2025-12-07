@@ -14,3 +14,4 @@ pub mod search_by_text;
 pub mod meta;
 pub mod other;
 pub mod r#type;
+pub mod reader;

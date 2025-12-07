@@ -16,12 +16,14 @@ import uniffi.native_lib.CommonProgressCollector
 import uniffi.native_lib.CountingResult
 import uniffi.native_lib.FileEvent
 import uniffi.native_lib.FileEventCollector
+import uniffi.native_lib.FileReader
 import uniffi.native_lib.HandleResult
 import uniffi.native_lib.Meta
 import uniffi.native_lib.MetaResult
 import uniffi.native_lib.MetasResult
 import uniffi.native_lib.NameSearchCollector
 import uniffi.native_lib.NameSearchProgress
+import uniffi.native_lib.ReaderResult
 import uniffi.native_lib.SearchQuery
 import uniffi.native_lib.SimpleResult
 import uniffi.native_lib.SuCmd
@@ -155,7 +157,7 @@ object NativeBridge {
         }
         return when (result) {
             is Rslt.Ok -> matches
-            is Rslt.Err -> TextSearchProgress.Err(Meta(target.bytes, result.message))
+            is Rslt.Err -> TextSearchProgress.Err(metaWithError(target.bytes, result.message))
         }
     }
 
@@ -194,10 +196,18 @@ object NativeBridge {
             override fun emit(event: FileEvent) = collector(Rslt.Ok(event))
             override fun error(message: String) = collector(Rslt.Err(message))
         }
-        val result = uniffi.native_lib.observeDir(target.bytes,  collector)
+        val result = uniffi.native_lib.observeDir(target.bytes, collector)
         return when (result) {
             is HandleResult.Ok -> Rslt.Ok(result.v1)
             is HandleResult.Err -> Rslt.Err(result.v1)
+        }
+    }
+
+    fun readFile(target: NodeRef, asSu: Boolean): Rslt<FileReader> {
+        val result = uniffi.native_lib.readFile(target.bytes, suCmd = suCmd.takeIf { asSu })
+        return when (result) {
+            is ReaderResult.Ok -> Rslt.Ok(result.v1)
+            is ReaderResult.Err -> Rslt.Err(result.v1)
         }
     }
 }
@@ -271,7 +281,7 @@ fun Context.verifyNativeLib(): Rslt<Unit> {
     return Rslt.Err("no $NATIVE_LIB_SO found for abi=$abi")
 }
 
-private operator fun Meta.Companion.invoke(path: ByteArray, error: String): Meta {
+private fun metaWithError(path: ByteArray, error: String): Meta {
     return Meta(path = path, access = "", owner = "", group = "", length = 0u, size = "", date = "", time = "", error = error)
 }
 

@@ -1,10 +1,11 @@
+use crate::api::api::{CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SimpleResult, TextSearchCollector, TextSearchProgress};
 use crate::api::bridge::{copy, create_dir, create_file, delete_by, find_names, find_text, get_file_type, get_file_types, get_meta, get_metas, get_usage};
 use crate::api::cancellation::{CancellationHandle, CancellationState};
-use crate::api::api::{CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SimpleResult, TextSearchCollector, TextSearchProgress};
 use crate::api::su_api::{control_frame, from_control_frame, len_to_frame, pid_to_frame, Request, Response, FINAL_FRAME};
 use crate::common::{config, Rslt};
 use crate::ext::encode::{EncodeExt, EncodedResult};
 use crate::ext::result::ResultExt;
+use crate::r#impl::reader::r#impl::read_file;
 use bincode::{decode_from_slice, enc, encode_to_vec};
 use std::io::{stdin, stdout, Read, Write};
 use std::sync::Arc;
@@ -28,7 +29,7 @@ pub extern "C" fn lib_main() {
             Ok(bytes) => Response::Ok(bytes),
             Err(e) => Response::Err(e.to_string()),
         };
-        write_response(response);
+        write_response(&response);
     }
 }
 
@@ -73,11 +74,12 @@ fn run(request: Request, cancellation: Arc<dyn CancellationState>) -> EncodedRes
             write_the_end();
             result.to_bytes()
         }
+        Request::ReadFile(path) => read_file(path).to_bytes(),
     }
 }
 
-fn write_response<E>(response: E) where E: enc::Encode {
-    let bytes = encode_to_vec(response, config())
+pub fn write_response<E>(response: &E) where E: enc::Encode {
+    let bytes = encode_to_vec(&response, config())
         .expect("encode response failed");
     let mut stdout = stdout();
     let len_buf = len_to_frame(bytes.len());
@@ -109,20 +111,20 @@ impl StdoutProgressWriter {
 impl <'l>CommonProgressCollector for StdoutProgressWriter {
 
     fn emit(&self, progress: CommonProgress) {
-        write_response(progress);
+        write_response(&progress);
     }
 }
 
 impl <'l>NameSearchCollector for StdoutProgressWriter {
 
     fn emit(&self, progress: NameSearchProgress) {
-        write_response(progress);
+        write_response(&progress);
     }
 }
 
 impl <'l>TextSearchCollector for StdoutProgressWriter {
 
     fn emit(&self, progress: TextSearchProgress) {
-        write_response(progress);
+        write_response(&progress);
     }
 }

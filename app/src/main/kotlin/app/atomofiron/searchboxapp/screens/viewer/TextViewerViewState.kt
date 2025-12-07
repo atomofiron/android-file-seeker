@@ -28,6 +28,7 @@ class TextViewerViewState(
     private val scope: CoroutineScope,
     private val session: TextViewerSession?,
     preferenceStore: PreferenceStore,
+    error: String?,
 ) : FinderItemsState by FinderItemsStateDelegate(
     isLocal = true,
     preferenceStore,
@@ -66,6 +67,7 @@ class TextViewerViewState(
     val tasks: StateFlow<List<TextSearchTask>> = session?.tasks ?: MutableStateFlow(emptyList())
     val textLines: StateFlow<List<TextLine>> = session?.lines ?: MutableStateFlow(emptyList())
     val currentTask = MutableStateFlow<TextSearchTask?>(null)
+    val error = session?.error ?: MutableStateFlow(error) // todo
 
     val dock = status.map { state ->
         var index: Int? = null

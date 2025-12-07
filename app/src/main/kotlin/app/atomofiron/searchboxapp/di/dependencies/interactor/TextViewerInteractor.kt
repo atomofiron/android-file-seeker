@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
+import app.atomofiron.searchboxapp.utils.Rslt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -32,7 +33,7 @@ class TextViewerInteractor(
         return item.update(asSu)
     }
 
-    fun fetchFileSession(ref: NodeRef): TextViewerSession? = service.getFileSession(ref)
+    fun fetchFileSession(ref: NodeRef): Rslt<TextViewerSession> = service.getFileSession(ref)
 
     /** invoke the callback after success */
     fun readFileToLine(ref: NodeRef, index: Int, callback: (() -> Unit)? = null) {
