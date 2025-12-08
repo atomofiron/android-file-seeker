@@ -68,8 +68,16 @@ class ExternalFileProvider : ContentProvider() {
             FileOutputStream(writeFd.fileDescriptor).use { out ->
                 while (true) when (val result = reader.next()) {
                     is ReadResult.Ok -> out.write(result.v1)
-                    is ReadResult.End -> break
-                    is ReadResult.Err -> throw Exception("Read file error: ${result.v1}")
+                    is ReadResult.End -> {
+                        out.flush()
+                        writeFd.close()
+                        break
+                    }
+                    is ReadResult.Err -> {
+                        out.flush()
+                        writeFd.close()
+                        throw Exception("Read file error: ${result.v1}")
+                    }
                 }
             }
         }.start()
