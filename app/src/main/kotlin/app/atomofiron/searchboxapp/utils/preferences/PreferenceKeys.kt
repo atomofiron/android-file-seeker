@@ -38,7 +38,7 @@ object PreferenceKeys {
     val KeyExplorerItem = PreferenceKey("pref_explorer_item", ExplorerItemComposition.DEFAULT)
     val KeyJoystick = PreferenceKey("pref_joystick", JoystickComposition.DEFAULT)
     val KeyHapticFeedback = PreferenceKey("pref_haptic_feedback", true)
-    val KeyScreenshotOperations = PreferenceKey("pref_screenshot_operations", true)
+    val KeyScreenshotOperations = PreferenceKey("pref_screenshot_operations", false)
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
         arrayOf(KeyOpenedDirPath, KeyDrawerGravity, KeyAppUpdateCode, KeyShownNotificationUpdateCode, KeyTestField, KeyShowSearchOptions, KeySearchOptions, KeyLocalSearchOptions, KeySpecialCharacters, KeyAppOrientation, KeyLocale, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeySuCmd, KeyExplorerItem, KeyJoystick, KeyHapticFeedback, KeyScreenshotOperations)
