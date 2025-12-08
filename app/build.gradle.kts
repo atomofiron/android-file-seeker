@@ -17,7 +17,8 @@ val ndkApi = android.defaultConfig.minSdk
 val cargoPath = "${System.getProperty("user.home")}/.cargo/bin/cargo"
 val kotlinDir = "src/main/kotlin"
 val jniLibsDir = "src/main/jniLibs"
-val nativeDir = "$projectDir/../native" // todo
+val jniLibsPath = "$projectDir/$jniLibsDir"
+val nativePath = "$projectDir/../native"
 val nativeLibName = "native_lib"
 val nativeLibSo = "lib$nativeLibName.so"
 val nativeLib = "native-lib"
@@ -28,7 +29,12 @@ val targets = arrayOf(
     "x86_64-linux-android",
     "i686-linux-android",
 )
-val soBindingFile = "target/${targets.first()}/debug/$nativeLibSo"
+val binSrcPaths = targets.map { "$nativePath/target/$it/release/$nativeBin" }
+val binDstDir = "src/main/assets/$nativeBin"
+val debugSoFile = "target/${targets.first()}/debug/$nativeLibSo"
+val debugBinFile = "target/${targets.first()}/debug/$nativeBin"
+val debugLibPath = "$nativePath/$debugSoFile"
+val debugBinPath = "$nativePath/$debugBinFile"
 val ktBindingFile = "$kotlinDir/uniffi/$nativeLibName/$nativeLibName.kt"
 
 android {
@@ -144,38 +150,19 @@ afterEvaluate {
 
 val groupUniffi = "uniffi"
 
-tasks.register<Exec>(taskBuildNative) {
-    group = groupUniffi
-    cargoTermColor()
-    workingDir(nativeDir)
-    commandLine(
-        cargoPath, "ndk",
-        "-t", "arm64-v8a",
-        "-t", "armeabi-v7a",
-        "-t", "x86",
-        "-t", "x86_64",
-        "-P", "$ndkApi",
-        "-o", "$projectDir/$jniLibsDir",
-        "build", "--release",
-        "-p", nativeLib,
-        "-p", nativeBin,
-    )
-    print()
-    isIgnoreExitValue = false
-    errorOutput = System.out
-    standardOutput = System.out
-}
-
 tasks.register<Exec>(taskBuildNativeDebug) {
     group = groupUniffi
+    // always run
+
     cargoTermColor()
-    workingDir(nativeDir)
+    workingDir(nativePath)
     commandLine(
         cargoPath, "ndk",
         "-t", "arm64-v8a",
         "-P", "$ndkApi",
         "build",
         "-p", nativeLib,
+        "-p", nativeBin, // is needed for inputs in next tasks
     )
     print()
     isIgnoreExitValue = false
@@ -185,17 +172,17 @@ tasks.register<Exec>(taskBuildNativeDebug) {
 
 tasks.register<Exec>(taskGenerateNativeBindings) {
     group = groupUniffi
-    inputs.file("$nativeDir/$soBindingFile")
+    inputs.file(debugLibPath)
     outputs.file(ktBindingFile)
     outputs.upToDateWhen { true } // ignore outputs
 
     cargoTermColor()
     environment("DEVELOPER_DIR", "/Library/Developer/CommandLineTools") // for MacOS only
-    workingDir(nativeDir)
+    workingDir(nativePath)
     commandLine(
         cargoPath, "run",
         "--bin", "uniffi-gen", "generate",
-        "--library", soBindingFile,
+        "--library", debugSoFile,
         "--language", "kotlin", "--no-format",
         "--out-dir", "../app/$kotlinDir",
     )
@@ -215,18 +202,46 @@ tasks.register<Exec>(taskGenerateNativeBindings) {
     }
 }
 
+tasks.register<Exec>(taskBuildNative) {
+    group = groupUniffi
+    inputs.file(debugLibPath)
+    inputs.file(debugBinPath)
+    outputs.dir(jniLibsPath)
+    // don't check the bins
+
+    cargoTermColor()
+    workingDir(nativePath)
+    commandLine(
+        cargoPath, "ndk",
+        "-t", "arm64-v8a",
+        "-t", "armeabi-v7a",
+        "-t", "x86",
+        "-t", "x86_64",
+        "-P", "$ndkApi",
+        "-o", jniLibsPath,
+        "build", "--release",
+        "-p", nativeLib,
+        "-p", nativeBin,
+    )
+    print()
+    isIgnoreExitValue = false
+    errorOutput = System.out
+    standardOutput = System.out
+}
+
 tasks.register<Copy>(taskCopyNativeBins) {
     group = groupUniffi
-    inputs.file("$nativeDir/$soBindingFile")
+    binSrcPaths.forEach { inputs.file(it) }
+    outputs.dir(binDstDir)
 
-    targets.associate {
-        it.split('-', limit = 2).first() to "$nativeDir/target/$it/release/$nativeBin"
+    binSrcPaths.associateBy {
+        it.split('-', limit = 2).first()
     }.forEach { (abi, sourcePath) ->
         from(sourcePath) {
             rename { _ -> abi }
         }
     }
-    into("src/main/assets/$nativeBin")
+    into(binDstDir)
 }
 
 operator fun String.invoke(action: Task.() -> Unit) = tasks.named(this).configure(action)
