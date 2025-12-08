@@ -100,7 +100,7 @@ class TestHolder(
                 }
                 offset += line.length.inc()
             }
-        } catch (e: Exception) {
+        } catch (_: Exception) {
         }
     }
 

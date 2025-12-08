@@ -92,8 +92,8 @@ class ReceiveWorker(
                 val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                 val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
                 if (cursor.moveToFirst()) {
-                    name = cursor.getString(nameIndex)
-                    size = cursor.getLong(sizeIndex)
+                    name = nameIndex.takeIf { it >= 0 }?.let { cursor.getString(it) }
+                    size = sizeIndex.takeIf { it >= 0 }?.let { cursor.getLong(it) } ?: 0L
                 }
             }
             val type = context.contentResolver.getType(uri)
@@ -110,7 +110,8 @@ class ReceiveWorker(
             Triple(name, size, stream)
         }
         dataRead()
-        val totalSize = files.sumOf { (_, size, _) -> size }
+        val totalSize = files.sumOf { (_, size, _) -> max(0, size) }
+            .coerceAtLeast(1)
         if (totalSize > Int.MAX_VALUE.toLong()) {
             progressScale = Int.MAX_VALUE / totalSize.toDouble()
         }

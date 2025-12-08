@@ -38,7 +38,7 @@ class UtilService(
         val mimeType = item.content.mimeType
             ?.takeIf { it != NodeContent.AnyType }
             ?: return null
-        val uri = context.getUriForFile(File(item.ref.string))
+        val uri = context.getUriForFile(File(item.ref.string), asSu)
         return context.useAs(uri, mimeType)
     }
 }

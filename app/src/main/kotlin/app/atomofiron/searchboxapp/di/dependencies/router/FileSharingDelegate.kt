@@ -12,6 +12,7 @@ import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.searchboxapp.android.Intents
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -33,13 +34,17 @@ interface FilePickingDelegate {
     fun shareMultiplePicked(items: List<Node>)
 }
 
-class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingDelegate, FilePickingDelegate {
+class FileSharingDelegateImpl(
+    activityProperty: ActivityProperty,
+    preferences: PreferenceStore,
+) : FileSharingDelegate, FilePickingDelegate {
 
+    private val asSu by preferences.asSu
     private val activity by activityProperty
 
     override fun openWith(item: Node) {
         val activity = activity ?: return
-        val chooser = Intents.openWith(activity, item.ref, item.content)
+        val chooser = Intents.openWith(activity, item.ref, asSu, item.content)
         activity.startActivity(chooser)
     }
 
@@ -49,7 +54,7 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
         if (items.size == 1) {
             val activity = activity ?: return
             val item = items.first()
-            val chooser = Intents.shareWith(activity, item.ref, item.content)
+            val chooser = Intents.shareWith(activity, item.ref, asSu,item.content)
             activity.startActivity(chooser)
             return
         }
@@ -69,7 +74,7 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
         val files = ArrayList<Uri>()
         for (item in items) {
             val file = File(item.ref.string)
-            files.add(context.getUriForFile(file))
+            files.add(context.getUriForFile(file, asSu))
         }
         if (files.isEmpty()) {
             return
@@ -82,7 +87,7 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
 
     override fun shareSinglePicked(item: Node) = activity?.run {
         val file = File(item.ref.string)
-        val uri = getUriForFile(file)
+        val uri = getUriForFile(file, asSu)
         val data = Intent().apply {
             setDataAndType(uri, contentResolver.getType(uri))
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -93,7 +98,7 @@ class FileSharingDelegateImpl(activityProperty: ActivityProperty) : FileSharingD
 
     override fun shareMultiplePicked(items: List<Node>) = activity?.run {
         val uris = items.map {
-            getUriForFile(File(it.ref.string))
+            getUriForFile(File(it.ref.string), asSu)
         }
         if (uris.isEmpty()) {
             return@run

@@ -72,7 +72,7 @@ class ByteSizeDelegate(
             if (converted != string) {
                 setText(converted)
             }
-        } catch (e: NumberFormatException) {
+        } catch (_: NumberFormatException) {
         } else {
             inputLayout?.showError(string.convertOrNull() == null)
         }

@@ -11,7 +11,7 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.ResultChannel
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
-import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegateImpl
+import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
@@ -76,7 +76,8 @@ class ResultModule {
         router: ResultRouter,
         resources: AppResources,
         itemActionDelegate: ResultItemActionDelegate,
-        filePickingDelegate: FilePickingDelegate,
+        picking: FilePickingDelegate,
+        sharing: FileSharingDelegate,
         workManager: WorkManager,
     ): ResultPresenter {
         return ResultPresenter(
@@ -88,7 +89,8 @@ class ResultModule {
             router,
             resources,
             itemActionDelegate,
-            filePickingDelegate,
+            picking,
+            sharing,
             workManager,
         )
     }
@@ -102,8 +104,9 @@ class ResultModule {
         menuListenerDelegate: ResultCurtainMenuDelegate,
         dialogs: DialogDelegate,
         interactor: ResultInteractor,
+        sharing: FileSharingDelegate,
     ): ResultItemActionDelegate {
-        return ResultItemActionDelegate(viewModel, operations, router, menuListenerDelegate, dialogs, interactor)
+        return ResultItemActionDelegate(viewModel, operations, router, menuListenerDelegate, dialogs, interactor, sharing)
     }
 
     @Provides
@@ -115,8 +118,9 @@ class ResultModule {
         apks: ApkInteractor,
         curtainChannel: CurtainChannel,
         utils: UtilService,
+        sharing: FileSharingDelegate,
     ): ResultCurtainMenuDelegate {
-        return ResultCurtainMenuDelegate(scope, router, interactor, apks, curtainChannel, utils)
+        return ResultCurtainMenuDelegate(scope, router, interactor, apks, curtainChannel, utils, sharing)
     }
 
     @Provides
@@ -147,12 +151,6 @@ class ResultModule {
     ): ResultViewState {
         return ResultViewState(params, mode, finderStore, scope, preferenceStore)
     }
-
-    @Provides
-    @ResultScope
-    fun fileSharingDelegate(
-        activityProperty: ActivityProperty,
-    ): FilePickingDelegate = FileSharingDelegateImpl(activityProperty)
 }
 
 interface ResultDependencies {

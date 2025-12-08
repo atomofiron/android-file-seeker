@@ -211,7 +211,7 @@ class FinderWorker(
                     is Params.Names -> params.searchNames(type)
                 }
             }.join()
-        } catch (e: CancellationException) {
+        } catch (_: CancellationException) {
             updateAsync {
                 when {
                     task.isProgress -> copy(status = SearchStatus.Stopping)

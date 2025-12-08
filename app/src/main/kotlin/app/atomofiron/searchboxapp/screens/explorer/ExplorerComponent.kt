@@ -7,18 +7,17 @@ import androidx.work.WorkManager
 import app.atomofiron.common.arch.Registerable
 import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.di.module.DelegateModule
-import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
-import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
-import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegateImpl
+import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
@@ -93,6 +92,7 @@ class ExplorerModule {
         explorerStore: ExplorerStore,
         explorerInteractor: ExplorerInteractor,
         apkInteractor: ApkInteractor,
+        sharing: FileSharingDelegate,
         curtainChannel: CurtainChannel,
         utils: UtilService,
     ): ExplorerCurtainMenuDelegate {
@@ -104,6 +104,7 @@ class ExplorerModule {
             explorerInteractor,
             apkInteractor,
             utils,
+            sharing,
             curtainChannel,
         )
     }
@@ -147,8 +148,11 @@ class ExplorerModule {
 
     @Provides
     @ExplorerScope
-    fun router(fragment: WeakProperty<out Fragment>): ExplorerRouter {
-        return ExplorerRouter(fragment)
+    fun router(
+        fragment: WeakProperty<out Fragment>,
+        sharing: FileSharingDelegate,
+    ): ExplorerRouter {
+        return ExplorerRouter(fragment, sharing)
     }
 
     @Provides
@@ -176,12 +180,6 @@ class ExplorerModule {
         router: ExplorerRouter,
         storagePermissionDelegate: StoragePermissionDelegate,
     ) = Registerable(router, storagePermissionDelegate)
-
-    @Provides
-    @ExplorerScope
-    fun fileSharingDelegate(
-        activityProperty: ActivityProperty,
-    ): FilePickingDelegate = FileSharingDelegateImpl(activityProperty)
 }
 
 interface ExplorerDependencies {

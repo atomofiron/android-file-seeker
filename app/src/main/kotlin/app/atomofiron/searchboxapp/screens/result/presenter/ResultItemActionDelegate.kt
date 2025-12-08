@@ -4,6 +4,7 @@ import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
+import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.other.toUni
@@ -21,13 +22,14 @@ class ResultItemActionDelegate(
     private val curtainDelegate: ResultCurtainMenuDelegate,
     private val dialogs: DialogDelegate,
     private val interactor: ResultInteractor,
+    private val sharing: FileSharingDelegate,
 ) : ResultItemActionListener {
     override fun onItemClick(item: Node) {
         when {
             item.isDirectory -> Unit // todo open dir
             item.content is NodeContent.Text -> router.openFile(item.ref, viewState.taskUuid)
             item.content is NodeContent.AndroidApp -> operations.askForAndroidApp(item.content)
-            else -> router.openWith(item)
+            else -> sharing.openWith(item)
         }
     }
 

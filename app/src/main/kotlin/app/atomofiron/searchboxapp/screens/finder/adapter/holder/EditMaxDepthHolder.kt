@@ -46,7 +46,7 @@ class EditMaxDepthHolder(
     override fun onSubmitCheck(value: String): Boolean = try {
         value.toInt()
         true
-    } catch (e: NumberFormatException) {
+    } catch (_: NumberFormatException) {
         false
     }.also { binding.box.showError(!it) }
 

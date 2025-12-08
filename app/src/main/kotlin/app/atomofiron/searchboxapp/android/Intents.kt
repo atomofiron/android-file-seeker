@@ -81,17 +81,17 @@ object Intents {
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     }
 
-    fun openWith(context: Context, ref: NodeRef, content: NodeContent? = null): Intent {
-        return chooser(context, Intent.ACTION_VIEW, ref, content)
+    fun openWith(context: Context, ref: NodeRef, asSu: Boolean, content: NodeContent? = null): Intent {
+        return chooser(context, Intent.ACTION_VIEW, ref, asSu, content)
     }
 
-    fun shareWith(context: Context, ref: NodeRef, content: NodeContent? = null): Intent {
-        return chooser(context, Intent.ACTION_SEND, ref, content)
+    fun shareWith(context: Context, ref: NodeRef, asSu: Boolean, content: NodeContent? = null): Intent {
+        return chooser(context, Intent.ACTION_SEND, ref, asSu, content)
     }
 
-    private fun chooser(context: Context, action: String, ref: NodeRef, content: NodeContent?): Intent {
+    private fun chooser(context: Context, action: String, ref: NodeRef, asSu: Boolean, content: NodeContent?): Intent {
         val file = File(ref.string)
-        val contentUri = context.getUriForFile(file)
+        val contentUri = context.getUriForFile(file, asSu)
         val type = content?.mimeType
             ?: MimeTypeMap.getSingleton().getMimeTypeFromExtension(ref.ext)
             ?: NodeContent.AnyType

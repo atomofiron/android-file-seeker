@@ -13,16 +13,12 @@ import app.atomofiron.common.util.dialog.DialogDelegateImpl
 import app.atomofiron.common.util.property.RoProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
-import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegateImpl
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 
 abstract class BaseRouter(
     fragmentProperty: RoProperty<out Fragment?>,
     protected val activityProperty: RoProperty<out FragmentActivity?> = fragmentProperty.map { it?.requireActivity() },
-) : FileSharingDelegate by FileSharingDelegateImpl(activityProperty)
-    , DialogDelegate by DialogDelegateImpl(activityProperty)
-{
+) : DialogDelegate by DialogDelegateImpl(activityProperty) {
     companion object {
         const val RECIPIENT = "RECIPIENT"
 

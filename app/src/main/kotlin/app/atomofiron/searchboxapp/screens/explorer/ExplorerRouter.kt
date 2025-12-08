@@ -6,6 +6,7 @@ import app.atomofiron.common.arch.Registerable
 import app.atomofiron.common.util.permission.PermissionDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
@@ -13,6 +14,7 @@ import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 
 class ExplorerRouter(
     property: WeakProperty<out Fragment>,
+    private val sharing: FileSharingDelegate,
 ) : BaseRouter(property), Registerable {
 
     override val currentDestinationId = R.id.rootFragment
@@ -38,7 +40,7 @@ class ExplorerRouter(
             val arguments = TextViewerParams.arguments(item.ref)
             navigate(R.id.textViewerFragment, arguments)
         } else {
-            openWith(item)
+            sharing.openWith(item)
         }
     }
 }

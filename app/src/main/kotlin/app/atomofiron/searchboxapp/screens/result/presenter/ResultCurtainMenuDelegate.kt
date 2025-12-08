@@ -9,6 +9,7 @@ import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
+import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
@@ -24,6 +25,7 @@ class ResultCurtainMenuDelegate(
     private val apks: ApkInteractor,
     curtainChannel: CurtainChannel,
     private val utils: UtilService,
+    private val sharing: FileSharingDelegate,
 ) : Recipient, CurtainApi.Adapter<CurtainApi.ViewHolder>(), MenuListener {
 
     private val optionsDelegate = OptionsDelegate(this)
@@ -47,8 +49,8 @@ class ResultCurtainMenuDelegate(
                 interactor.copyToClipboard(items.first())
                 if (Android.Below.T) controller?.showSnackbar(R.string.copied)
             }
-            Operations.OpenWith.id -> router.openWith(items.first())
-            Operations.Share.id -> router.shareWith(items.filter { it.isFile })
+            Operations.OpenWith.id -> sharing.openWith(items.first())
+            Operations.Share.id -> sharing.shareWith(items.filter { it.isFile })
             Operations.Delete.id -> {
                 controller?.close(irrevocably = true)
                 interactor.deleteItems(items)

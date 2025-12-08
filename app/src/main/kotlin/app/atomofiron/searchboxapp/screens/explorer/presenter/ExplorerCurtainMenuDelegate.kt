@@ -8,6 +8,7 @@ import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
+import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -36,6 +37,7 @@ class ExplorerCurtainMenuDelegate(
     private val interactor: ExplorerInteractor,
     private val apkInteractor: ApkInteractor,
     private val utils: UtilService,
+    private val sharing: FileSharingDelegate,
     curtainChannel: CurtainChannel,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>(), Recipient, MenuListener {
 
@@ -89,8 +91,8 @@ class ExplorerCurtainMenuDelegate(
             Operations.Create.id -> controller?.showNext(CREATE)
             Operations.Rename.id -> controller?.showNext(RENAME)
             Operations.Delete.id -> onRemoveConfirm(items)
-            Operations.Share.id -> router.shareWith(items.filter { it.isFile })
-            Operations.OpenWith.id -> router.openWith(items.first())
+            Operations.Share.id -> sharing.shareWith(items.filter { it.isFile })
+            Operations.OpenWith.id -> sharing.openWith(items.first())
             Operations.InstallApp.id -> apkInteractor.install(items.first(), viewState.currentTab.value)
             Operations.LaunchApp.id -> apkInteractor.launch(items.first())
             Operations.UseAs.id -> utils.useAs(options.items.first())

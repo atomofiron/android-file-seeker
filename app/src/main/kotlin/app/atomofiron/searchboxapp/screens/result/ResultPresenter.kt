@@ -8,6 +8,7 @@ import app.atomofiron.common.util.extension.logE
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
+import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.router.startReceiveInto
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
@@ -30,7 +31,8 @@ class ResultPresenter(
     router: ResultRouter,
     resources: AppResources,
     itemActionDelegate: ResultItemActionDelegate,
-    private val sharing: FilePickingDelegate,
+    private val picking: FilePickingDelegate,
+    private val sharing: FileSharingDelegate,
     private val workManager: WorkManager,
 ) : BasePresenter<ResultViewModel, ResultRouter>(scope, router),
     ResultItemActionListener by itemActionDelegate {
@@ -55,7 +57,7 @@ class ResultPresenter(
         val items = result.matches.mapNotNull { match ->
             match.item.takeIf { !checkedOnly || it.isChecked }
         }
-        router.shareWith(items)
+        sharing.shareWith(items)
     }
 
     fun onExportClick() {
@@ -85,8 +87,8 @@ class ResultPresenter(
                 }
             }
             mode !is ActivityMode.Share -> Unreachable
-            mode.multiple -> sharing.shareMultiplePicked(items)
-            else -> sharing.shareSinglePicked(first)
+            mode.multiple -> picking.shareMultiplePicked(items)
+            else -> picking.shareSinglePicked(first)
         }
     }
 
