@@ -69,6 +69,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.launch
 
 private const val SUB_PATH_CAMERA = "DCIM/Camera"
@@ -107,8 +108,8 @@ class ExplorerService(
             NativeBridge.setSuCmd(suCmd, binDir = context.filesDir.absolutePath)
             suDefined.complete()
         }.collect(appScope)
-        store.currentNode.collect(appScope) {
-            preferences.setOpenedDirPath(it?.ref?.string)
+        store.currentNode.drop(1).collect(appScope) {
+            preferences.setTree(it?.ref?.string)
         }
     }
 

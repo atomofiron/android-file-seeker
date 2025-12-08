@@ -32,7 +32,7 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyLocalSear
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyLocale
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxDepth
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxSize
-import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyOpenedDirPath
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTrees
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyScreenshotOperations
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShowSearchOptions
@@ -79,7 +79,7 @@ class PreferenceStore(
 
     val asSu = getFlow(KeyUseSu)
     val suCmd = getFlow(KeySuCmd)
-    val openedDirPath = getFlow(KeyOpenedDirPath)
+    val trees = getFlow(KeyTrees)
     val specialCharacters = getFlow(KeySpecialCharacters) { it.split(" ").toTypedArray() }
     val appOrientation = getFlow(KeyAppOrientation) { AppOrientation.entries[it.toInt()] }
     val explorerItemComposition = getFlow(KeyExplorerItem) { ExplorerItemComposition(it) }
@@ -112,11 +112,11 @@ class PreferenceStore(
         edit { it[KeyUseSu] = value }
     }
 
-    suspend fun setOpenedDirPath(value: String?) {
+    suspend fun setTree(value: String?) {
         edit {
             when (value) {
-                null -> it.remove(KeyOpenedDirPath)
-                else -> it[KeyOpenedDirPath] = value
+                null -> it.remove(KeyTrees)
+                else -> it[KeyTrees] = setOf(value)
             }
         }
     }
