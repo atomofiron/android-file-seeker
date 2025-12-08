@@ -83,18 +83,21 @@ class ExternalFileProvider : ContentProvider() {
         selectionArgs: Array<String>?,
         sortOrder: String?,
     ): Cursor? {
+        projection ?: return null
         val path = uri.path ?: return null
         uri.verify(context)
         val ref = NodeRef(path)
-        val size = File(path)
-            .takeIf { it.canRead() }
-            ?.length()
-            ?: NativeBridge.meta(ref, asSu = uri.asSu())
-                .value?.length?.toLong()
-        val metadata = listOfNotNull(
-            OpenableColumns.DISPLAY_NAME to ref.name,
-            OpenableColumns.SIZE to size,
-        )
+        val metadata = projection.mapNotNull { name ->
+            when (name) {
+                OpenableColumns.DISPLAY_NAME -> name to ref.name
+                OpenableColumns.SIZE -> File(path)
+                    .takeIf { it.canRead() }
+                    .let { it?.length() ?: NativeBridge.meta(ref, asSu = uri.asSu()).value?.length?.toLong() }
+                    .takeIf { it != null }
+                    ?.let { name to it }
+                else -> null
+            }
+        }
         val cursor = MatrixCursor(metadata.map { (name, _) -> name }.toTypedArray())
         cursor.addRow(metadata.map { (_, value) -> value })
         return cursor
