@@ -2,6 +2,7 @@ package app.atomofiron.common.util.extension
 
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,6 +23,7 @@ inline fun CoroutineScope.launchOnIO(
 
 inline fun CoroutineScope.launchOnMain(
     immediate: Boolean = false,
+    start: CoroutineStart = CoroutineStart.DEFAULT,
     noinline block: suspend CoroutineScope.() -> Unit,
 ) = launch(if (immediate) Dispatchers.Main.immediate else Dispatchers.Main, block = block)
 

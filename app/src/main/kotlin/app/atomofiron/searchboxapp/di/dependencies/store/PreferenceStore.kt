@@ -3,14 +3,20 @@ package app.atomofiron.searchboxapp.di.dependencies.store
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.SharedPreferencesMigration
-import androidx.datastore.preferences.core.*
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.preferencesDataStore
+import app.atomofiron.common.util.extension.launchOnMain
 import app.atomofiron.common.util.flow.StateFlowProperty
 import app.atomofiron.common.util.flow.asProperty
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchOptionsImpl
 import app.atomofiron.searchboxapp.model.finder.toInt
-import app.atomofiron.searchboxapp.model.preference.*
+import app.atomofiron.searchboxapp.model.preference.AppLocale
+import app.atomofiron.searchboxapp.model.preference.AppOrientation
+import app.atomofiron.searchboxapp.model.preference.AppTheme
+import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
+import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import app.atomofiron.searchboxapp.model.textviewer.LocalSearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKey
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
@@ -30,16 +36,23 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyOpenedDir
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyScreenshotOperations
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShowSearchOptions
-import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySpecialCharacters
-import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyUseSu
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShownNotificationUpdateCode
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySpecialCharacters
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySuCmd
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTestField
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyUseSu
 import app.atomofiron.searchboxapp.utils.preferences.get
 import app.atomofiron.searchboxapp.utils.preferences.remove
 import app.atomofiron.searchboxapp.utils.preferences.set
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
@@ -64,25 +77,40 @@ class PreferenceStore(
         }
     }
 
+    val asSu = getFlow(KeyUseSu)
+    val suCmd = getFlow(KeySuCmd)
+    val openedDirPath = getFlow(KeyOpenedDirPath)
+    val specialCharacters = getFlow(KeySpecialCharacters) { it.split(" ").toTypedArray() }
+    val appOrientation = getFlow(KeyAppOrientation) { AppOrientation.entries[it.toInt()] }
+    val explorerItemComposition = getFlow(KeyExplorerItem) { ExplorerItemComposition(it) }
+    val joystickComposition = getFlow(KeyJoystick) { JoystickComposition(it) }
+    var drawerGravity = getFlow(KeyDrawerGravity)
+    val testField = getNullableFlow(KeyTestField)
+    val showSearchOptions = getFlow(KeyShowSearchOptions)
+    val searchOptions = getFlow(KeySearchOptions, ::SearchOptionsImpl)
+    val localSearchOptions = getFlow(KeyLocalSearchOptions, ::LocalSearchOptions)
+    val maxFileSizeForSearch = getFlow(KeyMaxSize)
+    val appUpdateCode = getFlow(KeyAppUpdateCode)
+    val shownNotificationUpdateCode = getFlow(KeyShownNotificationUpdateCode)
+    val maxDepthForSearch = getFlow(KeyMaxDepth)
+    val hapticFeedback = getFlow(KeyHapticFeedback)
+    val screenshotOperations = getFlow(KeyScreenshotOperations)
+    val appLocale = getFlow(KeyLocale) { AppLocale.entries[it.toInt()] } // don't pass any default value
+    val appTheme = data.map {
+        val appThemeMode = it[KeyAppTheme] ?: AppTheme.defaultName()
+        val deepBlack = it[KeyDeepBlack] ?: false
+        AppTheme.fromString(appThemeMode, deepBlack)
+    }.stateInProperty(scope, initial = null) // don't pass any default value
+
     operator fun invoke(block: suspend PreferenceStore.() -> Unit) {
-        scope.launch(Dispatchers.Main.immediate, CoroutineStart.UNDISPATCHED) {
+        scope.launchOnMain(immediate = true,CoroutineStart.UNDISPATCHED) {
             this@PreferenceStore.block()
         }
     }
 
-    val asSu = getFlow(KeyUseSu)
-
     suspend fun setUseSu(value: Boolean) {
         edit { it[KeyUseSu] = value }
     }
-
-    val suCmd = getFlow(KeySuCmd)
-
-    suspend fun setSuCmd(value: String) {
-        edit { it[KeySuCmd] = KeySuCmd.check(value) }
-    }
-
-    val openedDirPath = getFlow(KeyOpenedDirPath)
 
     suspend fun setOpenedDirPath(value: String?) {
         edit {
@@ -93,151 +121,84 @@ class PreferenceStore(
         }
     }
 
-    var drawerGravity = getFlow(KeyDrawerGravity)
-
     suspend fun setDrawerGravity(value: Int) {
         edit { it[KeyDrawerGravity] = value }
     }
-
-    val testField = getNullableFlow(KeyTestField)
 
     suspend fun setTestField(value: String?) {
         edit { if (value == null) it.remove(KeyTestField) else it[KeyTestField] = value }
     }
 
-    val showSearchOptions = getFlow(KeyShowSearchOptions)
-
     suspend fun setShowSearchOptions(value: Boolean) {
         edit { it[KeyShowSearchOptions] = value }
     }
-
-    val searchOptions = getFlow(KeySearchOptions, ::SearchOptionsImpl)
 
     suspend fun setSearchOptions(value: SearchOptions) {
         edit { it[KeySearchOptions] = value.toInt() }
     }
 
-    val localSearchOptions = getFlow(KeyLocalSearchOptions, ::LocalSearchOptions)
-
     suspend fun setLocalSearchOptions(value: LocalSearchOptions) {
         edit { it[KeyLocalSearchOptions] = value.toInt() }
-    }
-
-    val specialCharacters = getFlow(KeySpecialCharacters) {
-        it.split(" ").toTypedArray()
     }
 
     suspend fun setSpecialCharacters(value: Array<String>) {
         edit { it[KeySpecialCharacters] = value.joinToString(separator = " ") }
     }
 
-    val maxFileSizeForSearch = getFlow(KeyMaxSize)
-
     suspend fun setMaxFileSizeForSearch(value: Long) {
         edit { it[KeyMaxSize] = value }
     }
-
-    val appUpdateCode = getFlow(KeyAppUpdateCode)
 
     suspend fun setAppUpdateCode(value: Int) {
         edit { it[KeyAppUpdateCode] = value }
     }
 
-    val shownNotificationUpdateCode = getFlow(KeyShownNotificationUpdateCode)
-
     suspend fun setShownNotificationUpdateCode(value: Int) {
         edit { it[KeyShownNotificationUpdateCode] = value }
     }
 
-    val maxDepthForSearch = getFlow(KeyMaxDepth)
-
     suspend fun setMaxDepthForSearch(value: Int) {
         edit { it[KeyMaxDepth] = value }
-    }
-
-    val deepBlack = getFlow(KeyDeepBlack)
-
-    suspend fun setDeepBlack(value: Boolean) {
-        edit { it[KeyDeepBlack] = value }
-    }
-
-    private val appThemeMode = getFlow(KeyAppTheme)
-
-    val appTheme = data.map {
-        val appThemeMode = it[KeyAppTheme] ?: AppTheme.defaultName()
-        val deepBlack = it[KeyDeepBlack] ?: false
-        AppTheme.fromString(appThemeMode, deepBlack)
-    }.shareInOne(scope).asProperty()
-
-    suspend fun setAppTheme(value: AppTheme) {
-        edit { it[KeyAppTheme] = value.name }
-    }
-
-    val appOrientation = getFlow(KeyAppOrientation) {
-        AppOrientation.entries[it.toInt()]
-    }
-
-    suspend fun setAppOrientation(value: AppOrientation) {
-        edit { it[KeyAppOrientation] = value.ordinal.toString() }
-    }
-
-    val appLocale = getFlow(KeyLocale) {
-        AppLocale.entries[it.toInt()]
     }
 
     suspend fun setAppLocale(value: AppLocale) {
         edit { it[KeyLocale] = value.ordinal.toString() }
     }
 
-    val explorerItemComposition = getFlow(KeyExplorerItem) {
-        ExplorerItemComposition(it)
-    }
-
     suspend fun setExplorerItemComposition(value: ExplorerItemComposition) {
         edit { it[KeyExplorerItem] = value.flags }
-    }
-
-    val joystickComposition = getFlow(KeyJoystick) {
-        JoystickComposition(it)
     }
 
     suspend fun setJoystickComposition(value: JoystickComposition) {
         edit { it[KeyJoystick] = value.data }
     }
 
-    val hapticFeedback = getFlow(KeyHapticFeedback)
-
     suspend fun setHapticFeedback(value: Boolean) {
         edit { it[KeyHapticFeedback] = value }
     }
 
-    val screenshotOperations = getFlow(KeyScreenshotOperations)
-
-    suspend fun setScreenshotOperations(value: Boolean) {
-        edit { it[KeyScreenshotOperations] = value }
-    }
-
     private fun <V> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {
         return data.mapNotNull { it[key] ?: key.default }
-            .shareInOne(scope)
-            .asProperty(initial = key.default)
+            .stateInProperty(scope, initial = key.default)
     }
 
     private fun <V> getNullableFlow(key: PreferenceKey<V>): StateFlowProperty<V?> {
         return data.map { it[key] }
-            .shareInOne(scope)
-            .asProperty()
+            .stateInProperty(scope, initial = null)
     }
 
     private fun <V,E> getFlow(key: PreferenceKey<V>, transformation: (V) -> E): StateFlowProperty<E> {
-        return data.mapNotNull { (it[key] ?: key.default).let(transformation) }
-            .shareInOne(scope)
-            .asProperty(initial = transformation(key.default))
+        return data.mapNotNull { (it[key] ?: key.default)
+            .let(transformation) }
+            .stateInProperty(scope, initial = transformation(key.default))
     }
 
-    private fun <T> Flow<T>.shareInOne(scope: CoroutineScope): SharedFlow<T> {
-        return distinctUntilChanged().shareIn(scope, SharingStarted.Eagerly, replay = 1)
-    }
+    private fun <T> Flow<T>.stateInProperty(
+        scope: CoroutineScope,
+        initial: T?,
+    ): StateFlowProperty<T> = distinctUntilChanged()
+        .shareIn(scope, SharingStarted.Eagerly, replay = 1)
+        .asProperty(initial)
 
     fun <T> getOrDefault(key: Preferences.Key<T>): T = preferences[key] ?: PreferenceKeys.default(key.name)
 }

@@ -22,7 +22,7 @@ object PreferenceKeys {
     val KeyDrawerGravity = PreferenceKey("pref_drawer_gravity", Gravity.START)
     val KeyAppUpdateCode = PreferenceKey("pref_app_update_code", 0)
     val KeyShownNotificationUpdateCode = PreferenceKey("pref_shown_notification_update_code", 0)
-    val KeyTestField = PreferenceKey("pref_test_field", "")
+    val KeyTestField = PreferenceKey("pref_test_field", default = "", resetValue = "")
     val KeyShowSearchOptions = PreferenceKey("pref_show_search_options", true)
     val KeySearchOptions = PreferenceKey("pref_search_options", SearchOptions.DEFAULT)
     val KeyLocalSearchOptions = PreferenceKey("pref_local_search_options", LocalSearchOptions.DEFAULT)
