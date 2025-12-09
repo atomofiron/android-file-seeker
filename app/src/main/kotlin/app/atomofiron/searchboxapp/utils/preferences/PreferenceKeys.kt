@@ -22,7 +22,7 @@ object PreferenceKeys {
     val KeyDrawerGravity = PreferenceKey("pref_drawer_gravity", Gravity.START)
     val KeyAppUpdateCode = PreferenceKey("pref_app_update_code", 0)
     val KeyShownNotificationUpdateCode = PreferenceKey("pref_shown_notification_update_code", 0)
-    val KeyTestField = PreferenceKey("pref_test_field", default = "", resetValue = "")
+    val KeyTestField = PreferenceKey("pref_test_field", default = "")
     val KeyShowSearchOptions = PreferenceKey("pref_show_search_options", true)
     val KeySearchOptions = PreferenceKey("pref_search_options", SearchOptions.DEFAULT)
     val KeyLocalSearchOptions = PreferenceKey("pref_local_search_options", LocalSearchOptions.DEFAULT)
@@ -47,7 +47,7 @@ object PreferenceKeys {
     @Suppress("UNCHECKED_CAST") // omg it's an error in Kotlin 2.2
     fun <T> default(key: String): T = keys.find { it.key.name == key }?.default as T
 
-    operator fun <T> get(key: Preferences.Key<T>): PreferenceKey<T> = keys.find { it.key == key } as PreferenceKey<T>
+    operator fun <T : Any> get(key: Preferences.Key<T>): PreferenceKey<T> = keys.find { it.key == key } as PreferenceKey<T>
 
-    fun <T> get(key: String): PreferenceKey<T> = keys.find { it.name == key } as PreferenceKey<T>
+    fun <T : Any> get(key: String): PreferenceKey<T> = keys.find { it.name == key } as PreferenceKey<T>
 }

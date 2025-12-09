@@ -6,6 +6,7 @@ import app.atomofiron.common.util.property.RoProperty
 import kotlin.collections.removeLast as dropLast
 
 typealias AndroidSdk = VERSION_CODES
+typealias StringSet = Set<String>
 
 fun <T> MutableList<T>.dropLast() = dropLast()
 

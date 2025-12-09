@@ -32,7 +32,6 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyLocalSear
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyLocale
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxDepth
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxSize
-import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTrees
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyScreenshotOperations
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShowSearchOptions
@@ -40,9 +39,9 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShownNoti
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySpecialCharacters
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySuCmd
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTestField
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTrees
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyUseSu
 import app.atomofiron.searchboxapp.utils.preferences.get
-import app.atomofiron.searchboxapp.utils.preferences.remove
 import app.atomofiron.searchboxapp.utils.preferences.set
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
@@ -113,12 +112,7 @@ class PreferenceStore(
     }
 
     suspend fun setTree(value: String?) {
-        edit {
-            when (value) {
-                null -> it.remove(KeyTrees)
-                else -> it[KeyTrees] = setOf(value)
-            }
-        }
+        edit { it[KeyTrees] = value?.let { setOf(value) } }
     }
 
     suspend fun setDrawerGravity(value: Int) {
@@ -126,7 +120,7 @@ class PreferenceStore(
     }
 
     suspend fun setTestField(value: String?) {
-        edit { if (value == null) it.remove(KeyTestField) else it[KeyTestField] = value }
+        edit { it[KeyTestField] = value }
     }
 
     suspend fun setShowSearchOptions(value: Boolean) {
@@ -177,17 +171,17 @@ class PreferenceStore(
         edit { it[KeyHapticFeedback] = value }
     }
 
-    private fun <V> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {
+    private fun <V : Any> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {
         return data.mapNotNull { it[key] ?: key.default }
             .stateInProperty(scope, initial = key.default)
     }
 
-    private fun <V> getNullableFlow(key: PreferenceKey<V>): StateFlowProperty<V?> {
+    private fun <V : Any> getNullableFlow(key: PreferenceKey<V>): StateFlowProperty<V?> {
         return data.map { it[key] }
             .stateInProperty(scope, initial = null)
     }
 
-    private fun <V,E> getFlow(key: PreferenceKey<V>, transformation: (V) -> E): StateFlowProperty<E> {
+    private fun <V : Any, E> getFlow(key: PreferenceKey<V>, transformation: (V) -> E): StateFlowProperty<E> {
         return data.mapNotNull { (it[key] ?: key.default)
             .let(transformation) }
             .stateInProperty(scope, initial = transformation(key.default))
