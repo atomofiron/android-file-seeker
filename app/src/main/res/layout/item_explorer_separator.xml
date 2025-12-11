@@ -16,7 +16,7 @@
         android:src="@drawable/ic_double_arrow_up"
         android:paddingStart="@dimen/padding_common"
         android:paddingEnd="@dimen/padding_half"
-        android:translationX="-2dp"
+        android:translationX="@dimen/explorer_item_icon_offset"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/title"

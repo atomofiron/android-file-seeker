@@ -32,7 +32,7 @@
         android:src="@drawable/ic_folder"
         android:foregroundGravity="top"
         android:baseline="19dp"
-        android:translationX="-2dp"
+        android:translationX="@dimen/explorer_item_icon_offset"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/barrier_start"
         app:layout_constraintBaseline_toBaselineOf="@+id/title"

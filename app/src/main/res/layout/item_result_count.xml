@@ -7,12 +7,13 @@
     >
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/result_tv_count"
-        android:layout_width="@dimen/edge_size"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:gravity="end"
-        android:paddingEnd="@dimen/padding_half"
-        app:layout_constraintEnd_toEndOf="@+id/item_explorer_iv_icon"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_width="wrap_content"
+        android:layout_height="19sp"
+        android:layout_marginEnd="@dimen/padding_half"
+        android:translationX="@dimen/explorer_item_icon_offset"
+        android:textSize="12sp"
+        android:typeface="monospace"
+        app:layout_constraintEnd_toStartOf="@+id/description"
+        app:layout_constraintTop_toTopOf="@+id/description"
         />
 </merge>

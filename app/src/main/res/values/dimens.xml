@@ -18,6 +18,7 @@
 	<dimen name="corner_nano">4dp</dimen>
 	<dimen name="icon_size">24dp</dimen>
 	<dimen name="item_icon_padding">4dp</dimen>
+	<dimen name="explorer_item_icon_offset">-2dp</dimen>
 
 	<dimen name="common_size">48dp</dimen>
 	<dimen name="common_size_half">24dp</dimen>
