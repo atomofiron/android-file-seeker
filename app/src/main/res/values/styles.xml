@@ -119,7 +119,7 @@
 	</style>
 
 	<style name="SnackbarStyle" parent="Widget.Material3.Snackbar">
-		<item name="shapeAppearance">?shapeAppearanceCornerLarge</item>
+		<item name="shapeAppearance">?shapeAppearanceCornerExtraLarge</item>
 	</style>
 
 </resources>
