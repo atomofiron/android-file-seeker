@@ -11,13 +11,12 @@ const val UNDEFINED = -1
 abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>>(
     itemCallback: DiffUtil.ItemCallback<D>? = null,
     itemId: (D.() -> Int)? = null,
-    itemUpdater: (D.(new: D) -> D)? = null,
     itemGeneration: (D.() -> Int)? = null,
 ) : RecyclerView.Adapter<H>() {
 
     private val mutableItems = mutableListOf<D>()
     private val differ = itemCallback?.let {
-        CoroutineListDiffer(mutableItems, this, itemId, itemCallback, itemGeneration, itemUpdater)
+        CoroutineListDiffer(mutableItems, this, itemId, itemCallback, itemGeneration)
     }
     val items: List<D> = mutableItems
 

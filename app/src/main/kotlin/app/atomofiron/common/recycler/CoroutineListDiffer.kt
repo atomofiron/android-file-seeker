@@ -16,7 +16,6 @@ class CoroutineListDiffer<I : Any>(
     private val itemId: (I.() -> Int)? = null,
     private val itemCallback: DiffUtil.ItemCallback<I>,
     private val itemGeneration: (I.() -> Int)? = null,
-    private val itemUpdater: (I.(new: I) -> I)? = null,
     private val detectMoves: Boolean = true,
     listener: ListListener<I>? = null,
 ) {

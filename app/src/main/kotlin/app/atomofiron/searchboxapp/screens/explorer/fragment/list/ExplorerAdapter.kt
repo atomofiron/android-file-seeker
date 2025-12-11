@@ -25,7 +25,6 @@ class ExplorerAdapter(
 ) : GeneralAdapter<Node, GeneralHolder<Node>>(
     itemCallback = NodeCallback,
     itemId = { uniqueId },
-    itemUpdater = Node::updater,
     itemGeneration = { generation },
 ) {
 
@@ -111,9 +110,4 @@ class ExplorerAdapter(
             }
         }
     }
-}
-
-private fun Node.updater(new: Node): Node {
-    return new.takeIf { it.isOpened == isOpened && it.isDeepest == isDeepest }
-        ?: new.copy(isDeepest = isDeepest, children = new.children?.copy(isOpened = isOpened))
 }
