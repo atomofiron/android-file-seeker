@@ -9,7 +9,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 
 private object ItemCallbackImpl : DiffUtil.ItemCallback<NodeRoot>() {
     override fun areItemsTheSame(oldItem: NodeRoot, newItem: NodeRoot): Boolean {
-        return oldItem.stableId == newItem.stableId
+        return oldItem.id == newItem.id
     }
 
     override fun areContentsTheSame(oldItem: NodeRoot, newItem: NodeRoot): Boolean {
@@ -23,7 +23,7 @@ class RootAdapter(private val listener: RootClickListener) : ListAdapter<NodeRoo
         setHasStableIds(true)
     }
 
-    private fun stableId(position: Int): Int = currentList[position].stableId
+    private fun stableId(position: Int): Int = currentList[position].id.inc()
 
     override fun getItemId(position: Int): Long = stableId(position).toLong()
 

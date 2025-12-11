@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.unsafeLazy
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
+import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_APK
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_ZIP
@@ -24,7 +25,7 @@ sealed class NodeContent(
     data object Link : NodeContent()
 
     data class Directory(
-        val kind: DirectoryKind = DirectoryKind.Ordinary,
+        val kind: DirectoryKind = DirectoryKind.Ordinary, // always Ordinary in the garden
         override val rootType: NodeRootType? = null,
     ) : NodeContent(mimeType = MIME_TYPE) {
         companion object {

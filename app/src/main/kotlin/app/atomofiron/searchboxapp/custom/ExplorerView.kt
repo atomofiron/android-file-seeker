@@ -20,7 +20,6 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapte
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerListDelegate
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.SwipeMarkerDelegate
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.NodeCallback
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -65,6 +64,7 @@ class ExplorerView(
     private fun ViewExplorerBinding.init() {
         val config = ConcatAdapter.Config.Builder()
             .setStableIdMode(ConcatAdapter.Config.StableIdMode.SHARED_STABLE_IDS)
+            .setIsolateViewTypes(false)
             .build()
         recyclerView.adapter = ConcatAdapter(config, rootAdapter, explorerAdapter)
     }

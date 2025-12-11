@@ -18,7 +18,8 @@ class NodeRef(val bytes: ByteArray) {
         val Root = NodeRef(byteArrayOf(SLASH_BYTE))
     }
 
-    val isRoot: Boolean get() = bytes.isNotEmpty() && bytes.all { it == SLASH_BYTE }
+    val isEmpty: Boolean get() = bytes.isEmpty()
+    val isRoot: Boolean get() = !isEmpty && bytes.all { it == SLASH_BYTE }
 
     var string: String = STUB_STRING
         private set
@@ -109,11 +110,9 @@ class NodeRef(val bytes: ByteArray) {
     }
 
     override fun hashCode(): Int {
-        if (hashCode != 0) {
-            return hashCode
+        if (hashCode == 0) {
+            hashCode = bytes.contentHashCode()
         }
-        hashCode = this::class.hashCode()
-        hashCode = 31 * hashCode + bytes.contentHashCode()
         return hashCode
     }
 }

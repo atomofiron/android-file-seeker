@@ -5,7 +5,7 @@ import app.atomofiron.common.util.extension.debugRequire
 data class Node(
     val ref: NodeRef,
     val parentRef: NodeRef = ref.parent,
-    val uniqueId: Int = ref.uniqueId,
+    val uniqueId: NodeId = ref.uniqueId,
     val rootId: Int = uniqueId,
     val children: NodeChildren? = null,
 

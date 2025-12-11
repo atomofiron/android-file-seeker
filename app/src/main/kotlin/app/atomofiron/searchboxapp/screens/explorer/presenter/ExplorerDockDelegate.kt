@@ -31,7 +31,7 @@ class ExplorerDockDelegate @Inject constructor(
     private val scope: CoroutineScope,
 ) : ExplorerDockListener {
 
-    val dock: Flow<List<DockItem>> = combine(store.currentNode, preferenceChannel.notification, store.checked, transform = ::dockItems)
+    val dock: Flow<List<DockItem>> = combine(store.currentDeepest, preferenceChannel.notification, store.checked, transform = ::dockItems)
 
     override fun onSearchClick() = router.showFinder()
 
@@ -58,7 +58,7 @@ class ExplorerDockDelegate @Inject constructor(
     }
 
     private fun receive(mode: ActivityMode.Receive) {
-        val destination = store.currentNode.value?.ref
+        val destination = store.currentDeepest.value?.ref
         destination ?: return
         router.permissions
             .request(POST_NOTIFICATIONS)

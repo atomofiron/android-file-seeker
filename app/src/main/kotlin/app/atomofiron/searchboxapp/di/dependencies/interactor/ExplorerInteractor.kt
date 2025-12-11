@@ -98,7 +98,7 @@ class ExplorerInteractor(
         }
     }
 
-    fun updateCurrentTab(key: NodeTabKey) {
+    fun updateCurrentTab(key: NodeTabKey.Explorer) {
         scope.launch(Dispatchers.Default) {
             store.setCurrentTab(key)
         }

@@ -15,7 +15,7 @@ class NodeGarden {
 
     operator fun get(key: NodeTabKey): NodeTab = tabs.getOrPut(key) {
         if (key is NodeTabKey.Explorer && key.pickerTypes != null) {
-            tabs[NodeTabKey.Explorer(key.index, null)]
+            tabs[key.copy(pickerTypes = null)]
                 ?.let { return@getOrPut it.clone(key, key.pickerTypes) }
         }
         NodeTab(key, roots, states)

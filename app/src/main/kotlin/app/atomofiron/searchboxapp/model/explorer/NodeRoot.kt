@@ -18,7 +18,7 @@ data class NodeRoot(
     constructor(type: NodeRootType, sorting: NodeSorting, vararg pathVariants: NodeRef)
             : this(type, Node.asRoot(pathVariants.first(), type), sorting, pathVariants = pathVariants.takeIf { it.size > 1 })
 
-    val stableId: Int = type.stableId
+    val id: NodeId = item.uniqueId + type.temp
     val isEnabled: Boolean get() = item.isCached || type is NodeRootType.Storage
     val withPreview: Boolean = type.withPreview
 

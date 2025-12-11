@@ -1,14 +1,15 @@
 package app.atomofiron.searchboxapp.model.explorer
 
-sealed interface NodeTabKey {
-    companion object {
-        val Stub: NodeTabKey = Explorer(index = 0, null)
-    }
+sealed class NodeTabKey(val primary: Boolean = false) {
 
     data class Explorer(
         val index: Int,
         val pickerTypes: List<String>?,
-    ) : NodeTabKey
+    ) : NodeTabKey(primary = pickerTypes == null) {
+        companion object {
+            val Stub = Explorer(index = 0, null)
+        }
+    }
 
-    data class Result(val id: Int) : NodeTabKey
+    data class Result(val id: Int) : NodeTabKey()
 }

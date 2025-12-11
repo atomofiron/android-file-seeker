@@ -18,7 +18,6 @@ object PreferenceKeys {
     const val PREF_CATEGORY_DEBUG = "pref_category_debug"
     const val PREF_COLOR_SCHEME = "pref_color_scheme"
 
-    val KeyTrees = PreferenceKey("pref_trees", emptySet())
     val KeyDrawerGravity = PreferenceKey("pref_drawer_gravity", Gravity.START)
     val KeyAppUpdateCode = PreferenceKey("pref_app_update_code", 0)
     val KeyShownNotificationUpdateCode = PreferenceKey("pref_shown_notification_update_code", 0)
@@ -41,7 +40,7 @@ object PreferenceKeys {
     val KeyScreenshotOperations = PreferenceKey("pref_screenshot_operations", false)
 
     private val keys by lazy(LazyThreadSafetyMode.NONE) {
-        arrayOf(KeyTrees, KeyDrawerGravity, KeyAppUpdateCode, KeyShownNotificationUpdateCode, KeyTestField, KeyShowSearchOptions, KeySearchOptions, KeyLocalSearchOptions, KeySpecialCharacters, KeyAppOrientation, KeyLocale, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeySuCmd, KeyExplorerItem, KeyJoystick, KeyHapticFeedback, KeyScreenshotOperations)
+        arrayOf(KeyDrawerGravity, KeyAppUpdateCode, KeyShownNotificationUpdateCode, KeyTestField, KeyShowSearchOptions, KeySearchOptions, KeyLocalSearchOptions, KeySpecialCharacters, KeyAppOrientation, KeyLocale, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeySuCmd, KeyExplorerItem, KeyJoystick, KeyHapticFeedback, KeyScreenshotOperations)
     }
 
     @Suppress("UNCHECKED_CAST") // omg it's an error in Kotlin 2.2

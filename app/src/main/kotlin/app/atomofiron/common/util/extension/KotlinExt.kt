@@ -117,7 +117,7 @@ inline fun <T> List<T>.indexOfFirst(fromIndex: Int = 0, orElse: Int = -1, predic
     return orElse
 }
 
-inline fun <T> MutableList<T>.set(new: T?, predicate: (T) -> Boolean): MutableList<T> {
+inline fun <T> MutableList<T>.put(new: T?, predicate: (T) -> Boolean): MutableList<T> {
     val iterator = listIterator()
     while (iterator.hasNext()) {
         val next = iterator.next()

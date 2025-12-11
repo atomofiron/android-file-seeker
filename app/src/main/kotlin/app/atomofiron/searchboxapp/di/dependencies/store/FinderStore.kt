@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.di.dependencies.store
 
-import app.atomofiron.common.util.extension.set
+import app.atomofiron.common.util.extension.put
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.GenericSearchTask
@@ -42,7 +42,7 @@ class FinderStore(
 
     suspend fun addOrUpdate(item: GenericSearchTask) {
         updateTasks {
-            set(item) { it.uuid == item.uuid }
+            put(item) { it.uuid == item.uuid }
         }
     }
 

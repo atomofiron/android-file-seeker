@@ -22,6 +22,7 @@ class HistoryAdapter(
         private const val UNDEFINED = -1
         private const val FIRST = 0
     }
+    // todo move out from here
     private val db = Room.databaseBuilder(context, HistoryDatabase::class.java, DB_NAME)
         .addMigrations(Migrations.MIGRATION_1_2)
         .allowMainThreadQueries()

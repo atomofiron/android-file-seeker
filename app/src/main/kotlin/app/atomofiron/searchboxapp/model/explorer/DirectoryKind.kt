@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.model.explorer
+package app.atomofiron.searchboxapp.model.explorer.other
 
 enum class DirectoryKind {
     Ordinary,

@@ -55,7 +55,7 @@ class ExplorerPresenter(
     fun onAllowStorageClick() = storagePermissionDelegate.launchSettings()
 
     fun onTabSelected(index: Int) {
-        viewState.currentTab.value = viewState.tabs[index]
+        // next time viewState.currentTab.value = viewState.tabs[index]
         interactor.updateCurrentTab(currentTab)
     }
 

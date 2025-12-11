@@ -8,7 +8,7 @@ import app.atomofiron.common.util.extension.takeIfDebug
 import app.atomofiron.common.util.forHumans
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.searchboxapp.android.NativeBridge
-import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
+import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.Node.Companion.stateStub
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
@@ -539,7 +539,12 @@ object ExplorerUtils {
 
     fun NodeRef.isContent() = string.startsWith(Const.SCHEME_CONTENT)
 
-    fun NodeRef.toNode(rootId: Int = uniqueId) = Node(this, rootId = rootId, content = NodeContent.Unknown)
+    fun NodeRef.toNode(
+        rootId: Int = uniqueId,
+        parentRef: NodeRef = parent,
+        content: NodeContent = NodeContent.Unknown,
+        children: NodeChildren? = null,
+    ) = Node(this, parentRef = parentRef, rootId = rootId, content = content, children = children)
 
     // means this node the fake, may be is a visual separating item, isn't a dir
     fun Node.isSeparator(): Boolean = ref.uniqueId == -uniqueId

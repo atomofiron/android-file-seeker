@@ -20,8 +20,8 @@ class ExplorerStore {
     private val currentLists = mutableMapOf<NodeTabKey, List<Node>?>()
 
     private val _storage = MutableStateFlow<List<NodeStorage>>(emptyList())
-    private val _currentTab = MutableStateFlow(NodeTabKey.Stub)
-    private val _currentNode = MutableStateFlow<Node?>(null)
+    private val _currentTab = MutableStateFlow(NodeTabKey.Explorer.Stub)
+    private val _currentDeepest = MutableStateFlow<Node?>(null)
     private val _internalRoot = MutableStateFlow(Node.asRoot(NodeRef(internalStoragePath), NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
     private val _screenshots = MutableStateFlow<NodeRef?>(null)
     private val _checked = MutableStateFlow<List<Node>>(listOf())
@@ -31,8 +31,8 @@ class ExplorerStore {
     var currentItems = listOf<Node>()
         private set
 
-    val currentTabKey: StateFlow<NodeTabKey> = _currentTab
-    val currentNode: StateFlow<Node?> = _currentNode
+    val currentTabKey: StateFlow<NodeTabKey.Explorer> = _currentTab
+    val currentDeepest: StateFlow<Node?> = _currentDeepest
     val storage: StateFlow<List<NodeStorage>> = _storage
     val internalStorage: StateFlow<Node> = _internalRoot
     val screenshots: StateFlow<NodeRef?> = _screenshots
@@ -56,7 +56,7 @@ class ExplorerStore {
         updateDeepest(tab)
     }
 
-    fun setCurrentTab(tab: NodeTabKey) {
+    fun setCurrentTab(tab: NodeTabKey.Explorer) {
         _currentTab.value = tab
         updateChecked(tab)
         updateCurrentItems(tab)
@@ -94,7 +94,7 @@ class ExplorerStore {
         tab ?: return
         deepestNodes.takeIf { tab == _currentTab.value }
             ?.let { it[tab] }
-            .let { _currentNode.value = it }
+            .let { _currentDeepest.value = it }
     }
 
     private fun updateCurrentItems(tab: NodeTabKey) {

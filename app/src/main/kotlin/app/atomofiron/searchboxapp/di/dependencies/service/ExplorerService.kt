@@ -10,8 +10,9 @@ import app.atomofiron.common.util.extension.debugDelay
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.indexOfFirst
 import app.atomofiron.common.util.extension.launchOnIO
+import app.atomofiron.common.util.extension.mutableCopy
+import app.atomofiron.common.util.extension.put
 import app.atomofiron.common.util.extension.replace
-import app.atomofiron.common.util.extension.set
 import app.atomofiron.common.util.extension.takeIf
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.common.util.flow.TriggerFlow
@@ -20,10 +21,12 @@ import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.verifyNativeBin
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
+import app.atomofiron.searchboxapp.di.dependencies.db.dao.Deepest
+import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
-import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeGarden
@@ -40,6 +43,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.isMedia
 import app.atomofiron.searchboxapp.model.explorer.isMovie
 import app.atomofiron.searchboxapp.model.explorer.isPicture
+import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.utils.Const
@@ -53,6 +57,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortBy
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortByName
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateWith
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -83,6 +88,7 @@ class ExplorerService(
     private val context: Context,
     private val appScope: AppScope,
     private val store: ExplorerStore,
+    private val db: ExplorerDao,
     private val preferences: PreferenceStore,
 ) {
     private var delayedRender: Job? = null
@@ -108,8 +114,14 @@ class ExplorerService(
             NativeBridge.setSuCmd(suCmd, binDir = context.filesDir.absolutePath)
             suDefined.complete()
         }.collect(appScope)
-        store.currentNode.drop(1).collect(appScope) {
-            preferences.setTree(it?.ref?.string)
+        store.currentDeepest.drop(1).collect(appScope) { deepest ->
+            deepest ?: return@collect
+            val tab = store.currentTabKey.value
+            val root = garden[tab].getSelectedRoot()
+                ?.takeIf { it.type != NodeRootType.Photos && it.type != NodeRootType.Videos }
+                ?: return@collect
+            val new = Deepest(tabIndex = tab.index, rootId = root.id, deepest.ref)
+            db.put(new)
         }
     }
 
@@ -136,6 +148,40 @@ class ExplorerService(
         return garden.getFlow(key) // concurrency? unlikely
     }
 
+    private fun NodeTab.restoreTree() {
+        val key = key as? NodeTabKey.Explorer
+        when {
+            key == null -> return
+            !key.primary -> return
+            tree.isNotEmpty() -> return
+        }
+        val root = getSelectedRoot()
+        root ?: return
+        val deepest = db.get(key.index, root.id)
+        deepest ?: return
+        val tree = mutableListOf<Node>()
+        var ref = deepest.ref
+        while (true) {
+            if (ref.isEmpty) {
+                return debugFail { "deepest=$deepest, tree=$tree" }
+            }
+            val children = NodeChildren(tree.mutableCopy())
+            children.items.reverse()
+            val item = ref.toNode(
+                parentRef = ref.parent,
+                content = NodeContent.Directory(),
+                children = children,
+            )
+            tree.add(item)
+            when (ref.uniqueId) {
+                deepest.rootId -> break
+                else -> ref = ref.parent
+            }
+        }
+        tree.reverse()
+        putTree(deepest.rootId, tree)
+    }
+
     fun drop(vararg keys: NodeTabKey) = garden.drop(*keys)
 
     private fun NodeGarden.initRoots() {
@@ -152,11 +198,14 @@ class ExplorerService(
 
     suspend fun tryToggleRoot(key: NodeTabKey, root: NodeRoot) {
         renderTab(key) {
-            val root = roots.find { it.stableId == root.stableId }
+            val root = roots.find { it.id == root.id }
             when {
                 root == null -> return
                 selected(root) -> deselectRoot()
                 else -> select(root)
+            }
+            if (tree.isEmpty()) {
+                restoreTree()
             }
         }
         tryCache(key, root.item)
@@ -199,13 +248,13 @@ class ExplorerService(
             val key = store.currentTabKey.value
             val tab = get(key)
             when {
-                roots.none { it.stableId == tab.selectedRootId } -> tab.deselectRoot()
+                roots.none { it.id == tab.selectedRootId } -> tab.deselectRoot()
                 withSu -> Unit
-                tab.selectedRootId == NodeRootType.SystemRoot.stableId -> tab.deselectRoot()
+                tab.getSelectedRoot()?.type is NodeRootType.SystemRoot -> tab.deselectRoot()
             }
             tab.render()
             roots.forEach { root ->
-                if (withSu || root.stableId != NodeRootType.SystemRoot.stableId) {
+                if (withSu || root.type !is NodeRootType.SystemRoot) {
                     updateRootAsync(key, root)
                 }
             }
@@ -220,7 +269,7 @@ class ExplorerService(
         }
         appScope.launch {
             garden(key) {
-                withCachingState(root.stableId) {
+                withCachingState(root.id) {
                     var updated = root.item.update(asSu)
                     updated = when (updated.error) {
                         is NodeError.NoSuchFile -> tryAlternative(root, updated)
@@ -252,7 +301,7 @@ class ExplorerService(
         var type = root?.type ?: NodeRootType.Storage(storage)
         type = (type as NodeRootType.Storage).copy(storage)
         root = root ?: NodeRoot(type, NodeSorting.Name, NodeRef(storage.path))
-        roots.set(root) { it.stableId == root.stableId }
+        roots.put(root) { it.id == root.id }
     }
 
     private fun NodeGarden.removeMissed(storage: List<NodeStorage>) {
@@ -295,13 +344,13 @@ class ExplorerService(
         filterMediaRootChildren(updated, targetRoot.type)
         val updatedRoot = updateRootThumbnail(updated, targetRoot)
         garden {
-            states.updateState(updatedRoot.stableId) {
-                nextState(updatedRoot.stableId, cachingJob = null)
+            states.updateState(updatedRoot.id) {
+                nextState(updatedRoot.id, cachingJob = null)
             }
             val tab = get(key)
             roots.replace { root ->
-                when (root.stableId) {
-                    targetRoot.stableId -> {
+                when (root.id) {
+                    targetRoot.id -> {
                         val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sorting)
                         val type = root.type.takeIf<NodeRootType.Storage,_>()?.run {
                             val stat = StatFs(root.item.ref.string)
@@ -323,10 +372,9 @@ class ExplorerService(
                     tab.tree[0] = updated.item
                 }
             }
-            tab.render()
-            /*tabs.values.forEach { otherTab ->
-                if (otherTab.key != key) otherTab.render()
-            }*/
+            tabs.values.asSequence()
+                .filter { it.key is NodeTabKey.Explorer && it.key.primary == key.primary }
+                .forEach { it.render() }
         }
     }
 
@@ -630,8 +678,8 @@ class ExplorerService(
         }
         val roots = renderRoots()
         roots.find { it.isSelected }
-            ?.takeIf { !trees.containsKey(it.stableId) }
-            ?.let { trees[it.stableId] = mutableListOf(it.item) }
+            ?.takeIf { !trees.containsKey(it.id) }
+            ?.let { putTree(it.id, listOf(it.item)) }
 
         val deepest = findDeepest()
         val items = renderNodes()
@@ -652,7 +700,7 @@ class ExplorerService(
     private fun NodeTab.renderRoots(): List<NodeRoot> {
         return roots.mutate {
             replaceEach {
-                when (it.type.stableId) {
+                when (it.id) {
                     selectedRootId -> it.copy(isSelected = true)
                     else -> it
                 }
@@ -675,7 +723,7 @@ class ExplorerService(
             while (iterator.hasNext()) {
                 val state = iterator.next()
                 if (state.empty) continue
-                var item = roots.find { it.stableId == state.uniqueId }?.item
+                var item = roots.find { it.id == state.uniqueId }?.item
                 item = item ?: items.find { it.uniqueId == state.uniqueId }
                 if (item == null) {
                     state.cachingJob?.cancel()
@@ -713,6 +761,7 @@ class ExplorerService(
         val filteredCounts = when {
             mimeTypes.isEmpty() -> null
             mimeTypes == NodeContent.Directory.mimeTypes -> null
+            // filteredCounts isn't always null! >:(
             else -> IntArray(tree.size)
         }
         var parent = items.first()
@@ -846,8 +895,11 @@ class ExplorerService(
                 !replaced -> return
                 updated.isDirectory -> resolveDirChildren(updated)
             }
-            if (!updated.areContentsTheSame(item)) {
-                renderUpdate(updated)
+            when (true) {
+                updated.areContentsTheSame(item) -> Unit
+                (updated.childCount == item.childCount),
+                tree.none { it.ref == item.ref } -> renderUpdate(updated)
+                else -> render()
             }
         }
     }

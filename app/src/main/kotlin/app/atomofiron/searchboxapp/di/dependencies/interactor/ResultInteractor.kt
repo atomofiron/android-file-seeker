@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.di.dependencies.interactor
 
 import app.atomofiron.common.util.extension.debugRequireNotNull
-import app.atomofiron.common.util.extension.set
+import app.atomofiron.common.util.extension.put
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
@@ -46,7 +46,7 @@ class ResultInteractor(
                 debugRequireNotNull(result) { "result is not Files" }
                 result?.matches
                     ?.toMutableList()
-                    ?.set(match) { it.item.ref == match.item.ref }
+                    ?.put(match) { it.item.ref == match.item.ref }
                     ?.let { copy(result = result.copy(matches = it, generation = result.generation.inc())) }
                     ?: this
             }

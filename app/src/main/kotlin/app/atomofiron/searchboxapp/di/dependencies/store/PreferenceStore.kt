@@ -39,7 +39,6 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShownNoti
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySpecialCharacters
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySuCmd
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTestField
-import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTrees
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyUseSu
 import app.atomofiron.searchboxapp.utils.preferences.get
 import app.atomofiron.searchboxapp.utils.preferences.set
@@ -78,7 +77,6 @@ class PreferenceStore(
 
     val asSu = getFlow(KeyUseSu)
     val suCmd = getFlow(KeySuCmd)
-    val trees = getFlow(KeyTrees)
     val specialCharacters = getFlow(KeySpecialCharacters) { it.split(" ").toTypedArray() }
     val appOrientation = getFlow(KeyAppOrientation) { AppOrientation.entries[it.toInt()] }
     val explorerItemComposition = getFlow(KeyExplorerItem) { ExplorerItemComposition(it) }
@@ -109,10 +107,6 @@ class PreferenceStore(
 
     suspend fun setUseSu(value: Boolean) {
         edit { it[KeyUseSu] = value }
-    }
-
-    suspend fun setTree(value: String?) {
-        edit { it[KeyTrees] = value?.let { setOf(value) } }
     }
 
     suspend fun setDrawerGravity(value: Int) {
@@ -194,5 +188,7 @@ class PreferenceStore(
         .shareIn(scope, SharingStarted.Eagerly, replay = 1)
         .asProperty(initial)
 
-    fun <T> getOrDefault(key: Preferences.Key<T>): T = preferences[key] ?: PreferenceKeys.default(key.name)
+    operator fun <T> get(key: Preferences.Key<T>): T = preferences[key] ?: PreferenceKeys.default(key.name)
+
+    operator fun <T : Any> get(key: PreferenceKey<T>): T = preferences[key] ?: key.default
 }

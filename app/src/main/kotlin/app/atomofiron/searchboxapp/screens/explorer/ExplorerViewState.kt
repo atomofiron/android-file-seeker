@@ -46,10 +46,10 @@ class ExplorerViewState(
         otherAlerts,
     )
     val tabs = listOf(firstTab, middleTab, lastTab)
-    val currentTab = MutableStateFlow(firstTab)
-    val currentNode get() = store.currentNode.value
+    val currentTab = MutableStateFlow(middleTab)
+    val currentNode get() = store.currentDeepest.value
 
-    val currentTabFlow = interactor.getFlow(firstTab)
+    val currentTabFlow = interactor.getFlow(middleTab)
     val updates: Flow<Node> = store.updated
     val permissionRequiredWarning = ChannelFlow<Unit>()
     val dock: Flow<List<DockItem>> = dockDelegate.dock

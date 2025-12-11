@@ -7,6 +7,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
+import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
 import app.atomofiron.searchboxapp.di.dependencies.service.ApkService
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
@@ -30,8 +31,9 @@ open class ServiceModule {
         context: Context,
         appScope: AppScope,
         explorerStore: ExplorerStore,
-        preferenceStore: PreferenceStore,
-    ): ExplorerService = ExplorerService(context, appScope, explorerStore, preferenceStore)
+        preferences: PreferenceStore,
+        db: ExplorerDao,
+    ): ExplorerService = ExplorerService(context, appScope, explorerStore, db, preferences)
 
     @Provides
     @Singleton

@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.util
 
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.model.explorer.DirectoryKind
+import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 

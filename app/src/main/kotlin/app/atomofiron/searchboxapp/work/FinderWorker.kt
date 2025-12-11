@@ -17,7 +17,7 @@ import androidx.work.WorkerParameters
 import app.atomofiron.common.util.GrowingList
 import app.atomofiron.common.util.extension.get
 import app.atomofiron.common.util.extension.logE
-import app.atomofiron.common.util.extension.set
+import app.atomofiron.common.util.extension.put
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.Notifications
@@ -141,7 +141,7 @@ class FinderWorker(
                     is NameSearchProgress.Match -> {
                         val itemMatch = ItemMatch.Single(match.v1.toNode())
                         val matches = result.matches.toMutableList()
-                        matches.set(itemMatch) { it.path == itemMatch.path }
+                        matches.put(itemMatch) { it.path == itemMatch.path }
                         copy(result = result.copy(count = count.inc(), matches = matches, countTotal = result.countTotal.inc()))
                     }
                     is NameSearchProgress.Err -> {

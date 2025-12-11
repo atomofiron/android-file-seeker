@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.android.InstallReceiver
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.module.ChannelModule
 import app.atomofiron.searchboxapp.di.module.CommonModule
+import app.atomofiron.searchboxapp.di.module.DbModule
 import app.atomofiron.searchboxapp.di.module.InteractorModule
 import app.atomofiron.searchboxapp.di.module.ServiceModule
 import app.atomofiron.searchboxapp.di.module.StoreModule
@@ -35,6 +36,7 @@ import javax.inject.Singleton
     ServiceModule::class,
     StoreModule::class,
     InteractorModule::class,
+    DbModule::class,
     //NetworkModule::class, I'll be back...
 ])
 @Singleton
