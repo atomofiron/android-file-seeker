@@ -201,3 +201,10 @@ private fun ByteArray.getExt(): String {
     }
     return ""
 }
+
+fun NodeRef.replace(parent: NodeRef, replace: Int): NodeRef {
+    val new = ByteArray(length + parent.length - replace)
+    System.arraycopy(parent.bytes, 0, new, 0, parent.length)
+    System.arraycopy(bytes, replace, new, parent.length, length - replace)
+    return NodeRef(new)
+}

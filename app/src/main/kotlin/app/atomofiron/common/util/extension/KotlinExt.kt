@@ -6,6 +6,8 @@ import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.nio.ByteBuffer
+import java.util.UUID
 import kotlin.collections.ArrayList
 import kotlin.math.ceil
 
@@ -132,6 +134,13 @@ inline fun <T> MutableList<T>.put(new: T?, predicate: (T) -> Boolean): MutableLi
     return this
 }
 
+fun <T> MutableList<T>.setAt(index: Int, new: T?) = when {
+    index > size -> Unit
+    new != null -> set(index, new)
+    index == size -> Unit
+    else -> removeAt(index)
+}
+
 inline fun <T> MutableList<T>.replace(action: (T) -> T?) {
     val iterator = listIterator()
     while (iterator.hasNext()) {
@@ -146,3 +155,16 @@ inline fun <T> MutableList<T>.replace(action: (T) -> T?) {
 }
 
 val IntRange.size: Int get() = if (isEmpty()) 0 else last - first + 1
+
+fun UUID.toBytes(): ByteArray {
+    val buffer = ByteBuffer.allocate(16)
+    buffer.putLong(mostSignificantBits)
+    buffer.putLong(leastSignificantBits)
+    return buffer.array()
+}
+
+fun ByteArray.toUUID(): UUID {
+    require(size == 16) { "ByteArray[$size].toUUID()" }
+    val buffer = ByteBuffer.wrap(this)
+    return UUID(buffer.long, buffer.long)
+}

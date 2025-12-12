@@ -5,7 +5,7 @@ import app.atomofiron.common.util.flow.DataFlow
 import app.atomofiron.searchboxapp.utils.EmptyMutableList
 
 private const val UNSELECTED_ROOT_ID = 0
-private val EmptyMutableList = EmptyMutableList<Node>()
+private val EmptyMutableList = EmptyMutableList<NodeRef>()
 
 data class NodeTab(
     val key: NodeTabKey,
@@ -13,13 +13,13 @@ data class NodeTab(
     val states: MutableList<NodeStateImpl>,
     val mimeTypes: List<String> = emptyList(),
 ) {
-    private val _trees = mutableMapOf<NodeId, MutableList<Node>>() // todo replace Node with NodeRef and use NodeRoot.item only?
-    val trees: Map<NodeId, MutableList<Node>> = _trees
+    private val _trees = mutableMapOf<NodeId, MutableList<NodeRef>>() // one NodeRef isn't flexible too much
+    val trees: Map<NodeId, MutableList<NodeRef>> = _trees
     var selectedRootId = UNSELECTED_ROOT_ID
         private set
     var generation = 0
         private set
-    val tree: MutableList<Node> get() = _trees[selectedRootId] ?: EmptyMutableList
+    val tree: MutableList<NodeRef> get() = _trees[selectedRootId] ?: EmptyMutableList
     val checked = mutableListOf<Int>()
     val flow = DataFlow(NodeTabItems(emptyList(), emptyList(), null))
 
@@ -57,7 +57,7 @@ data class NodeTab(
         return copy
     }
 
-    fun putTree(id: NodeId, tree: List<Node>) {
+    fun putTree(id: NodeId, tree: List<NodeRef>) {
         _trees[id] = tree.toMutableList()
     }
 }
