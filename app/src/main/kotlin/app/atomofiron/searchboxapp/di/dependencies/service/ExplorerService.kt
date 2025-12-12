@@ -760,7 +760,7 @@ class ExplorerService(
             val nextLevelId = tree.getOrNull(i.inc())?.uniqueId
             for (j in 0..<level.childCount) {
                 var item = level.children!![j]
-                if (dismatch(item)) {
+                if (mismatch(item)) {
                     filteredCounts?.inc(i)
                     continue
                 }
@@ -787,7 +787,7 @@ class ExplorerService(
             val opened = openedIndexes[i]
             for (j in opened.inc() until level.childCount) {
                 var item = level.children!![j]
-                if (dismatch(item)) {
+                if (mismatch(item)) {
                     filteredCounts?.inc(i)
                     continue
                 }
@@ -811,7 +811,7 @@ class ExplorerService(
 
     private fun IntArray.inc(i: Int) = set(i, get(i).inc())
 
-    private fun NodeTab.dismatch(item: Node): Boolean = mimeTypes.isNotEmpty() && item.isFile && !item.content.matchesAny(mimeTypes)
+    private fun NodeTab.mismatch(item: Node): Boolean = mimeTypes.isNotEmpty() && item.isFile && !item.content.matchesAny(mimeTypes)
 
     private suspend fun NodeTab.renderUpdate(new: Node) {
         store.emitUpdate(renderNode(new))
@@ -963,29 +963,6 @@ class ExplorerService(
         }
     }
 
-    private fun MutableList<Node>.replaceItem(item: Node) = replaceItem(item.uniqueId, item.parentRef, item)
-
-    private fun MutableList<Node>.replaceItem(uniqueId: Int, parentRef: NodeRef, item: Node?): Boolean {
-        val parent = find(parentRef)
-        val parentChildren = parent?.children?.items
-        val index = parentChildren?.indexOfFirst { it.uniqueId == uniqueId } ?: -1
-        var fails = 0
-        when {
-            parentChildren == null -> fails++
-            index < 0 -> fails++
-            item == null -> parentChildren.removeAt(index)
-            else -> parentChildren[index] = item
-        }
-        val (currentIndex, current) = findIndexed(uniqueId)
-        when {
-            current == null -> fails++
-            currentIndex < 0 -> fails++ // unreachable, always (-1, null)
-            item == null -> removeAt(currentIndex)
-            else -> set(currentIndex, item)
-        }
-        return fails < 2
-    }
-
     private fun NodeTab.findItem(uniqueId: Int): Node? = findItem(uniqueId) { _, _, it -> it }
 
     private fun NodeTab.removeNode(uniqueId: Int) = replaceItem(uniqueId, null)
@@ -1023,12 +1000,6 @@ class ExplorerService(
         }
         return null
     }
-
-    private fun List<Node>.findIndexed(uniqueId: Int): Pair<Int, Node?> = findWithIndex { it.uniqueId == uniqueId }
-
-    private fun List<Node>.find(ref: NodeRef): Node? = find { it.ref == ref }
-
-    private fun List<Node>.findIndexed(ref: NodeRef): Pair<Int, Node?> = findWithIndex { it.ref == ref }
 
     private fun List<NodeStateImpl>.findState(uniqueId: Int): Pair<Int, NodeStateImpl?> = findWithIndex { it.uniqueId == uniqueId }
 }
