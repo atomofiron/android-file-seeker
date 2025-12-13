@@ -308,71 +308,71 @@ object ExplorerUtils {
         val content = when (true) {
             (access.firstOrNull() == DIR_CHAR),
             (mimeType == DIRECTORY),
-            (content is NodeContent.Directory) -> content.ifNotCached { NodeContent.Directory() }
+            (content is NodeContent.Directory) -> content.ifMismatches { NodeContent.Directory() }
             (length == 0L) -> NodeContent.Empty
             mimeType.isBlank(),
             (mimeType == FILE_UNKNOWN) -> content.resolveFileType(ref)
-            mimeType.startsWith(FILE_PICTURE) -> content.ifNotCached { NodeContent.Picture.resolve(mimeType) }
+            mimeType.startsWith(FILE_PICTURE) -> content.ifMismatches { NodeContent.Picture.resolve(mimeType) }
             mimeType.startsWith(FILE_TEXT) -> when {
-                name.hasExt(EXT_SVG) -> content.ifNotCached { NodeContent.Text.Svg }
-                name == EXT_GIT -> content.ifNotCached { NodeContent.Text.Gitignore }
-                name.hasExt(EXT_OSU) -> content.ifNotCached { NodeContent.Text.Osu }
-                name.hasExt(EXT_CPP) -> content.ifNotCached { NodeContent.Text.Cpp }
-                name.hasExt(EXT_INO) -> content.ifNotCached { NodeContent.Text.Ino }
-                name.hasExt(EXT_BAT) -> content.ifNotCached { NodeContent.Text.BatScript }
-                mimeType == FILE_SSA -> content.ifNotCached { NodeContent.Text.Subtitles }
+                name.hasExt(EXT_SVG) -> content.ifMismatches { NodeContent.Text.Svg }
+                name == EXT_GIT -> content.ifMismatches { NodeContent.Text.Gitignore }
+                name.hasExt(EXT_OSU) -> content.ifMismatches { NodeContent.Text.Osu }
+                name.hasExt(EXT_CPP) -> content.ifMismatches { NodeContent.Text.Cpp }
+                name.hasExt(EXT_INO) -> content.ifMismatches { NodeContent.Text.Ino }
+                name.hasExt(EXT_BAT) -> content.ifMismatches { NodeContent.Text.BatScript }
+                mimeType == FILE_SSA -> content.ifMismatches { NodeContent.Text.Subtitles }
                 else -> NodeContent.Text.Plain
             }
-            (mimeType == FILE_XRIFF) -> content.ifNotCached { NodeContent.Picture(mimeType) }
-            (mimeType == FILE_APK) -> content.ifNotCached { AndroidApp.apk(ref) }
-            (mimeType == FILE_RAR) -> content.ifNotCached { NodeContent.Rar() }
+            (mimeType == FILE_XRIFF) -> content.ifMismatches { NodeContent.Picture(mimeType) }
+            (mimeType == FILE_APK) -> content.ifMismatches { AndroidApp.apk(ref) }
+            (mimeType == FILE_RAR) -> content.ifMismatches { NodeContent.Rar() }
             (mimeType == FILE_ZIP) -> when (true) {
                 name.hasExt(EXT_APKS),
-                name.hasExt(EXT_APKM) -> content.ifNotCached { AndroidApp.apks(ref) }
+                name.hasExt(EXT_APKM) -> content.ifMismatches { AndroidApp.apks(ref) }
                 (content is AndroidApp) -> return this
-                name.hasExt(EXT_OSZ) -> content.ifNotCached { NodeContent.Osu.Map() }
-                name.hasExt(EXT_OSK) -> content.ifNotCached { NodeContent.Osu.Skin() }
-                name.hasExt(EXT_OLZ) -> content.ifNotCached { NodeContent.Osu.LazerMap() }
-                name.hasExt(EXT_OSR) -> content.ifNotCached { NodeContent.Osu.Replay() }
-                name.hasExt(EXT_OSB) -> content.ifNotCached { NodeContent.Osu.Storyboard() }
-                else -> content.ifNotCached { NodeContent.Zip() }
+                name.hasExt(EXT_OSZ) -> content.ifMismatches { NodeContent.Osu.Map() }
+                name.hasExt(EXT_OSK) -> content.ifMismatches { NodeContent.Osu.Skin() }
+                name.hasExt(EXT_OLZ) -> content.ifMismatches { NodeContent.Osu.LazerMap() }
+                name.hasExt(EXT_OSR) -> content.ifMismatches { NodeContent.Osu.Replay() }
+                name.hasExt(EXT_OSB) -> content.ifMismatches { NodeContent.Osu.Storyboard() }
+                else -> content.ifMismatches { NodeContent.Zip() }
             }
             (mimeType == FILE_BZIP2) -> when {
-                name.hasExt(EXT_DMG) -> content.ifNotCached { NodeContent.Dmg }
-                else -> content.ifNotCached { NodeContent.Bzip2() }
+                name.hasExt(EXT_DMG) -> content.ifMismatches { NodeContent.Dmg }
+                else -> content.ifMismatches { NodeContent.Bzip2() }
             }
-            (mimeType == FILE_GZIP) -> content.ifNotCached { NodeContent.Gz() }
-            (mimeType == FILE_TAR) -> content.ifNotCached { NodeContent.Tar() }
-            (mimeType == FILE_XZ) -> content.ifNotCached { NodeContent.Xz }
-            mimeType.startsWith(FILE_FLASH) -> content.ifNotCached { NodeContent.Flash }
-            mimeType.startsWith(FILE_EXE) -> content.ifNotCached { NodeContent.ExeMs }
+            (mimeType == FILE_GZIP) -> content.ifMismatches { NodeContent.Gz() }
+            (mimeType == FILE_TAR) -> content.ifMismatches { NodeContent.Tar() }
+            (mimeType == FILE_XZ) -> content.ifMismatches { NodeContent.Xz }
+            mimeType.startsWith(FILE_FLASH) -> content.ifMismatches { NodeContent.Flash }
+            mimeType.startsWith(FILE_EXE) -> content.ifMismatches { NodeContent.ExeMs }
             mimeType.startsWith(FILE_MESSAGE) -> NodeContent.Text.Plain
-            (mimeType == FILE_XML) -> content.ifNotCached { NodeContent.Text.Xml }
-            mimeType.startsWith(FILE_AUDIO) -> content.ifNotCached { NodeContent.Music.resolve(mimeType) }
+            (mimeType == FILE_XML) -> content.ifMismatches { NodeContent.Text.Xml }
+            mimeType.startsWith(FILE_AUDIO) -> content.ifMismatches { NodeContent.Music.resolve(mimeType) }
             mimeType.startsWith(FILE_VIDEO),
             (mimeType == FILE_MATROSKA) -> when {
-                name.hasExt(EXT_MKA) -> content.ifNotCached { NodeContent.Music.resolve(mimeType) }
-                else -> content.ifNotCached { NodeContent.Movie.resolve(mimeType) }
+                name.hasExt(EXT_MKA) -> content.ifMismatches { NodeContent.Music.resolve(mimeType) }
+                else -> content.ifMismatches { NodeContent.Movie.resolve(mimeType) }
             }
-            (mimeType == FILE_PDF) -> content.ifNotCached { NodeContent.Pdf }
+            (mimeType == FILE_PDF) -> content.ifMismatches { NodeContent.Pdf }
             (mimeType == FILE_ELF_EXE) -> when {
-                name.hasExt(EXT_ODEX) -> content.ifNotCached { NodeContent.Java }
-                else -> content.ifNotCached { NodeContent.Elf }
+                name.hasExt(EXT_ODEX) -> content.ifMismatches { NodeContent.Java }
+                else -> content.ifMismatches { NodeContent.Elf }
             }
             (mimeType == FILE_ELF_RE) -> when {
-                name.hasExt(EXT_FAP) -> content.ifNotCached { NodeContent.Fap }
-                else -> content.ifNotCached { NodeContent.Elf }
+                name.hasExt(EXT_FAP) -> content.ifMismatches { NodeContent.Fap }
+                else -> content.ifMismatches { NodeContent.Elf }
             }
             (mimeType == FILE_PEM),
             (mimeType == FILE_CERT),
-            (mimeType == FILE_CA_CERT) -> content.ifNotCached { NodeContent.Cert }
-            (mimeType == FILE_TORRENT) -> content.ifNotCached { NodeContent.Torrent }
-            (mimeType == FILE_ODT) -> content.ifNotCached { NodeContent.Document }
-            (mimeType == FILE_TTF) -> content.ifNotCached { NodeContent.Font }
-            (mimeType == FILE_ELF_SO) -> content.ifNotCached { NodeContent.ElfSo }
-            (mimeType == FILE_MS_EXE) -> content.ifNotCached { NodeContent.ExeMs }
-            (mimeType == FILE_APL_EXE) -> content.ifNotCached { NodeContent.ExeApl }
-            (mimeType == FILE_JAVA) -> content.ifNotCached { NodeContent.Java }
+            (mimeType == FILE_CA_CERT) -> content.ifMismatches { NodeContent.Cert }
+            (mimeType == FILE_TORRENT) -> content.ifMismatches { NodeContent.Torrent }
+            (mimeType == FILE_ODT) -> content.ifMismatches { NodeContent.Document }
+            (mimeType == FILE_TTF) -> content.ifMismatches { NodeContent.Font }
+            (mimeType == FILE_ELF_SO) -> content.ifMismatches { NodeContent.ElfSo }
+            (mimeType == FILE_MS_EXE) -> content.ifMismatches { NodeContent.ExeMs }
+            (mimeType == FILE_APL_EXE) -> content.ifMismatches { NodeContent.ExeApl }
+            (mimeType == FILE_JAVA) -> content.ifMismatches { NodeContent.Java }
             (mimeType == FILE_SCRIPT),
             mimeType.startsWith(FILE_TEXT_SCRIPT) -> NodeContent.Text.ShellScript
             else -> {
@@ -450,9 +450,7 @@ object ExplorerUtils {
         copy(error = NodeError.Message(e.forHumans()))
     }
 
-    private inline fun <reified T : NodeContent> NodeContent?.ifNotCached(action: () -> T): T {
-        return if (this !is T || !isCached) action() else this
-    }
+    private inline fun <reified T : NodeContent> NodeContent?.ifMismatches(action: () -> T): T = this as? T ?: action()
 
     fun Node.sortBy(how: NodeSorting): Node = when (how) {
         is NodeSorting.Size,
@@ -638,25 +636,25 @@ object ExplorerUtils {
     private fun resolveFileType(ref: NodeRef) = null.resolveFileType(ref)
 
     private fun NodeContent?.resolveFileType(ref: NodeRef): NodeContent = when (true) {
-        ref.name.hasExt(EXT_APNG) -> ifNotCached { NodeContent.Picture.Apng }
-        ref.name.hasExt(EXT_PNG) -> ifNotCached { NodeContent.Picture.Png }
+        ref.name.hasExt(EXT_APNG) -> ifMismatches { NodeContent.Picture.Apng }
+        ref.name.hasExt(EXT_PNG) -> ifMismatches { NodeContent.Picture.Png }
         ref.name.hasExt(EXT_JPG),
-        ref.name.hasExt(EXT_JPEG) -> ifNotCached { NodeContent.Picture.Jpeg }
-        ref.name.hasExt(EXT_GIF) -> ifNotCached { NodeContent.Picture.Gif }
-        ref.name.hasExt(EXT_WEBP) -> ifNotCached { NodeContent.Picture.Webp }
-        ref.name.hasExt(EXT_AVIF) -> ifNotCached { NodeContent.Picture.Avif }
-        ref.name.hasExt(EXT_APK) -> ifNotCached { AndroidApp.apk(ref) }
+        ref.name.hasExt(EXT_JPEG) -> ifMismatches { NodeContent.Picture.Jpeg }
+        ref.name.hasExt(EXT_GIF) -> ifMismatches { NodeContent.Picture.Gif }
+        ref.name.hasExt(EXT_WEBP) -> ifMismatches { NodeContent.Picture.Webp }
+        ref.name.hasExt(EXT_AVIF) -> ifMismatches { NodeContent.Picture.Avif }
+        ref.name.hasExt(EXT_APK) -> ifMismatches { AndroidApp.apk(ref) }
         ref.name.hasExt(EXT_DEX),
         ref.name.hasExt(EXT_ODEX),
-        ref.name.hasExt(EXT_VDEX) -> ifNotCached { NodeContent.Java }
+        ref.name.hasExt(EXT_VDEX) -> ifMismatches { NodeContent.Java }
         ref.name.hasExt(EXT_APKS),
-        ref.name.hasExt(EXT_APKM) -> ifNotCached { AndroidApp.apks(ref) }
+        ref.name.hasExt(EXT_APKM) -> ifMismatches { AndroidApp.apks(ref) }
         ref.name.hasExt(EXT_ZIP),
-        ref.name.hasExt(EXT_XAPK) -> ifNotCached { NodeContent.Zip() }
-        ref.name.hasExt(EXT_TAR) -> ifNotCached { NodeContent.Tar() }
-        ref.name.hasExt(EXT_BZ2) -> ifNotCached { NodeContent.Bzip2() }
-        ref.name.hasExt(EXT_GZ) -> ifNotCached { NodeContent.Gz() }
-        ref.name.hasExt(EXT_RAR) -> ifNotCached { NodeContent.Rar() }
+        ref.name.hasExt(EXT_XAPK) -> ifMismatches { NodeContent.Zip() }
+        ref.name.hasExt(EXT_TAR) -> ifMismatches { NodeContent.Tar() }
+        ref.name.hasExt(EXT_BZ2) -> ifMismatches { NodeContent.Bzip2() }
+        ref.name.hasExt(EXT_GZ) -> ifMismatches { NodeContent.Gz() }
+        ref.name.hasExt(EXT_RAR) -> ifMismatches { NodeContent.Rar() }
         ref.name.hasExt(EXT_SH) -> NodeContent.Text.ShellScript
         ref.name.hasExt(EXT_BAT) -> NodeContent.Text.BatScript
         ref.name.hasExt(EXT_TXT),
@@ -668,38 +666,38 @@ object ExplorerUtils {
         ref.name.hasExt(EXT_SWIFT),
         ref.name.hasExt(EXT_YAML),
         ref.name.hasExt(EXT_HTML) -> NodeContent.Text.Plain
-        ref.name.hasExt(EXT_SVG) -> ifNotCached { NodeContent.Text.Svg }
+        ref.name.hasExt(EXT_SVG) -> ifMismatches { NodeContent.Text.Svg }
         ref.name.hasExt(EXT_IMG) -> NodeContent.DataImage
-        ref.name.hasExt(EXT_MP4) -> ifNotCached { NodeContent.Movie.Mp4 }
-        ref.name.hasExt(EXT_MKV) -> ifNotCached { NodeContent.Movie.Mkv }
-        ref.name.hasExt(EXT_MOV) -> ifNotCached { NodeContent.Movie.Mov }
-        ref.name.hasExt(EXT_WEBM) -> ifNotCached { NodeContent.Movie.Webm }
-        ref.name.hasExt(EXT_3GP) -> ifNotCached { NodeContent.Movie.Tgp }
-        ref.name.hasExt(EXT_AVI) -> ifNotCached { NodeContent.Movie.Avi }
-        ref.name.hasExt(EXT_MP3) -> ifNotCached { NodeContent.Music.Mp3 }
-        ref.name.hasExt(EXT_M4A) -> ifNotCached { NodeContent.Music.M4a }
+        ref.name.hasExt(EXT_MP4) -> ifMismatches { NodeContent.Movie.Mp4 }
+        ref.name.hasExt(EXT_MKV) -> ifMismatches { NodeContent.Movie.Mkv }
+        ref.name.hasExt(EXT_MOV) -> ifMismatches { NodeContent.Movie.Mov }
+        ref.name.hasExt(EXT_WEBM) -> ifMismatches { NodeContent.Movie.Webm }
+        ref.name.hasExt(EXT_3GP) -> ifMismatches { NodeContent.Movie.Tgp }
+        ref.name.hasExt(EXT_AVI) -> ifMismatches { NodeContent.Movie.Avi }
+        ref.name.hasExt(EXT_MP3) -> ifMismatches { NodeContent.Music.Mp3 }
+        ref.name.hasExt(EXT_M4A) -> ifMismatches { NodeContent.Music.M4a }
         ref.name.hasExt(EXT_OGA),
-        ref.name.hasExt(EXT_OGG) -> ifNotCached { NodeContent.Music.Ogg }
-        ref.name.hasExt(EXT_WAV) -> ifNotCached { NodeContent.Music.Wav }
-        ref.name.hasExt(EXT_FLAC) -> ifNotCached { NodeContent.Music.Flac }
-        ref.name.hasExt(EXT_AAC) -> ifNotCached { NodeContent.Music.Aac }
-        ref.name.hasExt(EXT_PDF) -> ifNotCached { NodeContent.Pdf }
-        ref.name.hasExt(EXT_TORRENT) -> ifNotCached { NodeContent.Torrent }
-        ref.name.hasExt(EXT_FAP) -> ifNotCached { NodeContent.Fap }
-        ref.name.hasExt(EXT_EXE) -> ifNotCached { NodeContent.ExeMs }
-        ref.name.hasExt(EXT_SWF) -> ifNotCached { NodeContent.Flash }
+        ref.name.hasExt(EXT_OGG) -> ifMismatches { NodeContent.Music.Ogg }
+        ref.name.hasExt(EXT_WAV) -> ifMismatches { NodeContent.Music.Wav }
+        ref.name.hasExt(EXT_FLAC) -> ifMismatches { NodeContent.Music.Flac }
+        ref.name.hasExt(EXT_AAC) -> ifMismatches { NodeContent.Music.Aac }
+        ref.name.hasExt(EXT_PDF) -> ifMismatches { NodeContent.Pdf }
+        ref.name.hasExt(EXT_TORRENT) -> ifMismatches { NodeContent.Torrent }
+        ref.name.hasExt(EXT_FAP) -> ifMismatches { NodeContent.Fap }
+        ref.name.hasExt(EXT_EXE) -> ifMismatches { NodeContent.ExeMs }
+        ref.name.hasExt(EXT_SWF) -> ifMismatches { NodeContent.Flash }
         ref.name.hasExt(EXT_TTF),
-        ref.name.hasExt(EXT_OTF) -> ifNotCached { NodeContent.Font }
+        ref.name.hasExt(EXT_OTF) -> ifMismatches { NodeContent.Font }
         ref.name.hasExt(EXT_PEM),
         ref.name.hasExt(EXT_P12),
-        ref.name.hasExt(EXT_CRT) -> ifNotCached { NodeContent.Cert }
-        ref.name.hasExt(EXT_OSZ) -> ifNotCached { NodeContent.Osu.Map() }
-        ref.name.hasExt(EXT_OSK) -> ifNotCached { NodeContent.Osu.Skin() }
-        ref.name.hasExt(EXT_OLZ) -> ifNotCached { NodeContent.Osu.LazerMap() }
-        ref.name.hasExt(EXT_OSR) -> ifNotCached { NodeContent.Osu.Replay() }
-        ref.name.hasExt(EXT_OSB) -> ifNotCached { NodeContent.Osu.Storyboard() }
-        ref.name.hasExt(EXT_XPI) -> ifNotCached { NodeContent.Firefox }
-        ref.name.hasExt(EXT_ASS) -> ifNotCached { NodeContent.Text.Subtitles }
+        ref.name.hasExt(EXT_CRT) -> ifMismatches { NodeContent.Cert }
+        ref.name.hasExt(EXT_OSZ) -> ifMismatches { NodeContent.Osu.Map() }
+        ref.name.hasExt(EXT_OSK) -> ifMismatches { NodeContent.Osu.Skin() }
+        ref.name.hasExt(EXT_OLZ) -> ifMismatches { NodeContent.Osu.LazerMap() }
+        ref.name.hasExt(EXT_OSR) -> ifMismatches { NodeContent.Osu.Replay() }
+        ref.name.hasExt(EXT_OSB) -> ifMismatches { NodeContent.Osu.Storyboard() }
+        ref.name.hasExt(EXT_XPI) -> ifMismatches { NodeContent.Firefox }
+        ref.name.hasExt(EXT_ASS) -> ifMismatches { NodeContent.Text.Subtitles }
         else -> NodeContent.Other
     }
 
