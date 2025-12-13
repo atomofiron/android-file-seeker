@@ -165,13 +165,6 @@ class ExplorerService(
             if (ref.isEmpty) {
                 return debugFail { "deepest=$deepest, tree=$tree" }
             }
-            /*val children = NodeChildren(tree.mutableCopy())
-            children.items.reverse()
-            val item = ref.toNode(
-                parentRef = ref.parent,
-                content = NodeContent.Directory(),
-                children = children,
-            )*/
             tree.add(ref)
             when (ref.uniqueId) {
                 deepest.rootId -> break
@@ -179,7 +172,6 @@ class ExplorerService(
             }
         }
         tree.reverse()
-        // todo root.item.put(tree)
         putTree(deepest.rootId, tree)
     }
 
