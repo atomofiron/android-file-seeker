@@ -27,6 +27,7 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.Text.Osu -> R.drawable.ic_file_osu
     is NodeContent.Text.ShellScript -> R.drawable.ic_script
     is NodeContent.Text.Ino -> R.drawable.ic_infinity
+    is NodeContent.Text.Subtitles -> R.drawable.ic_subtitles
     is NodeContent.Text,
     is NodeContent.Document -> R.drawable.ic_text
     is NodeContent.Pdf -> R.drawable.ic_pdf

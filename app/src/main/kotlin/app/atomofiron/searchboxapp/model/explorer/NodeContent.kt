@@ -66,7 +66,8 @@ sealed class NodeContent(
         override val isCached = duration >= 0
     }
 
-    data class Music(
+    @ConsistentCopyVisibility
+    data class Music private constructor(
         override val mimeType: String,
         val duration: Int = 0, // todo
     ) : File(mimeType = mimeType, thumbnail = Thumbnail.FilePath) {
@@ -156,6 +157,7 @@ sealed class NodeContent(
         data object Plain : Text()
         data object ShellScript : Text("text/x-shellscript")
         data object BatScript : Text()
+        data object Subtitles : Text()
         data object Gitignore : Text()
         data object Osu : Text("application/x-osu-beatmap")
         data object Svg : Text("image/svg+xml")

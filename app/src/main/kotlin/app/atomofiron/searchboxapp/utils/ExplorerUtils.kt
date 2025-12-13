@@ -51,6 +51,7 @@ object ExplorerUtils {
     private const val FILE_VIDEO = "video/"
     private const val FILE_TEXT_SCRIPT = "text/x-"
     private const val FILE_TEXT = "text/"
+    private const val FILE_SSA = "text/x-ssa" // .ass
     private const val FILE_MESSAGE = "message/rfc822"
     private const val FILE_UNKNOWN = "application/octet-stream"
     private const val FILE_XML = "application/xml"
@@ -117,6 +118,8 @@ object ExplorerUtils {
     private const val EXT_IMG = ".img"
     private const val EXT_MP4 = ".mp4"
     private const val EXT_MKV = ".mkv"
+    private const val EXT_MKA = ".mka"
+    private const val EXT_ASS = ".ass"
     private const val EXT_MOV = ".mov"
     private const val EXT_WEBM = ".webm"
     private const val EXT_3GP = ".3gp"
@@ -310,6 +313,16 @@ object ExplorerUtils {
             mimeType.isBlank(),
             (mimeType == FILE_UNKNOWN) -> content.resolveFileType(ref)
             mimeType.startsWith(FILE_PICTURE) -> content.ifNotCached { NodeContent.Picture.resolve(mimeType) }
+            mimeType.startsWith(FILE_TEXT) -> when {
+                name.hasExt(EXT_SVG) -> content.ifNotCached { NodeContent.Text.Svg }
+                name == EXT_GIT -> content.ifNotCached { NodeContent.Text.Gitignore }
+                name.hasExt(EXT_OSU) -> content.ifNotCached { NodeContent.Text.Osu }
+                name.hasExt(EXT_CPP) -> content.ifNotCached { NodeContent.Text.Cpp }
+                name.hasExt(EXT_INO) -> content.ifNotCached { NodeContent.Text.Ino }
+                name.hasExt(EXT_BAT) -> content.ifNotCached { NodeContent.Text.BatScript }
+                mimeType == FILE_SSA -> content.ifNotCached { NodeContent.Text.Subtitles }
+                else -> NodeContent.Text.Plain
+            }
             (mimeType == FILE_XRIFF) -> content.ifNotCached { NodeContent.Picture(mimeType) }
             (mimeType == FILE_APK) -> content.ifNotCached { AndroidApp.apk(ref) }
             (mimeType == FILE_RAR) -> content.ifNotCached { NodeContent.Rar() }
@@ -334,19 +347,13 @@ object ExplorerUtils {
             mimeType.startsWith(FILE_FLASH) -> content.ifNotCached { NodeContent.Flash }
             mimeType.startsWith(FILE_EXE) -> content.ifNotCached { NodeContent.ExeMs }
             mimeType.startsWith(FILE_MESSAGE) -> NodeContent.Text.Plain
-            mimeType.startsWith(FILE_TEXT) -> when {
-                name.hasExt(EXT_SVG) -> content.ifNotCached { NodeContent.Text.Svg }
-                name == EXT_GIT -> content.ifNotCached { NodeContent.Text.Gitignore }
-                name.hasExt(EXT_OSU) -> content.ifNotCached { NodeContent.Text.Osu }
-                name.hasExt(EXT_CPP) -> content.ifNotCached { NodeContent.Text.Cpp }
-                name.hasExt(EXT_INO) -> content.ifNotCached { NodeContent.Text.Ino }
-                name.hasExt(EXT_BAT) -> content.ifNotCached { NodeContent.Text.BatScript }
-                else -> NodeContent.Text.Plain
-            }
             (mimeType == FILE_XML) -> content.ifNotCached { NodeContent.Text.Xml }
             mimeType.startsWith(FILE_AUDIO) -> content.ifNotCached { NodeContent.Music.resolve(mimeType) }
             mimeType.startsWith(FILE_VIDEO),
-            (mimeType == FILE_MATROSKA) -> content.ifNotCached { NodeContent.Movie.resolve(mimeType) }
+            (mimeType == FILE_MATROSKA) -> when {
+                name.hasExt(EXT_MKA) -> content.ifNotCached { NodeContent.Music.resolve(mimeType) }
+                else -> content.ifNotCached { NodeContent.Movie.resolve(mimeType) }
+            }
             (mimeType == FILE_PDF) -> content.ifNotCached { NodeContent.Pdf }
             (mimeType == FILE_ELF_EXE) -> when {
                 name.hasExt(EXT_ODEX) -> content.ifNotCached { NodeContent.Java }
@@ -692,6 +699,7 @@ object ExplorerUtils {
         ref.name.hasExt(EXT_OSR) -> ifNotCached { NodeContent.Osu.Replay() }
         ref.name.hasExt(EXT_OSB) -> ifNotCached { NodeContent.Osu.Storyboard() }
         ref.name.hasExt(EXT_XPI) -> ifNotCached { NodeContent.Firefox }
+        ref.name.hasExt(EXT_ASS) -> ifNotCached { NodeContent.Text.Subtitles }
         else -> NodeContent.Other
     }
 
