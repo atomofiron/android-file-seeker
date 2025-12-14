@@ -25,6 +25,7 @@ data class Node(
         val stateStub = NodeStateImpl(0)
     }
     val name get() = ref.name
+    val path get() = ref.string
     val isRoot: Boolean = uniqueId == rootId
 
     val isDirectory: Boolean = content is NodeContent.Directory

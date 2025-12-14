@@ -1,16 +1,20 @@
 package app.atomofiron.searchboxapp.screens.viewer
 
 import android.os.Bundle
+import android.text.TextUtils
 import android.view.View
+import android.widget.TextView
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
+import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
+import app.atomofiron.common.util.extension.debug
+import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.flow.viewCollect
-import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentTextViewerBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
@@ -23,6 +27,7 @@ import app.atomofiron.searchboxapp.utils.addFastScroll
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_NO_SCROLL
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
+import com.google.android.material.appbar.MaterialToolbar
 import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState.Companion.Default as DefaultDockState
 
 class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
@@ -53,7 +58,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
             }
             dockBar.submit(DefaultDockState)
             dockBar.setListener(::onBottomMenuItemClick)
-            if (BuildConfig.DEBUG) toolbar.menu.add("Test")
+            debug { toolbar.menu.add("Test") }
             toolbar.setNavigationOnClickListener { presenter.onNavigationClick() }
             toolbar.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
@@ -62,14 +67,29 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
                 }
                 true
             }
+            toolbar.fixSubtitle()
             configureAppBar()
         }
         viewState.onViewCollect()
         binding.onApplyInsets()
     }
 
+    private fun MaterialToolbar.fixSubtitle() {
+        val were = children.toList()
+        subtitle = "…"
+        val now = children.toList()
+        val target = now.find { child ->
+            were.none { it === child }
+        } as TextView?
+        target?.ellipsize = TextUtils.TruncateAt.MIDDLE
+        debugRequire(target != null) { "subtitle is null" }
+    }
+
     override fun TextViewerViewState.onViewCollect() {
-        viewCollect(item) { binding.toolbar.title = it.name }
+        viewCollect(item) {
+            binding.toolbar.title = it.name
+            binding.toolbar.subtitle = it.path
+        }
         viewCollect(textLines, collector = viewerAdapter::submit)
         viewCollect(currentTask, collector = ::onTaskChanged)
         viewCollect(matchesCursor, collector = ::onMatchCursorChanged)
@@ -77,16 +97,18 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
     }
 
     override fun FragmentTextViewerBinding.onApplyInsets() {
-        root.apply(recyclerView = recyclerView, dockView = dockBar, appBarLayout = appbarLayout)
+        root.apply(recyclerView = recyclerView, dockView = dockBar, appBarLayout = appbar)
     }
 
     private fun FragmentTextViewerBinding.configureAppBar() {
         root.setScreenSizeListener { _, height ->
+            val collapsable = height == ScreenSize.Compact
+            appbar.isLiftOnScroll = !collapsable
             toolbar.updateLayoutParams<AppBarLayout.LayoutParams> {
-                scrollFlags = if (height == ScreenSize.Compact) SCROLL_FLAG_SCROLL else SCROLL_FLAG_NO_SCROLL
+                scrollFlags = if (collapsable) SCROLL_FLAG_SCROLL else SCROLL_FLAG_NO_SCROLL
             }
         }
-        appbarLayout.addOnOffsetChangedListener { _, verticalOffset ->
+        appbar.addOnOffsetChangedListener { _, verticalOffset ->
             toolbar.alpha = (toolbar.height + verticalOffset) / toolbar.height.toFloat()
         }
     }
