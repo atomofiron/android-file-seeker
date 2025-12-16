@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.di.dependencies.interactor
 
 import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
+import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -20,10 +21,11 @@ class TextViewerInteractor(
     private val scope: CoroutineScope,
     private val service: TextViewerService,
     private val store: ExplorerStore,
-    preferenceStore: PreferenceStore,
+    private val utils: UtilService,
+    preferences: PreferenceStore,
 ) {
     private val context = Dispatchers.IO
-    private val asSu by preferenceStore.asSu
+    private val asSu by preferences.asSu
 
     fun fetchItem(ref: NodeRef): Node {
         store.currentItems
@@ -64,4 +66,6 @@ class TextViewerInteractor(
     }
 
     fun closeSession(ref: NodeRef) = service.closeSession(ref)
+
+    fun copy(item: Node) = utils.copyToClipboard(item)
 }

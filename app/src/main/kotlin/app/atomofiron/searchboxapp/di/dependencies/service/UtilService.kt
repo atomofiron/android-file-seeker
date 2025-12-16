@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.di.dependencies.service
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.copy
 import app.atomofiron.searchboxapp.android.Intents.useAs
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
@@ -23,7 +24,7 @@ class UtilService(
     private val resources by resources
     private val asSu by preference.asSu
 
-    fun copyToClipboard(item: Node, withAlert: Boolean = false) = copyToClipboard(item.name, item.ref.string, withAlert)
+    fun copyToClipboard(item: Node, withAlert: Boolean = Android.Below.T) = copyToClipboard(item.name, item.path, withAlert)
 
     fun copyToClipboard(label: String, text: String, withAlert: Boolean = false) = clipboardManager.copy(context, label, text, resources, withAlert)
 
@@ -38,7 +39,7 @@ class UtilService(
         val mimeType = item.content.mimeType
             ?.takeIf { it != NodeContent.AnyType }
             ?: return null
-        val uri = context.getUriForFile(File(item.ref.string), asSu)
+        val uri = context.getUriForFile(File(item.path), asSu)
         return context.useAs(uri, mimeType)
     }
 }

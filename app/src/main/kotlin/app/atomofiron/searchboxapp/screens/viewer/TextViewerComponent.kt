@@ -5,6 +5,7 @@ import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
+import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -58,19 +59,17 @@ class TextViewerModule {
         viewState: TextViewerViewState,
         router: TextViewerRouter,
         searchAdapterPresenterDelegate: SearchAdapterPresenterDelegate,
-        textViewerInteractor: TextViewerInteractor,
+        interactor: TextViewerInteractor,
         session: TextViewerSessionResult,
-    ): TextViewerPresenter {
-        return TextViewerPresenter(
-            params,
-            scope,
-            viewState,
-            router,
-            searchAdapterPresenterDelegate,
-            textViewerInteractor,
-            session.result.value,
-        )
-    }
+    ): TextViewerPresenter = TextViewerPresenter(
+        params,
+        scope,
+        viewState,
+        router,
+        searchAdapterPresenterDelegate,
+        interactor,
+        session.result.value,
+    )
 
     @Provides
     @TextViewerScope
@@ -91,8 +90,9 @@ class TextViewerModule {
         scope: CoroutineScope,
         service: TextViewerService,
         explorerStore: ExplorerStore,
-        preferenceStore: PreferenceStore,
-    ): TextViewerInteractor = TextViewerInteractor(scope, service, explorerStore, preferenceStore)
+        preferences: PreferenceStore,
+        utils: UtilService,
+    ): TextViewerInteractor = TextViewerInteractor(scope, service, explorerStore, utils, preferences)
 
     @Provides
     @TextViewerScope
@@ -130,4 +130,5 @@ interface TextViewerDependencies {
     fun explorerStore(): ExplorerStore
     fun finderStore(): FinderStore
     fun curtainChannel(): CurtainChannel
+    fun utilService(): UtilService
 }

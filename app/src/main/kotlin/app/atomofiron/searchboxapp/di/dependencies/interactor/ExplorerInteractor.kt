@@ -60,7 +60,7 @@ class ExplorerInteractor(
 
     fun drop(vararg keys: NodeTabKey) = service.drop(*keys)
 
-    fun copyToClipboard(item: Node) = utils.copyToClipboard(item)
+    fun copyToClipboard(item: Node) = utils.copyToClipboard(item, withAlert = false)
 
     fun toggleRoot(key: NodeTabKey, item: NodeRoot) {
         scope.launch(context) {

@@ -68,6 +68,8 @@ class TextViewerPresenter(
 
     fun onNextClick() = onMoveClick(increment = true)
 
+    fun onCopyPathClick() = interactor.copy(viewState.item.value)
+
     private fun onMoveClick(increment: Boolean) {
         val requiredLineIndex = viewState.changeCursor(increment)
         if (requiredLineIndex >= 0) {

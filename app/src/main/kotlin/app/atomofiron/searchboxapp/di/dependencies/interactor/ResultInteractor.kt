@@ -29,7 +29,7 @@ class ResultInteractor(
 
     fun stop(uuid: UUID) = finderService.stop(uuid)
 
-    fun copyToClipboard(item: Node) = utilService.copyToClipboard(item)
+    fun copyToClipboard(item: Node) = utilService.copyToClipboard(item, withAlert = false)
 
     fun deleteItems(items: List<Node>) {
         scope.launch(dispatcher) {
