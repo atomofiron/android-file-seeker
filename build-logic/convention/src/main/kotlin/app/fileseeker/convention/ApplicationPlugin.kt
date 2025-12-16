@@ -4,7 +4,9 @@ import app.fileseeker.convention.app.fileseeker.convention.configureKotlinAndroi
 import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.tasks.Copy
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.register
 
 class AndroidApplicationConventionPlugin : Plugin<Project> {
 
@@ -13,11 +15,15 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             with(pluginManager) {
                 apply("com.android.application")
                 apply("org.jetbrains.kotlin.android")
+                apply("com.google.android.gms.oss-licenses-plugin")
             }
             extensions.configure<BaseAppModuleExtension> {
                 namespace = AppConfig.packageId
                 configureKotlinAndroid()
                 configureAndroidCommon()
+            }
+            afterEvaluate {
+                registerUpdateBundledOssLicensesTask()
             }
         }
     }
@@ -55,6 +61,27 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
             getByName("release") {
                 isMinifyEnabled = true
                 proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            }
+        }
+    }
+
+    private fun Project.registerUpdateBundledOssLicensesTask() {
+        val releaseTaskName = "releaseOssLicensesTask"
+        if (tasks.findByName(releaseTaskName) == null) {
+            return logger.lifecycle("OSS release task not found, skipping OSS license bundling for $path")
+        }
+        tasks.register<Copy>("updateBundledOssLicenses") {
+            group = "oss-licenses"
+            description = "Generate OSS licenses (release) and bundle them into src/main/assets"
+
+            dependsOn(releaseTaskName)
+
+            from(layout.buildDirectory.dir("generated/resources/releaseOssLicensesTask/raw"))
+            from(layout.buildDirectory.dir("generated/third_party_licenses/release"))
+            val appProject = rootProject.project(":app")
+            into(appProject.layout.projectDirectory.dir("src/main/assets/licenses"))
+            doFirst {
+                logger.lifecycle("Updating bundled OSS licenses for $path")
             }
         }
     }

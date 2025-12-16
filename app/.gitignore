@@ -4,3 +4,4 @@ src/main/jniLibs/
 *.iml
 /release
 src/main/kotlin/uniffi/
+src/main/assets/licenses/

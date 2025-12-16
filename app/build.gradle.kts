@@ -81,13 +81,13 @@ protobuf {
 }
 
 dependencies {
+    api(libs.androidx.appcompat)
+    api(libs.androidx.datastore)
     implementation(libs.kotlinx.core)
     implementation(libs.kotlinx.core.android)
     implementation(libs.kotlinx.protobuf)
     implementation(libs.protobuf.java)
     implementation(libs.protobuf.kotlin)
-    api(libs.androidx.appcompat)
-    api(libs.androidx.datastore)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
@@ -104,10 +104,7 @@ dependencies {
     implementation(libs.androidx.async.inflater)
     implementation(libs.androidx.room)
     implementation(libs.androidx.documentfile)
-    ksp(libs.androidx.room.compiler)
     implementation(libs.dagger)
-    kapt(libs.dagger.compiler)
-    kapt(libs.dagger.processor)
     implementation(libs.material)
     implementation(libs.play.core)
     implementation(libs.play.core.ktx)
@@ -117,12 +114,15 @@ dependencies {
     implementation(libs.ktor.cio)
     implementation(libs.insets)
     implementation(libs.glide)
+    implementation(libs.jna) { artifact { type = "aar" } }
+    kapt(libs.dagger.compiler)
+    kapt(libs.dagger.processor)
+    ksp(libs.androidx.room.compiler)
     ksp(libs.glide.ksp)
     debugImplementation(libs.leakcanary)
     testImplementation(libs.junit)
     testImplementation(kotlin("test"))
     androidTestImplementation(libs.androidx.junit)
-    implementation(libs.jna) { artifact { type = "aar" } }
 }
 
 val taskPreBuild = "preBuild"
