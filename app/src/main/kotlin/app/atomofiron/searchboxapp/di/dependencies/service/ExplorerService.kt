@@ -211,6 +211,9 @@ class ExplorerService(
             if (tree.isEmpty() && root.item.uniqueId != item.uniqueId) {
                 return
             }
+            val item = findItem(item.uniqueId)
+                ?.takeIf { it.hasChildren }
+                ?: return
             val index = tree.indexOfFirst { it.uniqueId == item.uniqueId }
             if (tree.isEmpty()) {
                 rootItem = root.item.copy(children = root.item.children?.fetch())
