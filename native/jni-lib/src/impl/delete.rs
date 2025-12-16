@@ -56,11 +56,6 @@ pub fn delete_recursively(
     first_try: bool,
 ) -> Rslt<()> {
     let mode = match get_dev_mode(path) {
-        //Ok((dev, mode)) if dev == root_dev => mode,
-        /*Ok((dev, _)) => {
-            send_err(&path, format!("target {dev}"), tx, &range)?;
-            return Ok(())
-        },*/
         Ok((_, mode)) => mode,
         Err(e) => return send_err(path, e, tx, &range),
     };
