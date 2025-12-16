@@ -20,6 +20,7 @@ import android.provider.OpenableColumns
 import android.util.LayoutDirection
 import android.util.TypedValue
 import android.view.Display
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
@@ -163,6 +164,8 @@ fun CoordinatorLayout.makeSnackbar(message: CharSequence, duration: Int): Snackb
 val View.isLayoutRtl: Boolean get() = layoutDirection == View.LAYOUT_DIRECTION_RTL
 
 fun View.isRtl(): Boolean = resources.isRtl()
+
+fun View.inflater(): LayoutInflater = LayoutInflater.from(context)
 
 fun Resources.isRtl(): Boolean = configuration.layoutDirection == LayoutDirection.RTL
 

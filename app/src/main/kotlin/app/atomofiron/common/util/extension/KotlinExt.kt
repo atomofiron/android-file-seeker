@@ -154,6 +154,8 @@ inline fun <T> MutableList<T>.replace(action: (T) -> T?) {
     }
 }
 
+inline fun <reified R> Sequence<*>.findAs(): R? = find { it is R } as R?
+
 val IntRange.size: Int get() = if (isEmpty()) 0 else last - first + 1
 
 fun UUID.toBytes(): ByteArray {
