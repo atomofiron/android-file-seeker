@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.Item
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBorderDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.RootItemPaddingDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.TAG_EXPLORER_OPENED_ITEM
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.ExplorerStickyDelegate
@@ -30,7 +31,7 @@ class ExplorerListDelegate(
 
     private val stickyDelegate = ExplorerStickyDelegate(recyclerView, rootAdapter, nodeAdapter, stickyBox, StickyListener())
     private val rootPaddingDecorator = RootItemPaddingDecorator(recyclerView.resources, rootAdapter)
-    private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = true)
+    private val backgroundDecorator = ItemBackgroundDecorator(R.id.item_explorer, evenNumbered = true, ignoringTag = TAG_EXPLORER_OPENED_ITEM)
     private val layoutManager = GridLayoutManager(recyclerView.context, EXPLORER_SPAN_COUNT)
     private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter, stickyDelegate::getDeepest)
     private val spanSizeLookup = ExplorerSpanSizeLookup(recyclerView, rootAdapter, rootPaddingDecorator)

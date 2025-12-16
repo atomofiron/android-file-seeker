@@ -8,14 +8,17 @@ import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.TAG_EXPLORER_OPENED_ITEM
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.getSortedChildren
 
-class ItemBackgroundDecorator(private val evenNumbered: Boolean) : RecyclerView.ItemDecoration() {
+class ItemBackgroundDecorator(
+    private val targetId: Int = 0,
+    private val evenNumbered: Boolean,
+    private val ignoringTag: String? = null,
+) : RecyclerView.ItemDecoration() {
 
     private var cornerRadius = 0f
     private val paint = Paint()
-    var enabled = false
+    var enabled = true
 
     fun init(resources: Resources) {
         cornerRadius = resources.getDimension(R.dimen.explorer_border_width)
@@ -32,8 +35,8 @@ class ItemBackgroundDecorator(private val evenNumbered: Boolean) : RecyclerView.
 
         parent.getSortedChildren().forEach {
             val child = it.value
-            if (child.id != R.id.item_explorer) return@forEach
-            if (child.tag == TAG_EXPLORER_OPENED_ITEM) return@forEach
+            if (targetId != 0 && child.id != targetId) return@forEach
+            if (child.tag == ignoringTag) return@forEach
 
             val holder = parent.getChildViewHolder(child)
             val position = holder.bindingAdapterPosition

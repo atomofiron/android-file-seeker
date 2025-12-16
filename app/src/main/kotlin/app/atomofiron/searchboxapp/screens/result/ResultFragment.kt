@@ -22,6 +22,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.screens.common.delegates.apply
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.TAG_EXPLORER_OPENED_ITEM
 import app.atomofiron.searchboxapp.screens.result.adapter.ItemGravityDecorator
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
 import app.atomofiron.searchboxapp.utils.makeSnackbar
@@ -41,7 +42,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             .setAction(R.string.got_it) { }
     }
     private val gravityDecorator = ItemGravityDecorator()
-    private val backgroundDecorator = ItemBackgroundDecorator(evenNumbered = false)
+    private val backgroundDecorator = ItemBackgroundDecorator(R.id.item_explorer, evenNumbered = false, ignoringTag = TAG_EXPLORER_OPENED_ITEM)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -5,8 +5,10 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.TextView
+import androidx.core.view.updatePaddingRelative
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.textviewer.MatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState.MatchCursor
@@ -16,9 +18,7 @@ class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
 
     var textViewerListener: TextViewerListener? = null
     private var matches: MatchMap = mapOf()
-
     private var cursor: MatchCursor? = null
-
     private var recyclerView: RecyclerView? = null
 
     init {
@@ -56,6 +56,8 @@ class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, inflater: LayoutInflater): TextViewerHolder {
         val textView = TextView(parent.context)
         textView.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
+        val padding = parent.resources.getDimensionPixelSize(R.dimen.content_margin_half)
+        textView.updatePaddingRelative(start = padding, end = padding)
         return TextViewerHolder(textView)
     }
 
