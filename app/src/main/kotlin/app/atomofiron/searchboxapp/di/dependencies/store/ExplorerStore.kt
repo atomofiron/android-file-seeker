@@ -11,6 +11,11 @@ import kotlinx.coroutines.flow.StateFlow
 
 class ExplorerStore {
 
+    val firstTab = NodeTabKey.Explorer(0)
+    val middleTab = NodeTabKey.Explorer(1)
+    val lastTab = NodeTabKey.Explorer(2)
+    val mainTabs = listOf(firstTab, middleTab, lastTab)
+
     private val internalStoragePath: String = Environment
         .getExternalStorageDirectory()
         .absolutePath
@@ -20,7 +25,7 @@ class ExplorerStore {
     private val currentLists = mutableMapOf<NodeTabKey, List<Node>?>()
 
     private val _storage = MutableStateFlow<List<NodeStorage>>(emptyList())
-    private val _currentTab = MutableStateFlow(NodeTabKey.Explorer.Stub)
+    private val _currentTab = MutableStateFlow(middleTab)
     private val _currentDeepest = MutableStateFlow<Node?>(null)
     private val _internalRoot = MutableStateFlow(Node.asRoot(NodeRef(internalStoragePath), NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
     private val _screenshots = MutableStateFlow<NodeRef?>(null)

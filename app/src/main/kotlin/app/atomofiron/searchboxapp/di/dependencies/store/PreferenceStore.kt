@@ -100,7 +100,7 @@ class PreferenceStore(
     }.stateInProperty(scope, initial = null) // don't pass any default value
 
     operator fun invoke(block: suspend PreferenceStore.() -> Unit) {
-        scope.launchOnMain(immediate = true,CoroutineStart.UNDISPATCHED) {
+        scope.launchOnMain(immediate = true, CoroutineStart.UNDISPATCHED) {
             this@PreferenceStore.block()
         }
     }

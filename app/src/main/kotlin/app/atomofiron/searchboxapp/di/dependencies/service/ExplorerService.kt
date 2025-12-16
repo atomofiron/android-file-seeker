@@ -75,6 +75,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
 
 private const val SUB_PATH_CAMERA = "DCIM/Camera"
@@ -566,7 +567,7 @@ class ExplorerService(
             }
         }
         fileJob.join()
-        dirJobs.forEach { it.join() }
+        dirJobs.joinAll()
         store.emitDeleted(items)
     }
 
@@ -608,7 +609,7 @@ class ExplorerService(
             }
         }
         fileJob.join()
-        dirJobs.forEach { it.join() }
+        dirJobs.joinAll()
         store.emitDeleted(deleted)
         mediaRootAffected?.let { mediaRoot ->
             garden {
@@ -713,7 +714,6 @@ class ExplorerService(
                 var item = roots.find { it.id == state.uniqueId }?.item
                 item = item ?: items.find { it.uniqueId == state.uniqueId }
                 if (item == null) {
-                    state.cachingJob?.cancel()
                     val next = state.nextState(state.uniqueId, cachingJob = null)
                     iterator.updateState(state, next)
                 }
@@ -841,9 +841,6 @@ class ExplorerService(
     private fun Node.defineDirKind(levelIndex: Int = -1): NodeContent = when {
         levelIndex > 0 -> content
         content !is NodeContent.Directory -> content
-            .also {
-                this
-            }
         internalStorageRef.length != (ref.length.dec() - name.length) -> content
         !ref.isChildOf(internalStorageRef) -> content
         else -> ExplorerUtils.getDirectoryType(name)

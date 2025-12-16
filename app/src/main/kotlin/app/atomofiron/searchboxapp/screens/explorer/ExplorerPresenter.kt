@@ -56,7 +56,7 @@ class ExplorerPresenter(
 
     fun onTabSelected(index: Int) {
         // next time viewState.currentTab.value = viewState.tabs[index]
-        interactor.updateCurrentTab(currentTab)
+        interactor.setCurrentTab(currentTab)
     }
 
     fun onVolumeUp(isCurrentDirVisible: Boolean) {
@@ -72,7 +72,7 @@ class ExplorerPresenter(
 
     override fun onCleared() {
         super.onCleared()
-        interactor.drop(viewState.firstTab, viewState.middleTab, viewState.lastTab)
+        interactor.drop(*viewState.tabs.toTypedArray())
     }
 
     private fun resetChecked(): Boolean {

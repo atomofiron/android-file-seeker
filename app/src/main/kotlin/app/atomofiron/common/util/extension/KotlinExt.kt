@@ -27,7 +27,7 @@ inline fun CoroutineScope.launchOnMain(
     immediate: Boolean = false,
     start: CoroutineStart = CoroutineStart.DEFAULT,
     noinline block: suspend CoroutineScope.() -> Unit,
-) = launch(if (immediate) Dispatchers.Main.immediate else Dispatchers.Main, block = block)
+) = launch(if (immediate) Dispatchers.Main.immediate else Dispatchers.Main, start, block = block)
 
 inline operator fun CoroutineScope.invoke(
     noinline block: suspend CoroutineScope.() -> Unit,

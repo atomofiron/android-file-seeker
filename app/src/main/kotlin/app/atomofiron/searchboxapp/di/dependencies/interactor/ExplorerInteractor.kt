@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.di.dependencies.interactor
 
+import app.atomofiron.common.util.extension.launchOnDefault
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
@@ -98,8 +99,8 @@ class ExplorerInteractor(
         }
     }
 
-    fun updateCurrentTab(key: NodeTabKey.Explorer) {
-        scope.launch(Dispatchers.Default) {
+    fun setCurrentTab(key: NodeTabKey.Explorer) {
+        scope.launchOnDefault {
             store.setCurrentTab(key)
         }
     }

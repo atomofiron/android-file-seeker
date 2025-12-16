@@ -9,7 +9,6 @@ import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerDockDelegate
@@ -29,9 +28,7 @@ class ExplorerViewState(
     preferences: PreferenceStore,
 ) {
     private val mimeTypes = mode.mimeFilters()
-    val firstTab = NodeTabKey.Explorer(0, mimeTypes)
-    val middleTab = NodeTabKey.Explorer(1, mimeTypes)
-    val lastTab = NodeTabKey.Explorer(2, mimeTypes)
+    val tabs = store.mainTabs.map { it.copy(pickerTypes = mimeTypes) }
 
     val scrollTo = ChannelFlow<Node>()
     val itemComposition = preferences.explorerItemComposition
@@ -45,11 +42,10 @@ class ExplorerViewState(
         },
         otherAlerts,
     )
-    val tabs = listOf(firstTab, middleTab, lastTab)
-    val currentTab = MutableStateFlow(middleTab)
+    val currentTab = MutableStateFlow(tabs[store.currentTabKey.value.index])
     val currentNode get() = store.currentDeepest.value
 
-    val currentTabFlow = interactor.getFlow(middleTab)
+    val currentTabFlow = interactor.getFlow(currentTab.value)
     val updates: Flow<Node> = store.updated
     val permissionRequiredWarning = ChannelFlow<Unit>()
     val dock: Flow<List<DockItem>> = dockDelegate.dock
