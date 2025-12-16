@@ -3,13 +3,13 @@ package app.atomofiron.searchboxapp.screens.explorer.curtain
 import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
+import app.atomofiron.common.util.extension.appendWithComma
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainExplorerOptionsBinding
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
-import app.atomofiron.searchboxapp.utils.Const.COMMA_SPACE
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 
@@ -48,11 +48,8 @@ class OptionsDelegate(private val output: MenuListener) {
             if (dirs > 0) {
                 string.append(resources.getQuantityString(R.plurals.x_dirs, dirs, dirs))
             }
-            if (dirs > 0 && files > 0) {
-                string.append(COMMA_SPACE)
-            }
             if (files > 0) {
-                string.append(resources.getQuantityString(R.plurals.x_files, files, files))
+                string.appendWithComma(resources.getQuantityString(R.plurals.x_files, files, files))
             }
             title.text = string.toString()
         }

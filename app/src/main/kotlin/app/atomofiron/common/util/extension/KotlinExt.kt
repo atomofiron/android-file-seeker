@@ -8,7 +8,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
 import java.util.UUID
-import kotlin.collections.ArrayList
 import kotlin.math.ceil
 
 inline fun <T> T.ctx(action: T.() -> Unit) = action()
@@ -169,4 +168,10 @@ fun ByteArray.toUUID(): UUID {
     require(size == 16) { "ByteArray[$size].toUUID()" }
     val buffer = ByteBuffer.wrap(this)
     return UUID(buffer.long, buffer.long)
+}
+
+fun StringBuilder.appendWithComma(part: String): StringBuilder {
+    if (isNotBlank()) append(", ")
+    append(part)
+    return this
 }

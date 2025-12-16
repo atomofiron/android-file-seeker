@@ -5,10 +5,10 @@ import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.extension.appendWithComma
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemHeaderBinding
 import app.atomofiron.searchboxapp.utils.Const
-import app.atomofiron.searchboxapp.utils.Const.COMMA_SPACE
 import app.atomofiron.searchboxapp.utils.colorAttr
 
 class ResultsHeaderHolder(private val binding: ItemHeaderBinding) : ResultsHolder<ResultItem.Header>(binding.root) {
@@ -24,18 +24,12 @@ class ResultsHeaderHolder(private val binding: ItemHeaderBinding) : ResultsHolde
         if (item.dirCount > 0) {
             string.append(context.resources.getQuantityString(R.plurals.x_dirs, item.dirCount, item.dirCount))
         }
-        if (item.dirCount > 0 && item.fileCount > 0) {
-            string.append(COMMA_SPACE)
-        }
         if (item.fileCount > 0) {
-            string.append(context.resources.getQuantityString(R.plurals.x_files, item.fileCount, item.fileCount))
-        }
-        if (item.fileCount > 0 && item.errorCount > 0) {
-            string.append(COMMA_SPACE)
+            string.appendWithComma(context.resources.getQuantityString(R.plurals.x_files, item.fileCount, item.fileCount))
         }
         binding.title.text = if (item.errorCount > 0) {
             val errors = context.resources.getQuantityString(R.plurals.x_errors, item.errorCount, item.errorCount)
-            string.append(errors)
+            string.appendWithComma(errors)
             string.append(Const.NBSP)
             val start = string.length
             string.append(context.resources.getString(R.string.show))
