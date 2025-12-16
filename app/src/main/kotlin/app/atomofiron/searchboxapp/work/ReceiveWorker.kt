@@ -96,11 +96,10 @@ class ReceiveWorker(
                     size = sizeIndex.takeIf { it >= 0 }?.let { cursor.getLong(it) } ?: 0L
                 }
             }
-            val type = context.contentResolver.getType(uri)
-            val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(type)
-            name = name ?: context.resources.formatDate()
-            if (ext != null && !name.endsWith(".$ext", ignoreCase = true)) {
-                name = "$name.$ext"
+            name = name ?: context.resources.formatDate().let {
+                val type = context.contentResolver.getType(uri)
+                val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(type)
+                "$it.${ext ?: "bin"}"
             }
             val stream = try {
                 context.contentResolver.openInputStream(uri)
@@ -131,7 +130,18 @@ class ReceiveWorker(
         val deferred = files.map { (name, _, stream) ->
             async {
                 stream?.use { input ->
-                    val output = FileOutputStream(File(data.destination.string, name))
+                    var file = File(data.destination.string, name)
+                    var i = 1
+                    while (file.exists()) {
+                        val builder = StringBuilder(name)
+                        val index = when {
+                            name.contains('.') -> name.lastIndexOf('.')
+                            else -> name.length
+                        }
+                        builder.insert(index, "(${++i})")
+                        file = File(data.destination.string, builder.toString())
+                    }
+                    val output = FileOutputStream(file)
                     val step = max(MB, input.available() / 100)
                     var read = 0L
                     input.writeTo(output) {
