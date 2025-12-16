@@ -29,7 +29,7 @@ class ResultsHeaderHolder(private val binding: ItemHeaderBinding) : ResultsHolde
         if (item.fileCount > 0) {
             string.append(context.resources.getQuantityString(R.plurals.x_files, item.fileCount, item.fileCount))
         }
-        if (item.dirCount > 0 || item.fileCount > 0) {
+        if (item.fileCount > 0 && item.errorCount > 0) {
             string.append(", ")
         }
         binding.title.text = if (item.errorCount > 0) {
