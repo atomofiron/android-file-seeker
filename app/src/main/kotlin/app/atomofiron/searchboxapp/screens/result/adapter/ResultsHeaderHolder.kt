@@ -8,6 +8,7 @@ import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemHeaderBinding
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.Const.COMMA_SPACE
 import app.atomofiron.searchboxapp.utils.colorAttr
 
 class ResultsHeaderHolder(private val binding: ItemHeaderBinding) : ResultsHolder<ResultItem.Header>(binding.root) {
@@ -24,13 +25,13 @@ class ResultsHeaderHolder(private val binding: ItemHeaderBinding) : ResultsHolde
             string.append(context.resources.getQuantityString(R.plurals.x_dirs, item.dirCount, item.dirCount))
         }
         if (item.dirCount > 0 && item.fileCount > 0) {
-            string.append(", ")
+            string.append(COMMA_SPACE)
         }
         if (item.fileCount > 0) {
             string.append(context.resources.getQuantityString(R.plurals.x_files, item.fileCount, item.fileCount))
         }
         if (item.fileCount > 0 && item.errorCount > 0) {
-            string.append(", ")
+            string.append(COMMA_SPACE)
         }
         binding.title.text = if (item.errorCount > 0) {
             val errors = context.resources.getQuantityString(R.plurals.x_errors, item.errorCount, item.errorCount)

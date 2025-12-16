@@ -9,6 +9,7 @@ import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
+import app.atomofiron.searchboxapp.utils.Const.COMMA_SPACE
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
 
@@ -48,7 +49,7 @@ class OptionsDelegate(private val output: MenuListener) {
                 string.append(resources.getQuantityString(R.plurals.x_dirs, dirs, dirs))
             }
             if (dirs > 0 && files > 0) {
-                string.append(", ")
+                string.append(COMMA_SPACE)
             }
             if (files > 0) {
                 string.append(resources.getQuantityString(R.plurals.x_files, files, files))
