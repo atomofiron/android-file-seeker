@@ -109,6 +109,7 @@
     <string name="resource_busy">Resurs zauzet</string>
     <string name="unknown_error">Nepoznata greška</string>
     <string name="inaccessible">Nedostupno</string>
+    <string name="empty">Prazno</string>
     <string name="unknown">nepoznato</string>
     <string name="unavailable">nedostupno</string>
     <string name="a_lot_of_errors">Mnogo grešaka</string>

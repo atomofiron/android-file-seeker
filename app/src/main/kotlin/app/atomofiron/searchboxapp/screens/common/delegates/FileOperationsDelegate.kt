@@ -52,8 +52,9 @@ class FileOperationsDelegate(
 
     fun operations(items: List<Node>, readOnly: Boolean = false): Rslt<ExplorerItemOptions> {
         val merged = items.merge()
-        if (merged.all { it.isInaccessible() }) {
-            return Rslt.Err(utils[R.string.inaccessible])
+        when {
+            merged.isEmpty() -> return Rslt.Err(utils[R.string.empty])
+            merged.all { it.isInaccessible() } -> return Rslt.Err(utils[R.string.inaccessible])
         }
         val first = merged.firstOrNull() ?: return Rslt.Err()
         val operations = when {

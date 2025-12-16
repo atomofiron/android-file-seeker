@@ -538,8 +538,6 @@ object ExplorerUtils {
 
     fun Node.isParentOf(other: Node): Boolean = other.parentRef == ref
 
-    fun Node.isSomeParentOf(other: Node): Boolean = ref.length <= other.ref.length && other.ref.isChildOf(ref)
-
     fun NodeProperties.isFile(): Boolean = access.firstOrNull() == FILE_CHAR
 
     fun NodeProperties.isDirectory(): Boolean = access.firstOrNull() == DIR_CHAR
@@ -774,8 +772,8 @@ object ExplorerUtils {
             val first = get(i)
             val second = get(j)
             when {
-                first.isSomeParentOf(second) -> removeAt(j)
-                second.isSomeParentOf(first) -> removeAt(i)
+                second.ref.isChildOf(first.ref) -> removeAt(j)
+                first.ref.isChildOf(second.ref) -> removeAt(i)
                 j == lastIndex -> j = ++i + 1
                 else -> j++
             }
