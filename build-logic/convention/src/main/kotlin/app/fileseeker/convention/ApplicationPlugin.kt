@@ -70,13 +70,12 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         if (tasks.findByName(releaseTaskName) == null) {
             return logger.lifecycle("OSS release task not found, skipping OSS license bundling for $path")
         }
-        tasks.register<Copy>("updateBundledOssLicenses") {
-            group = "oss-licenses"
+        tasks.register<Copy>("updateBundledLicenses") {
+            group = "licenses"
             description = "Generate OSS licenses (release) and bundle them into src/main/assets"
 
             dependsOn(releaseTaskName)
 
-            from(layout.buildDirectory.dir("generated/resources/releaseOssLicensesTask/raw"))
             from(layout.buildDirectory.dir("generated/third_party_licenses/release"))
             val appProject = rootProject.project(":app")
             into(appProject.layout.projectDirectory.dir("src/main/assets/licenses"))

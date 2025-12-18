@@ -158,5 +158,28 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/github"
             />
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/licenses"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_common"
+            android:background="@drawable/bg_toned_ripple"
+            android:ellipsize="end"
+            android:lines="1"
+            android:padding="@dimen/padding_semi"
+            android:drawablePadding="@dimen/padding_semi"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:textSize="20sp"
+            android:textColor="?colorSecondary"
+            android:drawableStart="@drawable/ic_license"
+            android:drawableTint="?colorContent"
+            android:text="@string/licenses"
+            android:paddingEnd="@dimen/padding_semi"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/forpda"
+            />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

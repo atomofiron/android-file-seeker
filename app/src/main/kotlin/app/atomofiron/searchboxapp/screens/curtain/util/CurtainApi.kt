@@ -15,6 +15,8 @@ import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
 import java.util.*
 
+// todo replace layoutId with (en)decodable sealed Any
+
 object CurtainApi {
 
     interface Controller {
@@ -90,8 +92,9 @@ object CurtainApi {
     ) {
         constructor(
             view: View,
+            unsureScrollable: Boolean = true,
             isCancelable: Boolean = true,
-        ) : this(isCancelable, view.makeScrollable())
+        ) : this(isCancelable, if (unsureScrollable) view.makeScrollable() else view)
     }
 }
 

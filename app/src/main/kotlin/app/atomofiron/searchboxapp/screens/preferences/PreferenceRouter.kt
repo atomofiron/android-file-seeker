@@ -14,5 +14,7 @@ class PreferenceRouter(fragmentProperty: WeakProperty<out Fragment>) : BaseRoute
 
     fun goToForPda() = context { startActivity(Intents.forPda) }
 
+    fun goToLicenses() = navigate(R.id.licensesFragment)
+
     fun showLocaleSettings() = activity { startActivity(Intents.locales) }
 }

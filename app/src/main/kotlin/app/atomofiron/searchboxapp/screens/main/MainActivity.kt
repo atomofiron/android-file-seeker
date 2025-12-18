@@ -98,7 +98,7 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
         binding.joystick.setOnClickListener { onEscClick() }
         binding.joystick.syncWithLayout(binding.root)
 
-        if (savedInstanceState == null) onIntent(intent)
+        savedInstanceState ?: onIntent(intent)
 
         val manager = getSystemService(Service.INPUT_METHOD_SERVICE) as InputMethodManager
         val onBackStackChangedListener: () -> Unit = {

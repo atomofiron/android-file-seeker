@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
 import androidx.preference.PreferenceDataStore
 import androidx.work.WorkManager
+import app.atomofiron.searchboxapp.android.WebClient
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.delegate.StorageDelegate
@@ -66,4 +67,8 @@ open class CommonModule {
         context: Context,
         store: ExplorerStore,
     ): StorageDelegate = StorageDelegate(context, store)
+
+    @Provides
+    @Singleton
+    open fun provideWebClient() = WebClient()
 }

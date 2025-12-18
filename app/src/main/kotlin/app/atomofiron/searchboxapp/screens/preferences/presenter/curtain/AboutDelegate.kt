@@ -48,12 +48,14 @@ class AboutDelegate(
         val listener = ::onClick
         github.setOnClickListener(listener)
         forpda.setOnClickListener(listener)
+        licenses.setOnClickListener(listener)
     }
 
     private fun onClick(view: View) {
         when (view.id) {
             R.id.github -> router.goToGithub()
             R.id.forpda -> router.goToForPda()
+            R.id.licenses -> router.goToLicenses()
         }
     }
 }

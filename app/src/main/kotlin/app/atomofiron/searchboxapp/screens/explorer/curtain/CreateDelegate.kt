@@ -55,7 +55,7 @@ class CreateDelegate(
         }
     }
 
-    private inner class ButtonState(
+    private class ButtonState(
         private val dirFiles: List<String>,
         private val buttons: Array<Button>,
     ) : TextWatcher {

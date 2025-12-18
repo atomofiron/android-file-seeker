@@ -37,9 +37,17 @@
     <fragment
         android:id="@+id/preferenceFragment"
         android:name="app.atomofiron.searchboxapp.screens.preferences.PreferenceFragment"
-        android:label="PreferenceFragment" />
+        android:label="PreferenceFragment" >
+        <action
+            android:id="@+id/action_preferenceFragment_to_licensesFragment"
+            app:destination="@id/licensesFragment" />
+    </fragment>
     <fragment
         android:id="@+id/textViewerFragment"
         android:name="app.atomofiron.searchboxapp.screens.viewer.TextViewerFragment"
         android:label="TextViewerFragment" />
+    <fragment
+        android:id="@+id/licensesFragment"
+        android:name="app.atomofiron.searchboxapp.screens.licenses.LicensesFragment"
+        android:label="LicensesFragment" />
 </navigation>
