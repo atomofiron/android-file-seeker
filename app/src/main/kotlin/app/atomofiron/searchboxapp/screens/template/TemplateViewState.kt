@@ -1,3 +1,6 @@
 package app.atomofiron.searchboxapp.screens.template
 
-class TemplateViewState
+import javax.inject.Inject
+
+@TemplateScope
+class TemplateViewState @Inject constructor()

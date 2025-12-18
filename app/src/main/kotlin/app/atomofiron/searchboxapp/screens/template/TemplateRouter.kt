@@ -3,8 +3,10 @@ package app.atomofiron.searchboxapp.screens.template
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.common.util.property.WeakProperty
+import javax.inject.Inject
 
-class TemplateRouter(
+@TemplateScope
+class TemplateRouter @Inject constructor(
     property: WeakProperty<out Fragment>,
 ) : BaseRouter(property) {
 

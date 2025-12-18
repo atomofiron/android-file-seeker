@@ -5,8 +5,8 @@ import app.atomofiron.common.util.property.WeakProperty
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
-import dagger.Provides
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import dagger.Binds
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
@@ -32,29 +32,12 @@ interface TemplateComponent {
 }
 
 @Module
-class TemplateModule {
-
-    @Provides
+interface TemplateModule {
+    @Binds
     @TemplateScope
-    fun presenter(
-        scope: CoroutineScope,
-        router: TemplateRouter,
-        preferenceStore: PreferenceStore,
-    ): TemplatePresenter {
-        return TemplatePresenter(scope, router, preferenceStore)
-    }
-
-    @Provides
-    @TemplateScope
-    fun router(
-        fragment: WeakProperty<out Fragment>,
-    ): TemplateRouter = TemplateRouter(fragment)
-
-    @Provides
-    @TemplateScope
-    fun viewState(): TemplateViewState = TemplateViewState()
+    fun dep(impl: Any): Any
 }
 
 interface TemplateDependencies {
-    fun preferenceStore(): PreferenceStore
+    fun preferences(): PreferenceStore
 }
