@@ -25,6 +25,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
 import android.view.WindowManager
+import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
@@ -35,6 +36,7 @@ import androidx.annotation.StringRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
+import androidx.core.net.toUri
 import androidx.core.view.ScrollingView
 import androidx.core.view.isEmpty
 import androidx.core.view.updateLayoutParams
@@ -323,4 +325,16 @@ fun View.addOnAttachListener(
         }
     }
     addOnAttachStateChangeListener(listener)
+}
+
+fun WebView.secureLoad(url: String) {
+    val uri = url.toUri()
+    val url = when (uri.scheme) {
+        "http" -> uri.buildUpon()
+            .scheme("https")
+            .build()
+            .toString()
+        else -> url
+    }
+    loadUrl(url)
 }

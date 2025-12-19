@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.screens.licenses.state.License
 import app.atomofiron.searchboxapp.screens.licenses.state.LicenseContent
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.secureLoad
 import lib.atomofiron.insets.insetsPadding
 
 class LicenseCurtainDelegate(
@@ -44,6 +45,6 @@ class LicenseCurtainDelegate(
                 progress.isVisible = false
             }, Const.LONG_DELAY)
         }
-        web.loadUrl(url)
+        web.secureLoad(url)
     }
 }
