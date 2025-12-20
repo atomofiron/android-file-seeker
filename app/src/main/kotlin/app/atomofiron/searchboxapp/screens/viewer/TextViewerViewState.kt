@@ -8,11 +8,15 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
+import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsStateDelegate
+import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
+import app.atomofiron.searchboxapp.screens.viewer.state.CursorResult
+import app.atomofiron.searchboxapp.screens.viewer.state.Status
 import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.toInt
@@ -34,27 +38,6 @@ class TextViewerViewState(
     preferenceStore,
     session?.tasks ?: emptyFlow(),
 ) {
-
-    data class Status(
-        val loading: Boolean = false,
-        val current: Int = 0,
-        val max: Int = 0,
-    ) {
-        fun clear(): Status = copy(current = 0, max = 0)
-        fun go(forward: Boolean): Status = copy(current = ((max + current.dec() + forward.toInt()) % max).inc())
-    }
-
-    @JvmInline
-    value class MatchCursor(val value: Long = 0) {
-        val lineIndex get() = value.shr(32).toInt()
-        val lineMatchIndex get() = value.toInt()
-
-        constructor(lineIndex: Int, matchIndex: Int = 0) : this(lineIndex.toLong().shl(32) + matchIndex.toLong())
-
-        fun copy(lineIndex: Int = this.lineIndex, matchIndex: Int = this.lineMatchIndex): MatchCursor {
-            return MatchCursor(lineIndex.toLong().shl(32) + matchIndex.toLong())
-        }
-    }
 
     val insertInQuery = ChannelFlow<String>()
 
@@ -95,58 +78,51 @@ class TextViewerViewState(
         }
     }
 
-    /** @return value >= 0 если нужно подгрузить файл. */
-    fun changeCursor(increment: Boolean): Int {
-        val none = -1
-        val cursor = matchesCursor.value
+    fun changeCursor(increment: Boolean): CursorResult {
         val result = currentTask.value?.result
-        result ?: return none
-        val matches = result.matches
-        val indexes = result.indexes
-        if (cursor == null) {
-            val statusIndex = when {
-                increment -> 1
-                indexes.last() < textLines.value.size -> status.value.max
-                else -> return indexes.last()
-            }
-            status.update {
-                it.copy(current = statusIndex)
-            }
-            val lineIndex = if (increment) indexes.first() else indexes.last()
-            val matchIndex = if (increment) 0 else matches[lineIndex]?.lastIndex ?: 0
-            matchesCursor.value = MatchCursor(lineIndex = lineIndex, matchIndex = matchIndex)
-            return none
-        }
+            ?: return CursorResult.Err("no search result")
+        val cursor = matchesCursor.value
+            ?: return startNavigation(result, increment)
         var lineIndex = cursor.lineIndex
-        var matchIndex = cursor.lineMatchIndex
-
-        if (increment) {
-            matchIndex++
-            val matches = matches[lineIndex] ?: return none
-            if (matchIndex == matches.size) {
-                var index = indexes.indexOf(lineIndex)
-                index = index.inc() % indexes.size
-                lineIndex = indexes[index]
-                matchIndex = 0
-            }
-        } else {
-            matchIndex--
-            if (matchIndex < 0) {
-                var index = indexes.indexOf(lineIndex)
-                if (index < 0) return none
-                index = indexes.run { (size + index.dec()) % size }
-                lineIndex = indexes[index]
-                matchIndex = matches[lineIndex]!!.lastIndex
-            }
+        val matches = result.matches[lineIndex]
+            ?: return CursorResult.Err("no matches for line index $lineIndex (max: ${result.matches.keys.sorted().max()})")
+        val indexes = result.indexes
+        var matchIndex = cursor.matchIndex + increment.toInt()
+        var index = indexes.indexOf(lineIndex)
+        if (increment && matchIndex == matches.size) {
+            index = index.inc() % indexes.size
+            lineIndex = indexes[index]
+            matchIndex = 0
+        } else if (!increment && matchIndex < 0) {
+            index = indexes.run { (size + index.dec()) % size }
+            lineIndex = indexes[index]
+            matchIndex = matches.lastIndex
         }
         if (lineIndex > textLines.value.lastIndex) {
-            return lineIndex
+            return CursorResult.Load(lineIndex)
         }
         matchesCursor.value = MatchCursor(lineIndex, matchIndex)
         status.run {
             value = value.go(forward = increment)
         }
-        return none
+        return CursorResult.Ok
+    }
+
+    private fun startNavigation(result: SearchResult.Text, increment: Boolean): CursorResult {
+        val indexes = result.indexes
+        val matches = result.matches
+        val statusIndex = when {
+            increment -> 1
+            indexes.last() < textLines.value.size -> status.value.max
+            else -> return CursorResult.Load(indexes.last())
+        }
+        status.update {
+            it.copy(current = statusIndex)
+        }
+        val lineIndex = if (increment) indexes.first() else indexes.last()
+        val matchIndex = if (increment) 0 else matches[lineIndex]?.lastIndex ?: 0
+        matchesCursor.value = MatchCursor(lineIndex = lineIndex, matchIndex = matchIndex)
+        return CursorResult.Ok
     }
 
     fun sendInsertInQuery(value: String) {
@@ -169,6 +145,7 @@ class TextViewerViewState(
         return (task.isEnded && task.count > 0).also { isOk ->
             if (isOk) {
                 currentTask.value = task
+                matchesCursor.value = null
                 status.run {
                     value = value.copy(current = 0, max = task.count)
                 }

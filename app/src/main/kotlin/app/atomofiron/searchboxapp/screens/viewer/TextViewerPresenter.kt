@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.viewer
 
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.extension.launchOnIO
+import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -11,6 +12,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.viewer.presenter.SearchAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 import app.atomofiron.searchboxapp.screens.viewer.recycler.TextViewerAdapter
+import app.atomofiron.searchboxapp.screens.viewer.state.CursorResult
 import kotlinx.coroutines.CoroutineScope
 
 class TextViewerPresenter(
@@ -71,9 +73,10 @@ class TextViewerPresenter(
     fun onCopyPathClick() = interactor.copy(viewState.item.value)
 
     private fun onMoveClick(increment: Boolean) {
-        val requiredLineIndex = viewState.changeCursor(increment)
-        if (requiredLineIndex >= 0) {
-            interactor.readFileToLine(itemRef, requiredLineIndex) {
+        when (val result = viewState.changeCursor(increment)) {
+            is CursorResult.Ok -> Unit
+            is CursorResult.Err -> logE(result.message)
+            is CursorResult.Load -> interactor.readFileToLine(itemRef, result.line) {
                 viewState.changeCursor(increment)
             }
         }

@@ -11,7 +11,7 @@ import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.textviewer.MatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
-import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState.MatchCursor
+import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
 import app.atomofiron.searchboxapp.utils.Const
 
 class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
@@ -67,7 +67,7 @@ class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
         val cursor = cursor
         val indexFocus = when {
             cursor == null -> Const.UNDEFINED
-            position == cursor.lineIndex -> cursor.lineMatchIndex
+            position == cursor.lineIndex -> cursor.matchIndex
             else -> Const.UNDEFINED
         }
         val matches = matches[position]

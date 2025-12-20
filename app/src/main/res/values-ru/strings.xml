@@ -173,8 +173,8 @@
     <string name="disclaimer_choose_directory">Выберите папку для сохранения файла(ов) и\u00A0Подтвердите</string>
     <string name="dismiss">Скрыть</string>
     <string name="got_it">Понятно</string>
-    <string name="next">Назад</string>
-    <string name="previous">Вперёд</string>
+    <string name="next">Вперёд</string>
+    <string name="previous">Назад</string>
     <string name="status">Статус</string>
     <string name="loading">Загрузка</string>
     <string name="edit">Редактировать</string>

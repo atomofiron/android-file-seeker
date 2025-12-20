@@ -17,6 +17,7 @@ import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemSeparatorDecorator
 import app.atomofiron.searchboxapp.screens.viewer.recycler.TextViewerAdapter
+import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
 import app.atomofiron.searchboxapp.utils.addFastScroll
 import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState.Companion.Default as DefaultDockState
 
@@ -99,5 +100,5 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         binding.toolbar.navigationIcon = ContextCompat.getDrawable(requireContext(), iconId)
     }
 
-    private fun onMatchCursorChanged(cursor: TextViewerViewState.MatchCursor?) = textAdapter.setCursor(cursor)
+    private fun onMatchCursorChanged(cursor: MatchCursor?) = textAdapter.setCursor(cursor)
 }
