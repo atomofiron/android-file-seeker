@@ -10,6 +10,10 @@
     <attr name="topRadioGroupBackground" format="color" />
     <attr name="materialTonalButton" format="color" />
 
+    <declare-styleable name="HeaderLayout">
+        <attr name="expandedHeight" format="reference" />
+    </declare-styleable>
+
     <declare-styleable name="DrawerView">
         <attr name="title" format="string" />
     </declare-styleable>

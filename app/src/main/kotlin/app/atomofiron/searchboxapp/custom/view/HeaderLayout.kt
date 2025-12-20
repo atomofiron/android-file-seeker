@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.withStyledAttributes
 import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
@@ -31,17 +32,37 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
     private var toolbar: View? = null
 
     constructor(context: Context) : super(context)
-    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        attrs?.apply()
+    }
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr) {
+        attrs?.apply(defStyleAttr)
+    }
 
     init {
         inflater().inflate(R.layout.view_header_layout, this)
         collapsing = findViewById(R.id.collapsing)
+        pinToolbar(true)
         addOnOffsetChangedListener(this)
         if (context.isDarkDeep()) {
             addLiftOnScrollListener { _, color ->
                 val background = background as MaterialShapeDrawable
                 background.fillColor = context.tonedOverlay(color)
+            }
+        }
+    }
+
+    private fun AttributeSet.apply(defStyleAttr: Int = 0) {
+        context.withStyledAttributes(this, R.styleable.HeaderLayout, defStyleAttr, 0) {
+            val resId = getResourceId(R.styleable.HeaderLayout_expandedHeight, 0)
+            if (resId != 0) {
+                collapsing.updateLayoutParams {
+                    height = resources.getDimensionPixelSize(resId)
+                }
+            }
+            collapsing.isTitleEnabled = collapsing.layoutParams.height > 0
+            if (!collapsing.isTitleEnabled) {
+                collapsing.contentScrim = null
             }
         }
     }
@@ -60,7 +81,7 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
 
     override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
         val toolbarHeight = toolbar?.height ?: return
-        val subHeight = subBar?.height ?: 0
+        val subHeight = subBar?.height ?: return
         alpha = (toolbarHeight + subHeight + verticalOffset) / toolbarHeight.toFloat()
         subBar?.alpha = (subHeight + verticalOffset) / subHeight.toFloat()
     }
