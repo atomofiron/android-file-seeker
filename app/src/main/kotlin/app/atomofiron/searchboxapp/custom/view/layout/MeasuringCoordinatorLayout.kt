@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 
-class MeasuringCoordinatorLayout @JvmOverloads constructor(
+open class MeasuringCoordinatorLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0,
