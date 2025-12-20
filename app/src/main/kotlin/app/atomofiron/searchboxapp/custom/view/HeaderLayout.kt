@@ -10,7 +10,9 @@ import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
 import app.atomofiron.common.util.extension.findAs
+import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.drawable.tonedOverlay
 import app.atomofiron.searchboxapp.utils.inflater
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
@@ -18,6 +20,7 @@ import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_OFF
 import com.google.android.material.appbar.CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PIN
+import com.google.android.material.shape.MaterialShapeDrawable
 import kotlin.math.min
 
 class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
@@ -35,6 +38,12 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
         inflater().inflate(R.layout.view_header_layout, this)
         collapsing = findViewById(R.id.collapsing)
         addOnOffsetChangedListener(this)
+        if (context.isDarkDeep()) {
+            addLiftOnScrollListener { _, color ->
+                val background = background as MaterialShapeDrawable
+                background.fillColor = context.tonedOverlay(color)
+            }
+        }
     }
 
     fun pinToolbar(pin: Boolean) {

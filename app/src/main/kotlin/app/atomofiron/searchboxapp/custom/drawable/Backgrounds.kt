@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.custom.drawable
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.GradientDrawable.Orientation.BOTTOM_TOP
 import android.graphics.drawable.RippleDrawable
@@ -40,7 +41,7 @@ fun View.setStrokedBackground(
         .also { updatePaddingRelative(top = it, bottom = it) }
 }
 
-fun TextField.makeHoled(layout: TextInputLayout) = makeFilled(layout, context.findColorByAttr(R.attr.colorBackground))
+fun TextField.makeHoled(layout: TextInputLayout) = makeFilled(layout, context.colorBackground())
 
 fun TextField.makeToned(layout: TextInputLayout) = makeFilled(layout, context.colorSurfaceContainer())
 
@@ -51,3 +52,7 @@ fun Context.colorSurfaceContainer(): Int {
         else -> color
     }
 }
+
+fun Context.tonedOverlay(color: Int): ColorStateList = ColorStateList.valueOf(color withAlpha Alpha.VODKA over colorBackground())
+
+private fun Context.colorBackground(): Int = findColorByAttr(R.attr.colorBackground)
