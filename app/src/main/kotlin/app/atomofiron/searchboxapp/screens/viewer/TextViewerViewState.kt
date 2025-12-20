@@ -14,8 +14,8 @@ import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsStateDelegate
-import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
 import app.atomofiron.searchboxapp.screens.viewer.state.CursorResult
+import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
 import app.atomofiron.searchboxapp.screens.viewer.state.Status
 import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
@@ -78,24 +78,32 @@ class TextViewerViewState(
         }
     }
 
-    fun changeCursor(increment: Boolean): CursorResult {
+    fun switchCursor(forward: Boolean): CursorResult {
         val result = currentTask.value?.result
             ?: return CursorResult.Err("no search result")
+
         val cursor = matchesCursor.value
-            ?: return startNavigation(result, increment)
+            ?: return result.startNavigation(forward)
+
+        return result.switch(cursor, forward)
+    }
+
+    private fun SearchResult.Text.switch(cursor: MatchCursor, forward: Boolean): CursorResult {
         var lineIndex = cursor.lineIndex
-        val matches = result.matches[lineIndex]
-            ?: return CursorResult.Err("no matches for line index $lineIndex (max: ${result.matches.keys.sorted().max()})")
-        val indexes = result.indexes
-        var matchIndex = cursor.matchIndex + increment.toInt()
+        var matches = matches[lineIndex]
+            ?: return noMatchesErr(lineIndex)
+
+        var matchIndex = cursor.matchIndex + forward.toInt()
         var index = indexes.indexOf(lineIndex)
-        if (increment && matchIndex == matches.size) {
+        if (forward && matchIndex == matches.size) {
             index = index.inc() % indexes.size
             lineIndex = indexes[index]
             matchIndex = 0
-        } else if (!increment && matchIndex < 0) {
+        } else if (!forward && matchIndex < 0) {
             index = indexes.run { (size + index.dec()) % size }
             lineIndex = indexes[index]
+            matches = this.matches[lineIndex]
+                ?: return noMatchesErr(lineIndex)
             matchIndex = matches.lastIndex
         }
         if (lineIndex > textLines.value.lastIndex) {
@@ -103,24 +111,24 @@ class TextViewerViewState(
         }
         matchesCursor.value = MatchCursor(lineIndex, matchIndex)
         status.run {
-            value = value.go(forward = increment)
+            value = value.jump(forward)
         }
         return CursorResult.Ok
     }
 
-    private fun startNavigation(result: SearchResult.Text, increment: Boolean): CursorResult {
-        val indexes = result.indexes
-        val matches = result.matches
+    private fun noMatchesErr(lineIndex: Int) = CursorResult.Err("no matches for line index $lineIndex (max: ${currentTask.value?.result?.matches?.keys?.sorted()?.max()})")
+
+    private fun SearchResult.Text.startNavigation(forward: Boolean): CursorResult {
         val statusIndex = when {
-            increment -> 1
+            forward -> 1
             indexes.last() < textLines.value.size -> status.value.max
             else -> return CursorResult.Load(indexes.last())
         }
         status.update {
             it.copy(current = statusIndex)
         }
-        val lineIndex = if (increment) indexes.first() else indexes.last()
-        val matchIndex = if (increment) 0 else matches[lineIndex]?.lastIndex ?: 0
+        val lineIndex = if (forward) indexes.first() else indexes.last()
+        val matchIndex = if (forward) 0 else matches[lineIndex]?.lastIndex ?: 0
         matchesCursor.value = MatchCursor(lineIndex = lineIndex, matchIndex = matchIndex)
         return CursorResult.Ok
     }

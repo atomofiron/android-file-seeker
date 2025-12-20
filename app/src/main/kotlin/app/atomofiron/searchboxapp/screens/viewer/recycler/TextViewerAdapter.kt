@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.model.textviewer.MatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.postToPosition
 
 class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
 
@@ -39,9 +40,7 @@ class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
         }
         if (cursor != null && cursor.lineIndex >= 0 && cursor.lineIndex != was) {
             notifyItemChanged(cursor.lineIndex)
-            recyclerView?.post {
-                recyclerView?.scrollToPosition(cursor.lineIndex)
-            }
+            recyclerView?.postToPosition(cursor.lineIndex)
         }
     }
 

@@ -1,8 +1,6 @@
 package app.atomofiron.searchboxapp.screens.licenses.di
 
-import android.content.Context
 import android.content.res.AssetManager
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.licenses.LicensesScope
 import app.atomofiron.searchboxapp.screens.licenses.state.License
 import app.atomofiron.searchboxapp.screens.licenses.state.LicenseContent
@@ -29,7 +27,6 @@ class LicensesService @Inject constructor(
             line.split(delimiters, limit = 3)
                 .takeIf { it.size == 3 }
         }.map { (index, length, name) ->
-            poop("$index + $length $name")
             var start = index.toInt()
             while (licenses[start] == LF_BYTE) {
                 start++

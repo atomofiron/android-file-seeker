@@ -8,5 +8,5 @@ data class Status(
     val max: Int = 0,
 ) {
     fun clear(): Status = copy(current = 0, max = 0)
-    fun go(forward: Boolean): Status = copy(current = ((max + current.dec() + forward.toInt()) % max).inc())
+    fun jump(forward: Boolean): Status = copy(current = ((max + current.dec() + forward.toInt()) % max).inc())
 }

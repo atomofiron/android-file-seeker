@@ -13,8 +13,6 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.TIRAMISU
-import android.os.Bundle
 import android.os.Environment
 import android.provider.OpenableColumns
 import android.util.LayoutDirection
@@ -48,6 +46,7 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Data
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.debugRequire
+import app.atomofiron.common.util.extension.unit
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
@@ -56,7 +55,6 @@ import app.atomofiron.searchboxapp.model.other.get
 import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
-import java.io.Serializable
 
 fun Context.findResIdByAttr(@AttrRes attr: Int): Int = findResIdsByAttr(attr)[0]
 
@@ -191,13 +189,11 @@ fun RecyclerView.scrollToTop(): Boolean {
     return true
 }
 
-val ViewPager2.recyclerView: RecyclerView get() = getChildAt(0) as RecyclerView
+fun RecyclerView.postToPosition(index: Int) = post {
+    scrollToPosition(index)
+}.unit()
 
-@Suppress("DEPRECATION")
-inline fun <reified T : Serializable> Bundle.getSerializableCompat(key: String, clazz: Class<T>): T? = when {
-    SDK_INT >= TIRAMISU -> getSerializable(key, clazz)
-    else -> getSerializable(key) as T?
-}
+val ViewPager2.recyclerView: RecyclerView get() = getChildAt(0) as RecyclerView
 
 fun Context.granted(permission: String) = checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 

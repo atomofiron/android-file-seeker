@@ -66,18 +66,18 @@ class TextViewerPresenter(
 
     fun onSearchClick() = searchDelegate.show()
 
-    fun onPreviousClick() = onMoveClick(increment = false)
+    fun onPreviousClick() = onMoveClick(forward = false)
 
-    fun onNextClick() = onMoveClick(increment = true)
+    fun onNextClick() = onMoveClick(forward = true)
 
     fun onCopyPathClick() = interactor.copy(viewState.item.value)
 
-    private fun onMoveClick(increment: Boolean) {
-        when (val result = viewState.changeCursor(increment)) {
+    private fun onMoveClick(forward: Boolean) {
+        when (val result = viewState.switchCursor(forward)) {
             is CursorResult.Ok -> Unit
             is CursorResult.Err -> logE(result.message)
             is CursorResult.Load -> interactor.readFileToLine(itemRef, result.line) {
-                viewState.changeCursor(increment)
+                viewState.switchCursor(forward)
             }
         }
     }
