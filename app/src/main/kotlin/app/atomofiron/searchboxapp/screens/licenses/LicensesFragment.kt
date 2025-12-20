@@ -40,6 +40,6 @@ class LicensesFragment : Fragment(R.layout.fragment_licenses)
     }
 
     private fun FragmentLicensesBinding.applyInsets() {
-        root.apply(recyclerView, appBarLayout = appbar)
+        root.apply(recyclerView, appBar = header)
     }
 }

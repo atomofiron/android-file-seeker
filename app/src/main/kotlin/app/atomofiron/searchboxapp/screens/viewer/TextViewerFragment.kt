@@ -75,12 +75,12 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
     }
 
     override fun FragmentTextViewerBinding.onApplyInsets() {
-        root.apply(recyclerView = recyclerView, dockView = dockBar, appBarLayout = appBar)
+        root.apply(recyclerView = recyclerView, dockView = dockBar, appBar = header)
     }
 
     private fun FragmentTextViewerBinding.configureAppBar() {
         root.setScreenSizeListener { _, height ->
-            appBar.pinToolbar(height != ScreenSize.Compact)
+            header.pinToolbar(height != ScreenSize.Compact)
         }
     }
 

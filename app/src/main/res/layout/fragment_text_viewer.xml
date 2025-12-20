@@ -6,13 +6,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="?colorBackground"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layout_constraintEnd_toStartOf="@+id/navigation_rail"
-    app:layout_constraintBottom_toTopOf="@+id/bottom_bar"
     >
     <app.atomofiron.searchboxapp.custom.view.HeaderLayout
-        android:id="@+id/app_bar"
+        android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         >
@@ -20,8 +16,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dense_toolbar"
-            app:menu="@menu/text_viewer"
             app:navigationIcon="@drawable/ic_back"
+            app:title="Title"
             tools:title="Title"
             />
         <LinearLayout
@@ -49,7 +45,7 @@
                 android:contentDescription="@string/copy"
                 />
         </LinearLayout>
-    </app.atomofiron.searchboxapp.custom.view.HeaderLayout>>
+    </app.atomofiron.searchboxapp.custom.view.HeaderLayout>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
         android:layout_width="match_parent"

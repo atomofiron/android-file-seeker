@@ -44,8 +44,8 @@ object LayoutDelegate {
     fun MeasureProvider.apply(
         recyclerView: RecyclerView? = null,
         dockView: DockBarView? = null,
-        tabLayout: MaterialButtonToggleGroup? = null,
-        appBarLayout: AppBarLayout? = null,
+        tabs: MaterialButtonToggleGroup? = null,
+        appBar: AppBarLayout? = null,
         snackbarContainer: CoordinatorLayout? = null,
         recyclerAddInsetType: TypeSet = TypeSet.Empty,
     ) {
@@ -56,14 +56,14 @@ object LayoutDelegate {
             val size = getDimensionPixelSize(R.dimen.joystick_size) - 2 * getDimensionPixelSize(R.dimen.joystick_padding)
             DockNotch(size)
         }
-        val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock + joystick + recyclerAddInsetType }, start = true, top = appBarLayout == null, end = true, bottom = true)
+        val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock + joystick + recyclerAddInsetType }, start = true, top = appBar == null, end = true, bottom = true)
         addLayoutListener { layout ->
             if (layout == layoutWas) {
                 return@addLayoutListener
             }
             layoutWas = layout
             val tappableBottom = insetsProvider.current[ExtType.tappableElement].bottom > 0
-            tabLayout?.isVisible = !layout.isWide
+            tabs?.isVisible = !layout.isWide
             dockView?.apply(layout, notch, dockDelegate!!, tappableBottom)
             recyclerDelegate?.combining(if (layout.isBottom) null else InsetsCombining(ExtType.invoke { displayCutout + dock }) )
             /* нужно только когда есть табы
@@ -73,7 +73,7 @@ object LayoutDelegate {
             insetsProvider.requestInsets()
         }
         snackbarContainer?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock })
-        appBarLayout?.insetsPadding(ExtType.invoke { barsWithCutout + dock + joystickFlank }, start = true, top = true, end = true)
+        appBar?.insetsPadding(ExtType.invoke { barsWithCutout + dock + joystickFlank }, start = true, top = true, end = true)
         dockView?.dockView?.insetsSource { view ->
             val layout = layoutWas
             val insets = when {

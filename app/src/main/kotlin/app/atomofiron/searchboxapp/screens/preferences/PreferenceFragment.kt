@@ -127,9 +127,8 @@ class PreferenceFragment : PreferenceFragmentCompat(),
 
     override fun FragmentPreferenceBinding.onApplyInsets() {
         recyclerView.insetsPadding(ExtType { barsWithCutout + ime + joystickBottom + joystickFlank }, start = true, end = true, bottom = true)
-        binding.appbarLayout.insetsPadding(ExtType { barsWithCutout + joystickFlank }, top = true)
+        binding.header.insetsPadding(ExtType { barsWithCutout + joystickFlank }, top = true)
         binding.toolbar.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, end = true)
-        binding.collapsingLayout.fixInsets()
         viewState.onViewCollect()
     }
 
@@ -158,16 +157,4 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         }
         binding.snackbarContainer.makeSnackbar(message, duration).show()
     }
-
-    private fun CollapsingToolbarLayout.fixInsets() = object : InsetsListener {
-        private val isRtl = isRtl()
-        private val defaultStart = expandedTitleMarginStart
-        private val defaultEnd = expandedTitleMarginEnd
-        override val types = ExtType { barsWithCutout + joystickFlank }
-        override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
-            val insets = windowInsets[types]
-            expandedTitleMarginStart = defaultStart + if (isRtl) insets.right else insets.left
-            expandedTitleMarginEnd = defaultEnd + if (isRtl) insets.left else insets.right
-        }
-    }.let { binding.root.attachInsetsListener(it) }
 }
