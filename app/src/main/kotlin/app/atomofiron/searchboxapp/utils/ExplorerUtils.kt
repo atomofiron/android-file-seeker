@@ -15,6 +15,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.model.explorer.NodeId
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeProperties
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -547,9 +548,9 @@ object ExplorerUtils {
     fun NodeRef.isContent() = string.startsWith(Const.SCHEME_CONTENT)
 
     fun NodeRef.toNode(
-        rootId: Int = uniqueId,
+        rootId: NodeId = uniqueId,
         parentRef: NodeRef = parent,
-        content: NodeContent = NodeContent.Unknown,
+        content: NodeContent = NodeContent.Undefined,
         children: NodeChildren? = null,
     ) = Node(this, parentRef = parentRef, rootId = rootId, content = content, children = children)
 

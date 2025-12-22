@@ -62,10 +62,12 @@ class ExplorerStore {
     }
 
     fun setCurrentTab(tab: NodeTabKey.Explorer) {
-        _currentTab.value = tab
-        updateChecked(tab)
-        updateCurrentItems(tab)
-        updateDeepest(tab)
+        if (tab != _currentTab.value) {
+            _currentTab.value = tab
+            updateChecked(tab)
+            updateCurrentItems(tab)
+            updateDeepest(tab)
+        }
     }
 
     fun updateInternalStorage(action: Node.() -> Node) {

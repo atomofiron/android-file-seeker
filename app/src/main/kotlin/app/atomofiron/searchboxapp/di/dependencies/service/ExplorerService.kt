@@ -103,6 +103,8 @@ class ExplorerService(
         val suDefined = Job()
         appScope.launchOnIO {
             garden { // lock due configuration
+                store.mainTabs
+                    .forEach { get(it) } // init
                 suDefined.join()
                 if (asSu) checkSu()
                 initRoots()
@@ -670,7 +672,7 @@ class ExplorerService(
             ?.let { putTree(it.id, listOf(it.item.ref)) }
 
         val deepest = findDeepest()
-        val items = renderNodes()
+        val items = renderItems()
         val tabItems = NodeTabItems(roots, items, deepest)
         flow.emit(tabItems)
         store.setDeepestNode(key, deepest)
@@ -733,7 +735,7 @@ class ExplorerService(
         }
     }
 
-    private fun NodeTab.renderNodes(): List<Node> {
+    private fun NodeTab.renderItems(): List<Node> {
         val root = getSelectedRoot()
             ?: return emptyList()
         val items = mutableListOf<Node>()
