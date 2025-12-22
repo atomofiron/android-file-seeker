@@ -14,19 +14,22 @@ class DataFlow<T> private constructor(
     private val sharedFlow: MutableSharedFlow<T>,
 ) : MutableSharedFlow<T> by sharedFlow, StateFlow<T> {
 
-    override var value: T = value
-        private set
+    private var data: T = value
+
+    override var value: T
+        get() = data
+        set(value) { tryEmit(value) }
 
     constructor(value: T) : this(value, MutableSharedFlow<T>(replay = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST))
 
-    override suspend fun emit(value: T) {
-        this.value = value
+    override suspend infix fun emit(value: T) {
+        this.data = value
         sharedFlow.emit(value)
     }
 
-    override fun tryEmit(value: T): Boolean {
+    override infix fun tryEmit(value: T): Boolean {
         return sharedFlow.tryEmit(value).also {
-            if (it) this.value = value
+            if (it) data = value
         }
     }
 }

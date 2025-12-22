@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.viewer
 
 import app.atomofiron.common.util.flow.ChannelFlow
+import app.atomofiron.common.util.flow.DataFlow
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
@@ -42,8 +43,7 @@ class TextViewerViewState(
     val insertInQuery = ChannelFlow<String>()
 
     private val status = MutableStateFlow(Status())
-    /** line index -> line match index */
-    val matchesCursor = MutableStateFlow<MatchCursor?>(null)
+    val matchingCursor = DataFlow<MatchCursor?>(null)
 
     val composition = preferenceStore.explorerItemComposition.value
     val item: StateFlow<Node> = session?.item ?: MutableStateFlow(ref.toNode())
@@ -82,7 +82,7 @@ class TextViewerViewState(
         val result = currentTask.value?.result
             ?: return CursorResult.Err("no search result")
 
-        val cursor = matchesCursor.value
+        val cursor = matchingCursor.value
             ?: return result.startNavigation(forward)
 
         return result.switch(cursor, forward)
@@ -109,7 +109,7 @@ class TextViewerViewState(
         if (lineIndex > textLines.value.lastIndex) {
             return CursorResult.Load(lineIndex)
         }
-        matchesCursor.value = MatchCursor(lineIndex, matchIndex)
+        matchingCursor.value = MatchCursor(lineIndex, matchIndex)
         status.run {
             value = value.jump(forward)
         }
@@ -129,7 +129,7 @@ class TextViewerViewState(
         }
         val lineIndex = if (forward) indexes.first() else indexes.last()
         val matchIndex = if (forward) 0 else matches[lineIndex]?.lastIndex ?: 0
-        matchesCursor.value = MatchCursor(lineIndex = lineIndex, matchIndex = matchIndex)
+        matchingCursor.value = MatchCursor(lineIndex = lineIndex, matchIndex = matchIndex)
         return CursorResult.Ok
     }
 
@@ -146,14 +146,14 @@ class TextViewerViewState(
     fun dropTask() {
         status.value = status.value.clear()
         currentTask.value = null
-        matchesCursor.value = null
+        matchingCursor.value = null
     }
 
     fun trySelectTask(task: TextSearchTask): Boolean {
         return (task.isEnded && task.count > 0).also { isOk ->
             if (isOk) {
                 currentTask.value = task
-                matchesCursor.value = null
+                matchingCursor.value = null
                 status.run {
                     value = value.copy(current = 0, max = task.count)
                 }

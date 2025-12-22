@@ -2,13 +2,9 @@ package app.atomofiron.searchboxapp.screens.viewer.recycler
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
-import android.widget.TextView
-import androidx.core.view.updatePaddingRelative
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralAdapter
-import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemTextLineBinding
 import app.atomofiron.searchboxapp.model.textviewer.MatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
@@ -40,7 +36,9 @@ class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
         }
         if (cursor != null && cursor.lineIndex >= 0 && cursor.lineIndex != was) {
             notifyItemChanged(cursor.lineIndex)
-            recyclerView?.postToPosition(cursor.lineIndex)
+        }
+        cursor?.lineIndex?.let {
+            recyclerView?.postToPosition(it)
         }
     }
 
@@ -53,11 +51,8 @@ class TextViewerAdapter : GeneralAdapter<TextLine, TextViewerHolder>() {
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, inflater: LayoutInflater): TextViewerHolder {
-        val textView = TextView(parent.context)
-        textView.layoutParams = ViewGroup.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
-        val padding = parent.resources.getDimensionPixelSize(R.dimen.content_margin_half)
-        textView.updatePaddingRelative(start = padding, end = padding)
-        return TextViewerHolder(textView)
+        val binding = ItemTextLineBinding.inflate(inflater, parent, false)
+        return TextViewerHolder(binding.root)
     }
 
     override fun getItemId(position: Int): Long = position.toLong()

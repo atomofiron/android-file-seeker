@@ -70,7 +70,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         }
         viewCollect(textLines, collector = textAdapter::submit)
         viewCollect(currentTask, collector = ::onTaskChanged)
-        viewCollect(matchesCursor, collector = ::onMatchCursorChanged)
+        viewCollect(matchingCursor, collector = ::onMatchCursorChanged)
         viewCollect(dock, collector = binding.dockBar::submit)
     }
 
