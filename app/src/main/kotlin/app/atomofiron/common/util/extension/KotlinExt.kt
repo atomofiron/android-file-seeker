@@ -177,3 +177,37 @@ fun StringBuilder.appendWithComma(part: String): StringBuilder {
     append(part)
     return this
 }
+
+fun hash(a: Any?) = when (a) {
+    null -> 0
+    is ByteArray -> a.contentHashCode()
+    is ShortArray -> a.contentHashCode()
+    is IntArray -> a.contentHashCode()
+    is LongArray -> a.contentHashCode()
+    is CharArray -> a.contentHashCode()
+    is FloatArray -> a.contentHashCode()
+    is DoubleArray -> a.contentHashCode()
+    is BooleanArray -> a.contentHashCode()
+    is Array<*> -> a.contentDeepHashCode()
+    else -> a.hashCode()
+}
+
+fun hash(a: Any?, b: Any?): Int = hash(hash(a), hash(b))
+
+fun hash(a: Any?, b: Any?, c: Any?): Int = hash(hash(a), hash(b), hash(c))
+
+fun hash(a: Any?, b: Any?, c: Any?, d: Any?): Int = hash(hash(a), hash(b), hash(c), hash(d))
+
+fun hash(a: Any?, b: Any?, c: Any?, d: Any?, e: Any?): Int = hash(hash(a), hash(b), hash(c), hash(d), hash(e))
+
+private fun hash(a: Int, b: Int, c: Int = 0, d: Int = 0, e: Int = 0): Int {
+    var result = a
+    // it's bad for hash(0), but it's not so bad for all I think
+    if (b != 0) result = result.append(b)
+    if (c != 0) result = result.append(c)
+    if (d != 0) result = result.append(c)
+    if (e != 0) result = result.append(e)
+    return result
+}
+
+private fun Int.append(other: Int) = 31 * this + other

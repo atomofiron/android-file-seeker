@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.model.preference
 
 import android.os.Build.VERSION.SDK_INT
 import android.os.Build.VERSION_CODES.Q
-import java.util.*
+import app.atomofiron.common.util.extension.hash
 
 sealed class AppTheme(
     val name: String,
@@ -23,7 +23,7 @@ sealed class AppTheme(
         else -> other.deepBlack == deepBlack
     }
 
-    override fun hashCode(): Int = Objects.hash(this::class, deepBlack)
+    override fun hashCode(): Int = hash(this::class, deepBlack)
 
     override fun toString(): String = "AppTheme{name=$name, deepBlack=$deepBlack}"
 

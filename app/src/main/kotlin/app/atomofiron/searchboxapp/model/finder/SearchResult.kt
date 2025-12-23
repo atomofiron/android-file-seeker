@@ -1,9 +1,9 @@
 package app.atomofiron.searchboxapp.model.finder
 
+import app.atomofiron.common.util.extension.hash
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.textviewer.MatchMap
-import app.atomofiron.searchboxapp.utils.Const
 import java.util.Objects
 import kotlin.LazyThreadSafetyMode.NONE
 
@@ -86,7 +86,7 @@ sealed class SearchResult {
 
         fun contains(match: ItemMatch) = matches.contains(match)
 
-        override fun hashCode(): Int = Objects.hash(this::class, count, countTotal, errors.size, sorting)
+        override fun hashCode(): Int = hash(this::class, count, countTotal, errors.size, sorting)
 
         override fun equals(other: Any?): Boolean = when {
             other === this -> true

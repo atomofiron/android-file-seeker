@@ -1,8 +1,8 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+import app.atomofiron.common.util.extension.hash
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
-import java.util.Objects
 
 data class NodeRoot(
     val type: NodeRootType,
@@ -35,5 +35,5 @@ data class NodeRoot(
         else -> true
     }
 
-    override fun hashCode(): Int = Objects.hash(type, thumbnail)
+    override fun hashCode(): Int = hash(type, thumbnail)
 }

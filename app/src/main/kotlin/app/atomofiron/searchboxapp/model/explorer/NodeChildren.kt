@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+import app.atomofiron.common.util.extension.hash
 import app.atomofiron.common.util.extension.mutableCopy
-import java.util.Objects
 
 data class NodeChildren(
     // a copy is made during rendering by NodeChildren.fetch()
@@ -16,7 +16,7 @@ data class NodeChildren(
     var dirs = items.count { it.isDirectory }
         private set
 
-    override fun hashCode(): Int = Objects.hash(isOpened, items.map { it.ref }, filteredOut)
+    override fun hashCode(): Int = hash(isOpened, items.map { it.ref }, filteredOut)
 
     override fun equals(other: Any?): Boolean = when {
         other !is NodeChildren -> false

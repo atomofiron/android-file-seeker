@@ -2,11 +2,11 @@ package app.atomofiron.searchboxapp.screens.finder.state
 
 import androidx.annotation.StringRes
 import app.atomofiron.common.recycler.GeneralItem
+import app.atomofiron.common.util.extension.hash
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
-import java.util.Objects
 
 sealed class FinderStateItem(
     val type: FinderItemType,
@@ -32,7 +32,7 @@ sealed class FinderStateItem(
             other !is SpecialCharacters -> false
             else -> characters.contentEquals(other.characters)
         }
-        override fun hashCode(): Int = Objects.hash(this::class, characters)
+        override fun hashCode(): Int = hash(this::class, characters)
     }
 
     data class Title(@StringRes val stringId: Int) : FinderStateItem(FinderItemType.TITLE, stringId)
