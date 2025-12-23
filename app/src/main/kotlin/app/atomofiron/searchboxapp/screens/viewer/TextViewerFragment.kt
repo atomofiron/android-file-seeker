@@ -6,7 +6,6 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
-import app.atomofiron.common.util.extension.debug
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentTextViewerBinding
@@ -46,9 +45,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
             }
             dockBar.submit(DefaultDockState)
             dockBar.setListener(::onBottomMenuItemClick)
-            debug { toolbar.menu.add("Test") }
             pathBar.setOnClickListener { presenter.onCopyPathClick() }
-            //copyPath.imageTintList = path.textColors
             toolbar.setNavigationOnClickListener { presenter.onNavigationClick() }
             toolbar.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
