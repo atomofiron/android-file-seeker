@@ -1,5 +1,7 @@
 package app.atomofiron.searchboxapp.model.textviewer
 
+import app.atomofiron.common.util.extension.hash
+
 class TextLine(
     val offset: Int,
     val text: ByteArray,
@@ -13,12 +15,7 @@ class TextLine(
         else -> text.contentEquals(other.text)
     }
 
-    override fun hashCode(): Int {
-        var result = offset
-        result = 31 * result + length
-        result = 31 * result + text.contentHashCode()
-        return result
-    }
+    override fun hashCode(): Int = hash(offset, length, text)
 
     override fun toString(): String = "${this::class.java.simpleName}(byteOffset=$offset, text=[$length])"
 }

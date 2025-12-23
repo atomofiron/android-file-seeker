@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
+import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -118,7 +119,7 @@ class FinderWorker(
                             val index = it.line.toInt()
                             map.getOrPut(index) { mutableListOf() }.add(it)
                         }
-                        val many = ItemMatch.Many(match.v1.toNode(), count = match.v2.size, map)
+                        val many = ItemMatch.Many(NodeRef(match.v1.path), count = match.v2.size, map)
                         val matches = result.matches.mutate { add(many) }
                         result.copy(count = result.count + many.count, matches = matches, countTotal = result.countTotal.inc())
                     }
@@ -133,15 +134,16 @@ class FinderWorker(
     }
 
     private fun Params.searchNames(type: Params.Names) {
+        Uri.encode("")
         val errors = GrowingList<String>()
         NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu, cancellation) { match ->
             updateAsync {
                 when (match) {
                     is NameSearchProgress.Skip -> copy(result = result.copy(countTotal = result.countTotal.inc()))
                     is NameSearchProgress.Match -> {
-                        val itemMatch = ItemMatch.Single(match.v1.toNode())
+                        val itemMatch = ItemMatch.Single(NodeRef(match.v1.path))
                         val matches = result.matches.toMutableList()
-                        matches.put(itemMatch) { it.path == itemMatch.path }
+                        matches.put(itemMatch) { it.ref == itemMatch.ref }
                         copy(result = result.copy(count = count.inc(), matches = matches, countTotal = result.countTotal.inc()))
                     }
                     is NameSearchProgress.Err -> {

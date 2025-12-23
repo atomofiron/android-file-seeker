@@ -4,10 +4,10 @@ import android.os.Looper
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.hash
 
+private var nextId = 0
+
 class Unique<T>(val value: T) : Equality {
-    companion object {
-        private var nextId = 0
-    }
+
     private val uniqueId = nextId++
 
     init {

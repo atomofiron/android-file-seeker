@@ -2,6 +2,8 @@ package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.extension.debugRequire
 
+val StateStub = NodeStateImpl(0)
+
 data class Node(
     val ref: NodeRef,
     val parentRef: NodeRef = ref.parent,
@@ -13,7 +15,7 @@ data class Node(
     val content: NodeContent,
     val error: NodeError? = null,
     // state is always stateStub in the garden
-    val state: NodeState = stateStub,
+    val state: NodeStateImpl = StateStub,
     // isChecked is always false in the garden
     val isChecked: Boolean = false,
     // isDeepest is always false in the garden
@@ -21,9 +23,7 @@ data class Node(
     // generation is always 0 in the garden
     val generation: Int = 0,
 ) : INodeProperties by properties, NodeState by state {
-    companion object {
-        val stateStub = NodeStateImpl(0)
-    }
+
     val name get() = ref.name
     val path get() = ref.string
     val isRoot: Boolean = uniqueId == rootId
@@ -84,7 +84,7 @@ data class Node(
         ref: NodeRef,
         parentRef: NodeRef = ref.parent,
         properties: NodeProperties = this.properties,
-        state: NodeState = this.state,
+        state: NodeStateImpl = this.state.copy(uniqueId = ref.uniqueId),
         error: NodeError? = this.error,
     ): Node {
         val new = copy(ref = ref, parentRef = parentRef, uniqueId = ref.uniqueId, properties = properties, state = state, error = error)

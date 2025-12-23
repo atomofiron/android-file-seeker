@@ -8,9 +8,7 @@ import app.atomofiron.common.util.extension.takeIfDebug
 import app.atomofiron.common.util.forHumans
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.searchboxapp.android.NativeBridge
-import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.Node.Companion.stateStub
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
@@ -22,6 +20,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
+import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
 import uniffi.native_lib.CountingResult
@@ -175,9 +174,9 @@ object ExplorerUtils {
         return Node(ref = target, parentRef = parent.ref, rootId = parent.rootId, properties = meta.toProperties(), content = content)
     }
 
-    fun Node.Companion.asRoot(ref: NodeRef, type: NodeRootType): Node {
+    fun NodeRef.asRoot(type: NodeRootType): Node {
         return Node(
-            ref = ref,
+            ref = this,
             properties = NodeProperties(),
             content = NodeContent.Directory(rootType = type),
         )
@@ -596,7 +595,7 @@ object ExplorerUtils {
 
     fun Node.move(parent: NodeRef = parentRef, name: String = this.name): Node {
         val ref = parent + name
-        return mutate(ref = ref, parentRef = parent, properties = properties, state = stateStub)
+        return mutate(ref = ref, parentRef = parent, properties = properties)
     }
 
     private fun String.toNodeError(): NodeError {

@@ -42,23 +42,20 @@ import kotlin.math.max
 private const val RECEIVED_UNKNOWN = -1L
 private const val MB = 1024 * 1024
 
+private val gates = mutableMapOf<UUID, WaitingGate>()
+private val lock = Mutex()
+
+private suspend fun get(id: UUID): WaitingGate = lock.withLock {
+    gates.getOrPut(id) { WaitingGate() }
+}
+
+suspend fun OneTimeWorkRequest.waitForDataRead() = get(id).await()
+
+private suspend fun ListenableWorker.dataRead() = get(id).finish()
 class ReceiveWorker(
     private val context: Context,
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {
-    companion object {
-        private val gates = mutableMapOf<UUID, WaitingGate>()
-        private val lock = Mutex()
-
-        private suspend fun get(id: UUID): WaitingGate = lock.withLock {
-            gates.getOrPut(id) { WaitingGate() }
-        }
-
-        suspend fun OneTimeWorkRequest.waitForDataRead() = get(id).await()
-
-        private suspend fun ListenableWorker.dataRead() = get(id).finish()
-    }
-
     private val notificationId = hashCode()
     private val progressStyle = NotificationCompat.ProgressStyle()
     private var progressScale = 1.0

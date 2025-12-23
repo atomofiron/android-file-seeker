@@ -7,9 +7,6 @@ import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 import javax.inject.Inject
 
 class TextViewerViewModel : BaseViewModel<TextViewerComponent, TextViewerFragment, TextViewerViewState, TextViewerPresenter>() {
-    companion object {
-        const val UNDEFINED = -1
-    }
 
     @Inject
     override lateinit var presenter: TextViewerPresenter
