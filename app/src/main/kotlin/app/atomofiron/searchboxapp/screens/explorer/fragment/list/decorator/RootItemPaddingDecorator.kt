@@ -19,8 +19,7 @@ class RootItemPaddingDecorator(
     private val adapter: RootAdapter,
 ) : RecyclerView.ItemDecoration(), InsetsListener {
 
-    private val outerPadding = resources.getDimensionPixelSize(R.dimen.padding_common)
-    private val innerPadding = resources.getDimensionPixelSize(R.dimen.padding_half)
+    private val padding = resources.getDimensionPixelSize(R.dimen.padding_half)
     private var rows = IntArray(0)
     private var paddings = mutableListOf<Int>()
     private var leftPadding = 0
@@ -50,14 +49,15 @@ class RootItemPaddingDecorator(
         }
         index *= 2
         val paddings = getPaddings(cellCount)
+        outRect.top = padding
         outRect.left = paddings[index]
         outRect.right = paddings[index.inc()]
     }
 
     override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
         val cutout = windowInsets[ExtType { displayCutout + dock }]
-        val left = max(0, outerPadding - cutout.left)
-        val right = max(0, outerPadding - cutout.right)
+        val left = max(0, padding - cutout.left)
+        val right = max(0, padding - cutout.right)
         if (left != leftPadding || right != rightPadding) {
             leftPadding = left
             rightPadding = right
@@ -74,7 +74,7 @@ class RootItemPaddingDecorator(
         paddings.resizeWith(cellCount * 2, 0)
         paddings[0] = leftPadding
         val spanCount = paddings.size / 2
-        val sum = leftPadding + rightPadding + innerPadding * spanCount.dec()
+        val sum = leftPadding + rightPadding + padding * spanCount.dec()
         val avg = sum / spanCount
         // distribute the paddings so that the cells become the same width
         for (i in 0..<spanCount) {
@@ -82,7 +82,7 @@ class RootItemPaddingDecorator(
                 paddings[1] = avg - paddings[0]
             } else {
                 val index = i * 2
-                val left = innerPadding - paddings[index.dec()]
+                val left = padding - paddings[index.dec()]
                 paddings[index] = left
                 paddings[index.inc()] = avg - left
             }
