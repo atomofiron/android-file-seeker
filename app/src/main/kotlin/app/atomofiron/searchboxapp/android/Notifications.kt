@@ -99,6 +99,7 @@ fun Context.showScreenshotOperations(ref: NodeRef) = notification(
     val openIntent = PendingIntent.getActivity(context, ref.uniqueId + 1, Intents.openWith(context, ref, asSu = false), flags)
     val sendIntent = PendingIntent.getActivity(context, ref.uniqueId + 2, Intents.shareWith(context, ref, asSu = false), flags)
     val deleteIntent = PendingIntent.getBroadcast(context, ref.uniqueId + 3, Intents.deleteScreenshot(context, ref), flags)
+    setLargeIcon(bitmap)
     setSmallIcon(R.drawable.ic_screenshot_operations)
     setContentTitle(getString(R.string.pref_screenshot_operations))
     setVisibility(NotificationCompat.VISIBILITY_PRIVATE)
