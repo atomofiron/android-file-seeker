@@ -51,9 +51,9 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
     )
 
     override fun onBind(item: TextLine, position: Int) {
+        textView.text = item.text.decode()
         // android:textIsSelectable="true" breaks down
         textView.setTextIsSelectable(true)
-        textView.text = item.text.decode()
     }
 
     fun bindMatches(item: TextLine, position: Int, matches: MatchList, indexFocus: Int) {
@@ -78,9 +78,9 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
             }
             spannable.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
+        textView.text = spannable
         // android:textIsSelectable="true" breaks down
         textView.setTextIsSelectable(true)
-        textView.text = spannable
     }
 
     private fun ByteArray.decode() = String(this, charset)

@@ -47,8 +47,8 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
             dockBar.submit(DefaultDockState)
             dockBar.setListener(::onBottomMenuItemClick)
             debug { toolbar.menu.add("Test") }
-            copyPath.setOnClickListener { presenter.onCopyPathClick() }
-            copyPath.imageTintList = path.textColors
+            pathBar.setOnClickListener { presenter.onCopyPathClick() }
+            //copyPath.imageTintList = path.textColors
             toolbar.setNavigationOnClickListener { presenter.onNavigationClick() }
             toolbar.setOnMenuItemClickListener { item ->
                 when (item.itemId) {

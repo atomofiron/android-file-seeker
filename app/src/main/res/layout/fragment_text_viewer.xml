@@ -25,6 +25,7 @@
             android:layout_height="wrap_content"
             android:paddingStart="@dimen/content_margin_half"
             android:orientation="horizontal"
+            android:background="@drawable/bg_ripple_16"
             >
             <TextView
                 android:id="@+id/path"
@@ -35,13 +36,12 @@
                 tools:text="/sdcard/fadb/file.txt"
                 />
             <ImageView
-                android:id="@+id/copy_path"
                 android:layout_width="@dimen/icon_button_size"
                 android:layout_height="@dimen/icon_button_size"
                 android:padding="@dimen/padding_semi"
                 android:src="@drawable/ic_copy"
-                android:background="@drawable/bg_ripple"
                 android:contentDescription="@string/copy"
+                android:tint="?colorContent"
                 />
         </LinearLayout>
     </app.atomofiron.searchboxapp.custom.view.HeaderLayout>
