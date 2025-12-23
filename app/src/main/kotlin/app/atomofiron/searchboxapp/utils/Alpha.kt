@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.utils
 
 import androidx.core.graphics.ColorUtils
+import kotlin.math.max
 
 object Alpha {
     const val INVISIBLE = 0f
@@ -30,6 +31,9 @@ object Alpha {
     fun enabled(value: Boolean) = if (value) VISIBLE else VODKA
     fun enabledInt(value: Boolean) = if (value) VISIBLE_INT else VODKA_INT
     fun vodkaInt(value: Boolean) = if (value) VODKA_INT else VISIBLE_INT
+
+    fun halfVisible(alpha: Float) = max(alpha * 2, VISIBLE)
+    fun halfInvisible(alpha: Float) = (alpha - HALF) / HALF
 }
 
 fun Float.toIntAlpha(): Int = (this * Alpha.VISIBLE_INT).toInt().coerceIn(Alpha.INVISIBLE_INT, Alpha.VISIBLE_INT)

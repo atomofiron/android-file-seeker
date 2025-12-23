@@ -11,18 +11,21 @@ import androidx.core.view.children
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.updateLayoutParams
 import app.atomofiron.common.util.extension.findAs
+import app.atomofiron.common.util.extension.hasBits
 import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.tonedOverlay
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.inflater
+import app.atomofiron.searchboxapp.utils.invoke
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
-import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
 import com.google.android.material.appbar.CollapsingToolbarLayout
 import com.google.android.material.appbar.CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_OFF
 import com.google.android.material.appbar.CollapsingToolbarLayout.LayoutParams.COLLAPSE_MODE_PIN
 import com.google.android.material.shape.MaterialShapeDrawable
 import kotlin.math.min
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_EXIT_UNTIL_COLLAPSED as EUC
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL as SCR
 
 class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
 
@@ -69,21 +72,16 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
 
     fun pinToolbar(pin: Boolean) {
         isLiftOnScroll = pin
-        collapsing.updateLayoutParams<LayoutParams> {
-            scrollFlags = when {
-                pin -> SCROLL_FLAG_SCROLL or SCROLL_FLAG_EXIT_UNTIL_COLLAPSED
-                else -> SCROLL_FLAG_SCROLL
-            }
+        collapsing<LayoutParams> {
+            scrollFlags = if (pin) SCR or EUC else SCR
         }
     }
 
     override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout?> = behavior
 
     override fun onOffsetChanged(appBarLayout: AppBarLayout, verticalOffset: Int) {
-        val toolbarHeight = toolbar?.height ?: return
-        val subHeight = subBar?.height ?: return
-        alpha = (toolbarHeight + subHeight + verticalOffset) / toolbarHeight.toFloat()
-        subBar?.alpha = (subHeight + verticalOffset) / subHeight.toFloat()
+        updateToolbarAlpha(verticalOffset)
+        updateSubBarAlpha(verticalOffset)
     }
 
     override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams) {
@@ -110,6 +108,26 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
                 behavior.limitOffset = -it.height
             }
         }
+    }
+
+    private fun updateToolbarAlpha(offset: Int) {
+        val toolbar = toolbar ?: return
+        val flags = collapsing<LayoutParams>().scrollFlags
+        toolbar.alpha = if (flags.hasBits(SCR) && !flags.hasBits(EUC)) {
+            val toolbarHeight = toolbar.height
+            val subHeight = subBar?.height ?: 0
+            val alpha = (toolbarHeight + subHeight + offset) / toolbarHeight.toFloat()
+            Alpha.halfInvisible(alpha)
+        } else {
+            Alpha.VISIBLE
+        }
+    }
+
+    private fun updateSubBarAlpha(offset: Int) {
+        val subBar = subBar ?: return
+        val subHeight = subBar.height
+        val alpha = (subHeight + offset) / subHeight.toFloat()
+        subBar.alpha = Alpha.halfInvisible(alpha)
     }
 
     private class HeaderBehavior : Behavior() {

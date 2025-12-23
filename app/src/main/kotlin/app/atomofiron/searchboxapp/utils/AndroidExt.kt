@@ -21,6 +21,7 @@ import android.view.Display
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewGroup.LayoutParams
 import android.view.ViewParent
 import android.view.WindowManager
 import android.webkit.WebView
@@ -166,6 +167,10 @@ val View.isLayoutRtl: Boolean get() = layoutDirection == View.LAYOUT_DIRECTION_R
 fun View.isRtl(): Boolean = resources.isRtl()
 
 fun View.inflater(): LayoutInflater = LayoutInflater.from(context)
+
+inline operator fun <reified P : LayoutParams> View.invoke() = layoutParams as P
+
+inline operator fun <reified P : LayoutParams> View.invoke(action: P.() -> Unit) = action(this<P>())
 
 fun Resources.isRtl(): Boolean = configuration.layoutDirection == LayoutDirection.RTL
 
