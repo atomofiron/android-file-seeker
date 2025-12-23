@@ -1,6 +1,8 @@
 package app.atomofiron.common.util
 
-import java.util.Objects
+import android.os.Looper
+import app.atomofiron.common.util.extension.debugRequire
+import app.atomofiron.common.util.extension.hash
 
 class Unique<T>(val value: T) : Equality {
     companion object {
@@ -8,7 +10,11 @@ class Unique<T>(val value: T) : Equality {
     }
     private val uniqueId = nextId++
 
-    override fun hashCode(): Int = Objects.hash(this::class, uniqueId)
+    init {
+        debugRequire(Looper.getMainLooper().isCurrentThread)
+    }
+
+    override fun hashCode(): Int = hash(this::class, uniqueId)
 
     override fun equals(other: Any?): Boolean = (other as? Unique<*>)?.uniqueId == uniqueId
 }
