@@ -290,7 +290,7 @@ class ExplorerService(
         val variants = root.pathVariants?.takeIf { it.isNotEmpty() }
         variants ?: return missing
         val items = variants.map { path ->
-            Node.asRoot(path, root.type).update(asSu)
+            path.asRoot(root.type).update(asSu)
         }
         val alt = items.find { it.error == null }
             ?: items.find { it.error !is NodeError.NoSuchFile }
