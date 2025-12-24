@@ -8,6 +8,7 @@ import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
+import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
@@ -15,6 +16,7 @@ import app.atomofiron.searchboxapp.screens.result.ResultViewState
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
 import app.atomofiron.searchboxapp.utils.Rslt
+import app.atomofiron.searchboxapp.utils.toAlert
 import kotlinx.coroutines.CoroutineScope
 
 class ResultItemActionDelegate(
@@ -29,10 +31,13 @@ class ResultItemActionDelegate(
 ) : ResultItemActionListener {
 
     override fun onItemClick(item: Node) {
-        when {
+        when (true) {
+            (item.error is NodeError.FileWasChanged),
+            (item.error is NodeError.NoSuchFileOrDir),
+            (item.error is NodeError.PermissionDenied) -> viewState.showAlert(item.error.toAlert(item.content))
             item.isDirectory -> Unit // todo open dir
-            item.content is NodeContent.Text -> router.openFile(item.ref, viewState.taskUuid)
-            item.content is NodeContent.AndroidApp -> operations.askForAndroidApp(item.content)
+            (item.content is NodeContent.Text) -> router.openFile(item.ref, viewState.taskUuid)
+            (item.content is NodeContent.AndroidApp) -> operations.askForAndroidApp(item.content)
             else -> sharing.openWith(item)
         }
     }

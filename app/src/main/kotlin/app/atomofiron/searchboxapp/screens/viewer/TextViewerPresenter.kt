@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.viewer
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.common.util.extension.logE
+import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.SearchResult
@@ -33,15 +34,15 @@ class TextViewerPresenter(
     init {
         session?.loading?.collect(scope, viewState::setLoading)
         scope.launchOnIO {
-            session ?: return@launchOnIO
+            session ?: return@launchOnIO withMain {
+                router.navigateBack()
+            }
             val item = interactor.fetchItem(itemRef)
             session.updateItem(item)
-        }
-        scope.launchOnIO {
-            val task = params.initialTaskId
+
+            params.initialTaskId
                 ?.let { interactor.fetchTask(itemRef, it) }
-                ?: return@launchOnIO
-            searchDelegate.trySelectTask(task)
+                ?.let { searchDelegate.trySelectTask(it) }
         }
     }
 
