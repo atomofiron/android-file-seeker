@@ -32,10 +32,9 @@ class ResultItemActionDelegate(
 
     override fun onItemClick(item: Node) {
         when (true) {
-            (item.error is NodeError.FileWasChanged),
+            item.isDirectory -> Unit // todo open dir
             (item.error is NodeError.NoSuchFileOrDir),
             (item.error is NodeError.PermissionDenied) -> viewState.showAlert(item.error.toAlert(item.content))
-            item.isDirectory -> Unit // todo open dir
             (item.content is NodeContent.Text) -> router.openFile(item.ref, viewState.taskUuid)
             (item.content is NodeContent.AndroidApp) -> operations.askForAndroidApp(item.content)
             else -> sharing.openWith(item)
