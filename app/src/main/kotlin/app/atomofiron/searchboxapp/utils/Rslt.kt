@@ -9,6 +9,7 @@ sealed class Rslt<T>(val isOk: Boolean) {
             private data class Ok<T>(override val value: T) : Rslt.Ok<T>()
             override val value = Unit
             operator fun <T> invoke(value: T): Rslt.Ok<T> = Ok(value)
+            override fun toString() = "Ok"
         }
         abstract val value: T
     }

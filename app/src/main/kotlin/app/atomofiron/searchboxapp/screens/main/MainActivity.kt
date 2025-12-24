@@ -37,10 +37,12 @@ import app.atomofiron.searchboxapp.di.dependencies.store.AppStoreProvider
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
+import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.common.ActivityModeProvider
 import app.atomofiron.searchboxapp.screens.main.util.offerKeyCodeToChildren
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.setHapticEffect
 import app.atomofiron.searchboxapp.utils.withAlpha
 import com.google.android.material.color.DynamicColors
@@ -88,6 +90,9 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
             window.setSoftInputMode(SOFT_INPUT_ADJUST_NOTHING)
             unlockHighFrameRate()
         }
+        poop("Ok: ${Rslt.Ok}")
+        poop("Ok: ${Rslt.Ok("Sdfsf")}")
+        poop("Err: ${Rslt.Err<Unit>("Sdfsf")}")
     }
 
     private fun onCreateView(savedInstanceState: Bundle?) {
