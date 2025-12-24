@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.preferences
 
 import androidx.preference.PreferenceDataStore
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.android.ScreenshotService
@@ -12,6 +13,7 @@ import debug.LeakWatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 
 class PreferenceViewState(
@@ -22,9 +24,8 @@ class PreferenceViewState(
     updateStore: AppUpdateStore,
     appWatcher: LeakWatcher,
 ) {
-    private val _alerts = ChannelFlow<String>()
-    val alerts = merge(preferenceChannel.appUpdateStatus, _alerts)
-    val alertOutputSuccess = ChannelFlow<Int>()
+    private val _alerts = ChannelFlow<Alert>()
+    val alerts = merge(preferenceChannel.appUpdateStatus.map(Alert::invoke), _alerts)
     val showDeepBlack = MutableStateFlow(false)
     val asSu: StateFlow<Boolean> = preferenceStore.asSu
     val hapticFeedback: StateFlow<Boolean> = preferenceStore.hapticFeedback
@@ -34,11 +35,7 @@ class PreferenceViewState(
     // todo zip and share the backup
     val isExportImportAvailable: Boolean = true
 
-    fun showAlert(value: String) {
-        _alerts[scope] = value
-    }
-
-    fun sendAlertOutputSuccess(value: Int) {
-        alertOutputSuccess[scope] = value
+    fun showAlert(alert: Alert) {
+        _alerts[scope] = alert
     }
 }

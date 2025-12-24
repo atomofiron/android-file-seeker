@@ -129,7 +129,6 @@ class PreferenceFragment : PreferenceFragmentCompat(),
 
     override fun PreferenceViewState.onViewCollect() {
         viewCollect(alerts, collector = ::onAlert)
-        viewCollect(alertOutputSuccess, collector = ::showOutputSuccess)
     }
 
     private fun PreferenceGroup.fixIcons() {
@@ -141,10 +140,5 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         }
     }
 
-    private fun onAlert(message: String) = binding.snackbarContainer.showSnackbar(Alert(message))
-
-    private fun showOutputSuccess(message: Int) {
-        val mod = Alert.Mod.Important.takeIf { message == R.string.successful_with_restart }
-        binding.snackbarContainer.showSnackbar(Alert(message, mod))
-    }
+    private fun onAlert(alert: Alert) = binding.snackbarContainer.showSnackbar(alert)
 }

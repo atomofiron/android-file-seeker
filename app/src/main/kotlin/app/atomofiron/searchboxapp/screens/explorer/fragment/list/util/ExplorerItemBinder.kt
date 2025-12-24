@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.util
 
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
@@ -26,7 +27,9 @@ import app.atomofiron.searchboxapp.custom.drawable.translated
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
+import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
+import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeDeepest
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeOpened
@@ -35,10 +38,10 @@ import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.audio.AudioCover
 import app.atomofiron.searchboxapp.utils.colorAttr
-import app.atomofiron.searchboxapp.utils.getString
 import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.remember
 import app.atomofiron.searchboxapp.utils.resources
+import app.atomofiron.searchboxapp.utils.toUni
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
 import com.bumptech.glide.RequestManager
@@ -144,7 +147,7 @@ class ExplorerItemBinder private constructor(
         }
         title.typeface = if (item.isDirectory) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
 
-        val errorText = item.error?.let { itemView.resources.getString(it, item.content) }
+        val errorText = item.error?.getString(item.content)
         error.text = errorText
 
         checkBox.isChecked = item.isChecked
@@ -316,5 +319,14 @@ class ExplorerItemBinder private constructor(
             apply(hasThumbnail = true)
             return false
         }
+    }
+
+    fun NodeError.getString(content: NodeContent? = null): String {
+        val isDirElseFile = when (content) {
+            is NodeContent.Directory -> true
+            is NodeContent.File -> false
+            else -> null
+        }
+        return itemView.resources[toUni(isDirElseFile)]
     }
 }

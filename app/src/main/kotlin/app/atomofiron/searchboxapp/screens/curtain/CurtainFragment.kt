@@ -14,14 +14,15 @@ import androidx.fragment.app.DialogFragment
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.arch.TranslucentFragment
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.MaterialDimen
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentCurtainBinding
+import app.atomofiron.searchboxapp.model.other.LabeledAction
 import app.atomofiron.searchboxapp.screens.curtain.fragment.BottomSheetKeyboardBehavior
 import app.atomofiron.searchboxapp.screens.curtain.fragment.CurtainContentDelegate
 import app.atomofiron.searchboxapp.screens.curtain.fragment.CurtainNode
@@ -29,11 +30,15 @@ import app.atomofiron.searchboxapp.screens.curtain.fragment.TransitionAnimator
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainBackground
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.colorAttr
+import app.atomofiron.searchboxapp.utils.context
 import app.atomofiron.searchboxapp.utils.getColorByAttr
+import app.atomofiron.searchboxapp.utils.makeSnackbar
+import app.atomofiron.searchboxapp.utils.withAlpha
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.color.MaterialColors
-import com.google.android.material.snackbar.Snackbar
 import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.insetsPadding
 import java.lang.ref.WeakReference
@@ -102,11 +107,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         viewState.onViewCollect()
     }
 
-    private fun showTestSnackbar() {
-        showSnackbar {
-            Snackbar.make(it, "Test", Snackbar.LENGTH_INDEFINITE).setAction(R.string.dismiss) {}
-        }
-    }
+    private fun showTestSnackbar() = showSnackbar(Alert("Boo", error = snackbarView.get() != null, important = true), LabeledAction(R.string.dismiss))
 
     override fun FragmentCurtainBinding.onApplyInsets() {
         root.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
@@ -166,23 +167,23 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
             is CurtainAction.ShowNext -> contentDelegate.showNext(action.layoutId)
             is CurtainAction.ShowPrev -> contentDelegate.showPrev()
             is CurtainAction.Hide -> hide(action.irrevocably)
-            is CurtainAction.ShowSnackbar -> showSnackbar(action.provider)
+            is CurtainAction.ShowSnackbar -> showSnackbar(action.alert)
         }
     }
 
-    private fun showSnackbar(provider: CurtainApi.SnackbarProvider) {
-        val context = context ?: return
-        val snackbar = provider.getSnackbar(binding.root)
+    private fun showSnackbar(alert: Alert.Uni, action: LabeledAction? = null) {
+        val context = binding.context
+        val snackbar = binding.root.makeSnackbar(alert, action)
         if (!context.isDarkTheme()) {
-            val colorSurface = context.findColorByAttr(MaterialAttr.colorSurface)
-            val colorOnSurface = context.findColorByAttr(MaterialAttr.colorOnSurface)
-            val colorPrimaryDark = context.findColorByAttr(MaterialAttr.colorPrimaryDark)
+            val background = context.colorAttr(if (alert.error) MaterialAttr.colorErrorContainer else MaterialAttr.colorSurface)
+            val text = context.colorAttr(if (alert.error) MaterialAttr.colorOnErrorContainer else MaterialAttr.colorOnSurface)
+            val action = context.colorAttr(if (alert.error) MaterialAttr.colorError else MaterialAttr.colorPrimaryDark)
             val alpha = ResourcesCompat.getFloat(resources, MaterialDimen.mtrl_snackbar_background_overlay_color_alpha)
-            val backgroundColor = MaterialColors.layer(colorOnSurface, colorSurface, alpha)
+            val backgroundTint = MaterialColors.layer(text, background, alpha)
             snackbar
-                .setBackgroundTint(backgroundColor)
-                .setTextColor(colorOnSurface)
-                .setActionTextColor(colorPrimaryDark)
+                .setBackgroundTint(backgroundTint)
+                .setTextColor(text)
+                .setActionTextColor(action)
         }
         snackbarView = WeakReference(snackbar.view)
         snackbar.view.doOnNextLayout { updateSnackbarTranslation() }
@@ -192,10 +193,9 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     private fun updateSaturation() {
         val sheet = binding.curtainSheet
         val parent = sheet.parent as View
-        val alpha = (1f - (sheet.bottom - parent.height) / sheet.height.toFloat()).coerceIn(0f, 1f)
+        val alpha = Alpha(1f - (sheet.bottom - parent.height) / sheet.height.toFloat())
         val overlayAlpha = (MAX_OVERLAY_SATURATION * alpha).toInt()
-        val overlayColor = ColorUtils.setAlphaComponent(overlayColor, overlayAlpha)
-        binding.root.setBackgroundColor(overlayColor)
+        binding.root.setBackgroundColor(overlayColor withAlpha overlayAlpha)
     }
 
     private fun updateSnackbarTranslation() {
@@ -207,7 +207,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         val sheet = binding.curtainSheet
         val parent = sheet.parent as View
         var offset = snackbarView.run { height + marginBottom + marginTop }.toFloat()
-        offset *= ((sheet.bottom - parent.height) / sheet.height.toFloat()).coerceIn(0f, 1f)
+        offset *= Alpha((sheet.bottom - parent.height) / sheet.height.toFloat())
         offset += binding.curtainSheet.top - binding.curtainSheet.height + bottomInset
         snackbarView.translationY = max(minOffset, offset)
     }

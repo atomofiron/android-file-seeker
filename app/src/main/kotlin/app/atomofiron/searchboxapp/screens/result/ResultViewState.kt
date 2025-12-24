@@ -27,6 +27,7 @@ import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveContent
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.sortBy
+import app.atomofiron.searchboxapp.utils.toAlert
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -91,7 +92,7 @@ class ResultViewState(
         if (error != task.error) {
             error = task.error
             task.error?.let {
-                alerts[scope] = Alert(it)
+                alerts[scope] = it.toAlert()
             }
         }
         val result = task.result as Global

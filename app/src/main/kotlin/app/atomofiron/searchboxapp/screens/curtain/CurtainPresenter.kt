@@ -1,13 +1,12 @@
 package app.atomofiron.searchboxapp.screens.curtain
 
-import com.google.android.material.snackbar.Snackbar
 import app.atomofiron.common.arch.BasePresenter
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.common.util.flow.valueOrNull
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainResponse
 import app.atomofiron.searchboxapp.model.other.UniText
-import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
@@ -55,20 +54,20 @@ class CurtainPresenter(
         }
     }
 
-    override fun showSnackbar(text: UniText, duration: Int) = showSnackbar {
-        Snackbar.make(it, it.resources[text], duration)
+    override fun showSnackbar(alert: Alert.Uni, duration: Int) {
+        viewState.action[scope] = CurtainAction.ShowSnackbar(alert)
     }
 
-    override fun showSnackbar(string: String, duration: Int) = showSnackbar {
-        Snackbar.make(it, string, duration)
+    override fun showSnackbar(text: UniText, duration: Int) {
+        viewState.action[scope] = CurtainAction.ShowSnackbar(Alert(text))
     }
 
-    override fun showSnackbar(stringId: Int, duration: Int) = showSnackbar {
-        Snackbar.make(it, stringId, duration)
+    override fun showSnackbar(string: String, duration: Int) {
+        viewState.action[scope] = CurtainAction.ShowSnackbar(Alert(string))
     }
 
-    override fun showSnackbar(provider: CurtainApi.SnackbarProvider) {
-        viewState.action[scope] = CurtainAction.ShowSnackbar(provider)
+    override fun showSnackbar(stringId: Int, duration: Int) {
+        viewState.action[scope] = CurtainAction.ShowSnackbar(Alert(stringId))
     }
 
     override fun setCancelable(value: Boolean) = viewState.cancelable.set(value)

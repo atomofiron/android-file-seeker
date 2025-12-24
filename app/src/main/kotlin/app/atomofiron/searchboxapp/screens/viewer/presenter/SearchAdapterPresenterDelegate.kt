@@ -11,6 +11,8 @@ import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.other.UniText
+import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.model.textviewer.toLocal
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -18,8 +20,8 @@ import app.atomofiron.searchboxapp.screens.viewer.TextViewerRouter
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState
 import app.atomofiron.searchboxapp.screens.viewer.di.TextViewerInteractor
 import app.atomofiron.searchboxapp.screens.viewer.presenter.curtain.CurtainSearchDelegate
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import app.atomofiron.searchboxapp.utils.Rslt
+import app.atomofiron.searchboxapp.utils.toAlert
 import app.atomofiron.searchboxapp.utils.toUni
 import kotlinx.coroutines.CoroutineScope
 
@@ -86,10 +88,10 @@ class SearchAdapterPresenterDelegate(
                 val result = interactor.getHash(hash.ref)
                 withMain {
                     when {
-                        task.error != null -> task.error.show()
+                        task.error != null -> task.error.toUni().showError()
                         hash.hash == result.ok()?.value -> task.trySelect()
-                        result is Rslt.Err -> result.message.toNodeError().show()
-                        else -> NodeError.FileWasChanged.show()
+                        result is Rslt.Err -> result.message.toUni().showError()
+                        else -> NodeError.FileWasChanged.toUni().showError()
                     }
                 }
             }
@@ -103,8 +105,9 @@ class SearchAdapterPresenterDelegate(
         }
     }
 
-    private fun NodeError.show() {
-        curtain.controller?.showSnackbar(toUni())
-            ?: viewState.showError(this)
+    private fun UniText.showError() {
+        val alert = toAlert(error = true)
+        curtain.controller?.showSnackbar(alert)
+            ?: viewState.showAlert(alert)
     }
 }

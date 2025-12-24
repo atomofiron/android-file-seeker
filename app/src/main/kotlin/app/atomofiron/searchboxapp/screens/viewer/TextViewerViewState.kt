@@ -22,6 +22,7 @@ import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
 import app.atomofiron.searchboxapp.screens.viewer.state.Status
 import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
+import app.atomofiron.searchboxapp.utils.toAlert
 import app.atomofiron.searchboxapp.utils.toInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,8 +54,8 @@ class TextViewerViewState(
     val tasks: StateFlow<List<TextSearchTask>> = session?.tasks ?: MutableStateFlow(emptyList())
     val textLines: StateFlow<List<TextLine>> = session?.lines ?: MutableStateFlow(emptyList())
     val currentTask = MutableStateFlow<TextSearchTask?>(null)
-    private val _alerts = DataFlow((session?.error?.value ?: error)?.let { Alert(it) })
-    val alerts: SharedFlow<Alert.Err?> = _alerts
+    private val _alerts: MutableStateFlow<Alert?> = DataFlow((session?.error?.value ?: error)?.toAlert())
+    val alerts: SharedFlow<Alert?> = _alerts
 
     val dock = status.map { state ->
         var index: Int? = null
@@ -153,8 +154,8 @@ class TextViewerViewState(
         matchingCursor.value = null
     }
 
-    fun showError(error: NodeError) {
-        _alerts.value = Alert(error)
+    fun showAlert(alert: Alert) {
+        _alerts.value = alert
     }
 
     fun trySelectTask(task: TextSearchTask): Boolean {

@@ -31,7 +31,6 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
@@ -47,11 +46,11 @@ import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Data
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Android
+import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.other.LabeledAction
 import app.atomofiron.searchboxapp.model.other.UniText
@@ -105,12 +104,23 @@ fun Context.showLongToast(text: UniText) = showToast(text, Toast.LENGTH_LONG)
 
 private fun Context.showToast(text: UniText, duration: Int) = Toast.makeText(this, resources[text], duration).show()
 
-fun NodeError.toUni(content: NodeContent? = null): UniText {
+fun UniText.toAlert(
+    error: Boolean = false,
+    important: Boolean = false,
+) = Alert(this, error, important)
+
+fun NodeError.toAlert(
+    error: Boolean = false,
+    important: Boolean = false,
+    isDirElseFile: Boolean? = null,
+) = Alert(toUni(isDirElseFile), error, important)
+
+fun NodeError.toUni(isDirElseFile: Boolean? = null): UniText {
     return when (this) {
-        is NodeError.NoSuchFileOrDir -> when (content) {
-            is NodeContent.Directory -> UniText(R.string.no_such_directory)
-            is NodeContent.File -> UniText(R.string.no_such_file)
-            else -> UniText(R.string.no_such_file_or_directory)
+        is NodeError.NoSuchFileOrDir -> when (isDirElseFile) {
+            true -> UniText(R.string.no_such_directory)
+            false -> UniText(R.string.no_such_file)
+            null -> UniText(R.string.no_such_file_or_directory)
         }
         is NodeError.PermissionDenied -> UniText(R.string.permission_denied)
         is NodeError.ResourceBusy -> UniText(R.string.resource_busy)
@@ -121,46 +131,57 @@ fun NodeError.toUni(content: NodeContent? = null): UniText {
     }
 }
 
-fun Resources.getString(error: NodeError, content: NodeContent? = null): String = get(error.toUni(content))
-
-inline fun <reified T> CoordinatorLayout.showSnackbar(
+inline fun <reified T : Any> CoordinatorLayout.showSnackbar(
     alert: Alert?,
     action: LabeledAction? = null,
     other: T.() -> UniText,
-) {
-    val alert = when (alert) {
-        !is Alert.Other -> alert
-        is T -> Alert.Uni(other(alert), alert.mod)
-        else -> return debugFail { alert.toString() }
-    }
-    showSnackbar(alert, action)
-}
+) = makeSnackbar(alert, action, other)?.show()
 
 fun CoordinatorLayout.showSnackbar(
     alert: Alert?,
     action: LabeledAction? = null,
-) {
-    val text = when (alert) {
-        null -> return
-        is Alert.Uni -> alert.message
-        is Alert.Err -> alert.error.toUni()
-        is Alert.Other -> return debugFail { alert.toString() }
-    }
-    showSnackbar(text, alert.important, action)
+) = when (alert) {
+    is Alert.Uni -> makeSnackbar(alert, action).show()
+    else -> debugFail { alert.toString() }
 }
 
-private fun CoordinatorLayout.showSnackbar(
+inline fun <reified T : Any> CoordinatorLayout.makeSnackbar(
+    alert: Alert?,
+    action: LabeledAction? = null,
+    other: T.() -> UniText,
+): Snackbar? {
+    val alert = when (alert) {
+        is Alert.Uni -> alert
+        is T -> Alert.Uni(other(alert), alert.error, alert.important)
+        else -> return null
+            .also { debugFail { alert.toString() } }
+    }
+    return makeSnackbar(alert, action)
+}
+
+fun CoordinatorLayout.makeSnackbar(
+    alert: Alert.Uni,
+    action: LabeledAction? = null,
+) = makeSnackbar(alert.text, alert.error, alert.important, action)
+
+private fun CoordinatorLayout.makeSnackbar(
     text: UniText,
+    error: Boolean,
     important: Boolean,
     action: LabeledAction?,
-) {
+): Snackbar {
     val duration = if (important) Snackbar.LENGTH_INDEFINITE else Snackbar.LENGTH_LONG
-    Snackbar.make(this, resources[text], duration).apply {
+    return Snackbar.make(this, resources[text], duration).apply {
+        if (error) {
+            setBackgroundTint(view.context.colorAttr(MaterialAttr.colorError))
+            setTextColor(view.context.colorAttr(MaterialAttr.colorOnError))
+            setActionTextColor(view.context.colorAttr(MaterialAttr.colorErrorContainer))
+        }
         when {
             action != null -> setAction(resources[action.label]) { action.action?.invoke() }
             important -> setAction(R.string.got_it) { }
         }
-    }.show()
+    }
 }
 
 const val DEFAULT_FREQUENCY = 60

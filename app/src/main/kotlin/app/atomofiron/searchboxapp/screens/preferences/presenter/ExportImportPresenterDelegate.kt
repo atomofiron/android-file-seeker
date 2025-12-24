@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.preferences.presenter
 
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.fileseeker.R
@@ -21,30 +22,30 @@ class ExportImportPresenterDelegate(
 
     override fun exportPreferences() {
         val result = preferenceService.exportPreferences()
-        showOutput(result, R.string.successful)
+        show(result, Alert(R.string.successful))
     }
 
     override fun exportHistory() {
         val result = preferenceService.exportHistory()
-        showOutput(result, R.string.successful)
+        show(result, Alert(R.string.successful))
     }
 
     override fun importPreferences() {
         val result = preferenceService.importPreferences()
-        showOutput(result, R.string.successful_with_restart)
+        show(result, Alert(R.string.successful_with_restart, important = true))
     }
 
     override fun importHistory() {
         val result = preferenceService.importHistory()
-        showOutput(result, R.string.successful)
+        show(result, Alert(R.string.successful))
         if (result.isOk) {
             preferenceChannel.onHistoryImported.invoke(scope)
         }
     }
 
-    private fun showOutput(result: Rslt<Unit>, successMessage: Int) {
+    private fun show(result: Rslt<Unit>, alert: Alert) {
         when (result) {
-            is Rslt.Ok -> viewState.sendAlertOutputSuccess(successMessage)
+            is Rslt.Ok -> viewState.showAlert(alert)
             is Rslt.Err -> dialogs.showError(result.message.toUni())
         }
     }

@@ -3,18 +3,17 @@ package app.atomofiron.searchboxapp.screens.curtain.util
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
 import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.util.Unique
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Equality
+import app.atomofiron.common.util.Unique
 import app.atomofiron.searchboxapp.model.other.UniText
 import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
-import java.util.*
 
 // todo replace layoutId with (en)decodable sealed Any
 
@@ -28,15 +27,11 @@ object CurtainApi {
         fun showNext(layoutId: Int)
         fun showPrev()
         fun close(immediately: Boolean = false, irrevocably: Boolean = false)
+        fun showSnackbar(alert: Alert.Uni, duration: Int = Snackbar.LENGTH_SHORT)
         fun showSnackbar(text: UniText, duration: Int = Snackbar.LENGTH_SHORT)
         fun showSnackbar(string: String, duration: Int = Snackbar.LENGTH_SHORT)
         fun showSnackbar(stringId: Int, duration: Int = Snackbar.LENGTH_SHORT)
-        fun showSnackbar(provider: SnackbarProvider)
         fun setCancelable(value: Boolean)
-    }
-
-    fun interface SnackbarProvider {
-        fun getSnackbar(container: ViewGroup): Snackbar
     }
 
     abstract class Adapter<H : ViewHolder> : Equality by Unique(Unit) {

@@ -12,6 +12,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerDockDelegate
+import app.atomofiron.searchboxapp.utils.toUni
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,7 +35,7 @@ class ExplorerViewState(
     val itemComposition = preferences.explorerItemComposition
     private val otherAlerts = ChannelFlow<Alert>()
     val alerts: Flow<Alert> = merge(
-        store.alerts.map { Alert(it) },
+        store.alerts.map { Alert(it.toUni()) },
         store.deleted.mapNotNull { deleted ->
             deleted.takeIf { it.isNotEmpty() }
                 ?.let { ExplorerAlert.Deleted(it) }

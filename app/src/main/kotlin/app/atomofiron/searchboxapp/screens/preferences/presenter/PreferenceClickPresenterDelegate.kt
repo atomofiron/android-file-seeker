@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.preferences.presenter
 
 import android.content.Context
 import app.atomofiron.common.arch.Recipient
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.fileseeker.R
@@ -74,7 +75,7 @@ class PreferenceClickPresenterDelegate(
             val last = message.indexOfLast { it == LF }
             when {
                 first != last -> dialogs.showError(message.toUni())
-                else -> viewState.showAlert(message)
+                else -> viewState.showAlert(Alert(message))
             }
         }
         return result.isOk

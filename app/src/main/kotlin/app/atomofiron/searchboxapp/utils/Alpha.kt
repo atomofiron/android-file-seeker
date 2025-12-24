@@ -34,6 +34,8 @@ object Alpha {
 
     fun halfVisible(alpha: Float) = max(alpha * 2, VISIBLE)
     fun halfInvisible(alpha: Float) = (alpha - HALF) / HALF
+
+    operator fun invoke(value: Float) = value.coerceIn(INVISIBLE, VISIBLE)
 }
 
 fun Float.toIntAlpha(): Int = (this * Alpha.VISIBLE_INT).toInt().coerceIn(Alpha.INVISIBLE_INT, Alpha.VISIBLE_INT)
