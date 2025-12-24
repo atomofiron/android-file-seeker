@@ -50,7 +50,6 @@ import app.atomofiron.searchboxapp.model.explorer.replace
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
@@ -59,6 +58,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortBy
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortByName
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateWith
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -67,7 +67,7 @@ import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.searchboxapp.utils.removeOneIf
 import app.atomofiron.searchboxapp.utils.replaceEach
 import app.atomofiron.searchboxapp.utils.showLongToast
-import app.atomofiron.searchboxapp.utils.unwrapOrNull
+import app.atomofiron.searchboxapp.utils.unwrapOr
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
@@ -492,9 +492,8 @@ class ExplorerService(
                 nextState(to.uniqueId, copying = null)
             }
             new ?: return debugFail { "null after copy ${from.ref} to ${to.ref}" }
-            findItem(new.uniqueId) { children, i, _ ->
-                children ?: return@findItem
-                children.items[i] = new
+            findItem(from.uniqueId) { children, i, _ ->
+                children?.items?.add(i.inc(), new)
             }
         }
         tryCache(key, to)
@@ -901,9 +900,7 @@ class ExplorerService(
 
     private fun resolveSizeAsync(key: NodeTabKey, item: Node) {
         appScope.launch {
-            val size = NativeBridge.usage(item.ref, asSu)
-                .unwrapOrNull()
-                ?: ""
+            val size = NativeBridge.usage(item.ref, asSu).unwrapOr("")
             if (size != item.size) garden(key) {
                 val current = findItem(item.uniqueId)
                 current ?: return@launch
