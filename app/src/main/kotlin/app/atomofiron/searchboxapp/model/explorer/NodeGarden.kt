@@ -21,8 +21,6 @@ class NodeGarden {
         NodeTab(key, roots, states)
     }
 
-    operator fun get(item: Node): NodeStateImpl? = states.find { it.uniqueId == item.uniqueId }
-
     fun getFlow(key: NodeTabKey): StateFlow<NodeTabItems> = get(key).flow
 
     fun drop(vararg keys: NodeTabKey) = keys.forEach {

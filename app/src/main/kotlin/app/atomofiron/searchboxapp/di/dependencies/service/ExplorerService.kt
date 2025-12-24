@@ -193,7 +193,7 @@ class ExplorerService(
     }
 
     suspend fun tryToggleRoot(key: NodeTabKey, root: NodeRoot) {
-        renderTab(key) {
+        render(key) {
             val root = roots.find { it.id == root.id }
             when {
                 root == null -> return
@@ -209,7 +209,7 @@ class ExplorerService(
 
     suspend fun tryToggle(key: NodeTabKey, item: Node) {
         var rootItem: Node? = null
-        renderTab(key) {
+        render(key) {
             val root = getSelectedRoot() ?: return
             if (tree.isEmpty() && root.item.uniqueId != item.uniqueId) {
                 return
@@ -427,7 +427,7 @@ class ExplorerService(
         // todo change uniqueId in state, create the new one state instance
         val renamed = item.rename(name, asSu)
             ?: return debugFail { "null after rename $ref to $name" }
-        renderTab(key) {
+        render(key) {
             replaceItem(renamed)
             var index = tree.indexOf(item.ref)
             if (index >= 0) {
@@ -445,7 +445,7 @@ class ExplorerService(
     suspend fun tryCreate(key: NodeTabKey, parent: Node, name: String, directory: Boolean) {
         val item = ExplorerUtils.create(parent, name, directory, asSu)
         item ?: return
-        renderTab(key) {
+        render(key) {
             val children = findItem(parent.uniqueId)
                 ?.children
                 ?: findItem(parent.parentRef.uniqueId)
@@ -465,14 +465,16 @@ class ExplorerService(
     }
 
     suspend fun tryCopy(key: NodeTabKey, from: Node, to: Node, asMoving: Boolean) {
-        renderTab(key) {
+        render(key) {
             states.updateState(from.uniqueId) {
                 nextState(from.uniqueId, copying = NodeOperation.Copying(isSource = true, asMoving = asMoving))
-            }.let { if (it?.isCopying != true) return }
+            }.let {
+                if (it?.isCopying != true) return
+            }
             states.updateState(to.uniqueId) {
                 nextState(to.uniqueId, copying = NodeOperation.Copying(isSource = false))
             }
-            findItem(to.uniqueId) { children, i, _ ->
+            findItem(to.uniqueId) { children, _, _ ->
                 children ?: return@findItem
                 var index = children.indexOfFirst { it.isFile }
                 if (index < 0) index = children.size
@@ -481,14 +483,14 @@ class ExplorerService(
             }
         }
         val new = ExplorerUtils.copy(from, to, asSu)
-        renderTab(key) {
+        render(key) {
             states.updateState(from.uniqueId) {
                 nextState(from.uniqueId, copying = null)
             }
             states.updateState(to.uniqueId) {
                 nextState(to.uniqueId, copying = null)
             }
-            new ?: return@renderTab debugFail { "null after copy ${from.ref} to ${to.ref}" }
+            new ?: return debugFail { "null after copy ${from.ref} to ${to.ref}" }
             findItem(new.uniqueId) { children, i, _ ->
                 children ?: return@findItem
                 children.items[i] = new
@@ -576,7 +578,7 @@ class ExplorerService(
     suspend fun tryDelete(key: NodeTabKey, its: List<Node>) {
         var mediaRootAffected: NodeRoot? = null
         val items = mutableListOf<Node>()
-        renderTab(key) {
+        render(key) {
             mediaRootAffected = roots.find { selected(it) && it.withPreview }
             its.mapNotNull { item ->
                 val state = states.updateState(item.uniqueId) {
@@ -642,7 +644,7 @@ class ExplorerService(
         }
     }
 
-    private suspend inline fun renderTab(key: NodeTabKey, block: NodeTab.() -> Unit) {
+    private suspend inline fun render(key: NodeTabKey, block: NodeTab.() -> Unit) {
         garden(key) {
             block()
             render()
@@ -671,17 +673,15 @@ class ExplorerService(
             ?.takeIf { !trees.containsKey(it.id) }
             ?.let { putTree(it.id, listOf(it.item.ref)) }
 
-        val deepest = findDeepest()
-        val items = renderItems()
-        val tabItems = NodeTabItems(roots, items, deepest)
-        flow.emit(tabItems)
-        store.setDeepestNode(key, deepest)
+        val rendered = renderItems(roots)
+        flow.emit(rendered)
+        store.setDeepestNode(key, rendered.deepest)
 
-        updateStates(items)
-        updateChecked(items)
-        val checked = items.filter { it.isChecked }
+        updateStates(rendered.items)
+        updateChecked(rendered.items)
+        val checked = rendered.items.filter { it.isChecked }
         store.emitChecked(key, checked)
-        store.setCurrentItems(key, items)
+        store.setCurrentItems(key, rendered.items)
 
         require(this.roots.all { !it.isSelected })
         incrementGeneration()
@@ -735,14 +735,15 @@ class ExplorerService(
         }
     }
 
-    private fun NodeTab.renderItems(): List<Node> {
+    private fun NodeTab.renderItems(roots: List<NodeRoot>): NodeTabItems {
         val root = getSelectedRoot()
-            ?: return emptyList()
+            ?: return NodeTabItems(roots, emptyList(), null)
         val items = mutableListOf<Node>()
         renderNode(root.item, content = root.item.defineDirKind(), isOpened = tree.isNotEmpty(), isDeepest = tree.size == 1)
             .also { items.add(it) }
             .takeIf { !it.isOpened }
-            ?.let { return items }
+            ?.let { return NodeTabItems(roots, items, null) }
+        var deepest = items.first()
         val openedIndexes = mutableListOf<Int>()
         val filteredCounts = when {
             mimeTypes.isEmpty() -> null
@@ -768,6 +769,9 @@ class ExplorerService(
                     isOpened = isOpened,
                     content = item.defineDirKind(i),
                 )
+                if (item.isDeepest) {
+                    deepest = item
+                }
                 items.add(item)
                 if (isOpened) {
                     parent.children?.items[j] = item
@@ -803,7 +807,7 @@ class ExplorerService(
             val offset = offset++
             items[i] = it.copy(children = it.children?.copy(filteredOut = filteredCounts[offset]))
         }
-        return items
+        return NodeTabItems(roots, items, deepest)
     }
 
     private fun IntArray.inc(i: Int) = set(i, get(i).inc())
