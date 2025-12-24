@@ -110,6 +110,11 @@ fun UniText.toAlert(
     important: Boolean = false,
 ) = Alert(this, error, important)
 
+fun NodeError.toAlert(
+    content: NodeContent? = null,
+    important: Boolean = false,
+) = toUni(content).toAlert(error = true, important)
+
 fun NodeError.toUni(content: NodeContent? = null): UniText {
     return when (this) {
         is NodeError.NoSuchFileOrDir -> when (content) {
