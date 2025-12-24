@@ -11,7 +11,7 @@ data class Node(
     val rootId: Int = uniqueId,
     val children: NodeChildren? = null,
 
-    val properties: NodeProperties = NodeProperties.Empty,
+    val meta: NodeMeta = NodeMeta.Empty,
     val content: NodeContent,
     val error: NodeError? = null,
     // state is always stateStub in the garden
@@ -22,7 +22,7 @@ data class Node(
     val isDeepest: Boolean = false,
     // generation is always 0 in the garden
     val generation: Int = 0,
-) : INodeProperties by properties, NodeState by state {
+) : NodeMetaData by meta, NodeState by state {
 
     val name get() = ref.name
     val path get() = ref.string
@@ -47,7 +47,7 @@ data class Node(
         other.uniqueId != uniqueId -> false
         other.ref != ref -> false
         other.rootId != rootId -> false
-        other.properties != properties -> false
+        other.meta != meta -> false
         other.state.operation != state.operation -> false
         other.error != error -> false
         other.isCached != isCached -> false
@@ -83,11 +83,11 @@ data class Node(
     fun mutate(
         ref: NodeRef,
         parentRef: NodeRef = ref.parent,
-        properties: NodeProperties = this.properties,
+        meta: NodeMeta = this.meta,
         state: NodeStateImpl = this.state.copy(uniqueId = ref.uniqueId),
         error: NodeError? = this.error,
     ): Node {
-        val new = copy(ref = ref, parentRef = parentRef, uniqueId = ref.uniqueId, properties = properties, state = state, error = error)
+        val new = copy(ref = ref, parentRef = parentRef, uniqueId = ref.uniqueId, meta = meta, state = state, error = error)
         val children = new.children?.items
         children?.forEachIndexed { i, it ->
             val item = children[i]

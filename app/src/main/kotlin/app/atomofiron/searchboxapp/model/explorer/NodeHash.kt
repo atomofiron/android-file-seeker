@@ -2,10 +2,9 @@ package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.extension.hash
 
-// todo rename to NodeMeta
 data class NodeHash(
     val ref: NodeRef,
-    val properties: NodeProperties,
+    val meta: NodeMeta,
     val mime: String,
     val hash: Int,
 ) {

@@ -15,7 +15,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeId
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
-import app.atomofiron.searchboxapp.model.explorer.NodeProperties
+import app.atomofiron.searchboxapp.model.explorer.NodeMeta
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
@@ -172,18 +172,18 @@ object ExplorerUtils {
             is Rslt.Ok -> output.value
             is Rslt.Err -> return null
         }
-        return Node(ref = target, parentRef = parent.ref, rootId = parent.rootId, properties = meta.toProperties(), content = content)
+        return Node(ref = target, parentRef = parent.ref, rootId = parent.rootId, meta = meta.toNodeMeta(), content = content)
     }
 
     fun NodeRef.toRoot(type: NodeRootType): Node {
         return Node(
             ref = this,
-            properties = NodeProperties(),
+            meta = NodeMeta(),
             content = NodeContent.Directory(rootType = type),
         )
     }
 
-    fun Meta.toProperties(size: String? = null) = NodeProperties(
+    fun Meta.toNodeMeta(size: String? = null) = NodeMeta(
         access = access,
         owner = owner,
         group = group,
@@ -224,8 +224,8 @@ object ExplorerUtils {
         return builder.toString()
     }
 
-    private fun parse(ref: NodeRef, parentRef: NodeRef, root: Int, properties: NodeProperties): Node {
-        val content = when (properties.access.firstOrNull()) {
+    private fun parse(ref: NodeRef, parentRef: NodeRef, root: Int, meta: NodeMeta): Node {
+        val content = when (meta.access.firstOrNull()) {
             DIR_CHAR -> NodeContent.Directory(DirectoryKind.Ordinary)
             LINK_CHAR -> NodeContent.Link
             null -> NodeContent.Unknown
@@ -235,7 +235,7 @@ object ExplorerUtils {
             rootId = root,
             ref = ref,
             parentRef = parentRef,
-            properties = properties,
+            meta = meta,
             content = content,
         )
     }
@@ -258,25 +258,25 @@ object ExplorerUtils {
         val type = NativeBridge.type(ref, asSu)
         return when (type) {
             is Rslt.Ok -> parseNode(type.value.meta).resolveType(type.value.mime)
-                .run { if (ensureCached) ensureCached(asSu, oldProps = properties) else this }
+                .run { if (ensureCached) ensureCached(asSu, oldProps = meta) else this }
             is Rslt.Err -> copy(error = type.message.toNodeError())
         }
     }
 
-    fun Node.updateUsage(asSu: Boolean): NodeProperties {
+    fun Node.updateUsage(asSu: Boolean): NodeMeta {
         if (!isDirectory) {
-            return properties
+            return meta
         }
         val result = NativeBridge.usage(ref, asSu)
         val size = when (result) {
             is Rslt.Err -> ""
             is Rslt.Ok -> result.value
         }.takeIf { it != size }
-        size ?: return properties
-        return properties.copy(size = size)
+        size ?: return meta
+        return meta.copy(size = size)
     }
 
-    private fun Node.ensureCached(asSu: Boolean, oldProps: NodeProperties): Node = when {
+    private fun Node.ensureCached(asSu: Boolean, oldProps: NodeMeta): Node = when {
         isDirectory -> cacheDir(asSu)
         length == 0L && oldProps.size != size -> resolveFileType()
         length == 0L -> this
@@ -312,20 +312,20 @@ object ExplorerUtils {
             children.run {
                 val child = items[index]
                 items[index] = child.resolveType(mimeType = entry.mime)
-                    .copy(properties = entry.meta.toProperties(child.size))
+                    .copy(meta = entry.meta.toNodeMeta(child.size))
             }
         }
         return entries.isNotEmpty()
     }
 
-    fun Node.resolveType(mimeType: String): Node = copy(content = ref.resolveContent(mimeType, properties, content))
+    fun Node.resolveType(mimeType: String): Node = copy(content = ref.resolveContent(mimeType, meta, content))
 
-    fun NodeRef.resolveContent(mimeType: String, properties: NodeProperties, content: NodeContent? = null): NodeContent {
+    fun NodeRef.resolveContent(mimeType: String, meta: NodeMeta, content: NodeContent? = null): NodeContent {
         return when (true) {
-            (properties.access.firstOrNull() == DIR_CHAR),
+            (meta.access.firstOrNull() == DIR_CHAR),
             (mimeType == DIRECTORY),
             (content is NodeContent.Directory) -> content.ifMismatches { NodeContent.Directory() }
-            (properties.length == 0L) -> NodeContent.Empty
+            (meta.length == 0L) -> NodeContent.Empty
             mimeType.isBlank(),
             (mimeType == FILE_UNKNOWN) -> content.resolveFileType(this)
             mimeType.startsWith(FILE_PICTURE) -> content.ifMismatches { NodeContent.Picture.resolve(mimeType) }
@@ -450,11 +450,11 @@ object ExplorerUtils {
                     entry.isDirectory -> NodeContent.Directory()
                     else -> NodeContent.Unknown
                 }
-                val dateTime = SimpleDateFormat(NodeProperties.DATE_TIME_FORMAT, Locale.ROOT)
+                val dateTime = SimpleDateFormat(NodeMeta.DATE_TIME_FORMAT, Locale.ROOT)
                     .format(Date(entry.time))
-                    .split(NodeProperties.DATE_TIME_SEPARATOR)
-                val properties = NodeProperties(date = dateTime.first(), time = dateTime.last(), size = entry.size.toSize(), length = entry.size)
-                val child = Node(ref + entry.name, parentRef = ref, rootId = uniqueId, properties = properties, content = content)
+                    .split(NodeMeta.DATE_TIME_SEPARATOR)
+                val meta = NodeMeta(date = dateTime.first(), time = dateTime.last(), size = entry.size.toSize(), length = entry.size)
+                val child = Node(ref + entry.name, parentRef = ref, rootId = uniqueId, meta = meta, content = content)
                 children.add(child)
                 entry = stream.nextEntry
             }
@@ -497,41 +497,41 @@ object ExplorerUtils {
     }
 
     private fun Node.parseNode(meta: Meta): Node {
-        val properties = meta.toProperties(size)
+        val meta = meta.toNodeMeta(size)
         val (children, content) = when {
-            properties.isDirectory() -> when (content) {
+            meta.isDirectory() -> when (content) {
                 is NodeContent.Directory -> children to content
                 else -> null to NodeContent.Directory()
             }
-            properties.isLink() -> when (content) {
+            meta.isLink() -> when (content) {
                 is NodeContent.Link -> children to content
                 else -> null to NodeContent.Link
             }
-            properties.isFile() -> when (content) {
+            meta.isFile() -> when (content) {
                 is NodeContent.File -> children to content
                 else -> null to resolveFileType(ref)
             }
             else -> null to NodeContent.Undefined
         }
-        return copy(children = children, properties = properties, content = content)
+        return copy(children = children, meta = meta, content = content)
     }
 
     private fun Node.parseDir(metas: List<Meta>): Node {
         val items = MutableList<Node>(metas.size)
         val files = MutableList<Node>(metas.size)
         for (i in metas.indices) {
-            val meta = metas[i]
-            var properties = meta.toProperties()
+            val m = metas[i]
+            var meta = m.toNodeMeta()
             val parentRef = this@parseDir.ref
-            val ref = NodeRef(meta.path)
+            val ref = NodeRef(m.path)
             val child = children?.findOnMut { it.ref == ref }
             if (child?.isDirectory == true) {
-                properties = properties.copy(size = child.properties.size)
+                meta = meta.copy(size = child.meta.size)
             }
             val item = when {
-                child == null -> parse(ref, parentRef, rootId, properties)
-                child.properties == properties -> child
-                else -> child.copy(properties = properties)
+                child == null -> parse(ref, parentRef, rootId, meta)
+                child.meta == meta -> child
+                else -> child.copy(meta = meta)
             }
             when {
                 item.isDirectory -> items.add(item)
@@ -553,11 +553,11 @@ object ExplorerUtils {
 
     fun Node.isParentOf(other: Node): Boolean = other.parentRef == ref
 
-    fun NodeProperties.isFile(): Boolean = access.firstOrNull() == FILE_CHAR
+    fun NodeMeta.isFile(): Boolean = access.firstOrNull() == FILE_CHAR
 
-    fun NodeProperties.isDirectory(): Boolean = access.firstOrNull() == DIR_CHAR
+    fun NodeMeta.isDirectory(): Boolean = access.firstOrNull() == DIR_CHAR
 
-    fun NodeProperties.isLink(): Boolean = access.firstOrNull() == LINK_CHAR
+    fun NodeMeta.isLink(): Boolean = access.firstOrNull() == LINK_CHAR
 
     fun NodeRef.isContent() = string.startsWith(Const.SCHEME_CONTENT)
 
@@ -565,9 +565,9 @@ object ExplorerUtils {
         rootId: NodeId = uniqueId,
         parentRef: NodeRef = parent,
         content: NodeContent = NodeContent.Undefined,
-        properties: NodeProperties = NodeProperties.Empty,
+        meta: NodeMeta = NodeMeta.Empty,
         children: NodeChildren? = null,
-    ) = Node(this, parentRef = parentRef, properties = properties, rootId = rootId, content = content, children = children)
+    ) = Node(this, parentRef = parentRef, meta = meta, rootId = rootId, content = content, children = children)
 
     // means this node the fake, may be is a visual separating item, isn't a dir
     fun Node.isSeparator(): Boolean = ref.uniqueId == -uniqueId
@@ -591,27 +591,27 @@ object ExplorerUtils {
     }
 
     fun Node.apply(result: CountingResult): Node? {
-        val meta = when (result) {
+        val rMeta = when (result) {
             is CountingResult.Ok -> result.meta
             is CountingResult.Err -> result.v1
         }
-        meta ?: return null
+        rMeta ?: return null
         val ref = when {
-            ref.theSame(meta.path) -> ref
-            else -> NodeRef(meta.path)
+            ref.theSame(rMeta.path) -> ref
+            else -> NodeRef(rMeta.path)
         }
-        val properties = meta.toProperties(size.takeIf { ref == this.ref })
-        val error = meta.error
+        val meta = rMeta.toNodeMeta(size.takeIf { ref == this.ref })
+        val error = rMeta.error
             ?.toNodeError()
             ?: (result as? CountingResult.Ok)
                 ?.errors
                 ?.toNodeError()
-        return mutate(ref = ref, parentRef = ref.parent, properties = properties, error = error)
+        return mutate(ref = ref, parentRef = ref.parent, meta = meta, error = error)
     }
 
     fun Node.move(parent: NodeRef = parentRef, name: String = this.name): Node {
         val ref = parent + name
-        return mutate(ref = ref, parentRef = parent, properties = properties)
+        return mutate(ref = ref, parentRef = parent, meta = meta)
     }
 
     fun String.toNodeError(): NodeError {
@@ -737,9 +737,9 @@ object ExplorerUtils {
                         }
                     }
                     oldIndex++
-                    val actual = when (old.properties) {
-                        next.properties -> old
-                        else -> old.copy(properties = next.properties)
+                    val actual = when (old.meta) {
+                        next.meta -> old
+                        else -> old.copy(meta = next.meta)
                     }
                     iterator.set(actual)
                 }
@@ -752,7 +752,7 @@ object ExplorerUtils {
             else -> content
         }
         return copy(
-            properties = item.properties,
+            meta = item.meta,
             content = content,
             children = children,
             error = item.error,
@@ -761,22 +761,22 @@ object ExplorerUtils {
         }
     }
 
-    fun Node.updateWith(new: NodeContent, properties: NodeProperties): Node {
+    fun Node.updateWith(new: NodeContent, meta: NodeMeta): Node {
         val content = when (true) {
             (new::class != content::class),
             !isCached -> new
             else -> null
         }
-        val properties = when {
-            properties == this.properties -> null
-            !properties.isDirectory() -> properties
-            properties.size.isNotEmpty() -> properties
-            this.properties.size.isEmpty() -> properties
-            else -> properties.copy(size = this.properties.size)
+        val meta = when {
+            meta == this.meta -> null
+            !meta.isDirectory() -> meta
+            meta.size.isNotEmpty() -> meta
+            this.meta.size.isEmpty() -> meta
+            else -> meta.copy(size = this.meta.size)
         }
         return when (true) {
-            (properties != null),
-            (content != null) -> copy(content = content ?: this.content, properties = properties ?: this.properties)
+            (meta != null),
+            (content != null) -> copy(content = content ?: this.content, meta = meta ?: this.meta)
             else -> this
         }
     }

@@ -62,8 +62,8 @@ class ResultItemActionDelegate(
     override fun onItemVisible(item: ResultItem.Item) {
         scope.launchOnIO {
             val updated = interactor.update(item.item)
-            val properties = interactor.usage(updated)
-            updated.copy(properties = properties)
+            val meta = interactor.usage(updated)
+            updated.copy(meta = meta)
                 .takeIf { it != item.item }
                 ?.copy(isChecked = false)
                 ?.let { item.copy(item = it) }

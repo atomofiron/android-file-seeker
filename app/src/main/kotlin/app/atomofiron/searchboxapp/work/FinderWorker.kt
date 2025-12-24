@@ -45,7 +45,7 @@ import app.atomofiron.searchboxapp.utils.Codes
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.toProperties
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeMeta
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.ifCanNotice
@@ -146,7 +146,7 @@ class FinderWorker(
         }
         return NodeHash(
             ref = NodeRef(meta.path),
-            properties = meta.toProperties(),
+            meta = meta.toNodeMeta(),
             mime = mime,
             hash = hash,
         )
@@ -251,7 +251,7 @@ class FinderWorker(
         return Result.success(dataBuilder.build())
     }
 
-    private fun Meta.toNode() = Node(NodeRef(path), rootId = task.uniqueId, content = NodeContent.Unknown, properties = toProperties())
+    private fun Meta.toNode() = Node(NodeRef(path), rootId = task.uniqueId, content = NodeContent.Unknown, meta = toNodeMeta())
 
     private fun TypedMeta.toNode() = meta.toNode().resolveType(mime)
 

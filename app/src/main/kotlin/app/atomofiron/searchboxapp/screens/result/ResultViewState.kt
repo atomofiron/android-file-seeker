@@ -99,8 +99,8 @@ class ResultViewState(
             val cached = _cache[it.uniqueId]
             _cache[it.uniqueId] = when {
                 cached == null -> {
-                    val content = it.ref.resolveContent(it.meta.mime, it.meta.properties)
-                    val item = it.ref.toNode(rootId = taskId, properties = it.meta.properties, content = content)
+                    val content = it.ref.resolveContent(it.meta.mime, it.meta.meta)
+                    val item = it.ref.toNode(rootId = taskId, meta = it.meta.meta, content = content)
                     ResultItem.Item(match = it, item)
                 }
                 cached.match != it -> cached.copy(match = it)

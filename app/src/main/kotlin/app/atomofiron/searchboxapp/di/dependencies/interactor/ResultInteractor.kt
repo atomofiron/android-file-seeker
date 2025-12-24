@@ -5,7 +5,7 @@ import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeProperties
+import app.atomofiron.searchboxapp.model.explorer.NodeMeta
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateUsage
 import kotlinx.coroutines.CoroutineScope
@@ -33,7 +33,7 @@ class ResultInteractor(
         }
     }
 
-    fun usage(item: Node): NodeProperties = item.updateUsage(asSu)
+    fun usage(item: Node): NodeMeta = item.updateUsage(asSu)
 
     fun update(item: Node): Node = item.update(asSu)
 }

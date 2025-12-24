@@ -408,7 +408,7 @@ class ExplorerService(
                 items.forEachIndexed { index, current ->
                     val resolved = children.find { child -> child.uniqueId == current.uniqueId }
                     resolved ?: return@forEachIndexed
-                    val updated = current.updateWith(resolved.content, resolved.properties)
+                    val updated = current.updateWith(resolved.content, resolved.meta)
                     val old = items[index]
                     items[index] = updated
                     if (item.opened() && !updated.areContentsTheSame(old)) {
@@ -901,7 +901,7 @@ class ExplorerService(
             if (size != item.size) garden(key) {
                 val current = findItem(item.uniqueId)
                 current ?: return@launch
-                val updated = current.copy(properties = item.properties.copy(size = size))
+                val updated = current.copy(meta = item.meta.copy(size = size))
                 val replaced = replaceItem(updated)
                 if (replaced && !updated.areContentsTheSame(item)) {
                     renderUpdate(updated)
