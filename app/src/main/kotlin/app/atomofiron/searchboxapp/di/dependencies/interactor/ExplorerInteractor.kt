@@ -4,10 +4,10 @@ import app.atomofiron.common.util.extension.launchOnDefault
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
+import app.atomofiron.searchboxapp.model.explorer.ExplorerTabKey
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
-import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.move
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,33 +57,33 @@ class ExplorerInteractor(
 ) {
     private val context = Dispatchers.IO
 
-    fun getFlow(key: NodeTabKey) = service.getFlow(key)
+    fun getFlow(key: ExplorerTabKey) = service.getFlow(key)
 
-    fun drop(vararg keys: NodeTabKey) = service.drop(*keys)
+    fun drop(vararg keys: ExplorerTabKey) = service.drop(*keys)
 
     fun copyToClipboard(item: Node) = utils.copyToClipboard(item, withAlert = false)
 
-    fun toggleRoot(key: NodeTabKey, item: NodeRoot) {
+    fun toggleRoot(key: ExplorerTabKey, item: NodeRoot) {
         scope.launch(context) {
             service.tryToggleRoot(key, item)
         }
     }
 
-    fun check(tab: NodeTabKey, item: Node, toChecked: Boolean) = check(tab, listOf(item), toChecked)
+    fun check(tab: ExplorerTabKey, item: Node, toChecked: Boolean) = check(tab, listOf(item), toChecked)
 
-    fun check(tab: NodeTabKey, items: List<Node>, toChecked: Boolean) {
+    fun check(tab: ExplorerTabKey, items: List<Node>, toChecked: Boolean) {
         scope.launch(context) {
             service.tryCheck(tab, items, toChecked)
         }
     }
 
-    fun toggleDir(key: NodeTabKey, dir: Node) {
+    fun toggleDir(key: ExplorerTabKey, dir: Node) {
         scope.launch(context) {
             service.tryToggle(key, dir)
         }
     }
 
-    fun updateItems(key: NodeTabKey, items: List<Node>) {
+    fun updateItems(key: ExplorerTabKey, items: List<Node>) {
         scope.launch(context) {
             items.forEach {
                 launch {
@@ -99,31 +99,31 @@ class ExplorerInteractor(
         }
     }
 
-    fun setCurrentTab(key: NodeTabKey.Explorer) {
+    fun setCurrentTab(key: ExplorerTabKey) {
         scope.launchOnDefault {
             store.setCurrentTab(key)
         }
     }
 
-    fun deleteItems(key: NodeTabKey, items: List<Node>) {
+    fun deleteItems(key: ExplorerTabKey, items: List<Node>) {
         scope.launch(context) {
             service.tryDelete(key, items)
         }
     }
 
-    fun rename(key: NodeTabKey, ref: NodeRef, name: String) {
+    fun rename(key: ExplorerTabKey, ref: NodeRef, name: String) {
         scope.launch(context) {
             service.tryRename(key, ref, name)
         }
     }
 
-    fun create(key: NodeTabKey, parent: Node, name: String, directory: Boolean) {
+    fun create(key: ExplorerTabKey, parent: Node, name: String, directory: Boolean) {
         scope.launch(context) {
             service.tryCreate(key, parent, name, directory)
         }
     }
 
-    fun clone(key: NodeTabKey, target: Node, name: String) {
+    fun clone(key: ExplorerTabKey, target: Node, name: String) {
         scope.launch(context) {
             var to = target.move(name = name)
             if (to.isDirectory) to = to.copy(children = null)
@@ -131,7 +131,7 @@ class ExplorerInteractor(
         }
     }
 
-    fun resetChecked(key: NodeTabKey) {
+    fun resetChecked(key: ExplorerTabKey) {
         scope.launch(context) {
             service.resetChecked(key)
         }

@@ -36,7 +36,7 @@ class ExplorerStore {
     var currentItems = listOf<Node>()
         private set
 
-    val currentTabKey: StateFlow<NodeTabKey.Explorer> = _currentTab
+    val currentTabKey: StateFlow<ExplorerTabKey> = _currentTab
     val currentDeepest: StateFlow<Node?> = _currentDeepest
     val storage: StateFlow<List<NodeStorage>> = _storage
     val internalStorage: StateFlow<Node> = _internalRoot
@@ -46,22 +46,22 @@ class ExplorerStore {
     val deleted: Flow<List<Node>> = _deleted
     val updated: Flow<Node> = _updated
 
-    fun setCurrentItems(tab: NodeTabKey, items: List<Node>) {
+    fun setCurrentItems(tab: ExplorerTabKey, items: List<Node>) {
         currentLists[tab] = items
         updateCurrentItems(tab)
     }
 
-    fun emitChecked(tab: NodeTabKey, items: List<Node>) {
+    fun emitChecked(tab: ExplorerTabKey, items: List<Node>) {
         checkedLists[tab] = items
         updateChecked(tab)
     }
 
-    fun setDeepestNode(tab: NodeTabKey, node: Node?) {
-        deepestNodes[tab] = node
+    fun setDeepestNode(tab: ExplorerTabKey, item: Node?) {
+        deepestNodes[tab] = item
         updateDeepest(tab)
     }
 
-    fun setCurrentTab(tab: NodeTabKey.Explorer) {
+    fun setCurrentTab(tab: ExplorerTabKey) {
         if (tab != _currentTab.value) {
             _currentTab.value = tab
             updateChecked(tab)

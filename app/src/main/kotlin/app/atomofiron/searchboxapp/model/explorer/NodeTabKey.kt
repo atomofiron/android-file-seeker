@@ -1,5 +1,7 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+typealias ExplorerTabKey = NodeTabKey.Explorer
+
 sealed class NodeTabKey(val primary: Boolean = false) {
 
     data class Explorer(

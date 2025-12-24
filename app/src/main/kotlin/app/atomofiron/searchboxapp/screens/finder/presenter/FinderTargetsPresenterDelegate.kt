@@ -17,10 +17,14 @@ class FinderTargetsPresenterDelegate(
 ) : TargetsHolder.FinderTargetsOutput {
 
     init {
-        val merged = combine(explorerStore.currentDeepest, explorerStore.checked, explorerStore.internalStorage) { current, targets, storage ->
+        val merged = combine(
+            explorerStore.currentDeepest,
+            explorerStore.checked,
+            explorerStore.internalStorage,
+        ) { deepest, targets, storage ->
             when {
                 targets.isNotEmpty() -> targets
-                else -> listOfNotNull(current ?: storage)
+                else -> listOfNotNull(deepest ?: storage)
             }
         }
         // zip() ignores new values from 'current'

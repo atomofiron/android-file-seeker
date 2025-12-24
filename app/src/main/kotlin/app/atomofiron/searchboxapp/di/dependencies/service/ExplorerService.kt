@@ -25,6 +25,7 @@ import app.atomofiron.searchboxapp.di.dependencies.db.dao.Deepest
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.explorer.ExplorerTabKey
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -152,7 +153,7 @@ class ExplorerService(
     }
 
     private fun NodeTab.restoreTree() {
-        val key = key as? NodeTabKey.Explorer
+        val key = key as? ExplorerTabKey
         when {
             key == null -> return
             !key.primary -> return
@@ -370,7 +371,7 @@ class ExplorerService(
                 }
             }
             tabs.values.asSequence()
-                .filter { it.key is NodeTabKey.Explorer && it.key.primary == key.primary }
+                .filter { it.key is ExplorerTabKey && it.key.primary == key.primary }
                 .forEach { it.render() }
         }
     }
@@ -499,7 +500,7 @@ class ExplorerService(
         tryCache(key, to)
     }
 
-    suspend fun tryCheck(key: NodeTabKey, refs: List<Node>, toChecked: Boolean) {
+    suspend fun tryCheck(key: ExplorerTabKey, refs: List<Node>, toChecked: Boolean) {
         garden(key) {
             val toRender = mutableListOf<Node>()
             for (item in refs) {
@@ -635,7 +636,7 @@ class ExplorerService(
         return result == null
     }
 
-    suspend fun resetChecked(key: NodeTabKey) {
+    suspend fun resetChecked(key: ExplorerTabKey) {
         garden(key) {
             store.emitChecked(key, emptyList())
             checked.mapNotNull { findItem(it) }
@@ -675,14 +676,15 @@ class ExplorerService(
 
         val rendered = renderItems(roots)
         flow.emit(rendered)
-        store.setDeepestNode(key, rendered.deepest)
 
         updateStates(rendered.items)
         updateChecked(rendered.items)
         val checked = rendered.items.filter { it.isChecked }
-        store.emitChecked(key, checked)
-        store.setCurrentItems(key, rendered.items)
-
+        if (key is ExplorerTabKey) {
+            store.setDeepestNode(key, rendered.deepest)
+            store.emitChecked(key, checked)
+            store.setCurrentItems(key, rendered.items)
+        }
         require(this.roots.all { !it.isSelected })
         incrementGeneration()
     }
@@ -818,7 +820,7 @@ class ExplorerService(
         store.emitUpdate(renderNode(new))
     }
 
-    private fun renderChecked(key: NodeTabKey, item: Node, toChecked: Boolean) {
+    private fun renderChecked(key: ExplorerTabKey, item: Node, toChecked: Boolean) {
         store.checked.value.mutate {
             when {
                 toChecked -> add(item)
