@@ -109,6 +109,8 @@
     <string name="no_storage_permission">Nema pristupa datotekama</string>
     <string name="resource_busy">Resurs zauzet</string>
     <string name="unknown_error">Nepoznata greška</string>
+    <string name="error_file_was_changed">Datoteka je izmenjena</string>
+    <string name="error_file_gone">Datoteka ne postoji</string>
     <string name="inaccessible">Nedostupno</string>
     <string name="empty">Prazno</string>
     <string name="unknown">nepoznato</string>

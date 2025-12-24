@@ -11,6 +11,7 @@ import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.Unique
 import app.atomofiron.common.util.Equality
+import app.atomofiron.searchboxapp.model.other.UniText
 import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
 import java.util.*
@@ -27,6 +28,7 @@ object CurtainApi {
         fun showNext(layoutId: Int)
         fun showPrev()
         fun close(immediately: Boolean = false, irrevocably: Boolean = false)
+        fun showSnackbar(text: UniText, duration: Int = Snackbar.LENGTH_SHORT)
         fun showSnackbar(string: String, duration: Int = Snackbar.LENGTH_SHORT)
         fun showSnackbar(stringId: Int, duration: Int = Snackbar.LENGTH_SHORT)
         fun showSnackbar(provider: SnackbarProvider)

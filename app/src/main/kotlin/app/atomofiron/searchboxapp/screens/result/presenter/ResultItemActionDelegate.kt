@@ -1,7 +1,8 @@
 package app.atomofiron.searchboxapp.screens.result.presenter
 
-import app.atomofiron.common.util.AlertMessage
+import app.atomofiron.common.util.AlertErr
 import app.atomofiron.common.util.dialog.DialogDelegate
+import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
@@ -14,9 +15,11 @@ import app.atomofiron.searchboxapp.screens.result.ResultViewState
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
 import app.atomofiron.searchboxapp.utils.Rslt
+import kotlinx.coroutines.CoroutineScope
 
 class ResultItemActionDelegate(
     private val viewState: ResultViewState,
+    private val scope: CoroutineScope,
     private val operations: FileOperationsDelegate,
     private val router: ResultRouter,
     private val curtainDelegate: ResultCurtainMenuDelegate,
@@ -24,6 +27,7 @@ class ResultItemActionDelegate(
     private val interactor: ResultInteractor,
     private val sharing: FileSharingDelegate,
 ) : ResultItemActionListener {
+
     override fun onItemClick(item: Node) {
         when {
             item.isDirectory -> Unit // todo open dir
@@ -34,35 +38,41 @@ class ResultItemActionDelegate(
     }
 
     override fun onItemLongClick(item: Node) = viewState.run {
-        val matches = result.value.matches
         val items = when {
-            item.isChecked -> matches.mapNotNull { it.item.takeIf { checked.value.contains(it.uniqueId) } }
+            item.isChecked -> cache.values.mapNotNull { item ->
+                item.item.takeIf { checked.contains(item.uniqueId) }
+            }
             else -> listOf(item)
         }
         val options = operations.operations(items, readOnly = true)
         when (options) {
             is Rslt.Ok -> curtainDelegate.showOptions(options.value)
             is Rslt.Err -> when {
-                options.isEmpty -> AlertMessage(R.string.unknown_error)
-                else -> AlertMessage(options.message)
+                options.isEmpty -> AlertErr(R.string.unknown_error)
+                else -> AlertErr(options.message)
             }.let { viewState.showAlert(it) }
         }
     }
 
     override fun onItemCheck(item: Node, toChecked: Boolean): Boolean {
-        val checked = viewState.checked.value.toMutableList()
-        when {
-            toChecked -> checked.add(item.uniqueId)
-            else -> checked.remove(item.uniqueId)
-        }
-        viewState.checked.value = checked
+        viewState.setChecked(item.uniqueId, toChecked)
         return true
     }
 
-    override fun onItemVisible(item: ResultItem.Item) = interactor.update(viewState.taskUuid, item.match)
+    override fun onItemVisible(item: ResultItem.Item) {
+        scope.launchOnIO {
+            val updated = interactor.update(item.item)
+            val properties = interactor.usage(updated)
+            updated.copy(properties = properties)
+                .takeIf { it != item.item }
+                ?.copy(isChecked = false)
+                ?.let { item.copy(item = it) }
+                ?.let { viewState.cache(it) }
+        }
+    }
 
     override fun onErrorsClick() {
-        val error = viewState.result.value.errors.joinToString(separator = "\n")
+        val error = viewState.result.errors.joinToString(separator = "\n")
         dialogs.showErrors(error.toUni())
     }
 }

@@ -60,6 +60,13 @@ pub enum HandleResult {
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
+pub enum CrcResult {
+    Ok(u32),
+    Err(String),
+}
+
+#[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(uniffi::Enum)]
 pub enum CountingResult {
     Ok {
         count: u32,
@@ -80,7 +87,7 @@ pub struct SearchQuery {
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum NameSearchProgress {
-    Match(Meta),
+    Match(TypedMeta),
     Skip,
     Err(Meta),
 }
@@ -88,7 +95,7 @@ pub enum NameSearchProgress {
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum TextSearchProgress {
-    Match(Meta, Vec<TextMatch>),
+    Match(TypedMeta, CrcResult, Vec<TextMatch>),
     Skip,
     Err(Meta),
 }
@@ -130,7 +137,7 @@ pub struct Meta {
     pub error: Option<String>,
 }
 
-#[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(Debug, Encode, Decode, PartialEq, Clone)]
 #[derive(uniffi::Record)]
 pub struct TypedMeta {
     pub meta: Meta,

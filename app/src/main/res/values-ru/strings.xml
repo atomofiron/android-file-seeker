@@ -109,6 +109,8 @@
     <string name="no_storage_permission">Нет доступа к файлам</string>
     <string name="resource_busy">Ресурс занят</string>
     <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="error_file_was_changed">Файл был изменён</string>
+    <string name="error_file_gone">Файл не существует</string>
     <string name="inaccessible">Недоступно</string>
     <string name="empty">Пусто</string>
     <string name="unknown">неизвестно</string>

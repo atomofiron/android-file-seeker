@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.screens.explorer.presenter
 
-import app.atomofiron.common.util.AlertMessage
+import app.atomofiron.common.util.AlertErr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
@@ -36,8 +36,8 @@ class ExplorerItemActionListenerDelegate(
         when (options) {
             is Rslt.Ok -> menuListenerDelegate.showOptions(options.value)
             is Rslt.Err -> when {
-                options.isEmpty -> AlertMessage(R.string.unknown_error)
-                else -> AlertMessage(options.message)
+                options.isEmpty -> AlertErr(R.string.unknown_error)
+                else -> AlertErr(options.message)
             }.let { viewState.showAlert(it) }
         }
     }

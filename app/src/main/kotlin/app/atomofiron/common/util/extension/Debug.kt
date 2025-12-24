@@ -12,7 +12,7 @@ import java.lang.ref.WeakReference
 
 var debugContext = WeakReference<Context>(null)
 
-fun stub() { "check the stack trace" }
+fun stub(): String = "check the stack trace"
 
 inline fun debug(action: () -> Unit) = when {
     BuildConfig.DEBUG -> action()
@@ -20,6 +20,8 @@ inline fun debug(action: () -> Unit) = when {
 }
 
 inline fun Any.debugFail(lazyMessage: () -> Any = ::stub) = debugRequire(false, lazyMessage)
+
+fun Any.debugFailUnreachable() = debugFail { "unreachable?" }
 
 inline fun Any.debugRequireNotNull(any: Any?, lazyMessage: () -> Any = ::stub) = debugRequire(any != null, lazyMessage)
 

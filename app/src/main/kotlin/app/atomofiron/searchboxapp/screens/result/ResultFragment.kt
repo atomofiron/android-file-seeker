@@ -9,24 +9,21 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
-import app.atomofiron.common.util.AlertMessage
 import app.atomofiron.common.util.flow.viewCollect
-import app.atomofiron.common.util.unsafeLazy
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentResultBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.addExplorerFastScroll
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
-import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.screens.common.delegates.apply
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.TAG_EXPLORER_OPENED_ITEM
 import app.atomofiron.searchboxapp.screens.result.adapter.ItemGravityDecorator
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
-import app.atomofiron.searchboxapp.utils.makeSnackbar
-import com.google.android.material.snackbar.Snackbar
+import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.showSnackbar
+import lib.atomofiron.insets.insetsPadding
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState.Companion.Default as DefaultDockState
 
 class ResultFragment : Fragment(R.layout.fragment_result),
@@ -37,10 +34,6 @@ class ResultFragment : Fragment(R.layout.fragment_result),
     private lateinit var statusDrawable: Drawable
 
     private val resultAdapter = ResultAdapter()
-    private val errorSnackbar by unsafeLazy {
-        binding.snackbarContainer.makeSnackbar("", Snackbar.LENGTH_INDEFINITE)
-            .setAction(R.string.got_it) { }
-    }
     private val gravityDecorator = ItemGravityDecorator()
     private val backgroundDecorator = ItemBackgroundDecorator(R.id.item_explorer, evenNumbered = false, ignoringTag = TAG_EXPLORER_OPENED_ITEM)
 
@@ -89,37 +82,20 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             backgroundDecorator.enabled = it.visibleBg
             resultAdapter.setComposition(it)
         }
-        viewCollect(result, collector = ::onTaskChange)
-        viewCollect(alerts, collector = ::showSnackbar)
+        viewCollect(items) { resultAdapter.submit(it) }
+        viewCollect(updates) { resultAdapter.submit(it) }
+        viewCollect(alerts) { binding.snackbarContainer.showSnackbar(it) }
         viewCollect(dock, collector = binding.dockBar::submit)
     }
 
     override fun FragmentResultBinding.onApplyInsets() {
         disclaimer.apply(viewState.mode, insetsBackground, root)
         root.apply(recyclerView = recyclerView, dockView = dockBar, snackbarContainer = snackbarContainer)
+        snackbarContainer.insetsPadding(ExtType { barsWithCutout + dock }, start = true, end = true, bottom = true)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         resultAdapter.notifyItemChanged(0)
-    }
-
-    private fun onTaskChange(result: SearchResult.Files) {
-        resultAdapter.setResult(result)
-
-        if (!result.isEmpty) {
-            // fix first item offset
-            resultAdapter.notifyItemChanged(0)
-        }
-        viewState.error?.let {
-            errorSnackbar.setText(it).show()
-        }
-    }
-
-    private fun showSnackbar(message: AlertMessage.Uni) {
-        val length = if (message.important) Snackbar.LENGTH_INDEFINITE else Snackbar.LENGTH_LONG
-        binding.snackbarContainer.makeSnackbar(resources[message.message], length)
-            .apply { if (message.important) setAction(R.string.got_it) { } }
-            .show()
     }
 }

@@ -18,6 +18,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.Item
 import app.atomofiron.searchboxapp.screens.viewer.recycler.TextViewerAdapter
 import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
 import app.atomofiron.searchboxapp.utils.addFastScroll
+import app.atomofiron.searchboxapp.utils.showSnackbar
 import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState.Companion.Default as DefaultDockState
 
 class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
@@ -69,6 +70,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         viewCollect(currentTask, collector = ::onTaskChanged)
         viewCollect(matchingCursor, collector = ::onMatchCursorChanged)
         viewCollect(dock, collector = binding.dockBar::submit)
+        viewCollect(alerts) { binding.snackbarContainer.showSnackbar(it) }
     }
 
     override fun FragmentTextViewerBinding.onApplyInsets() {

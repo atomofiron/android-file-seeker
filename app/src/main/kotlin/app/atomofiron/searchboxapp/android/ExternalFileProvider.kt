@@ -100,7 +100,7 @@ class ExternalFileProvider : ContentProvider() {
                 OpenableColumns.DISPLAY_NAME -> name to ref.name
                 OpenableColumns.SIZE -> File(path)
                     .takeIf { it.canRead() }
-                    .let { it?.length() ?: NativeBridge.meta(ref, asSu = uri.asSu()).value?.length?.toLong() }
+                    .let { it?.length() ?: NativeBridge.meta(ref, asSu = uri.asSu()).ok()?.value?.length?.toLong() }
                     .takeIf { it != null }
                     ?.let { name to it }
                 else -> null

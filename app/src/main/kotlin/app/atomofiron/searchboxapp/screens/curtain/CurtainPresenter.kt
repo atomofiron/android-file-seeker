@@ -6,6 +6,8 @@ import app.atomofiron.common.util.flow.set
 import app.atomofiron.common.util.flow.valueOrNull
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainResponse
+import app.atomofiron.searchboxapp.model.other.UniText
+import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
@@ -51,6 +53,10 @@ class CurtainPresenter(
             immediately -> router.navigateBack()
             else -> viewState.action[scope] = CurtainAction.Hide(irrevocably)
         }
+    }
+
+    override fun showSnackbar(text: UniText, duration: Int) = showSnackbar {
+        Snackbar.make(it, it.resources[text], duration)
     }
 
     override fun showSnackbar(string: String, duration: Int) = showSnackbar {

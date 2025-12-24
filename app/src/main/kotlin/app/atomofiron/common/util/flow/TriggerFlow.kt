@@ -1,16 +1,23 @@
 package app.atomofiron.common.util.flow
 
 import kotlinx.coroutines.ExperimentalForInheritanceCoroutinesApi
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.flow.FlowCollector
 import kotlinx.coroutines.flow.MutableSharedFlow
 
 @OptIn(ExperimentalForInheritanceCoroutinesApi::class)
-class TriggerFlow private constructor(private val impl: MutableSharedFlow<Unit>) : MutableSharedFlow<Unit> by impl {
+class TriggerFlow<T> private constructor(
+    private var initial: T? = null,
+    private val impl: MutableSharedFlow<T>,
+) : MutableSharedFlow<T> by impl {
 
-    constructor() : this(MutableSharedFlow<Unit>())
+    constructor(initial: T? = null) : this(initial, MutableSharedFlow<T>(replay = 1, 1, DROP_OLDEST))
 
-    override suspend fun collect(collector: FlowCollector<Unit>): Nothing {
-        if (replayCache.isEmpty()) collector.emit(Unit)
+    override suspend fun collect(collector: FlowCollector<T>): Nothing {
+        if (initial != null && replayCache.isEmpty()) {
+            initial?.let { collector.emit(it) }
+            initial = null
+        }
         impl.collect(collector)
     }
 }

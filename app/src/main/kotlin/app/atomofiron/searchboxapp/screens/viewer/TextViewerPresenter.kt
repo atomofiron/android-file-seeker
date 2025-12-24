@@ -4,11 +4,11 @@ import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
+import app.atomofiron.searchboxapp.screens.viewer.di.TextViewerInteractor
 import app.atomofiron.searchboxapp.screens.viewer.presenter.SearchAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 import app.atomofiron.searchboxapp.screens.viewer.recycler.TextViewerAdapter
@@ -25,22 +25,23 @@ class TextViewerPresenter(
     session: TextViewerSession?,
 ) : BasePresenter<TextViewerViewModel, TextViewerRouter>(scope, router),
     TextViewerAdapter.TextViewerListener,
-    FinderAdapterOutput<SearchResult.Text> by searchDelegate
+    FinderAdapterOutput<SearchResult.Local> by searchDelegate
 {
 
     private val itemRef: NodeRef get() = viewState.item.value.ref
 
     init {
         session?.loading?.collect(scope, viewState::setLoading)
-        params.initialTaskId?.let { taskId ->
-            interactor.fetchTask(itemRef, taskId) { task ->
-                viewState.trySelectTask(task)
-            }
-        }
         scope.launchOnIO {
             session ?: return@launchOnIO
             val item = interactor.fetchItem(itemRef)
             session.updateItem(item)
+        }
+        scope.launchOnIO {
+            val task = params.initialTaskId
+                ?.let { interactor.fetchTask(itemRef, it) }
+                ?: return@launchOnIO
+            searchDelegate.trySelectTask(task)
         }
     }
 

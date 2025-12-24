@@ -104,7 +104,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
 
     private fun showTestSnackbar() {
         showSnackbar {
-            Snackbar.make(it, "Test", Snackbar.LENGTH_INDEFINITE).setAction("Dismiss") {}
+            Snackbar.make(it, "Test", Snackbar.LENGTH_INDEFINITE).setAction(R.string.dismiss) {}
         }
     }
 

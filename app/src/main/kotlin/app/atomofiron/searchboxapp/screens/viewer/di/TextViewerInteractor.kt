@@ -1,5 +1,6 @@
-package app.atomofiron.searchboxapp.di.dependencies.interactor
+package app.atomofiron.searchboxapp.screens.viewer.di
 
+import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
@@ -46,12 +47,9 @@ class TextViewerInteractor(
         }
     }
 
-    fun fetchTask(ref: NodeRef, taskId: UUID, callback: (TextSearchTask) -> Unit) {
-        scope.launch {
-            val task = service.fetchTask(ref, taskId)
-            task?.let(callback)
-        }
-    }
+    suspend fun fetchTask(ref: NodeRef, taskId: UUID): TextSearchTask? = service.fetchTask(ref, taskId)
+
+    fun getHash(ref: NodeRef): Rslt<Int> = NativeBridge.crcHash(ref, asSu)
 
     fun search(ref: NodeRef, params: QueryParams) {
         scope.launch(Dispatchers.IO) {

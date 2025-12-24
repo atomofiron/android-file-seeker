@@ -2,9 +2,10 @@ package app.atomofiron.searchboxapp.screens.result
 
 import androidx.work.WorkManager
 import app.atomofiron.common.arch.BasePresenter
-import app.atomofiron.common.util.AlertMessage
-import app.atomofiron.common.util.Unreachable
+import app.atomofiron.common.util.AlertErr
+import app.atomofiron.common.util.extension.debugFailUnreachable
 import app.atomofiron.common.util.extension.logE
+import app.atomofiron.common.util.extension.mapCast
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
@@ -14,13 +15,13 @@ import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
+import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultItemActionDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import app.atomofiron.searchboxapp.utils.formatDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import kotlin.collections.ifEmpty
 
 class ResultPresenter(
     params: ResultPresenterParams,
@@ -52,41 +53,42 @@ class ResultPresenter(
     fun onStopClick() = interactor.stop(viewState.taskUuid)
 
     fun onShareClick() {
-        val result = viewState.result.value
-        val checkedOnly = result.matches.any { it.item.isChecked }
-        val items = result.matches.mapNotNull { match ->
-            match.item.takeIf { !checkedOnly || it.isChecked }
+        val checkedOnly = viewState.checked.isNotEmpty()
+        val items = viewState.items.value.mapCast<_, ResultItem.Item, _> {
+            item.takeIf { !checkedOnly || isChecked }
         }
         sharing.shareWith(items)
     }
 
     fun onExportClick() {
-        val result = viewState.result.value
-        val checkedOnly = result.matches.any { it.item.isChecked }
-        val data = result.toMarkdown(checkedOnly)
+        val checkedOnly = viewState.checked.isNotEmpty()
+        val data = when {
+            checkedOnly -> viewState.result.toMarkdown {
+                viewState.checked.contains(it.uniqueId)
+            }
+            else -> viewState.result.toMarkdown()
+        }
         val title = "search_${resources.formatDate()}.md.txt";
         if (!router.shareFile(title, data)) {
-            viewState.showAlert(AlertMessage(R.string.no_activity, important = true))
+            viewState.showAlert(AlertErr(R.string.no_activity))
         }
     }
 
     fun onConfirmClick() {
-        val matches = viewState.result.value.matches
-        val items = viewState.checked.value
-            .mapNotNull { uniqueId ->
-                matches.find { it.item.uniqueId == uniqueId }?.item
-            }.ifEmpty { return }
+        val items = viewState.items.value.mapCast<_, ResultItem.Item, _> {
+            item.takeIf { viewState.checked.contains(uniqueId) }
+        }
         val mode = viewState.mode
         val first = items.firstOrNull() ?: return
         when {
-            mode is ActivityMode.Default -> Unreachable
+            mode is ActivityMode.Default -> debugFailUnreachable()
             mode is ActivityMode.Receive -> {
                 scope.launch {
                     workManager.startReceiveInto(first.ref, viewState.mode)
                     router.finish()
                 }
             }
-            mode !is ActivityMode.Share -> Unreachable
+            mode !is ActivityMode.Share -> debugFailUnreachable()
             mode.multiple -> picking.shareMultiplePicked(items)
             else -> picking.shareSinglePicked(first)
         }

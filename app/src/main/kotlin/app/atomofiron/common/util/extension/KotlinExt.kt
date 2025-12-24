@@ -105,6 +105,15 @@ fun <T> MutableList<T>.resizeWith(size: Int, with: T) {
     fill(with)
 }
 
+inline fun <T, reified S : T, R> List<T>.mapCast(transform: S.() -> R?): List<R> {
+    return mapNotNull {
+        when (it) {
+            is S -> it.transform()
+            else -> null
+        }
+    }
+}
+
 inline fun <T> List<T>.indexOfFirst(fromIndex: Int = 0, orElse: Int = -1, predicate: (T) -> Boolean): Int {
     if (fromIndex in indices) {
         var index = fromIndex

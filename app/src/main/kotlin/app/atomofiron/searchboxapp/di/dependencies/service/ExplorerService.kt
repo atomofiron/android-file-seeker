@@ -49,7 +49,7 @@ import app.atomofiron.searchboxapp.model.explorer.replace
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
@@ -97,7 +97,7 @@ class ExplorerService(
     private val asSu by preferences.asSu
     private val garden = NodeGarden()
     private val internalStorageRef = store.internalStorage.value.ref
-    private val updateRootTrigger = TriggerFlow()
+    private val updateRootTrigger = TriggerFlow<Unit>()
 
     init {
         val suDefined = Job()
@@ -274,7 +274,7 @@ class ExplorerService(
                 withCachingState(root.id) {
                     var updated = root.item.update(asSu)
                     updated = when (updated.error) {
-                        is NodeError.NoSuchFile -> tryAlternative(root, updated)
+                        is NodeError.NoSuchFileOrDir -> tryAlternative(root, updated)
                         else -> updated
                     }
                     updateRootSync(updated, key, root)
@@ -290,10 +290,10 @@ class ExplorerService(
         val variants = root.pathVariants?.takeIf { it.isNotEmpty() }
         variants ?: return missing
         val items = variants.map { path ->
-            path.asRoot(root.type).update(asSu)
+            path.toRoot(root.type).update(asSu)
         }
         val alt = items.find { it.error == null }
-            ?: items.find { it.error !is NodeError.NoSuchFile }
+            ?: items.find { it.error !is NodeError.NoSuchFileOrDir }
         return alt ?: missing
     }
 
@@ -872,7 +872,7 @@ class ExplorerService(
             }
             val current = findItem(item.uniqueId)
             current ?: return
-            if (updated.error is NodeError.NoSuchFile) {
+            if (updated.error is NodeError.NoSuchFileOrDir) {
                 if (removeNode(item.uniqueId)) {
                     render()
                 }
@@ -895,11 +895,10 @@ class ExplorerService(
 
     private fun resolveSizeAsync(key: NodeTabKey, item: Node) {
         appScope.launch {
-            val size = NativeBridge.usage(item.ref, asSu).unwrapOrNull()
-            when (size) {
-                null, item.size -> return@launch
-            }
-            garden(key) {
+            val size = NativeBridge.usage(item.ref, asSu)
+                .unwrapOrNull()
+                ?: ""
+            if (size != item.size) garden(key) {
                 val current = findItem(item.uniqueId)
                 current ?: return@launch
                 val updated = current.copy(properties = item.properties.copy(size = size))

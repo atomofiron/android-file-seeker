@@ -13,6 +13,7 @@ pub enum Request {
     CreateDir(RawPath),
     CreateFile(RawPath),
     Delete(RawPath),
+    CrcHash(RawPath),
     TryRun,
     Copy(RawPath, RawPath, bool),
     FindNames {

@@ -1,12 +1,11 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.util
 
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
+import app.atomofiron.common.recycler.GeneralAdapter
 
-class ItemVisibilityDelegate(
-    private val adapter: ExplorerAdapter,
-    private val listener: ExplorerItemVisibilityListener,
+class ItemVisibilityDelegate<D : Any>(
+    private val adapter: GeneralAdapter<D, *>,
+    private val listener: ItemVisibilityListener<D>,
 ) {
 
     private val _visibleItems = mutableSetOf<Int>()
@@ -24,7 +23,7 @@ class ItemVisibilityDelegate(
         _visibleItems.remove(holder.bindingAdapterPosition)
     }
 
-    interface ExplorerItemVisibilityListener {
-        fun onItemsBecomeVisible(items: List<Node>)
+    fun interface ItemVisibilityListener<D> {
+        fun onItemsBecomeVisible(items: List<D>)
     }
 }

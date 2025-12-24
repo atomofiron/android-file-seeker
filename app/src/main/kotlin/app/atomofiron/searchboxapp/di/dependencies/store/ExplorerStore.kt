@@ -4,7 +4,7 @@ import android.os.Environment
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +27,7 @@ class ExplorerStore {
     private val _storage = MutableStateFlow<List<NodeStorage>>(emptyList())
     private val _currentTab = MutableStateFlow(middleTab)
     private val _currentDeepest = MutableStateFlow<Node?>(null)
-    private val _internalRoot = MutableStateFlow(Node.asRoot(NodeRef(internalStoragePath), NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
+    private val _internalRoot = MutableStateFlow(NodeRef(internalStoragePath).toRoot(NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
     private val _screenshots = MutableStateFlow<NodeRef?>(null)
     private val _checked = MutableStateFlow<List<Node>>(listOf())
     private val _alerts = EventFlow<NodeError>()

@@ -11,7 +11,7 @@ data class Node(
     val rootId: Int = uniqueId,
     val children: NodeChildren? = null,
 
-    val properties: NodeProperties = NodeProperties(),
+    val properties: NodeProperties = NodeProperties.Empty,
     val content: NodeContent,
     val error: NodeError? = null,
     // state is always stateStub in the garden

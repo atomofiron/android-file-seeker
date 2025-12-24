@@ -12,6 +12,8 @@ data class NodeProperties(
     companion object {
         const val DATE_TIME_SEPARATOR = " "
         const val DATE_TIME_FORMAT = "yyyy-MM-dd${DATE_TIME_SEPARATOR}HH:mm"
+
+        val Empty = NodeProperties()
     }
 }
 

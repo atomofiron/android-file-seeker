@@ -41,8 +41,9 @@ object ExplorerUtils {
     private const val DIR_CHAR = 'd'
     private const val LINK_CHAR = 'l'
     private const val FILE_CHAR = '-'
-    private const val LS_NO_SUCH_FILE = "No such file or directory"
-    private const val LS_PERMISSION_DENIED = "Permission denied"
+    // todo replace with enum in rust
+    private const val NO_SUCH_FILE_OR_DIR = "No such file or directory"
+    private const val PERMISSION_DENIED = "Permission denied"
     private const val RESOURCE_BUSY = "Device or resource busy"
 
     private const val DIRECTORY = NodeContent.Directory.MIME_TYPE
@@ -174,7 +175,7 @@ object ExplorerUtils {
         return Node(ref = target, parentRef = parent.ref, rootId = parent.rootId, properties = meta.toProperties(), content = content)
     }
 
-    fun NodeRef.asRoot(type: NodeRootType): Node {
+    fun NodeRef.toRoot(type: NodeRootType): Node {
         return Node(
             ref = this,
             properties = NodeProperties(),
@@ -262,6 +263,19 @@ object ExplorerUtils {
         }
     }
 
+    fun Node.updateUsage(asSu: Boolean): NodeProperties {
+        if (!isDirectory) {
+            return properties
+        }
+        val result = NativeBridge.usage(ref, asSu)
+        val size = when (result) {
+            is Rslt.Err -> ""
+            is Rslt.Ok -> result.value
+        }.takeIf { it != size }
+        size ?: return properties
+        return properties.copy(size = size)
+    }
+
     private fun Node.ensureCached(asSu: Boolean, oldProps: NodeProperties): Node = when {
         isDirectory -> cacheDir(asSu)
         length == 0L && oldProps.size != size -> resolveFileType()
@@ -275,7 +289,7 @@ object ExplorerUtils {
         }
     }
 
-    private fun Node.cacheDir(asSu: Boolean): Node {
+    fun Node.cacheDir(asSu: Boolean): Node {
         val result = NativeBridge.metas(ref, asSu)
         return when (result) {
             is Rslt.Ok -> parseDir(result.value)
@@ -304,14 +318,16 @@ object ExplorerUtils {
         return entries.isNotEmpty()
     }
 
-    fun Node.resolveType(mimeType: String): Node {
-        val content = when (true) {
-            (access.firstOrNull() == DIR_CHAR),
+    fun Node.resolveType(mimeType: String): Node = copy(content = ref.resolveContent(mimeType, properties, content))
+
+    fun NodeRef.resolveContent(mimeType: String, properties: NodeProperties, content: NodeContent? = null): NodeContent {
+        return when (true) {
+            (properties.access.firstOrNull() == DIR_CHAR),
             (mimeType == DIRECTORY),
             (content is NodeContent.Directory) -> content.ifMismatches { NodeContent.Directory() }
-            (length == 0L) -> NodeContent.Empty
+            (properties.length == 0L) -> NodeContent.Empty
             mimeType.isBlank(),
-            (mimeType == FILE_UNKNOWN) -> content.resolveFileType(ref)
+            (mimeType == FILE_UNKNOWN) -> content.resolveFileType(this)
             mimeType.startsWith(FILE_PICTURE) -> content.ifMismatches { NodeContent.Picture.resolve(mimeType) }
             mimeType.startsWith(FILE_TEXT) -> when {
                 name.hasExt(EXT_SVG) -> content.ifMismatches { NodeContent.Text.Svg }
@@ -324,12 +340,12 @@ object ExplorerUtils {
                 else -> NodeContent.Text.Plain
             }
             (mimeType == FILE_XRIFF) -> content.ifMismatches { NodeContent.Picture(mimeType) }
-            (mimeType == FILE_APK) -> content.ifMismatches { AndroidApp.apk(ref) }
+            (mimeType == FILE_APK) -> content.ifMismatches { AndroidApp.apk(this) }
             (mimeType == FILE_RAR) -> content.ifMismatches { NodeContent.Rar() }
             (mimeType == FILE_ZIP) -> when (true) {
                 name.hasExt(EXT_APKS),
-                name.hasExt(EXT_APKM) -> content.ifMismatches { AndroidApp.apks(ref) }
-                (content is AndroidApp) -> return this
+                name.hasExt(EXT_APKM) -> content.ifMismatches { AndroidApp.apks(this) }
+                (content is AndroidApp) -> return content
                 name.hasExt(EXT_OSZ) -> content.ifMismatches { NodeContent.Osu.Map() }
                 name.hasExt(EXT_OSK) -> content.ifMismatches { NodeContent.Osu.Skin() }
                 name.hasExt(EXT_OLZ) -> content.ifMismatches { NodeContent.Osu.LazerMap() }
@@ -376,11 +392,10 @@ object ExplorerUtils {
             (mimeType == FILE_SCRIPT),
             mimeType.startsWith(FILE_TEXT_SCRIPT) -> NodeContent.Text.ShellScript
             else -> {
-                logE("'${ref.ext}' unknown type: $mimeType ${ref.takeIfDebug()}")
-                content.resolveFileType(ref)
+                logE("'$ext' unknown type: $mimeType ${takeIfDebug()}")
+                content.resolveFileType(this)
             }
         }
-        return copy(content = content)
     }
 
     private fun Node.cacheFile(): Node {
@@ -550,8 +565,9 @@ object ExplorerUtils {
         rootId: NodeId = uniqueId,
         parentRef: NodeRef = parent,
         content: NodeContent = NodeContent.Undefined,
+        properties: NodeProperties = NodeProperties.Empty,
         children: NodeChildren? = null,
-    ) = Node(this, parentRef = parentRef, rootId = rootId, content = content, children = children)
+    ) = Node(this, parentRef = parentRef, properties = properties, rootId = rootId, content = content, children = children)
 
     // means this node the fake, may be is a visual separating item, isn't a dir
     fun Node.isSeparator(): Boolean = ref.uniqueId == -uniqueId
@@ -598,20 +614,20 @@ object ExplorerUtils {
         return mutate(ref = ref, parentRef = parent, properties = properties)
     }
 
-    private fun String.toNodeError(): NodeError {
+    fun String.toNodeError(): NodeError {
         val lines = split(LF).filter { it.isNotBlank() }
         val first = lines.firstOrNull()
         return when {
             lines.size > 1 -> NodeError.Multiply(lines)
             first == null -> NodeError.Unknown
-            first.startsWith(LS_NO_SUCH_FILE) -> NodeError.NoSuchFile
-            first.startsWith(LS_PERMISSION_DENIED) -> NodeError.PermissionDenied
+            first.startsWith(NO_SUCH_FILE_OR_DIR) -> NodeError.NoSuchFileOrDir
+            first.startsWith(PERMISSION_DENIED) -> NodeError.PermissionDenied
             first.startsWith(RESOURCE_BUSY) -> NodeError.ResourceBusy
             else -> NodeError.Message.orUnknown(first)
         }
     }
 
-    fun Node.isInaccessible() = error is NodeError.NoSuchFile || error is NodeError.PermissionDenied
+    fun Node.isInaccessible() = error is NodeError.NoSuchFileOrDir || error is NodeError.PermissionDenied
 
     private fun List<String>.toNodeError(): NodeError? = takeIf { it.isNotEmpty() }
         ?.let { NodeError.Multiply(it) }

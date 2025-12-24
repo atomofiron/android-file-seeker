@@ -5,7 +5,6 @@ import androidx.work.WorkManager
 import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.ResultChannel
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
@@ -19,6 +18,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.dependencies.store.ResultStore
+import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultCurtainMenuDelegate
@@ -98,6 +98,7 @@ class ResultModule {
     @Provides
     @ResultScope
     fun resultItemActionDelegate(
+        scope: CoroutineScope,
         viewModel: ResultViewState,
         operations: FileOperationsDelegate,
         router: ResultRouter,
@@ -106,7 +107,7 @@ class ResultModule {
         interactor: ResultInteractor,
         sharing: FileSharingDelegate,
     ): ResultItemActionDelegate {
-        return ResultItemActionDelegate(viewModel, operations, router, menuListenerDelegate, dialogs, interactor, sharing)
+        return ResultItemActionDelegate(viewModel, scope, operations, router, menuListenerDelegate, dialogs, interactor, sharing)
     }
 
     @Provides
@@ -130,10 +131,9 @@ class ResultModule {
         utilService: UtilService,
         explorerService: ExplorerService,
         finderService: FinderService,
-        finderStore: FinderStore,
         preferences: PreferenceStore,
     ): ResultInteractor {
-        return ResultInteractor(scope, utilService, explorerService, finderService, finderStore, preferences)
+        return ResultInteractor(scope, utilService, explorerService, finderService, preferences)
     }
 
     @Provides

@@ -1,6 +1,7 @@
 use crate::api::api::TypedMeta;
 use crate::common::{empty_string, Rslt, AUDIO_OGG, VIDEO_OGG};
 use crate::r#impl::hr_meta::HumanReadableMeta;
+use crate::r#impl::meta::meta_with_error;
 use ogg::PacketReader;
 use std::fs;
 use std::fs::File;
@@ -29,6 +30,15 @@ pub fn file_types(path: &PathBuf) -> Rslt<Vec<TypedMeta>> {
         })
     }).collect::<Vec<_>>();
     return Ok(entries);
+}
+
+pub fn type_or_meta(path: &PathBuf) -> TypedMeta {
+    file_type(path).unwrap_or_else(|e| {
+        TypedMeta {
+            meta: meta_with_error(&path.into(), &e),
+            mime: empty_string(),
+        }
+    })
 }
 
 fn check(path: &PathBuf, mime: &str) -> String {

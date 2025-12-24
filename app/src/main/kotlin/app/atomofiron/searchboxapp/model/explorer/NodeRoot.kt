@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.extension.hash
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.asRoot
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 
 data class NodeRoot(
     val type: NodeRootType,
@@ -16,7 +16,7 @@ data class NodeRoot(
 ) {
 
     constructor(type: NodeRootType, sorting: NodeSorting, vararg pathVariants: NodeRef)
-            : this(type, Node.asRoot(pathVariants.first(), type), sorting, pathVariants = pathVariants.takeIf { it.size > 1 })
+            : this(type, pathVariants.first().toRoot(type), sorting, pathVariants = pathVariants.takeIf { it.size > 1 })
 
     val id: NodeId = item.uniqueId + type.temp
     val isEnabled: Boolean get() = item.isCached || type is NodeRootType.Storage

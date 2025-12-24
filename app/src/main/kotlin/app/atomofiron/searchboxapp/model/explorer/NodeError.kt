@@ -3,7 +3,8 @@ package app.atomofiron.searchboxapp.model.explorer
 import app.atomofiron.common.util.extension.debugRequire
 
 sealed class NodeError {
-    data object NoSuchFile : NodeError()
+    data object NoSuchFileOrDir : NodeError()
+    data object FileWasChanged : NodeError()
     data object PermissionDenied : NodeError()
     data object ResourceBusy : NodeError()
     data object Unknown : NodeError()

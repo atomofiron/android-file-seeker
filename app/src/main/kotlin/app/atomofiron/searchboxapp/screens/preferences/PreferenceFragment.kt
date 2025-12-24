@@ -16,6 +16,7 @@ import androidx.preference.forEach
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findColorByAttr
@@ -28,16 +29,10 @@ import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.custom.preference.DropDownPreference
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.ExtType
-import app.atomofiron.searchboxapp.utils.isRtl
-import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.performHapticLite
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
+import app.atomofiron.searchboxapp.utils.showSnackbar
 import com.google.android.material.appbar.AppBarLayout
-import com.google.android.material.appbar.CollapsingToolbarLayout
-import com.google.android.material.snackbar.Snackbar
-import lib.atomofiron.insets.ExtendedWindowInsets
-import lib.atomofiron.insets.InsetsListener
-import lib.atomofiron.insets.attachInsetsListener
 import lib.atomofiron.insets.insetsPadding
 
 class PreferenceFragment : PreferenceFragmentCompat(),
@@ -146,15 +141,10 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         }
     }
 
-    private fun onAlert(message: String) {
-        binding.snackbarContainer.makeSnackbar(message, Snackbar.LENGTH_SHORT).show()
-    }
+    private fun onAlert(message: String) = binding.snackbarContainer.showSnackbar(Alert(message))
 
     private fun showOutputSuccess(message: Int) {
-        val duration = when (message) {
-            R.string.successful_with_restart -> Snackbar.LENGTH_LONG
-            else -> Snackbar.LENGTH_SHORT
-        }
-        binding.snackbarContainer.makeSnackbar(message, duration).show()
+        val mod = Alert.Mod.Important.takeIf { message == R.string.successful_with_restart }
+        binding.snackbarContainer.showSnackbar(Alert(message, mod))
     }
 }

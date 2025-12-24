@@ -21,7 +21,10 @@ sealed class NodeContent(
     open val rootType: NodeRootType? = null
     open val isCached = true
 
-    data object Undefined : NodeContent()
+    data object Undefined : NodeContent() {
+        override val isCached = false
+    }
+
     data object Link : NodeContent()
 
     data class Directory(

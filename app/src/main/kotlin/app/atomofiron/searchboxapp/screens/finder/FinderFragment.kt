@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.recycler.FlexSpanSizeLookup
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.hideKeyboard
 import app.atomofiron.common.util.showKeyboard
@@ -16,12 +17,12 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.model.finder.SearchResult
+import app.atomofiron.searchboxapp.model.other.LabeledAction
 import app.atomofiron.searchboxapp.screens.common.SectionBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
 import app.atomofiron.searchboxapp.screens.finder.history.adapter.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
-import app.atomofiron.searchboxapp.utils.makeSnackbar
-import com.google.android.material.snackbar.Snackbar
+import app.atomofiron.searchboxapp.utils.showSnackbar
 
 class FinderFragment : Fragment(R.layout.fragment_finder),
     BaseFragment<FinderFragment, FinderViewState, FinderPresenter, FragmentFinderBinding> by BaseFragmentImpl()
@@ -95,7 +96,6 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         viewCollect(insertInQuery, collector = ::onInsertInQuery)
         viewCollect(items, collector = ::onStateChange)
         viewCollect(replaceQuery, collector = ::onReplaceQuery)
-        viewCollect(snackbar, collector = ::onShowSnackbar)
         viewCollect(showHistory) { binding.drawer.open() }
         viewCollect(permissionRequiredWarning, collector = ::showPermissionRequiredWarning)
     }
@@ -121,10 +121,6 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         findQueryField()?.setText(value)
     }
 
-    private fun onShowSnackbar(value: String) {
-        binding.snackbarContainer.makeSnackbar(value, Snackbar.LENGTH_SHORT).show()
-    }
-
     private fun onInsertInQuery(value: String) {
         findQueryField()?.run {
             showKeyboard()
@@ -133,8 +129,9 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     }
 
     private fun showPermissionRequiredWarning(unit: Unit) {
-        binding.snackbarContainer.makeSnackbar(R.string.access_to_storage_forbidden, Snackbar.LENGTH_LONG)
-            .setAction(R.string.allow) { presenter.onAllowStorageClick() }
-            .show()
+        binding.snackbarContainer.showSnackbar(
+            Alert(R.string.access_to_storage_forbidden),
+            LabeledAction(R.string.allow) { presenter.onAllowStorageClick() },
+        )
     }
 }

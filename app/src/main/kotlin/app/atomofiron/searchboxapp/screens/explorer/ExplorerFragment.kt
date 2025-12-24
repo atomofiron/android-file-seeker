@@ -3,31 +3,27 @@ package app.atomofiron.searchboxapp.screens.explorer
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
-import app.atomofiron.common.util.AlertMessage
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentExplorerBinding
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
-import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeError
-import app.atomofiron.searchboxapp.model.other.get
+import app.atomofiron.searchboxapp.model.other.LabeledAction
+import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.screens.common.delegates.apply
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock
 import app.atomofiron.searchboxapp.screens.main.util.KeyCodeConsumer
-import app.atomofiron.searchboxapp.utils.getString
-import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.recyclerView
-import com.google.android.material.snackbar.Snackbar
+import app.atomofiron.searchboxapp.utils.showSnackbar
 
 class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     BaseFragment<ExplorerFragment, ExplorerViewState, ExplorerPresenter, FragmentExplorerBinding> by BaseFragmentImpl(),
@@ -85,7 +81,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
         viewCollect(scrollTo) { item ->
             getCurrentTabView().scrollTo(item)
         }
-        viewCollect(alerts, collector = ::showSnackbar)
+        viewCollect(alerts) { binding.snackbarContainer.showSnackbar(it, other = ::onAlert) }
         viewCollect(dock, collector = binding.dockBar::submit)
         viewCollect(currentTab) {
             binding.pager.currentItem = it.index
@@ -115,21 +111,14 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     private fun getCurrentTabView(): ExplorerView = explorerViews[binding.pager.currentItem]
 
-    private fun showSnackbar(message: AlertMessage) {
-        binding.snackbarContainer.run {
-            when (message) {
-                is AlertMessage.Uni -> makeSnackbar(resources[message.message], Snackbar.LENGTH_LONG)
-                is AlertMessage.Other<*> -> when (message.message) {
-                    is NodeError -> makeSnackbar(resources.getString(message.message), Snackbar.LENGTH_LONG)
-                    is ExplorerAlert.Deleted -> deletedSnackbar(message.message.items)
-                    else -> return
-                }
-            }
-        }.show()
+    private fun onAlert(alert: ExplorerAlert): UniText {
+        return when (alert) {
+            is ExplorerAlert.Deleted -> alert.toUni()
+        }
     }
 
-    private fun CoordinatorLayout.deletedSnackbar(items: List<Node>): Snackbar {
-        val message = items.takeIf { it.isNotEmpty() }?.let {
+    private fun ExplorerAlert.Deleted.toUni(): UniText {
+        return items.takeIf { it.isNotEmpty() }?.let {
             val dirs = items.count { it.isDirectory }
             val files = items.size - dirs
             val what = listOfNotNull(
@@ -137,13 +126,14 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
                 resources.takeIf { files > 0 }?.getQuantityString(R.plurals.x_files, files, files),
             ).joinToString(separator = resources.getString(R.string.and))
             resources.getQuantityString(R.plurals.x_deleted, items.size, what)
-        } ?: resources.getString(R.string.something_wasnt_deleted)
-        return makeSnackbar(message, Snackbar.LENGTH_LONG)
+        }?.let { UniText(it) }
+            ?: UniText(R.string.something_wasnt_deleted)
     }
 
     private fun showPermissionRequiredWarning(unit: Unit) {
-        binding.snackbarContainer.makeSnackbar(R.string.access_to_storage_forbidden, Snackbar.LENGTH_LONG)
-            .setAction(R.string.allow) { presenter.onAllowStorageClick() }
-            .show()
+        binding.snackbarContainer.showSnackbar(
+            Alert(R.string.access_to_storage_forbidden),
+            LabeledAction(R.string.allow) { presenter.onAllowStorageClick() },
+        )
     }
 }

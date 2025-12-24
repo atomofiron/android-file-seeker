@@ -1,9 +1,11 @@
-use crate::api::cancellation::CancellationState;
 use crate::api::api::Check;
 use crate::api::api::{SearchQuery, SimpleResult, TextSearchCollector, TextSearchProgress};
+use crate::api::cancellation::CancellationState;
 use crate::common::{Rslt, JOINING_ERROR};
 use crate::ext::raw_path::RawPath;
-use crate::r#impl::meta::{meta, meta_with_error};
+use crate::r#impl::hash::r#impl::crc32;
+use crate::r#impl::meta::meta_with_error;
+use crate::r#impl::r#type::type_or_meta;
 use crate::r#impl::search::progress::proxy_progress;
 use crate::r#impl::search::text_matcher::TextMatcher;
 use crate::r#impl::search::walker::walk;
@@ -65,7 +67,7 @@ pub fn find_text_recursively(
         }.and_then(|_| matcher.search(path))
             .map(|matches| match matches.is_empty() {
                 true => TextSearchProgress::Skip,
-                false => TextSearchProgress::Match(meta(&path.into()), matches),
+                false => TextSearchProgress::Match(type_or_meta(&path.into()), crc32(path), matches),
             }).unwrap_or_else(|e| TextSearchProgress::Err(meta_with_error(&path.into(), &e)));
         return match sender.send(progress) {
             Ok(_) => WalkState::Continue,

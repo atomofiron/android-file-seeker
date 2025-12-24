@@ -27,7 +27,6 @@ class FinderViewState(
     val reloadHistory = ChannelFlow<Unit>()
     val insertInQuery = ChannelFlow<String>()
     val replaceQuery = ChannelFlow<String>()
-    val snackbar = ChannelFlow<String>()
     val history = ChannelFlow<String>()
     val showHistory = EventFlow<Unit>()
     val permissionRequiredWarning = ChannelFlow<Unit>()
@@ -42,10 +41,6 @@ class FinderViewState(
 
     fun replaceQuery(value: String) {
         replaceQuery[scope] = value
-    }
-
-    fun showSnackbar(value: String) {
-        snackbar[scope] = value
     }
 
     fun addToHistory(value: String) {

@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.screens.explorer
 
-import app.atomofiron.common.util.AlertMessage
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
@@ -32,13 +32,12 @@ class ExplorerViewState(
 
     val scrollTo = ChannelFlow<Node>()
     val itemComposition = preferences.explorerItemComposition
-    private val otherAlerts = ChannelFlow<AlertMessage>()
-    val alerts: Flow<AlertMessage> = merge(
-        store.alerts.map { AlertMessage(it) },
+    private val otherAlerts = ChannelFlow<Alert>()
+    val alerts: Flow<Alert> = merge(
+        store.alerts.map { Alert(it) },
         store.deleted.mapNotNull { deleted ->
             deleted.takeIf { it.isNotEmpty() }
                 ?.let { ExplorerAlert.Deleted(it) }
-                ?.let { AlertMessage(it) }
         },
         otherAlerts,
     )
@@ -56,7 +55,7 @@ class ExplorerViewState(
         scrollTo[scope] = item
     }
 
-    fun showAlert(message: AlertMessage) {
+    fun showAlert(message: Alert) {
         otherAlerts[scope] = message
     }
 }

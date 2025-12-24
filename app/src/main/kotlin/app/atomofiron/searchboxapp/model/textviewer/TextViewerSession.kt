@@ -1,14 +1,13 @@
 package app.atomofiron.searchboxapp.model.textviewer
 
 import app.atomofiron.common.util.GrowingList
-import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.utils.ByteArrayBuilder
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
-import app.atomofiron.searchboxapp.utils.Rslt
-import app.atomofiron.searchboxapp.utils.map
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
@@ -23,16 +22,10 @@ private const val BUFFER_SIZE = 8 * 1024
 private const val CR: Byte = 0x0D
 private const val LF: Byte = 0x0A
 
-class TextViewerSession private constructor(
+class TextViewerSession(
     private val input: FileReader,
     ref: NodeRef,
 ) : Closeable {
-    companion object {
-        operator fun invoke(ref: NodeRef, asSu: Boolean): Rslt<TextViewerSession> {
-            return NativeBridge.readFile(ref, asSu)
-                .map { TextViewerSession(it, ref) }
-        }
-    }
 
     private var bytes = ByteArray(BUFFER_SIZE)
     private var byteBuf = ByteBuffer.wrap(bytes)
@@ -44,8 +37,8 @@ class TextViewerSession private constructor(
     val mutex = Mutex()
     private val _item = MutableStateFlow(ref.toNode())
     val item: StateFlow<Node> = _item
-    private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> = _error
+    private val _error = MutableStateFlow<NodeError?>(null)
+    val error: StateFlow<NodeError?> = _error
     private val lineList = GrowingList<TextLine>()
     private val _lines = MutableStateFlow<List<TextLine>>(listOf())
     val lines: StateFlow<List<TextLine>> = _lines
@@ -105,7 +98,7 @@ class TextViewerSession private constructor(
                 .let { true }
             is ReadResult.Err -> {
                 byteBuf.limit(0)
-                _error.value = result.v1
+                _error.value = result.v1.toNodeError()
                 true
             }
         }

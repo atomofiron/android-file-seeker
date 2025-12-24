@@ -19,11 +19,9 @@ class ResultsItemHolder(binding: ItemExplorerBinding) : ResultsHolder<ResultItem
     }
 
     override fun onBind(item: ResultItem.Item, position: Int) {
-        val result = item.match
-        binder.bind(result.item)
-        tvCounter.isVisible = result.withCounter
-        tvCounter.text = result.count.toString()
-        listener.onItemVisible(item)
+        item.item.let { binder.bind(it) }
+        tvCounter.isVisible = item.match.withCounter
+        tvCounter.text = item.match.count.toString()
     }
 
     fun bindComposition(composition: ExplorerItemComposition) = binder.bindComposition(composition)

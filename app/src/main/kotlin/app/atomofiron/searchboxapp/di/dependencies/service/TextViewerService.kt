@@ -11,15 +11,17 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.finder.SearchResult.Text
-import app.atomofiron.searchboxapp.model.finder.SearchStatus
+import app.atomofiron.searchboxapp.model.finder.SearchResult.Local
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.finder.TextSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import app.atomofiron.searchboxapp.utils.Rslt
+import app.atomofiron.searchboxapp.utils.ifOk
+import app.atomofiron.searchboxapp.utils.map
 import app.atomofiron.searchboxapp.utils.removeOneIf
 import kotlinx.coroutines.CoroutineScope
 import uniffi.native_lib.CancellationState
@@ -39,12 +41,14 @@ class TextViewerService(
     private val asSu: Boolean get() = preferences.asSu.value
 
     fun getFileSession(ref: NodeRef): Rslt<TextViewerSession> {
-        val session = findSession(ref)
-            ?: return TextViewerSession(ref, asSu).also {
-                store.sessions[ref.uniqueId] = it.value ?: return@also
-                scope.launchOnIO { readFile(ref) }
-            }
-        return Rslt.Ok(session)
+        return findSession(ref)
+            ?.let { Rslt.Ok(it) }
+            ?: NativeBridge.readFile(ref, asSu)
+                .map { TextViewerSession(it, ref) }
+                .ifOk {
+                    store.sessions[ref.uniqueId] = it
+                    scope.launchOnIO { readFile(ref) }
+                }
     }
 
     suspend fun fetchTask(ref: NodeRef, taskId: UUID): TextSearchTask? {
@@ -52,21 +56,16 @@ class TextViewerService(
         finderTask ?: return null
         val session = findSession(ref)
         session ?: return null
-        val result = finderTask.result as SearchResult.Files
-        val itemMatch = result.matches.find {
-            it.item.uniqueId == ref.uniqueId
+        val result = finderTask.result as SearchResult.Global
+        val item = result.matches.find {
+            it.uniqueId == ref.uniqueId
         } as? ItemMatch.Many
-        itemMatch ?: return null
-        val task = finderTask.copy(result = Text(itemMatch.count, itemMatch.matches))
+        item ?: return null
+        val task = finderTask.copy(result = Local(item.count, item.matches, item.meta))
         @Suppress("UNCHECKED_CAST")
         task as TextSearchTask
         session.tasks { add(task) }
         return task
-    }
-
-    private fun SearchStatus.toLocal() = when (this) {
-        is SearchStatus.Ended -> copy(removable = false)
-        else -> this
     }
 
     /** @return true if success */
@@ -100,7 +99,7 @@ class TextViewerService(
 
     suspend fun search(ref: NodeRef, params: QueryParams) {
         val session = findSession(ref) ?: return
-        val uuid = SearchTask(params, Text())
+        val uuid = SearchTask(params, Local())
             .also { session.tasks { add(it) } }
             .uuid
         val result = NativeBridge.findLocalText(params, ref, asSu, NotCancelable)
@@ -108,14 +107,14 @@ class TextViewerService(
             when (result) {
                 is TextSearchProgress.Match -> {
                     val map: MutableMatchMap = hashMapOf()
-                    result.v2.forEach {
+                    result.v3.forEach {
                         val index = it.line.toInt()
                         map.getOrPut(index) { mutableListOf() }.add(it)
                     }
-                    toEnded(result = Text(result.v2.size, map))
+                    toEnded(result = Local(result.v3.size, map))
                 }
                 is TextSearchProgress.Skip -> toEnded()
-                is TextSearchProgress.Err -> toEnded(error = result.v1.error)
+                is TextSearchProgress.Err -> toEnded(error = result.v1.error?.toNodeError())
             }
         }
     }

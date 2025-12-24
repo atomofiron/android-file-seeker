@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
-import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
@@ -16,25 +15,28 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import app.atomofiron.common.util.GrowingList
+import app.atomofiron.common.util.extension.debug
 import app.atomofiron.common.util.extension.get
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.extension.put
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.Notifications
-import app.atomofiron.searchboxapp.android.tryShow
 import app.atomofiron.searchboxapp.android.flags
 import app.atomofiron.searchboxapp.android.notification
+import app.atomofiron.searchboxapp.android.tryShow
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
+import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.model.explorer.NodeHash
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.FilesSearchTask
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.QueryParams
-import app.atomofiron.searchboxapp.model.finder.SearchResult.Files
+import app.atomofiron.searchboxapp.model.finder.SearchResult.Global
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
@@ -42,6 +44,7 @@ import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveType
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toProperties
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.canForegroundService
@@ -53,6 +56,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
 import uniffi.native_lib.CancellationState
+import uniffi.native_lib.CrcResult
 import uniffi.native_lib.Meta
 import uniffi.native_lib.NameSearchProgress
 import uniffi.native_lib.TextSearchProgress
@@ -115,11 +119,11 @@ class FinderWorker(
                     is TextSearchProgress.Skip -> result.copy(countTotal = result.countTotal.inc())
                     is TextSearchProgress.Match -> {
                         val map: MutableMatchMap = hashMapOf()
-                        match.v2.forEach {
+                        match.v3.forEach {
                             val index = it.line.toInt()
                             map.getOrPut(index) { mutableListOf() }.add(it)
                         }
-                        val many = ItemMatch.Many(NodeRef(match.v1.path), count = match.v2.size, map)
+                        val many = ItemMatch.Many(match.v1.toNodeHash(match.v2), count = match.v3.size, map)
                         val matches = result.matches.mutate { add(many) }
                         result.copy(count = result.count + many.count, matches = matches, countTotal = result.countTotal.inc())
                     }
@@ -133,15 +137,29 @@ class FinderWorker(
         }.apply()
     }
 
+    private fun TypedMeta.toNodeHash(result: CrcResult? = null): NodeHash {
+        val hash = (result as? CrcResult.Ok)?.v1?.toInt() ?: 0
+        debug {
+            (result as? CrcResult.Err)?.v1?.let {
+                logE("file hash error: $it")
+            }
+        }
+        return NodeHash(
+            ref = NodeRef(meta.path),
+            properties = meta.toProperties(),
+            mime = mime,
+            hash = hash,
+        )
+    }
+
     private fun Params.searchNames(type: Params.Names) {
-        Uri.encode("")
         val errors = GrowingList<String>()
         NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu, cancellation) { match ->
             updateAsync {
                 when (match) {
                     is NameSearchProgress.Skip -> copy(result = result.copy(countTotal = result.countTotal.inc()))
                     is NameSearchProgress.Match -> {
-                        val itemMatch = ItemMatch.Single(NodeRef(match.v1.path))
+                        val itemMatch = ItemMatch.One(match.v1.toNodeHash())
                         val matches = result.matches.toMutableList()
                         matches.put(itemMatch) { it.ref == itemMatch.ref }
                         copy(result = result.copy(count = count.inc(), matches = matches, countTotal = result.countTotal.inc()))
@@ -168,7 +186,7 @@ class FinderWorker(
         if (context.canForegroundService()) {
             setForeground(getForegroundInfo())
         }
-        task = SearchTask(params.query, result = Files(params.type is Params.Text), taskId)
+        task = SearchTask(params.query, result = Global(params.type is Params.Text), taskId)
         finderStore.addOrUpdate(task.upcast())
         return work(params)
     }
@@ -192,7 +210,7 @@ class FinderWorker(
     }
 
     private fun Rslt<Unit>.apply() = updateAsync {
-        val error = (this@apply as? Rslt.Err)?.message
+        val error = err()?.message?.toNodeError()
         val stopped = isStopping
         val ended = toEnded(error = error, removable = isStopping, stopped = stopped)
         if (!isStopping) finderStore {
@@ -224,7 +242,7 @@ class FinderWorker(
         } catch (e: Exception) {
             logE(e.toString())
             updateAsync {
-                copy(error = e.toString())
+                copy(error = NodeError.Message(e.toString()))
             }
             dataBuilder.putString(KEY_EXCEPTION, e.toString())
         } finally {

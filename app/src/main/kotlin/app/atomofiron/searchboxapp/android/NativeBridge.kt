@@ -14,6 +14,7 @@ import uniffi.native_lib.Check
 import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CommonProgressCollector
 import uniffi.native_lib.CountingResult
+import uniffi.native_lib.CrcResult
 import uniffi.native_lib.FileEvent
 import uniffi.native_lib.FileEventCollector
 import uniffi.native_lib.FileReader
@@ -113,6 +114,14 @@ object NativeBridge {
             override fun emit(progress: CommonProgress) = Unit
         }
         return uniffi.native_lib.deleteBy(ref.bytes, suCmd = suCmd.takeIf { asSu }, collector)
+    }
+
+    fun crcHash(ref: NodeRef, asSu: Boolean): Rslt<Int> {
+        val response = uniffi.native_lib.crcHash(ref.bytes, suCmd = suCmd.takeIf { asSu })
+        return when (response) {
+            is CrcResult.Ok -> Rslt.Ok(response.v1.toInt())
+            is CrcResult.Err -> Rslt.Err(response.v1)
+        }
     }
 
     fun copy(

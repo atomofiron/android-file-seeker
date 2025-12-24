@@ -45,14 +45,18 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import androidx.viewpager2.widget.ViewPager2
 import androidx.work.Data
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Android
+import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.model.other.LabeledAction
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.get
+import app.atomofiron.searchboxapp.model.other.toUni
 import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -101,19 +105,62 @@ fun Context.showLongToast(text: UniText) = showToast(text, Toast.LENGTH_LONG)
 
 private fun Context.showToast(text: UniText, duration: Int) = Toast.makeText(this, resources[text], duration).show()
 
-fun Resources.getString(error: NodeError, content: NodeContent? = null): String {
-    return when (error) {
-        is NodeError.NoSuchFile -> when (content) {
-            is NodeContent.Directory -> getString(R.string.no_such_directory)
-            is NodeContent.File -> getString(R.string.no_such_file)
-            else -> getString(R.string.no_such_file_or_directory)
+fun NodeError.toUni(content: NodeContent? = null): UniText {
+    return when (this) {
+        is NodeError.NoSuchFileOrDir -> when (content) {
+            is NodeContent.Directory -> UniText(R.string.no_such_directory)
+            is NodeContent.File -> UniText(R.string.no_such_file)
+            else -> UniText(R.string.no_such_file_or_directory)
         }
-        is NodeError.PermissionDenied -> getString(R.string.permission_denied)
-        is NodeError.ResourceBusy -> getString(R.string.resource_busy)
-        is NodeError.Unknown -> getString(R.string.unknown_error)
-        is NodeError.Multiply -> getString(R.string.a_lot_of_errors)
-        is NodeError.Message -> error.message
+        is NodeError.PermissionDenied -> UniText(R.string.permission_denied)
+        is NodeError.ResourceBusy -> UniText(R.string.resource_busy)
+        is NodeError.Unknown -> UniText(R.string.unknown_error)
+        is NodeError.Multiply -> UniText(R.string.a_lot_of_errors)
+        is NodeError.Message -> message.toUni()
+        is NodeError.FileWasChanged -> UniText(R.string.error_file_was_changed)
     }
+}
+
+fun Resources.getString(error: NodeError, content: NodeContent? = null): String = get(error.toUni(content))
+
+inline fun <reified T> CoordinatorLayout.showSnackbar(
+    alert: Alert?,
+    action: LabeledAction? = null,
+    other: T.() -> UniText,
+) {
+    val alert = when (alert) {
+        !is Alert.Other -> alert
+        is T -> Alert.Uni(other(alert), alert.mod)
+        else -> return debugFail { alert.toString() }
+    }
+    showSnackbar(alert, action)
+}
+
+fun CoordinatorLayout.showSnackbar(
+    alert: Alert?,
+    action: LabeledAction? = null,
+) {
+    val text = when (alert) {
+        null -> return
+        is Alert.Uni -> alert.message
+        is Alert.Err -> alert.error.toUni()
+        is Alert.Other -> return debugFail { alert.toString() }
+    }
+    showSnackbar(text, alert.important, action)
+}
+
+private fun CoordinatorLayout.showSnackbar(
+    text: UniText,
+    important: Boolean,
+    action: LabeledAction?,
+) {
+    val duration = if (important) Snackbar.LENGTH_INDEFINITE else Snackbar.LENGTH_LONG
+    Snackbar.make(this, resources[text], duration).apply {
+        when {
+            action != null -> setAction(resources[action.label]) { action.action?.invoke() }
+            important -> setAction(R.string.got_it) { }
+        }
+    }.show()
 }
 
 const val DEFAULT_FREQUENCY = 60
@@ -154,12 +201,6 @@ private fun getStateMut(
     checked?.let { flags.add(android.R.attr.state_checked * it.toInt()) }
     activated?.let { flags.add(android.R.attr.state_activated * it.toInt()) }
     return flags
-}
-
-fun CoordinatorLayout.makeSnackbar(@StringRes message: Int, duration: Int) = makeSnackbar(resources.getText(message), duration)
-
-fun CoordinatorLayout.makeSnackbar(message: CharSequence, duration: Int): Snackbar {
-    return Snackbar.make(this, message, duration)
 }
 
 val View.isLayoutRtl: Boolean get() = layoutDirection == View.LAYOUT_DIRECTION_RTL

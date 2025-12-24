@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.utils
 import app.atomofiron.common.util.forHumans
 
 sealed class Rslt<T>(val isOk: Boolean) {
-    open val value: T? = null
 
     abstract class Ok<T> : Rslt<T>(isOk = true) {
         companion object : Rslt.Ok<Unit>() {
@@ -11,11 +10,16 @@ sealed class Rslt<T>(val isOk: Boolean) {
             override val value = Unit
             operator fun <T> invoke(value: T): Rslt.Ok<T> = Ok(value)
         }
-        abstract override val value: T
+        abstract val value: T
     }
+
     open class Err<T>(open val message: String = "") : Rslt<T>(isOk = false) {
         val isEmpty: Boolean get() = message.isEmpty()
     }
+
+    fun ok(): Ok<T>? = this as? Ok<T>
+
+    fun err(): Err<T>? = this as? Err<T>
 }
 
 fun <T> T.toOk() = Rslt.Ok(this)
@@ -45,9 +49,7 @@ inline fun <T, R> Rslt<T>.map(map: (T) -> R): Rslt<R> = when (this) {
     is Rslt.Err -> Rslt.Err(message)
 }
 
-inline fun <T> Rslt<T>.ifErr(action: (String) -> Unit): Rslt<T> {
-    if (this is Rslt.Err) {
-        action(message)
-    }
+inline fun <T> Rslt<T>.ifOk(action: (T) -> Unit): Rslt<T> {
+    ok()?.let { action(it.value) }
     return this
 }

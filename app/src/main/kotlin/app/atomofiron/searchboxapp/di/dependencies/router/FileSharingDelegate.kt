@@ -21,7 +21,7 @@ import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.getUriForFile
 import app.atomofiron.searchboxapp.work.ReceiveData
 import app.atomofiron.searchboxapp.work.ReceiveWorker
-import app.atomofiron.searchboxapp.work.ReceiveWorker.Companion.waitForDataRead
+import app.atomofiron.searchboxapp.work.waitForDataRead
 import java.io.File
 
 interface FileSharingDelegate {

@@ -3,16 +3,18 @@ package app.atomofiron.searchboxapp.screens.viewer
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
-import app.atomofiron.searchboxapp.di.dependencies.interactor.TextViewerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.dependencies.store.TextViewerStore
+import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
+import app.atomofiron.searchboxapp.screens.viewer.di.TextViewerInteractor
 import app.atomofiron.searchboxapp.screens.viewer.presenter.SearchAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import app.atomofiron.searchboxapp.utils.Rslt
 import dagger.BindsInstance
 import dagger.Component
@@ -27,7 +29,7 @@ import javax.inject.Scope
 annotation class TextViewerScope
 
 class TextViewerSessionResult(val result: Rslt<TextViewerSession>) {
-    val error: String? = (result as? Rslt.Err)?.message
+    val error: NodeError? = result.err()?.message?.toNodeError()
 }
 
 @TextViewerScope
@@ -68,7 +70,7 @@ class TextViewerModule {
         router,
         searchAdapterPresenterDelegate,
         interactor,
-        session.result.value,
+        session.result.ok()?.value,
     )
 
     @Provides
@@ -112,7 +114,7 @@ class TextViewerModule {
         scope: CoroutineScope,
         session: TextViewerSessionResult,
         preferenceStore: PreferenceStore,
-    ): TextViewerViewState = TextViewerViewState(params.ref, scope, session.result.value, preferenceStore, session.error)
+    ): TextViewerViewState = TextViewerViewState(params.ref, scope, session.result.ok()?.value, preferenceStore, session.error)
 
     @Provides
     @TextViewerScope

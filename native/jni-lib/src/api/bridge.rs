@@ -1,4 +1,4 @@
-use crate::api::api::{Check, FileEventCollector, HandleResult, SuCmd};
+use crate::api::api::{Check, CrcResult, FileEventCollector, HandleResult, SuCmd};
 use crate::api::api::{CommonProgressCollector, CountingResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
 use crate::api::cancellation::CancellationState;
 use crate::api::su_api::Request;
@@ -7,6 +7,7 @@ use crate::ext::raw_path::{RawPath, RawPathExt};
 use crate::ext::result::ResultExt;
 use crate::r#impl::copy::copy_impl;
 use crate::r#impl::delete::delete_impl;
+use crate::r#impl::hash::r#impl::crc32;
 use crate::r#impl::inotify::r#impl::try_observe_dir;
 use crate::r#impl::meta::{meta_with_error, metas, try_meta};
 use crate::r#impl::other::{new_dir, new_file, usage};
@@ -121,6 +122,15 @@ pub fn get_file_types(path: RawPath, su_cmd: Option<SuCmd>) -> TypedMetasResult 
         Ok(data) => TypedMetasResult::Ok(data),
         Err(e) => TypedMetasResult::Err(e.to_string()),
     }
+}
+
+#[uniffi::export]
+pub fn crc_hash(path: RawPath, su_cmd: Option<SuCmd>) -> CrcResult {
+    if let Some(su_cmd) = su_cmd {
+        return as_su::<CrcResult>(Request::CrcHash(path), su_cmd)
+            .unwrap_or_else(|e| CrcResult::Err(e.to_string()))
+    }
+    return crc32(&path.buf())
 }
 
 #[uniffi::export]

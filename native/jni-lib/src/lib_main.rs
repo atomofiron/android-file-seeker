@@ -1,5 +1,5 @@
 use crate::api::api::{CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SimpleResult, TextSearchCollector, TextSearchProgress};
-use crate::api::bridge::{copy, create_dir, create_file, delete_by, find_names, find_text, get_file_type, get_file_types, get_meta, get_metas, get_usage};
+use crate::api::bridge::{copy, crc_hash, create_dir, create_file, delete_by, find_names, find_text, get_file_type, get_file_types, get_meta, get_metas, get_usage};
 use crate::api::cancellation::{CancellationHandle, CancellationState};
 use crate::api::su_api::{control_frame, from_control_frame, len_to_frame, pid_to_frame, Request, Response, FINAL_FRAME};
 use crate::common::{config, Rslt};
@@ -54,6 +54,7 @@ fn run(request: Request, cancellation: Arc<dyn CancellationState>) -> EncodedRes
         Request::GetTypedMetas(arg) => get_file_types(arg, None).to_bytes(),
         Request::CreateDir(arg) => create_dir(arg, None).to_bytes(),
         Request::CreateFile(arg) => create_file(arg, None).to_bytes(),
+        Request::CrcHash(arg) => crc_hash(arg, None).to_bytes(),
         Request::Delete(arg) => {
             let result = delete_by(arg, None, StdoutProgressWriter::arc());
             write_the_end();

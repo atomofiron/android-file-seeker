@@ -24,7 +24,7 @@ import kotlinx.coroutines.CoroutineScope
 import lib.atomofiron.insets.insetsPadding
 
 class CurtainSearchDelegate(
-    output: FinderAdapterOutput<SearchResult.Text>,
+    output: FinderAdapterOutput<SearchResult.Local>,
     private val viewState: TextViewerViewState,
     scope: CoroutineScope,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {

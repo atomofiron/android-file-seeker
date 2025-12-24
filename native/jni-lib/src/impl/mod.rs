@@ -8,6 +8,7 @@ mod progress;
 mod search;
 pub mod copy;
 pub mod delete;
+pub mod hash;
 pub mod inotify;
 pub mod search_by_name;
 pub mod search_by_text;

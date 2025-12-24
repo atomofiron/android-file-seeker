@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.di.dependencies.store
 
 import app.atomofiron.common.util.extension.put
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.GenericSearchTask
 import app.atomofiron.searchboxapp.model.finder.SearchResult
@@ -29,11 +30,12 @@ class FinderStore(
         updateTasks { add(item) }
     }
 
-    suspend fun update(uuid: UUID, state: SearchStatus, error: String? = null) {
+    // todo use it
+    suspend fun update(uuid: UUID, state: SearchStatus, error: NodeError? = null) {
         update(uuid) {
             when {
                 status.order >= state.order -> this
-                else -> copy(status = state, error = error ?: error)
+                else -> copy(status = state, error = error ?: this.error)
             }
         }
     }
@@ -50,7 +52,7 @@ class FinderStore(
         updateTasks {
             val index = indexOfFirst { it.uniqueId == id }
             val task = getOrNull(index) ?: return
-            val result = task.result as? SearchResult.Files
+            val result = task.result as? SearchResult.Global
             result ?: return
             set(index, task.copy(result = result.copy(sorting = sorting)))
         }
@@ -62,7 +64,7 @@ class FinderStore(
         }
         updateTasks {
             forEachIndexed { index, task ->
-                val result = task.result as? SearchResult.Files
+                val result = task.result as? SearchResult.Global
                 result ?: return@forEachIndexed
                 val new = result.removeItems(items)
                 if (new !== result) {

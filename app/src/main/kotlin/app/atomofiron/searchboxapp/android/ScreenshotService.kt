@@ -85,7 +85,7 @@ class ScreenshotService : Service() {
         val result = NativeBridge.observeDir(target) {
             onEventResult(it, target)
         }
-        handle = result.value
+        handle = result.ok()?.value
         _error.value = when (result) {
             is Rslt.Ok -> null
             is Rslt.Err -> {

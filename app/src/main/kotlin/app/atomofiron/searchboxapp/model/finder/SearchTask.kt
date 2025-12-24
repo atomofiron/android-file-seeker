@@ -1,9 +1,10 @@
 package app.atomofiron.searchboxapp.model.finder
 
+import app.atomofiron.searchboxapp.model.explorer.NodeError
 import java.util.UUID
 
-typealias TextSearchTask = SearchTask<SearchResult.Text>
-typealias FilesSearchTask = SearchTask<SearchResult.Files>
+typealias TextSearchTask = SearchTask<SearchResult.Local>
+typealias FilesSearchTask = SearchTask<SearchResult.Global>
 typealias GenericSearchTask = SearchTask<SearchResult>
 
 data class SearchTask<Result : SearchResult>(
@@ -11,7 +12,7 @@ data class SearchTask<Result : SearchResult>(
     val result: Result,
     val uuid: UUID = UUID.randomUUID(),
     val status: SearchStatus = SearchStatus.Progress,
-    val error: String? = null,
+    val error: NodeError? = null,
 ) {
     val uniqueId: Int get() = uuid.hashCode()
     val count: Int = result.count
@@ -24,7 +25,7 @@ data class SearchTask<Result : SearchResult>(
 
     fun toEnded(
         result: Result = this.result,
-        error: String? = this.error,
+        error: NodeError? = this.error,
         stopped: Boolean = false,
         removable: Boolean = true,
     ): SearchTask<Result> {
