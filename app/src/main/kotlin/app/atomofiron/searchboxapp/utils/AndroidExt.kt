@@ -51,6 +51,7 @@ import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.other.LabeledAction
 import app.atomofiron.searchboxapp.model.other.UniText
@@ -109,18 +110,12 @@ fun UniText.toAlert(
     important: Boolean = false,
 ) = Alert(this, error, important)
 
-fun NodeError.toAlert(
-    error: Boolean = false,
-    important: Boolean = false,
-    isDirElseFile: Boolean? = null,
-) = Alert(toUni(isDirElseFile), error, important)
-
-fun NodeError.toUni(isDirElseFile: Boolean? = null): UniText {
+fun NodeError.toUni(content: NodeContent? = null): UniText {
     return when (this) {
-        is NodeError.NoSuchFileOrDir -> when (isDirElseFile) {
-            true -> UniText(R.string.no_such_directory)
-            false -> UniText(R.string.no_such_file)
-            null -> UniText(R.string.no_such_file_or_directory)
+        is NodeError.NoSuchFileOrDir -> when (content) {
+            is NodeContent.Directory -> UniText(R.string.no_such_directory)
+            is NodeContent.File -> UniText(R.string.no_such_file)
+            else -> UniText(R.string.no_such_file_or_directory)
         }
         is NodeError.PermissionDenied -> UniText(R.string.permission_denied)
         is NodeError.ResourceBusy -> UniText(R.string.resource_busy)

@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.util
 
 import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
@@ -321,12 +320,5 @@ class ExplorerItemBinder private constructor(
         }
     }
 
-    fun NodeError.getString(content: NodeContent? = null): String {
-        val isDirElseFile = when (content) {
-            is NodeContent.Directory -> true
-            is NodeContent.File -> false
-            else -> null
-        }
-        return itemView.resources[toUni(isDirElseFile)]
-    }
+    fun NodeError.getString(content: NodeContent? = null): String = itemView.resources[toUni(content)]
 }
