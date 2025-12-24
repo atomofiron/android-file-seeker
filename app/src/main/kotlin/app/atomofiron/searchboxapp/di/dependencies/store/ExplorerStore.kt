@@ -101,7 +101,7 @@ class ExplorerStore {
         tab ?: return
         deepestNodes.takeIf { tab == _currentTab.value }
             ?.let { it[tab] }
-            .let { _currentDeepest.value = it }
+            ?.let { _currentDeepest.value = it }
     }
 
     private fun updateCurrentItems(tab: NodeTabKey) {
