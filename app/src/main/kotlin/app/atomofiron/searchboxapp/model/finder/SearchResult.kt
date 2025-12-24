@@ -20,7 +20,7 @@ sealed class SearchResult {
     data class Local(
         override val count: Int,
         val matches: MatchMap,
-        val meta: NodeHash? = null,
+        val hash: NodeHash? = null,
     ) : SearchResult() {
 
         val indexes: List<Int> by lazy(NONE) { matches.keys.sorted() }

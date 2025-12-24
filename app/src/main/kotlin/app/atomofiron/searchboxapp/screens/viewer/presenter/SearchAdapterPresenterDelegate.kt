@@ -80,15 +80,15 @@ class SearchAdapterPresenterDelegate(
     override fun onEditMaxSize(new: Long) = Unit
 
     fun trySelectTask(task: SearchTask<SearchResult.Local>) {
-        val meta = task.result.meta
+        val hash = task.result.hash
         when {
-            meta != null -> scope.launchOnIO {
-                val hash = interactor.getHash(meta.ref)
+            hash != null -> scope.launchOnIO {
+                val result = interactor.getHash(hash.ref)
                 withMain {
                     when {
                         task.error != null -> task.error.show()
-                        meta.hash == hash.ok()?.value -> task.trySelect()
-                        hash is Rslt.Err -> hash.message.toNodeError().show()
+                        hash.hash == result.ok()?.value -> task.trySelect()
+                        result is Rslt.Err -> result.message.toNodeError().show()
                         else -> NodeError.FileWasChanged.show()
                     }
                 }

@@ -61,7 +61,7 @@ class TextViewerService(
             it.uniqueId == ref.uniqueId
         } as? ItemMatch.Many
         item ?: return null
-        val task = finderTask.copy(result = Local(item.count, item.matches, item.meta))
+        val task = finderTask.copy(result = Local(item.count, item.matches, item.hash))
         @Suppress("UNCHECKED_CAST")
         task as TextSearchTask
         session.tasks { add(task) }
