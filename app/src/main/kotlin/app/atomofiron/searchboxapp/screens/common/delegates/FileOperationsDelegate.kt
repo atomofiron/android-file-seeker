@@ -74,11 +74,7 @@ class FileOperationsDelegate(
     fun askForApks(ref: NodeRef, contentResolver: ContentResolver) = askForAndroidApp(NodeContent.AndroidApp.apks(ref), contentResolver)
 
     private fun forMany(count: Int) = buildList {
-        when (count) {
-             0 -> Unit
-             1 -> add(Operations.Share.copy(label = UniText(R.string.share_file)))
-             else -> add(Operations.Share.copy(label = UniText(R.string.share_files)))
-        }
+        if (count != 0) add(Operations.Share)
         add(Operations.Delete)
     }
 

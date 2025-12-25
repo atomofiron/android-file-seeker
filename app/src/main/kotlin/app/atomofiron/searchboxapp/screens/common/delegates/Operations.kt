@@ -15,7 +15,7 @@ object Operations {
     val Create = MenuItem(id = Increment(), UniText(R.string.create_new), R.drawable.ic_create, longLabel = UniText(R.string.create_file_or_dir), forwardable = true)
     val Rename = MenuItem(id = Increment(), UniText(R.string.rename), R.drawable.ic_rename, forwardable = true)
     val OpenWith = MenuItem(id = Increment(), UniText(R.string.open_with), R.drawable.ic_open_outside)
-    val Share = MenuItem(id = Increment(), UniText(R.string.share_files), R.drawable.ic_share)
+    val Share = MenuItem(id = Increment(), UniText(R.string.share), R.drawable.ic_share)
     val CopyPath = MenuItem(id = Increment(), UniText(R.string.copy_path), R.drawable.ic_link)
     val Delete = MenuItem(id = Increment(), UniText(R.string.delete), MenuItemContent.Dangerous(R.drawable.ic_trashbox))
 }

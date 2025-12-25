@@ -63,9 +63,7 @@
     <string name="tasks">Zadaci</string>
     <string name="settings">Podešavanja</string>
     <string name="licenses">Licence</string>
-    <string name="share">Podeli</string>
-    <string name="share_file">Podeli datoteku</string>
-    <string name="share_files">Podeli datoteke</string>
+    <string name="share">Pošalji</string>
     <string name="pref_orientation">Orijentacija ekrana</string>
     <string name="pref_locale">Jezik</string>
     <string name="by_system">Sistemski</string>
