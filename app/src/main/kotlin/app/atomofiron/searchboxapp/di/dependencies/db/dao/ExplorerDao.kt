@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.di.dependencies.dao
+package app.atomofiron.searchboxapp.di.dependencies.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert

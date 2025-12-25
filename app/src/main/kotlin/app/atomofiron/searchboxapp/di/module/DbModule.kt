@@ -3,8 +3,8 @@ package app.atomofiron.searchboxapp.di.module
 import android.content.Context
 import dagger.Module
 import dagger.Provides
-import app.atomofiron.searchboxapp.di.dependencies.dao.ExplorerDao
-import app.atomofiron.searchboxapp.di.dependencies.dao.Database
+import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
+import app.atomofiron.searchboxapp.di.dependencies.db.Database
 import javax.inject.Singleton
 
 @Module

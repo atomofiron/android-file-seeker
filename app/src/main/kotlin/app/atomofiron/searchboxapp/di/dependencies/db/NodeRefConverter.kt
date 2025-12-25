@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.di.dependencies.dao
+package app.atomofiron.searchboxapp.di.dependencies.db
 
 import androidx.room.TypeConverter
 import app.atomofiron.searchboxapp.model.explorer.NodeRef

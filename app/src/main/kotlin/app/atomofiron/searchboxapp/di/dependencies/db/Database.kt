@@ -1,10 +1,11 @@
-package app.atomofiron.searchboxapp.di.dependencies.dao
+package app.atomofiron.searchboxapp.di.dependencies.db
 
 import android.content.Context
 import androidx.room.Database as DatabaseInfo
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
 import app.atomofiron.searchboxapp.model.explorer.other.Deepest
 
 @DatabaseInfo(
