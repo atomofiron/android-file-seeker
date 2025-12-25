@@ -1,7 +1,7 @@
-package app.atomofiron.searchboxapp.screens.finder.history.adapter
+package app.atomofiron.searchboxapp.screens.finder.fragment.history
 
 import androidx.recyclerview.widget.DiffUtil
-import app.atomofiron.searchboxapp.screens.finder.history.dao.ItemHistory
+import app.atomofiron.searchboxapp.screens.finder.di.history.ItemHistory
 
 object HistoryItemCallback : DiffUtil.ItemCallback<ItemHistory>() {
     override fun areItemsTheSame(oldItem: ItemHistory, newItem: ItemHistory): Boolean {

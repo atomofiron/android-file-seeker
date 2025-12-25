@@ -20,7 +20,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.other.LabeledAction
 import app.atomofiron.searchboxapp.screens.common.SectionBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
-import app.atomofiron.searchboxapp.screens.finder.history.adapter.HistoryAdapter
+import app.atomofiron.searchboxapp.screens.finder.fragment.history.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.utils.showSnackbar
 
@@ -34,14 +34,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
     private lateinit var spanSizeLookup: FlexSpanSizeLookup
     private var animNextShow = false
 
-    private val historyAdapter: HistoryAdapter by lazy {
-        HistoryAdapter(requireContext(), object : HistoryAdapter.OnItemClickListener {
-            override fun onItemClick(node: String) {
-                binding.drawer.close()
-                presenter.onHistoryItemClick(node)
-            }
-        })
-    }
+    private val historyAdapter: HistoryAdapter by lazy { HistoryAdapter(presenter) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,8 +84,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
     override fun FinderViewState.onViewCollect() {
         viewCollect(historyDrawerGravity, collector = binding.drawer::setGravity)
-        viewCollect(reloadHistory, collector = historyAdapter::reload)
-        viewCollect(history, collector = historyAdapter::add)
+        viewCollect(history, collector = historyAdapter::submitList)
         viewCollect(insertInQuery, collector = ::onInsertInQuery)
         viewCollect(items, collector = ::onStateChange)
         viewCollect(replaceQuery, collector = ::onReplaceQuery)
@@ -118,6 +110,7 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         ?.findViewById(R.id.field)
 
     private fun onReplaceQuery(value: String) {
+        binding.drawer.close()
         findQueryField()?.setText(value)
     }
 

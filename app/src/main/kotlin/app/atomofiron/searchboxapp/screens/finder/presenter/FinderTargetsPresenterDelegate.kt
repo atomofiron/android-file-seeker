@@ -3,14 +3,17 @@ package app.atomofiron.searchboxapp.screens.finder.presenter
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.screens.finder.FinderScope
 import app.atomofiron.searchboxapp.screens.finder.FinderViewState
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
 import app.atomofiron.searchboxapp.utils.mutate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class FinderTargetsPresenterDelegate(
+@FinderScope
+class FinderTargetsPresenterDelegate @Inject constructor(
     scope: CoroutineScope,
     private val viewState: FinderViewState,
     explorerStore: ExplorerStore,

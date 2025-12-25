@@ -7,15 +7,21 @@ import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.finder.di.history.HistoryDao
+import app.atomofiron.searchboxapp.screens.finder.di.history.ItemHistory
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsStateDelegate
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import javax.inject.Inject
 
-class FinderViewState(
+@FinderScope
+class FinderViewState @Inject constructor(
     private val scope: CoroutineScope,
     preferencesStore: PreferenceStore,
     val finderStore: FinderStore,
+    private val db: HistoryDao,
 ) : FinderItemsState by FinderItemsStateDelegate(
     isLocal = false,
     preferencesStore,
@@ -24,10 +30,9 @@ class FinderViewState(
 
     val inactiveTargets = MutableStateFlow(emptyList<Int>())
     val historyDrawerGravity = MutableStateFlow(Gravity.START)
-    val reloadHistory = ChannelFlow<Unit>()
     val insertInQuery = ChannelFlow<String>()
     val replaceQuery = ChannelFlow<String>()
-    val history = ChannelFlow<String>()
+    val history: Flow<List<ItemHistory>> = db.flow
     val showHistory = EventFlow<Unit>()
     val permissionRequiredWarning = ChannelFlow<Unit>()
 
@@ -41,10 +46,6 @@ class FinderViewState(
 
     fun replaceQuery(value: String) {
         replaceQuery[scope] = value
-    }
-
-    fun addToHistory(value: String) {
-        history[scope] = value
     }
 
     fun showHistory() = showHistory.invoke(scope)

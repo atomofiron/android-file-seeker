@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.finder
 
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
@@ -17,19 +16,23 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolde
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
+import app.atomofiron.searchboxapp.screens.finder.fragment.history.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderAdapterPresenterDelegate
+import app.atomofiron.searchboxapp.screens.finder.presenter.FinderHistoryPresenterDelegate
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderTargetsPresenterDelegate
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-class FinderPresenter(
+@FinderScope
+class FinderPresenter @Inject constructor(
     scope: CoroutineScope,
     private val viewState: FinderViewState,
     router: FinderRouter,
     private val storagePermissionDelegate: StoragePermissionDelegate,
     finderAdapterDelegate: FinderAdapterPresenterDelegate,
     targetsDelegate: FinderTargetsPresenterDelegate,
+    historyDelegate: FinderHistoryPresenterDelegate,
     private val preferenceStore: PreferenceStore,
-    private val preferenceChannel: PreferenceChannel
 ) : BasePresenter<FinderViewModel, FinderRouter>(scope, router),
     FinderAdapterOutput<SearchResult>,
     QueryFieldHolder.OnActionListener by finderAdapterDelegate,
@@ -41,7 +44,8 @@ class FinderPresenter(
     EditOptionsHolder.FinderConfigListener by finderAdapterDelegate,
     ButtonsHolder.FinderButtonsListener by finderAdapterDelegate,
     TaskHolder.OnActionListener<SearchResult> by finderAdapterDelegate,
-    TargetsHolder.FinderTargetsOutput by targetsDelegate
+    TargetsHolder.FinderTargetsOutput by targetsDelegate,
+    HistoryAdapter.OnItemClickListener by historyDelegate
 {
 
     init {
@@ -52,14 +56,9 @@ class FinderPresenter(
         preferenceStore.drawerGravity.collect(scope) { gravity ->
             viewState.historyDrawerGravity.value = gravity
         }
-        viewState.reloadHistory.collect(scope) {
-            preferenceChannel.notifyHistoryImported()
-        }
     }
 
     fun onDrawerGravityChange(gravity: Int) = preferenceStore { setDrawerGravity(gravity) }
-
-    fun onHistoryItemClick(node: String) = viewState.replaceQuery(node)
 
     fun onAllowStorageClick() = storagePermissionDelegate.launchSettings()
 

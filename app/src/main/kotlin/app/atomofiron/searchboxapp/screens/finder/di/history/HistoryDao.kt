@@ -1,10 +1,11 @@
-package app.atomofiron.searchboxapp.screens.finder.history.dao
+package app.atomofiron.searchboxapp.screens.finder.di.history
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HistoryDao {
@@ -12,13 +13,7 @@ interface HistoryDao {
         const val TABLE_NAME = "SearchHistory"
     }
     @get:Query("SELECT * FROM $TABLE_NAME order by pinned desc, id desc")
-    val all: List<ItemHistory>
-
-    @Query("SELECT * FROM $TABLE_NAME WHERE id = :id")
-    fun getById(id: Long): ItemHistory
-
-    @Query("SELECT COUNT(*) FROM $TABLE_NAME")
-    fun count(): Int
+    val flow: Flow<List<ItemHistory>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insert(item: ItemHistory): Long

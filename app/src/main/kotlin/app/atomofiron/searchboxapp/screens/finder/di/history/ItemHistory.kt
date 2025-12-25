@@ -1,5 +1,6 @@
-package app.atomofiron.searchboxapp.screens.finder.history.dao
+package app.atomofiron.searchboxapp.screens.finder.di.history
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -7,6 +8,7 @@ import androidx.room.PrimaryKey
 data class ItemHistory(
     @PrimaryKey(autoGenerate = true)
     var id: Long = 0,
-    var title: String = "",
+    @ColumnInfo(name = "title")
+    var query: String = "",
     var pinned: Boolean = false,
 )

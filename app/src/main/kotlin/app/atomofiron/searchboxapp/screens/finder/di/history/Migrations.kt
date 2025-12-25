@@ -1,5 +1,4 @@
-package app.atomofiron.searchboxapp.screens.finder.history.dao
-
+package app.atomofiron.searchboxapp.screens.finder.di.history
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase

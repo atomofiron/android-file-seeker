@@ -1,17 +1,17 @@
 package app.atomofiron.searchboxapp.screens.finder
 
+import android.content.Context
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.Registerable
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
-import app.atomofiron.searchboxapp.di.dependencies.interactor.FinderInteractor
 import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
-import app.atomofiron.searchboxapp.screens.finder.presenter.FinderAdapterPresenterDelegate
-import app.atomofiron.searchboxapp.screens.finder.presenter.FinderTargetsPresenterDelegate
+import app.atomofiron.searchboxapp.screens.finder.di.history.HistoryDao
+import app.atomofiron.searchboxapp.screens.finder.di.history.HistoryDatabase
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -42,69 +42,6 @@ interface FinderComponent {
 
 @Module
 class FinderModule {
-    @Provides
-    @FinderScope
-    fun presenter(
-        scope: CoroutineScope,
-        viewState: FinderViewState,
-        router: FinderRouter,
-        storagePermissionDelegate: StoragePermissionDelegate,
-        finderAdapterDelegate: FinderAdapterPresenterDelegate,
-        targetsDelegate: FinderTargetsPresenterDelegate,
-        preferenceStore: PreferenceStore,
-        preferenceChannel: PreferenceChannel
-    ): FinderPresenter {
-        return FinderPresenter(
-            scope,
-            viewState,
-            router,
-            storagePermissionDelegate,
-            finderAdapterDelegate,
-            targetsDelegate,
-            preferenceStore,
-            preferenceChannel,
-        )
-    }
-
-    @Provides
-    @FinderScope
-    fun finderAdapterOutput(
-        viewState: FinderViewState,
-        router: FinderRouter,
-        storagePermissionDelegate: StoragePermissionDelegate,
-        interactor: FinderInteractor,
-        preferenceStore: PreferenceStore,
-    ): FinderAdapterPresenterDelegate {
-        return FinderAdapterPresenterDelegate(viewState, router, storagePermissionDelegate, interactor, preferenceStore)
-    }
-
-    @Provides
-    @FinderScope
-    fun finderTargetsDelegate(
-        scope: CoroutineScope,
-        viewState: FinderViewState,
-        explorerStore: ExplorerStore,
-    ): FinderTargetsPresenterDelegate {
-        return FinderTargetsPresenterDelegate(scope, viewState, explorerStore)
-    }
-
-    @Provides
-    @FinderScope
-    fun router(fragment: WeakProperty<out Fragment>) = FinderRouter(fragment)
-
-    @Provides
-    @FinderScope
-    fun interactor(finderService: FinderService): FinderInteractor {
-        return FinderInteractor(finderService)
-    }
-
-    @Provides
-    @FinderScope
-    fun viewState(
-        scope: CoroutineScope,
-        preferencesStore: PreferenceStore,
-        finderStore: FinderStore,
-    ): FinderViewState = FinderViewState(scope, preferencesStore, finderStore)
 
     @Provides
     @FinderScope
@@ -118,9 +55,14 @@ class FinderModule {
         router: FinderRouter,
         storagePermissionDelegate: StoragePermissionDelegate,
     ) = Registerable(router, storagePermissionDelegate)
+
+    @Provides
+    @FinderScope
+    fun dao(context: Context): HistoryDao = HistoryDatabase(context).historyDao()
 }
 
 interface FinderDependencies {
+    fun context(): Context
     fun preferenceChannel(): PreferenceChannel
     fun explorerStore(): ExplorerStore
     fun preferenceStore(): PreferenceStore

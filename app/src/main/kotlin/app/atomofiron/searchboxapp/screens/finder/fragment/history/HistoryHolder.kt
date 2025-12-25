@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.screens.finder.history.adapter
+package app.atomofiron.searchboxapp.screens.finder.fragment.history
 
 import android.view.View
 import android.widget.ImageButton

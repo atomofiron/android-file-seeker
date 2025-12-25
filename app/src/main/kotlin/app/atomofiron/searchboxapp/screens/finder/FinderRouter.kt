@@ -6,10 +6,12 @@ import app.atomofiron.common.arch.Registerable
 import app.atomofiron.common.util.permission.PermissionDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
+import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
+import javax.inject.Inject
 
-class FinderRouter(property: WeakProperty<out Fragment>) : BaseRouter(property), Registerable {
+@FinderScope
+class FinderRouter @Inject constructor(property: WeakProperty<out Fragment>) : BaseRouter(property), Registerable {
 
     override val currentDestinationId = R.id.rootFragment
 
