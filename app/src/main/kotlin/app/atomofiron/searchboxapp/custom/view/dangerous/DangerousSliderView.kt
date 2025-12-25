@@ -187,6 +187,7 @@ class DangerousSliderView @JvmOverloads constructor(
         val arrowsAlpha = tipAnimator.animatedValue as Float * 2 - 1
         arrows.draw(canvas, flip = isRtl, progress = progress, alpha = arrowsAlpha, offset = tipOffset, arrowSize = tip.textSize / 2)
         canvas.drawPath(borderPath, borderPaint)
+        canvas.clipRect(offset, 0f, width.toFloat(), height.toFloat())
         super.draw(canvas)
         if (isDone) done.draw(canvas)
     }
