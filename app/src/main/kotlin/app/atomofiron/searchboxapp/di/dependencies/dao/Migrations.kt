@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.di.dependencies.db.dao
+package app.atomofiron.searchboxapp.di.dependencies.dao
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase

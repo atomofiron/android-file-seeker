@@ -21,8 +21,8 @@ import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.verifyNativeBin
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
-import app.atomofiron.searchboxapp.di.dependencies.db.dao.Deepest
-import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
+import app.atomofiron.searchboxapp.model.explorer.other.Deepest
+import app.atomofiron.searchboxapp.di.dependencies.dao.ExplorerDao
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.ExplorerTabKey

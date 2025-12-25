@@ -1,9 +1,10 @@
-package app.atomofiron.searchboxapp.di.dependencies.db.dao
+package app.atomofiron.searchboxapp.di.dependencies.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import app.atomofiron.searchboxapp.model.explorer.other.Deepest
 
 @Dao
 interface ExplorerDao {
