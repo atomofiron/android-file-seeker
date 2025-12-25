@@ -11,16 +11,31 @@ import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.os.Build.VERSION_CODES.Q
+import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.utils.isRtl
 
 class NoticeableDrawable(
     private val drawable: Drawable,
     private var dotColor: Int,
+    private val placement: Placement = Placement.TopEnd,
 ) : Drawable(), Drawable.Callback {
+    enum class Placement(
+        private val start: Boolean,
+        private val top: Boolean,
+    ) {
+        TopStart(start = true, top = true),
+        TopEnd(start = false, top = true),
+        BottomStart(start = true, top = false),
+        BottomEnd(start = false, top = false),
+        ;
+        fun left(rtl: Boolean) = start != rtl
+        fun top() = top
+    }
 
     private val clipOutPath = Path()
     private val paint = Paint()
@@ -30,8 +45,9 @@ class NoticeableDrawable(
 
     private val dotRadius: Float get() = bounds.width().toFloat() / 6
     private val holeRadius: Float get() = bounds.width().toFloat() / 4
-    private val holeX: Float get() = bounds.right - dotRadius
-    private val holeY: Float get() = dotRadius
+    private val rtl get() = (callback as? View)?.isRtl() == true
+    private val holeX: Float get() = if (placement.left(rtl)) dotRadius else bounds.right - dotRadius
+    private val holeY: Float get() = if (placement.top()) dotRadius else bounds.bottom - dotRadius
 
     init {
         paint.isAntiAlias = true
@@ -42,13 +58,15 @@ class NoticeableDrawable(
         context: Context,
         @DrawableRes iconId: Int,
         @ColorRes dotColorId: Int = R.color.red,
-    ) : this(context, ContextCompat.getDrawable(context, iconId)!!, dotColorId)
+        placement: Placement = Placement.TopEnd,
+    ) : this(context, ContextCompat.getDrawable(context, iconId)!!, dotColorId, placement)
 
     constructor(
         context: Context,
         icon: Drawable,
         @ColorRes dotColorId: Int = R.color.red,
-    ) : this(icon, ContextCompat.getColor(context, dotColorId))
+        placement: Placement = Placement.TopEnd,
+    ) : this(icon, ContextCompat.getColor(context, dotColorId), placement)
 
     fun setDotColor(color: Int): NoticeableDrawable {
         dotColor = color
