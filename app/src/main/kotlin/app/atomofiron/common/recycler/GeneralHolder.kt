@@ -1,6 +1,7 @@
 package app.atomofiron.common.recycler
 
 import android.content.Context
+import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,7 @@ const val FILL_ROW = 0f
 open class GeneralHolder<D : Any>(view: View) : RecyclerView.ViewHolder(view) {
 
     protected val context: Context = view.context
+    protected val resources: Resources = view.resources
 
     private var _itemOrNull: D? = null
     protected val itemOrNull: D?

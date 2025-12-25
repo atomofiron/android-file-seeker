@@ -1,9 +1,12 @@
 package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.GradientDrawable.Orientation
 import android.view.ViewGroup
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemSearchEditOptionsMiniBinding
+import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder.FinderConfigListener
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -15,6 +18,7 @@ class MiniEditOptionsHolder(
 ) : GeneralHolder<FinderStateItem.Options>(parent, R.layout.item_search_edit_options_mini) {
 
     override val hungry = true
+    private val corners = resources.getDimension(R.dimen.corner_extra)
 
     private val binding = ItemSearchEditOptionsMiniBinding.bind(itemView)
 
@@ -25,6 +29,9 @@ class MiniEditOptionsHolder(
     private fun ItemSearchEditOptionsMiniBinding.init() {
         root.isFocusable = false
         root.isClickable = false
+        val color = context.colorSurfaceContainer()
+        toggles.background = GradientDrawable(Orientation.BOTTOM_TOP, intArrayOf(color, color))
+            .apply { cornerRadius = corners }
         caseSense.setOnClickListener {
             update { it.edit(ignoreCase = !it.ignoreCase) }
         }
