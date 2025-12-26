@@ -9,7 +9,7 @@ import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import javax.inject.Singleton
 
 @Module
-open class DbModule {
+open class DaoModule {
 
     @Provides
     @Singleton
