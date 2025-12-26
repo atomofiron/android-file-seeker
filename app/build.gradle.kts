@@ -7,7 +7,6 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.serialization)
-    alias(libs.plugins.parcelize)
     alias(libs.plugins.protobuf)
     alias(libs.plugins.kapt)
     id("app.fileseeker.convention.library")
