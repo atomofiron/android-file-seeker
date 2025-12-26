@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.Registerable
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
+import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
@@ -68,4 +69,5 @@ interface FinderDependencies {
     fun preferenceStore(): PreferenceStore
     fun finderService(): FinderService
     fun finderStore(): FinderStore
+    fun finderDao(): FinderDao
 }

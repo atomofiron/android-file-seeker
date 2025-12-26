@@ -6,7 +6,7 @@ import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
-import app.atomofiron.searchboxapp.model.finder.SearchResult
+import app.atomofiron.searchboxapp.model.finder.LocalSearchResult
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.viewer.di.TextViewerInteractor
@@ -26,7 +26,7 @@ class TextViewerPresenter(
     session: TextViewerSession?,
 ) : BasePresenter<TextViewerViewModel, TextViewerRouter>(scope, router),
     TextViewerAdapter.TextViewerListener,
-    FinderAdapterOutput<SearchResult.Local> by searchDelegate
+    FinderAdapterOutput<LocalSearchResult> by searchDelegate
 {
 
     private val itemRef: NodeRef get() = viewState.item.value.ref

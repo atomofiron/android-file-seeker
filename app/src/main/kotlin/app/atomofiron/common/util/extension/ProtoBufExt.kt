@@ -6,7 +6,9 @@ import kotlinx.serialization.protobuf.ProtoBuf
 
 inline fun <reified T : Any> T.encode() = ProtoBuf.encodeToByteArray(this)
 
-inline fun <reified T : Any> ByteArray.decode(): T? = when {
+inline fun <reified T : Any> ByteArray.decode(): T = ProtoBuf.decodeFromByteArray<T>(this)
+
+inline fun <reified T : Any> ByteArray.decodeOrNull(): T? = when {
     isEmpty() -> null
-    else -> ProtoBuf.decodeFromByteArray<T>(this)
+    else -> decode()
 }

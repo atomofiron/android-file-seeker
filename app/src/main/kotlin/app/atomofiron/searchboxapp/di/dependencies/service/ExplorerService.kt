@@ -90,7 +90,7 @@ class ExplorerService(
     private val context: Context,
     private val appScope: AppScope,
     private val store: ExplorerStore,
-    private val db: ExplorerDao,
+    private val dao: ExplorerDao,
     private val preferences: PreferenceStore,
 ) {
     private var delayedRender: Job? = null
@@ -125,7 +125,7 @@ class ExplorerService(
                 ?.takeIf { it.type != NodeRootType.Photos && it.type != NodeRootType.Videos }
                 ?: return@collect
             val new = Deepest(tabIndex = tab.index, rootId = root.id, deepest.ref)
-            db.put(new)
+            dao.put(new)
         }
     }
 
@@ -161,7 +161,7 @@ class ExplorerService(
         }
         val root = getSelectedRoot()
         root ?: return
-        val deepest = db.get(key.index, root.id)
+        val deepest = dao.get(key.index, root.id)
         deepest ?: return
         val tree = mutableListOf<NodeRef>()
         var ref = deepest.ref

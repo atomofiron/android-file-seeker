@@ -193,8 +193,10 @@ tasks.register<Exec>(taskGenerateNativeBindings) {
         val emptyCompanion = "    companion object\n"
         val cleaner = "interface UniffiCleaner {"
         val file = File(projectDir, ktBindingFile)
+        val textMatch = "data class TextMatch"
         file.readText()
             .replace("    object", "    data object")
+            .replace(textMatch, "@kotlinx.serialization.Serializable\n$textMatch")
             .replace(emptyCompanion, "")
             .replace(cleaner, "$cleaner\n$emptyCompanion") // put it back
             .let { file.writeText(it) }

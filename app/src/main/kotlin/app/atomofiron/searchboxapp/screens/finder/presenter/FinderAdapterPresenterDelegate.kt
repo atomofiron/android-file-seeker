@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.finder.presenter
 
 import android.Manifest.permission.POST_NOTIFICATIONS
+import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.screens.finder.di.FinderInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -34,7 +35,8 @@ class FinderAdapterPresenterDelegate @Inject constructor(
     private val storagePermissionDelegate: StoragePermissionDelegate,
     private val interactor: FinderInteractor,
     private val preferences: PreferenceStore,
-    private val db: HistoryDao,
+    private val history: HistoryDao,
+    private val cache: FinderDao,
 ) : CoroutineLauncher,
     QueryFieldHolder.OnActionListener,
     CharactersHolder.OnActionListener,
@@ -66,16 +68,16 @@ class FinderAdapterPresenterDelegate @Inject constructor(
         router.showResult(item.task.uniqueId)
     }
 
-    override fun onProgressStopClick(item: FinderStateItem.Task<SearchResult>) {
+    override fun onTaskStopClick(item: FinderStateItem.Task<SearchResult>) {
         interactor.stop(item.task.uuid)
     }
 
-    override fun onProgressRemoveClick(item: FinderStateItem.Task<SearchResult>) {
+    override fun onTaskRemoveClick(item: FinderStateItem.Task<SearchResult>) {
         interactor.drop(item.task)
+        io { cache.delete(item.task.uniqueId) }
     }
 
-    override fun onReplaceClick(value: String) {
-    }
+    override fun onReplaceClick(value: String) = Unit
 
     override fun onSearchClick(value: String) {
         val targets = viewState.targets.value
@@ -98,7 +100,10 @@ class FinderAdapterPresenterDelegate @Inject constructor(
     }
 
     private fun startSearch(query: String, targets: List<NodeRef>) {
-        io { db.insert(ItemHistory(query = query)) }
+        io {
+            if (history.exists(query)) history.delete(query)
+            history.put(ItemHistory(query = query))
+        }
         val config = viewState.toggles.value.toggles
         interactor.search(query, targets, config)
     }

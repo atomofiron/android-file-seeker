@@ -1,7 +1,9 @@
 package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.extension.hash
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class NodeHash(
     val ref: NodeRef,
     val meta: NodeMeta,

@@ -13,7 +13,7 @@ import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.setScreenSizeListener
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.ScreenSize
-import app.atomofiron.searchboxapp.model.finder.TextSearchTask
+import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemSeparatorDecorator
 import app.atomofiron.searchboxapp.screens.viewer.recycler.TextViewerAdapter
 import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
@@ -92,7 +92,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
         }
     }
 
-    private fun onTaskChanged(task: TextSearchTask?) {
+    private fun onTaskChanged(task: LocalSearchTask?) {
         val matches = task?.result?.matches
         textAdapter.setMatches(matches)
         val iconId = if (task == null) R.drawable.ic_back else R.drawable.ic_cross

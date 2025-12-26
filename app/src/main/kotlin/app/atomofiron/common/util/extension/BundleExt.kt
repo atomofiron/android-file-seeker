@@ -7,14 +7,14 @@ import java.util.UUID
 
 inline fun <reified T : Any> protobufBytesKey(): String = T::class.java.name
 
-inline fun <reified T : Any> Bundle.get(): T? = getByteArray(protobufBytesKey<T>())?.decode()
+inline fun <reified T : Any> Bundle.get(): T? = getByteArray(protobufBytesKey<T>())?.decodeOrNull()
 
 inline fun <reified T : Any> Bundle.put(data: T): Bundle {
     putByteArray(protobufBytesKey<T>(), data.encode())
     return this
 }
 
-inline fun <reified T : Any> Intent.get(): T? = getByteArrayExtra(protobufBytesKey<T>())?.decode()
+inline fun <reified T : Any> Intent.get(): T? = getByteArrayExtra(protobufBytesKey<T>())?.decodeOrNull()
 
 inline fun <reified T : Any> Intent.put(data: T): Intent {
     putExtra(protobufBytesKey<T>(), data.encode())
@@ -25,7 +25,7 @@ inline operator fun <reified T : Any> Data.Companion.invoke(data: T): Data {
     return Data.Builder().put(data).build()
 }
 
-inline fun <reified T : Any> Data.get(): T? = getByteArray(protobufBytesKey<T>())?.decode()
+inline fun <reified T : Any> Data.get(): T? = getByteArray(protobufBytesKey<T>())?.decodeOrNull()
 
 inline fun <reified T : Any> Data.Builder.put(data: T): Data.Builder {
     putByteArray(protobufBytesKey<T>(), data.encode())

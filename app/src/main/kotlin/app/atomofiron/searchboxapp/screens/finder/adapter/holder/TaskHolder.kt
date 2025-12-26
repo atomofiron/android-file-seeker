@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isInvisible
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.Unreachable
+import app.atomofiron.common.util.extension.debugFailUnreachable
 import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemProgressBinding
@@ -36,9 +36,9 @@ class TaskHolder<Result : SearchResult>(
             view.isEnabled = false
             val item = item
             when (item.task.status) {
-                is SearchStatus.Progress -> listener.onProgressStopClick(item)
-                is SearchStatus.Ended -> listener.onProgressRemoveClick(item)
-                is SearchStatus.Stopping -> Unreachable
+                is SearchStatus.Progress -> listener.onTaskStopClick(item)
+                is SearchStatus.Ended -> listener.onTaskRemoveClick(item)
+                is SearchStatus.Stopping -> debugFailUnreachable()
             }
         }
         binding.params.setSingleLine()
@@ -71,7 +71,7 @@ class TaskHolder<Result : SearchResult>(
             else -> R.string.remove
         }
         action.setText(idAction)
-        action.isEnabled = task.isProgress || task.status.removable
+        action.isEnabled = task.isProgress || task.isRemovable
         itemView.isEnabled = item.clickableIfEmpty || !task.result.isEmpty
     }
 
@@ -117,7 +117,7 @@ class TaskHolder<Result : SearchResult>(
 
     interface OnActionListener<R : SearchResult> {
         fun onItemClick(item: FinderStateItem.Task<R>)
-        fun onProgressStopClick(item: FinderStateItem.Task<R>)
-        fun onProgressRemoveClick(item: FinderStateItem.Task<R>)
+        fun onTaskStopClick(item: FinderStateItem.Task<R>)
+        fun onTaskRemoveClick(item: FinderStateItem.Task<R>)
     }
 }

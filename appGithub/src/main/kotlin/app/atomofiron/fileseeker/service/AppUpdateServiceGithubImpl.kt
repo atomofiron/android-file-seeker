@@ -4,7 +4,7 @@ import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.searchboxapp.BuildConfig
-import app.atomofiron.common.util.Unreachable
+import app.atomofiron.common.util.extension.debugFailUnreachable
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
@@ -83,7 +83,7 @@ class AppUpdateServiceGithubImpl(
     }
 
     override fun startUpdate(variant: UpdateType.Variant) {
-        val asset = asset ?: return Unreachable
+        val asset = asset ?: return debugFailUnreachable()
         file = getFile(asset.id).verify(asset)
         when (file) {
             null -> downloadUpdate(asset)

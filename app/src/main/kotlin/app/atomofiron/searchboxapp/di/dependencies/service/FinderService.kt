@@ -6,14 +6,18 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import app.atomofiron.common.util.extension.invoke
+import app.atomofiron.common.util.extension.launchOnDefault
 import app.atomofiron.common.util.flow.collect
+import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.GenericSearchTask
+import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
+import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.work.FinderWorker
 import kotlinx.coroutines.CoroutineScope
 import java.util.UUID
@@ -22,14 +26,21 @@ class FinderService(
     scope: CoroutineScope,
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
-    private val finderStore: FinderStore,
+    private val store: FinderStore,
     private val preferenceStore: PreferenceStore,
     explorerStore: ExplorerStore,
+    dao: FinderDao,
 ) {
     init {
         workManager.cancelAllWork()
         explorerStore.deleted.collect(scope) {
-            finderStore.deleteResultFromTasks(it)
+            store.deleteResultFromTasks(it)
+        }
+        scope.launchOnDefault {
+            val cached = dao.all().map {
+                GlobalSearchTask(it.params, it.result, status = SearchStatus.Ended(stopped = it.stopped))
+            }
+            store.addAll(cached)
         }
     }
 
@@ -55,7 +66,7 @@ class FinderService(
     }
 
     fun drop(task: GenericSearchTask) {
-        finderStore {
+        store {
             drop(task.uuid)
         }
         notificationManager.cancel(task.uniqueId)

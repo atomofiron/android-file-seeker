@@ -16,8 +16,14 @@ interface HistoryDao {
     val flow: Flow<List<ItemHistory>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insert(item: ItemHistory): Long
+    fun put(item: ItemHistory): Long
+
+    @Query("SELECT EXISTS(SELECT 1 FROM $TABLE_NAME WHERE title = :query)")
+    fun exists(query: String): Boolean
 
     @Delete
     fun delete(item: ItemHistory)
+
+    @Query("DELETE FROM $TABLE_NAME WHERE title = :query")
+    fun delete(query: String)
 }

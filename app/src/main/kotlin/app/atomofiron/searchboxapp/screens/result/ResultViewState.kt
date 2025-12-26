@@ -16,14 +16,13 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeId
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
-import app.atomofiron.searchboxapp.model.finder.GenericSearchTask
-import app.atomofiron.searchboxapp.model.finder.SearchResult.Global
+import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
+import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
 import app.atomofiron.searchboxapp.model.toDockItem
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState
-import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveContent
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.sortBy
@@ -50,8 +49,8 @@ class ResultViewState(
         private set
     private var error: NodeError? = null
 
-    private var _result: Global = Global.Stub
-    val result: Global get() = _result
+    private lateinit var _result: GlobalSearchResult
+    val result: GlobalSearchResult get() = _result
     private val _cache = mutableMapOf<NodeId, ResultItem.Item>()
     val cache: Map<NodeId, ResultItem.Item> = _cache
     private val _items = MutableStateFlow<List<ResultItem>>(emptyList())
@@ -69,7 +68,10 @@ class ResultViewState(
     val alerts = ChannelFlow<Alert>()
 
     init {
-        transformState()
+        finderStore.tasksFlow.value
+            .find { it.uniqueId == taskId }
+            ?.let { _result = it.result }
+            ?.also { transformState() }
     }
 
     fun showAlert(message: Alert.Uni) {
@@ -77,17 +79,15 @@ class ResultViewState(
     }
 
     private fun transformState() {
-        if (taskId != Const.UNDEFINED) {
-            val task = finderStore.tasksFlow.mapNotNull { tasks ->
-                tasks.find { it.uniqueId == taskId }
-            }
-            combineTransform(renderRequest, task, checkedEvent) { _, task, checked ->
-                emit(reduce(task, checked))
-            }.launch(scope, Dispatchers.Default)
+        val tasks = finderStore.tasksFlow.mapNotNull { tasks ->
+            tasks.find { it.uniqueId == taskId }
         }
+        combineTransform(renderRequest, tasks, checkedEvent) { _, task, checked ->
+            emit(reduce(task, checked))
+        }.launch(scope, Dispatchers.Default)
     }
 
-    private fun reduce(task: GenericSearchTask, checked: Set<Int>) {
+    private fun reduce(task: GlobalSearchTask, checked: Set<Int>) {
         taskUuid = task.uuid
         if (error != task.error) {
             error = task.error
@@ -95,7 +95,7 @@ class ResultViewState(
                 alerts[scope] = it.toAlert()
             }
         }
-        val result = task.result as Global
+        val result = task.result
         result.matches.forEach {
             val cached = _cache[it.uniqueId]
             _cache[it.uniqueId] = when {

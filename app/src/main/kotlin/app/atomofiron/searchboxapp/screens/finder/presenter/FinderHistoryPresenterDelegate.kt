@@ -14,16 +14,16 @@ import javax.inject.Inject
 class FinderHistoryPresenterDelegate @Inject constructor(
     override val scope: CoroutineScope,
     private val viewState: FinderViewState,
-    private val db: HistoryDao,
+    private val history: HistoryDao,
 ) : HistoryAdapter.OnItemClickListener, CoroutineLauncher {
 
     override fun onItemClick(item: ItemHistory) = viewState.replaceQuery(item.query)
 
     override fun onItemPin(item: ItemHistory) = io {
-        db.insert(item.copy(pinned = !item.pinned)).unit()
+        history.put(item.copy(pinned = !item.pinned)).unit()
     }.unit()
 
     override fun onItemRemove(item: ItemHistory) = io {
-        db.delete(item)
+        history.delete(item)
     }.unit()
 }

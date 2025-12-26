@@ -7,10 +7,10 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.model.finder.LocalSearchResult
+import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
-import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.model.textviewer.toLocal
@@ -32,7 +32,7 @@ class SearchAdapterPresenterDelegate(
     private val interactor: TextViewerInteractor,
     private val preferences: PreferenceStore,
     curtainChannel: CurtainChannel,
-) : Recipient, FinderAdapterOutput<SearchResult.Local> {
+) : Recipient, FinderAdapterOutput<LocalSearchResult> {
 
     private val curtain = CurtainSearchDelegate(this, viewState, scope)
 
@@ -66,22 +66,22 @@ class SearchAdapterPresenterDelegate(
 
     override fun onEditMaxDepth(new: Int) = Unit
 
-    override fun onItemClick(item: FinderStateItem.Task<SearchResult.Local>) = trySelectTask(item.task)
+    override fun onItemClick(item: FinderStateItem.Task<LocalSearchResult>) = trySelectTask(item.task)
 
-    override fun onProgressRemoveClick(item: FinderStateItem.Task<SearchResult.Local>) {
+    override fun onTaskRemoveClick(item: FinderStateItem.Task<LocalSearchResult>) {
         interactor.removeTask(viewState.item.value.ref, item.task.uniqueId)
         viewState.dropTask()
     }
 
     override fun onReplaceClick(value: String) = Unit
 
-    override fun onProgressStopClick(item: FinderStateItem.Task<SearchResult.Local>) = Unit
+    override fun onTaskStopClick(item: FinderStateItem.Task<LocalSearchResult>) = Unit
 
     override fun onTestTextChange(value: String?) = Unit
 
     override fun onEditMaxSize(new: Long) = Unit
 
-    fun trySelectTask(task: SearchTask<SearchResult.Local>) {
+    fun trySelectTask(task: LocalSearchTask) {
         val hash = task.result.hash
         when {
             hash != null -> scope.launchOnIO {
@@ -99,7 +99,7 @@ class SearchAdapterPresenterDelegate(
         }
     }
 
-    private fun SearchTask<SearchResult.Local>.trySelect() {
+    private fun LocalSearchTask.trySelect() {
         if (viewState.trySelectTask(this)) {
             curtain.controller?.close()
         }

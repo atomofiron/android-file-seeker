@@ -8,7 +8,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.QueryParams
-import app.atomofiron.searchboxapp.model.finder.TextSearchTask
+import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
@@ -47,7 +47,7 @@ class TextViewerInteractor(
         }
     }
 
-    suspend fun fetchTask(ref: NodeRef, taskId: UUID): TextSearchTask? = service.fetchTask(ref, taskId)
+    suspend fun fetchTask(ref: NodeRef, taskId: UUID): LocalSearchTask? = service.fetchTask(ref, taskId)
 
     fun getHash(ref: NodeRef): Rslt<Int> = NativeBridge.crcHash(ref, asSu)
 

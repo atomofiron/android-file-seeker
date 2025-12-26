@@ -11,8 +11,8 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
-import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.finder.TextSearchTask
+import app.atomofiron.searchboxapp.model.finder.LocalSearchResult
+import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
@@ -51,9 +51,9 @@ class TextViewerViewState(
 
     val composition = preferenceStore.explorerItemComposition.value
     val item: StateFlow<Node> = session?.item ?: MutableStateFlow(ref.toNode())
-    val tasks: StateFlow<List<TextSearchTask>> = session?.tasks ?: MutableStateFlow(emptyList())
+    val tasks: StateFlow<List<LocalSearchTask>> = session?.tasks ?: MutableStateFlow(emptyList())
     val textLines: StateFlow<List<TextLine>> = session?.lines ?: MutableStateFlow(emptyList())
-    val currentTask = MutableStateFlow<TextSearchTask?>(null)
+    val currentTask = MutableStateFlow<LocalSearchTask?>(null)
     private val _alerts: MutableStateFlow<Alert?> = DataFlow((session?.error?.value ?: error)?.toAlert())
     val alerts: SharedFlow<Alert?> = _alerts
 
@@ -93,7 +93,7 @@ class TextViewerViewState(
         return result.switch(cursor, forward)
     }
 
-    private fun SearchResult.Local.switch(cursor: MatchCursor, forward: Boolean): CursorResult {
+    private fun LocalSearchResult.switch(cursor: MatchCursor, forward: Boolean): CursorResult {
         var lineIndex = cursor.lineIndex
         var matches = matches[lineIndex]
             ?: return noMatchesErr(lineIndex)
@@ -123,7 +123,7 @@ class TextViewerViewState(
 
     private fun noMatchesErr(lineIndex: Int) = CursorResult.Err("no matches for line index $lineIndex (max: ${currentTask.value?.result?.matches?.keys?.sorted()?.max()})")
 
-    private fun SearchResult.Local.startNavigation(forward: Boolean): CursorResult {
+    private fun LocalSearchResult.startNavigation(forward: Boolean): CursorResult {
         val statusIndex = when {
             forward -> 1
             indexes.last() < textLines.value.size -> status.value.max
@@ -158,7 +158,7 @@ class TextViewerViewState(
         _alerts.value = alert
     }
 
-    fun trySelectTask(task: TextSearchTask): Boolean {
+    fun trySelectTask(task: LocalSearchTask): Boolean {
         return (task.isEnded && task.count > 0 && task.error == null).also { isOk ->
             if (isOk) {
                 currentTask.value = task

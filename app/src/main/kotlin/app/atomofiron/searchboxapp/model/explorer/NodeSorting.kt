@@ -1,7 +1,9 @@
 package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import kotlinx.serialization.Serializable
 
+@Serializable
 sealed class NodeSorting(val reversed: Boolean) : DockItem.Id.Auto() {
     sealed class Name(reversed: Boolean) : NodeSorting(reversed) {
         data object Reversed : Name(reversed = true) {

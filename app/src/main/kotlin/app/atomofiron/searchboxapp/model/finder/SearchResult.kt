@@ -5,13 +5,18 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeHash
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.textviewer.MatchMap
+import kotlinx.serialization.Serializable
 import java.util.Objects
 import kotlin.LazyThreadSafetyMode.NONE
+
+typealias GlobalSearchResult = SearchResult.Global
+typealias LocalSearchResult = SearchResult.Local
 
 sealed class SearchResult {
 
     abstract val count: Int
     abstract val countTotal: Int
+    open val removable: Boolean get() = true
 
     val isEmpty: Boolean get() = count == 0
 
@@ -21,6 +26,7 @@ sealed class SearchResult {
         override val count: Int,
         val matches: MatchMap,
         val hash: NodeHash? = null,
+        override val removable: Boolean = true,
     ) : SearchResult() {
 
         val indexes: List<Int> by lazy(NONE) { matches.keys.sorted() }
@@ -41,6 +47,7 @@ sealed class SearchResult {
         }
     }
 
+    @Serializable
     data class Global(
         private val forText: Boolean,
         override val count: Int = 0,
@@ -50,9 +57,6 @@ sealed class SearchResult {
         val sorting: NodeSorting = NodeSorting.Date.Reversed,
         val generation: Int = 0,
     ) : SearchResult() {
-        companion object {
-            val Stub = Global(forText = false)
-        }
 
         override fun getCounters(): IntArray = when {
             forText -> intArrayOf(count, matches.size, countTotal)
@@ -71,7 +75,7 @@ sealed class SearchResult {
             return data.toString()
         }
 
-        fun removeItems(removed: List<Node>): SearchResult {
+        fun removeItems(removed: List<Node>): Global {
             val nothing = matches.none { match ->
                 removed.any { match.ref.isChildOf(it.ref) }
             }
@@ -82,7 +86,7 @@ sealed class SearchResult {
                 removed.none { match.ref.isChildOf(it.ref) }
             }
             val count = left.sumOf { it.count }
-            return Global(forText, count = count, countTotal = left.size, left)
+            return copy(forText = forText, count = count, countTotal = left.size, matches = left)
         }
 
         fun contains(match: ItemMatch) = matches.contains(match)

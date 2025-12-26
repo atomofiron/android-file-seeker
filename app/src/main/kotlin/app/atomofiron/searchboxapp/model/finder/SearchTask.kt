@@ -3,8 +3,8 @@ package app.atomofiron.searchboxapp.model.finder
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import java.util.UUID
 
-typealias TextSearchTask = SearchTask<SearchResult.Local>
-typealias FilesSearchTask = SearchTask<SearchResult.Global>
+typealias LocalSearchTask = SearchTask<LocalSearchResult>
+typealias GlobalSearchTask = SearchTask<GlobalSearchResult>
 typealias GenericSearchTask = SearchTask<SearchResult>
 
 data class SearchTask<Result : SearchResult>(
@@ -17,6 +17,7 @@ data class SearchTask<Result : SearchResult>(
     val uniqueId: Int get() = uuid.hashCode()
     val count: Int = result.count
 
+    val isRemovable get() = result.removable
     val isProgress: Boolean get() = status is SearchStatus.Progress
     val isStopping: Boolean get() = status is SearchStatus.Stopping
     val isEnded: Boolean get() = status is SearchStatus.Ended
@@ -27,9 +28,8 @@ data class SearchTask<Result : SearchResult>(
         result: Result = this.result,
         error: NodeError? = this.error,
         stopped: Boolean = false,
-        removable: Boolean = true,
     ): SearchTask<Result> {
-        val state = SearchStatus.Ended(removable = removable, stopped = stopped)
+        val state = SearchStatus.Ended(stopped = stopped)
         return copy(status = state, result = result, error = error)
     }
 

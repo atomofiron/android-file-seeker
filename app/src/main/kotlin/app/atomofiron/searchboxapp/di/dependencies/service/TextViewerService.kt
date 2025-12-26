@@ -9,11 +9,10 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.dependencies.store.TextViewerStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
+import app.atomofiron.searchboxapp.model.finder.LocalSearchResult
 import app.atomofiron.searchboxapp.model.finder.QueryParams
-import app.atomofiron.searchboxapp.model.finder.SearchResult
-import app.atomofiron.searchboxapp.model.finder.SearchResult.Local
 import app.atomofiron.searchboxapp.model.finder.SearchTask
-import app.atomofiron.searchboxapp.model.finder.TextSearchTask
+import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
@@ -51,19 +50,18 @@ class TextViewerService(
                 }
     }
 
-    suspend fun fetchTask(ref: NodeRef, taskId: UUID): TextSearchTask? {
+    suspend fun fetchTask(ref: NodeRef, taskId: UUID): LocalSearchTask? {
         val finderTask = finderStore.tasks.find { it.uuid == taskId }
         finderTask ?: return null
         val session = findSession(ref)
         session ?: return null
-        val result = finderTask.result as SearchResult.Global
+        val result = finderTask.result
         val item = result.matches.find {
             it.uniqueId == ref.uniqueId
         } as? ItemMatch.Many
         item ?: return null
-        val task = finderTask.copy(result = Local(item.count, item.matches, item.hash))
-        @Suppress("UNCHECKED_CAST")
-        task as TextSearchTask
+        val local = LocalSearchResult(item.count, item.matches, item.hash)
+        val task = LocalSearchTask(finderTask.query, result = local, finderTask.uuid, finderTask.status, finderTask.error)
         session.tasks { add(task) }
         return task
     }
@@ -99,7 +97,7 @@ class TextViewerService(
 
     suspend fun search(ref: NodeRef, params: QueryParams) {
         val session = findSession(ref) ?: return
-        val uuid = SearchTask(params, Local())
+        val uuid = SearchTask(params, LocalSearchResult())
             .also { session.tasks { add(it) } }
             .uuid
         val result = NativeBridge.findLocalText(params, ref, asSu, NotCancelable)
@@ -111,7 +109,7 @@ class TextViewerService(
                         val index = it.line.toInt()
                         map.getOrPut(index) { mutableListOf() }.add(it)
                     }
-                    toEnded(result = Local(result.v3.size, map))
+                    toEnded(result = LocalSearchResult(result.v3.size, map, removable = false))
                 }
                 is TextSearchProgress.Skip -> toEnded()
                 is TextSearchProgress.Err -> toEnded(error = result.v1.error?.toNodeError())
@@ -134,7 +132,7 @@ class TextViewerService(
         }
     }
 
-    private inline fun TextViewerSession.update(uuid: UUID, crossinline action: TextSearchTask.() -> TextSearchTask) {
+    private inline fun TextViewerSession.update(uuid: UUID, crossinline action: LocalSearchTask.() -> LocalSearchTask) {
         scope.launchOnDefault {
             tasks {
                 val index = indexOfFirst { it.uuid == uuid }

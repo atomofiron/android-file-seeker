@@ -1,5 +1,8 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class NodeMeta(
     override val access: String = "",
     override val owner: String = "",

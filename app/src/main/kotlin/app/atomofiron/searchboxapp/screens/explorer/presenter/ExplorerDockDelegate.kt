@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer.presenter
 
 import android.Manifest.permission.POST_NOTIFICATIONS
 import androidx.work.WorkManager
-import app.atomofiron.common.util.Unreachable
+import app.atomofiron.common.util.extension.debugFailUnreachable
 import app.atomofiron.common.util.extension.launchOnMain
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
@@ -39,7 +39,7 @@ class ExplorerDockDelegate @Inject constructor(
 
     override fun onConfirmClick() {
         when (mode) {
-            is ActivityMode.Default -> Unreachable
+            is ActivityMode.Default -> debugFailUnreachable()
             is ActivityMode.Receive -> receive(mode)
             is ActivityMode.Share -> share(mode.multiple)
         }

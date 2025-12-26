@@ -4,7 +4,7 @@ import app.atomofiron.common.util.GrowingList
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
-import app.atomofiron.searchboxapp.model.finder.TextSearchTask
+import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.utils.ByteArrayBuilder
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
@@ -43,8 +43,8 @@ class TextViewerSession(
     private val _lines = MutableStateFlow<List<TextLine>>(listOf())
     val lines: StateFlow<List<TextLine>> = _lines
     val loading = MutableStateFlow(false)
-    private val _tasks = MutableStateFlow<List<TextSearchTask>>(listOf())
-    val tasks: StateFlow<List<TextSearchTask>> = _tasks
+    private val _tasks = MutableStateFlow<List<LocalSearchTask>>(listOf())
+    val tasks: StateFlow<List<LocalSearchTask>> = _tasks
 
     init {
         Charset.availableCharsets().keys.forEach { println(it) }
@@ -55,7 +55,7 @@ class TextViewerSession(
         _item.value = item
     }
 
-    suspend fun tasks(action: suspend MutableList<TextSearchTask>.() -> Unit) = mutex.withLock {
+    suspend fun tasks(action: suspend MutableList<LocalSearchTask>.() -> Unit) = mutex.withLock {
         _tasks.run {
             value = value.toMutableList()
                 .apply { action() }

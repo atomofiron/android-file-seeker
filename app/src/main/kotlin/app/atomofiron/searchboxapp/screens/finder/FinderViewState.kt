@@ -21,7 +21,7 @@ class FinderViewState @Inject constructor(
     private val scope: CoroutineScope,
     preferencesStore: PreferenceStore,
     val finderStore: FinderStore,
-    private val db: HistoryDao,
+    history: HistoryDao,
 ) : FinderItemsState by FinderItemsStateDelegate(
     isLocal = false,
     preferencesStore,
@@ -32,7 +32,7 @@ class FinderViewState @Inject constructor(
     val historyDrawerGravity = MutableStateFlow(Gravity.START)
     val insertInQuery = ChannelFlow<String>()
     val replaceQuery = ChannelFlow<String>()
-    val history: Flow<List<ItemHistory>> = db.flow
+    val history: Flow<List<ItemHistory>> = history.flow
     val showHistory = EventFlow<Unit>()
     val permissionRequiredWarning = ChannelFlow<Unit>()
 

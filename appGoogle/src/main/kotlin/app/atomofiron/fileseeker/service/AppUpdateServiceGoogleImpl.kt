@@ -10,7 +10,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.fileseeker.R
-import app.atomofiron.common.util.Unreachable
+import app.atomofiron.common.util.extension.debugFailUnreachable
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.service.ApkService
@@ -123,7 +123,7 @@ class AppUpdateServiceGoogleImpl(
         }
     }
 
-    override fun retry() = Unreachable // no AppUpdateState.Error sent
+    override fun retry() = debugFailUnreachable() // no AppUpdateState.Error sent
 
     override fun startUpdate(variant: UpdateType.Variant) {
         val appUpdateInfo = appUpdateInfo ?: return

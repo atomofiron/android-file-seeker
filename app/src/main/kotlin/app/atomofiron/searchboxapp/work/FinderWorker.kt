@@ -12,7 +12,6 @@ import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.Data
 import androidx.work.ForegroundInfo
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import app.atomofiron.common.util.GrowingList
 import app.atomofiron.common.util.extension.debug
@@ -26,17 +25,18 @@ import app.atomofiron.searchboxapp.android.flags
 import app.atomofiron.searchboxapp.android.notification
 import app.atomofiron.searchboxapp.android.tryShow
 import app.atomofiron.searchboxapp.di.DaggerInjector
+import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
-import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeHash
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
-import app.atomofiron.searchboxapp.model.finder.FilesSearchTask
+import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
+import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.QueryParams
-import app.atomofiron.searchboxapp.model.finder.SearchResult.Global
+import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
@@ -92,20 +92,16 @@ class FinderWorker(
 
     private val taskMutex = Mutex()
     // todo remove deleting files from results
-    private lateinit var task: FilesSearchTask
+    private lateinit var task: GlobalSearchTask
     private val taskId = id
     private val cancellation = object : CancellationState {
         override fun cancelled(): Boolean = !task.isProgress
     }
 
     @Inject
-    lateinit var finderStore: FinderStore
+    lateinit var store: FinderStore
     @Inject
-    lateinit var notifications: NotificationManagerCompat
-    @Inject
-    lateinit var preferenceStore: PreferenceStore
-    @Inject
-    lateinit var workManager: WorkManager
+    lateinit var db: FinderDao
 
     init {
         DaggerInjector.appComponent.inject(this)
@@ -186,8 +182,8 @@ class FinderWorker(
         if (context.canForegroundService()) {
             setForeground(getForegroundInfo())
         }
-        task = SearchTask(params.query, result = Global(params.type is Params.Text), taskId)
-        finderStore.addOrUpdate(task.upcast())
+        task = SearchTask(params.query, result = GlobalSearchResult(params.type is Params.Text), taskId)
+        store.addOrUpdate(task)
         return work(params)
     }
 
@@ -196,15 +192,15 @@ class FinderWorker(
         add("${ref.string}: ${meta.error}")
     }
 
-    private suspend inline fun update(transform: FilesSearchTask.() -> FilesSearchTask) {
+    private suspend inline fun update(transform: GlobalSearchTask.() -> GlobalSearchTask) {
         taskMutex.withLock {
             task = task.transform()
         }
-        finderStore.addOrUpdate(task.upcast())
+        store.addOrUpdate(task)
     }
 
-    private fun updateAsync(transform: FilesSearchTask.() -> FilesSearchTask) {
-        finderStore {
+    private fun updateAsync(transform: GlobalSearchTask.() -> GlobalSearchTask) {
+        store {
             update(transform)
         }
     }
@@ -212,20 +208,21 @@ class FinderWorker(
     private fun Rslt<Unit>.apply() = updateAsync {
         val error = err()?.message?.toNodeError()
         val stopped = isStopping
-        val ended = toEnded(error = error, removable = isStopping, stopped = stopped)
-        if (!isStopping) finderStore {
+        val ended = toEnded(error = error, stopped = stopped)
+        if (!isStopping) store {
             delay(Const.LONG_DELAY)
             update {
-                toEnded(removable = true, stopped = stopped)
+                ended
             }
         }
+        db.put(SearchResultCache(ended.uniqueId, stopped, ended.query, ended.result))
         ended
     }
 
     private suspend fun work(params: Params): Result {
         val dataBuilder = Data.Builder()
         try {
-            finderStore {
+            store {
                 when (val type = params.type) {
                     is Params.Text -> params.searchText(type)
                     is Params.Names -> params.searchNames(type)

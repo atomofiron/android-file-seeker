@@ -4,11 +4,13 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+private const val LEGACY_QUERY_NAME = "title"
+
 @Entity(tableName = HistoryDao.TABLE_NAME)
 data class ItemHistory(
     @PrimaryKey(autoGenerate = true)
-    var id: Long = 0,
-    @ColumnInfo(name = "title")
-    var query: String = "",
-    var pinned: Boolean = false,
+    val id: Long = 0,
+    @ColumnInfo(name = LEGACY_QUERY_NAME)
+    val query: String = "",
+    val pinned: Boolean = false,
 )
