@@ -135,6 +135,11 @@ object ExplorerUtils {
     private const val EXT_AAC = ".aac"
     private const val EXT_OGA = ".oga"
     private const val EXT_FAP = ".fap"
+    private const val EXT_RFID = ".rfid"
+    private const val EXT_SUB = ".sub"
+    private const val EXT_IR = ".ir"
+    private const val EXT_NFC = ".nfc"
+    private const val EXT_IBTN = ".ibtn"
     private const val EXT_PDF = ".pdf"
     private const val EXT_PEM = ".pem"
     private const val EXT_P12 = ".p12"
@@ -331,6 +336,11 @@ object ExplorerUtils {
             mimeType.startsWith(FILE_PICTURE) -> content.ifMismatches { NodeContent.Picture.resolve(mimeType) }
             mimeType.startsWith(FILE_TEXT) -> when {
                 name.hasExt(EXT_SVG) -> content.ifMismatches { NodeContent.Text.Svg }
+                name.hasExt(EXT_NFC) -> content.ifMismatches { NodeContent.Text.Nfc }
+                name.hasExt(EXT_IR) -> content.ifMismatches { NodeContent.Text.Ir }
+                name.hasExt(EXT_IBTN) -> content.ifMismatches { NodeContent.Text.Ibtn }
+                name.hasExt(EXT_SUB) -> content.ifMismatches { NodeContent.Text.Sub }
+                name.hasExt(EXT_RFID) -> content.ifMismatches { NodeContent.Text.Rfid }
                 name == EXT_GIT -> content.ifMismatches { NodeContent.Text.Gitignore }
                 name.hasExt(EXT_OSU) -> content.ifMismatches { NodeContent.Text.Osu }
                 name.hasExt(EXT_CPP) -> content.ifMismatches { NodeContent.Text.Cpp }
