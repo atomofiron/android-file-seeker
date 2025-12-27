@@ -19,6 +19,7 @@ import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.resolve
+import app.atomofiron.searchboxapp.utils.updateDrawables
 import lib.atomofiron.insets.insetsPadding
 import javax.inject.Inject
 
@@ -55,7 +56,7 @@ class AboutDelegate @Inject constructor(
         githubIcon.setTint(tint)
         resolveTelegramInfo()
             ?.apply { setBounds(0, 0, githubIcon.intrinsicWidth, githubIcon.intrinsicHeight) }
-            ?.let { discuss.setCompoundDrawablesRelative(it, null, null, null) }
+            ?.let { discuss.updateDrawables(start = it) }
             ?: discuss.compoundDrawablesRelative[0].setTint(tint)
 
         available = context.resolve(Intents.forPda)

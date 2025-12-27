@@ -25,6 +25,7 @@ import android.view.ViewGroup.LayoutParams
 import android.view.ViewParent
 import android.view.WindowManager
 import android.webkit.WebView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
@@ -235,6 +236,13 @@ inline operator fun <reified P : LayoutParams> View.invoke() = layoutParams as P
 inline operator fun <reified P : LayoutParams> View.invoke(action: P.() -> Unit) = action(this<P>())
 
 fun Resources.isRtl(): Boolean = configuration.layoutDirection == LayoutDirection.RTL
+
+fun TextView.updateDrawables(
+    start: Drawable? = compoundDrawablesRelative[0],
+    top: Drawable? = compoundDrawablesRelative[1],
+    end: Drawable? = compoundDrawablesRelative[2],
+    bottom: Drawable? = compoundDrawablesRelative[3],
+) = setCompoundDrawablesRelative(start, top, end, bottom)
 
 fun RecyclerView.scrollToTop(): Boolean {
     if (isEmpty()) return false
