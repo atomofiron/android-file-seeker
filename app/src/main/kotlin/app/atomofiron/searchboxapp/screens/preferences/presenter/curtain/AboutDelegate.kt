@@ -5,8 +5,6 @@ import android.content.pm.ResolveInfo
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
-import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainAboutBinding
 import app.atomofiron.searchboxapp.android.Intents
@@ -18,7 +16,11 @@ import app.atomofiron.searchboxapp.screens.preferences.PreferenceRouter
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.colorAttr
+import app.atomofiron.searchboxapp.utils.drawableEnd
+import app.atomofiron.searchboxapp.utils.drawableStart
 import app.atomofiron.searchboxapp.utils.resolve
+import app.atomofiron.searchboxapp.utils.resources
 import app.atomofiron.searchboxapp.utils.updateDrawables
 import lib.atomofiron.insets.insetsPadding
 import javax.inject.Inject
@@ -51,13 +53,15 @@ class AboutDelegate @Inject constructor(
         var available = context.resolve(Intents.github)
         github.isEnabled = available
         github.alpha = Alpha.enabled(available)
-        val tint = context.findColorByAttr(MaterialAttr.colorOnSurface)
-        val githubIcon = github.compoundDrawablesRelative[0]
-        githubIcon.setTint(tint)
-        resolveTelegramInfo()
-            ?.apply { setBounds(0, 0, githubIcon.intrinsicWidth, githubIcon.intrinsicHeight) }
-            ?.let { discuss.updateDrawables(start = it) }
-            ?: discuss.compoundDrawablesRelative[0].setTint(tint)
+        val tint = context.colorAttr(R.attr.colorContent)
+        github.drawableStart?.setTint(tint)
+        github.drawableEnd?.setTint(tint)
+        discuss.drawableEnd?.setTint(tint)
+        resolveTelegramInfo()?.also { icon ->
+            val size = resources.getDimensionPixelSize(R.dimen.icon_size)
+            icon.setBounds(0, 0, size, size)
+            discuss.updateDrawables(start = icon)
+        } ?: discuss.drawableStart?.setTint(tint)
 
         available = context.resolve(Intents.forPda)
         discuss.isEnabled = available

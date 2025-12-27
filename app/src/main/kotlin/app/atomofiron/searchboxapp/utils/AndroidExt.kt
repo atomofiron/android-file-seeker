@@ -7,6 +7,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.Color
 import android.graphics.drawable.Drawable
@@ -236,6 +237,18 @@ inline operator fun <reified P : LayoutParams> View.invoke() = layoutParams as P
 inline operator fun <reified P : LayoutParams> View.invoke(action: P.() -> Unit) = action(this<P>())
 
 fun Resources.isRtl(): Boolean = configuration.layoutDirection == LayoutDirection.RTL
+
+val TextView.drawableStart: Drawable? get() = compoundDrawablesRelative[0]
+
+val TextView.drawableTop: Drawable? get() = compoundDrawablesRelative[1]
+
+val TextView.drawableEnd: Drawable? get() = compoundDrawablesRelative[2]
+
+val TextView.drawableBottom: Drawable? get() = compoundDrawablesRelative[3]
+
+var TextView.drawableTintList: ColorStateList? get() = compoundDrawableTintList
+    @SuppressLint("UseCompatTextViewDrawableApis") // SDK_INT >= 24: textView.setCompoundDrawableTintList(tint);
+    set(value) { compoundDrawableTintList = value }
 
 fun TextView.updateDrawables(
     start: Drawable? = compoundDrawablesRelative[0],
