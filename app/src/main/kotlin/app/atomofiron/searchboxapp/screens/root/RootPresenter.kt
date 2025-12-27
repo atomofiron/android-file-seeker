@@ -2,8 +2,10 @@ package app.atomofiron.searchboxapp.screens.root
 
 import app.atomofiron.common.arch.BasePresenter
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-class RootPresenter(
+@RootScope
+class RootPresenter @Inject constructor(
     scope: CoroutineScope,
     router: RootRouter,
 ) : BasePresenter<RootViewModel, RootRouter>(scope, router) {

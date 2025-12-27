@@ -7,8 +7,10 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.common.RootRouting
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerFragment
 import app.atomofiron.searchboxapp.screens.finder.FinderFragment
+import javax.inject.Inject
 
-class RootRouter(property: WeakProperty<out Fragment>) : BaseRouter(property), RootRouting {
+@RootScope
+class RootRouter @Inject constructor(property: WeakProperty<out Fragment>) : BaseRouter(property), RootRouting {
 
     override val currentDestinationId = R.id.rootFragment
 

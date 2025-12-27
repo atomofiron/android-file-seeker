@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.screens.root
 
-import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-class RootViewState(
-    private val scope: CoroutineScope,
-)
+@RootScope
+class RootViewState @Inject constructor()

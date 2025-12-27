@@ -5,10 +5,10 @@ import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.screens.common.RootRouting
 import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
+import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
-import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
@@ -35,30 +35,11 @@ interface RootComponent {
 }
 
 @Module
-class RootModule {
+abstract class RootModule {
 
-    @Provides
+    @Binds
     @RootScope
-    fun presenter(
-        scope: CoroutineScope,
-        router: RootRouter,
-    ): RootPresenter {
-        return RootPresenter(scope, router)
-    }
-
-    @Provides
-    @RootScope
-    fun router(
-        fragment: WeakProperty<out Fragment>,
-    ): RootRouter = RootRouter(fragment)
-
-    @Provides
-    @RootScope
-    fun rootRouting(router: RootRouter): RootRouting = router
-
-    @Provides
-    @RootScope
-    fun viewState(scope: CoroutineScope): RootViewState = RootViewState(scope)
+    abstract fun rootRouting(router: RootRouter): RootRouting
 }
 
 interface RootDependencies {
