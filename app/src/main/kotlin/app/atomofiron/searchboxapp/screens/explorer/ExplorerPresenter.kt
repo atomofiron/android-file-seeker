@@ -5,7 +5,7 @@ import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.valueOrNull
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
-import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
+import app.atomofiron.searchboxapp.screens.explorer.di.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot

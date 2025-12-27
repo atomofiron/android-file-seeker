@@ -5,7 +5,7 @@ import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
-import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
+import app.atomofiron.searchboxapp.screens.explorer.di.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node

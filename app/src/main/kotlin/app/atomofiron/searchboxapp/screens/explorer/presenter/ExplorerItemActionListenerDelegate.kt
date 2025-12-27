@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer.presenter
 
 import app.atomofiron.common.util.AlertErr
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.di.dependencies.interactor.ExplorerInteractor
+import app.atomofiron.searchboxapp.screens.explorer.di.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
