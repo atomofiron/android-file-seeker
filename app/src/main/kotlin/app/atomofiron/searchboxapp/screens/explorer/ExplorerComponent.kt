@@ -53,6 +53,12 @@ class ExplorerModule {
 
     @Provides
     @ExplorerScope
+    fun storagePermissionDelegate(property: WeakProperty<out Fragment>): StoragePermissionDelegate {
+        return StoragePermissionDelegate(property)
+    }
+
+    @Provides
+    @ExplorerScope
     fun activity(property: WeakProperty<out Fragment>): ActivityProperty {
         return property.map { it?.activity }
     }

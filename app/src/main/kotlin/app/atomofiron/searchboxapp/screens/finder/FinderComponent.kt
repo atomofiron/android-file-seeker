@@ -46,6 +46,12 @@ class FinderModule {
 
     @Provides
     @FinderScope
+    fun storagePermissionDelegate(property: WeakProperty<out Fragment>): StoragePermissionDelegate {
+        return StoragePermissionDelegate(property)
+    }
+
+    @Provides
+    @FinderScope
     fun registerable(
         router: FinderRouter,
         storagePermissionDelegate: StoragePermissionDelegate,
