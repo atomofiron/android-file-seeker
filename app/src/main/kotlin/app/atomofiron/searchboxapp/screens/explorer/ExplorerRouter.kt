@@ -11,8 +11,10 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
+import javax.inject.Inject
 
-class ExplorerRouter(
+@ExplorerScope
+class ExplorerRouter @Inject constructor(
     property: WeakProperty<out Fragment>,
     private val sharing: FileSharingDelegate,
 ) : BaseRouter(property), Registerable {

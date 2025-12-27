@@ -19,8 +19,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
+import javax.inject.Inject
 
-class ExplorerViewState(
+@ExplorerScope
+class ExplorerViewState @Inject constructor(
     private val scope: CoroutineScope,
     val mode: ActivityMode,
     dockDelegate: ExplorerDockDelegate,

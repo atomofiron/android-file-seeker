@@ -13,9 +13,12 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.permission.PermissionDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.android.Intents
+import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
 import app.atomofiron.searchboxapp.utils.canManageFiles
+import javax.inject.Inject
 
-class StoragePermissionDelegate(
+@ExplorerScope
+class StoragePermissionDelegate @Inject constructor(
     private val fragment: WeakProperty<out Fragment>,
 ) : ActivityResultCallback<ActivityResult>, Registerable {
 

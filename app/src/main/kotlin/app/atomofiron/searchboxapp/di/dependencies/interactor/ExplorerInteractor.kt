@@ -8,10 +8,12 @@ import app.atomofiron.searchboxapp.model.explorer.ExplorerTabKey
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
+import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.move
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 sealed class Cell<T> {
     open val value: T get() = throw Exception()
@@ -49,7 +51,8 @@ class Chain<T : Any> {
     }
 }
 
-class ExplorerInteractor(
+@ExplorerScope
+class ExplorerInteractor @Inject constructor(
     private val scope: CoroutineScope,
     private val service: ExplorerService,
     private val store: ExplorerStore,

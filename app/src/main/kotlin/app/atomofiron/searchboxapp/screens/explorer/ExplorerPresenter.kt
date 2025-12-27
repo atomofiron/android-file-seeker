@@ -16,8 +16,10 @@ import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDel
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerDockListener
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerDockDelegate
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-class ExplorerPresenter(
+@ExplorerScope
+class ExplorerPresenter @Inject constructor(
     scope: CoroutineScope,
     private val viewState: ExplorerViewState,
     router: ExplorerRouter,

@@ -8,11 +8,14 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
+import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerViewState
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.utils.Rslt
+import javax.inject.Inject
 
-class ExplorerItemActionListenerDelegate(
+@ExplorerScope
+class ExplorerItemActionListenerDelegate @Inject constructor(
     private val viewState: ExplorerViewState,
     private val operations: FileOperationsDelegate,
     private val menuListenerDelegate: ExplorerCurtainMenuDelegate,

@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
+import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerViewState
 import app.atomofiron.searchboxapp.screens.explorer.curtain.CloneDelegate
 import app.atomofiron.searchboxapp.screens.explorer.curtain.CreateDelegate
@@ -23,13 +24,15 @@ import app.atomofiron.searchboxapp.screens.explorer.curtain.OptionsDelegate
 import app.atomofiron.searchboxapp.screens.explorer.curtain.RenameDelegate
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isParentOf
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
 private const val OPTIONS = 111
 private const val CREATE = 222
 private const val RENAME = 333
 private const val CLONE = 444
 
-class ExplorerCurtainMenuDelegate(
+@ExplorerScope
+class ExplorerCurtainMenuDelegate @Inject constructor(
     scope: CoroutineScope,
     private val viewState: ExplorerViewState,
     private val router: ExplorerRouter,
