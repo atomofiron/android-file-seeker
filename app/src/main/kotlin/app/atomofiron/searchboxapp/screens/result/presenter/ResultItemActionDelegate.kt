@@ -4,7 +4,6 @@ import app.atomofiron.common.util.AlertErr
 import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -16,6 +15,7 @@ import app.atomofiron.searchboxapp.screens.result.ResultScope
 import app.atomofiron.searchboxapp.screens.result.ResultViewState
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
+import app.atomofiron.searchboxapp.screens.result.di.ResultInteractor
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.toAlert
 import kotlinx.coroutines.CoroutineScope

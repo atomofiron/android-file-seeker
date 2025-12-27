@@ -7,7 +7,6 @@ import app.atomofiron.common.util.extension.debugFailUnreachable
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.extension.mapCast
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.di.dependencies.interactor.ResultInteractor
 import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.router.startReceiveInto
@@ -17,6 +16,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
+import app.atomofiron.searchboxapp.screens.result.di.ResultInteractor
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultItemActionDelegate
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import app.atomofiron.searchboxapp.utils.formatDate

@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.di.dependencies.interactor
+package app.atomofiron.searchboxapp.screens.result.di
 
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
