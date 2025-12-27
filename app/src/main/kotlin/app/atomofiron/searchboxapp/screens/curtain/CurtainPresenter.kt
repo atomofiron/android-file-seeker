@@ -10,8 +10,10 @@ import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
+import javax.inject.Inject
 
-class CurtainPresenter(
+@CurtainScope
+class CurtainPresenter @Inject constructor(
     private val params: CurtainPresenterParams,
     private val viewState: CurtainViewState,
     router: CurtainRouter,

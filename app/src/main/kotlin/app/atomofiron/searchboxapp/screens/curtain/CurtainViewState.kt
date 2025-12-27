@@ -8,9 +8,11 @@ import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
+import javax.inject.Inject
 
-class CurtainViewState(
-    private val params: CurtainPresenterParams,
+@CurtainScope
+class CurtainViewState @Inject constructor(
+    params: CurtainPresenterParams,
     val scope: CoroutineScope,
 ) {
 
