@@ -1,20 +1,23 @@
 package app.atomofiron.searchboxapp.di.dependencies.store
 
 import app.atomofiron.common.util.extension.put
+import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
 import app.atomofiron.searchboxapp.utils.mutate
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class FinderStore(
-    private val scope: CoroutineScope,
+@Singleton
+class FinderStore @Inject constructor(
+    private val scope: AppScope,
 ) {
     private val mutex = Mutex()
     private val _tasksFlow = MutableStateFlow(listOf<GlobalSearchTask>())

@@ -9,6 +9,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import app.atomofiron.common.util.extension.launchOnMain
 import app.atomofiron.common.util.flow.StateFlowProperty
 import app.atomofiron.common.util.flow.asProperty
+import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchOptionsImpl
 import app.atomofiron.searchboxapp.model.finder.toInt
@@ -51,6 +52,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
@@ -60,9 +63,10 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     },
 )
 
-class PreferenceStore(
+@Singleton
+class PreferenceStore @Inject constructor(
     private val context: Context,
-    private val scope: CoroutineScope,
+    private val scope: AppScope,
 ) : DataStore<Preferences> by context.dataStore {
 
     private lateinit var preferences: Preferences

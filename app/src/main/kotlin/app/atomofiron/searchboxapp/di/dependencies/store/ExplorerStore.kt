@@ -8,8 +8,11 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ExplorerStore {
+@Singleton
+class ExplorerStore @Inject constructor() {
 
     val firstTab = NodeTabKey.Explorer(0)
     val middleTab = NodeTabKey.Explorer(1)

@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.android.WebClient
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.delegate.StorageDelegate
+import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
@@ -19,35 +20,39 @@ import debug.LeakWatcher
 import javax.inject.Singleton
 
 @Module
-open class CommonModule {
+class CommonModule {
 
     @Provides
     @Singleton
-    open fun provideInitialDelegate(context: Context, packageManager: PackageManager): InitialDelegate {
+    fun appResources(context: Context) = AppResources(context.resources)
+
+    @Provides
+    @Singleton
+    fun provideInitialDelegate(context: Context, packageManager: PackageManager): InitialDelegate {
         return InitialDelegate(context, packageManager)
     }
 
     @Provides
     @Singleton
-    open fun provideNotificationManager(context: Context): NotificationManagerCompat {
+    fun provideNotificationManager(context: Context): NotificationManagerCompat {
         return NotificationManagerCompat.from(context)
     }
 
     @Provides
     @Singleton
-    open fun provideWorkManager(context: Context): WorkManager {
+    fun provideWorkManager(context: Context): WorkManager {
         return WorkManager.getInstance(context)
     }
 
     @Provides
     @Singleton
-    open fun provideClipboardManager(context: Context): ClipboardManager {
+    fun provideClipboardManager(context: Context): ClipboardManager {
         return context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
     }
 
     @Provides
     @Singleton
-    open fun provideCoroutineScope(): AppScope {
+    fun provideCoroutineScope(): AppScope {
         return AppScope()
     }
 
@@ -63,12 +68,12 @@ open class CommonModule {
 
     @Provides
     @Singleton
-    open fun provideStorageDelegate(
+    fun provideStorageDelegate(
         context: Context,
         store: ExplorerStore,
     ): StorageDelegate = StorageDelegate(context, store)
 
     @Provides
     @Singleton
-    open fun provideWebClient() = WebClient()
+    fun provideWebClient() = WebClient()
 }

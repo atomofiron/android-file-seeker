@@ -3,8 +3,12 @@ package app.atomofiron.searchboxapp.di.dependencies.store
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AppUpdateStore {
+@Singleton
+class AppUpdateStore @Inject constructor() {
+
     private var fallback: AppUpdateState = AppUpdateState.Unknown
     private val _state = MutableStateFlow<AppUpdateState>(AppUpdateState.Unknown)
     val state: StateFlow<AppUpdateState> = _state
