@@ -5,8 +5,11 @@ import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ApkChannel(
+@Singleton
+class ApkChannel @Inject constructor(
     private val appScope: AppScope,
     private val resources: AppResources,
 ) {

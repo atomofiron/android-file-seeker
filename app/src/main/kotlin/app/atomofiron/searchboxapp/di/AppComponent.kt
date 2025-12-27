@@ -8,7 +8,6 @@ import android.content.res.AssetManager
 import app.atomofiron.searchboxapp.android.AbstractApp
 import app.atomofiron.searchboxapp.android.InstallReceiver
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
-import app.atomofiron.searchboxapp.di.module.ChannelModule
 import app.atomofiron.searchboxapp.di.module.CommonModule
 import app.atomofiron.searchboxapp.di.module.DaoModule
 import app.atomofiron.searchboxapp.di.module.ServiceModule
@@ -31,7 +30,6 @@ import debug.LeakWatcher
 import javax.inject.Singleton
 
 @Component(modules = [
-    ChannelModule::class,
     CommonModule::class,
     ServiceModule::class,
     StoreModule::class,

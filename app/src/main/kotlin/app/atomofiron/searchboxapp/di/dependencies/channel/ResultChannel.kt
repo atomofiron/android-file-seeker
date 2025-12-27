@@ -1,3 +1,7 @@
 package app.atomofiron.searchboxapp.di.dependencies.channel
 
-class ResultChannel
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class ResultChannel @Inject constructor()
