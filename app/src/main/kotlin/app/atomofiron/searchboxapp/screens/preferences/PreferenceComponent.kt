@@ -20,6 +20,7 @@ import app.atomofiron.searchboxapp.screens.preferences.presenter.ExportImportPre
 import app.atomofiron.searchboxapp.screens.preferences.presenter.PreferenceClickPresenterDelegate
 import app.atomofiron.searchboxapp.screens.preferences.presenter.UpdatePresenterDelegate
 import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExportImportDelegate
+import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
@@ -50,23 +51,26 @@ interface PreferenceComponent {
 }
 
 @Module
-class PreferenceModule {
+abstract class PreferenceModule {
 
-    @Provides
+    @Binds
     @PreferenceScope
-    fun exportImportPresenterDelegate(impl: ExportImportPresenterDelegate): ExportImportDelegate.ExportImportOutput = impl
+    abstract fun exportImportPresenterDelegate(impl: ExportImportPresenterDelegate): ExportImportDelegate.ExportImportOutput
 
-    @Provides
+    @Binds
     @PreferenceScope
-    fun preferenceClickOutput(impl: PreferenceClickPresenterDelegate): PreferenceClickOutput = impl
+    abstract fun preferenceClickOutput(impl: PreferenceClickPresenterDelegate): PreferenceClickOutput
 
-    @Provides
+    @Binds
     @PreferenceScope
-    fun updatePresenterDelegate(impl: UpdatePresenterDelegate): UpdateActionListener = impl
+    abstract fun updatePresenterDelegate(impl: UpdatePresenterDelegate): UpdateActionListener
 
-    @Provides
-    @PreferenceScope
-    fun activity(property: WeakProperty<out Fragment>): ActivityProperty = property.map { it?.activity }
+    companion object {
+
+        @Provides
+        @PreferenceScope
+        fun activity(property: WeakProperty<out Fragment>): ActivityProperty = property.map { it?.activity }
+    }
 }
 
 interface PreferenceDependencies {
