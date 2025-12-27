@@ -6,7 +6,7 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
-import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.screens.explorer.di.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
@@ -38,7 +38,7 @@ class ExplorerCurtainMenuDelegate @Inject constructor(
     private val router: ExplorerRouter,
     private val explorerStore: ExplorerStore,
     private val interactor: ExplorerInteractor,
-    private val apkInteractor: ApkInteractor,
+    private val apks: ApkDelegate,
     private val utils: UtilService,
     private val sharing: FileSharingDelegate,
     curtainChannel: CurtainChannel,
@@ -96,8 +96,8 @@ class ExplorerCurtainMenuDelegate @Inject constructor(
             Operations.Delete.id -> onRemoveConfirm(items)
             Operations.Share.id -> sharing.shareWith(items.filter { it.isFile })
             Operations.OpenWith.id -> sharing.openWith(items.first())
-            Operations.InstallApp.id -> apkInteractor.install(items.first(), viewState.currentTab.value)
-            Operations.LaunchApp.id -> apkInteractor.launch(items.first())
+            Operations.InstallApp.id -> apks.install(items.first(), viewState.currentTab.value)
+            Operations.LaunchApp.id -> apks.launch(items.first())
             Operations.UseAs.id -> utils.useAs(options.items.first())
             Operations.CopyPath.id -> {
                 interactor.copyToClipboard(items.first())

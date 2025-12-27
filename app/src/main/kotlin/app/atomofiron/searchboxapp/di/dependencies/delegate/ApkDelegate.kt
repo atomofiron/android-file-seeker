@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.di.dependencies.interactor
+package app.atomofiron.searchboxapp.di.dependencies.delegate
 
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.searchboxapp.android.Intents
@@ -14,8 +14,11 @@ import app.atomofiron.searchboxapp.utils.Rslt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ApkInteractor(
+@Singleton
+class ApkDelegate @Inject constructor(
     private val scope: CoroutineScope,
     private val apkService: ApkService,
     private val explorerService: ExplorerService,

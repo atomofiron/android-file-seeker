@@ -11,7 +11,6 @@ import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.module.ChannelModule
 import app.atomofiron.searchboxapp.di.module.CommonModule
 import app.atomofiron.searchboxapp.di.module.DaoModule
-import app.atomofiron.searchboxapp.di.module.InteractorModule
 import app.atomofiron.searchboxapp.di.module.ServiceModule
 import app.atomofiron.searchboxapp.di.module.StoreModule
 import app.atomofiron.searchboxapp.model.AppSource
@@ -36,7 +35,6 @@ import javax.inject.Singleton
     CommonModule::class,
     ServiceModule::class,
     StoreModule::class,
-    InteractorModule::class,
     DaoModule::class,
     //NetworkModule::class, I'll be back...
 ])

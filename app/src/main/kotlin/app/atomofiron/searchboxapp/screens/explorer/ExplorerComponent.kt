@@ -10,11 +10,7 @@ import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
-import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
-import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
-import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
-import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
@@ -71,15 +67,11 @@ class ExplorerModule {
     ) = Registerable(router, storagePermissionDelegate)
 }
 
-interface ExplorerDependencies {
+interface ExplorerDependencies : DelegateModule.Dependencies {
     fun context(): Context
     fun assetManager(): AssetManager
-    fun explorerService(): ExplorerService
-    fun utilService(): UtilService
     fun explorerStore(): ExplorerStore
-    fun preferenceStore(): PreferenceStore
     fun curtainChannel(): CurtainChannel
-    fun apkInteractor(): ApkInteractor
     fun mainChannel(): CommonChannel
     fun preferenceChannel(): PreferenceChannel
     fun workManager(): WorkManager

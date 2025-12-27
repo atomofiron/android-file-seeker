@@ -7,7 +7,7 @@ import app.atomofiron.common.util.flow.collect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
-import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
@@ -25,7 +25,7 @@ class ResultCurtainMenuDelegate @Inject constructor(
     scope: CoroutineScope,
     private val router: ResultRouter,
     private val interactor: ResultInteractor,
-    private val apks: ApkInteractor,
+    private val apks: ApkDelegate,
     curtainChannel: CurtainChannel,
     private val utils: UtilService,
     private val sharing: FileSharingDelegate,

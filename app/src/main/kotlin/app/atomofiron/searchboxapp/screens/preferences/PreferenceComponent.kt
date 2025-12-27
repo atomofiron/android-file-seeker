@@ -73,11 +73,10 @@ abstract class PreferenceModule {
     }
 }
 
-interface PreferenceDependencies {
+interface PreferenceDependencies : DelegateModule.Dependencies {
     fun appSource(): AppSource
     fun appResources(): AppResources
     fun preferenceChannel(): PreferenceChannel
-    fun preferenceStore(): PreferenceStore
     fun context(): Context
     fun curtainChannel(): CurtainChannel
     fun appWatcherProxy(): LeakWatcher

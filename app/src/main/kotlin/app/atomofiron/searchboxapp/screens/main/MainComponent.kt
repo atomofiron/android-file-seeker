@@ -5,16 +5,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
-import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
-import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.AndroidStore
 import app.atomofiron.searchboxapp.di.dependencies.store.AppStore
 import app.atomofiron.searchboxapp.di.dependencies.store.AppStoreConsumer
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
-import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import dagger.Binds
@@ -65,13 +61,9 @@ abstract class MainModule {
     abstract fun provideAppStoreConsumer(androidStore: AndroidStore): AppStoreConsumer
 }
 
-interface MainDependencies {
+interface MainDependencies : DelegateModule.Dependencies {
     fun context(): Context
-    fun preferenceStore(): PreferenceStore
-    fun apkChannel (): ApkChannel
     fun initialDelegate(): InitialDelegate
     fun appUpdateService(): AppUpdateService
     fun appUpdateStore(): AppUpdateStore
-    fun apks(): ApkInteractor
-    fun utils(): UtilService
 }

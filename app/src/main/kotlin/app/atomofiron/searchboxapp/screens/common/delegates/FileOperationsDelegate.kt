@@ -12,7 +12,7 @@ import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.menu.LongItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
-import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -44,7 +44,7 @@ private val readWrite = listOf(Operations.Create, Operations.Duplicate, Operatio
 
 class FileOperationsDelegate(
     preferences: PreferenceStore,
-    private val apks: ApkInteractor,
+    private val apks: ApkDelegate,
     private val dialogs: DialogDelegate,
     private val utils: UtilService,
 ) {

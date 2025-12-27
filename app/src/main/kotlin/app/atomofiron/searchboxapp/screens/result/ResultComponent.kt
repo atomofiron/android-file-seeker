@@ -6,13 +6,9 @@ import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.ResultChannel
-import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
-import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
-import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
-import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.dependencies.store.ResultStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
@@ -59,14 +55,10 @@ class ResultModule {
     }
 }
 
-interface ResultDependencies {
+interface ResultDependencies : DelegateModule.Dependencies {
     fun appResources(): AppResources
     fun finderStore(): FinderStore
-    fun preferenceStore(): PreferenceStore
-    fun resultService(): UtilService
-    fun explorerService(): ExplorerService
     fun finderService(): FinderService
-    fun apkInteractor(): ApkInteractor
     fun resultStore(): ResultStore
     fun resultChannel(): ResultChannel
     fun curtainChannel(): CurtainChannel
