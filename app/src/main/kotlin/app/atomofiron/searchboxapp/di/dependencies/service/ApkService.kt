@@ -19,8 +19,11 @@ import java.io.BufferedInputStream
 import java.io.FileInputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class ApkService(
+@Singleton
+class ApkService @Inject constructor(
     private val context: Context,
     private val installer: PackageInstaller,
 ) {

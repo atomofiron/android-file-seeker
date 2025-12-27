@@ -78,6 +78,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.joinAll
 import kotlinx.coroutines.launch
+import javax.inject.Inject
+import javax.inject.Singleton
 
 private const val SUB_PATH_CAMERA = "DCIM/Camera"
 private const val SUB_PATH_PIC_SCREENSHOTS = "Pictures/Screenshots"
@@ -86,7 +88,8 @@ private const val SUB_PATH_DOWNLOAD = "Download"
 private const val SUB_PATH_DOWNLOAD_BLUETOOTH = "Download/Bluetooth"
 private const val SUB_PATH_BLUETOOTH = "Bluetooth"
 
-class ExplorerService(
+@Singleton
+class ExplorerService @Inject constructor(
     private val context: Context,
     private val appScope: AppScope,
     private val store: ExplorerStore,

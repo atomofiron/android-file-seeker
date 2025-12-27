@@ -8,6 +8,7 @@ import androidx.work.WorkManager
 import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.launchOnDefault
 import app.atomofiron.common.util.flow.collect
+import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
@@ -19,11 +20,13 @@ import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.work.FinderWorker
-import kotlinx.coroutines.CoroutineScope
 import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class FinderService(
-    scope: CoroutineScope,
+@Singleton
+class FinderService @Inject constructor(
+    scope: AppScope,
     private val workManager: WorkManager,
     private val notificationManager: NotificationManagerCompat,
     private val store: FinderStore,

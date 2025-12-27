@@ -13,8 +13,11 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.utils.getUriForFile
 import java.io.File
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class UtilService(
+@Singleton
+class UtilService @Inject constructor(
     private val context: Context,
     resources: AppResources,
     private val clipboardManager: ClipboardManager,
