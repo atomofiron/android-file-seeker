@@ -10,18 +10,25 @@ import app.atomofiron.searchboxapp.android.verifyNativeBin
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
-import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceRouter
+import app.atomofiron.searchboxapp.screens.preferences.PreferenceScope
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
-import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.*
+import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.AboutDelegate
+import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ColorSchemeDelegate
+import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExplorerItemDelegate
+import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExportImportDelegate
+import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.JoystickDelegate
 import app.atomofiron.searchboxapp.utils.Const.LF
 import app.atomofiron.searchboxapp.utils.Rslt
+import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-class PreferenceClickPresenterDelegate(
+@PreferenceScope
+class PreferenceClickPresenterDelegate @Inject constructor(
     private val context: Context,
     scope: CoroutineScope,
     private val viewState: PreferenceViewState,
@@ -30,8 +37,8 @@ class PreferenceClickPresenterDelegate(
     private val preferenceStore: PreferenceStore,
     curtainChannel: CurtainChannel,
     resources: AppResources,
-    appSource: AppSource,
     private val dialogs: DialogDelegate,
+    private val aboutDelegate: Lazy<AboutDelegate>,
 ) : Recipient, PreferenceClickOutput {
 
     val resources by resources
@@ -40,7 +47,7 @@ class PreferenceClickPresenterDelegate(
         curtainChannel.flow.collectForMe(scope) { controller ->
             controller ?: return@collectForMe
             val adapter: CurtainApi.Adapter<*> = when (controller.requestId) {
-                R.layout.curtain_about -> AboutDelegate(router, appSource)
+                R.layout.curtain_about -> aboutDelegate.get()
                 R.layout.curtain_preference_export_import -> ExportImportDelegate(exportImportDelegate)
                 R.layout.curtain_preference_explorer_item -> ExplorerItemDelegate(preferenceStore, resources)
                 R.layout.curtain_preference_joystick -> JoystickDelegate(preferenceStore)

@@ -9,8 +9,10 @@ import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExportI
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PreferencePresenter(
+@PreferenceScope
+class PreferencePresenter @Inject constructor(
     scope: CoroutineScope,
     private val viewState: PreferenceViewState,
     router: PreferenceRouter,

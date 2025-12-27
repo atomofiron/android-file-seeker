@@ -2,9 +2,12 @@ package app.atomofiron.searchboxapp.di.dependencies.service
 
 import android.content.Context
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.preferences.PreferenceScope
 import app.atomofiron.searchboxapp.utils.Rslt
+import javax.inject.Inject
 
-class PreferenceService(
+@PreferenceScope
+class PreferenceService @Inject constructor(
     val context: Context,
     val preferenceStore: PreferenceStore,
 ) {

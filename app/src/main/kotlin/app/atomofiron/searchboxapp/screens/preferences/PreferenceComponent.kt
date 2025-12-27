@@ -1,16 +1,15 @@
 package app.atomofiron.searchboxapp.screens.preferences
 
 import android.content.Context
+import android.content.pm.PackageManager
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.ActivityProperty
-import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.custom.preference.UpdateActionListener
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
-import app.atomofiron.searchboxapp.di.dependencies.service.PreferenceService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -55,96 +54,19 @@ class PreferenceModule {
 
     @Provides
     @PreferenceScope
-    fun exportImportPresenterDelegate(
-        scope: CoroutineScope,
-        viewState: PreferenceViewState,
-        preferenceService: PreferenceService,
-        preferenceChannel: PreferenceChannel,
-        dialogs: DialogDelegate,
-    ): ExportImportDelegate.ExportImportOutput {
-        return ExportImportPresenterDelegate(scope, viewState, preferenceService, preferenceChannel, dialogs)
-    }
+    fun exportImportPresenterDelegate(impl: ExportImportPresenterDelegate): ExportImportDelegate.ExportImportOutput = impl
 
     @Provides
     @PreferenceScope
-    fun preferenceClickPresenterDelegate(
-        context: Context,
-        scope: CoroutineScope,
-        viewState: PreferenceViewState,
-        router: PreferenceRouter,
-        exportImportDelegate: ExportImportDelegate.ExportImportOutput,
-        preferenceStore: PreferenceStore,
-        curtainChannel: CurtainChannel,
-        resources: AppResources,
-        appSource: AppSource,
-        dialogs: DialogDelegate,
-    ): PreferenceClickOutput {
-        return PreferenceClickPresenterDelegate(
-            context,
-            scope,
-            viewState,
-            router,
-            exportImportDelegate,
-            preferenceStore,
-            curtainChannel,
-            resources,
-            appSource,
-            dialogs,
-        )
-    }
+    fun preferenceClickOutput(impl: PreferenceClickPresenterDelegate): PreferenceClickOutput = impl
 
     @Provides
     @PreferenceScope
-    fun updatePresenterDelegate(service: AppUpdateService): UpdateActionListener {
-        return UpdatePresenterDelegate(service)
-    }
-
-    @Provides
-    @PreferenceScope
-    fun presenter(
-        scope: CoroutineScope,
-        viewState: PreferenceViewState,
-        router: PreferenceRouter,
-        exportImportDelegate: ExportImportDelegate.ExportImportOutput,
-        preferenceClickOutput: PreferenceClickOutput,
-        preferenceStore: PreferenceStore,
-        updateDelegate: UpdateActionListener,
-    ): PreferencePresenter {
-        return PreferencePresenter(
-            scope,
-            viewState,
-            router,
-            exportImportDelegate,
-            preferenceClickOutput,
-            preferenceStore,
-            updateDelegate,
-        )
-    }
-
-    @Provides
-    @PreferenceScope
-    fun preferenceService(context: Context, preferenceStore: PreferenceStore): PreferenceService {
-        return PreferenceService(context, preferenceStore)
-    }
-
-    @Provides
-    @PreferenceScope
-    fun router(fragment: WeakProperty<out Fragment>): PreferenceRouter = PreferenceRouter(fragment)
+    fun updatePresenterDelegate(impl: UpdatePresenterDelegate): UpdateActionListener = impl
 
     @Provides
     @PreferenceScope
     fun activity(property: WeakProperty<out Fragment>): ActivityProperty = property.map { it?.activity }
-
-    @Provides
-    @PreferenceScope
-    fun viewState(
-        scope: CoroutineScope,
-        preferenceDataStore: PreferenceDataStore,
-        updateStore: AppUpdateStore,
-        preferenceStore: PreferenceStore,
-        appWatcher: LeakWatcher,
-        preferenceChannel: PreferenceChannel,
-    ): PreferenceViewState = PreferenceViewState(scope, preferenceDataStore, preferenceStore, preferenceChannel, updateStore, appWatcher)
 }
 
 interface PreferenceDependencies {
@@ -158,4 +80,5 @@ interface PreferenceDependencies {
     fun updateStore(): AppUpdateStore
     fun appUpdateService(): AppUpdateService
     fun preferenceDataStore(): PreferenceDataStore
+    fun packageManager(): PackageManager
 }

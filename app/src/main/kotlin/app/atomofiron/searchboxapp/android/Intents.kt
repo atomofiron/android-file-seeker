@@ -34,6 +34,7 @@ object Intents {
     val locales = Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
         data = Uri.fromParts(Const.SCHEME_PACKAGE, BuildConfig.PACKAGE_NAME, null)
     }
+    val telegram get() = Intent(Intent.ACTION_VIEW, Uri.parse(Const.TELEGRAM_URL))
 
     fun mainActivity(context: Context, action: String? = null) = Intent(context, MainActivity::class.java).setAction(action)
 

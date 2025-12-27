@@ -32,6 +32,9 @@ object Const {
     const val MIME_TEXT_PLAIN = "text/plain"
     const val GITHUB_URL = "https://github.com/atomofiron/android-file-seeker"
     const val FORPDA_URL = "https://4pda.to/forum/index.php?showtopic=1000070&view=findpost&p=98557921"
+    const val TELEGRAM_URL = "https://t.me/fileseeker"
+    const val TELEGRAM_PACKAGE_NAME = "org.telegram.messenger"
+    const val GRAM = "gram"
 
     const val TEXT_FILE_PAGINATION_STEP = 128
     const val TEXT_FILE_PAGINATION_STEP_OFFSET = 16

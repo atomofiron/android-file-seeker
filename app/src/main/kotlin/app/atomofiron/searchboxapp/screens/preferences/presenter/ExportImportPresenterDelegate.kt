@@ -7,12 +7,15 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.service.PreferenceService
 import app.atomofiron.searchboxapp.model.other.toUni
+import app.atomofiron.searchboxapp.screens.preferences.PreferenceScope
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceViewState
 import app.atomofiron.searchboxapp.screens.preferences.presenter.curtain.ExportImportDelegate
 import app.atomofiron.searchboxapp.utils.Rslt
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-class ExportImportPresenterDelegate(
+@PreferenceScope
+class ExportImportPresenterDelegate @Inject constructor(
     private val scope: CoroutineScope,
     private val viewState: PreferenceViewState,
     private val preferenceService: PreferenceService,

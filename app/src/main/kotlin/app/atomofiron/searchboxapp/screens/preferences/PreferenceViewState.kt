@@ -15,8 +15,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import javax.inject.Inject
 
-class PreferenceViewState(
+@PreferenceScope
+class PreferenceViewState @Inject constructor(
     private val scope: CoroutineScope,
     val preferenceDataStore: PreferenceDataStore,
     preferenceStore: PreferenceStore,
