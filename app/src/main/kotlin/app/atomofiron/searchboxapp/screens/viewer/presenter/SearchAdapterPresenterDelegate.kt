@@ -17,6 +17,7 @@ import app.atomofiron.searchboxapp.model.textviewer.toLocal
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerRouter
+import app.atomofiron.searchboxapp.screens.viewer.TextViewerScope
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState
 import app.atomofiron.searchboxapp.screens.viewer.di.TextViewerInteractor
 import app.atomofiron.searchboxapp.screens.viewer.presenter.curtain.CurtainSearchDelegate
@@ -24,8 +25,10 @@ import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.toAlert
 import app.atomofiron.searchboxapp.utils.toUni
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-class SearchAdapterPresenterDelegate(
+@TextViewerScope
+class SearchAdapterPresenterDelegate @Inject constructor(
     private val scope: CoroutineScope,
     private val viewState: TextViewerViewState,
     private val router: TextViewerRouter,

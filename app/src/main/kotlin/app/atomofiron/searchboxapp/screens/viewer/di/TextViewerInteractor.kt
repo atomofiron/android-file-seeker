@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
+import app.atomofiron.searchboxapp.screens.viewer.TextViewerScope
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -17,8 +18,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
+import javax.inject.Inject
 
-class TextViewerInteractor(
+@TextViewerScope
+class TextViewerInteractor @Inject constructor(
     private val scope: CoroutineScope,
     private val service: TextViewerService,
     private val store: ExplorerStore,

@@ -7,7 +7,6 @@ import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.LocalSearchResult
-import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.viewer.di.TextViewerInteractor
 import app.atomofiron.searchboxapp.screens.viewer.presenter.SearchAdapterPresenterDelegate
@@ -15,15 +14,17 @@ import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 import app.atomofiron.searchboxapp.screens.viewer.recycler.TextViewerAdapter
 import app.atomofiron.searchboxapp.screens.viewer.state.CursorResult
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-class TextViewerPresenter(
+@TextViewerScope
+class TextViewerPresenter @Inject constructor(
     params: TextViewerParams,
     scope: CoroutineScope,
     private val viewState: TextViewerViewState,
     router: TextViewerRouter,
     private val searchDelegate: SearchAdapterPresenterDelegate,
     private val interactor: TextViewerInteractor,
-    session: TextViewerSession?,
+    sessionResult: TextViewerSessionResult,
 ) : BasePresenter<TextViewerViewModel, TextViewerRouter>(scope, router),
     TextViewerAdapter.TextViewerListener,
     FinderAdapterOutput<LocalSearchResult> by searchDelegate
@@ -32,6 +33,7 @@ class TextViewerPresenter(
     private val itemRef: NodeRef get() = viewState.item.value.ref
 
     init {
+        val session = sessionResult.result.ok()?.value
         session?.loading?.collect(scope, viewState::setLoading)
         scope.launchOnIO {
             session ?: return@launchOnIO withMain {

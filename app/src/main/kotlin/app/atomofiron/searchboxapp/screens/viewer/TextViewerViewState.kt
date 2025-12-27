@@ -17,6 +17,7 @@ import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsStateDelegate
+import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 import app.atomofiron.searchboxapp.screens.viewer.state.CursorResult
 import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
 import app.atomofiron.searchboxapp.screens.viewer.state.Status
@@ -31,8 +32,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class TextViewerViewState(
+@TextViewerScope
+class TextViewerViewState private constructor(
     ref: NodeRef,
     private val scope: CoroutineScope,
     private val session: TextViewerSession?,
@@ -82,6 +85,13 @@ class TextViewerViewState(
             )
         }
     }
+
+    @Inject constructor(
+        params: TextViewerParams,
+        scope: CoroutineScope,
+        preferenceStore: PreferenceStore,
+        session: TextViewerSessionResult,
+    ) : this(params.ref, scope, session.result.ok()?.value, preferenceStore, session.error)
 
     fun switchCursor(forward: Boolean): CursorResult {
         val result = currentTask.value?.result

@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
+import app.atomofiron.searchboxapp.screens.viewer.TextViewerScope
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -26,9 +27,11 @@ import kotlinx.coroutines.CoroutineScope
 import uniffi.native_lib.CancellationState
 import uniffi.native_lib.TextSearchProgress
 import java.util.UUID
+import javax.inject.Inject
 import kotlin.math.max
 
-class TextViewerService(
+@TextViewerScope
+class TextViewerService @Inject constructor(
     private val scope: CoroutineScope,
     private val preferences: PreferenceStore,
     private val store: TextViewerStore,
