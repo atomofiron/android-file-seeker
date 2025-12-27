@@ -9,8 +9,11 @@ import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.utils.ExplorerUtils
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyAppTheme
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyDeepBlack
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class InitialDelegate(
+@Singleton
+class InitialDelegate @Inject constructor(
     context: Context,
     packageManager: PackageManager,
 ) {

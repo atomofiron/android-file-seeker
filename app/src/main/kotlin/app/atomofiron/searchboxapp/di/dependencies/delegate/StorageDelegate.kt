@@ -14,8 +14,11 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class StorageDelegate(
+@Singleton
+class StorageDelegate @Inject constructor(
     private val context: Context,
     private val store: ExplorerStore,
 ) {
