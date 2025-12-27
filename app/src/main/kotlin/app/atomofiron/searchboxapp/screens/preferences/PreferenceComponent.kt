@@ -12,9 +12,9 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
-import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.model.AppSource
+import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceClickOutput
 import app.atomofiron.searchboxapp.screens.preferences.presenter.ExportImportPresenterDelegate
 import app.atomofiron.searchboxapp.screens.preferences.presenter.PreferenceClickPresenterDelegate
@@ -65,6 +65,10 @@ abstract class PreferenceModule {
     @PreferenceScope
     abstract fun updatePresenterDelegate(impl: UpdatePresenterDelegate): UpdateActionListener
 
+    @Binds
+    @PreferenceScope
+    abstract fun preferenceDataStore(impl: LegacyPreferenceDataStore): PreferenceDataStore
+
     companion object {
 
         @Provides
@@ -82,6 +86,5 @@ interface PreferenceDependencies : DelegateModule.Dependencies {
     fun appWatcherProxy(): LeakWatcher
     fun updateStore(): AppUpdateStore
     fun appUpdateService(): AppUpdateService
-    fun preferenceDataStore(): PreferenceDataStore
     fun packageManager(): PackageManager
 }

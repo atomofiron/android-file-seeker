@@ -4,7 +4,6 @@ import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import androidx.core.app.NotificationManagerCompat
-import androidx.preference.PreferenceDataStore
 import androidx.work.WorkManager
 import app.atomofiron.searchboxapp.android.WebClient
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
@@ -12,11 +11,8 @@ import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.delegate.StorageDelegate
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
-import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
-import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
 import dagger.Module
 import dagger.Provides
-import debug.LeakWatcher
 import javax.inject.Singleton
 
 @Module
@@ -54,16 +50,6 @@ class CommonModule {
     @Singleton
     fun provideCoroutineScope(): AppScope {
         return AppScope()
-    }
-
-    @Provides
-    @Singleton
-    fun preferenceDataStore(
-        preferences: PreferenceStore,
-        appScope: AppScope,
-        watcher: LeakWatcher,
-    ): PreferenceDataStore {
-        return LegacyPreferenceDataStore(preferences, appScope, watcher)
     }
 
     @Provides

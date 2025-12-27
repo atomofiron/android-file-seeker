@@ -11,44 +11,47 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.preference.PreferenceDataStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.screens.preferences.PreferenceScope
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 import debug.LeakWatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LegacyPreferenceDataStore(
-    private val preferenceStore: PreferenceStore,
+@PreferenceScope
+class LegacyPreferenceDataStore @Inject constructor(
+    private val store: PreferenceStore,
     private val scope: CoroutineScope,
     private val watcher: LeakWatcher,
-) : PreferenceDataStore(), DataStore<Preferences> by preferenceStore {
+) : PreferenceDataStore(), DataStore<Preferences> by store {
 
     override fun getBoolean(key: String, defValue: Boolean): Boolean {
         return when (key) {
             PreferenceKeys.PREF_LEAK_CANARY -> watcher.isEnabled
-            else -> preferenceStore[booleanPreferencesKey(key)]
+            else -> store[booleanPreferencesKey(key)]
         }
     }
 
     override fun getInt(key: String, defValue: Int): Int {
-        return preferenceStore[intPreferencesKey(key)]
+        return store[intPreferencesKey(key)]
     }
 
     override fun getFloat(key: String, defValue: Float): Float {
-        return preferenceStore[floatPreferencesKey(key)]
+        return store[floatPreferencesKey(key)]
     }
 
     override fun getLong(key: String, defValue: Long): Long {
-        return preferenceStore[longPreferencesKey(key)]
+        return store[longPreferencesKey(key)]
     }
 
     override fun getString(key: String, defValue: String?): String? {
-        return preferenceStore[stringPreferencesKey(key)]
+        return store[stringPreferencesKey(key)]
     }
 
     override fun getStringSet(key: String, defValues: Set<String>?): Set<String>? {
-        return preferenceStore[stringSetPreferencesKey(key)]
+        return store[stringSetPreferencesKey(key)]
     }
 
     override fun putBoolean(key: String, value: Boolean) {
