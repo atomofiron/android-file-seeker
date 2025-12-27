@@ -7,9 +7,9 @@ import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
-import app.atomofiron.searchboxapp.di.dependencies.store.AndroidStore
-import app.atomofiron.searchboxapp.di.dependencies.store.AppStore
-import app.atomofiron.searchboxapp.di.dependencies.store.AppStoreConsumer
+import app.atomofiron.searchboxapp.screens.main.di.AndroidStore
+import app.atomofiron.searchboxapp.screens.main.di.AppStore
+import app.atomofiron.searchboxapp.screens.main.di.AppStoreConsumer
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode

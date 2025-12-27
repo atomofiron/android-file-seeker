@@ -5,7 +5,7 @@ import android.os.Build.VERSION_CODES.R
 import android.view.Window
 import android.view.WindowManager.LayoutParams.FLAG_SECURE
 import app.atomofiron.fileseeker.BuildConfig
-import app.atomofiron.searchboxapp.di.dependencies.store.AppStore
+import app.atomofiron.searchboxapp.screens.main.di.AppStore
 import app.atomofiron.searchboxapp.screens.main.MainScope
 import javax.inject.Inject
 

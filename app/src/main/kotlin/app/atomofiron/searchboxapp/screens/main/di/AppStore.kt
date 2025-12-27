@@ -1,4 +1,4 @@
-package app.atomofiron.searchboxapp.di.dependencies.store
+package app.atomofiron.searchboxapp.screens.main.di
 
 import android.content.res.Resources
 import android.view.Window
