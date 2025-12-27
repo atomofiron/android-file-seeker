@@ -18,7 +18,7 @@ import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 
 @Module
-open class DelegateModule {
+class DelegateModule {
     interface Dependencies {
         val preferenceStore: PreferenceStore
         val utilService: UtilService
@@ -28,10 +28,10 @@ open class DelegateModule {
     }
 
     @Provides
-    open fun provideDialogDelegate(activityProperty: ActivityProperty): DialogDelegate = DialogDelegateImpl(activityProperty)
+    fun provideDialogDelegate(activityProperty: ActivityProperty): DialogDelegate = DialogDelegateImpl(activityProperty)
 
     @Provides
-    open fun provideFileOperationsDelegate(
+    fun provideFileOperationsDelegate(
         preferenceStore: PreferenceStore,
         apks: ApkDelegate,
         dialogs: DialogDelegate,

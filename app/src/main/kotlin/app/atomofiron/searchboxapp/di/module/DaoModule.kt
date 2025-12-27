@@ -9,17 +9,17 @@ import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import javax.inject.Singleton
 
 @Module
-open class DaoModule {
+class DaoModule {
 
     @Provides
     @Singleton
-    open fun provideDatabase(context: Context): Database = Database(context)
+    fun provideDatabase(context: Context): Database = Database(context)
 
     @Provides
     @Singleton
-    open fun provideExplorerDao(db: Database): ExplorerDao = db.explorer()
+    fun provideExplorerDao(db: Database): ExplorerDao = db.explorer()
 
     @Provides
     @Singleton
-    open fun provideFinderDao(db: Database): FinderDao = db.finder()
+    fun provideFinderDao(db: Database): FinderDao = db.finder()
 }
