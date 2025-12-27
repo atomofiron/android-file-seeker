@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.di
 
 import android.app.Application
 import app.atomofiron.fileseeker.BuildConfig
-import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.model.AppSource
 import debug.LeakWatcher

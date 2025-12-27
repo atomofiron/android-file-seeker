@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.root
 
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.screens.common.RootRouting
 import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
 import dagger.Binds
@@ -39,9 +38,7 @@ abstract class RootModule {
 
     @Binds
     @RootScope
-    abstract fun rootRouting(router: RootRouter): RootRouting
+    abstract fun routing(router: RootRouter): RootRouting
 }
 
-interface RootDependencies {
-    fun initialDelegate(): InitialDelegate
-}
+interface RootDependencies
