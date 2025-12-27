@@ -22,8 +22,10 @@ import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParam
 import app.atomofiron.searchboxapp.utils.formatDate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ResultPresenter(
+@ResultScope
+class ResultPresenter @Inject constructor(
     params: ResultPresenterParams,
     scope: CoroutineScope,
     private val viewState: ResultViewState,

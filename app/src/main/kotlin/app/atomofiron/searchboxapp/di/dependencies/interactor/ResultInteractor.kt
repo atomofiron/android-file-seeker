@@ -6,14 +6,17 @@ import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeMeta
+import app.atomofiron.searchboxapp.screens.result.ResultScope
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateUsage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.UUID
+import javax.inject.Inject
 
-class ResultInteractor(
+@ResultScope
+class ResultInteractor @Inject constructor(
     private val scope: CoroutineScope,
     private val utilService: UtilService,
     private val explorerService: ExplorerService,

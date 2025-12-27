@@ -9,8 +9,10 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 import app.atomofiron.searchboxapp.utils.Const
 import java.util.*
+import javax.inject.Inject
 
-class ResultRouter(property: WeakProperty<out Fragment>) : BaseRouter(property) {
+@ResultScope
+class ResultRouter @Inject constructor(property: WeakProperty<out Fragment>) : BaseRouter(property) {
 
     override val currentDestinationId = R.id.resultFragment
 

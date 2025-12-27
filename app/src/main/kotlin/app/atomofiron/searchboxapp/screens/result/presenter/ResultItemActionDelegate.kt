@@ -12,14 +12,17 @@ import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
+import app.atomofiron.searchboxapp.screens.result.ResultScope
 import app.atomofiron.searchboxapp.screens.result.ResultViewState
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.toAlert
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-class ResultItemActionDelegate(
+@ResultScope
+class ResultItemActionDelegate @Inject constructor(
     private val viewState: ResultViewState,
     private val scope: CoroutineScope,
     private val operations: FileOperationsDelegate,

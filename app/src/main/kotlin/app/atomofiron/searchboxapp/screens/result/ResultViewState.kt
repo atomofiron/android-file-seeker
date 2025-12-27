@@ -35,8 +35,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.mapNotNull
 import java.util.UUID
+import javax.inject.Inject
 
-class ResultViewState(
+@ResultScope
+class ResultViewState @Inject constructor(
     params: ResultPresenterParams,
     val mode: ActivityMode,
     private val finderStore: FinderStore,

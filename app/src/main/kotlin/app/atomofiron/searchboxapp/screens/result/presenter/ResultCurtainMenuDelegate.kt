@@ -16,9 +16,12 @@ import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations
 import app.atomofiron.searchboxapp.screens.explorer.curtain.OptionsDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
+import app.atomofiron.searchboxapp.screens.result.ResultScope
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-class ResultCurtainMenuDelegate(
+@ResultScope
+class ResultCurtainMenuDelegate @Inject constructor(
     scope: CoroutineScope,
     private val router: ResultRouter,
     private val interactor: ResultInteractor,
