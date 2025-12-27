@@ -22,7 +22,7 @@ abstract class Database : RoomDatabase() {
         operator fun invoke(context: Context): Database = Room.databaseBuilder(
             context,
             Database::class.java,
-            name = "file-seeker",
+            name = "db",
         ).addMigrations()
             .fallbackToDestructiveMigration(BuildConfig.DEBUG)
             .build()
