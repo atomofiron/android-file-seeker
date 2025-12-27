@@ -5,8 +5,10 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.main.util.tasks.XTask
 import kotlinx.coroutines.flow.MutableStateFlow
+import javax.inject.Inject
 
-class MainViewState(
+@MainScope
+class MainViewState @Inject constructor(
     val activityMode: ActivityMode,
     val preferences: PreferenceStore,
     initialDelegate: InitialDelegate,

@@ -9,8 +9,10 @@ import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegate
 import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegateApi
 import app.atomofiron.searchboxapp.screens.main.util.tasks.XTask
 import kotlinx.coroutines.CoroutineScope
+import javax.inject.Inject
 
-class MainPresenter(
+@MainScope
+class MainPresenter @Inject constructor(
     scope: CoroutineScope,
     private val viewState: MainViewState,
     router: MainRouter,

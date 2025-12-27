@@ -7,8 +7,10 @@ import app.atomofiron.common.arch.BaseRouter
 import app.atomofiron.common.util.navigation.CustomNavHostFragment
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
+import javax.inject.Inject
 
-class MainRouter(activityProperty: WeakProperty<out FragmentActivity>) : BaseRouter(activityProperty) {
+@MainScope
+class MainRouter @Inject constructor(activityProperty: WeakProperty<out FragmentActivity>) : BaseRouter(activityProperty) {
 
     override val currentDestinationId = 0
     override val isCurrentDestination: Boolean = true

@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsControllerCompat
 import app.atomofiron.common.util.property.MutableStrongProperty
 import app.atomofiron.common.util.property.StrongProperty
+import app.atomofiron.searchboxapp.screens.main.MainScope
+import javax.inject.Inject
 
 // todo soo then all deps should be provided as impls of interfaces (because of SomeDep : AppStore by appStore)
 
@@ -26,7 +28,8 @@ interface AppStoreProvider {
     val appStore: AppStore
 }
 
-class AndroidStore(activity: AppCompatActivity) : AppStore, AppStoreConsumer {
+@MainScope
+class AndroidStore @Inject constructor(activity: AppCompatActivity) : AppStore, AppStoreConsumer {
 
     override val activityProperty = MutableStrongProperty(activity)
     override val windowProperty = MutableStrongProperty<Window>(activity.window)

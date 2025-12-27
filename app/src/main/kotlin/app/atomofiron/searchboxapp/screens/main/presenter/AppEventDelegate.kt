@@ -29,10 +29,12 @@ import app.atomofiron.searchboxapp.model.preference.AppLocale
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.main.MainRouter
+import app.atomofiron.searchboxapp.screens.main.MainScope
 import app.atomofiron.searchboxapp.utils.launch
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.FlowCollector
+import javax.inject.Inject
 
 interface AppEventDelegateApi {
     fun onActivityCreate(activity: AppCompatActivity)
@@ -41,7 +43,8 @@ interface AppEventDelegateApi {
     fun onActivityFinish()
 }
 
-class AppEventDelegate(
+@MainScope
+class AppEventDelegate @Inject constructor(
     private val context: Context,
     scope: CoroutineScope,
     private val router: MainRouter,

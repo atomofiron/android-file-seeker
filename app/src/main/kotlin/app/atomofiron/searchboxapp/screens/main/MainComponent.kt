@@ -4,27 +4,23 @@ import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.ActivityProperty
-import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.property.WeakProperty
-import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.interactor.ApkInteractor
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
-import app.atomofiron.searchboxapp.di.dependencies.service.WindowService
 import app.atomofiron.searchboxapp.di.dependencies.store.AndroidStore
 import app.atomofiron.searchboxapp.di.dependencies.store.AppStore
 import app.atomofiron.searchboxapp.di.dependencies.store.AppStoreConsumer
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
-import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
-import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegate
+import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
-import dagger.Provides
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Scope
 
@@ -54,80 +50,19 @@ interface MainComponent {
 }
 
 @Module
-class MainModule {
+abstract class MainModule {
 
-    @Provides
+    @Binds
     @MainScope
-    fun activity(property: WeakProperty<out FragmentActivity>): ActivityProperty {
-        return property
-    }
+    abstract fun activity(property: WeakProperty<out FragmentActivity>): ActivityProperty
 
-    @Provides
+    @Binds
     @MainScope
-    fun presenter(
-        scope: CoroutineScope,
-        viewState: MainViewState,
-        router: MainRouter,
-        appEventDelegate: AppEventDelegate,
-        windowService: WindowService,
-        preferenceStore: PreferenceStore,
-        initialDelegate: InitialDelegate,
-    ): MainPresenter {
-        return MainPresenter(scope, viewState, router, appEventDelegate, windowService, preferenceStore, initialDelegate)
-    }
+    abstract fun provideAppStore(androidStore: AndroidStore): AppStore
 
-    @Provides
+    @Binds
     @MainScope
-    fun appEventDelegate(
-        context: Context,
-        scope: CoroutineScope,
-        router: MainRouter,
-        operations: FileOperationsDelegate,
-        dialogs: DialogDelegate,
-        appStoreConsumer: AppStoreConsumer,
-        preferenceStore: PreferenceStore,
-        updateStore: AppUpdateStore,
-        apkChannel: ApkChannel,
-        updateService: AppUpdateService,
-    ): AppEventDelegate {
-        return AppEventDelegate(context, scope, router, appStoreConsumer, operations, dialogs, preferenceStore, updateStore, apkChannel, updateService)
-    }
-
-    @Provides
-    @MainScope
-    fun router(activity: WeakProperty<out FragmentActivity>): MainRouter = MainRouter(activity)
-
-    @Provides
-    @MainScope
-    fun viewState(
-        activityMode: ActivityMode,
-        preferenceStore: PreferenceStore,
-        initialDelegate: InitialDelegate,
-    ): MainViewState = MainViewState(activityMode, preferenceStore, initialDelegate)
-
-    @Provides
-    @MainScope
-    fun provideAndroidStore(activity: AppCompatActivity): AndroidStore {
-        return AndroidStore(activity)
-    }
-
-    @Provides
-    @MainScope
-    fun provideAppStore(androidStore: AndroidStore): AppStore {
-        return androidStore
-    }
-
-    @Provides
-    @MainScope
-    fun provideAppStoreConsumer(androidStore: AndroidStore): AppStoreConsumer {
-        return androidStore
-    }
-
-    @Provides
-    @MainScope
-    fun windowService(
-        appStore: AppStore,
-    ): WindowService = WindowService(appStore)
+    abstract fun provideAppStoreConsumer(androidStore: AndroidStore): AppStoreConsumer
 }
 
 interface MainDependencies {
