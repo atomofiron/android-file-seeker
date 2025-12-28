@@ -36,13 +36,14 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.io.FileInputStream
+import javax.inject.Inject
 
 private val rootOptions = listOf(Operations.Create, Operations.CopyPath)
 private val directoryOptions = listOf(Operations.Create, Operations.CopyPath, Operations.Duplicate, Operations.Rename, Operations.Delete)
 private val oneFileOptions = listOf(Operations.Share, Operations.OpenWith, Operations.CopyPath, Operations.Duplicate, Operations.Rename, Operations.Delete)
 private val readWrite = listOf(Operations.Create, Operations.Duplicate, Operations.Rename)
 
-class FileOperationsDelegate(
+class FileOperationsDelegate @Inject constructor(
     preferences: PreferenceStore,
     private val apks: ApkDelegate,
     private val dialogs: DialogDelegate,

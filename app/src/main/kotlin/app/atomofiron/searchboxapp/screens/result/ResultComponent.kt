@@ -6,7 +6,10 @@ import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.ResultChannel
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
+import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
+import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.ResultStore
@@ -63,4 +66,7 @@ interface ResultDependencies : DelegateModule.Dependencies {
     fun resultChannel(): ResultChannel
     fun curtainChannel(): CurtainChannel
     fun workManager(): WorkManager
+    fun apks(): ApkDelegate
+    fun utils(): UtilService
+    fun explorerService(): ExplorerService
 }

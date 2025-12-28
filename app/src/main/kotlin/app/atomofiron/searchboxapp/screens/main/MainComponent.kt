@@ -5,14 +5,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
-import app.atomofiron.searchboxapp.screens.main.di.AndroidStore
-import app.atomofiron.searchboxapp.screens.main.di.AppStore
-import app.atomofiron.searchboxapp.screens.main.di.AppStoreConsumer
+import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
+import app.atomofiron.searchboxapp.screens.main.di.AndroidStore
+import app.atomofiron.searchboxapp.screens.main.di.AppStore
+import app.atomofiron.searchboxapp.screens.main.di.AppStoreConsumer
 import dagger.Binds
 import dagger.BindsInstance
 import dagger.Component
@@ -66,4 +69,7 @@ interface MainDependencies : DelegateModule.Dependencies {
     fun initialDelegate(): InitialDelegate
     fun appUpdateService(): AppUpdateService
     fun appUpdateStore(): AppUpdateStore
+    fun apkChannel(): ApkChannel
+    fun utils(): UtilService
+    fun apks(): ApkDelegate
 }

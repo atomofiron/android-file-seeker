@@ -10,6 +10,9 @@ import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
+import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
+import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
@@ -75,4 +78,7 @@ interface ExplorerDependencies : DelegateModule.Dependencies {
     fun mainChannel(): CommonChannel
     fun preferenceChannel(): PreferenceChannel
     fun workManager(): WorkManager
+    fun apks(): ApkDelegate
+    fun utils(): UtilService
+    fun explorerService(): ExplorerService
 }

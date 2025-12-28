@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.di.dependencies.delegate
 
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.searchboxapp.android.Intents
+import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
 import app.atomofiron.searchboxapp.di.dependencies.service.ApkService
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
@@ -11,7 +12,6 @@ import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.utils.Rslt
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -19,7 +19,7 @@ import javax.inject.Singleton
 
 @Singleton
 class ApkDelegate @Inject constructor(
-    private val scope: CoroutineScope,
+    private val scope: AppScope,
     private val apkService: ApkService,
     private val explorerService: ExplorerService,
     private val apkChannel: ApkChannel,
