@@ -41,6 +41,7 @@ import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.audio.AudioCover
 import app.atomofiron.searchboxapp.utils.colorAttr
+import app.atomofiron.searchboxapp.utils.context
 import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.remember
 import app.atomofiron.searchboxapp.utils.resources
@@ -56,21 +57,23 @@ import com.bumptech.glide.request.target.Target
 private const val SPACE = " "
 private const val EMPTY = ""
 
-class ExplorerItemBinder private constructor(
-    private val itemView: View,
+class ExplorerItemBinder(
     private val binding: ItemExplorerBinding,
-    private val isOpened: Boolean,
+    private val isOpened: Boolean = false,
 ) {
+    private val context = binding.context
+    private val resources = binding.resources
+
     private lateinit var item: Node
     private var isDeepest: Boolean? = null
 
-    private var dirDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_folder)!!.mutate().translated()
-    private var fileDrawable = ContextCompat.getDrawable(itemView.context, R.drawable.ic_file)!!.mutate().translated()
-    private val placeholder = MuonsDrawable(itemView.context)
-    private val dirTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorPrimary))
-    private val fileTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorAccent))
+    private var dirDrawable = ContextCompat.getDrawable(context, R.drawable.ic_folder)!!.mutate().translated()
+    private var fileDrawable = ContextCompat.getDrawable(context, R.drawable.ic_file)!!.mutate().translated()
+    private val placeholder = MuonsDrawable(context)
+    private val dirTint = ColorStateList.valueOf(context.colorAttr(MaterialAttr.colorPrimary))
+    private val fileTint = ColorStateList.valueOf(context.colorAttr(MaterialAttr.colorAccent))
     private val lemon = LemonDrawable()
-    private val copyingProgress = ProgressLineDrawable(itemView.context)
+    private val copyingProgress = ProgressLineDrawable(context)
 
     private var onItemActionListener: ExplorerItemBinderActionListener? = null
 
@@ -91,9 +94,7 @@ class ExplorerItemBinder private constructor(
     }
     private val bitmapListener = BitmapListener()
 
-    constructor(itemView: View, isOpened: Boolean) : this(itemView, ItemExplorerBinding.bind(itemView), isOpened)
-
-    constructor(binding: ItemExplorerBinding, isOpened: Boolean = false) : this(binding.root, binding, isOpened)
+    constructor(itemView: View, isOpened: Boolean) : this(ItemExplorerBinding.bind(itemView), isOpened)
 
     init {
         bindStyle(isOpened, isDeepest = false)
@@ -107,7 +108,7 @@ class ExplorerItemBinder private constructor(
         dirDrawable.setBounds(0, 0, size, size)
         fileDrawable.setBounds(0, 0, size, size)
         val dx = when {
-            itemView.isRtl() -> 0f
+            binding.root.isRtl() -> 0f
             else -> size.toFloat() / dirDrawable.intrinsicWidth * 6
         }
         val dy = size.toFloat() / dirDrawable.intrinsicHeight * 6
@@ -128,8 +129,8 @@ class ExplorerItemBinder private constructor(
     fun bind(item: Node) = binding.run {
         this@ExplorerItemBinder.item = item
 
-        itemView.setOnClickListener(onClickListener)
-        itemView.setOnLongClickListener(onLongClickListener)
+        binding.root.setOnClickListener(onClickListener)
+        binding.root.setOnLongClickListener(onLongClickListener)
         checkBox.setOnCheckedChangeListener(onCheckListener)
 
         when (val tn = (item.content as? NodeContent.File)?.thumbnail) {
@@ -149,7 +150,7 @@ class ExplorerItemBinder private constructor(
         apply(hasThumbnail = item.content.instantThumbnail())
 
         title.text = when {
-            item.isRoot -> item.getTitle(itemView.resources)
+            item.isRoot -> item.getTitle(resources)
             else -> item.name
         }
         title.typeface = if (item.isDirectory) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
@@ -162,7 +163,7 @@ class ExplorerItemBinder private constructor(
         error.isVisible = errorText?.isNotBlank() == true
         progress.isVisible = item.inProgress
         checkBox.isInvisible = item.inProgress
-        details.maxWidth = itemView.resources.displayMetrics.widthPixels / 3
+        details.maxWidth = resources.displayMetrics.widthPixels / 3
 
         val iconTint = if (item.isDirectory) dirTint else fileTint
         icon.ifVisible {
@@ -215,7 +216,7 @@ class ExplorerItemBinder private constructor(
                 if (composition.visibleGroup) append(item.group).append(SPACE)
                 toString()
             }
-            else -> binding.resources.getQuantityString(R.plurals.files_filtered, filteredOut, filteredOut)
+            else -> resources.getQuantityString(R.plurals.files_filtered, filteredOut, filteredOut)
         }
         binding.details.text = item
             .takeIf { composition.visibleDetails }
@@ -227,12 +228,12 @@ class ExplorerItemBinder private constructor(
 
     fun disableClicks() {
         binding.checkBox.isEnabled = false
-        itemView.setOnClickListener(null)
-        itemView.setOnLongClickListener(null)
-        itemView.background = null
-        itemView.isFocusable = false
-        itemView.isClickable = false
-        itemView.isLongClickable = false
+        binding.root.setOnClickListener(null)
+        binding.root.setOnLongClickListener(null)
+        binding.root.background = null
+        binding.root.isFocusable = false
+        binding.root.isClickable = false
+        binding.root.isLongClickable = false
     }
 
     fun hideCheckBox() {
@@ -241,10 +242,10 @@ class ExplorerItemBinder private constructor(
 
     fun showAlternatingBackground(visible: Boolean) {
         val color = when {
-            visible -> itemView.context.colorSurfaceContainer()
+            visible -> context.colorSurfaceContainer()
             else -> Color.TRANSPARENT
         }
-        itemView.setBackgroundColor(color)
+        binding.root.setBackgroundColor(color)
     }
 
     private fun Node.getDetails(): CharSequence? = when {
@@ -331,5 +332,5 @@ class ExplorerItemBinder private constructor(
         }
     }
 
-    fun NodeError.getString(content: NodeContent? = null): String = itemView.resources[toUni(content)]
+    fun NodeError.getString(content: NodeContent? = null): String = resources[toUni(content)]
 }

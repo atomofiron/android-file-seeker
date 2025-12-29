@@ -42,11 +42,11 @@ class CurtainSearchDelegate(
     override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
         val binding = CurtainTextViewerSearchBinding.inflate(inflater, null, false)
 
-        val holder = ExplorerItemBinder(binding.itemExplorer)
-        holder.bind(node)
-        holder.bindComposition(composition)
-        holder.disableClicks()
-        holder.hideCheckBox()
+        val binder = ExplorerItemBinder(binding.itemExplorer)
+        binder.bind(node)
+        binder.bindComposition(composition)
+        binder.disableClicks()
+        binder.hideCheckBox()
         binding.itemExplorer.root.setStrokedBackground(vertical = R.dimen.padding_half)
 
         binding.recyclerView.run {
