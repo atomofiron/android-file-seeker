@@ -40,6 +40,7 @@ import app.atomofiron.searchboxapp.utils.toOk
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
+private val rootOptions = listOf(Create, CopyPath)
 private val Empty = null to null
 
 class FileOperationDelegate @Inject constructor(
@@ -89,6 +90,9 @@ class FileOperationDelegate @Inject constructor(
         val single = targets.size == 1
         if (mode.rw) add(Create)
         if (single) add(CopyPath)
+        if (first.isRoot) {
+            return@buildList
+        }
         if (single && mode.rw) add(Duplicate)
         if (single && mode.rw) add(Rename)
         add(Copy)
