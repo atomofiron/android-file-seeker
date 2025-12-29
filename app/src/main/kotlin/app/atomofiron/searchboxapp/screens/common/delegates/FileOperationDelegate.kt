@@ -93,7 +93,7 @@ class FileOperationDelegate @Inject constructor(
         if (single && mode.rw) add(Rename)
         add(Copy)
         val copied = store.pasteBuffer
-        val pasteable = copied.isNotEmpty() && copied.none { it.ref == first.ref || it.parentRef == first.ref || first.ref.isChildOf(it.ref) }
+        val pasteable = single && first.isDirectory && copied.isNotEmpty() && copied.none { it.ref == first.ref || it.parentRef == first.ref || first.ref.isChildOf(it.ref) }
         val allDirs = copied.isNotEmpty() && copied.all { it.isDirectory }
         add(Paste.copy(
             icon = if (allDirs) R.drawable.ic_insert_folder else R.drawable.ic_insert_file,
