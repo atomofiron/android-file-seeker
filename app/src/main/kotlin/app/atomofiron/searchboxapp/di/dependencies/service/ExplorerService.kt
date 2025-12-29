@@ -49,6 +49,7 @@ import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.explorer.replace
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.CoroutineLauncher
 import app.atomofiron.searchboxapp.utils.ExplorerUtils
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.asSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.delete
@@ -91,21 +92,22 @@ private const val SUB_PATH_BLUETOOTH = "Bluetooth"
 @Singleton
 class ExplorerService @Inject constructor(
     private val context: Context,
-    private val appScope: AppScope,
+    override val scope: AppScope,
     private val store: ExplorerStore,
     private val dao: ExplorerDao,
     private val preferences: PreferenceStore,
-) {
+) : CoroutineLauncher {
     private var delayedRender: Job? = null
 
     private val asSu by preferences.asSu
     private val garden = NodeGarden()
     private val internalStorageRef = store.internalStorage.value.ref
     private val updateRootTrigger = TriggerFlow<Unit>()
+    //private val renderRequests = MutableSharedFlow<Pair<NodeTabKey, Node>>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     init {
         val suDefined = Job()
-        appScope.launchOnIO {
+        scope.launchOnIO {
             garden { // lock due configuration
                 store.mainTabs
                     .forEach { get(it) } // init
@@ -120,8 +122,13 @@ class ExplorerService @Inject constructor(
         combine(preferences.asSu, preferences.suCmd) { asSu, suCmd ->
             NativeBridge.setSuCmd(suCmd, binDir = context.filesDir.absolutePath)
             suDefined.complete()
-        }.collect(appScope)
-        store.currentDeepest.drop(1).collect(appScope) { deepest ->
+        }.collect(scope)
+        /*default {
+            renderRequests.collect { (key, item) ->
+                garden[key].renderUpdate(item)
+            }
+        }*/
+        store.currentDeepest.drop(1).collect(scope) { deepest ->
             deepest ?: return@collect
             val tab = store.currentTabKey.value
             val root = garden[tab].getSelectedRoot()
@@ -146,7 +153,7 @@ class ExplorerService @Inject constructor(
 
     fun getFlow(key: NodeTabKey): SharedFlow<NodeTabItems> {
         if (!garden.has(key)) {
-            appScope.launchOnIO {
+            scope.launchOnIO {
                 garden(key) {
                     render()
                 }
@@ -273,7 +280,7 @@ class ExplorerService @Inject constructor(
             root.type !is NodeRootType.SystemRoot -> Unit
             else -> return
         }
-        appScope.launch {
+        scope.launch {
             garden(key) {
                 withCachingState(root.id) {
                     var updated = root.item.update(asSu)
@@ -468,6 +475,13 @@ class ExplorerService @Inject constructor(
         }
     }
 
+    suspend fun tryCopy(key: NodeTabKey, targets: List<Node>, destination: Node, asMoving: Boolean) {
+        for (target in targets) {
+            val to = target.mutate(ref = destination.ref + target.name)
+            tryCopy(key, target, to, asMoving)
+        }
+    }
+
     suspend fun tryCopy(key: NodeTabKey, from: Node, to: Node, asMoving: Boolean) {
         render(key) {
             states.updateState(from.uniqueId) {
@@ -478,15 +492,23 @@ class ExplorerService @Inject constructor(
             states.updateState(to.uniqueId) {
                 nextState(to.uniqueId, copying = NodeOperation.Copying(isSource = false))
             }
-            findItem(to.uniqueId) { children, _, _ ->
-                children ?: return@findItem
-                var index = children.indexOfFirst { it.isFile }
-                if (index < 0) index = children.size
-                children.items.add(index, to)
-                children.sortByName()
+            findItem(to.parentRef.uniqueId) { _, _, item ->
+                val children = item.children
+                children?.indexOfLast { it.isDirectory }
+                    ?.let { children.items.add(it.inc(), to) }
             }
         }
-        val new = ExplorerUtils.copy(from, to, asSu)
+        val new = ExplorerUtils.copy(from, to, move = asMoving, asSu = asSu) {
+            default {
+                val operation = NodeOperation.Copying(isSource = false, it.progress)
+                garden {
+                    states.updateState(to.uniqueId) {
+                        nextState(to.uniqueId, copying = operation)
+                    }
+                    get(key).renderUpdate(to)
+                }
+            }
+        }
         render(key) {
             states.updateState(from.uniqueId) {
                 nextState(from.uniqueId, copying = null)
@@ -494,12 +516,14 @@ class ExplorerService @Inject constructor(
             states.updateState(to.uniqueId) {
                 nextState(to.uniqueId, copying = null)
             }
-            new ?: return debugFail { "null after copy ${from.ref} to ${to.ref}" }
-            findItem(from.uniqueId) { children, i, _ ->
-                children?.items?.add(i.inc(), new)
+            findItem(to.parentRef.uniqueId) { _, _, dst ->
+                val children = dst.children
+                children?.indexOfFirst { it.uniqueId == to.uniqueId }
+                    ?.takeIf { it >= 0 }
+                    ?.let { children.items.setAt(it, new) }
             }
         }
-        tryCache(key, to)
+        if (asMoving) tryCache(key, from)
     }
 
     suspend fun tryCheck(key: ExplorerTabKey, refs: List<Node>, toChecked: Boolean) {
@@ -561,14 +585,14 @@ class ExplorerService @Inject constructor(
         // todo delete every where
         val files = items.filter { !it.isDirectory }
         val dirs = items.filter { it.isDirectory }
-        val fileJob = appScope.launch {
+        val fileJob = scope.launch {
             for (file in files) {
                 file.delete(asSu)
                 store.emitDeleted(file.copy(children = null))
             }
         }
         val dirJobs = dirs.map { dir ->
-            appScope.launch {
+            scope.launch {
                 dir.delete(asSu)
                 store.emitDeleted(dir.copy(children = null))
             }
@@ -578,7 +602,10 @@ class ExplorerService @Inject constructor(
         store.emitDeleted(items)
     }
 
-    suspend fun tryDelete(key: NodeTabKey, its: List<Node>) {
+    suspend fun tryDelete(key: NodeTabKey?, its: List<Node>) {
+        if (key == null) {
+            return deleteEveryWhere(its)
+        }
         var mediaRootAffected: NodeRoot? = null
         val items = mutableListOf<Node>()
         render(key) {
@@ -601,7 +628,7 @@ class ExplorerService @Inject constructor(
         val dirs = items.filter { it.isDirectory }
         val deleted = CoroutineSafeList<Node>()
         debugDelay(1)
-        val fileJob = appScope.launch {
+        val fileJob = scope.launch {
             for (file in files) {
                 if (file.deleteIn(key)) {
                     deleted.add(file)
@@ -609,7 +636,7 @@ class ExplorerService @Inject constructor(
             }
         }
         val dirJobs = dirs.map { dir ->
-            appScope.launch {
+            scope.launch {
                 if (dir.deleteIn(key)) {
                     deleted.add(dir)
                 }
@@ -655,7 +682,7 @@ class ExplorerService @Inject constructor(
     }
 
     private fun NodeTab.lazyRender() {
-        delayedRender = delayedRender ?: appScope.launch {
+        delayedRender = delayedRender ?: scope.launch {
             delay(Const.SMALL_DELAY)
             delayedRender = null
             garden(key) {
@@ -818,8 +845,11 @@ class ExplorerService @Inject constructor(
 
     private fun NodeTab.mismatch(item: Node): Boolean = mimeTypes.isNotEmpty() && item.isFile && !item.content.matchesAny(mimeTypes)
 
-    private suspend fun NodeTab.renderUpdate(new: Node) {
-        store.emitUpdate(renderNode(new))
+    private suspend fun NodeTab.renderUpdate(
+        new: Node,
+        state: NodeStateImpl? = null,
+    ) {
+        store.emitUpdate(renderNode(new, state = state))
     }
 
     private fun renderChecked(key: ExplorerTabKey, item: Node, toChecked: Boolean) {
@@ -837,11 +867,12 @@ class ExplorerService @Inject constructor(
         isOpened: Boolean = tree.any { it.uniqueId == item.uniqueId },
         isDeepest: Boolean = tree.lastOrNull()?.uniqueId == item.uniqueId,
         content: NodeContent = item.defineDirKind(),
+        state: NodeStateImpl? = null,
     ): Node {
         return item.copy(
             isChecked = checked.any { it == item.uniqueId },
             isDeepest = isDeepest,
-            state = states.find { it.uniqueId == item.uniqueId } ?: item.state,
+            state = state ?: states.find { it.uniqueId == item.uniqueId } ?: item.state,
             children = item.children?.fetch(isOpened),
             generation = generation,
             content = content,
@@ -863,7 +894,7 @@ class ExplorerService @Inject constructor(
     private fun NodeTab.withCachingState(id: Int, caching: suspend CoroutineScope.() -> Unit): Job? {
         var state = states.find { it.uniqueId == id }
         if (state != null) return state.cachingJob
-        val job = appScope.launch(start = CoroutineStart.LAZY, block = caching)
+        val job = scope.launch(start = CoroutineStart.LAZY, block = caching)
         state = states.updateState(id) {
             nextState(id, cachingJob = job)
         }
@@ -902,7 +933,7 @@ class ExplorerService @Inject constructor(
     }
 
     private fun resolveSizeAsync(key: NodeTabKey, item: Node) {
-        appScope.launch {
+        scope.launch {
             val size = NativeBridge.usage(item.ref, asSu).unwrapOr("")
             if (size != item.size) garden(key) {
                 val current = findItem(item.uniqueId)
@@ -984,9 +1015,11 @@ class ExplorerService @Inject constructor(
             return action(null, -1, root.item)
         }
         val tree = tree
-        var children = root.item.children
+        var children: NodeChildren? = null
         for (level in tree) {
-            if (level.uniqueId != root.item.uniqueId && children != null) {
+            if (level.uniqueId == root.item.uniqueId) {
+                children = root.item.children
+            } else if (children != null) {
                  children = children.indexOfFirst { it.uniqueId == level.uniqueId }
                      .let { children.getOrNull(it) }
                      ?.children

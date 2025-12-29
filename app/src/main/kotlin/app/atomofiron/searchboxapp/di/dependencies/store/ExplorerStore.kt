@@ -5,6 +5,7 @@ import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
+import app.atomofiron.searchboxapp.utils.replaceAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,6 +37,7 @@ class ExplorerStore @Inject constructor() {
     private val _alerts = EventFlow<NodeError>()
     private val _deleted = EventFlow<List<Node>>()
     private val _updated = EventFlow<Node>()
+    private val _pasteBuffer = mutableListOf<Node>()
     var currentItems = listOf<Node>()
         private set
 
@@ -48,6 +50,7 @@ class ExplorerStore @Inject constructor() {
     val alerts: Flow<NodeError> = _alerts
     val deleted: Flow<List<Node>> = _deleted
     val updated: Flow<Node> = _updated
+    val pasteBuffer: List<Node> = _pasteBuffer
 
     fun setCurrentItems(tab: ExplorerTabKey, items: List<Node>) {
         currentLists[tab] = items
@@ -72,6 +75,8 @@ class ExplorerStore @Inject constructor() {
             updateDeepest(tab)
         }
     }
+
+    fun setForCopy(list: List<Node>) = _pasteBuffer.replaceAll(list)
 
     fun updateInternalStorage(action: Node.() -> Node) {
         _internalRoot.run {

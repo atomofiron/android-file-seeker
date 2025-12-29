@@ -2,7 +2,6 @@ package app.atomofiron.searchboxapp.screens.explorer.di
 
 import app.atomofiron.common.util.extension.launchOnDefault
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
-import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.ExplorerTabKey
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -56,15 +55,12 @@ class ExplorerInteractor @Inject constructor(
     private val scope: CoroutineScope,
     private val service: ExplorerService,
     private val store: ExplorerStore,
-    private val utils: UtilService,
 ) {
     private val context = Dispatchers.IO
 
     fun getFlow(key: ExplorerTabKey) = service.getFlow(key)
 
     fun drop(vararg keys: ExplorerTabKey) = service.drop(*keys)
-
-    fun copyToClipboard(item: Node) = utils.copyToClipboard(item, withAlert = false)
 
     fun toggleRoot(key: ExplorerTabKey, item: NodeRoot) {
         scope.launch(context) {

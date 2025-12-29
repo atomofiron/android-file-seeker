@@ -9,6 +9,7 @@ import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItemContent
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.model.other.get
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.resources
 
 class MenuItemHolder private constructor(
@@ -40,5 +41,7 @@ class MenuItemHolder private constructor(
         if (content.tail != null) {
             binding.tail.setImageResource(content.tail)
         }
+        binding.root.isEnabled = item.enabled
+        binding.root.alpha = Alpha.enabled(item.enabled)
     }
 }

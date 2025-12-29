@@ -141,7 +141,9 @@
     <string name="use_as">Koristi kao…</string>
     <string name="create">Napravi</string>
     <string name="duplicate">Dubliraj</string>
-    <string name="copy_move">Kopiraj/Premesti</string>
+    <string name="paste">Nalepi</string>
+    <string name="by_copying">Kopiranjem</string>
+    <string name="by_moving">Premeštanjem</string>
     <string name="create_file_or_dir">Napravi novu datoteku ili fasciklu</string>
     <string name="create_file_dir">Nova datoteka/fascikla</string>
     <string name="date">Datum</string>

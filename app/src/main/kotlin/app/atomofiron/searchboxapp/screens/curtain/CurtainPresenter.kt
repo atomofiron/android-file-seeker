@@ -19,7 +19,10 @@ class CurtainPresenter @Inject constructor(
     router: CurtainRouter,
     private val curtainChannel: CurtainChannel,
 ) : BasePresenter<CurtainViewModel, CurtainRouter>(viewState.scope, router), CurtainApi.Controller {
+
     private var adapter: CurtainApi.Adapter<*>? = null
+    var closed = false
+        private set
 
     override val requestFrom: Int = params.recipient
     override val requestId: Int = params.layoutId
@@ -50,6 +53,9 @@ class CurtainPresenter @Inject constructor(
     }
 
     override fun close(immediately: Boolean, irrevocably: Boolean) {
+        if (immediately || irrevocably) {
+            closed = true
+        }
         when {
             immediately -> router.navigateBack()
             else -> viewState.action[scope] = CurtainAction.Hide(irrevocably)

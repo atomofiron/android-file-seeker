@@ -6,6 +6,7 @@ import app.atomofiron.searchboxapp.screens.explorer.di.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
+import app.atomofiron.searchboxapp.screens.common.delegates.ApkOperationsDelegate
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
@@ -18,6 +19,7 @@ import javax.inject.Inject
 class ExplorerItemActionListenerDelegate @Inject constructor(
     private val viewState: ExplorerViewState,
     private val operations: FileOperationsDelegate,
+    private val apks: ApkOperationsDelegate,
     private val menuListenerDelegate: ExplorerCurtainMenuDelegate,
     private val explorerStore: ExplorerStore,
     private val router: ExplorerRouter,
@@ -50,7 +52,7 @@ class ExplorerItemActionListenerDelegate @Inject constructor(
     private fun openItem(item: Node) {
         when {
             item.isDirectory -> interactor.toggleDir(currentTab, item)
-            item.content is AndroidApp -> operations.askForAndroidApp(item.content, currentTab)
+            item.content is AndroidApp -> apks.askForAndroidApp(item.content, currentTab)
             else -> router.showFile(item)
         }
     }

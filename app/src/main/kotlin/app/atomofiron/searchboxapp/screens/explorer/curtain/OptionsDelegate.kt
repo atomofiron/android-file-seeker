@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import androidx.core.view.isVisible
 import app.atomofiron.common.util.extension.appendWithComma
+import app.atomofiron.common.util.extension.unit
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainExplorerOptionsBinding
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
@@ -15,19 +16,20 @@ import lib.atomofiron.insets.insetsPadding
 
 class OptionsDelegate(private val output: MenuListener) {
 
+    private var binding: CurtainExplorerOptionsBinding? = null
+
     fun getView(options: ExplorerItemOptions, inflater: LayoutInflater): View {
         val binding = CurtainExplorerOptionsBinding.inflate(inflater, null, false)
-        binding.menuView.run {
-            submit(options)
-            setMenuListener(output)
-        }
-        binding.init(options)
+        this.binding = binding
+        binding.bind(options)
         binding.root.insetsPadding(ExtType.curtain, top = true)
         binding.menuView.insetsPadding(ExtType.curtain, bottom = true)
         return binding.root
     }
 
-    fun CurtainExplorerOptionsBinding.init(options: ExplorerItemOptions) {
+    fun bind(options: ExplorerItemOptions) = binding?.bind(options).unit()
+
+    private fun CurtainExplorerOptionsBinding.bind(options: ExplorerItemOptions) {
         val single = options.items.size == 1
         itemView.root.isVisible = single
         title.isVisible = !single
@@ -52,6 +54,10 @@ class OptionsDelegate(private val output: MenuListener) {
                 string.appendWithComma(resources.getQuantityString(R.plurals.x_files, files, files))
             }
             title.text = string.toString()
+        }
+        menuView.run {
+            submit(options)
+            setMenuListener(output)
         }
     }
 }

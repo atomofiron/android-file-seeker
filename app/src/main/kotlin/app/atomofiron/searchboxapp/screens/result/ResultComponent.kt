@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
+import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.ResultStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
@@ -69,4 +70,5 @@ interface ResultDependencies : DelegateModule.Dependencies {
     fun apks(): ApkDelegate
     fun utils(): UtilService
     fun explorerService(): ExplorerService
+    fun explorerStore(): ExplorerStore
 }

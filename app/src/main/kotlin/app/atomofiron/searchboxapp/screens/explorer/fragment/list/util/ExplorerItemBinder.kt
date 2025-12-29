@@ -4,6 +4,7 @@ import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.LayerDrawable
 import android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
@@ -16,10 +17,12 @@ import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugRequire
+import app.atomofiron.common.util.extension.unit
 import app.atomofiron.common.util.ifVisible
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
 import app.atomofiron.searchboxapp.custom.LemonDrawable
+import app.atomofiron.searchboxapp.custom.ProgressLineDrawable
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.custom.drawable.translated
@@ -27,6 +30,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
@@ -66,6 +70,7 @@ class ExplorerItemBinder private constructor(
     private val dirTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorPrimary))
     private val fileTint = ColorStateList.valueOf(itemView.context.colorAttr(MaterialAttr.colorAccent))
     private val lemon = LemonDrawable()
+    private val copyingProgress = ProgressLineDrawable(itemView.context)
 
     private var onItemActionListener: ExplorerItemBinderActionListener? = null
 
@@ -91,7 +96,7 @@ class ExplorerItemBinder private constructor(
     constructor(binding: ItemExplorerBinding, isOpened: Boolean = false) : this(binding.root, binding, isOpened)
 
     init {
-        bindState(isOpened, isDeepest = false)
+        bindStyle(isOpened, isDeepest = false)
         if (binding.checkBox.buttonTintList == null) {
             binding.checkBox.isUseMaterialThemeColors = true
         }
@@ -115,6 +120,9 @@ class ExplorerItemBinder private constructor(
 
         placeholder.setPadding(placeholder.intrinsicSize / 6)
         binding.thumbnail.clipToOutline = true
+        binding.root.run {
+            background = LayerDrawable(arrayOf(background, copyingProgress))
+        }
     }
 
     fun bind(item: Node) = binding.run {
@@ -152,8 +160,8 @@ class ExplorerItemBinder private constructor(
         checkBox.isChecked = item.isChecked
 
         error.isVisible = errorText?.isNotBlank() == true
-        progress.isVisible = item.withOperation
-        checkBox.isInvisible = item.withOperation
+        progress.isVisible = item.inProgress
+        checkBox.isInvisible = item.inProgress
         details.maxWidth = itemView.resources.displayMetrics.widthPixels / 3
 
         val iconTint = if (item.isDirectory) dirTint else fileTint
@@ -164,8 +172,11 @@ class ExplorerItemBinder private constructor(
         }
         TextViewCompat.setCompoundDrawableTintList(title, iconTint)
         debugRequire(item.isOpened == isOpened) { "${item.name} isOpened change: $isOpened -> ${item.isOpened}, isDeepest=$isDeepest" }
-        bindState(item.isOpened, item.isDeepest)
-    }
+        bindStyle(item.isOpened, item.isDeepest)
+        val copying = item.state.operation as? NodeOperation.Copying
+        copyingProgress.setVisible(copying?.isSource == false)
+        copying?.let { copyingProgress.set(it.progress) }
+    }.unit()
 
     private fun transparentCheckbox(defaultBoxTintList: ColorStateList): ColorStateList {
         val stateEnabledChecked = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked)
@@ -179,7 +190,7 @@ class ExplorerItemBinder private constructor(
         return ColorStateList(states, colors)
     }
 
-    private fun bindState(isOpened: Boolean, isDeepest: Boolean) {
+    private fun bindStyle(isOpened: Boolean, isDeepest: Boolean) {
         when {
             !isOpened -> Unit // always is opened or not
             isDeepest == this.isDeepest -> Unit

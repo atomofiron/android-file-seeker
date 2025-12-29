@@ -9,6 +9,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.other.toUni
+import app.atomofiron.searchboxapp.screens.common.delegates.ApkOperationsDelegate
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
 import app.atomofiron.searchboxapp.screens.result.ResultScope
@@ -26,6 +27,7 @@ class ResultItemActionDelegate @Inject constructor(
     private val viewState: ResultViewState,
     private val scope: CoroutineScope,
     private val operations: FileOperationsDelegate,
+    private val apks: ApkOperationsDelegate,
     private val router: ResultRouter,
     private val curtainDelegate: ResultCurtainMenuDelegate,
     private val dialogs: DialogDelegate,
@@ -39,7 +41,7 @@ class ResultItemActionDelegate @Inject constructor(
             (item.error is NodeError.NoSuchFileOrDir),
             (item.error is NodeError.PermissionDenied) -> viewState.showAlert(item.error.toAlert(item.content))
             (item.content is NodeContent.Text) -> router.openFile(item.ref, viewState.taskUuid)
-            (item.content is NodeContent.AndroidApp) -> operations.askForAndroidApp(item.content)
+            (item.content is NodeContent.AndroidApp) -> apks.askForAndroidApp(item.content)
             else -> sharing.openWith(item)
         }
     }

@@ -6,9 +6,12 @@ import android.content.Context
 import android.content.pm.PackageInfo
 import android.content.res.Resources
 import android.widget.Toast
+import app.atomofiron.common.util.Alert
+import app.atomofiron.common.util.AlertErr
 import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.other.ApkSignature
+import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.utils.Const
 import java.security.MessageDigest
 import java.security.cert.CertificateFactory
@@ -24,15 +27,20 @@ fun ClipboardManager.copy(
     text: String,
     resources: Resources = context.resources,
     withAlert: Boolean = false,
-) {
+): Alert.Uni? {
     val clip = ClipData.newPlainText(label, text)
-    val toast = try {
+    val alert = try {
         setPrimaryClip(clip)
-        resources.getString(R.string.copied)
+        Alert(R.string.copied)
     } catch (e: Exception) {
-        e.toString()
+        AlertErr(e.toString())
     }
-    if (withAlert && Android.Below.T) Toast.makeText(context, toast, Toast.LENGTH_LONG).show()
+    return when {
+        Android.T -> null
+        !withAlert -> alert
+        else -> Toast.makeText(context, resources[alert.text], Toast.LENGTH_LONG).show()
+            .let { null }
+    }
 }
 
 fun PackageInfo.signature(): ApkSignature? {

@@ -10,26 +10,16 @@ import app.atomofiron.common.util.extension.debugDelay
 import app.atomofiron.common.util.extension.then
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.view.menu.LongItem
-import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
-import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
-import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
-import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
-import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isContent
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.isInaccessible
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.merge
 import app.atomofiron.searchboxapp.utils.Rslt
-import app.atomofiron.searchboxapp.utils.getApksContent
-import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.searchboxapp.utils.getApkContent
-import app.atomofiron.searchboxapp.utils.toOk
+import app.atomofiron.searchboxapp.utils.getApksContent
 import app.atomofiron.searchboxapp.utils.unwrapOrElse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -38,56 +28,13 @@ import kotlinx.coroutines.launch
 import java.io.FileInputStream
 import javax.inject.Inject
 
-private val rootOptions = listOf(Operations.Create, Operations.CopyPath)
-private val directoryOptions = listOf(Operations.Create, Operations.CopyPath, Operations.Duplicate, Operations.Rename, Operations.Delete)
-private val oneFileOptions = listOf(Operations.Share, Operations.OpenWith, Operations.CopyPath, Operations.Duplicate, Operations.Rename, Operations.Delete)
-private val readWrite = listOf(Operations.Create, Operations.Duplicate, Operations.Rename)
-
-class FileOperationsDelegate @Inject constructor(
-    preferences: PreferenceStore,
+class ApkOperationsDelegate @Inject constructor(
     private val apks: ApkDelegate,
     private val dialogs: DialogDelegate,
-    private val utils: UtilService,
 ) {
-    private val itemComposition by preferences.explorerItemComposition
-
-    fun operations(items: List<Node>, readOnly: Boolean = false): Rslt<ExplorerItemOptions> {
-        val merged = items.merge()
-        when {
-            merged.isEmpty() -> return Rslt.Err(utils[R.string.empty])
-            merged.all { it.isInaccessible() } -> return Rslt.Err(utils[R.string.inaccessible])
-        }
-        val first = merged.firstOrNull() ?: return Rslt.Err()
-        val operations = when {
-            merged.size > 1 -> forMany(count =  merged.count { it.isFile })
-            first.isFile -> oneFileOptions.completeForSingle(first)
-            first.isRoot -> rootOptions
-            first.isDirectory -> directoryOptions
-            else -> oneFileOptions
-        }.filter {
-            readWrite.takeIf { readOnly }?.contains(it) != true
-        }
-        return ExplorerItemOptions(operations, merged, itemComposition).toOk()
-    }
-
     fun askForAndroidApp(content: NodeContent.AndroidApp, tab: NodeTabKey? = null) = askForAndroidApp(content, contentResolver = null, tab)
 
     fun askForApks(ref: NodeRef, contentResolver: ContentResolver) = askForAndroidApp(NodeContent.AndroidApp.apks(ref), contentResolver)
-
-    private fun forMany(count: Int) = buildList {
-        if (count != 0) add(Operations.Share)
-        add(Operations.Delete)
-    }
-
-    private fun List<MenuItem>.completeForSingle(single: Node): List<MenuItem> = mutate {
-        if (single.content is NodeContent.AndroidApp) {
-            val index = sumOf { it.content.cells } % LongItem
-            add(index, Operations.LaunchApp.copy(enabled = apks.launchable(single)))
-            add(index, Operations.InstallApp)
-        } else if (utils.canUseAs(single)) {
-            add(0, Operations.UseAs)
-        }
-    }
 
     private fun askForAndroidApp(
         content: NodeContent.AndroidApp,

@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.di.dependencies.service
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.copy
 import app.atomofiron.searchboxapp.android.Intents.useAs
@@ -27,7 +28,7 @@ class UtilService @Inject constructor(
     private val resources by resources
     private val asSu by preference.asSu
 
-    fun copyToClipboard(item: Node, withAlert: Boolean = Android.Below.T) = copyToClipboard(item.name, item.path, withAlert)
+    fun copyToClipboard(item: Node, withAlert: Boolean = Android.Below.T): Alert.Uni? = copyToClipboard(item.name, item.path, withAlert)
 
     fun copyToClipboard(label: String, text: String, withAlert: Boolean = false) = clipboardManager.copy(context, label, text, resources, withAlert)
 

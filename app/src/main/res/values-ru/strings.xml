@@ -152,7 +152,9 @@
     <string name="create_new">Создать</string>
     <string name="make_a_clone">Создать копию</string>
     <string name="duplicate">Дублировать</string>
-    <string name="copy_move">Копировать</string>
+    <string name="paste">Вставить</string>
+    <string name="by_copying">Копированием</string>
+    <string name="by_moving">Перемещением</string>
     <string name="create_file_or_dir">Создать файл или папку</string>
     <string name="create_file_dir">Создать файл/папку</string>
     <string name="a_name">Имя</string>

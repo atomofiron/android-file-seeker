@@ -27,7 +27,7 @@ import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.UpdateNotification
 import app.atomofiron.searchboxapp.model.preference.AppLocale
 import app.atomofiron.searchboxapp.model.preference.AppTheme
-import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
+import app.atomofiron.searchboxapp.screens.common.delegates.ApkOperationsDelegate
 import app.atomofiron.searchboxapp.screens.main.MainRouter
 import app.atomofiron.searchboxapp.screens.main.MainScope
 import app.atomofiron.searchboxapp.utils.launch
@@ -49,7 +49,7 @@ class AppEventDelegate @Inject constructor(
     scope: CoroutineScope,
     private val router: MainRouter,
     private val appStoreConsumer: AppStoreConsumer,
-    private val operations: FileOperationsDelegate,
+    private val operations: ApkOperationsDelegate,
     private val dialogs: DialogDelegate,
     private val preferences: PreferenceStore,
     updateStore: AppUpdateStore,

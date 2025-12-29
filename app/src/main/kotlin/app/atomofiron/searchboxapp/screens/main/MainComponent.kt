@@ -9,8 +9,8 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
 import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
-import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
+import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.main.di.AndroidStore
@@ -70,6 +70,6 @@ interface MainDependencies : DelegateModule.Dependencies {
     fun appUpdateService(): AppUpdateService
     fun appUpdateStore(): AppUpdateStore
     fun apkChannel(): ApkChannel
-    fun utils(): UtilService
     fun apks(): ApkDelegate
+    fun explorerStore(): ExplorerStore
 }

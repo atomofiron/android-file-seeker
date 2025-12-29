@@ -18,4 +18,15 @@ data class MenuItem(
         forwardable: Boolean = false,
         longLabel: UniText? = null,
     ) : this(id, title, MenuItemContent(icon, R.drawable.ic_forward_12.takeIf { forwardable }), longLabel = longLabel)
+
+    fun copy(
+        @DrawableRes icon: Int,
+        enabled: Boolean = true,
+    ): MenuItem {
+        val content = when (content) {
+            is MenuItemContent.Common -> content.copy(head = icon)
+            is MenuItemContent.Dangerous -> content.copy(icon = icon)
+        }
+        return copy(enabled = enabled, content = content)
+    }
 }

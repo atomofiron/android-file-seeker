@@ -23,6 +23,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
 import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.utils.Const.LF
 import kotlinx.coroutines.Job
+import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CountingResult
 import uniffi.native_lib.Meta
 import java.io.BufferedInputStream
@@ -156,11 +157,9 @@ object ExplorerUtils {
     private const val EXT_OSR = ".osr" // osu replay
     private const val EXT_OSB = ".osb" // osu storyboard
 
-    fun copy(from: Node, to: Node, asSu: Boolean): Node? {
-        val result = NativeBridge.copy(from.ref, to.ref, asSu = asSu) {
-            // todo
-        }
-        return from.apply(result)?.update(asSu, ensureCached = false)
+    fun copy(from: Node, to: Node, move: Boolean, asSu: Boolean, collector: (CommonProgress) -> Unit): Node? {
+        val result = NativeBridge.copy(from.ref, to.ref, move = move, asSu = asSu, collector)
+        return to.apply(result)?.update(asSu, ensureCached = false)
     }
 
     fun create(parent: Node, name: String, directory: Boolean, asSu: Boolean): Node? {

@@ -108,6 +108,22 @@ inline fun <I> MutableList<I>.replaceEach(action: (I) -> I) {
     }
 }
 
+inline fun <T> MutableList<T>.replaceOne(new: T, predicate: T.() -> Boolean) {
+    val each = listIterator()
+    while (each.hasNext()) {
+        val item = each.next()
+        if (predicate(item)) {
+            each.set(new)
+            return
+        }
+    }
+}
+
+fun <T> MutableList<T>.replaceAll(items: List<T>) {
+    clear()
+    addAll(items)
+}
+
 inline fun <reified E : I, I> MutableList<I>.replaceOne(action: E.() -> E): E? {
     for (i in indices) {
         val element = get(i)
