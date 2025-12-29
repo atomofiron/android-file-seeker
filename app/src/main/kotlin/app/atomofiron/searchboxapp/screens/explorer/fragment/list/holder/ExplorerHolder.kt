@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder
 
-import android.graphics.drawable.RippleDrawable
 import android.view.View
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -20,7 +19,7 @@ class ExplorerHolder(itemView: View, isOpened: Boolean) : GeneralHolder<Node>(it
     fun bindComposition(composition: ExplorerItemComposition) = binder.bindComposition(composition)
 
     fun highlight() {
-        val background = itemView.background as RippleDrawable
+        val background = binder.rippleDrawable ?: return
         val normalState = background.state
         if (normalState.contains(android.R.attr.state_pressed)) return
         val pressedState = normalState.toMutableList().apply {

@@ -6,9 +6,8 @@
     android:id="@+id/item_explorer"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/item_explorer"
     android:paddingStart="@dimen/padding_common"
-    android:paddingVertical="1dp"
+    android:paddingVertical="@dimen/padding_micro"
     >
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/thumbnail"

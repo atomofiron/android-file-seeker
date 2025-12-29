@@ -7,6 +7,7 @@ import android.graphics.drawable.GradientDrawable.Orientation.BOTTOM_TOP
 import android.graphics.drawable.RippleDrawable
 import android.view.View
 import androidx.annotation.DimenRes
+import androidx.core.content.ContextCompat
 import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findColorByAttr
@@ -14,10 +15,19 @@ import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.TextField
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.drawable
 import app.atomofiron.searchboxapp.utils.over
 import app.atomofiron.searchboxapp.utils.withAlpha
 import com.google.android.material.textfield.TextInputLayout
+
+fun Context.explorerRippleDrawable(): RippleDrawable {
+    val mask = ContextCompat.getColor(this@explorerRippleDrawable, R.color.mask)
+        .let { GradientDrawable(BOTTOM_TOP, intArrayOf(it, it)) }
+    mask.cornerRadius = resources.getDimension(R.dimen.explorer_border_width)
+    val ripple = colorAttr(MaterialAttr.colorControlHighlight)
+    return RippleDrawable(ColorStateList.valueOf(ripple), null, mask)
+}
 
 fun View.setMenuItemBackground() {
     val drawable = context.drawable(R.drawable.item_menu) as RippleDrawable

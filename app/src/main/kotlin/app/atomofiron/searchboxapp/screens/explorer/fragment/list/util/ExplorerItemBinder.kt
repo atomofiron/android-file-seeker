@@ -25,6 +25,7 @@ import app.atomofiron.searchboxapp.custom.LemonDrawable
 import app.atomofiron.searchboxapp.custom.ProgressLineDrawable
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
+import app.atomofiron.searchboxapp.custom.drawable.explorerRippleDrawable
 import app.atomofiron.searchboxapp.custom.drawable.translated
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
@@ -74,7 +75,7 @@ class ExplorerItemBinder(
     private val fileTint = ColorStateList.valueOf(context.colorAttr(MaterialAttr.colorAccent))
     private val lemon = LemonDrawable()
     private val progressDrawable = ProgressLineDrawable(context)
-    val rippleDrawable = binding.root.background as? RippleDrawable
+    val rippleDrawable get() = binding.root.background as? RippleDrawable
 
     private var onItemActionListener: ExplorerItemBinderActionListener? = null
 
@@ -98,6 +99,11 @@ class ExplorerItemBinder(
     constructor(itemView: View, isOpened: Boolean = false) : this(ItemExplorerBinding.bind(itemView), isOpened)
 
     init {
+        if (!isOpened) {
+            val rippleDrawable = context.explorerRippleDrawable()
+            rippleDrawable.addLayer(progressDrawable)
+            binding.root.background = rippleDrawable
+        }
         bindStyle(isOpened, isDeepest = false)
         if (binding.checkBox.buttonTintList == null) {
             binding.checkBox.isUseMaterialThemeColors = true
@@ -122,7 +128,6 @@ class ExplorerItemBinder(
 
         placeholder.setPadding(placeholder.intrinsicSize / 6)
         binding.thumbnail.clipToOutline = true
-        rippleDrawable?.addLayer(progressDrawable)
     }
 
     fun bind(item: Node) = binding.run {
