@@ -4,7 +4,7 @@ import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.Typeface
-import android.graphics.drawable.LayerDrawable
+import android.graphics.drawable.RippleDrawable
 import android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
 import android.text.SpannableStringBuilder
 import android.text.style.ImageSpan
@@ -73,7 +73,8 @@ class ExplorerItemBinder(
     private val dirTint = ColorStateList.valueOf(context.colorAttr(MaterialAttr.colorPrimary))
     private val fileTint = ColorStateList.valueOf(context.colorAttr(MaterialAttr.colorAccent))
     private val lemon = LemonDrawable()
-    private val copyingProgress = ProgressLineDrawable(context)
+    private val progressDrawable = ProgressLineDrawable(context)
+    val rippleDrawable = binding.root.background as? RippleDrawable
 
     private var onItemActionListener: ExplorerItemBinderActionListener? = null
 
@@ -94,7 +95,7 @@ class ExplorerItemBinder(
     }
     private val bitmapListener = BitmapListener()
 
-    constructor(itemView: View, isOpened: Boolean) : this(ItemExplorerBinding.bind(itemView), isOpened)
+    constructor(itemView: View, isOpened: Boolean = false) : this(ItemExplorerBinding.bind(itemView), isOpened)
 
     init {
         bindStyle(isOpened, isDeepest = false)
@@ -121,9 +122,7 @@ class ExplorerItemBinder(
 
         placeholder.setPadding(placeholder.intrinsicSize / 6)
         binding.thumbnail.clipToOutline = true
-        binding.root.run {
-            background = LayerDrawable(arrayOf(background, copyingProgress))
-        }
+        rippleDrawable?.addLayer(progressDrawable)
     }
 
     fun bind(item: Node) = binding.run {
@@ -175,8 +174,8 @@ class ExplorerItemBinder(
         debugRequire(item.isOpened == isOpened) { "${item.name} isOpened change: $isOpened -> ${item.isOpened}, isDeepest=$isDeepest" }
         bindStyle(item.isOpened, item.isDeepest)
         val copying = item.state.operation as? NodeOperation.Copying
-        copyingProgress.setVisible(copying?.isSource == false)
-        copying?.let { copyingProgress.set(it.progress) }
+        progressDrawable.setVisible(copying?.isSource == false)
+        copying?.let { progressDrawable.set(it.progress) }
     }.unit()
 
     private fun transparentCheckbox(defaultBoxTintList: ColorStateList): ColorStateList {

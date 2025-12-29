@@ -87,7 +87,7 @@ class ExplorerCurtainMenuDelegate @Inject constructor(
             Operations.Rename.id -> controller?.showNext(RENAME)
             else -> null
         }?.let { return }
-        val (alert, new) = operations.action(item, targets, viewState.currentTab.value)
+        val (alert, operations) = operations.action(item, targets, viewState.currentTab.value)
         alert?.let { controller?.showSnackbar(it) }
         if (alert?.error == true) {
             return
@@ -98,7 +98,7 @@ class ExplorerCurtainMenuDelegate @Inject constructor(
             Operations.Delete.id -> controller?.close(irrevocably = true)
                 .also { return }
         }
-        new?.let { optionsDelegate.bind(it) }
+        operations?.let { optionsDelegate.bind(it) }
     }
 
     fun onCloneConfirm(target: Node, name: String) {

@@ -40,7 +40,7 @@ class ResultCurtainMenuDelegate @Inject constructor(
     override fun onMenuItemSelected(item: MenuItem) {
         val data = data ?: return
         val targets = data.items
-        val (alert, new) = operations.action(item, targets)
+        val (alert, operations) = operations.action(item, targets)
         alert?.let { controller?.showSnackbar(it) }
         if (alert?.error == true) {
             return
@@ -51,7 +51,7 @@ class ResultCurtainMenuDelegate @Inject constructor(
             Operations.Delete.id -> controller?.close(irrevocably = true)
                 .also { return }
         }
-        new?.let { optionsDelegate.bind(it) }
+        operations?.let { optionsDelegate.bind(it) }
     }
 
     fun showOptions(options: ExplorerItemOptions) {

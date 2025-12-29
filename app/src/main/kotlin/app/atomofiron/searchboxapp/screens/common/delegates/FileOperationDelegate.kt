@@ -64,20 +64,20 @@ class FileOperationDelegate @Inject constructor(
         .map { it.copy(visibleBox = false) }
 
     fun operations(targets: List<Node>, readOnly: Boolean = false): Rslt<ExplorerItemOptions> {
-        return operations(targets, mode = if (readOnly) Mode.Copy else Mode.CopyPaste)
-    }
-
-    private fun operations(targets: List<Node>, mode: Mode): Rslt<ExplorerItemOptions> {
         val merged = targets.merge()
         when {
             merged.isEmpty() -> return Rslt.Err(utils[R.string.empty])
             merged.all { it.isInaccessible() } -> return Rslt.Err(utils[R.string.inaccessible])
         }
-        val operations = buildOption(merged, first = merged.first(), mode)
+        val operations = buildOperations(merged, first = merged.first(), readOnly)
         return ExplorerItemOptions(operations, merged, itemComposition).toOk()
     }
 
-    private fun buildOption(targets: List<Node>, first: Node, mode: Mode): List<MenuItem> = buildList {
+    private fun buildOperations(targets: List<Node>, first: Node, readOnly: Boolean): List<MenuItem> {
+        return buildOperations(targets, first, mode = if (readOnly) Mode.Copy else Mode.CopyPaste)
+    }
+
+    private fun buildOperations(targets: List<Node>, first: Node, mode: Mode): List<MenuItem> = buildList {
         val single = targets.size == 1
         if (mode.rw) add(Create)
         if (single) add(CopyPath)
@@ -106,7 +106,7 @@ class FileOperationDelegate @Inject constructor(
         }
     }
 
-    fun action(item: MenuItem, targets: List<Node>, key: NodeTabKey? = null): Pair<Alert.Uni?, ExplorerItemOptions?> {
+    fun action(item: MenuItem, targets: List<Node>, key: NodeTabKey? = null): Pair<Alert.Uni?, List<MenuItem>?> {
         val first = targets.firstOrNull()
         first ?: return Empty.also { debugFail { "targets are empty" } }
         when (item.id) {
@@ -119,9 +119,9 @@ class FileOperationDelegate @Inject constructor(
             CopyPath.id -> return utils.copyToClipboard(first, withAlert = false) to null
             Copy.id -> {
                 store.setForCopy(targets)
-                return Alert(R.string.copied) to operations(targets, readOnly = key == null).ok()?.value
+                return Alert(R.string.copied) to buildOperations(targets, first, readOnly = key == null)
             }
-            Paste.id -> return null to operations(targets, mode = if (item.activated) Mode.CopyPaste else Mode.Paste).ok()?.value
+            Paste.id -> return null to buildOperations(targets, first, mode = if (item.activated) Mode.CopyPaste else Mode.Paste)
             ByCopying.id,
             ByMoving.id -> {
                 val copied = store.pasteBuffer

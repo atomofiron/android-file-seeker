@@ -8,4 +8,4 @@ data class ExplorerItemOptions(
     val operations: List<MenuItem>,
     val items: List<Node>,
     val composition: ExplorerItemComposition,
-) : List<MenuItem> by operations
+)
