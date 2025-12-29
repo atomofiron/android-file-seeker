@@ -10,7 +10,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.screens.common.delegates.ApkOperationsDelegate
-import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
+import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
 import app.atomofiron.searchboxapp.screens.result.ResultScope
 import app.atomofiron.searchboxapp.screens.result.ResultViewState
@@ -26,7 +26,7 @@ import javax.inject.Inject
 class ResultItemActionDelegate @Inject constructor(
     private val viewState: ResultViewState,
     private val scope: CoroutineScope,
-    private val operations: FileOperationsDelegate,
+    private val operations: FileOperationDelegate,
     private val apks: ApkOperationsDelegate,
     private val router: ResultRouter,
     private val curtainDelegate: ResultCurtainMenuDelegate,

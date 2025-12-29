@@ -7,7 +7,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.screens.common.delegates.ApkOperationsDelegate
-import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
+import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationDelegate
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerViewState
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @ExplorerScope
 class ExplorerItemActionListenerDelegate @Inject constructor(
     private val viewState: ExplorerViewState,
-    private val operations: FileOperationsDelegate,
+    private val operations: FileOperationDelegate,
     private val apks: ApkOperationsDelegate,
     private val menuListenerDelegate: ExplorerCurtainMenuDelegate,
     private val explorerStore: ExplorerStore,

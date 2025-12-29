@@ -7,7 +7,7 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
-import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
+import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationDelegate
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations.ByCopying
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations.ByMoving
@@ -36,7 +36,7 @@ class ExplorerCurtainMenuDelegate @Inject constructor(
     private val viewState: ExplorerViewState,
     private val router: ExplorerRouter,
     private val explorerStore: ExplorerStore,
-    private val operations: FileOperationsDelegate,
+    private val operations: FileOperationDelegate,
     private val interactor: ExplorerInteractor,
     curtainChannel: CurtainChannel,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>(), Recipient, MenuListener {

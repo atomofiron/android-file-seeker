@@ -6,7 +6,7 @@ import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
-import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationsDelegate
+import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationDelegate
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations.ByCopying
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations.ByMoving
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class ResultCurtainMenuDelegate @Inject constructor(
     scope: CoroutineScope,
     private val router: ResultRouter,
-    private val operations: FileOperationsDelegate,
+    private val operations: FileOperationDelegate,
     curtainChannel: CurtainChannel,
 ) : Recipient, CurtainApi.Adapter<CurtainApi.ViewHolder>(), MenuListener {
 

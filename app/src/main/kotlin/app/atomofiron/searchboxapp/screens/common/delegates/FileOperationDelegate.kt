@@ -42,7 +42,7 @@ import javax.inject.Inject
 
 private val Empty = null to null
 
-class FileOperationsDelegate @Inject constructor(
+class FileOperationDelegate @Inject constructor(
     override val scope: CoroutineScope,
     preferences: PreferenceStore,
     private val apks: ApkDelegate,
