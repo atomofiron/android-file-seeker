@@ -28,10 +28,13 @@ open class GeneralHolder<D : Any>(view: View) : RecyclerView.ViewHolder(view) {
     constructor(parent: ViewGroup, layoutId: Int) : this(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
 
     fun bind(item: D, position: Int) {
+        onPreBind(_itemOrNull, item, position)
         truePosition = position
         _itemOrNull = item
         onBind(item, position)
     }
+
+    protected open fun onPreBind(old: D?, new: D, position: Int) = Unit
 
     protected open fun onBind(item: D, position: Int) = Unit
 
