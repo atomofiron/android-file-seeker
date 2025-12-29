@@ -39,6 +39,8 @@ fun <T> Flow<T>.collect(scope: CoroutineScope, collector: FlowCollector<T> = Nop
     scope.launch { collect(collector) }
 }
 
+operator fun <T> Flow<T>.set(scope: CoroutineScope, collector: FlowCollector<T>) = collect(scope, collector)
+
 fun <T> Flow<T>.first(scope: CoroutineScope, collector: FlowCollector<T>) {
     scope.launch { collector.emit(first()) }
 }

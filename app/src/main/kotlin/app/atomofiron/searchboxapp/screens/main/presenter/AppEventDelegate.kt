@@ -7,18 +7,16 @@ import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.lifecycle.Lifecycle
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.dialog.DialogConfig
 import app.atomofiron.common.util.dialog.DialogDelegate
-import app.atomofiron.common.util.flow.collect
+import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.android.dismissUpdateNotification
 import app.atomofiron.searchboxapp.android.showUpdateNotification
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
-import app.atomofiron.searchboxapp.screens.main.di.AppStoreConsumer
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -30,10 +28,9 @@ import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.common.delegates.ApkOperationsDelegate
 import app.atomofiron.searchboxapp.screens.main.MainRouter
 import app.atomofiron.searchboxapp.screens.main.MainScope
+import app.atomofiron.searchboxapp.screens.main.di.AppStoreConsumer
 import app.atomofiron.searchboxapp.utils.launch
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.FlowCollector
 import javax.inject.Inject
 
 interface AppEventDelegateApi {
@@ -61,10 +58,10 @@ class AppEventDelegate @Inject constructor(
     private val activity get() = router.activity
 
     init {
-        preferences.appTheme.collect(scope, ::onThemeApplied)
-        updateStore.state.collect(scope, ::onUpdateState)
-        apkChannel.errorMessage.collectWhenResumed(scope) { dialogs.showError(UniText(it)) }
-        apkChannel.offerPackageName.collectWhenResumed(scope) { offerLaunch(it) }
+        preferences.appTheme[scope] = ::onThemeApplied
+        updateStore.state[scope] = ::onUpdateState
+        apkChannel.errorMessage[scope] = { dialogs.showError(UniText(it)) }
+        apkChannel.offerPackageName[scope] = { offerLaunch(it) }
     }
 
     override fun onActivityCreate(activity: AppCompatActivity) {
@@ -136,14 +133,6 @@ class AppEventDelegate @Inject constructor(
                 }
             },
         )
-    }
-
-    private fun <T> Flow<T>.collectWhenResumed(scope: CoroutineScope, collector: FlowCollector<T>) {
-        collect(scope) {
-            if (activity?.lifecycle?.currentState == Lifecycle.State.RESUMED) {
-                collector.emit(it)
-            }
-        }
     }
 
     private fun updateLocalePreference() {
