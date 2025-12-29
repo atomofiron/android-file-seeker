@@ -62,6 +62,7 @@ private fun attrs() = listOf(
     MaterialAttr.colorOnBackground,
     MaterialAttr.colorSurface,
     MaterialAttr.colorOnSurface,
+    MaterialAttr.colorSurfaceContainer,
     MaterialAttr.colorSurfaceVariant,
     MaterialAttr.colorOnSurfaceVariant,
     MaterialAttr.colorOutline,

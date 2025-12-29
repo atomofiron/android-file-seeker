@@ -9,6 +9,7 @@ data class MenuItem(
     val label: UniText,
     val content: MenuItemContent,
     val enabled: Boolean = true,
+    val secondary: Boolean = false,
     val longLabel: UniText? = null,
 ) {
     constructor(
@@ -17,7 +18,8 @@ data class MenuItem(
         @DrawableRes icon: Int,
         forwardable: Boolean = false,
         longLabel: UniText? = null,
-    ) : this(id, title, MenuItemContent(icon, R.drawable.ic_forward_12.takeIf { forwardable }), longLabel = longLabel)
+        secondary: Boolean = false,
+    ) : this(id, title, MenuItemContent(icon, R.drawable.ic_forward_12.takeIf { forwardable }), secondary = secondary, longLabel = longLabel)
 
     fun copy(
         @DrawableRes icon: Int,

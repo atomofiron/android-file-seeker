@@ -43,5 +43,6 @@ class MenuItemHolder private constructor(
         }
         binding.root.isEnabled = item.enabled
         binding.root.alpha = Alpha.enabled(item.enabled)
+        binding.root.isActivated = item.secondary
     }
 }
