@@ -95,14 +95,14 @@ class FileOperationsDelegate @Inject constructor(
         val copied = store.pasteBuffer
         val pasteable = copied.isNotEmpty() && copied.none { it.ref == first.ref || it.parentRef == first.ref || first.ref.isChildOf(it.ref) }
         val allDirs = copied.isNotEmpty() && copied.all { it.isDirectory }
-        val icon = when (allDirs) {
-            true -> R.drawable.ic_insert_folder
-            false -> R.drawable.ic_insert_file
-        }
-        add(Paste.copy(enabled = mode.rw && pasteable && !mode.pasting, icon = icon))
+        add(Paste.copy(
+            icon = if (allDirs) R.drawable.ic_insert_folder else R.drawable.ic_insert_file,
+            enabled = mode.rw && pasteable && !mode.pasting,
+            extra = mode.pasting,
+        ))
         if (mode.pasting) {
-            add(ByCopying)
-            add(ByMoving)
+            add(ByCopying.copy(icon = if (allDirs) R.drawable.ic_insert_copy_folder else R.drawable.ic_insert_copy_file))
+            add(ByMoving.copy(icon = if (allDirs) R.drawable.ic_insert_move_folder else R.drawable.ic_insert_move_file))
         }
         add(Delete)
         if (single && first.content is NodeContent.AndroidApp) {
