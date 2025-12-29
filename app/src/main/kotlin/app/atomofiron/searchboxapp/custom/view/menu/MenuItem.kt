@@ -9,7 +9,7 @@ data class MenuItem(
     val label: UniText,
     val content: MenuItemContent,
     val enabled: Boolean = true,
-    val extra: Boolean = false,
+    val activated: Boolean = false,
     val longLabel: UniText? = null,
 ) {
     constructor(
@@ -19,17 +19,17 @@ data class MenuItem(
         forwardable: Boolean = false,
         longLabel: UniText? = null,
         secondary: Boolean = false,
-    ) : this(id, title, MenuItemContent(icon, R.drawable.ic_forward_12.takeIf { forwardable }), extra = secondary, longLabel = longLabel)
+    ) : this(id, title, MenuItemContent(icon, R.drawable.ic_forward_12.takeIf { forwardable }), activated = secondary, longLabel = longLabel)
 
     fun copy(
         @DrawableRes icon: Int,
         enabled: Boolean = this.enabled,
-        extra: Boolean = this.extra,
+        activated: Boolean = this.activated,
     ): MenuItem {
         val content = when (content) {
             is MenuItemContent.Common -> content.copy(head = icon)
             is MenuItemContent.Dangerous -> content.copy(icon = icon)
         }
-        return copy(enabled = enabled, content = content, extra = extra)
+        return copy(enabled = enabled, content = content, activated = activated)
     }
 }

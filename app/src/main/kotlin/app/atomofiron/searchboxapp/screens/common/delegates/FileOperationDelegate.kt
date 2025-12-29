@@ -40,7 +40,6 @@ import app.atomofiron.searchboxapp.utils.toOk
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
-private val rootOptions = listOf(Create, CopyPath)
 private val Empty = null to null
 
 class FileOperationDelegate @Inject constructor(
@@ -74,41 +73,30 @@ class FileOperationDelegate @Inject constructor(
             merged.isEmpty() -> return Rslt.Err(utils[R.string.empty])
             merged.all { it.isInaccessible() } -> return Rslt.Err(utils[R.string.inaccessible])
         }
-        val operations = when {
-            merged.size > 1 -> Rslt.Ok(Operations.run { listOf(Share, Copy, Delete) })
-            else -> buildOption(merged, mode)
-        }
-        return when (operations) {
-            is Rslt.Ok -> ExplorerItemOptions(operations.value, merged, itemComposition).toOk()
-            is Rslt.Err -> return Rslt.Err(operations.message)
-        }
+        val operations = buildOption(merged, first = merged.first(), mode)
+        return ExplorerItemOptions(operations, merged, itemComposition).toOk()
     }
 
-    private fun buildOption(targets: List<Node>, mode: Mode): Rslt<List<MenuItem>> = buildList {
-        val first = targets.firstOrNull()
-            ?: return Rslt.Err()
+    private fun buildOption(targets: List<Node>, first: Node, mode: Mode): List<MenuItem> = buildList {
         val single = targets.size == 1
         if (mode.rw) add(Create)
         if (single) add(CopyPath)
-        if (first.isRoot) {
-            return@buildList
-        }
-        if (single && mode.rw) add(Duplicate)
-        if (single && mode.rw) add(Rename)
-        add(Copy)
+        if (single && mode.rw && !first.isRoot) add(Duplicate)
+        if (single && mode.rw && !first.isRoot) add(Rename)
+        add(Copy.copy(enabled = !first.isRoot))
         val copied = store.pasteBuffer
         val pasteable = single && first.isDirectory && copied.isNotEmpty() && copied.none { it.ref == first.ref || it.parentRef == first.ref || first.ref.isChildOf(it.ref) }
         val allDirs = copied.isNotEmpty() && copied.all { it.isDirectory }
         add(Paste.copy(
             icon = if (allDirs) R.drawable.ic_insert_folder else R.drawable.ic_insert_file,
-            enabled = mode.rw && pasteable && !mode.pasting,
-            extra = mode.pasting,
+            enabled = single && mode.rw && pasteable,
+            activated = mode.pasting,
         ))
         if (mode.pasting) {
             add(ByCopying.copy(icon = if (allDirs) R.drawable.ic_insert_copy_folder else R.drawable.ic_insert_copy_file))
             add(ByMoving.copy(icon = if (allDirs) R.drawable.ic_insert_move_folder else R.drawable.ic_insert_move_file))
         }
-        add(Delete)
+        if (!first.isRoot) add(Delete)
         if (single && first.content is NodeContent.AndroidApp) {
             val index = sumOf<MenuItem> { it.content.cells } % LongItem
             add(index, LaunchApp.copy(enabled = apks.launchable(first)))
@@ -116,12 +104,12 @@ class FileOperationDelegate @Inject constructor(
         } else if (single && utils.canUseAs(first)) {
             add(0, UseAs)
         }
-    }.let { Rslt.Ok(it) }
+    }
 
-    fun action(id: Int, targets: List<Node>, key: NodeTabKey? = null): Pair<Alert.Uni?, ExplorerItemOptions?> {
+    fun action(item: MenuItem, targets: List<Node>, key: NodeTabKey? = null): Pair<Alert.Uni?, ExplorerItemOptions?> {
         val first = targets.firstOrNull()
         first ?: return Empty.also { debugFail { "targets are empty" } }
-        when (id) {
+        when (item.id) {
             Delete.id -> deleteFile(targets, key)
             Share.id -> sharing.shareWith(targets.filter { it.isFile })
             OpenWith.id -> sharing.openWith(first)
@@ -133,14 +121,14 @@ class FileOperationDelegate @Inject constructor(
                 store.setForCopy(targets)
                 return Alert(R.string.copied) to operations(targets, readOnly = key == null).ok()?.value
             }
-            Paste.id -> return null to operations(targets, mode = Mode.Paste).ok()?.value
+            Paste.id -> return null to operations(targets, mode = if (item.activated) Mode.CopyPaste else Mode.Paste).ok()?.value
             ByCopying.id,
             ByMoving.id -> {
                 val copied = store.pasteBuffer
                     .takeIfNotEmpty()
                     ?: return Empty.also { debugFailUnreachable() }
                 val key = key ?: return Empty.also { debugFailUnreachable() }
-                io { service.tryCopy(key, copied, first, asMoving = id == ByMoving.id) }
+                io { service.tryCopy(key, copied, first, asMoving = item.id == ByMoving.id) }
             }
             else -> Unit
         }

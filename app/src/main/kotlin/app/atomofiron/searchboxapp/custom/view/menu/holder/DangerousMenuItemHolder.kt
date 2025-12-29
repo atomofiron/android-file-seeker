@@ -18,7 +18,6 @@ class DangerousMenuItemHolder private constructor(
     private val listener: MenuListener,
 ) : MenuHolder(view) {
 
-    private var itemId = 0
 
     constructor(parent: ViewGroup, listener: MenuListener) : this(
         ItemCurtainMenuDangerousBinding.inflate(LayoutInflater.from(parent.context), parent, false).root,
@@ -27,7 +26,7 @@ class DangerousMenuItemHolder private constructor(
 
     init {
         view.listener = {
-            listener.onMenuItemSelected(itemId)
+            listener.onMenuItemSelected(item)
             true
         }
         view.setThumbColor(view.context.colorSurfaceContainer())
@@ -36,7 +35,6 @@ class DangerousMenuItemHolder private constructor(
     }
 
     override fun onBind(item: MenuItem, position: Int) {
-        itemId = item.id
         val title = view.resources[item.label]
         val content = item.content as MenuItemContent.Dangerous
         view.setText(title)

@@ -17,8 +17,6 @@ class MenuItemHolder private constructor(
     private val listener: MenuListener,
 ) : MenuHolder(binding.root) {
 
-    private var itemId = 0
-
     constructor(parent: ViewGroup, listener: MenuListener) : this(
         ItemCurtainMenuBinding.inflate(LayoutInflater.from(parent.context), parent, false),
         listener,
@@ -27,12 +25,11 @@ class MenuItemHolder private constructor(
     init {
         binding.root.setMenuItemBackground()
         itemView.setOnClickListener {
-            listener.onMenuItemSelected(itemId)
+            listener.onMenuItemSelected(item)
         }
     }
 
     override fun onBind(item: MenuItem, position: Int) {
-        itemId = item.id
         val content = item.content as MenuItemContent.Common
         binding.icon.setImageResource(content.head)
         val label = item.longLabel?.takeIf { isLong } ?: item.label
@@ -43,6 +40,6 @@ class MenuItemHolder private constructor(
         }
         binding.root.isEnabled = item.enabled
         binding.root.alpha = Alpha.enabled(item.enabled)
-        binding.root.isActivated = item.extra
+        binding.root.isActivated = item.activated
     }
 }

@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer.presenter
 
 import android.view.LayoutInflater
 import app.atomofiron.common.arch.Recipient
+import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
@@ -9,8 +10,6 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationDelegate
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations
-import app.atomofiron.searchboxapp.screens.common.delegates.Operations.ByCopying
-import app.atomofiron.searchboxapp.screens.common.delegates.Operations.ByMoving
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
@@ -79,23 +78,23 @@ class ExplorerCurtainMenuDelegate @Inject constructor(
         }
     }
 
-    override fun onMenuItemSelected(id: Int) {
+    override fun onMenuItemSelected(item: MenuItem) {
         val options = data ?: return
         val targets = options.items
-        when (id) {
+        when (item.id) {
             Operations.Duplicate.id -> controller?.showNext(CLONE)
             Operations.Create.id -> controller?.showNext(CREATE)
             Operations.Rename.id -> controller?.showNext(RENAME)
             else -> null
         }?.let { return }
-        val (alert, new) = operations.action(id, targets, viewState.currentTab.value)
+        val (alert, new) = operations.action(item, targets, viewState.currentTab.value)
         alert?.let { controller?.showSnackbar(it) }
         if (alert?.error == true) {
             return
         }
-        when (id) {
-            ByCopying.id,
-            ByMoving.id,
+        when (item.id) {
+            Operations.ByCopying.id,
+            Operations.ByMoving.id,
             Operations.Delete.id -> controller?.close(irrevocably = true)
                 .also { return }
         }
