@@ -17,6 +17,7 @@ class ProgressLineDrawable(context: Context) : Drawable() {
     private val radius = context.resources.getDimension(R.dimen.progress_line_width) / 2
     private val padding = context.resources.getDimension(R.dimen.padding_common)
     private var progress = 0f
+    private var visible = false
 
     init {
         paint.strokeWidth = radius * 2
@@ -24,7 +25,15 @@ class ProgressLineDrawable(context: Context) : Drawable() {
         paint.color = context.colorAttr(MaterialAttr.colorPrimaryInverse)
     }
 
-    fun setVisible(visible: Boolean) = super.setVisible(visible, false)
+    override fun setVisible(visible: Boolean, restart: Boolean): Boolean = false
+
+    fun setVisible(visible: Boolean) {
+        if (visible != this.visible && visible == super.isVisible) {
+            invalidateSelf()
+        }
+        super.setVisible(visible, false)
+        this.visible = visible
+    }
 
     fun set(progress: Float) {
         this.progress = progress
@@ -32,7 +41,7 @@ class ProgressLineDrawable(context: Context) : Drawable() {
     }
 
     override fun draw(canvas: Canvas) {
-        if (!isVisible) return
+        if (!visible) return
         val y = bounds.bottom - radius
         val dx = (bounds.width() - padding) * progress
         paint.alpha = Alpha.LEVEL_30
