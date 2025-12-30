@@ -4,6 +4,7 @@ import app.atomofiron.common.util.extension.put
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
+import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
 import app.atomofiron.searchboxapp.utils.mutate
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,11 +41,13 @@ class FinderStore @Inject constructor(
         put(item) { it.uuid == item.uuid }
     }
 
-    suspend fun setSorting(id: Int, sorting: NodeSorting) {
-        updateTasks {
+    suspend fun setSorting(id: Int, sorting: NodeSorting): GlobalSearchResult? {
+        return updateTasks {
             val index = indexOfFirst { it.uniqueId == id }
-            val task = getOrNull(index) ?: return
-            set(index, task.copy(result = task.result.copy(sorting = sorting)))
+            val task = getOrNull(index) ?: return null
+            val new = task.result.copy(sorting = sorting)
+            set(index, task.copy(result = new))
+            new
         }
     }
 
@@ -62,9 +65,12 @@ class FinderStore @Inject constructor(
         }
     }
 
-    private suspend inline fun updateTasks(action: MutableList<GlobalSearchTask>.() -> Unit) {
-        mutex.withLock {
-            _tasksFlow.value = _tasksFlow.value.toMutableList().apply(action)
+    private suspend inline fun <R> updateTasks(action: MutableList<GlobalSearchTask>.() -> R): R {
+        return mutex.withLock {
+            val new = _tasksFlow.value.toMutableList()
+            val result = new.action()
+            _tasksFlow.value = new
+            result
         }
     }
 

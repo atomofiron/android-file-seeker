@@ -43,14 +43,14 @@ import javax.inject.Inject
 private val Empty = null to null
 
 class FileOperationDelegate @Inject constructor(
-    override val scope: CoroutineScope,
+    private val scope: CoroutineScope,
     preferences: PreferenceStore,
     private val apks: ApkDelegate,
     private val utils: UtilService,
     private val store: ExplorerStore,
     private val sharing: FileSharingDelegate,
     private val service: ExplorerService,
-) : CoroutineLauncher {
+) : CoroutineLauncher by CoroutineLauncher(scope) {
     private enum class Mode(
         val rw: Boolean,
         val pasting: Boolean,

@@ -12,10 +12,10 @@ import javax.inject.Inject
 
 @FinderScope
 class FinderHistoryPresenterDelegate @Inject constructor(
-    override val scope: CoroutineScope,
+    private val scope: CoroutineScope,
     private val viewState: FinderViewState,
     private val history: HistoryDao,
-) : HistoryAdapter.OnItemClickListener, CoroutineLauncher {
+) : HistoryAdapter.OnItemClickListener, CoroutineLauncher by CoroutineLauncher(scope) {
 
     override fun onItemClick(item: ItemHistory) = viewState.replaceQuery(item.query)
 

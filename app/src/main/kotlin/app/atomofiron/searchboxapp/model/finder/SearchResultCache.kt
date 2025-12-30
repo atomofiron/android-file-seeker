@@ -5,7 +5,7 @@ import androidx.room.PrimaryKey
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 
 @Entity(tableName = FinderDao.RESULT)
-class SearchResultCache(
+data class SearchResultCache(
     @PrimaryKey
     val id: Int,
     val stopped: Boolean,

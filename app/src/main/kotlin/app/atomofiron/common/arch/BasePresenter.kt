@@ -2,14 +2,13 @@ package app.atomofiron.common.arch
 
 import android.os.Bundle
 import androidx.lifecycle.ViewModel
+import app.atomofiron.searchboxapp.utils.CoroutineLauncher
 import kotlinx.coroutines.CoroutineScope
 
-abstract class BasePresenter<M : ViewModel, R : BaseRouter> constructor(
+abstract class BasePresenter<M : ViewModel, R : BaseRouter>(
     protected val scope: CoroutineScope,
     protected val router: R,
-    private val nullableResponseRecipient: String? = null,
-) : Recipient {
-    protected val responseRecipient: String get() = nullableResponseRecipient!!
+) : Recipient, CoroutineLauncher by CoroutineLauncher(scope) {
 
     abstract fun onSubscribeData()
 

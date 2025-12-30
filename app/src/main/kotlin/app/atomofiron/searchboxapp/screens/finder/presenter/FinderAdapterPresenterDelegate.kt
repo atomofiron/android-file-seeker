@@ -29,7 +29,7 @@ import javax.inject.Inject
 
 @FinderScope
 class FinderAdapterPresenterDelegate @Inject constructor(
-    override val scope: CoroutineScope,
+    private val scope: CoroutineScope,
     private val viewState: FinderViewState,
     private val router: FinderRouter,
     private val storagePermissionDelegate: StoragePermissionDelegate,
@@ -37,7 +37,7 @@ class FinderAdapterPresenterDelegate @Inject constructor(
     private val preferences: PreferenceStore,
     private val history: HistoryDao,
     private val cache: FinderDao,
-) : CoroutineLauncher,
+) : CoroutineLauncher by CoroutineLauncher(scope),
     QueryFieldHolder.OnActionListener,
     CharactersHolder.OnActionListener,
     EditOptionsHolder.FinderConfigListener,

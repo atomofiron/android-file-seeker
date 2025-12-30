@@ -7,6 +7,7 @@ import app.atomofiron.common.util.extension.debugFailUnreachable
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.extension.mapCast
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.router.startReceiveInto
@@ -37,8 +38,10 @@ class ResultPresenter @Inject constructor(
     private val picking: FilePickingDelegate,
     private val sharing: FileSharingDelegate,
     private val workManager: WorkManager,
+    private val dao: FinderDao,
 ) : BasePresenter<ResultViewModel, ResultRouter>(scope, router),
     ResultItemActionListener by itemActionDelegate {
+
     private val taskId = params.taskId
     private val resources by resources
 
@@ -85,7 +88,7 @@ class ResultPresenter @Inject constructor(
         when {
             mode is ActivityMode.Default -> debugFailUnreachable()
             mode is ActivityMode.Receive -> {
-                scope.launch {
+                main {
                     workManager.startReceiveInto(first.ref, viewState.mode)
                     router.finish()
                 }
@@ -97,8 +100,11 @@ class ResultPresenter @Inject constructor(
     }
 
     fun onSortingSelected(sorting: NodeSorting) {
-        scope.launch {
-            finderStore.setSorting(taskId, sorting)
+        default {
+            val new = finderStore.setSorting(taskId, sorting)
+            new ?: return@default
+            val old = dao.get(taskId) ?: return@default
+            dao.put(old.copy(result = new))
         }
     }
 }

@@ -6,6 +6,7 @@ import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.ResultChannel
+import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
@@ -71,4 +72,5 @@ interface ResultDependencies : DelegateModule.Dependencies {
     fun utils(): UtilService
     fun explorerService(): ExplorerService
     fun explorerStore(): ExplorerStore
+    fun finderDao(): FinderDao
 }

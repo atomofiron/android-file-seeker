@@ -16,6 +16,9 @@ interface FinderDao {
     @Query("SELECT * FROM $RESULT WHERE version = $VERSION order by id")
     fun all(): List<SearchResultCache>
 
+    @Query("SELECT * FROM $RESULT WHERE version = $VERSION AND id = :id")
+    fun get(id: Int): SearchResultCache?
+
     @Insert
     fun put(item: SearchResultCache): Long
 
