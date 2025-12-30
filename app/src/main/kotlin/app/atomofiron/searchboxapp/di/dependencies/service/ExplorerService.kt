@@ -103,7 +103,6 @@ class ExplorerService @Inject constructor(
     private val garden = NodeGarden()
     private val internalStorageRef = store.internalStorage.value.ref
     private val updateRootTrigger = TriggerFlow<Unit>()
-    //private val renderRequests = MutableSharedFlow<Pair<NodeTabKey, Node>>(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     init {
         val suDefined = Job()
@@ -123,11 +122,6 @@ class ExplorerService @Inject constructor(
             NativeBridge.setSuCmd(suCmd, binDir = context.filesDir.absolutePath)
             suDefined.complete()
         }.collect(scope)
-        /*default {
-            renderRequests.collect { (key, item) ->
-                garden[key].renderUpdate(item)
-            }
-        }*/
         store.currentDeepest.drop(1).collect(scope) { deepest ->
             deepest ?: return@collect
             val tab = store.currentTabKey.value
@@ -845,11 +839,8 @@ class ExplorerService @Inject constructor(
 
     private fun NodeTab.mismatch(item: Node): Boolean = mimeTypes.isNotEmpty() && item.isFile && !item.content.matchesAny(mimeTypes)
 
-    private suspend fun NodeTab.renderUpdate(
-        new: Node,
-        state: NodeStateImpl? = null,
-    ) {
-        store.emitUpdate(renderNode(new, state = state))
+    private suspend fun NodeTab.renderUpdate(new: Node) {
+        store.emitUpdate(renderNode(new))
     }
 
     private fun renderChecked(key: ExplorerTabKey, item: Node, toChecked: Boolean) {
@@ -867,12 +858,11 @@ class ExplorerService @Inject constructor(
         isOpened: Boolean = tree.any { it.uniqueId == item.uniqueId },
         isDeepest: Boolean = tree.lastOrNull()?.uniqueId == item.uniqueId,
         content: NodeContent = item.defineDirKind(),
-        state: NodeStateImpl? = null,
     ): Node {
         return item.copy(
             isChecked = checked.any { it == item.uniqueId },
             isDeepest = isDeepest,
-            state = state ?: states.find { it.uniqueId == item.uniqueId } ?: item.state,
+            state = states.find { it.uniqueId == item.uniqueId } ?: item.state,
             children = item.children?.fetch(isOpened),
             generation = generation,
             content = content,

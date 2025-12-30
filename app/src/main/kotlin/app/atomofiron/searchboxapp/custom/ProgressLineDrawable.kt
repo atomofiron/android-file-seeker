@@ -78,13 +78,14 @@ class ProgressLineDrawable(context: Context) : Drawable(), ValueAnimator.Animato
     }
 
     private fun Canvas.drawIndeterminate(range: Float, y: Float) {
-        paint.alpha = Alpha.LEVEL_20
+        val progress = max(range * progress - strokeWidth, 0f)
+        val remaining = range - progress
         var start = max(offset - 1, 0f)
         var end = min(offset, 1f)
-        start = sin(start * HalfPi) * range
-        end = (1 - cos(end * HalfPi)) * range
+        start = sin(start * HalfPi) * remaining
+        end = (1 - cos(end * HalfPi)) * remaining
         paint.alpha = (Alpha.LEVEL_20 * Alpha((end - start) / strokeWidth)).toInt()
-        drawLine(start, y, end, y, paint)
+        drawLine(progress + start, y, progress + end, y, paint)
     }
 
     private fun Canvas.drawProgress(range: Float, y: Float) {
