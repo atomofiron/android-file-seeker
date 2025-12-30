@@ -13,6 +13,7 @@ object Alpha {
     const val LEVEL_5 = 12
     const val LEVEL_10 = 25
     const val LEVEL_12 = 31
+    const val LEVEL_20 = 51
     const val LEVEL_30 = 80
     const val LEVEL_50 = 128
     const val LEVEL_67 = 170

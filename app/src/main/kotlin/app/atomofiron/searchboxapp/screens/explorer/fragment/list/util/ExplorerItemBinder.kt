@@ -102,6 +102,7 @@ class ExplorerItemBinder(
         if (!isOpened) {
             val rippleDrawable = context.explorerRippleDrawable()
             rippleDrawable.addLayer(progressDrawable)
+            progressDrawable.callback = rippleDrawable
             binding.root.background = rippleDrawable
         }
         bindStyle(isOpened, isDeepest = false)
