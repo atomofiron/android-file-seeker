@@ -11,38 +11,33 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Equality
 import app.atomofiron.common.util.Unique
-import app.atomofiron.searchboxapp.model.other.UniText
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainKey
 import com.google.android.material.snackbar.Snackbar
 import java.lang.ref.WeakReference
-
-// todo replace layoutId with (en)decodable sealed Any
 
 object CurtainApi {
 
     interface Controller {
         val requestFrom: Int
-        val requestId: Int
+        val requestId: CurtainId
 
         fun setAdapter(adapter: Adapter<*>)
-        fun showNext(layoutId: Int)
+        fun showNext(key: CurtainKey)
         fun showPrev()
         fun close(immediately: Boolean = false, irrevocably: Boolean = false)
         fun showSnackbar(alert: Alert.Uni, duration: Int = Snackbar.LENGTH_SHORT)
-        fun showSnackbar(text: UniText, duration: Int = Snackbar.LENGTH_SHORT)
-        fun showSnackbar(string: String, duration: Int = Snackbar.LENGTH_SHORT)
-        fun showSnackbar(stringId: Int, duration: Int = Snackbar.LENGTH_SHORT)
         fun setCancelable(value: Boolean)
     }
 
     abstract class Adapter<H : ViewHolder> : Equality by Unique(Unit) {
-        companion object {
-            private val unused = Any()
-        }
-        private val holderList = HashMap<Int, H>()
+        private companion object Empty
+
+        private val holderList = HashMap<CurtainId, H>()
         private var controllerReference = WeakReference<Controller>(null)
-        val holders: Map<Int, H> = holderList
+        val holders: Map<CurtainId, H> = holderList
         val controller: Controller? get() = controllerReference.get()
-        open val data: Any? = unused
+        open val data: Any? = Empty
 
         inline fun <reified B : H> holder(): B? = holders.values.find { it is B } as B?
 
@@ -64,20 +59,20 @@ object CurtainApi {
             }
         }
 
-        fun drop(layoutId: Int) {
-            holderList.remove(layoutId)
+        fun drop(id: CurtainId) {
+            holderList.remove(id)
         }
 
         fun clear() = holderList.clear()
 
-        protected abstract fun getHolder(inflater: LayoutInflater, layoutId: Int): H?
+        protected abstract fun getHolder(inflater: LayoutInflater, id: CurtainId): H?
 
-        fun getViewHolderOrNull(layoutId: Int): ViewHolder? = holderList[layoutId]
+        fun getViewHolderOrNull(key: CurtainKey): ViewHolder? = holderList[key.id]
 
-        fun getViewHolder(context: Context, layoutId: Int): ViewHolder? {
+        fun getViewHolder(context: Context, id: CurtainId): ViewHolder? {
             val inflater = LayoutInflater.from(context)
-            val holder = holderList[layoutId] ?: getHolder(inflater, layoutId)?.apply {
-                holderList[layoutId] = this
+            val holder = holderList[id] ?: getHolder(inflater, id)?.apply {
+                holderList[id] = this
             }
             return holder
         }

@@ -6,6 +6,7 @@ import app.atomofiron.common.arch.Recipient
 import app.atomofiron.fileseeker.databinding.CurtainLicenseBinding
 import app.atomofiron.searchboxapp.android.WebClient
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Companion.setMuonsDrawable
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.licenses.state.License
 import app.atomofiron.searchboxapp.screens.licenses.state.LicenseContent
@@ -19,7 +20,7 @@ class LicenseCurtainDelegate(
     private val license: License,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>(), Recipient {
 
-    override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
+    override fun getHolder(inflater: LayoutInflater, id: CurtainId): CurtainApi.ViewHolder {
         val binding = CurtainLicenseBinding.inflate(inflater)
         binding.title.text = license.name
         when (license.content) {

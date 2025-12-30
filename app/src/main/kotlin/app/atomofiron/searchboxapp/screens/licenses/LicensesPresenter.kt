@@ -3,15 +3,16 @@ package app.atomofiron.searchboxapp.screens.licenses
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.arch.Recipient
 import app.atomofiron.common.util.extension.launchOnDefault
-import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.WebClient
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
-import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainKey
 import app.atomofiron.searchboxapp.screens.licenses.delegate.LicenseCurtainDelegate
 import app.atomofiron.searchboxapp.screens.licenses.di.LicensesService
 import app.atomofiron.searchboxapp.screens.licenses.state.License
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
+
+private object LicenseCurtainKey : CurtainKey()
 
 @LicensesScope
 class LicensesPresenter @Inject constructor(
@@ -29,11 +30,7 @@ class LicensesPresenter @Inject constructor(
         curtains.flow.collectForMe(scope) { controller ->
             controller ?: return@collectForMe
             val license = license ?: return@collectForMe
-            val adapter: CurtainApi.Adapter<*> = when (controller.requestId) {
-                R.layout.curtain_license -> LicenseCurtainDelegate(webClient, license)
-                else -> return@collectForMe
-            }
-            adapter.setController(controller)
+            LicenseCurtainDelegate(webClient, license).setController(controller)
         }
         scope.launchOnDefault {
             val licenses = service.readLicences()
@@ -45,6 +42,6 @@ class LicensesPresenter @Inject constructor(
 
     fun onLicenseClick(license: License) {
         this.license = license
-        router.showCurtain(recipient, R.layout.curtain_license)
+        router.showCurtain(LicenseCurtainKey, recipient)
     }
 }

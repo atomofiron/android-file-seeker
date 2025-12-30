@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable.Placement
 import app.atomofiron.searchboxapp.model.AppSource
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceRouter
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -33,7 +34,7 @@ class AboutDelegate @Inject constructor(
 
     private var telegramInfo: ResolveInfo? = null
 
-    override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
+    override fun getHolder(inflater: LayoutInflater, id: CurtainId): CurtainApi.ViewHolder {
         val binding = CurtainAboutBinding.inflate(inflater, null, false)
         binding.init()
         binding.root.insetsPadding(ExtType.curtain, vertical = true)

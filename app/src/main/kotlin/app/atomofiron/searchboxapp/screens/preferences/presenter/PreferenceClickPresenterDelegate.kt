@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.other.toUni
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainKey
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceRouter
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceScope
@@ -26,6 +27,12 @@ import app.atomofiron.searchboxapp.utils.Rslt
 import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
+
+private object AboutCurtainKey : CurtainKey()
+private object ExportImportCurtainKey : CurtainKey()
+private object ExplorerItemCurtainKey : CurtainKey()
+private object JoystickCurtainKey : CurtainKey()
+private object ColorSchemeCurtainKey : CurtainKey()
 
 @PreferenceScope
 class PreferenceClickPresenterDelegate @Inject constructor(
@@ -47,26 +54,26 @@ class PreferenceClickPresenterDelegate @Inject constructor(
         curtainChannel.flow.collectForMe(scope) { controller ->
             controller ?: return@collectForMe
             val adapter: CurtainApi.Adapter<*> = when (controller.requestId) {
-                R.layout.curtain_about -> aboutDelegate.get()
-                R.layout.curtain_preference_export_import -> ExportImportDelegate(exportImportDelegate)
-                R.layout.curtain_preference_explorer_item -> ExplorerItemDelegate(preferenceStore, resources)
-                R.layout.curtain_preference_joystick -> JoystickDelegate(preferenceStore)
-                R.layout.curtain_color_scheme -> ColorSchemeDelegate()
+                AboutCurtainKey.id -> aboutDelegate.get()
+                ExportImportCurtainKey.id -> ExportImportDelegate(exportImportDelegate)
+                ExplorerItemCurtainKey.id -> ExplorerItemDelegate(preferenceStore, resources)
+                JoystickCurtainKey.id -> JoystickDelegate(preferenceStore)
+                ColorSchemeCurtainKey.id -> ColorSchemeDelegate()
                 else -> return@collectForMe
             }
             adapter.setController(controller)
         }
     }
 
-    override fun onAboutClick() = router.showCurtain(recipient, R.layout.curtain_about)
+    override fun onAboutClick() = router.showCurtain(AboutCurtainKey, recipient)
 
-    override fun onColorSchemeClick() = router.showCurtain(recipient, R.layout.curtain_color_scheme)
+    override fun onColorSchemeClick() = router.showCurtain(ColorSchemeCurtainKey, recipient)
 
-    override fun onExportImportClick() = router.showCurtain(recipient, R.layout.curtain_preference_export_import)
+    override fun onExportImportClick() = router.showCurtain(ExportImportCurtainKey, recipient)
 
-    override fun onExplorerItemClick() = router.showCurtain(recipient, R.layout.curtain_preference_explorer_item)
+    override fun onExplorerItemClick() = router.showCurtain(ExplorerItemCurtainKey, recipient)
 
-    override fun onJoystickClick() = router.showCurtain(recipient, R.layout.curtain_preference_joystick)
+    override fun onJoystickClick() = router.showCurtain(JoystickCurtainKey, recipient)
 
     override fun onLocaleClick() {
         if (Android.T) router.showLocaleSettings()

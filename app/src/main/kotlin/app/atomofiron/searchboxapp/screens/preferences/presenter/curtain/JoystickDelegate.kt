@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.custom.view.joystickDefaultColor
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -31,7 +32,7 @@ class JoystickDelegate(
     private val hapticFeedbackWasEnabled: Boolean = preferences.hapticFeedback.value
     private val hapticFeedback: Boolean get() = preferences.hapticFeedback.value
 
-    override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
+    override fun getHolder(inflater: LayoutInflater, id: CurtainId): CurtainApi.ViewHolder {
         val binding = CurtainPreferenceJoystickBinding.inflate(inflater, null, false)
         binding.init()
         binding.root.insetsPadding(ExtType.curtain, vertical = true)

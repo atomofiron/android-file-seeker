@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.curtain.fragment
 import app.atomofiron.fileseeker.databinding.FragmentCurtainBinding
 import app.atomofiron.common.util.dropLast
 import app.atomofiron.searchboxapp.screens.curtain.CurtainPresenter
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 
 class CurtainContentDelegate(
@@ -15,7 +16,7 @@ class CurtainContentDelegate(
     fun showLast() {
         val node = stack.last()
         if (node.view == null) {
-            val holder = getHolder(node.layoutId)
+            val holder = getHolder(node.curtainId)
             holder ?: return
             node.view = holder.view
             node.isCancelable = holder.isCancelable
@@ -25,13 +26,13 @@ class CurtainContentDelegate(
         }
     }
 
-    fun showNext(layoutId: Int) {
-        val holder = getHolder(layoutId)
+    fun showNext(id: CurtainId) {
+        val holder = getHolder(id)
         holder ?: return
         if (transitionAnimator.transitionIsRunning) return
 
         val view = holder.view
-        val node = CurtainNode(layoutId, view, holder.isCancelable)
+        val node = CurtainNode(id, view, holder.isCancelable)
         stack.add(node)
         node.removeParent()
         binding.curtainSheet.addView(view)
@@ -43,11 +44,11 @@ class CurtainContentDelegate(
         if (transitionAnimator.transitionIsRunning) return false
 
         val last = stack.dropLast()
-        adapter.drop(last.layoutId)
+        adapter.drop(last.curtainId)
 
         val prev = stack.last()
         if (prev.view == null) {
-            val holder = getHolder(prev.layoutId)
+            val holder = getHolder(prev.curtainId)
             holder ?: return false
             prev.view = holder.view
             prev.isCancelable = holder.isCancelable
@@ -59,8 +60,8 @@ class CurtainContentDelegate(
         return true
     }
 
-    private fun getHolder(layoutId: Int): CurtainApi.ViewHolder? {
-        val holder = adapter.getViewHolder(binding.root.context, layoutId)
+    private fun getHolder(id: CurtainId): CurtainApi.ViewHolder? {
+        val holder = adapter.getViewHolder(binding.root.context, id)
         when (holder) {
             null -> presenter.onNullViewGot()
             else -> presenter.setCancelable(holder.isCancelable)

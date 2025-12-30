@@ -1,8 +1,12 @@
 package app.atomofiron.searchboxapp.screens.viewer.presenter
 
+import android.view.View
+import android.widget.EditText
 import app.atomofiron.common.arch.Recipient
 import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.common.util.extension.withMain
+import app.atomofiron.common.util.flow.set
+import app.atomofiron.common.util.showKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -14,6 +18,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.model.textviewer.toLocal
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainKey
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerRouter
@@ -26,6 +31,8 @@ import app.atomofiron.searchboxapp.utils.toAlert
 import app.atomofiron.searchboxapp.utils.toUni
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
+
+private object TextSearchCurtainKey : CurtainKey()
 
 @TextViewerScope
 class SearchAdapterPresenterDelegate @Inject constructor(
@@ -43,9 +50,10 @@ class SearchAdapterPresenterDelegate @Inject constructor(
         curtainChannel.flow.collectForMe(scope) { controller ->
             curtain.setController(controller)
         }
+        viewState.insertInQuery[scope] = ::onInsertInQuery
     }
 
-    fun show() = router.showCurtain(recipient, R.layout.curtain_text_viewer_search)
+    fun show() = router.showCurtain(TextSearchCurtainKey, recipient)
 
     override fun onOptionsChange(options: SearchOptions) {
         preferences { setLocalSearchOptions(options.toLocal()) }
@@ -112,5 +120,15 @@ class SearchAdapterPresenterDelegate @Inject constructor(
         val alert = toAlert(error = true)
         curtain.controller?.showSnackbar(alert)
             ?: viewState.showAlert(alert)
+    }
+
+    private fun onInsertInQuery(value: String) {
+        curtain.getViewHolderOrNull(TextSearchCurtainKey)
+            ?.view
+            ?.findViewById<View>(R.id.query_field)
+            ?.findViewById<EditText>(R.id.field)?.run {
+                showKeyboard()
+                text.replace(selectionStart, selectionEnd, value)
+            }
     }
 }

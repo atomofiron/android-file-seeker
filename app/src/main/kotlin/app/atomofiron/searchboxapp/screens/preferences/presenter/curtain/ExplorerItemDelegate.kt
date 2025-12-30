@@ -17,6 +17,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeMeta
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -49,7 +50,7 @@ class ExplorerItemDelegate(
 
     private var composition = preferenceStore.explorerItemComposition.value
 
-    override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
+    override fun getHolder(inflater: LayoutInflater, id: CurtainId): CurtainApi.ViewHolder {
         val binding = CurtainPreferenceExplorerItemBinding.inflate(inflater, null, false)
         binding.init()
         binding.root.insetsPadding(ExtType.curtain, vertical = true)

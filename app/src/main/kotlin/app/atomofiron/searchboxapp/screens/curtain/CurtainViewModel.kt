@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.curtain
 import androidx.lifecycle.viewModelScope
 import app.atomofiron.common.arch.BaseViewModel
 import app.atomofiron.searchboxapp.di.DaggerInjector
-import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainParams
 import javax.inject.Inject
 
 class CurtainViewModel : BaseViewModel<CurtainComponent, CurtainFragment, CurtainViewState, CurtainPresenter>() {
@@ -13,7 +13,7 @@ class CurtainViewModel : BaseViewModel<CurtainComponent, CurtainFragment, Curtai
     override lateinit var viewState: CurtainViewState
 
     override fun component(view: CurtainFragment): CurtainComponent {
-        val params = CurtainPresenterParams.params(view.requireArguments())
+        val params = CurtainParams.params(view.requireArguments())
         return DaggerCurtainComponent
             .builder()
             .bind(viewModelScope)

@@ -9,12 +9,16 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationDelegate
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainKey
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.curtain.OptionsDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
 import app.atomofiron.searchboxapp.screens.result.ResultScope
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
+
+private object MenuCurtainKey : CurtainKey()
 
 @ResultScope
 class ResultCurtainMenuDelegate @Inject constructor(
@@ -31,7 +35,7 @@ class ResultCurtainMenuDelegate @Inject constructor(
         curtainChannel.flow.filterForMe().collect(scope, ::setController)
     }
 
-    override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder? {
+    override fun getHolder(inflater: LayoutInflater, id: CurtainId): CurtainApi.ViewHolder? {
         val data = data ?: return null
         val view = optionsDelegate.getView(data, inflater)
         return CurtainApi.ViewHolder(view)
@@ -56,6 +60,6 @@ class ResultCurtainMenuDelegate @Inject constructor(
 
     fun showOptions(options: ExplorerItemOptions) {
         data = options
-        router.showCurtain(recipient, 0)
+        router.showCurtain(MenuCurtainKey, recipient)
     }
 }

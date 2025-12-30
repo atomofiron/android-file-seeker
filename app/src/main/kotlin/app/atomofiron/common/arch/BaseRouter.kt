@@ -13,7 +13,8 @@ import app.atomofiron.common.util.dialog.DialogDelegateImpl
 import app.atomofiron.common.util.property.RoProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.screens.curtain.model.CurtainPresenterParams
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainKey
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainParams
 
 abstract class BaseRouter(
     fragmentProperty: RoProperty<out Fragment?>,
@@ -94,9 +95,9 @@ abstract class BaseRouter(
         }
     }
 
-    fun showCurtain(recipient: Int, layoutId: Int) {
+    fun showCurtain(key: CurtainKey, recipient: Int) {
         navigation {
-            val args = CurtainPresenterParams.args(recipient, layoutId)
+            val args = CurtainParams.args(key, recipient)
             navigate(R.id.curtainFragment, args, curtainOptions)
         }
     }

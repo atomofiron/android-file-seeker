@@ -5,7 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.Insets
 import androidx.core.view.doOnNextLayout
 import androidx.core.view.marginBottom
@@ -67,9 +66,9 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         overlayColor = requireContext().getColorByAttr(R.attr.colorOverlay)
 
         when (savedInstanceState) {
-            null -> stack.add(CurtainNode(viewState.initialLayoutId, view = null, isCancelable = true))
-            else -> savedInstanceState.getIntArray(SAVED_STACK)?.let { ids ->
-                val restored = ids.map { CurtainNode(layoutId = it, view = null, isCancelable = true) }
+            null -> stack.add(CurtainNode(viewState.initialId, view = null, isCancelable = true))
+            else -> savedInstanceState.getStringArray(SAVED_STACK)?.let { ids ->
+                val restored = ids.map { CurtainNode(curtainId = it, view = null, isCancelable = true) }
                 stack.addAll(restored)
             }
         }
@@ -91,8 +90,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
                 tryHide()
             }
             root.setOnLongClickListener {
-                if (BuildConfig.DEBUG) showTestSnackbar()
-                true
+                BuildConfig.DEBUG.also { if (it) showTestSnackbar() }
             }
             root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateSnackbarTranslation() }
             val layoutParams = curtainSheet.layoutParams as CoordinatorLayout.LayoutParams
@@ -125,7 +123,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putIntArray(SAVED_STACK, stack.map { it.layoutId }.toIntArray())
+        outState.putStringArray(SAVED_STACK, stack.map { it.curtainId }.toTypedArray())
     }
 
     override fun onBack(soft: Boolean): Boolean {
@@ -139,9 +137,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
-        if (!hidden) {
-            presenter.onShown()
-        }
+        if (!hidden) presenter.onShown()
     }
 
     private fun tryHide() {
@@ -164,7 +160,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
 
     private fun onActionCollect(action: CurtainAction) {
         when (action) {
-            is CurtainAction.ShowNext -> contentDelegate.showNext(action.layoutId)
+            is CurtainAction.ShowNext -> contentDelegate.showNext(action.id)
             is CurtainAction.ShowPrev -> contentDelegate.showPrev()
             is CurtainAction.Hide -> hide(action.irrevocably)
             is CurtainAction.ShowSnackbar -> showSnackbar(action.alert)

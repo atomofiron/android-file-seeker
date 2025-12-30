@@ -1,18 +1,16 @@
 package app.atomofiron.searchboxapp.screens.viewer.presenter.curtain
 
 import android.view.LayoutInflater
-import android.view.View
-import android.widget.EditText
 import androidx.recyclerview.widget.GridLayoutManager
 import app.atomofiron.common.recycler.FlexSpanSizeLookup
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.common.util.showKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainTextViewerSearchBinding
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.finder.LocalSearchResult
 import app.atomofiron.searchboxapp.screens.common.SectionBackgroundDecorator
+import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
@@ -36,12 +34,10 @@ class CurtainSearchDelegate(
 
     init {
         viewState.items.collect(scope) { finderAdapter.submitList(it) }
-        viewState.insertInQuery.collect(scope, collector = ::onInsertInQuery)
     }
 
-    override fun getHolder(inflater: LayoutInflater, layoutId: Int): CurtainApi.ViewHolder {
+    override fun getHolder(inflater: LayoutInflater, id: CurtainId): CurtainApi.ViewHolder {
         val binding = CurtainTextViewerSearchBinding.inflate(inflater, null, false)
-
         val binder = ExplorerItemBinder(binding.itemExplorer)
         binder.bind(node)
         binder.bindComposition(composition)
@@ -65,16 +61,4 @@ class CurtainSearchDelegate(
 
         return CurtainApi.ViewHolder(binding.root)
     }
-
-    private fun onInsertInQuery(value: String) {
-        findQueryField()?.run {
-            showKeyboard()
-            text.replace(selectionStart, selectionEnd, value)
-        }
-    }
-
-    private fun findQueryField(): EditText? = getViewHolderOrNull(R.layout.curtain_text_viewer_search)
-        ?.view
-        ?.findViewById<View>(R.id.query_field)
-        ?.findViewById(R.id.field)
 }
