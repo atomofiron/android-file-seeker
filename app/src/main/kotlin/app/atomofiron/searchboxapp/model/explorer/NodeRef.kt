@@ -2,11 +2,10 @@ package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.extension.debug
 import kotlinx.serialization.Serializable
-import kotlin.text.contains
 
 private const val SLASH_BYTE = '/'.code.toByte()
 private const val DOT_BYTE = '.'.code.toByte()
-private val STUB_STRING = String(byteArrayOf())
+private val STUB_STRING = String(byteArrayOf()) // !== ""
 private val lowerBytes = 97..122 // a-z
 private val upperBytes = 65..90 // A-Z
 private val digitBytes = 48..57 // 0-9
@@ -42,6 +41,14 @@ class NodeRef(val bytes: ByteArray) {
         get() {
             if (field !== STUB_STRING) return field
             field = bytes.getName()
+            return field
+        }
+
+    var lowercaseName: String = STUB_STRING
+        private set
+        get() {
+            if (field !== STUB_STRING) return field
+            field = name.lowercase()
             return field
         }
 

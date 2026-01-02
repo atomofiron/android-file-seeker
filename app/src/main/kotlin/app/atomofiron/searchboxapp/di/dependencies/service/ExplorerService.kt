@@ -16,12 +16,11 @@ import app.atomofiron.common.util.extension.setAt
 import app.atomofiron.common.util.extension.takeIf
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.common.util.flow.TriggerFlow
-import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.invoke
+import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.verifyNativeBin
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
-import app.atomofiron.searchboxapp.model.explorer.other.Deepest
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -31,6 +30,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeGarden
+import app.atomofiron.searchboxapp.model.explorer.NodeMeta
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
@@ -44,6 +44,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.isMedia
 import app.atomofiron.searchboxapp.model.explorer.isMovie
 import app.atomofiron.searchboxapp.model.explorer.isPicture
+import app.atomofiron.searchboxapp.model.explorer.other.Deepest
 import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.explorer.replace
@@ -57,7 +58,6 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortBy
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortByName
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
@@ -68,7 +68,7 @@ import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.searchboxapp.utils.removeOneIf
 import app.atomofiron.searchboxapp.utils.replaceEach
 import app.atomofiron.searchboxapp.utils.showLongToast
-import app.atomofiron.searchboxapp.utils.unwrapOr
+import app.atomofiron.searchboxapp.utils.unwrapOrElse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
@@ -92,11 +92,12 @@ private const val SUB_PATH_BLUETOOTH = "Bluetooth"
 @Singleton
 class ExplorerService @Inject constructor(
     private val context: Context,
-    override val scope: AppScope,
+    private val scope: AppScope,
     private val store: ExplorerStore,
     private val dao: ExplorerDao,
     private val preferences: PreferenceStore,
-) : CoroutineLauncher {
+) : CoroutineLauncher by CoroutineLauncher(scope) {
+
     private var delayedRender: Job? = null
 
     private val asSu by preferences.asSu
@@ -106,10 +107,9 @@ class ExplorerService @Inject constructor(
 
     init {
         val suDefined = Job()
-        scope.launchOnIO {
+        io {
             garden { // lock due configuration
-                store.mainTabs
-                    .forEach { get(it) } // init
+                store.mainTabs.forEach { get(it) } // init
                 suDefined.join()
                 if (asSu) checkSu()
                 initRoots()
@@ -118,16 +118,19 @@ class ExplorerService @Inject constructor(
                 updateRootsAsync(volumes, asSu)
             }.collect()
         }
-        combine(preferences.asSu, preferences.suCmd) { asSu, suCmd ->
-            NativeBridge.setSuCmd(suCmd, binDir = context.filesDir.absolutePath)
+        preferences.suCmd[scope] = { cmd ->
+            NativeBridge.setSuCmd(cmd, binDir = context.filesDir.absolutePath)
             suDefined.complete()
-        }.collect(scope)
-        store.currentDeepest.drop(1).collect(scope) { deepest ->
-            deepest ?: return@collect
+        }
+        store.currentSorting[scope] = { (key, sorting) ->
+            garden(key) { render() }
+        }
+        store.currentDeepest.drop(1)[scope] = l@{ deepest ->
+            deepest ?: return@l
             val tab = store.currentTabKey.value
             val root = garden[tab].getSelectedRoot()
                 ?.takeIf { it.type != NodeRootType.Photos && it.type != NodeRootType.Videos }
-                ?: return@collect
+                ?: return@l
             val new = Deepest(tabIndex = tab.index, rootId = root.id, deepest.ref)
             dao.put(new)
         }
@@ -322,7 +325,7 @@ class ExplorerService @Inject constructor(
         val onlyVideos = type == NodeRootType.Videos
         val onlyMedia = type == NodeRootType.Camera
         if (onlyPhotos || onlyVideos || onlyMedia) {
-            updated.children?.update {
+            updated.children?.update(updateMetadata = true) {
                 replace {
                     when {
                         onlyPhotos && !it.content.isPicture() -> null
@@ -358,7 +361,8 @@ class ExplorerService @Inject constructor(
             roots.replace { root ->
                 when (root.id) {
                     targetRoot.id -> {
-                        val updatedItem = root.item.updateWith(updatedRoot.item, targetRoot.sorting)
+                        val updatedItem = root.item.updateWith(updatedRoot.item)
+                        root.item.sortBy(targetRoot.sorting)
                         val type = root.type.takeIf<NodeRootType.Storage,_>()?.run {
                             val stat = StatFs(root.item.ref.string)
                             val info = info.copy(total = stat.totalBytes, used = stat.totalBytes - stat.freeBytes)
@@ -469,17 +473,17 @@ class ExplorerService @Inject constructor(
         }
     }
 
-    suspend fun tryCopy(key: NodeTabKey, targets: List<Node>, destination: Node, asMoving: Boolean) {
+    suspend fun tryCopy(key: NodeTabKey, targets: List<Node>, dst: Node, withMoving: Boolean) {
         for (target in targets) {
-            val to = target.mutate(ref = destination.ref + target.name)
-            tryCopy(key, target, to, asMoving)
+            val to = target.mutate(ref = dst.ref + target.name)
+            tryCopy(key, target, to, withMoving)
         }
     }
 
-    suspend fun tryCopy(key: NodeTabKey, from: Node, to: Node, asMoving: Boolean) {
+    suspend fun tryCopy(key: NodeTabKey, from: Node, to: Node, withMoving: Boolean) {
         render(key) {
             states.updateState(from.uniqueId) {
-                nextState(from.uniqueId, copying = NodeOperation.Copying(isSource = true, asMoving = asMoving))
+                nextState(from.uniqueId, copying = NodeOperation.Copying(isSource = true, withMoving = withMoving))
             }.let {
                 if (it?.isCopying != true) return
             }
@@ -492,7 +496,7 @@ class ExplorerService @Inject constructor(
                     ?.let { children.items.add(it.inc(), to) }
             }
         }
-        val new = ExplorerUtils.copy(from, to, move = asMoving, asSu = asSu) {
+        val new = ExplorerUtils.copy(from, to, move = withMoving, asSu = asSu) {
             default {
                 val operation = NodeOperation.Copying(isSource = false, it.progress)
                 garden {
@@ -517,7 +521,7 @@ class ExplorerService @Inject constructor(
                     ?.let { children.items.setAt(it, new) }
             }
         }
-        if (asMoving) tryCache(key, from)
+        if (withMoving) tryCache(key, from)
     }
 
     suspend fun tryCheck(key: ExplorerTabKey, refs: List<Node>, toChecked: Boolean) {
@@ -768,6 +772,7 @@ class ExplorerService @Inject constructor(
             .also { items.add(it) }
             .takeIf { !it.isOpened }
             ?.let { return NodeTabItems(roots, items, null) }
+        val sorting = store.getSorting(key)
         var deepest = items.first()
         val openedIndexes = mutableListOf<Int>()
         val filteredCounts = when {
@@ -780,6 +785,7 @@ class ExplorerService @Inject constructor(
         for (i in tree.indices) {
             val level = findItem(tree[i].uniqueId)
             level ?: break
+            level.sortBy(sorting)
             val nextLevelId = tree.getOrNull(i.inc())?.uniqueId
             for (j in 0..<level.childCount) {
                 var item = level.children!![j]
@@ -894,7 +900,7 @@ class ExplorerService @Inject constructor(
     }
 
     private suspend fun cacheSync(key: NodeTabKey, item: Node) {
-        var updated = item.update(asSu).sortByName()
+        var updated = item.update(asSu)
         garden(key) {
             states.updateState(item.uniqueId) {
                 nextState(item.uniqueId, cachingJob = null)
@@ -924,11 +930,12 @@ class ExplorerService @Inject constructor(
 
     private fun resolveSizeAsync(key: NodeTabKey, item: Node) {
         scope.launch {
-            val size = NativeBridge.usage(item.ref, asSu).unwrapOr("")
-            if (size != item.size) garden(key) {
+            val (length, size) = NativeBridge.usage(item.ref, asSu)
+                .unwrapOrElse { NodeMeta.Empty.run { length to size } }
+            if (length != item.length && size != item.size) garden(key) {
                 val current = findItem(item.uniqueId)
                 current ?: return@launch
-                val updated = current.copy(meta = item.meta.copy(size = size))
+                val updated = current.copy(meta = item.meta.copy(length = length, size = size))
                 val replaced = replaceItem(updated)
                 if (replaced && !updated.areContentsTheSame(item)) {
                     renderUpdate(updated)

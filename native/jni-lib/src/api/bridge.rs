@@ -71,7 +71,7 @@ pub fn get_usage(path: RawPath, su_cmd: Option<SuCmd>) -> UsageResult {
             .unwrap_or_else(|e| UsageResult::Err(e.to_string()))
     }
     match usage(&path.buf()) {
-        Ok(data) => UsageResult::Ok(data),
+        Ok((length, size)) => UsageResult::Ok(length, size),
         Err(e) => UsageResult::Err(e.to_string()),
     }
 }

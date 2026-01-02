@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.custom.view.dock.item
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.Insets
@@ -26,6 +27,7 @@ class DockItemHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private lateinit var item: DockItem
+    private var longClicked = false
     private var config: DockItemConfig? = null
     private val drawable = DockItemDrawable(
         ripple = binding.root.context.findColorByAttr(MaterialAttr.colorControlHighlight),
@@ -41,6 +43,7 @@ class DockItemHolder(
             popup.noClip()
             button.background = drawable
             button.setOnClickListener { onClick() }
+            button.setOnLongClickListener { onLongClick() }
             ColorStateList(
                 arrayOf(intArrayOf(android.R.attr.state_activated), intArrayOf()),
                 intArrayOf(
@@ -75,9 +78,10 @@ class DockItemHolder(
         if (item.progress) {
             icon.setMuonsDrawable()
         }
-        if (item.notice) icon.drawable
+        if (item.notice != null) icon.drawable
             .let { it ?: ContextCompat.getDrawable(icon.context, R.drawable.ic_dock_empty)!! }
             .let { NoticeableDrawable(icon.context, it).forceShowDot(true) }
+            .also { if (!item.notice.alert) it.setDotColor(icon.imageTintList?.defaultColor ?: Color.TRANSPARENT) }
             .let { icon.setImageDrawable(it) }
         when (val it = item.label) {
             null -> label.text = null
@@ -95,10 +99,24 @@ class DockItemHolder(
     }
 
     private fun ItemDockBinding.onClick() {
-        if (item.children.isEmpty()) {
-            selectListener(item)
-        } else if (popup.isNotEmpty()) {
-            popup.collapse()
+        when {
+            item.children.isEmpty() || item.children.secondary -> selectListener(item)
+            else -> togglePopup()
+        }
+        root.performHapticLite()
+    }
+
+    private fun ItemDockBinding.onLongClick(): Boolean = when {
+        item.children.isEmpty() -> false
+        !item.children.secondary -> false
+        !togglePopup(hideIfShown = false) -> false
+        else -> true
+    }
+
+    private fun ItemDockBinding.togglePopup(hideIfShown: Boolean = true): Boolean {
+        return if (popup.isNotEmpty()) {
+            if (hideIfShown) popup.collapse()
+            hideIfShown
         } else {
             var config = config!!
             config = config.copy(insets = Insets.of(config.insets.top, config.insets.top, config.insets.bottom, config.insets.bottom))
@@ -111,7 +129,7 @@ class DockItemHolder(
                     icon.drawable?.callback = icon
                 }
             })
+            true
         }
-        root.performHapticLite()
     }
 }

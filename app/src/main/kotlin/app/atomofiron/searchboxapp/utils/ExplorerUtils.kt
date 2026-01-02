@@ -14,8 +14,8 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeId
-import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeMeta
+import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
@@ -187,13 +187,20 @@ object ExplorerUtils {
         )
     }
 
-    fun Meta.toNodeMeta(size: String? = null) = NodeMeta(
+    fun Meta.toNodeMeta(
+        length: Long? = null,
+        size: String? = null,
+    ) = NodeMeta(
         access = access,
         owner = owner,
         group = group,
         date = date,
         time = time,
-        length = if (access.firstOrNull() == FILE_CHAR) length.toLong() else 0,
+        length = when {
+            length != null -> length
+            access.firstOrNull() == FILE_CHAR -> this.length.toLong()
+            else -> 0
+        },
         size = this.size.takeIf { it.isNotEmpty() } ?: size ?: "",
     )
 
@@ -272,12 +279,14 @@ object ExplorerUtils {
             return meta
         }
         val result = NativeBridge.usage(ref, asSu)
-        val size = when (result) {
-            is Rslt.Err -> ""
+        val (length, size) = when (result) {
+            is Rslt.Err -> NodeMeta.Empty.run { length to size }
             is Rslt.Ok -> result.value
-        }.takeIf { it != size }
-        size ?: return meta
-        return meta.copy(size = size)
+        }
+        if (length == this.length && size == this.size) {
+            return meta
+        }
+        return meta.copy(length = length, size = size)
     }
 
     private fun Node.ensureCached(asSu: Boolean, oldProps: NodeMeta): Node = when {
@@ -304,8 +313,7 @@ object ExplorerUtils {
     /** resolve content types */
     fun Node.resolveDirChildren(asSu: Boolean): Boolean {
         val children = children ?: return false
-        val types = NativeBridge.types(ref, asSu)
-        val entries = when (types) {
+        val entries = when (val types = NativeBridge.types(ref, asSu)) {
             is Rslt.Ok -> types.value
             is Rslt.Err -> return false
         }
@@ -316,7 +324,7 @@ object ExplorerUtils {
             children.run {
                 val child = items[index]
                 items[index] = child.resolveType(mimeType = entry.mime)
-                    .copy(meta = entry.meta.toNodeMeta(child.size))
+                    .copy(meta = entry.meta.toNodeMeta(length = child.length, size = child.size))
             }
         }
         return entries.isNotEmpty()
@@ -476,37 +484,39 @@ object ExplorerUtils {
 
     private inline fun <reified T : NodeContent> NodeContent?.ifMismatches(action: () -> T): T = this as? T ?: action()
 
-    fun Node.sortBy(how: NodeSorting): Node = when (how) {
-        is NodeSorting.Size,
-        is NodeSorting.Name -> sortByName(reversed = how.reversed)
-        is NodeSorting.Date -> sortByDate(newFirst = how.reversed)
-    }
-
-    fun Node.sortByName(reversed: Boolean = false): Node {
-        children?.sortByName(reversed)
+    fun Node.sortBy(how: NodeSorting): Node {
+        children?.sortBy(how)
         return this
     }
 
-    fun NodeChildren.sortByName(reversed: Boolean = false) {
-        update(updateMetadata = false) {
-            sortBy { it.name.lowercase() }
-            if (reversed) reverse()
-            sortBy { !it.isDirectory }
-        }
+    fun NodeChildren.sortBy(how: NodeSorting) = items.sortBy(how) { it }
+
+    fun <T> MutableList<T>.sortBy(how: NodeSorting, what: (T) -> Node) = when (how) {
+        is NodeSorting.Size -> sortBySize(what, reversed = how.reversed)
+        is NodeSorting.Name -> sortByName(what, reversed = how.reversed)
+        is NodeSorting.Date -> sortByDate(what, reversed = how.reversed)
     }
 
-    private fun Node.sortByDate(newFirst: Boolean = true): Node {
-        children?.update(updateMetadata = false) {
-            sortBy { it.time }
-            sortBy { it.date }
-            if (newFirst) reverse()
-            sortBy { !it.isDirectory }
-        }
-        return this
+    fun <T> MutableList<T>.sortByName(what: (T) -> Node, reversed: Boolean) {
+        sortBy(reversed) { (what(it)).lowercaseName }
+        sortBy { !what(it).isDirectory }
+    }
+
+    private fun <T> MutableList<T>.sortBySize(what: (T) -> Node, reversed: Boolean) {
+        sortBy { what(it).lowercaseName }
+        sortBy(reversed) { what(it).length }
+        sortBy { !what(it).isDirectory }
+    }
+
+    private fun <T> MutableList<T>.sortByDate(what: (T) -> Node, reversed: Boolean) {
+        sortBy { what(it).lowercaseName }
+        sortBy(reversed) { what(it).time }
+        sortBy(reversed) { what(it).date }
+        sortBy { !what(it).isDirectory }
     }
 
     private fun Node.parseNode(meta: Meta): Node {
-        val meta = meta.toNodeMeta(size)
+        val meta = meta.toNodeMeta(length, size)
         val (children, content) = when {
             meta.isDirectory() -> when (content) {
                 is NodeContent.Directory -> children to content
@@ -535,7 +545,7 @@ object ExplorerUtils {
             val ref = NodeRef(m.path)
             val child = children?.findOnMut { it.ref == ref }
             if (child?.isDirectory == true) {
-                meta = meta.copy(size = child.meta.size)
+                meta = meta.copy(length = child.meta.length, size = child.meta.size)
             }
             val item = when {
                 child == null -> parse(ref, parentRef, rootId, meta)
@@ -609,7 +619,10 @@ object ExplorerUtils {
             ref.theSame(rMeta.path) -> ref
             else -> NodeRef(rMeta.path)
         }
-        val meta = rMeta.toNodeMeta(size.takeIf { ref == this.ref })
+        val meta = when (ref) {
+            this.ref -> rMeta.toNodeMeta(length, size)
+            else -> rMeta.toNodeMeta()
+        }
         val error = rMeta.error
             ?.toNodeError()
             ?: (result as? CountingResult.Ok)
@@ -724,7 +737,7 @@ object ExplorerUtils {
         else -> NodeContent.Other
     }
 
-    fun Node.updateWith(item: Node, sorting: NodeSorting? = null): Node {
+    fun Node.updateWith(item: Node): Node {
         val children = when {
             children == null && item.children == null -> null
             children == null || item.children == null -> item.children
@@ -765,9 +778,7 @@ object ExplorerUtils {
             content = content,
             children = children,
             error = item.error,
-        ).run {
-            sortBy(sorting ?: return@run this)
-        }
+        )
     }
 
     fun Node.updateWith(new: NodeContent, meta: NodeMeta): Node {
@@ -781,7 +792,7 @@ object ExplorerUtils {
             !meta.isDirectory() -> meta
             meta.size.isNotEmpty() -> meta
             this.meta.size.isEmpty() -> meta
-            else -> meta.copy(size = this.meta.size)
+            else -> meta.copy(length = this.meta.length, size = this.meta.size)
         }
         return when (true) {
             (meta != null),

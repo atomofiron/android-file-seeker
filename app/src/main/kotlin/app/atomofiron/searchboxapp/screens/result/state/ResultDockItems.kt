@@ -2,9 +2,8 @@ package app.atomofiron.searchboxapp.screens.result.state
 
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
-import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
-import app.atomofiron.searchboxapp.model.toDockItem
+import app.atomofiron.searchboxapp.model.toDockItemChildren
 
 data class ResultDockState(
     val status: DockItem,
@@ -25,15 +24,7 @@ data class ResultDockState(
                 DockItem.Id.Auto(),
                 DockItem.Icon(R.drawable.ic_sort_az_desc),
                 DockItem.Label(R.string.sorting),
-                children = DockItemChildren(
-                    columns = 2,
-                    NodeSorting.Name.toDockItem(),
-                    NodeSorting.Name.Reversed.toDockItem(),
-                    NodeSorting.Date.toDockItem(),
-                    NodeSorting.Date.Reversed.toDockItem(),
-                    NodeSorting.Size.toDockItem(),
-                    NodeSorting.Size.Reversed.toDockItem(),
-                )
+                children = NodeSorting.toDockItemChildren(),
             ),
             share = DockItem(
                 DockItem.Id.Auto(),

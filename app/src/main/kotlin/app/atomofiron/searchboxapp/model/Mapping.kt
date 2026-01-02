@@ -2,7 +2,18 @@ package app.atomofiron.searchboxapp.model
 
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
+
+fun NodeSorting.Companion.toDockItemChildren() = DockItemChildren(
+    columns = 2,
+    NodeSorting.Name.toDockItem(),
+    NodeSorting.Name.Reversed.toDockItem(),
+    NodeSorting.Date.toDockItem(),
+    NodeSorting.Date.Reversed.toDockItem(),
+    NodeSorting.Size.toDockItem(),
+    NodeSorting.Size.Reversed.toDockItem(),
+)
 
 fun NodeSorting.toDockItem(): DockItem = toDockItem(this, null)
 

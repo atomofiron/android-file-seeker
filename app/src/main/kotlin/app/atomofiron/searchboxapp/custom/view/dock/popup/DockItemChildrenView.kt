@@ -110,7 +110,7 @@ class DockItemChildrenView(
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         return super.dispatchTouchEvent(event).also {
-            if (!it) remove()
+            if (!it && event.action == MotionEvent.ACTION_DOWN) remove()
         }
     }
 

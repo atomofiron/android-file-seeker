@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import kotlinx.serialization.Serializable
+import kotlin.LazyThreadSafetyMode.NONE
 
 @Serializable
 sealed class NodeSorting(val reversed: Boolean) : DockItem.Id.Auto() {
@@ -31,5 +32,11 @@ sealed class NodeSorting(val reversed: Boolean) : DockItem.Id.Auto() {
             operator fun invoke(reversed: Boolean): NodeSorting = if (reversed) Reversed else this
             override fun toString() = "Size"
         }
+    }
+    companion object {
+
+        val entries by lazy(NONE) { listOf(Name, Name.Reversed, Date, Date.Reversed, Size, Size.Reversed) }
+
+        operator fun invoke(id: DockItem.Id): NodeSorting? = entries.find { it == id }
     }
 }

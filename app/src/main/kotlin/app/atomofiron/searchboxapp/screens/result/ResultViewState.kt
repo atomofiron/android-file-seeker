@@ -24,8 +24,8 @@ import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveContent
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortBy
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
-import app.atomofiron.searchboxapp.utils.sortBy
 import app.atomofiron.searchboxapp.utils.toAlert
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -146,11 +146,9 @@ class ResultViewState @Inject constructor(
     }
 
     private fun DockItemChildren.makeSelected(sorting: NodeSorting): DockItemChildren {
-        return copy(
-            items = map {
-                if (it.selectionMatches(sorting)) it else it.copy(selected = it.id == sorting)
-            }
-        )
+        return copy {
+            if (it.selectionMatches(sorting)) it else it.copy(selected = it.id == sorting)
+        }
     }
 
     private fun DockItemChildren.selectionMatches(sorting: NodeSorting): Boolean {
@@ -174,12 +172,7 @@ class ResultViewState @Inject constructor(
                 else -> item.copy(item = item.item.copy(isChecked = true))
             }
         }
-        when (sorting) {
-            is NodeSorting.Date -> items.sortBy(sorting.reversed) { it.item.date }
-            is NodeSorting.Name -> items.sortBy(sorting.reversed) { it.item.name }
-            is NodeSorting.Size -> items.sortBy(sorting.reversed) { it.item.length }
-        }
-        items.sortBy { !it.isDirectory }
+        items.sortBy(sorting) { it.item }
         value = buildList(items.size.inc()) {
             val dirCount = items.count { it.isDirectory }
             val fileCount = items.size - dirCount

@@ -21,9 +21,9 @@ pub fn new_dir(path: &PathBuf) -> Rslt<Meta> {
     return Ok(meta.to_hr(path));
 }
 
-pub fn usage(path: &PathBuf) -> Rslt<String> {
+pub fn usage(path: &PathBuf) -> Rslt<(u64, String)> {
     dir::get_size(path)
-        .map(|r| r.to_hr_size())
+        .map(|r| (r, r.to_hr_size()))
         .boxed()
 }
 

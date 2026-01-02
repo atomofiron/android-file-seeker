@@ -62,7 +62,7 @@ class ExplorerPresenter @Inject constructor(
     }
 
     fun onVolumeUp(isCurrentDirVisible: Boolean) {
-        val currentNode = viewState.currentNode
+        val currentNode = viewState.deepest
         currentNode ?: return
         scrollOrOpenParent(currentNode, isCurrentDirVisible)
     }

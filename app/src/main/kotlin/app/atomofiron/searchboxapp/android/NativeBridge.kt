@@ -101,10 +101,10 @@ object NativeBridge {
         }
     }
 
-    fun usage(ref: NodeRef, asSu: Boolean): Rslt<String> {
+    fun usage(ref: NodeRef, asSu: Boolean): Rslt<Pair<Long, String>> {
         val response = uniffi.native_lib.getUsage(ref.bytes, suCmd = suCmd.takeIf { asSu })
         return when (response) {
-            is UsageResult.Ok -> Rslt.Ok(response.v1)
+            is UsageResult.Ok -> Rslt.Ok(response.v1.toLong() to response.v2)
             is UsageResult.Err -> Rslt.Err(response.v1)
         }
     }

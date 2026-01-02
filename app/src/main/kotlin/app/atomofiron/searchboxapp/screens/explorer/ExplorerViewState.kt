@@ -11,7 +11,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
-import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerDockDelegate
+import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDockState
 import app.atomofiron.searchboxapp.utils.toUni
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -25,7 +25,7 @@ import javax.inject.Inject
 class ExplorerViewState @Inject constructor(
     private val scope: CoroutineScope,
     val mode: ActivityMode,
-    dockDelegate: ExplorerDockDelegate,
+    dockState: ExplorerDockState,
     private val store: ExplorerStore,
     interactor: ExplorerInteractor,
     preferences: PreferenceStore,
@@ -45,12 +45,12 @@ class ExplorerViewState @Inject constructor(
         otherAlerts,
     )
     val currentTab = MutableStateFlow(tabs[store.currentTabKey.value.index])
-    val currentNode get() = store.currentDeepest.value
+    val deepest get() = store.currentDeepest.value
 
     val currentTabFlow = interactor.getFlow(currentTab.value)
     val updates: Flow<Node> = store.updated
     val permissionRequiredWarning = ChannelFlow<Unit>()
-    val dock: Flow<List<DockItem>> = dockDelegate.dock
+    val dock: Flow<List<DockItem>> = dockState.state
 
     fun showPermissionRequiredWarning() = permissionRequiredWarning(scope)
 

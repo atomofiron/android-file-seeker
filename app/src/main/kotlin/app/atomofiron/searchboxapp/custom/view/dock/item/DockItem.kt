@@ -9,12 +9,12 @@ data class DockItem(
     val icon: Icon? = null,
     val label: Label? = null,
     val enabled: Boolean = true,
-    val clickable: Boolean? = null, // null = by enabled
+    val clickable: Boolean? = null, // null = by this.enabled
     val selected: Boolean = false,
     val primary: Boolean = false,
     val progress: Boolean = false,
-    val notice: Boolean = false,
-    val children: DockItemChildren = DockItemChildren.Stub,
+    val notice: Notice? = null,
+    val children: DockItemChildren = DockItemChildren.Empty,
 ) {
     sealed interface Icon {
         @JvmInline
@@ -43,6 +43,10 @@ data class DockItem(
             }
         }
     }
+    enum class Notice(val alert: Boolean) {
+        Normal(false),
+        Alert(true),
+    }
     interface Id {
         val value: Long
 
@@ -50,12 +54,16 @@ data class DockItem(
         private value class Digit(override val value: Long) : Id
 
         open class Auto : Id {
-            private var next = Int.MAX_VALUE.toLong()
             override val value = next++
+        }
+
+        interface Factory {
+            fun nextId(): Id = Digit(next++)
         }
 
         companion object {
             val Undefined: Id = Digit(-1L)
+            private var next = Int.MAX_VALUE.toLong()
 
             operator fun invoke(value: Int): Id = Digit(value.toLong())
             operator fun invoke(value: Long): Id = Digit(value)
@@ -66,5 +74,5 @@ data class DockItem(
 
     fun with(drawable: Drawable) = copy(icon = Icon.Value(drawable))
 
-    fun withOutChildren() = copy(children = DockItemChildren.Stub)
+    fun withOutChildren() = copy(children = DockItemChildren.Empty)
 }

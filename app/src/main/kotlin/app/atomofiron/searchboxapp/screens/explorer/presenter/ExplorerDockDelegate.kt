@@ -1,84 +1,94 @@
-package app.atomofiron.searchboxapp.screens.explorer.presenter
+package app.atomofiron.searchboxapp.screens.explorer.state
 
-import android.Manifest.permission.POST_NOTIFICATIONS
-import androidx.work.WorkManager
-import app.atomofiron.common.util.extension.debugFailUnreachable
-import app.atomofiron.common.util.extension.launchOnMain
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
-import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
-import app.atomofiron.searchboxapp.di.dependencies.router.startReceiveInto
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
-import app.atomofiron.searchboxapp.screens.explorer.ExplorerRouter
+import app.atomofiron.searchboxapp.screens.common.delegates.copiable
+import app.atomofiron.searchboxapp.screens.common.delegates.pasteable
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
-import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerDockListener
-import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDockState
-import kotlinx.coroutines.CoroutineScope
+import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock.PasteCopy
+import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock.PasteMove
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 @ExplorerScope
-class ExplorerDockDelegate @Inject constructor(
+class ExplorerDockState @Inject constructor(
     private val mode: ActivityMode,
-    private val router: ExplorerRouter,
-    private val sharing: FilePickingDelegate,
-    private val store: ExplorerStore,
+    store: ExplorerStore,
     preferenceChannel: PreferenceChannel,
-    private val workManager: WorkManager,
-    private val scope: CoroutineScope,
-) : ExplorerDockListener {
+) {
+    private val sorting: Flow<DockItem> = store.currentSorting.map { (_, it) -> sorting(it) }
+    private val copy: Flow<DockItem> = combine(store.currentDeepest, store.checked, store.pasteBuffer, transform = ::copyPaste)
+    private val settingsConfirm: Flow<DockItem> = combine(store.currentDeepest, preferenceChannel.notification, store.checked, transform = ::settingsConfirmItem)
+    val state: Flow<List<DockItem>> = combine(sorting, copy, settingsConfirm, transform = ::dockItems)
 
-    val dock: Flow<List<DockItem>> = combine(store.currentDeepest, preferenceChannel.notification, store.checked, transform = ::dockItems)
-
-    override fun onSearchClick() = router.showFinder()
-
-    override fun onSettingsClick() = router.showSettings()
-
-    override fun onConfirmClick() {
-        when (mode) {
-            is ActivityMode.Default -> debugFailUnreachable()
-            is ActivityMode.Receive -> receive(mode)
-            is ActivityMode.Share -> share(mode.multiple)
-        }
-    }
-
-    private fun dockItems(currentDir: Node?, notice: Boolean, checked: List<Node>): List<DockItem> {
+    private fun settingsConfirmItem(deepest: Node?, notice: Boolean, checked: List<Node>): DockItem {
         val checked = checked.filter { it.isFile }
-        return ExplorerDockState {
-            add(it.search)
-            when (mode) {
-                is ActivityMode.Default -> add(it.settings.copy(notice = notice))
-                is ActivityMode.Receive -> add(it.confirm.copy(enabled = currentDir?.isDirectory == true))
-                is ActivityMode.Share -> add(it.confirm.copy(enabled = currentDir?.isFile == true || checked.isNotEmpty() && (mode.multiple || checked.size == 1)))
-            }
+        return when (mode) {
+            is ActivityMode.Default -> ExplorerDock.Settings.copy(notice = DockItem.Notice.Alert.takeIf { notice })
+            is ActivityMode.Receive -> ExplorerDock.Confirm.copy(enabled = deepest?.isDirectory == true)
+            is ActivityMode.Share -> ExplorerDock.Confirm.copy(enabled = deepest?.isFile == true || checked.isNotEmpty() && (mode.multiple || checked.size == 1))
         }
     }
 
-    private fun receive(mode: ActivityMode.Receive) {
-        val destination = store.currentDeepest.value?.ref
-        destination ?: return
-        router.permissions
-            .request(POST_NOTIFICATIONS)
-            .any {
-                scope.launchOnMain {
-                    workManager.startReceiveInto(destination, mode)
-                    router.finish()
-                }
-            }
+    private fun sorting(sorting: NodeSorting): DockItem {
+        var selected = ExplorerDock.Sorting.children
+            .find { it.id == sorting }
+            ?: ExplorerDock.Sorting.children.first()
+        selected = selected.copy(selected = true)
+        val children = ExplorerDock.Sorting.children.copy {
+            if (it.id == selected.id) selected else it
+        }
+        return ExplorerDock.Sorting.copy(icon = selected.icon, children = children)
     }
 
-    private fun share(multiple: Boolean) {
-        val items = checkedFiles() ?: return
-        when {
-            multiple -> sharing.shareMultiplePicked(items)
-            else -> sharing.shareSinglePicked(items.first())
+    private fun copyPaste(deepest: Node?, checked: List<Node>, copied: List<Node>): DockItem {
+        val pasteable = deepest != null && copied.pasteable(deepest)
+        val copyable = when {
+            checked.isNotEmpty() -> checked.copiable()
+            deepest != null -> deepest.copiable()
+            else -> false
+        }
+        val allCopiedAreDirs = copied.isNotEmpty() && copied.all { it.isDirectory }
+        val icon = when {
+            deepest == null -> R.drawable.ic_copy_file
+            !copyable && pasteable && allCopiedAreDirs -> R.drawable.ic_insert_folder
+            !copyable && pasteable -> R.drawable.ic_insert_file
+            copyable && checked.all { it.isDirectory } -> R.drawable.ic_copy_folder
+            copyable && checked.isNotEmpty() -> R.drawable.ic_copy_file
+            copyable && deepest.isDirectory -> R.drawable.ic_copy_folder
+            copyable -> R.drawable.ic_copy_file
+            else -> R.drawable.ic_copy_file
+        }.let { DockItem.Icon(it) }
+        val pasteCopy = (if (allCopiedAreDirs) R.drawable.ic_insert_copy_folder else R.drawable.ic_insert_copy_file)
+            .let { DockItem.Icon(it) }
+            .let { PasteCopy.copy(enabled = pasteable, icon = it) }
+        val pasteMove = (if (allCopiedAreDirs) R.drawable.ic_insert_copy_folder else R.drawable.ic_insert_copy_file)
+            .let { DockItem.Icon(it) }
+            .let { PasteMove.copy(enabled = pasteable, icon = it) }
+        val notice = DockItem.Notice.Normal.takeIf { copied.isNotEmpty() }
+        val children = DockItemChildren(pasteCopy, pasteMove, secondary = copyable)
+        return when {
+            !copyable && pasteable -> ExplorerDock.Paste.copy(icon = icon, notice = notice, children = children)
+            else -> ExplorerDock.Copy.copy(icon = icon, enabled = copyable, notice = notice, children = children)
         }
     }
 
-    private fun checkedFiles() = store.checked.value
-        .filter { it.isFile }
-        .ifEmpty { null }
+    private fun dockItems(
+        sorting: DockItem,
+        copy: DockItem,
+        settingsConfirm: DockItem,
+    ): List<DockItem> = buildList {
+        add(ExplorerDock.Search)
+        add(sorting)
+        add(copy)
+        add(settingsConfirm)
+    }
 }

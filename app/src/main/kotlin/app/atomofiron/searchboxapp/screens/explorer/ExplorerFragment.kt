@@ -60,10 +60,14 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     }
 
     private fun onNavigationItemSelected(item: DockItem) {
-        when (item.id as ExplorerDock) {
-            ExplorerDock.Search -> presenter.onSearchClick()
-            ExplorerDock.Settings -> presenter.onSettingsClick()
-            ExplorerDock.Confirm -> presenter.onConfirmClick()
+        when (item.id) {
+            ExplorerDock.Search.id -> presenter.onSearchClick()
+            ExplorerDock.Copy.id -> presenter.onCopyClick()
+            ExplorerDock.PasteMove.id -> presenter.onPasteClick(move = true)
+            ExplorerDock.PasteCopy.id -> presenter.onPasteClick(move = false)
+            ExplorerDock.Settings.id -> presenter.onSettingsClick()
+            ExplorerDock.Confirm.id -> presenter.onConfirmClick()
+            in ExplorerDock.Sorting.children.ids() -> presenter.onSortPick(item)
         }
     }
 

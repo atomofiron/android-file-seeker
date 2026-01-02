@@ -30,7 +30,7 @@ data class NodeChildren(
 
     override fun toString() = "NodeChildren(items=[${items.size}], isOpened=$isOpened, filteredOut=$filteredOut)"
 
-    inline fun update(updateMetadata: Boolean = true, action: MutableList<Node>.() -> Unit) {
+    inline fun update(updateMetadata: Boolean, action: MutableList<Node>.() -> Unit) {
         items.action()
         if (updateMetadata) updateMetadata()
     }

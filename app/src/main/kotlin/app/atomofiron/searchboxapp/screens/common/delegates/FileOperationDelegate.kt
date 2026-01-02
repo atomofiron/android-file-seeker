@@ -42,6 +42,16 @@ import javax.inject.Inject
 
 private val Empty = null to null
 
+fun Node.copiable() = !isRoot
+
+fun List<Node>.copiable() = when {
+    isEmpty() -> false
+    size == 1 -> first().copiable()
+    else -> all { it.copiable() } // just in case
+}
+
+fun List<Node>.pasteable(dst: Node) = isNotEmpty() && none { it.ref == dst.ref || it.parentRef == dst.ref || dst.ref.isChildOf(it.ref) }
+
 class FileOperationDelegate @Inject constructor(
     private val scope: CoroutineScope,
     preferences: PreferenceStore,
@@ -83,13 +93,12 @@ class FileOperationDelegate @Inject constructor(
         if (single) add(CopyPath)
         if (single && mode.rw && !first.isRoot) add(Duplicate)
         if (single && mode.rw && !first.isRoot) add(Rename)
-        add(Copy.copy(enabled = !first.isRoot))
-        val copied = store.pasteBuffer
-        val pasteable = single && first.isDirectory && copied.isNotEmpty() && copied.none { it.ref == first.ref || it.parentRef == first.ref || first.ref.isChildOf(it.ref) }
+        add(Copy.copy(enabled = targets.copiable()))
+        val copied = store.pasteBuffer.value
         val allDirs = copied.isNotEmpty() && copied.all { it.isDirectory }
         add(Paste.copy(
             icon = if (allDirs) R.drawable.ic_insert_folder else R.drawable.ic_insert_file,
-            enabled = single && mode.rw && pasteable,
+            enabled = single && mode.rw && first.isDirectory && copied.pasteable(first),
             activated = mode.pasting,
         ))
         if (mode.pasting) {
@@ -124,11 +133,12 @@ class FileOperationDelegate @Inject constructor(
             Paste.id -> return null to buildOperations(targets, first, mode = if (item.activated) Mode.CopyPaste else Mode.Paste)
             ByCopying.id,
             ByMoving.id -> {
-                val copied = store.pasteBuffer
+                val copied = store.pasteBuffer.value
                     .takeIfNotEmpty()
                     ?: return Empty.also { debugFailUnreachable() }
                 val key = key ?: return Empty.also { debugFailUnreachable() }
-                io { service.tryCopy(key, copied, first, asMoving = item.id == ByMoving.id) }
+                io { service.tryCopy(key, copied, first, withMoving = item.id == ByMoving.id) }
+                store.resetCopyBuffer()
             }
             else -> Unit
         }

@@ -41,7 +41,7 @@ pub enum TypedMetasResult {
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Enum)]
 pub enum UsageResult {
-    Ok(String),
+    Ok(u64, String),
     Err(String),
 }
 

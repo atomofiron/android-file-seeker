@@ -9,8 +9,8 @@ sealed class NodeOperation(val inProgress: Boolean) {
     data class Copying(
         val isSource: Boolean,
         val progress: Float = 0f,
-        val asMoving: Boolean = false,
-    ) : NodeOperation(inProgress = asMoving || !isSource)
+        val withMoving: Boolean = false,
+    ) : NodeOperation(inProgress = withMoving || !isSource)
 
     data object Installing : NodeOperation(inProgress = true)
 }

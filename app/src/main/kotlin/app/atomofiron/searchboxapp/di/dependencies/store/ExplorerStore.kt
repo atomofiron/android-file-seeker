@@ -5,10 +5,10 @@ import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
-import app.atomofiron.searchboxapp.utils.replaceAll
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,12 +32,13 @@ class ExplorerStore @Inject constructor() {
     private val _currentTab = MutableStateFlow(middleTab)
     private val _currentDeepest = MutableStateFlow<Node?>(null)
     private val _internalRoot = MutableStateFlow(NodeRef(internalStoragePath).toRoot(NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
+    private val _sorting = MutableStateFlow<Map<NodeTabKey, NodeSorting>>(mapOf(firstTab to NodeSorting.Name, middleTab to NodeSorting.Name, lastTab to NodeSorting.Name))
     private val _screenshots = MutableStateFlow<NodeRef?>(null)
     private val _checked = MutableStateFlow<List<Node>>(listOf())
     private val _alerts = EventFlow<NodeError>()
     private val _deleted = EventFlow<List<Node>>()
     private val _updated = EventFlow<Node>()
-    private val _pasteBuffer = mutableListOf<Node>()
+    private val _pasteBuffer = MutableStateFlow<List<Node>>(emptyList())
     var currentItems = listOf<Node>()
         private set
 
@@ -50,7 +51,17 @@ class ExplorerStore @Inject constructor() {
     val alerts: Flow<NodeError> = _alerts
     val deleted: Flow<List<Node>> = _deleted
     val updated: Flow<Node> = _updated
-    val pasteBuffer: List<Node> = _pasteBuffer
+    val pasteBuffer: StateFlow<List<Node>> = _pasteBuffer
+    val sorting: StateFlow<Map<NodeTabKey, NodeSorting>> = _sorting
+    val currentSorting: Flow<Pair<NodeTabKey, NodeSorting>> = combine(_sorting, _currentTab) { sorting, key ->
+        key to sorting.getOrDefault(key)
+    }
+
+    fun getSorting(key: NodeTabKey) = sorting.value.getOrDefault(key)
+
+    fun Map<NodeTabKey, NodeSorting>.getOrDefault(key: NodeTabKey): NodeSorting {
+        return getOrDefault(key, NodeSorting.Name)
+    }
 
     fun setCurrentItems(tab: ExplorerTabKey, items: List<Node>) {
         currentLists[tab] = items
@@ -76,7 +87,11 @@ class ExplorerStore @Inject constructor() {
         }
     }
 
-    fun setForCopy(list: List<Node>) = _pasteBuffer.replaceAll(list)
+    fun resetCopyBuffer() = setForCopy(emptyList())
+
+    fun setForCopy(list: List<Node>) {
+        _pasteBuffer.value = list
+    }
 
     fun updateInternalStorage(action: Node.() -> Node) {
         _internalRoot.run {
@@ -97,6 +112,12 @@ class ExplorerStore @Inject constructor() {
     suspend fun emitDeleted(item: Node) = _deleted.emit(listOf(item))
 
     suspend fun emitDeleted(items: List<Node>) = _deleted.emit(items)
+
+    fun setSorting(key: NodeTabKey, sorting: NodeSorting) {
+        _sorting.value = _sorting.value.toMutableMap().apply {
+            set(key, sorting)
+        }
+    }
 
     private fun updateChecked(tab: NodeTabKey? = _currentTab.value) {
         tab ?: return

@@ -25,6 +25,7 @@ data class Node(
 ) : NodeMetaData by meta, NodeState by state {
 
     val name get() = ref.name
+    val lowercaseName get() = ref.lowercaseName
     val path get() = ref.string
     val isRoot: Boolean = uniqueId == rootId
 

@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name" translatable="false">File Seeker</string>
     <string name="ellipsis" translatable="false">…</string>
+    <string name="stub" translatable="false">@string/ellipsis</string>
 
     <string name="case_sens">Case sensitivity</string>
     <string name="storage_err">Error accessing memory</string>
