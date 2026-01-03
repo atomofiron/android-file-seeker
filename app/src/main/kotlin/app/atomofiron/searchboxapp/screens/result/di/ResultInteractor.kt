@@ -21,5 +21,5 @@ class ResultInteractor @Inject constructor(
 
     fun usage(item: Node): NodeMeta = item.updateUsage(asSu)
 
-    fun update(item: Node): Node = item.update(asSu)
+    suspend fun update(item: Node): Node = item.update(asSu)
 }

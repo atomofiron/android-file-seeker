@@ -157,7 +157,7 @@ object ExplorerUtils {
     private const val EXT_OSR = ".osr" // osu replay
     private const val EXT_OSB = ".osb" // osu storyboard
 
-    fun copy(from: Node, to: Node, move: Boolean, asSu: Boolean, collector: (CommonProgress) -> Unit): Node? {
+    suspend fun copy(from: Node, to: Node, move: Boolean, asSu: Boolean, collector: (CommonProgress) -> Unit): Node? {
         val result = NativeBridge.copy(from.ref, to.ref, move = move, asSu = asSu, collector)
         return to.apply(result)?.update(asSu, ensureCached = false)
     }
@@ -265,7 +265,7 @@ object ExplorerUtils {
         }
     }
 
-    fun Node.update(asSu: Boolean, ensureCached: Boolean = true): Node {
+    suspend fun Node.update(asSu: Boolean, ensureCached: Boolean = true): Node {
         val type = NativeBridge.type(ref, asSu)
         return when (type) {
             is Rslt.Ok -> parseNode(type.value.meta).resolveType(type.value.mime)
@@ -289,14 +289,14 @@ object ExplorerUtils {
         return meta.copy(length = length, size = size)
     }
 
-    private fun Node.ensureCached(asSu: Boolean, oldProps: NodeMeta): Node = when {
+    private suspend fun Node.ensureCached(asSu: Boolean, oldProps: NodeMeta): Node = when {
         isDirectory -> cacheDir(asSu)
         length == 0L && oldProps.size != size -> resolveFileType()
         length == 0L -> this
         isCached && oldProps.size == size -> this
         // if size changed -> cache again
         else -> try {
-            cacheFile()
+            cacheFile(asSu)
         } catch (e: Exception) {
             this.copy(error = NodeError.Message(e.toString()))
         }
@@ -415,7 +415,7 @@ object ExplorerUtils {
         }
     }
 
-    private fun Node.cacheFile(): Node {
+    private suspend fun Node.cacheFile(asSu: Boolean): Node {
         val content = when (content) {
             is NodeContent.Picture,
             is NodeContent.Movie -> content
@@ -424,19 +424,13 @@ object ExplorerUtils {
                 when (children?.possibleContainsMainApk()) {
                     null, false -> return item
                     true -> AndroidApp.apks(ref).let { apks ->
-                        apks.tryGetApksContent(ref.string)
+                        apks.getAppContent(asSu)
                             .contentOrNodeError(this, apks.copy(isCached = true)) { return it }
                     }
                 }
             }
-            is AndroidApp -> when {
-                content.splitApk -> content
-                    .tryGetApksContent(ref.string)
-                    .contentOrNodeError(this, content.copy(isCached = true)) { return it }
-                else -> content
-                    .getApkContent(ref.string)
-                    .contentOrNodeError(this, content.copy(isCached = true)) { return it }
-            }
+            is AndroidApp -> content.getAppContent(asSu)
+                .contentOrNodeError(this, content.copy(isCached = true)) { return it }
             else -> return this
         }
         return copy(content = content)
@@ -446,12 +440,6 @@ object ExplorerUtils {
         return unwrapOrElse {
             action(node.copy(content = content, error = NodeError.Message.orUnknown(it)))
         }
-    }
-
-    private fun AndroidApp.tryGetApksContent(zipPath: String): Rslt<AndroidApp> = try {
-        getApksContent(zipPath)
-    } catch (e: Exception) {
-        e.toRslt()
     }
 
     private fun Node.cacheZip(): Node = try {

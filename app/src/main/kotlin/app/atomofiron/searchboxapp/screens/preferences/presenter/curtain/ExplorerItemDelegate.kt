@@ -47,7 +47,7 @@ class ExplorerItemDelegate @Inject constructor(
             .split(' ').first()
         val name = "$appName $versionName$DOT_APK".replace(' ', '_')
         val meta = NodeMeta("drwxrwx---", "owner", "group", "47K", "2038-01-19", "03:14")
-        val apkInfo = ApkInfo(Thumbnail(R.mipmap.ic_launcher), "", VERSION_NAME, 0, "", 0, 0, null, 0, null)
+        val apkInfo = ApkInfo(Thumbnail(R.mipmap.ic_launcher), "", VERSION_NAME, 0, "", 0, 0, null, 0, null, withIcon = true, withSignature = false)
         val content = NodeContent.AndroidApp.apk(NodeRef(""), apkInfo)
         Node(ref = NodeRef(name), meta = meta, content = content)
     }

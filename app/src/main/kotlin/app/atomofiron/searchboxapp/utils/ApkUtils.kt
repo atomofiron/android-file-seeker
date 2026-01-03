@@ -9,8 +9,12 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.signature
 import app.atomofiron.common.util.extension.then
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.android.NativeBridge
+import app.atomofiron.searchboxapp.di.dependencies.store.ApkInfoCache
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
+import app.atomofiron.searchboxapp.model.explorer.NodeHash
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.Const.DOT_APK
@@ -48,6 +52,8 @@ fun PackageManager.apkInfo(path: String, icon: Boolean = true, signature: Boolea
         compileSdkVersion = if (Android.S) info.compileSdkVersion else null,
         installLocation = packageInfo.installLocation,
         signature = packageInfo.signature(),
+        withIcon = icon,
+        withSignature = signature,
     )
 }
 
@@ -63,12 +69,23 @@ fun Context.launch(packageName: String): Boolean {
 }
 
 @Throws(IOException::class)
-fun AndroidApp.getApksContent(zipPath: String, signature: Boolean = false): Rslt<AndroidApp> {
-    return getApksContent(FileInputStream(zipPath), signature)
+suspend fun AndroidApp.getAppContent(asSu: Boolean, signature: Boolean = false): Rslt<AndroidApp> {
+    val (hash, info) = ref.getCachedApkInfo(asSu = asSu, signature = signature)
+    info?.let {
+        return update(it).toOk()
+    }
+    return try {
+        when {
+            splitApk -> getApksContent(FileInputStream(ref.string), hash, signature = signature)
+            else -> getApkContent(ref.string, hash, signature = signature)
+        }
+    } catch (e: Exception) {
+        e.toRslt()
+    }
 }
 
 @Throws(IOException::class)
-fun AndroidApp.getApksContent(input: InputStream?, signature: Boolean = false): Rslt<AndroidApp> {
+suspend fun AndroidApp.getApksContent(input: InputStream?, hash: NodeHash? = null, signature: Boolean = false): Rslt<AndroidApp> {
     val tempDir = System.getProperty("java.io.tmpdir")
         ?: return Rslt.Err("No temp dir")
     val tmp = File("$tempDir/$TEMP_APKS_DIR/${Random.nextUInt()}")
@@ -98,19 +115,28 @@ fun AndroidApp.getApksContent(input: InputStream?, signature: Boolean = false): 
     return when {
         !containsMainApk -> Rslt.Err("$BASE_APK not found")
         tmp.length() == 0L -> Rslt.Err("Temp file is empty")
-        else -> getApkContent(tmp.absolutePath, signature)
+        else -> getApkContent(apkPath = tmp.absolutePath, hash, signature = signature)
     }.also { tmp.delete() }
 }
 
-fun AndroidApp.getApkContent(apkPath: String, signature: Boolean = false): Rslt<AndroidApp> {
-    val packageManager = packageManager.value
+private suspend fun AndroidApp.getApkContent(apkPath: String, hash: NodeHash?, signature: Boolean = false): Rslt<AndroidApp> {
+    val manager = packageManager.value
         ?: return Rslt.Err("No package manager")
-    val info = packageManager.apkInfo(apkPath, icon = true, signature)
-    return when (info) {
-        null -> Rslt.Err()
-        else -> copy(info = info, isCached = true).toOk()
+    val info = manager.apkInfo(apkPath, icon = true, signature = signature)
+        ?: return Rslt.Err()
+    hash?.let {
+        ApkInfoCache.offer(it, withIcon = true, withSignature = signature, info)
     }
+    return update(info).toOk()
 }
+
+private fun NodeRef.getCachedApkInfo(asSu: Boolean, signature: Boolean): Pair<NodeHash?, ApkInfo?> {
+    val hash = NativeBridge.crcHash(this, asSu).ok()?.value
+    return hash to hash
+        ?.let { ApkInfoCache.get(it, withIcon = true, withSignature = signature) }
+}
+
+private fun AndroidApp.update(info: ApkInfo): AndroidApp = copy(info = info, isCached = true)
 
 private fun String.possibleMainApk() = this == BASE_APK || !startsWith("config.") && endsWith(DOT_APK)
 

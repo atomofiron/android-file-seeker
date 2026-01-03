@@ -6,11 +6,11 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.UnreachableException
 import app.atomofiron.common.util.dialog.DialogConfig
 import app.atomofiron.common.util.dialog.DialogDelegate
-import app.atomofiron.common.util.extension.debugDelay
 import app.atomofiron.common.util.extension.then
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
@@ -18,20 +18,22 @@ import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isContent
 import app.atomofiron.searchboxapp.utils.Rslt
-import app.atomofiron.searchboxapp.utils.getApkContent
 import app.atomofiron.searchboxapp.utils.getApksContent
+import app.atomofiron.searchboxapp.utils.getAppContent
 import app.atomofiron.searchboxapp.utils.unwrapOrElse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import java.io.FileInputStream
 import javax.inject.Inject
 
 class ApkOperationsDelegate @Inject constructor(
     private val apks: ApkDelegate,
     private val dialogs: DialogDelegate,
+    preferences: PreferenceStore,
 ) {
+    private val asSu by preferences.asSu
+
     fun askForAndroidApp(content: NodeContent.AndroidApp, tab: NodeTabKey? = null) = askForAndroidApp(content, contentResolver = null, tab)
 
     fun askForApks(ref: NodeRef, contentResolver: ContentResolver) = askForAndroidApp(NodeContent.AndroidApp.apks(ref), contentResolver)
@@ -53,7 +55,6 @@ class ApkOperationsDelegate @Inject constructor(
         updater ?: return
         scope = CoroutineScope(Job())
         val job = scope.launch {
-            debugDelay(2)
             val forSignature = content.info != null
             var result = content.resolve(contentResolver, signature = forSignature)
             withMain {
@@ -66,7 +67,6 @@ class ApkOperationsDelegate @Inject constructor(
             if (forSignature) {
                 return@launch
             }
-            debugDelay(2)
             result = content.resolve(contentResolver, signature = true)
             withMain {
                 content = result.unwrapOrElse {
@@ -81,14 +81,13 @@ class ApkOperationsDelegate @Inject constructor(
         }
     }
 
-    private fun NodeContent.AndroidApp.resolve(resolver: ContentResolver?, signature: Boolean): Rslt<NodeContent.AndroidApp> {
+    private suspend fun NodeContent.AndroidApp.resolve(resolver: ContentResolver?, signature: Boolean): Rslt<NodeContent.AndroidApp> {
         val stream = when {
-            !splitApk -> return getApkContent(ref.string, signature)
-            !ref.isContent() -> FileInputStream(ref.string)
+            !ref.isContent() -> return getAppContent(asSu = asSu, signature = signature)
             resolver == null -> throw UnreachableException()
             else -> resolver.openInputStream(ref.string.toUri())
         }
-        return getApksContent(stream, signature)
+        return getApksContent(stream, signature = signature)
     }
 
     private fun DialogConfig.update(content: NodeContent.AndroidApp, withSignature: Boolean = false): DialogConfig = copy(

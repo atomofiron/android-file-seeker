@@ -10,7 +10,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 interface FinderDao {
     companion object {
         const val RESULT = "search"
-        const val VERSION = 0
+        const val VERSION = 1
     }
 
     @Query("SELECT * FROM $RESULT WHERE version = $VERSION order by id")

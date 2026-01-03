@@ -297,7 +297,7 @@ class ExplorerService @Inject constructor(
         }
     }
 
-    private fun tryAlternative(root: NodeRoot, missing: Node): Node {
+    private suspend fun tryAlternative(root: NodeRoot, missing: Node): Node {
         val variants = root.pathVariants?.takeIf { it.isNotEmpty() }
         variants ?: return missing
         val items = variants.map { path ->

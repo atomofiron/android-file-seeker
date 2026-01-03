@@ -31,7 +31,7 @@ class TextViewerInteractor @Inject constructor(
     private val context = Dispatchers.IO
     private val asSu by preferences.asSu
 
-    fun fetchItem(ref: NodeRef): Node {
+    suspend fun fetchItem(ref: NodeRef): Node {
         store.currentItems
             .find { it.ref == ref }
             ?.let { return it }
