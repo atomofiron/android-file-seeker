@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.screens.preferences
 
 import androidx.preference.PreferenceDataStore
 import app.atomofiron.common.util.Alert
-import app.atomofiron.common.util.flow.ChannelFlow
+import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.android.ScreenshotService
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
@@ -26,7 +26,7 @@ class PreferenceViewState @Inject constructor(
     updateStore: AppUpdateStore,
     appWatcher: LeakWatcher,
 ) {
-    private val _alerts = ChannelFlow<Alert>()
+    private val _alerts = EventFlow<Alert>()
     val alerts = merge(preferenceChannel.appUpdateStatus.map(Alert::invoke), _alerts)
     val showDeepBlack = MutableStateFlow(false)
     val asSu: StateFlow<Boolean> = preferenceStore.asSu

@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.screens.finder
 
 import android.view.Gravity
-import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
@@ -30,11 +29,11 @@ class FinderViewState @Inject constructor(
 
     val inactiveTargets = MutableStateFlow(emptyList<Int>())
     val historyDrawerGravity = MutableStateFlow(Gravity.START)
-    val insertInQuery = ChannelFlow<String>()
-    val replaceQuery = ChannelFlow<String>()
+    val insertInQuery = EventFlow<String>()
+    val replaceQuery = EventFlow<String>()
     val history: Flow<List<ItemHistory>> = history.flow
     val showHistory = EventFlow<Unit>()
-    val permissionRequiredWarning = ChannelFlow<Unit>()
+    val permissionRequiredWarning = EventFlow<Unit>()
 
     fun showPermissionRequiredWarning() {
         permissionRequiredWarning(scope)

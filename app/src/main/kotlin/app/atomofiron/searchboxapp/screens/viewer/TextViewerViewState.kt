@@ -1,8 +1,8 @@
 package app.atomofiron.searchboxapp.screens.viewer
 
 import app.atomofiron.common.util.Alert
-import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.DataFlow
+import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
@@ -46,8 +46,7 @@ class TextViewerViewState private constructor(
     preferenceStore,
     session?.tasks ?: emptyFlow(),
 ) {
-
-    val insertInQuery = ChannelFlow<String>()
+    val insertInQuery = EventFlow<String>()
 
     private val status = MutableStateFlow(Status())
     val matchingCursor = DataFlow<MatchCursor?>(null)

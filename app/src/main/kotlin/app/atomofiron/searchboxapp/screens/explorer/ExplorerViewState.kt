@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.screens.explorer
 
 import app.atomofiron.common.util.Alert
-import app.atomofiron.common.util.flow.ChannelFlow
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
@@ -32,7 +31,7 @@ class ExplorerViewState @Inject constructor(
     private val mimeTypes = mode.mimeFilters()
     val tabs = store.mainTabs.map { it.copy(pickerTypes = mimeTypes) }
 
-    val scrollTo = ChannelFlow<Node>()
+    val scrollTo = EventFlow<Node>()
     val itemComposition = preferences.explorerItemComposition
     private val otherAlerts = EventFlow<Alert>()
     val alerts: Flow<Alert> = merge(
@@ -47,7 +46,7 @@ class ExplorerViewState @Inject constructor(
 
     val currentTabFlow = interactor.getFlow(currentTab.value)
     val updates: Flow<Node> = store.updated
-    val permissionRequiredWarning = ChannelFlow<Unit>()
+    val permissionRequiredWarning = EventFlow<Unit>()
     val dock: Flow<List<DockItem>> = dockState.state
 
     fun showPermissionRequiredWarning() = permissionRequiredWarning(scope)

@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.screens.result
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.extension.launchOnDefault
-import app.atomofiron.common.util.flow.ChannelFlow
+import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.TriggerFlow
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.launch
@@ -57,7 +57,7 @@ class ResultViewState @Inject constructor(
     val cache: Map<NodeId, ResultItem.Item> = _cache
     private val _items = MutableStateFlow<List<ResultItem>>(emptyList())
     val items: StateFlow<List<ResultItem>> = _items
-    private val _updates = ChannelFlow<ResultItem>()
+    private val _updates = EventFlow<ResultItem>()
     val updates: Flow<ResultItem> = _updates
     private val _checked = hashSetOf<NodeId>()
     val checked: Set<NodeId> = _checked
@@ -67,7 +67,7 @@ class ResultViewState @Inject constructor(
     private val checkedEvent = TriggerFlow(initial = emptySet<NodeId>())
     private val renderRequest = TriggerFlow(initial = Unit)
     val composition = preferenceStore.explorerItemComposition
-    val alerts = ChannelFlow<Alert>()
+    val alerts = EventFlow<Alert>()
 
     init {
         finderStore.tasksFlow.value
@@ -185,7 +185,7 @@ class ResultViewState @Inject constructor(
         val wasCached = _cache[item.uniqueId]?.isCached == true
         _cache[item.uniqueId] = item
         when {
-            wasCached -> _updates.send(item)
+            wasCached -> _updates.emit(item)
             else -> renderRequest()
         }
     }

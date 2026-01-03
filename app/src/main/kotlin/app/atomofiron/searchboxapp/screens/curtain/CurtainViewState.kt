@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.screens.curtain
 
-import app.atomofiron.common.util.flow.ChannelFlow
+import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.LateinitDataFlow
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainAction
@@ -18,7 +18,7 @@ class CurtainViewState @Inject constructor(
 
     val initialId = params.id
     val adapter = LateinitDataFlow<CurtainApi.Adapter<*>>()
-    val action = ChannelFlow<CurtainAction>()
+    val action = EventFlow<CurtainAction>()
     val cancelable = MutableStateFlow(true)
 
     fun setCurtainAdapter(factory: CurtainApi.Adapter<*>) {
