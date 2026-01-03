@@ -1,15 +1,15 @@
 package app.atomofiron.searchboxapp.screens.preferences.presenter.curtain
 
-import android.content.res.Resources
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.CompoundButton
-import app.atomofiron.common.util.property.StrongProperty
 import app.atomofiron.fileseeker.BuildConfig.VERSION_NAME
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainPreferenceExplorerItemBinding
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
+import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.Strings
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -20,15 +20,19 @@ import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder
+import app.atomofiron.searchboxapp.screens.preferences.PreferenceScope
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const.DOT_APK
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
+import javax.inject.Inject
 
-class ExplorerItemDelegate(
+@PreferenceScope
+class ExplorerItemDelegate @Inject constructor(
     private val preferenceStore: PreferenceStore,
-    private val resources: StrongProperty<Resources>,
-) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
+    resources: AppResources,
+) : CurtainApi.Adapter<CurtainApi.ViewHolder>(), Strings by resources {
+
     private val dir = run {
         val meta = NodeMeta("drwxrwx---", "owner", "group", "4K", "2038-01-19", "03:14")
         val dirContent = NodeContent.Directory()
@@ -38,8 +42,8 @@ class ExplorerItemDelegate(
         Node(ref = NodeRef("Android"), meta = meta, content = dirContent, children = children)
     }
     private val file = run {
-        val appName = resources.value.getString(R.string.app_name)
-        val versionName = resources.value.getString(R.string.version_name)
+        val appName = get(R.string.app_name)
+        val versionName = get(R.string.version_name)
             .split(' ').first()
         val name = "$appName $versionName$DOT_APK".replace(' ', '_')
         val meta = NodeMeta("drwxrwx---", "owner", "group", "47K", "2038-01-19", "03:14")

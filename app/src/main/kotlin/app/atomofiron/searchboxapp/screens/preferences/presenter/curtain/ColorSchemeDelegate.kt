@@ -12,11 +12,14 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainColorSchemeBinding
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
+import app.atomofiron.searchboxapp.screens.preferences.PreferenceScope
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.updateLayoutParams
 import lib.atomofiron.insets.insetsPadding
+import javax.inject.Inject
 
-class ColorSchemeDelegate : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
+@PreferenceScope
+class ColorSchemeDelegate @Inject constructor() : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
 
     override fun getHolder(inflater: LayoutInflater, id: CurtainId): CurtainApi.ViewHolder {
         val binding = CurtainColorSchemeBinding.inflate(inflater, null, false)

@@ -9,8 +9,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.verifyNativeBin
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
-import app.atomofiron.searchboxapp.di.dependencies.store.EasterEggStore
-import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.Strings
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainKey
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
@@ -41,26 +40,25 @@ class PreferenceClickPresenterDelegate @Inject constructor(
     scope: CoroutineScope,
     private val viewState: PreferenceViewState,
     private val router: PreferenceRouter,
-    private val exportImportDelegate: ExportImportDelegate.ExportImportOutput,
-    private val preferenceStore: PreferenceStore,
-    private val eggStore: EasterEggStore,
     curtainChannel: CurtainChannel,
     resources: AppResources,
     private val dialogs: DialogDelegate,
     private val aboutDelegate: Lazy<AboutDelegate>,
-) : Recipient, PreferenceClickOutput {
-
-    val resources by resources
+    private val exportImportDelegate: Lazy<ExportImportDelegate>,
+    private val explorerItemDelegate: Lazy<ExplorerItemDelegate>,
+    private val joystickDelegate: Lazy<JoystickDelegate>,
+    private val colorSchemeDelegate: Lazy<ColorSchemeDelegate>,
+) : Recipient, PreferenceClickOutput, Strings by resources {
 
     init {
         curtainChannel.flow.collectForMe(scope) { controller ->
             controller ?: return@collectForMe
             val adapter: CurtainApi.Adapter<*> = when (controller.requestId) {
                 AboutCurtainKey.id -> aboutDelegate.get()
-                ExportImportCurtainKey.id -> ExportImportDelegate(exportImportDelegate)
-                ExplorerItemCurtainKey.id -> ExplorerItemDelegate(preferenceStore, resources)
-                JoystickCurtainKey.id -> JoystickDelegate(preferenceStore, eggStore)
-                ColorSchemeCurtainKey.id -> ColorSchemeDelegate()
+                ExportImportCurtainKey.id -> exportImportDelegate.get()
+                ExplorerItemCurtainKey.id -> explorerItemDelegate.get()
+                JoystickCurtainKey.id -> joystickDelegate.get()
+                ColorSchemeCurtainKey.id -> colorSchemeDelegate.get()
                 else -> return@collectForMe
             }
             adapter.setController(controller)
@@ -86,7 +84,7 @@ class PreferenceClickPresenterDelegate @Inject constructor(
         if (result is Rslt.Err) {
             val message = result.message
                 .takeIf { it.isNotBlank() }
-                ?: resources.getString(R.string.not_allowed)
+                ?: get(R.string.not_allowed)
             val first = message.indexOfFirst { it == LF }
             val last = message.indexOfLast { it == LF }
             when {

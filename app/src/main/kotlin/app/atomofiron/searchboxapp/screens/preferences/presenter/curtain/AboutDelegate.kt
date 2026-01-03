@@ -14,6 +14,7 @@ import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceRouter
+import app.atomofiron.searchboxapp.screens.preferences.PreferenceScope
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
@@ -26,6 +27,7 @@ import app.atomofiron.searchboxapp.utils.updateDrawables
 import lib.atomofiron.insets.insetsPadding
 import javax.inject.Inject
 
+@PreferenceScope
 class AboutDelegate @Inject constructor(
     private val router: PreferenceRouter,
     private val appSource: AppSource,

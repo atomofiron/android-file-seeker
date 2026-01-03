@@ -5,10 +5,13 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainPreferenceExportImportBinding
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
+import app.atomofiron.searchboxapp.screens.preferences.PreferenceScope
 import app.atomofiron.searchboxapp.utils.ExtType
 import lib.atomofiron.insets.insetsPadding
+import javax.inject.Inject
 
-class ExportImportDelegate(
+@PreferenceScope
+class ExportImportDelegate @Inject constructor(
     private val output: ExportImportOutput,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
 

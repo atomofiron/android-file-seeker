@@ -19,6 +19,7 @@ import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.main.model.EasterEgg
+import app.atomofiron.searchboxapp.screens.preferences.PreferenceScope
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.context
@@ -27,8 +28,10 @@ import app.atomofiron.searchboxapp.utils.performHapticEffect
 import app.atomofiron.searchboxapp.utils.setHapticEffect
 import com.google.android.material.slider.Slider
 import lib.atomofiron.insets.insetsPadding
+import javax.inject.Inject
 
-class JoystickDelegate(
+@PreferenceScope
+class JoystickDelegate @Inject constructor(
     private val preferences: PreferenceStore,
     private val eggStore: EasterEggStore,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
