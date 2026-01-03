@@ -6,9 +6,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NodeInfo(
     val ref: NodeRef,
-    val meta: NodeMeta,
+    val hash: NodeHash,
     val mime: String,
-    val hash: Int,
+    val meta: NodeMeta,
 ) {
 
     override fun equals(other: Any?): Boolean = when {
@@ -19,7 +19,7 @@ data class NodeInfo(
         else -> hash != other.hash
     }
 
-    override fun hashCode(): Int = hash(ref, mime, hash)
+    override fun hashCode(): Int = hash(ref, mime, hash, meta)
 
-    override fun toString() = "NodeHash(ref=$ref, mime=$mime, hash=${hash.toHexString()})"
+    override fun toString() = "NodeHash(ref=$ref, hash=${hash.toHexString()}, mime=$mime, meta=$meta)"
 }
