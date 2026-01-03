@@ -20,6 +20,18 @@
         <item quantity="few">%s su obrisana</item>
         <item quantity="other">%s su obrisana</item>
     </plurals>
+    <plurals name="x_copied">
+        <item quantity="one">%s je kopirana</item>
+        <item quantity="few">%s su kopirane</item>
+        <item quantity="many">%s su kopirane</item>
+        <item quantity="other">%s su kopirane</item>
+    </plurals>
+    <plurals name="x_moved">
+        <item quantity="one">%s je premeštena</item>
+        <item quantity="few">%s su premeštene</item>
+        <item quantity="many">%s su premeštene</item>
+        <item quantity="other">%s su premeštene</item>
+    </plurals>
     <plurals name="receiving_files">
         <item quantity="one">Primanje %d datoteke…</item>
         <item quantity="few">Primanje %d datoteke…</item>

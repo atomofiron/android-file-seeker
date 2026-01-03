@@ -3,6 +3,8 @@ package app.atomofiron.searchboxapp.screens.explorer
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
+import androidx.annotation.PluralsRes
+import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -15,6 +17,7 @@ import app.atomofiron.fileseeker.databinding.FragmentExplorerBinding
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.other.LabeledAction
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.screens.common.delegates.apply
@@ -117,21 +120,23 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     private fun onAlert(alert: ExplorerAlert): UniText {
         return when (alert) {
-            is ExplorerAlert.Deleted -> alert.toUni()
+            is ExplorerAlert.Deleted -> alert.items.toUni(R.plurals.x_deleted, R.string.files_were_not_deleted)
+            is ExplorerAlert.Copied -> alert.items.toUni(R.plurals.x_copied, R.string.files_were_not_copied)
+            is ExplorerAlert.Moved -> alert.items.toUni(R.plurals.x_moved, R.string.files_were_not_moved)
         }
     }
 
-    private fun ExplorerAlert.Deleted.toUni(): UniText {
-        return items.takeIf { it.isNotEmpty() }?.let {
-            val dirs = items.count { it.isDirectory }
-            val files = items.size - dirs
+    private fun List<Node>.toUni(@PluralsRes success: Int, @StringRes empty: Int): UniText {
+        return takeIf { it.isNotEmpty() }?.let {
+            val dirs = count { it.isDirectory }
+            val files = size - dirs
             val what = listOfNotNull(
                 resources.takeIf { dirs > 0 }?.getQuantityString(R.plurals.x_dirs, dirs, dirs),
                 resources.takeIf { files > 0 }?.getQuantityString(R.plurals.x_files, files, files),
             ).joinToString(separator = resources.getString(R.string.and))
-            resources.getQuantityString(R.plurals.x_deleted, items.size, what)
+            resources.getQuantityString(success, size, what)
         }?.let { UniText(it) }
-            ?: UniText(R.string.something_wasnt_deleted)
+            ?: UniText(empty)
     }
 
     private fun showPermissionRequiredWarning(unit: Unit) {

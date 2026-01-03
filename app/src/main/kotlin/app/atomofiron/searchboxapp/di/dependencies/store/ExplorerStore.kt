@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.di.dependencies.store
 
 import android.os.Environment
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.searchboxapp.model.explorer.*
 import app.atomofiron.searchboxapp.model.explorer.NodeRootType
@@ -35,8 +36,10 @@ class ExplorerStore @Inject constructor() {
     private val _sorting = MutableStateFlow<Map<NodeTabKey, NodeSorting>>(mapOf(firstTab to NodeSorting.Name, middleTab to NodeSorting.Name, lastTab to NodeSorting.Name))
     private val _screenshots = MutableStateFlow<NodeRef?>(null)
     private val _checked = MutableStateFlow<List<Node>>(listOf())
-    private val _alerts = EventFlow<NodeError>()
+    private val _alerts = EventFlow<Alert>()
     private val _deleted = EventFlow<List<Node>>()
+    private val _copied = EventFlow<List<Node>>()
+    private val _moved = EventFlow<List<Node>>()
     private val _updated = EventFlow<Node>()
     private val _pasteBuffer = MutableStateFlow<List<Node>>(emptyList())
     var currentItems = listOf<Node>()
@@ -48,8 +51,10 @@ class ExplorerStore @Inject constructor() {
     val internalStorage: StateFlow<Node> = _internalRoot
     val screenshots: StateFlow<NodeRef?> = _screenshots
     val checked: StateFlow<List<Node>> = _checked
-    val alerts: Flow<NodeError> = _alerts
+    val alerts: Flow<Alert> = _alerts
     val deleted: Flow<List<Node>> = _deleted
+    val copied: Flow<List<Node>> = _copied
+    val moved: Flow<List<Node>> = _moved
     val updated: Flow<Node> = _updated
     val pasteBuffer: StateFlow<List<Node>> = _pasteBuffer
     val sorting: StateFlow<Map<NodeTabKey, NodeSorting>> = _sorting
@@ -112,6 +117,16 @@ class ExplorerStore @Inject constructor() {
     suspend fun emitDeleted(item: Node) = _deleted.emit(listOf(item))
 
     suspend fun emitDeleted(items: List<Node>) = _deleted.emit(items)
+
+    suspend fun emitCopied(item: Node) = _copied.emit(listOf(item))
+
+    suspend fun emitCopied(items: List<Node>) = _copied.emit(items)
+
+    suspend fun emitMoved(item: Node) = _moved.emit(listOf(item))
+
+    suspend fun emitMoved(items: List<Node>) = _moved.emit(items)
+
+    suspend fun emitAlert(alert: Alert) = _alerts.emit(alert)
 
     fun setSorting(key: NodeTabKey, sorting: NodeSorting) {
         _sorting.value = _sorting.value.toMutableMap().apply {

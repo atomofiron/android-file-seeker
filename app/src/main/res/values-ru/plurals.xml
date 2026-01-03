@@ -19,10 +19,22 @@
         <item quantity="other">%d ошибок</item>
     </plurals>
     <plurals name="x_deleted">
-        <item quantity="one">Было удалено: %s</item>
-        <item quantity="few">Были удалены: %s</item>
-        <item quantity="many">Были удалены: %s</item>
-        <item quantity="other">Были удалены: %s</item>
+        <item quantity="one">%s был(а) удален(а)</item>
+        <item quantity="few">%s были удалены</item>
+        <item quantity="many">%s были удалены</item>
+        <item quantity="other">%s были удалены</item>
+    </plurals>
+    <plurals name="x_copied">
+        <item quantity="one">%s был(a) скопирован(a)</item>
+        <item quantity="few">%s были скопированы</item>
+        <item quantity="many">%s были скопированы</item>
+        <item quantity="other">%s были скопированы</item>
+    </plurals>
+    <plurals name="x_moved">
+        <item quantity="one">%s был(a) перемещен(a)</item>
+        <item quantity="few">%s были перемещены</item>
+        <item quantity="many">%s были перемещены</item>
+        <item quantity="other">%s были перемещены</item>
     </plurals>
     <plurals name="receiving_files">
         <item quantity="one">Получение %d файла…</item>
@@ -31,7 +43,7 @@
         <item quantity="other">Получение %d файлов…</item>
     </plurals>
     <plurals name="files_received">
-        <item quantity="one">Получен %d из %d файла</item>
+        <item quantity="one">Получен %d файл из %d</item>
         <item quantity="few">Получено %d из %d файлов</item>
         <item quantity="many">Получено %d из %d файлов</item>
         <item quantity="other">Получено %d из %d файлов</item>

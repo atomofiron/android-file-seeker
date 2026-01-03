@@ -216,7 +216,9 @@
     <string name="fetching">Fetching metadata…</string>
     <string name="and">\u0020and\u0020</string>
     <string name="nothing_was_deleted">Nothing was deleted</string>
-    <string name="something_wasnt_deleted">Something wasn\'t deleted</string>
+    <string name="files_were_not_deleted">Files weren\'t deleted</string>
+    <string name="files_were_not_copied">Files weren\'t copied</string>
+    <string name="files_were_not_moved">Files weren\'t moved</string>
     <string name="none">None</string>
     <string name="lite">Lite</string>
     <string name="twice">Double</string>

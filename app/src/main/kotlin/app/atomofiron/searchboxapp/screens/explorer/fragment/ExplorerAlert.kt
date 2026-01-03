@@ -8,4 +8,6 @@ sealed class ExplorerAlert(
     important: Boolean = false,
 ) : Alert.Other(error, important) {
     data class Deleted(val items: List<Node>) : ExplorerAlert()
+    data class Copied(val items: List<Node>) : ExplorerAlert()
+    data class Moved(val items: List<Node>) : ExplorerAlert()
 }

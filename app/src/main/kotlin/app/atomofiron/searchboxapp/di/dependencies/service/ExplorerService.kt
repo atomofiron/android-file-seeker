@@ -68,10 +68,13 @@ import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.searchboxapp.utils.removeOneIf
 import app.atomofiron.searchboxapp.utils.replaceEach
 import app.atomofiron.searchboxapp.utils.showLongToast
+import app.atomofiron.searchboxapp.utils.toAlert
 import app.atomofiron.searchboxapp.utils.unwrapOrElse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collect
@@ -474,18 +477,25 @@ class ExplorerService @Inject constructor(
     }
 
     suspend fun tryCopy(key: NodeTabKey, targets: List<Node>, dst: Node, withMoving: Boolean) {
-        for (target in targets) {
-            val to = target.mutate(ref = dst.ref + target.name)
-            tryCopy(key, target, to, withMoving)
+        val items = targets.map {
+            scope.async {
+                val to = it.mutate(ref = dst.ref + it.name)
+                tryCopy(key, it, to, withMoving, withNotice = false)
+            }
+        }.awaitAll()
+            .mapNotNull { it?.takeIf { it.error == null } }
+        when {
+            withMoving -> store.emitMoved(items)
+            else -> store.emitCopied(items)
         }
     }
 
-    suspend fun tryCopy(key: NodeTabKey, from: Node, to: Node, withMoving: Boolean) {
+    suspend fun tryCopy(key: NodeTabKey, from: Node, to: Node, withMoving: Boolean, withNotice: Boolean = true): Node? {
         render(key) {
             states.updateState(from.uniqueId) {
                 nextState(from.uniqueId, copying = NodeOperation.Copying(isSource = true, withMoving = withMoving))
             }.let {
-                if (it?.isCopying != true) return
+                if (it?.isCopying != true) return null
             }
             states.updateState(to.uniqueId) {
                 nextState(to.uniqueId, copying = NodeOperation.Copying(isSource = false))
@@ -507,6 +517,12 @@ class ExplorerService @Inject constructor(
                 }
             }
         }
+        when {
+            !withNotice -> Unit
+            new == null || new.error != null -> store.emitAlert((new?.error ?: NodeError.Unknown).toAlert(from.content))
+            withMoving -> store.emitMoved(from)
+            else -> store.emitCopied(from)
+        }
         render(key) {
             states.updateState(from.uniqueId) {
                 nextState(from.uniqueId, copying = null)
@@ -522,6 +538,7 @@ class ExplorerService @Inject constructor(
             }
         }
         if (withMoving) tryCache(key, from)
+        return new
     }
 
     suspend fun tryCheck(key: ExplorerTabKey, refs: List<Node>, toChecked: Boolean) {

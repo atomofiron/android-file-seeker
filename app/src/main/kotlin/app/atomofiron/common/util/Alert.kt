@@ -45,3 +45,6 @@ fun AlertErr(message: String, important: Boolean = false) = Alert(message, error
 
 @Suppress("FunctionName")
 fun AlertErr(@StringRes message: Int, important: Boolean = false) = Alert(message, error = true, important)
+
+@Suppress("FunctionName")
+fun AlertErr(message: UniText, important: Boolean = false) = Alert(message, error = true, important)

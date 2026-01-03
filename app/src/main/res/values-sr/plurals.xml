@@ -20,6 +20,18 @@
         <item quantity="few">%s су обрисана</item>
         <item quantity="other">%s су обрисана</item>
     </plurals>
+    <plurals name="x_copied">
+        <item quantity="one">%s je копирана</item>
+        <item quantity="few">%s su копиране</item>
+        <item quantity="many">%s su копиране</item>
+        <item quantity="other">%s su копиране</item>
+    </plurals>
+    <plurals name="x_moved">
+        <item quantity="one">%s je премештена</item>
+        <item quantity="few">%s su премештене</item>
+        <item quantity="many">%s su премештене</item>
+        <item quantity="other">%s su премештене</item>
+    </plurals>
     <plurals name="receiving_files">
         <item quantity="one">Примање %d датотеке…</item>
         <item quantity="few">Примање %d датотеке…</item>

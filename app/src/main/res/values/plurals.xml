@@ -30,6 +30,22 @@
         <item quantity="many">%s were deleted</item>
         <item quantity="other">%s were deleted</item>
     </plurals>
+    <plurals name="x_copied">
+        <item quantity="zero">%s was copied</item>
+        <item quantity="one">%s was copied</item>
+        <item quantity="two">%s were copied</item>
+        <item quantity="few">%s were copied</item>
+        <item quantity="many">%s were copied</item>
+        <item quantity="other">%s were copied</item>
+    </plurals>
+    <plurals name="x_moved">
+        <item quantity="zero">%s was moved</item>
+        <item quantity="one">%s was moved</item>
+        <item quantity="two">%s were moved</item>
+        <item quantity="few">%s were moved</item>
+        <item quantity="many">%s were moved</item>
+        <item quantity="other">%s were moved</item>
+    </plurals>
     <plurals name="receiving_files">
         <item quantity="zero">Receiving %d files…</item>
         <item quantity="one">Receiving a single file…</item>

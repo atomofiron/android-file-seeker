@@ -207,7 +207,9 @@
     <string name="fetching">Получение метаданных…</string>
     <string name="and">\u0020и\u0020</string>
     <string name="nothing_was_deleted">Ничего не было удалено</string>
-    <string name="something_wasnt_deleted">Что-то не было удалено</string>
+    <string name="files_were_not_deleted">Файлы не были удалены</string>
+    <string name="files_were_not_copied">Файлы не были скопированы</string>
+    <string name="files_were_not_moved">Файлы не были перемещены</string>
     <string name="none">Нет</string>
     <string name="lite">Лёгкий</string>
     <string name="twice">Двойной</string>

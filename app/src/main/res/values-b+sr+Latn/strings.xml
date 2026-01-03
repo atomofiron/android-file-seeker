@@ -207,7 +207,9 @@
     <string name="fetching">Dobavljanje metapodataka…</string>
     <string name="and">\u0020i\u0020</string>
     <string name="nothing_was_deleted">Ništa nije obrisano</string>
-    <string name="something_wasnt_deleted">Nešto nije uklonjeno</string>
+    <string name="files_were_not_deleted">Datoteke nisu izbrisane</string>
+    <string name="files_were_not_copied">Datoteke nisu kopirane</string>
+    <string name="files_were_not_moved">Datoteke nisu premeštene</string>
     <string name="none">Nema</string>
     <string name="lite">Lagan</string>
     <string name="twice">Duplo</string>
