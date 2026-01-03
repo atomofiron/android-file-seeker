@@ -13,7 +13,6 @@ import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.custom.view.JoystickView
@@ -27,6 +26,7 @@ import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.addOnAttachListener
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.getDisplayCompat
 import app.atomofiron.searchboxapp.utils.isRtl
 import com.google.android.material.appbar.AppBarLayout
@@ -101,7 +101,7 @@ object LayoutDelegate {
         }
         val translucent = !layout.ground.isBottom
         val fill = when {
-            translucent -> context.findColorByAttr(R.attr.colorBackground)
+            translucent -> context.colorAttr(R.attr.colorBackground)
             else -> context.colorSurfaceContainer()
         }
         setStyle(DockStyle(fill = fill, translucent = translucent))

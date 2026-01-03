@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.core.view.isInvisible
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugFailUnreachable
-import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemProgressBinding
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Speed
@@ -60,8 +60,8 @@ class TaskHolder<Result : SearchResult>(
             is SearchStatus.Ended -> if (task.status.stopped) R.string.stopped else R.string.completed
         }
         val colorLabel = when {
-            task.isError -> context.findColorByAttr(MaterialAttr.colorError)
-            else -> context.findColorByAttr(MaterialAttr.colorAccent)
+            task.isError -> context.colorAttr(MaterialAttr.colorError)
+            else -> context.colorAttr(MaterialAttr.colorAccent)
         }
         label.setText(idLabel)
         label.setTextColor(colorLabel)

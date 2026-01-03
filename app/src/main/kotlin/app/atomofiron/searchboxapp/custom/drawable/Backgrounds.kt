@@ -11,7 +11,6 @@ import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.TextField
@@ -68,13 +67,13 @@ fun TextField.makeHoled(layout: TextInputLayout) = makeFilled(layout, context.co
 fun TextField.makeToned(layout: TextInputLayout) = makeFilled(layout, context.colorSurfaceContainer())
 
 fun Context.colorSurfaceContainer(): Int {
-    val color = findColorByAttr(MaterialAttr.colorSurfaceContainer)
+    val color = colorAttr(MaterialAttr.colorSurfaceContainer)
     return when {
-        isDarkDeep() -> color withAlpha Alpha.VODKA over findColorByAttr(R.attr.colorBackground)
+        isDarkDeep() -> color withAlpha Alpha.VODKA over colorAttr(R.attr.colorBackground)
         else -> color
     }
 }
 
 fun Context.tonedOverlay(color: Int): ColorStateList = ColorStateList.valueOf(color withAlpha Alpha.VODKA over colorBackground())
 
-private fun Context.colorBackground(): Int = findColorByAttr(R.attr.colorBackground)
+private fun Context.colorBackground(): Int = colorAttr(R.attr.colorBackground)

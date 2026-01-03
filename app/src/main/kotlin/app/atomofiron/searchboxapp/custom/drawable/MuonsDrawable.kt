@@ -17,7 +17,7 @@ import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.annotation.DimenRes
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import kotlin.math.cos
 import kotlin.math.max
@@ -48,7 +48,7 @@ class MuonsDrawable private constructor(
         }
 
         operator fun invoke(context: Context, @DimenRes sizeRes: Int = R.dimen.icon_size, fillCenter: Boolean = true): MuonsDrawable {
-            val color = context.findColorByAttr(MaterialAttr.colorAccent)
+            val color = context.colorAttr(MaterialAttr.colorAccent)
             val intrinsicSize = context.resources.getDimensionPixelSize(sizeRes)
             return MuonsDrawable(color, fillCenter, intrinsicSize)
         }

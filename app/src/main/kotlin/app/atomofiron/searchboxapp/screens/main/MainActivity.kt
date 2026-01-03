@@ -22,7 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.CornerPathDebug
 import app.atomofiron.common.util.findBooleanByAttr
-import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.first
 import app.atomofiron.common.util.hideKeyboard
@@ -67,7 +67,7 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge(window)
-        val color = findColorByAttr(R.attr.colorBackground) withAlpha 1
+        val color = colorAttr(R.attr.colorBackground) withAlpha 1
         enableEdgeToEdge(navigationBarStyle = SystemBarStyle.auto(color, color))
         if (Android.Q) window.isNavigationBarContrastEnforced = false
 
@@ -188,7 +188,7 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
     override fun setTheme(resId: Int) {
         super.setTheme(resId)
         if (::binding.isInitialized) {
-            binding.root.setBackgroundColor(findColorByAttr(R.attr.colorBackground))
+            binding.root.setBackgroundColor(colorAttr(R.attr.colorBackground))
             binding.joystick.setComposition()
         }
     }

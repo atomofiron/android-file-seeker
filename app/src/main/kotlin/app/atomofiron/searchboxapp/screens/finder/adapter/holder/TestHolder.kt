@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemTextFieldBinding
 import app.atomofiron.searchboxapp.custom.drawable.makeHoled
@@ -26,9 +26,9 @@ class TestHolder(
     private val binding = ItemTextFieldBinding.bind(itemView)
     private val default = parent.resources.getString(R.string.pangram)
     private val span get() = RoundedBackgroundSpan(
-        backgroundColor = context.findColorByAttr(MaterialAttr.colorSurfaceVariant),
-        borderColor = context.findColorByAttr(MaterialAttr.colorSecondary),
-        textColor = context.findColorByAttr(MaterialAttr.colorOnSurfaceVariant),
+        backgroundColor = context.colorAttr(MaterialAttr.colorSurfaceVariant),
+        borderColor = context.colorAttr(MaterialAttr.colorSecondary),
+        textColor = context.colorAttr(MaterialAttr.colorOnSurfaceVariant),
         context.resources.getDimension(R.dimen.background_span_corner_radius),
         context.resources.getDimension(R.dimen.background_span_border_thickness),
     )

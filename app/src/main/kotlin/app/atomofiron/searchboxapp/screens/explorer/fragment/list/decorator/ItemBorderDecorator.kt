@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
@@ -54,7 +54,7 @@ class ItemBorderDecorator(
         paint.style = Paint.Style.FILL
         paint.strokeCap = Paint.Cap.ROUND
         paint.strokeWidth = borderWidth
-        paint.color = context.findColorByAttr(MaterialAttr.colorSecondary)
+        paint.color = context.colorAttr(MaterialAttr.colorSecondary)
     }
 
     fun setDeepestDir(item: Node?) {

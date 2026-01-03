@@ -19,7 +19,7 @@ import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.R
@@ -105,7 +105,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentPreferenceBinding.bind(view)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
-        view.setBackgroundColor(view.context.findColorByAttr(R.attr.colorBackground))
+        view.setBackgroundColor(view.context.colorAttr(R.attr.colorBackground))
         preferenceScreen.fixIcons()
         recyclerView.clipToPadding = false
         recyclerView.updatePadding(top = resources.getDimensionPixelSize(R.dimen.content_margin_half))
@@ -133,7 +133,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
 
     private fun PreferenceGroup.fixIcons() {
         // todo foresee NoticeableDrawable and colored icons
-        val iconTint = requireContext().findColorByAttr(MaterialAttr.colorControlNormal)
+        val iconTint = requireContext().colorAttr(MaterialAttr.colorControlNormal)
         forEach {
             it.icon?.setTint(iconTint)
             if (it is PreferenceGroup) it.fixIcons()

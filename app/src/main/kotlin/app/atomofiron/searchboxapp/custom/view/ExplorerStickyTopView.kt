@@ -7,7 +7,7 @@ import android.graphics.Paint
 import android.view.View
 import android.widget.FrameLayout
 import app.atomofiron.common.util.extension.debugFail
-import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
@@ -34,7 +34,7 @@ class ExplorerStickyTopView(
     init {
         binder.setOnItemActionListener(listener)
         paint.style = Paint.Style.FILL
-        paint.color = context.findColorByAttr(R.attr.colorBackground)
+        paint.color = context.colorAttr(R.attr.colorBackground)
         setWillNotDraw(false)
         noClip()
     }

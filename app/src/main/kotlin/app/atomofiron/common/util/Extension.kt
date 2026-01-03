@@ -9,12 +9,9 @@ import android.view.ViewParent
 import android.view.Window
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.AttrRes
-import androidx.annotation.ColorInt
 import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.utils.colorAttr
-import com.google.android.material.color.MaterialColors
 import kotlin.math.min
 
 fun Window.reallyDisableFitsSystemWindows() {
@@ -59,27 +56,6 @@ fun Context.findBooleansByAttr(@AttrRes vararg attrs: Int): BooleanArray {
 
     return values
 }
-
-fun Context.findDimenByAttr(@AttrRes attr: Int): Int = findDimensByAttr(attr)[0]
-
-fun Context.findDimensByAttr(@AttrRes vararg attrs: Int): IntArray {
-    @SuppressLint("ResourceType")
-    val array = obtainStyledAttributes(attrs)
-
-    val values = IntArray(attrs.size)
-    for (i in attrs.indices) {
-        values[i] = array.getDimensionPixelOffset(i, 0)
-    }
-    array.recycle()
-
-    return values
-}
-
-@ColorInt
-fun Context.findColorByAttr(@AttrRes attr: Int): Int = colorAttr(attr)
-
-@ColorInt
-fun Context.materialColor(@AttrRes attr: Int) = MaterialColors.getColor(this, attr, -1)
 
 fun ViewGroup.moveChildrenFrom(layoutId: Int) {
     val inflater = LayoutInflater.from(context)

@@ -6,7 +6,7 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.RectF
 import android.util.AttributeSet
-import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import com.google.android.material.card.MaterialCardView
@@ -26,7 +26,7 @@ class SelectableMaterialCardView : MaterialCardView {
     init {
         framePaint.isAntiAlias = true
         framePaint.style = Paint.Style.FILL
-        framePaint.color = context.findColorByAttr(MaterialAttr.colorPrimary)
+        framePaint.color = context.colorAttr(MaterialAttr.colorPrimary)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

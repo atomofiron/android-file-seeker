@@ -5,7 +5,7 @@ import android.content.Context
 import android.graphics.Paint
 import android.view.LayoutInflater
 import android.widget.FrameLayout
-import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerSeparatorBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -27,7 +27,7 @@ class ExplorerStickyBottomView(
         binding.makeSeparator()
         binding.root.setOnClickListener { onclick(item) }
         paint.style = Paint.Style.FILL
-        paint.color = context.findColorByAttr(R.attr.colorBackground)
+        paint.color = context.colorAttr(R.attr.colorBackground)
     }
 
     fun bind(item: Node) {

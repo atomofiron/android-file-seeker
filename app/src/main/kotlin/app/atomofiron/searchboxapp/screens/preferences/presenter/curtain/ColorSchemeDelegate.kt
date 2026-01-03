@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.common.util.findColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainColorSchemeBinding
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
@@ -34,7 +34,7 @@ class ColorSchemeDelegate @Inject constructor() : CurtainApi.Adapter<CurtainApi.
             val padding = root.resources.getDimensionPixelSize(R.dimen.padding_half)
             textView.updatePaddingRelative(start = padding, top = padding, end = padding, bottom = padding)
             textView.text = root.resources.getResourceEntryName(attr)
-            val color = root.context.findColorByAttr(attr)
+            val color = root.context.colorAttr(attr)
             textView.setBackgroundColor(color)
             when (ColorUtils.calculateLuminance(color) > 0.5) {
                 true -> textView.setTextColor(Color.BLACK)
