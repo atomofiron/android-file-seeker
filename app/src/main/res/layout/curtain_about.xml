@@ -41,7 +41,6 @@
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
             android:text="@string/version_name"
-            android:textColor="?colorSecondary"
             android:layout_marginBottom="@dimen/padding_half"
             android:drawableStart="@drawable/ic_info"
             android:gravity="center_vertical"
