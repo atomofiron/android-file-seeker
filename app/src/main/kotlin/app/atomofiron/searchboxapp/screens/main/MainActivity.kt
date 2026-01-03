@@ -32,13 +32,14 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ActivityMainBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.getLayout
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.syncWithLayout
-import app.atomofiron.searchboxapp.screens.main.di.AppStore
-import app.atomofiron.searchboxapp.screens.main.di.AppStoreProvider
 import app.atomofiron.searchboxapp.model.Layout.Ground
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
 import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.common.ActivityModeProvider
+import app.atomofiron.searchboxapp.screens.main.di.AppStore
+import app.atomofiron.searchboxapp.screens.main.di.AppStoreProvider
+import app.atomofiron.searchboxapp.screens.main.model.EasterEgg
 import app.atomofiron.searchboxapp.screens.main.util.offerKeyCodeToChildren
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.setHapticEffect
@@ -198,6 +199,7 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
             setOrientation.collect(lifecycleScope, ::setOrientation)
             setJoystick.collect(lifecycleScope, binding.joystick::setComposition)
             hapticFeedback.first(lifecycleScope, binding.root::setHapticEffect)
+            easterEgg.collect(lifecycleScope, ::setEasterEgg)
         }
     }
 
@@ -224,6 +226,13 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
     private fun setOrientation(orientation: AppOrientation) {
         if (requestedOrientation != orientation.constant) {
             requestedOrientation = orientation.constant
+        }
+    }
+
+    private fun setEasterEgg(value: EasterEgg?) = binding.joystick.run {
+        when (value) {
+            null -> resetPressedState()
+            else -> overridePressedState(value.colorId, value.drawableId)
         }
     }
 

@@ -165,5 +165,15 @@
             android:text="@string/by_default"
             style="?materialTonalButton"
             />
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/egg_toggle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/padding_common"
+            android:layout_marginHorizontal="@dimen/padding_common"
+            android:text="@string/easter_egg"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            />
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>

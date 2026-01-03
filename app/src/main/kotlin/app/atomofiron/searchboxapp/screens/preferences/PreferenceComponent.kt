@@ -12,6 +12,7 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
+import app.atomofiron.searchboxapp.di.dependencies.store.EasterEggStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.screens.preferences.fragment.LegacyPreferenceDataStore
@@ -87,4 +88,5 @@ interface PreferenceDependencies : DelegateModule.Dependencies {
     fun updateStore(): AppUpdateStore
     fun appUpdateService(): AppUpdateService
     fun packageManager(): PackageManager
+    fun easterEggStore(): EasterEggStore
 }

@@ -9,6 +9,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.verifyNativeBin
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
+import app.atomofiron.searchboxapp.di.dependencies.store.EasterEggStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainKey
@@ -42,6 +43,7 @@ class PreferenceClickPresenterDelegate @Inject constructor(
     private val router: PreferenceRouter,
     private val exportImportDelegate: ExportImportDelegate.ExportImportOutput,
     private val preferenceStore: PreferenceStore,
+    private val eggStore: EasterEggStore,
     curtainChannel: CurtainChannel,
     resources: AppResources,
     private val dialogs: DialogDelegate,
@@ -57,7 +59,7 @@ class PreferenceClickPresenterDelegate @Inject constructor(
                 AboutCurtainKey.id -> aboutDelegate.get()
                 ExportImportCurtainKey.id -> ExportImportDelegate(exportImportDelegate)
                 ExplorerItemCurtainKey.id -> ExplorerItemDelegate(preferenceStore, resources)
-                JoystickCurtainKey.id -> JoystickDelegate(preferenceStore)
+                JoystickCurtainKey.id -> JoystickDelegate(preferenceStore, eggStore)
                 ColorSchemeCurtainKey.id -> ColorSchemeDelegate()
                 else -> return@collectForMe
             }

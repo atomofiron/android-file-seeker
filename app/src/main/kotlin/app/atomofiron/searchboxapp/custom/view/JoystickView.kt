@@ -10,22 +10,30 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
+import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.createBitmap
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findBooleanByAttr
-import app.atomofiron.common.util.findColorByAttr
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
+import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.HAPTIC_HEAVY
 import app.atomofiron.searchboxapp.utils.HAPTIC_LITE
 import app.atomofiron.searchboxapp.utils.HAPTIC_NO
+import app.atomofiron.searchboxapp.utils.color
+import app.atomofiron.searchboxapp.utils.colorAttr
+import app.atomofiron.searchboxapp.utils.drawable
+import app.atomofiron.searchboxapp.utils.over
 import app.atomofiron.searchboxapp.utils.performHapticEffect
+import app.atomofiron.searchboxapp.utils.toIntAlpha
+import app.atomofiron.searchboxapp.utils.withAlpha
 import kotlin.math.min
 import kotlin.math.pow
 import kotlin.math.sin
@@ -43,7 +51,12 @@ fun JoystickHaptic.effect(press: Boolean) = when (this) {
     JoystickHaptic.Heavy -> if (press) HAPTIC_HEAVY else HAPTIC_LITE
 }
 
-fun Context.joystickDefaultColor() = findColorByAttr(MaterialAttr.colorTertiaryContainer)
+fun Context.joystickDefaultColor() = colorAttr(MaterialAttr.colorTertiaryContainer)
+
+private class Override(
+    val glowingColor: Int,
+    val drawable: Drawable,
+)
 
 class JoystickView @JvmOverloads constructor(
     context: Context,
@@ -56,8 +69,9 @@ class JoystickView @JvmOverloads constructor(
     private val paintBlur = Paint()
     private val glowingPaint = Paint()
     private val paint = Paint()
-    private var shadowColor = ColorUtils.setAlphaComponent(Color.BLACK, 80)
+    private var shadowColor = Color.BLACK withAlpha Alpha.LEVEL_30
     private var glowColor = 0
+    private var override: Override? = null
 
     private val animator = ValueAnimator.ofFloat()
     private val shadowRadius = resources.getDimension(R.dimen.joystick_elevation)
@@ -116,15 +130,23 @@ class JoystickView @JvmOverloads constructor(
 
         val black = ContextCompat.getColor(context, R.color.black)
         val white = ContextCompat.getColor(context, R.color.white)
-        val contrastBlack = ColorUtils.calculateContrast(black, circleColor)
-        val contrastWhite = ColorUtils.calculateContrast(white, circleColor)
+        val contrastBlack = black over circleColor
+        val contrastWhite = white over circleColor
         val iconColor = when {
-            !composition.overrideColor -> context.findColorByAttr(MaterialAttr.colorOnTertiaryContainer)
+            !composition.overrideColor -> context.colorAttr(MaterialAttr.colorOnTertiaryContainer)
             contrastBlack > contrastWhite -> black
             else -> white
         }
         icon.colorFilter = PorterDuffColorFilter(iconColor, PorterDuff.Mode.SRC_IN)
         invalidate()
+    }
+
+    fun resetPressedState() {
+        override = null
+    }
+
+    fun overridePressedState(@ColorRes glowingColor: Int, @DrawableRes drawableId: Int) {
+        override = Override(context.color(glowingColor), context.drawable(drawableId))
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
@@ -162,12 +184,23 @@ class JoystickView @JvmOverloads constructor(
         canvas.translate(cx, cy)
         canvas.scale(scale, scale)
         icon.draw(canvas)
+        canvas.translate(-cx, -cy)
+
+        override?.drawable?.run {
+            val padding = (padding / 2 + (padding - scale * padding)).toInt()
+            setBounds(padding, padding, width - padding, height - padding)
+            alpha = pressure.toIntAlpha()
+            draw(canvas)
+        }
     }
 
     private fun calcBlurColor(): Int {
         val glowAlpha = (FULL * pressure).toInt()
-        val foreground = ColorUtils.setAlphaComponent(glowColor, glowAlpha)
-        return ColorUtils.compositeColors(foreground, shadowColor)
+        val foreground = when (val override = override) {
+            null -> glowColor withAlpha glowAlpha
+            else -> override.glowingColor withAlpha glowAlpha
+        }
+        return foreground over shadowColor
     }
 
     private fun fromToBy(from: Float, to: Float, by: Float) = from + (to - from) * by

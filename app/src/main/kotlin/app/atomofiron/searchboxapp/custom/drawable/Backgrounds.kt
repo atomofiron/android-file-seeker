@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.custom.drawable
 
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Color
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.GradientDrawable.Orientation.BOTTOM_TOP
 import android.graphics.drawable.RippleDrawable
@@ -21,12 +22,15 @@ import app.atomofiron.searchboxapp.utils.over
 import app.atomofiron.searchboxapp.utils.withAlpha
 import com.google.android.material.textfield.TextInputLayout
 
+private fun Context.rippleColor() = colorAttr(MaterialAttr.colorControlHighlight)
+
+private fun Context.rippleColorList() = ColorStateList.valueOf(rippleColor())
+
 fun Context.explorerRippleDrawable(): RippleDrawable {
     val mask = ContextCompat.getColor(this@explorerRippleDrawable, R.color.mask)
         .let { GradientDrawable(BOTTOM_TOP, intArrayOf(it, it)) }
     mask.cornerRadius = resources.getDimension(R.dimen.explorer_border_width)
-    val ripple = colorAttr(MaterialAttr.colorControlHighlight)
-    return RippleDrawable(ColorStateList.valueOf(ripple), null, mask)
+    return RippleDrawable(rippleColorList(), null, mask)
 }
 
 fun View.setMenuItemBackground() {
@@ -34,6 +38,14 @@ fun View.setMenuItemBackground() {
     drawable.findDrawableByLayerId(R.id.fill).alpha = Alpha.vodkaInt(context.isDarkDeep())
     background = drawable
 }
+
+fun View.setRippleForeground(@DimenRes corners: Int = R.dimen.corner_radius) {
+    val mask = GradientDrawable(BOTTOM_TOP, intArrayOf(Color.BLACK, Color.BLACK))
+    mask.cornerRadius = resources.getDimension(corners)
+    foreground = RippleDrawable(context.rippleColorList(), null, mask)
+}
+
+fun View.setStrokedBackground(@DimenRes padding: Int = 0) = setStrokedBackground(padding, padding)
 
 fun View.setStrokedBackground(
     @DimenRes horizontal: Int = 0,

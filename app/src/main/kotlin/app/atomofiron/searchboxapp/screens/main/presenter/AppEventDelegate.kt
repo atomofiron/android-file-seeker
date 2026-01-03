@@ -4,9 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration.UI_MODE_NIGHT_MASK
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.icu.util.Calendar
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.dialog.DialogConfig
 import app.atomofiron.common.util.dialog.DialogDelegate
@@ -18,6 +22,7 @@ import app.atomofiron.searchboxapp.android.showUpdateNotification
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
+import app.atomofiron.searchboxapp.di.dependencies.store.EasterEggStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
@@ -29,6 +34,8 @@ import app.atomofiron.searchboxapp.screens.common.delegates.ApkOperationsDelegat
 import app.atomofiron.searchboxapp.screens.main.MainRouter
 import app.atomofiron.searchboxapp.screens.main.MainScope
 import app.atomofiron.searchboxapp.screens.main.di.AppStoreConsumer
+import app.atomofiron.searchboxapp.screens.main.model.EasterEgg
+import app.atomofiron.searchboxapp.screens.main.util.EasterEggPeriods
 import app.atomofiron.searchboxapp.utils.launch
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
@@ -50,9 +57,10 @@ class AppEventDelegate @Inject constructor(
     private val dialogs: DialogDelegate,
     private val preferences: PreferenceStore,
     updateStore: AppUpdateStore,
+    private val eggStore: EasterEggStore,
     apkChannel: ApkChannel,
     private val updateService: AppUpdateService,
-) : AppEventDelegateApi {
+) : AppEventDelegateApi, LifecycleEventObserver {
 
     private var currentTheme: AppTheme? = null
     private val activity get() = router.activity
@@ -69,6 +77,7 @@ class AppEventDelegate @Inject constructor(
         appStoreConsumer.onResourcesChange(activity.resources)
         updateService.onActivityCreate(activity)
         if (Android.T) updateLocalePreference()
+        activity.lifecycle.addObserver(this)
     }
 
     override fun onIntent(intent: Intent) {
@@ -84,6 +93,21 @@ class AppEventDelegate @Inject constructor(
     override fun onActivityDestroy() = appStoreConsumer.onActivityDestroy()
 
     override fun onActivityFinish() = updateService.completeUpdate()
+
+    override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+        if (event == Lifecycle.Event.ON_START) {
+            val now = Calendar.getInstance()
+            EasterEggPeriods.updateYear(now)
+            val value = when (now) {
+                in EasterEggPeriods.halloween -> EasterEgg.Halloween
+                in EasterEggPeriods.clown -> EasterEgg.Clown
+                in EasterEggPeriods.oldYear -> EasterEgg.NewYear
+                in EasterEggPeriods.newYear -> EasterEgg.NewYear
+                else -> null
+            }
+            eggStore.set(value)
+        }
+    }
 
     private fun onThemeApplied(theme: AppTheme) {
         val activityNight = activity

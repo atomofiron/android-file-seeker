@@ -5,16 +5,20 @@ import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.CompoundButton
+import androidx.core.view.isVisible
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainPreferenceJoystickBinding
+import app.atomofiron.searchboxapp.custom.drawable.setRippleForeground
 import app.atomofiron.searchboxapp.custom.drawable.setStrokedBackground
 import app.atomofiron.searchboxapp.custom.view.effect
 import app.atomofiron.searchboxapp.custom.view.joystickDefaultColor
+import app.atomofiron.searchboxapp.di.dependencies.store.EasterEggStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import app.atomofiron.searchboxapp.model.preference.JoystickHaptic
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
+import app.atomofiron.searchboxapp.screens.main.model.EasterEgg
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.context
@@ -26,11 +30,13 @@ import lib.atomofiron.insets.insetsPadding
 
 class JoystickDelegate(
     private val preferences: PreferenceStore,
+    private val eggStore: EasterEggStore,
 ) : CurtainApi.Adapter<CurtainApi.ViewHolder>() {
 
     private var entity: JoystickComposition = preferences.joystickComposition.value
     private val hapticFeedbackWasEnabled: Boolean = preferences.hapticFeedback.value
     private val hapticFeedback: Boolean get() = preferences.hapticFeedback.value
+    private val easterEgg: EasterEgg? get() = eggStore.value.value
 
     override fun getHolder(inflater: LayoutInflater, id: CurtainId): CurtainApi.ViewHolder {
         val binding = CurtainPreferenceJoystickBinding.inflate(inflater, null, false)
@@ -46,7 +52,6 @@ class JoystickDelegate(
         }
         hapticScale.intValue = JoystickHaptic.entries.lastIndex
         colorPicker.setStrokedBackground(vertical = R.dimen.padding_half)
-
         bind()
         val delegate = LocalDelegate(this)
         red.addOnChangeListener(delegate::onColorChanged)
@@ -60,6 +65,11 @@ class JoystickDelegate(
         hapticScale.addOnChangeListener(delegate::onHapticChanged)
         hapticScale.setLabelFormatter(delegate::hapticLabels)
         btnReset.setOnClickListener(delegate::onResetDefaultClick)
+        easterEgg?.let {
+            eggToggle.setStrokedBackground(R.dimen.padding_common)
+            eggToggle.setRippleForeground()
+            eggToggle.setOnCheckedChangeListener { _, checked -> delegate.onEggChanged(it, checked) }
+        }
     }
 
     private fun CurtainPreferenceJoystickBinding.bind() {
@@ -70,6 +80,13 @@ class JoystickDelegate(
         invForTheme.setChipIconResource(entity.invForDark.iconId())
         invHighlight.isChecked = entity.invGlowing
         invHighlight.setChipIconResource(entity.invGlowing.iconId())
+        eggToggle.isVisible = easterEgg != null
+        eggToggle.isChecked = when (easterEgg) {
+            EasterEgg.Halloween -> preferences.eggHalloween.value
+            EasterEgg.NewYear -> preferences.eggNewYear.value
+            EasterEgg.Clown -> preferences.eggClown.value
+            else -> false
+        }
         hapticScale.intValue = when {
             hapticFeedback -> entity.haptic.index
             else -> JoystickHaptic.None.index
@@ -143,6 +160,10 @@ class JoystickDelegate(
 
         fun onHighlightInvertingChanged(button: CompoundButton, isChecked: Boolean) {
             entity.copy(invGlowing = isChecked).apply()
+        }
+
+        fun onEggChanged(egg: EasterEgg, isChecked: Boolean) {
+            preferences { setEasterEggEnabled(egg, isChecked) }
         }
 
         private fun JoystickComposition.isColorDefault(): Boolean {

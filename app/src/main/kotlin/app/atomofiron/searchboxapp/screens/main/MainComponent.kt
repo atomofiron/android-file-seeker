@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
+import app.atomofiron.searchboxapp.di.dependencies.store.EasterEggStore
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
@@ -72,4 +73,5 @@ interface MainDependencies : DelegateModule.Dependencies {
     fun apkChannel(): ApkChannel
     fun apks(): ApkDelegate
     fun explorerStore(): ExplorerStore
+    fun easterEggStore(): EasterEggStore
 }

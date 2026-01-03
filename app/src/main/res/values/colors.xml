@@ -61,7 +61,8 @@
 	<color name="green">#ff00ff00</color>
 	<color name="blue">#ff0000ff</color>
 	<color name="red_transparent">#33ff0000</color>
-
+    <color name="ny_ball">#ff3311</color>
+    <color name="pumpkin">#FF7518</color>
 
 	<color name="day_night_primary">@color/md_theme_light_primary</color>
 

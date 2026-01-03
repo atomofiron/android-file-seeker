@@ -162,6 +162,7 @@
     <string name="a_directory">Fascikla</string>
     <string name="inverse_glow">Invertuj sjaj</string>
     <string name="haptic_effect">Taktilni odziv</string>
+    <string name="easter_egg">Skrivena fora</string>
     <string name="inverse_for_dark">Invertuj u tamnoj temi</string>
     <string name="pref_category_debug">Debug</string>
     <string name="root">Koren</string>

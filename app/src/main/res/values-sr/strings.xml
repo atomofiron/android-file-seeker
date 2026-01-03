@@ -162,6 +162,7 @@
     <string name="a_directory">Фасцикла</string>
     <string name="inverse_glow">Инвертуј сјај</string>
     <string name="haptic_effect">Тактилни одзив</string>
+    <string name="easter_egg">Скривена фора</string>
     <string name="inverse_for_dark">Инвертуј у тамној теми</string>
     <string name="pref_category_debug">Дебаг</string>
     <string name="root">Корен</string>

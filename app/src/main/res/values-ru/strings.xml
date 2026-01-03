@@ -162,6 +162,7 @@
     <string name="a_directory">Папку</string>
     <string name="inverse_glow">Инвертировать свечение</string>
     <string name="haptic_effect">Тактильный отклик</string>
+    <string name="easter_egg">Пасхалка</string>
     <string name="inverse_for_dark">Инвертировать на тёмной теме</string>
     <string name="pref_category_debug">Отладка</string>
     <string name="root">Корень</string>

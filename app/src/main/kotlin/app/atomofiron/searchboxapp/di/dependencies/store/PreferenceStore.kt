@@ -19,20 +19,24 @@ import app.atomofiron.searchboxapp.model.preference.AppTheme
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.model.preference.JoystickComposition
 import app.atomofiron.searchboxapp.model.textviewer.LocalSearchOptions
+import app.atomofiron.searchboxapp.screens.main.model.EasterEgg
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKey
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyAppOrientation
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyAppTheme
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyAppUpdateCode
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyClown
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyDeepBlack
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyDrawerGravity
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyExplorerItem
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyHalloween
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyHapticFeedback
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyJoystick
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyLocalSearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyLocale
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxDepth
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyMaxSize
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyNewYear
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyScreenshotOperations
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySearchOptions
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyShowSearchOptions
@@ -96,6 +100,9 @@ class PreferenceStore @Inject constructor(
     val maxDepthForSearch = getFlow(KeyMaxDepth)
     val hapticFeedback = getFlow(KeyHapticFeedback)
     val screenshotOperations = getFlow(KeyScreenshotOperations)
+    val eggHalloween = getFlow(KeyHalloween)
+    val eggNewYear = getFlow(KeyNewYear)
+    val eggClown = getFlow(KeyClown)
     val appLocale = getFlow(KeyLocale) { AppLocale.entries[it.toInt()] } // don't pass any default value
     val appTheme = data.map {
         val appThemeMode = it[KeyAppTheme] ?: AppTheme.defaultName()
@@ -167,6 +174,17 @@ class PreferenceStore @Inject constructor(
 
     suspend fun setHapticFeedback(value: Boolean) {
         edit { it[KeyHapticFeedback] = value }
+    }
+
+    suspend fun setEasterEggEnabled(egg: EasterEgg, value: Boolean) {
+        edit {
+            val key = when (egg) {
+                EasterEgg.Halloween -> KeyHalloween
+                EasterEgg.NewYear -> KeyNewYear
+                EasterEgg.Clown -> KeyClown
+            }
+            it[key] = value
+        }
     }
 
     private fun <V : Any> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {

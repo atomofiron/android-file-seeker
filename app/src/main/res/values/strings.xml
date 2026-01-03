@@ -167,6 +167,7 @@
     <string name="a_directory">Folder</string>
     <string name="inverse_glow">Inverse glow</string>
     <string name="haptic_effect">Haptic feedback</string>
+    <string name="easter_egg">Easter egg</string>
     <string name="inverse_for_dark">Inverse for Dark theme</string>
     <string name="pref_category_debug">Debug</string>
     <string name="pref_leak_canary" translatable="false">Leak Canary</string>
