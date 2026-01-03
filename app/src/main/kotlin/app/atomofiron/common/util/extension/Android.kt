@@ -50,22 +50,20 @@ fun PackageInfo.signature(): ApkSignature? {
     }?.firstOrNull()
     signature ?: return null
     val bytes = signature.toByteArray()
-    return ApkSignature.invoke(bytes.size) {
-        val factory = CertificateFactory.getInstance("X.509")
-        val cert = factory.generateCertificate(signature.toByteArray().inputStream()) as X509Certificate
-        val digest = MessageDigest.getInstance(HASH_ALG)
-        val hashBytes = digest.digest(bytes)
-        val hash = hashBytes.joinToString("") { Const.HEX_BYTE.format(it) }
-        object : ApkSignature {
-            override val algName = cert.sigAlgName
-            override val algOID = cert.sigAlgOID
-            override val issuerName = cert.issuerDN.name
-            override val since = cert.notBefore.toString()
-            override val until = cert.notAfter.toString()
-            override val version = cert.version
-            override val hashAlg = HASH_ALG
-            override val hash = hash
-            override val bytes = bytes.size
-        }
-    }
+    val factory = CertificateFactory.getInstance("X.509")
+    val cert = factory.generateCertificate(signature.toByteArray().inputStream()) as X509Certificate
+    val digest = MessageDigest.getInstance(HASH_ALG)
+    val hashBytes = digest.digest(bytes)
+    val hash = hashBytes.joinToString("") { Const.HEX_BYTE.format(it) }
+    return ApkSignature(
+        algName = cert.sigAlgName,
+        algOID = cert.sigAlgOID,
+        issuerName = cert.issuerDN.name,
+        since = cert.notBefore.toString(),
+        until = cert.notAfter.toString(),
+        version = cert.version,
+        hashAlg = HASH_ALG,
+        hash = hash,
+        bytes = bytes.size,
+    )
 }

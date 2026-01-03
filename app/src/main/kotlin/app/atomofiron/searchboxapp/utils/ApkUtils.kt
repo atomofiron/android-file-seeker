@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.utils
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.widget.Toast
@@ -32,7 +31,7 @@ import kotlin.random.nextUInt
 
 const val BASE_APK = "base$DOT_APK"
 const val TEMP_APKS_DIR = "apks"
-@Suppress("DEPRECATION") @SuppressLint("InlinedApi")
+@Suppress("DEPRECATION")
 private const val WITH_SIGNATURE = PackageManager.GET_SIGNATURES or PackageManager.GET_SIGNING_CERTIFICATES
 
 fun PackageManager.apkInfo(path: String, icon: Boolean = true, signature: Boolean = false): ApkInfo? {
