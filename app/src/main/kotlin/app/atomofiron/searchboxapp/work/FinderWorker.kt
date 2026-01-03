@@ -30,7 +30,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
-import app.atomofiron.searchboxapp.model.explorer.NodeHash
+import app.atomofiron.searchboxapp.model.explorer.NodeInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
@@ -133,14 +133,14 @@ class FinderWorker(
         }.apply()
     }
 
-    private fun TypedMeta.toNodeHash(result: CrcResult? = null): NodeHash {
+    private fun TypedMeta.toNodeHash(result: CrcResult? = null): NodeInfo {
         val hash = (result as? CrcResult.Ok)?.v1?.toInt() ?: 0
         debug {
             (result as? CrcResult.Err)?.v1?.let {
                 logE("file hash error: $it")
             }
         }
-        return NodeHash(
+        return NodeInfo(
             ref = NodeRef(meta.path),
             meta = meta.toNodeMeta(),
             mime = mime,

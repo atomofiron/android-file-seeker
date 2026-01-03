@@ -4,7 +4,7 @@ import app.atomofiron.common.util.extension.hash
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NodeHash(
+data class NodeInfo(
     val ref: NodeRef,
     val meta: NodeMeta,
     val mime: String,
@@ -13,7 +13,7 @@ data class NodeHash(
 
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
-        other !is NodeHash -> false
+        other !is NodeInfo -> false
         ref != other.ref -> false
         mime != other.mime -> false
         else -> hash != other.hash

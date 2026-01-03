@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.model.finder
 
-import app.atomofiron.searchboxapp.model.explorer.NodeHash
+import app.atomofiron.searchboxapp.model.explorer.NodeInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import kotlinx.serialization.Serializable
@@ -8,7 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 sealed class ItemMatch(val ref: NodeRef) {
 
-    abstract val hash: NodeHash
+    abstract val hash: NodeInfo
     abstract val count: Int
 
     val uniqueId get() = ref.uniqueId
@@ -16,14 +16,14 @@ sealed class ItemMatch(val ref: NodeRef) {
 
     @Serializable
     data class One(
-        override val hash: NodeHash,
+        override val hash: NodeInfo,
     ) : ItemMatch(hash.ref) {
         override val count = 1
     }
 
     @Serializable
     data class Many(
-        override val hash: NodeHash,
+        override val hash: NodeInfo,
         override val count: Int = 0,
         val matches: MutableMatchMap = hashMapOf(),
     ) : ItemMatch(hash.ref)

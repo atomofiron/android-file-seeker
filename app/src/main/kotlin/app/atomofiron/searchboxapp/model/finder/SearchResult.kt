@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.model.finder
 
 import app.atomofiron.common.util.extension.hash
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeHash
+import app.atomofiron.searchboxapp.model.explorer.NodeInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.textviewer.MatchMap
 import kotlinx.serialization.Serializable
@@ -25,7 +25,7 @@ sealed class SearchResult {
     data class Local(
         override val count: Int,
         val matches: MatchMap,
-        val hash: NodeHash? = null,
+        val hash: NodeInfo? = null,
         override val removable: Boolean = true,
     ) : SearchResult() {
 
