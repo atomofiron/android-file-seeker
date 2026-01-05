@@ -440,9 +440,10 @@ class ExplorerService @Inject constructor(
         val renamed = item.rename(name, asSu)
             ?: return debugFail { "null after rename $ref to $name" }
         render(key) {
-            replaceItem(renamed)
+            replaceItem(item.uniqueId, renamed)
             var index = tree.indexOf(item.ref)
             if (index >= 0) {
+                tree[index] = renamed.ref
                 while (++index < tree.size) {
                     val next = tree[index]
                     debug {

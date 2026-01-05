@@ -591,9 +591,7 @@ object ExplorerUtils {
 
     fun Node.rename(name: String, asSu: Boolean): Node? {
         val targetRef = parentRef + name
-        val result = NativeBridge.copy(from = ref, to = targetRef, asSu = asSu, move = true) {
-            // todo
-        }
+        val result = NativeBridge.copy(from = ref, to = targetRef, asSu = asSu, move = true) { }
         return apply(result)
     }
 
