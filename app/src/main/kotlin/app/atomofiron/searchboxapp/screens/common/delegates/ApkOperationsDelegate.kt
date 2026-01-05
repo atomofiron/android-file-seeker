@@ -34,11 +34,12 @@ class ApkOperationsDelegate @Inject constructor(
 ) {
     private val asSu by preferences.asSu
 
-    fun askForAndroidApp(content: NodeContent.AndroidApp, tab: NodeTabKey? = null) = askForAndroidApp(content, contentResolver = null, tab)
+    fun askForAndroidApp(ref: NodeRef, content: NodeContent.AndroidApp, tab: NodeTabKey? = null) = askForAndroidApp(ref, content, contentResolver = null, tab)
 
-    fun askForApks(ref: NodeRef, contentResolver: ContentResolver) = askForAndroidApp(NodeContent.AndroidApp.apks(ref), contentResolver)
+    fun askForApks(ref: NodeRef, contentResolver: ContentResolver) = askForAndroidApp(ref, NodeContent.AndroidApp.Apks, contentResolver)
 
     private fun askForAndroidApp(
+        ref: NodeRef,
         content: NodeContent.AndroidApp,
         contentResolver: ContentResolver?,
         tab: NodeTabKey? = null,
@@ -49,14 +50,14 @@ class ApkOperationsDelegate @Inject constructor(
             cancelable = content.info != null,
             negative = DialogDelegate.Cancel,
             positive = UniText(R.string.install),
-            onPositiveClick = { apks.install(content, tab) },
+            onPositiveClick = { apks.install(ref, content, tab) },
             onDismiss = { scope?.cancel() },
         ).update(content)
         updater ?: return
         scope = CoroutineScope(Job())
         val job = scope.launch {
             val forSignature = content.info != null
-            var result = content.resolve(contentResolver, signature = forSignature)
+            var result = content.resolve(ref, contentResolver, signature = forSignature)
             withMain {
                 content = result.unwrapOrElse {
                     if (!forSignature) updater.showError(it)
@@ -67,7 +68,7 @@ class ApkOperationsDelegate @Inject constructor(
             if (forSignature) {
                 return@launch
             }
-            result = content.resolve(contentResolver, signature = true)
+            result = content.resolve(ref, contentResolver, signature = true)
             withMain {
                 content = result.unwrapOrElse {
                     return@withMain
@@ -81,9 +82,9 @@ class ApkOperationsDelegate @Inject constructor(
         }
     }
 
-    private suspend fun NodeContent.AndroidApp.resolve(resolver: ContentResolver?, signature: Boolean): Rslt<NodeContent.AndroidApp> {
+    private suspend fun NodeContent.AndroidApp.resolve(ref: NodeRef, resolver: ContentResolver?, signature: Boolean): Rslt<NodeContent.AndroidApp> {
         val stream = when {
-            !ref.isContent() -> return getAppContent(asSu = asSu, signature = signature)
+            !ref.isContent() -> return getAppContent(ref, asSu = asSu, signature = signature)
             resolver == null -> throw UnreachableException()
             else -> resolver.openInputStream(ref.string.toUri())
         }

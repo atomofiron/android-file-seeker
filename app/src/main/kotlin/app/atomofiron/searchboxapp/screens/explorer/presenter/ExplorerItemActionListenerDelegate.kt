@@ -52,7 +52,7 @@ class ExplorerItemActionListenerDelegate @Inject constructor(
     private fun openItem(item: Node) {
         when {
             item.isDirectory -> interactor.toggleDir(currentTab, item)
-            item.content is AndroidApp -> apks.askForAndroidApp(item.content, currentTab)
+            item.content is AndroidApp -> apks.askForAndroidApp(item.ref, item.content, currentTab)
             else -> router.showFile(item)
         }
     }

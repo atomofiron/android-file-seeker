@@ -126,7 +126,6 @@ sealed class NodeContent(
     data class Rar(override val isCached: Boolean = true) : Archive("application/vnd.rar")
 
     data class AndroidApp(
-        val ref: NodeRef,
         val splitApk: Boolean,
         val info: ApkInfo? = null,
         override val isCached: Boolean = false,
@@ -140,8 +139,8 @@ sealed class NodeContent(
             else -> null
         }
         companion object {
-            fun apk(ref: NodeRef, info: ApkInfo? = null) = AndroidApp(ref, splitApk = false, info)
-            fun apks(ref: NodeRef, info: ApkInfo? = null) = AndroidApp(ref, splitApk = true, info)
+            val Apk = AndroidApp(splitApk = false)
+            val Apks = AndroidApp(splitApk = true)
         }
     }
 

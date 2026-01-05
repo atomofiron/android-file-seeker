@@ -90,8 +90,7 @@ data class Node(
     ): Node {
         val new = copy(ref = ref, parentRef = parentRef, uniqueId = ref.uniqueId, meta = meta, state = state, error = error)
         val children = new.children?.items
-        children?.forEachIndexed { i, it ->
-            val item = children[i]
+        children?.forEachIndexed { i, item ->
             if (item.parentRef != ref) {
                 children[i] = item.mutate(ref = ref + item.name)
             }

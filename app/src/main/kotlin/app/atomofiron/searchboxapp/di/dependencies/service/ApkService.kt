@@ -27,18 +27,18 @@ class ApkService @Inject constructor(
     private val context: Context,
     private val installer: PackageInstaller,
 ) {
-    fun install(content: AndroidApp, action: String): Rslt<Unit> = try {
+    fun install(ref: NodeRef, content: AndroidApp, action: String): Rslt<Unit> = try {
         when {
-            content.splitApk -> installApks(content, action)
-            else -> installApk(content, action)
+            content.splitApk -> installApks(ref, content, action)
+            else -> installApk(ref, content, action)
         }
     } catch (e: Exception) {
         e.toRslt()
     }
 
-    private fun installApks(content: AndroidApp, action: String): Rslt<Unit> {
+    private fun installApks(ref: NodeRef, content: AndroidApp, action: String): Rslt<Unit> {
         val stringId = content.info?.stringId()
-        return ZipInputStream(BufferedInputStream(content.ref.stream())).use { stream ->
+        return ZipInputStream(BufferedInputStream(ref.stream())).use { stream ->
             install(stream.available().toLong(), action, installLocation = content.info?.installLocation) {
                 var entry: ZipEntry? = stream.nextEntry
                     ?: return@install Rslt.Err("archive is empty")
@@ -57,8 +57,8 @@ class ApkService @Inject constructor(
         }
     }
 
-    fun installApk(content: AndroidApp, action: String, silently: Boolean = false): Rslt<Unit> {
-        return installApk(content.ref, action, content.info?.stringId(), silently, content.info?.installLocation)
+    fun installApk(ref: NodeRef, content: AndroidApp, action: String, silently: Boolean = false): Rslt<Unit> {
+        return installApk(ref, action, content.info?.stringId(), silently, content.info?.installLocation)
     }
 
     fun installApk(ref: NodeRef, action: String, stringId: String? = null, silently: Boolean = false, installLocation: Int? = null): Rslt<Unit> {

@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.utils.Rslt
 import kotlinx.coroutines.Dispatchers
@@ -27,23 +28,23 @@ class ApkDelegate @Inject constructor(
     fun install(item: Node, tab: NodeTabKey? = null) {
         val content = item.content as? AndroidApp
         content ?: return
-        install(content, tab)
+        install(item.ref, content, tab)
     }
 
-    fun install(content: AndroidApp, tab: NodeTabKey? = null) {
+    fun install(ref: NodeRef, content: AndroidApp, tab: NodeTabKey? = null) {
         scope.launch(Dispatchers.IO) {
             if (tab != null) {
-                val allowed = explorerService.tryMarkInstalling(tab, content.ref, NodeOperation.Installing)
+                val allowed = explorerService.tryMarkInstalling(tab, ref, NodeOperation.Installing)
                 if (allowed != true) return@launch
             }
-            val result = apkService.install(content, Intents.ACTION_INSTALL_APP)
+            val result = apkService.install(ref, content, Intents.ACTION_INSTALL_APP)
             if (result is Rslt.Err) {
                 withMain {
                     apkChannel.errorMessage(result.message)
                 }
             }
             if (tab != null) {
-                explorerService.tryMarkInstalling(tab, content.ref, installing = null)
+                explorerService.tryMarkInstalling(tab, ref, installing = null)
             }
         }
     }

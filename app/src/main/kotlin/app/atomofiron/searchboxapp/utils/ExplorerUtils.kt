@@ -357,11 +357,11 @@ object ExplorerUtils {
                 else -> NodeContent.Text.Plain
             }
             (mimeType == FILE_XRIFF) -> content.ifMismatches { NodeContent.Picture(mimeType) }
-            (mimeType == FILE_APK) -> content.ifMismatches { AndroidApp.apk(this) }
+            (mimeType == FILE_APK) -> content.ifMismatches { AndroidApp.Apk }
             (mimeType == FILE_RAR) -> content.ifMismatches { NodeContent.Rar() }
             (mimeType == FILE_ZIP) -> when (true) {
                 name.hasExt(EXT_APKS),
-                name.hasExt(EXT_APKM) -> content.ifMismatches { AndroidApp.apks(this) }
+                name.hasExt(EXT_APKM) -> content.ifMismatches { AndroidApp.Apks }
                 (content is AndroidApp) -> return content
                 name.hasExt(EXT_OSZ) -> content.ifMismatches { NodeContent.Osu.Map() }
                 name.hasExt(EXT_OSK) -> content.ifMismatches { NodeContent.Osu.Skin() }
@@ -423,13 +423,13 @@ object ExplorerUtils {
             is NodeContent.Zip -> cacheZip().let { item ->
                 when (children?.possibleContainsMainApk()) {
                     null, false -> return item
-                    true -> AndroidApp.apks(ref).let { apks ->
-                        apks.getAppContent(asSu)
+                    true -> AndroidApp.Apks.let { apks ->
+                        apks.getAppContent(ref, asSu = asSu)
                             .contentOrNodeError(this, apks.copy(isCached = true)) { return it }
                     }
                 }
             }
-            is AndroidApp -> content.getAppContent(asSu)
+            is AndroidApp -> content.getAppContent(ref, asSu = asSu)
                 .contentOrNodeError(this, content.copy(isCached = true)) { return it }
             else -> return this
         }
@@ -665,12 +665,12 @@ object ExplorerUtils {
         ref.name.hasExt(EXT_GIF) -> ifMismatches { NodeContent.Picture.Gif }
         ref.name.hasExt(EXT_WEBP) -> ifMismatches { NodeContent.Picture.Webp }
         ref.name.hasExt(EXT_AVIF) -> ifMismatches { NodeContent.Picture.Avif }
-        ref.name.hasExt(EXT_APK) -> ifMismatches { AndroidApp.apk(ref) }
+        ref.name.hasExt(EXT_APK) -> ifMismatches { AndroidApp.Apk }
         ref.name.hasExt(EXT_DEX),
         ref.name.hasExt(EXT_ODEX),
         ref.name.hasExt(EXT_VDEX) -> ifMismatches { NodeContent.Java }
         ref.name.hasExt(EXT_APKS),
-        ref.name.hasExt(EXT_APKM) -> ifMismatches { AndroidApp.apks(ref) }
+        ref.name.hasExt(EXT_APKM) -> ifMismatches { AndroidApp.Apks }
         ref.name.hasExt(EXT_ZIP),
         ref.name.hasExt(EXT_XAPK) -> ifMismatches { NodeContent.Zip() }
         ref.name.hasExt(EXT_TAR) -> ifMismatches { NodeContent.Tar() }

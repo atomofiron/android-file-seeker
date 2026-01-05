@@ -41,7 +41,7 @@ class ResultItemActionDelegate @Inject constructor(
             (item.error is NodeError.NoSuchFileOrDir),
             (item.error is NodeError.PermissionDenied) -> viewState.showAlert(item.error.toAlert(item.content))
             (item.content is NodeContent.Text) -> router.openFile(item.ref, viewState.taskUuid)
-            (item.content is NodeContent.AndroidApp) -> apks.askForAndroidApp(item.content)
+            (item.content is NodeContent.AndroidApp) -> apks.askForAndroidApp(item.ref, item.content)
             else -> sharing.openWith(item)
         }
     }

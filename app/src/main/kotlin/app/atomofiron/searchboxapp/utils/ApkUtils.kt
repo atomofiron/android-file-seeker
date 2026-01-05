@@ -68,7 +68,7 @@ fun Context.launch(packageName: String): Boolean {
 }
 
 @Throws(IOException::class)
-suspend fun AndroidApp.getAppContent(asSu: Boolean, signature: Boolean = false): Rslt<AndroidApp> {
+suspend fun AndroidApp.getAppContent(ref: NodeRef, asSu: Boolean, signature: Boolean = false): Rslt<AndroidApp> {
     val (hash, info) = ref.getCachedApkInfo(asSu = asSu, signature = signature)
     info?.let {
         return update(it).toOk()
