@@ -57,10 +57,11 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
                 isDebuggable = false
                 isMinifyEnabled = true
                 signingConfig = signingConfigs.getByName("debug")
+                proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "../app/proguard-rules.pro")
             }
             getByName("release") {
                 isMinifyEnabled = true
-                proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+                proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "../app/proguard-rules.pro")
             }
         }
     }

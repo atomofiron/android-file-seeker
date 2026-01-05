@@ -16,3 +16,17 @@
 #   public *;
 #}
 -keep class com.android.vending.billing.**
+
+# JNA
+-dontwarn com.sun.jna.**
+-keep class com.sun.jna.** { *; }
+-keep class java.nio.** { *; }
+-keep class java.util.concurrent.** { *; }
+-keep class * implements com.sun.jna.Library { *; }
+-keepclassmembers class * implements com.sun.jna.Library { *; }
+-keep class * extends com.sun.jna.Structure { *; }
+-keep class * extends com.sun.jna.Union { *; }
+-keep class * implements com.sun.jna.Callback { *; }
+
+# UniFFI
+-keep class uniffi.** { *; }
