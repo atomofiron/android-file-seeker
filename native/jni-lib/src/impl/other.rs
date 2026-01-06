@@ -1,14 +1,23 @@
 use crate::api::api::Meta;
-use crate::common::Rslt;
+use crate::common::{Rslt, OKI};
 use crate::ext::result::ResultExt;
 use crate::r#impl::hr_meta::HumanReadableMeta;
 use crate::r#impl::hr_size::HumanReadableSize;
 use fs_extra::dir;
+use libc::c_int;
 use std::fs::File;
-use std::io::{Error, Read};
+use std::io::Read;
 use std::path::PathBuf;
 use std::process::{Child, ExitStatus};
 use std::{fs, io};
+
+pub fn last_os_error<T>() -> Rslt<T> {
+    Err(io::Error::last_os_error().into())
+}
+
+pub fn raw_os_error() -> c_int {
+    io::Error::last_os_error().raw_os_error().unwrap_or(OKI)
+}
 
 pub fn new_file(path: &PathBuf) -> Rslt<Meta> {
     let meta = File::create(path)?.metadata();
@@ -27,7 +36,7 @@ pub fn usage(path: &PathBuf) -> Rslt<(u64, String)> {
         .boxed()
 }
 
-pub fn read_error(child: &mut Child, error: Error) -> String {
+pub fn read_error(child: &mut Child, error: io::Error) -> String {
     let another = try_read_error(child)
         .unwrap_or_else(|e| e.to_string());
     return format!("{error}\n++++++++++++++++ {another}");

@@ -2,8 +2,9 @@
 
 use crate::api::api::{CommonProgressCollector, CountingResult};
 use crate::common::{Rslt, JOINING_ERROR, OKI};
-use crate::r#impl::copy_method::CopyMethod;
+use crate::ext::result::ResultExt;
 use crate::r#impl::delete::delete;
+use crate::r#impl::other::{last_os_error, raw_os_error};
 use crate::r#impl::progress::{convert_progress, send_inc, ProgressChange};
 use libc::off_t;
 use std::ffi::CString;
@@ -23,26 +24,31 @@ const INVALID_PATH: &str = "Invalid path";
 const MAX_CHUNK: usize = 64 * 1024 * 1024;
 const BUFFER_SIZE: usize = 1024 * 1024;
 
+enum CopyResult {
+    Fallback,
+    Retry,
+    Ok,
+}
+
 pub fn copy_impl(
     from: &PathBuf,
     to: &PathBuf,
     moving: bool,
     collector: Arc<dyn CommonProgressCollector>,
 ) -> Rslt<CountingResult> {
-    let method = CopyMethod::detect();
     let (tx, rx) = channel::<ProgressChange>();
     let handle = convert_progress(rx, collector, to.clone());
     if moving {
         match fs::rename(from, to) {
             Ok(()) => send_inc(&tx, &(0.0..1.0))?,
             Err(e) if e.raw_os_error() == Some(libc::EXDEV) => {
-                copy_recursive(from, to, method, &tx, 0.0..0.5)?;
+                copy_recursive(from, to, &tx, 0.0..0.5)?;
                 delete(from, &tx, 0.5..1.0)?;
             }
             Err(e) => return Err(e.into()),
         }
     } else {
-        copy_recursive(from, to, method, &tx, 0.0..1.0)?;
+        copy_recursive(from, to, &tx, 0.0..1.0)?;
     }
     drop(tx);
     return handle.join().map_err(|_| JOINING_ERROR.into());
@@ -51,7 +57,6 @@ pub fn copy_impl(
 fn copy_recursive(
     from: &Path,
     to: &Path,
-    method: CopyMethod,
     tx: &Sender<ProgressChange>,
     range: Range<f32>,
 ) -> Rslt<()> {
@@ -75,11 +80,11 @@ fn copy_recursive(
             let offset = step * i as f32;
             let start = range.start + offset;
             let range = start..(start + step);
-            copy_recursive(&from_path, &to_path, method, tx, range)?;
+            copy_recursive(&from_path, &to_path, tx, range)?;
         }
         copy_metadata(&metadata, to)?;
     } else {
-        copy_file(from, to, &metadata, method, tx, range)?;
+        copy_file(from, to, &metadata, tx, range)?;
     }
     return Ok(());
 }
@@ -88,15 +93,19 @@ fn copy_file(
     from: &Path,
     to: &Path,
     metadata: &Metadata,
-    method: CopyMethod,
     tx: &Sender<ProgressChange>,
     range: Range<f32>,
 ) -> Rslt<()> {
-    match method {
-        CopyMethod::CopyFileRange => copy_file_range(from, to, metadata.len(), tx, range),
-        CopyMethod::Sendfile => sendfile(from, to, metadata.len(), tx, range),
-        CopyMethod::Buffered => buffered(from, to, metadata.len(), tx, range),
-    }?;
+    let mut result = copy_file_range(from, to, metadata.len(), tx, &range)?;
+    if matches!(result, CopyResult::Fallback) {
+        result = sendfile(from, to, metadata.len(), tx, &range)?;
+    }
+    if matches!(result, CopyResult::Retry) {
+        return copy_file(from, to, metadata, tx, range);
+    }
+    if matches!(result, CopyResult::Fallback) {
+        buffered(from, to, metadata.len(), tx, &range)?;
+    }
     copy_metadata(metadata, to)?;
     return Ok(());
 }
@@ -106,8 +115,8 @@ fn copy_file_range(
     to: &Path,
     len: u64,
     tx: &Sender<ProgressChange>,
-    range: Range<f32>,
-) -> Rslt<()> {
+    range: &Range<f32>,
+) -> Rslt<CopyResult> {
     let src = File::open(from)?;
     let dst = File::create(to)?;
 
@@ -131,16 +140,15 @@ fn copy_file_range(
                 0u32,
             )
         };
-        if copied < 0 {
-            return Err(io::Error::last_os_error().into());
-        }
-        if copied == 0 {
-            return Err(format!("{remaining} {BYTES_LEFT}").into());
-        }
-        remaining -= copied as u64;
-        send(remaining, len, tx, &range)?;
+        match resolve(&mut remaining, copied as i64, len, tx, range)? {
+            CopyResult::Ok => continue,
+            r => return Ok(r),
+        };
     }
-    return Ok(());
+    return match remaining {
+        0 => Ok(CopyResult::Ok),
+        _ => Err(format!("{remaining} {BYTES_LEFT}").into()),
+    };
 }
 
 fn sendfile(
@@ -148,15 +156,15 @@ fn sendfile(
     to: &Path,
     len: u64,
     tx: &Sender<ProgressChange>,
-    range: Range<f32>,
-) -> Rslt<()> {
+    range: &Range<f32>,
+) -> Rslt<CopyResult> {
     let src = File::open(from)?;
     let dst = File::create(to)?;
     let src_fd = src.as_raw_fd();
     let dst_fd = dst.as_raw_fd();
     unsafe {
-        libc::posix_fadvise(src_fd, 0, len.try_into()?, libc::POSIX_FADV_SEQUENTIAL);
-    }
+        libc::posix_fadvise(src_fd, 0, len.try_into()?, libc::POSIX_FADV_SEQUENTIAL)
+    };
     let mut offset: off_t = 0;
     let mut remaining = len;
     while remaining > 0 {
@@ -164,25 +172,39 @@ fn sendfile(
         let copied = unsafe {
             libc::sendfile(dst_fd, src_fd, &mut offset as *mut off_t, to_copy)
         };
-        if copied < 0 {
-            let errno = io::Error::last_os_error();
-            if errno.raw_os_error() == Some(libc::EINVAL) {
-                drop(src);
-                drop(dst);
-                return buffered(from, to, len, tx, range);
-            }
-            return Err(errno.into());
-        }
-        if copied == 0 {
-            break;
-        }
-        remaining -= copied as u64;
-        send(remaining, len, tx, &range)?;
+        match resolve(&mut remaining, copied as i64, len, tx, range)? {
+            CopyResult::Ok => continue,
+            r => return Ok(r),
+        };
     }
     return match remaining {
-        0 => Ok(()),
+        0 => Ok(CopyResult::Ok),
         _ => Err(format!("{remaining} {BYTES_LEFT}").into()),
     };
+}
+
+fn resolve(
+    remaining: &mut u64,
+    copied: i64,
+    len: u64,
+    tx: &Sender<ProgressChange>,
+    range: &Range<f32>,
+) -> Rslt<CopyResult> {
+    if copied > 0 {
+        *remaining -= copied as u64;
+        send(*remaining, len, tx, &range)?;
+        return Ok(CopyResult::Ok);
+    } else if copied == 0 {
+        return Err(format!("{remaining} {BYTES_LEFT}").into());
+    }
+    return match raw_os_error() {
+        libc::EINTR => Ok(CopyResult::Retry),
+        libc::ENOSYS |
+        libc::EXDEV |
+        libc::EOPNOTSUPP |
+        libc::EINVAL => Ok(CopyResult::Fallback),
+        err => Err(err.to_string().into()),
+    }
 }
 
 fn buffered(
@@ -190,7 +212,7 @@ fn buffered(
     to: &Path,
     len: u64,
     tx: &Sender<ProgressChange>,
-    range: Range<f32>,
+    range: &Range<f32>,
 ) -> Rslt<()> {
     let mut src = File::open(from)?;
     let mut dst = File::create(to)?;
@@ -206,29 +228,7 @@ fn buffered(
         } else {
             dst.write_all(&buffer[..read])?;
             remaining -= read as u64;
-            send(remaining, len, tx, &range)?;
-        }
-    }
-    return Ok(());
-}
-
-fn copy_metadata(metadata: &Metadata, to: &Path) -> Rslt<()> {
-    let permissions = fs::Permissions::from_mode(metadata.mode());
-    fs::set_permissions(to, permissions)?;
-    unsafe {
-        let path_cstr = CString::new(to.as_os_str().as_bytes())
-            .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, INVALID_PATH))?;
-        let time = get_times(metadata)?;
-        let result = libc::utimensat(libc::AT_FDCWD, path_cstr.as_ptr(), time.as_ptr(), 0);
-        if result != OKI {
-            return Err(io::Error::last_os_error().into());
-        }
-    }
-    unsafe {
-        let path_cstr = CString::new(to.as_os_str().as_bytes()).ok();
-        if let Some(path_cstr) = path_cstr {
-            libc::chown(path_cstr.as_ptr(), metadata.uid(), metadata.gid());
-            // ignore result
+            send(remaining, len, tx, range)?;
         }
     }
     return Ok(());
@@ -260,6 +260,51 @@ fn copy_symlink_metadata(metadata: &Metadata, to: &Path) -> Rslt<()> {
             libc::AT_SYMLINK_NOFOLLOW,
         );
         libc::lchown(path_cstr.as_ptr(), metadata.uid(), metadata.gid());
+    }
+    return Ok(());
+}
+
+fn copy_metadata(metadata: &Metadata, to: &Path) -> Rslt<()> {
+    let permissions = fs::Permissions::from_mode(metadata.mode());
+    let result = fs::set_permissions(to, permissions);
+    if result.is_err() {
+        match raw_os_error() {
+            libc::EPERM |
+            libc::EACCES |
+            libc::EROFS |
+            libc::EOPNOTSUPP => (), // ignore
+            _ => return result.boxed(),
+        }
+    }
+    let path_cstr = CString::new(to.as_os_str().as_bytes())
+        .map_err(|_| io::Error::new(io::ErrorKind::InvalidInput, INVALID_PATH))?;
+    let time = get_times(metadata)?;
+    let result = unsafe {
+        libc::utimensat(libc::AT_FDCWD, path_cstr.as_ptr(), time.as_ptr(), 0)
+    };
+    if result != OKI {
+        match raw_os_error() {
+            libc::EPERM |
+            libc::EACCES |
+            libc::EROFS |
+            libc::EOPNOTSUPP => (), // ignore
+            _ => return last_os_error(),
+        }
+    }
+    let path_cstr = CString::new(to.as_os_str().as_bytes()).ok();
+    if let Some(path_cstr) = path_cstr {
+        let result = unsafe {
+            libc::chown(path_cstr.as_ptr(), metadata.uid(), metadata.gid())
+        };
+        if result != OKI {
+            match raw_os_error() {
+                libc::EPERM |
+                libc::EACCES |
+                libc::EROFS |
+                libc::EOPNOTSUPP => (), // ignore
+                _ => return last_os_error(),
+            }
+        }
     }
     return Ok(());
 }
