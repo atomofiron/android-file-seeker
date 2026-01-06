@@ -3,6 +3,7 @@
 use crate::api::api::{CommonProgressCollector, CountingResult};
 use crate::common::{Rslt, OKI, PERMISSION_DENIED, RESOURCE_BUSY};
 use crate::ext::result::ResultExt;
+use crate::r#impl::other::last_os_error;
 use crate::r#impl::progress::{convert_progress, send_inc, ProgressChange};
 use libc::{c_int, c_uint, closedir, dev_t, mode_t, opendir, readdir};
 use std::ffi::{CStr, CString};
@@ -40,7 +41,6 @@ pub fn delete_impl(path: &PathBuf, collector: Arc<dyn CommonProgressCollector>) 
 pub fn delete(path: &PathBuf, tx: &Sender<ProgressChange>, range: Range<f32>) -> Rslt<()> {
     let c_path = CString::new(path.as_os_str().as_bytes())?;
     let (dev, _) = get_dev_mode(&c_path)?;
-    send_err(&c_path, format!("target {dev}"), tx, &range)?;
     delete_recursively(&c_path, dev, tx, range, true)?;
     match path.exists() { // 1 retry
         true => delete_recursively(&c_path, dev, tx, 1.0..1.0, false),
@@ -65,9 +65,7 @@ pub fn delete_recursively(
         Ok(_) => (), // os error
         Err(e) => return send_err(path, e, tx, &range),
     }
-    let error = io::Error::last_os_error()
-        .raw_os_error()
-        .unwrap_or(0);
+    let error = last_os_error().unwrap_or(0);
     return if error == libc::ENOENT {
         Ok(()) //            vvvvvvvvv - no AT_RECURSIVE
     } else if error == libc::ENOTEMPTY {
@@ -142,7 +140,7 @@ pub fn child_count(path: &CString) -> Rslt<u32> {
     unsafe {
         let dir = opendir(path.as_ptr());
         if dir.is_null() {
-            return Err(io::Error::last_os_error().into())
+            return last_os_error()
         }
         let mut count = 0u32;
         loop {
@@ -176,7 +174,7 @@ fn get_dev_mode(path: &CString) -> Rslt<(dev_t, c_uint)> {
     };
     return match result {
         OKI => Ok((stat.st_dev as dev_t, stat.st_mode)),
-        _ => Err(io::Error::last_os_error().into()),
+        _ => last_os_error(),
     }
 }
 
