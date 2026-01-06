@@ -16,12 +16,15 @@ import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.alpha
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.isRtl
+import app.atomofiron.searchboxapp.utils.withAlpha
 
 class NoticeableDrawable(
     private val drawable: Drawable,
-    private var dotColor: Int,
+    dotColor: Int,
     private val placement: Placement = Placement.TopEnd,
 ) : Drawable(), Drawable.Callback {
     enum class Placement(
@@ -52,6 +55,7 @@ class NoticeableDrawable(
     init {
         paint.isAntiAlias = true
         drawable.callback = this
+        setDotColor(dotColor)
     }
 
     constructor(
@@ -69,7 +73,7 @@ class NoticeableDrawable(
     ) : this(icon, ContextCompat.getColor(context, dotColorId), placement)
 
     fun setDotColor(color: Int): NoticeableDrawable {
-        dotColor = color
+        paint.color = color withAlpha (color.alpha * alpha / Alpha.VISIBLE_INT)
         invalidateSelf()
         return this
     }
@@ -112,8 +116,6 @@ class NoticeableDrawable(
             return
         }
         if (drawDot || forceDrawDot) {
-            paint.color = dotColor
-            paint.alpha = alpha
             canvas.drawCircle(holeX, holeY, dotRadius, paint)
             canvas.clipPath(clipOutPath)
         }
