@@ -18,7 +18,7 @@ import app.atomofiron.searchboxapp.screens.result.ResultScope
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
-private object MenuCurtainKey : CurtainKey()
+private data object MenuCurtainKey : CurtainKey()
 
 @ResultScope
 class ResultCurtainMenuDelegate @Inject constructor(

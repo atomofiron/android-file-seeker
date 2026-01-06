@@ -12,7 +12,7 @@ import app.atomofiron.searchboxapp.screens.licenses.state.License
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
-private object LicenseCurtainKey : CurtainKey()
+private data object LicenseCurtainKey : CurtainKey()
 
 @LicensesScope
 class LicensesPresenter @Inject constructor(

@@ -28,11 +28,11 @@ import dagger.Lazy
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
-private object AboutCurtainKey : CurtainKey()
-private object ExportImportCurtainKey : CurtainKey()
-private object ExplorerItemCurtainKey : CurtainKey()
-private object JoystickCurtainKey : CurtainKey()
-private object ColorSchemeCurtainKey : CurtainKey()
+private data object AboutCurtainKey : CurtainKey()
+private data object ExportImportCurtainKey : CurtainKey()
+private data object ExplorerItemCurtainKey : CurtainKey()
+private data object JoystickCurtainKey : CurtainKey()
+private data object ColorSchemeCurtainKey : CurtainKey()
 
 @PreferenceScope
 class PreferenceClickPresenterDelegate @Inject constructor(

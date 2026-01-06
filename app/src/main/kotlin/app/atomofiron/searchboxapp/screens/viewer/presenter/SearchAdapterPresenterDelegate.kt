@@ -32,7 +32,7 @@ import app.atomofiron.searchboxapp.utils.toUni
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
-private object TextSearchCurtainKey : CurtainKey()
+private data object TextSearchCurtainKey : CurtainKey()
 
 @TextViewerScope
 class SearchAdapterPresenterDelegate @Inject constructor(
