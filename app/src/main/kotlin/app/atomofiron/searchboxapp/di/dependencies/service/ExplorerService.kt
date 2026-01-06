@@ -748,12 +748,6 @@ class ExplorerService @Inject constructor(
         }
     }
 
-    private fun NodeTab.findDeepest(): Node? {
-        return tree.lastOrNull()
-            ?.let { findItem(it.uniqueId) }
-            ?.let { if (checked.contains(it.uniqueId)) it.copy(isChecked = true) else it }
-    }
-
     private fun NodeTab.updateStates(items: List<Node>) {
         if (states.isNotEmpty()) {
             val iterator = states.listIterator()
