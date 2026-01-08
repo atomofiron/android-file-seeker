@@ -509,10 +509,11 @@ class ExplorerService @Inject constructor(
         }
         val new = ExplorerUtils.copy(from, to, move = withMoving, asSu = asSu) {
             default {
-                val operation = NodeOperation.Copying(isSource = false, it.progress)
+                val copying = NodeOperation.Copying(isSource = false, it.progress)
                 garden {
                     states.updateState(to.uniqueId) {
-                        nextState(to.uniqueId, copying = operation)
+                        this ?: return@updateState null
+                        nextState(to.uniqueId, copying = copying)
                     }
                     get(key).renderUpdate(to)
                 }
