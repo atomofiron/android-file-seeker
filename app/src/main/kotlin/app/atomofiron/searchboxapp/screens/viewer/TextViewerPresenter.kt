@@ -48,11 +48,6 @@ class TextViewerPresenter @Inject constructor(
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        interactor.closeSession(itemRef)
-    }
-
     override fun onSubscribeData() = Unit
 
     override fun onLineVisible(index: Int) = interactor.readFileToLine(itemRef, index)

@@ -7,8 +7,8 @@ import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
-import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
+import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerScope
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
@@ -65,8 +65,6 @@ class TextViewerInteractor @Inject constructor(
             service.removeTask(ref, taskId)
         }
     }
-
-    fun closeSession(ref: NodeRef) = service.closeSession(ref)
 
     fun copy(item: Node) = utils.copyToClipboard(item)
 }

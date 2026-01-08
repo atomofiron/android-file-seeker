@@ -87,11 +87,6 @@ class TextViewerService @Inject constructor(
         callback?.invoke(true)
     }
 
-    fun closeSession(ref: NodeRef) {
-        val session = store.sessions.remove(ref.uniqueId)
-        session?.close()
-    }
-
     suspend fun removeTask(ref: NodeRef, taskId: Int) {
         findSession(ref)?.tasks {
             removeOneIf { it.uniqueId == taskId }

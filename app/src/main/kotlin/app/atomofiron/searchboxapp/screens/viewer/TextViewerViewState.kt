@@ -53,7 +53,6 @@ class TextViewerViewState private constructor(
 
     val composition = preferenceStore.explorerItemComposition.value
     val item: StateFlow<Node> = session?.item ?: MutableStateFlow(ref.toNode())
-    val tasks: StateFlow<List<LocalSearchTask>> = session?.tasks ?: MutableStateFlow(emptyList())
     val textLines: StateFlow<List<TextLine>> = session?.lines ?: MutableStateFlow(emptyList())
     val currentTask = MutableStateFlow<LocalSearchTask?>(null)
     private val _alerts: MutableStateFlow<Alert?> = DataFlow((session?.error?.value ?: error)?.toAlert())
