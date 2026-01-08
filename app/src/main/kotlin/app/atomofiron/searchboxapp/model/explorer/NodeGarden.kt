@@ -31,7 +31,7 @@ class NodeGarden {
         return mutex.withLock { action() }
     }
 
-    suspend inline operator fun <R> invoke(key: NodeTabKey, action: NodeTab.() -> R): R? {
+    suspend inline operator fun <R> invoke(key: NodeTabKey, action: NodeTab.() -> R): R {
         return mutex.withLock { get(key).action() }
     }
 }

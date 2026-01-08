@@ -13,7 +13,7 @@ import app.atomofiron.fileseeker.databinding.ItemExplorerCardBinding
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
-import app.atomofiron.searchboxapp.model.explorer.NodeRootType
+import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -26,20 +26,20 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
 
         fun Node.getTitle(resources: Resources): String = content.rootType?.getTitle(resources) ?: name
 
-        fun NodeRootType.getTitle(resources: Resources): String? = when (this) {
-            is NodeRootType.Photos -> resources.getString(R.string.root_photos)
-            is NodeRootType.Videos -> resources.getString(R.string.root_videos)
-            is NodeRootType.Camera -> resources.getString(R.string.root_camera)
-            is NodeRootType.Screenshots -> resources.getString(R.string.root_screenshots)
-            is NodeRootType.Downloads -> resources.getString(R.string.root_downloads)
-            is NodeRootType.Bluetooth -> resources.getString(R.string.root_bluetooth)
-            is NodeRootType.Storage -> when (kind) {
+        fun NodeRootInfo.getTitle(resources: Resources): String? = when (this) {
+            is NodeRootInfo.Photos -> resources.getString(R.string.root_photos)
+            is NodeRootInfo.Videos -> resources.getString(R.string.root_videos)
+            is NodeRootInfo.Camera -> resources.getString(R.string.root_camera)
+            is NodeRootInfo.Screenshots -> resources.getString(R.string.root_screenshots)
+            is NodeRootInfo.Downloads -> resources.getString(R.string.root_downloads)
+            is NodeRootInfo.Bluetooth -> resources.getString(R.string.root_bluetooth)
+            is NodeRootInfo.Storage -> when (kind) {
                 NodeStorage.Kind.InternalStorage -> resources.getString(R.string.internal_storage)
                 NodeStorage.Kind.SdCard -> resources.getString(R.string.sdcard)
                 NodeStorage.Kind.UsbStorage -> info.alias ?: info.name ?: resources.getString(R.string.usb_storage)
             }
-            is NodeRootType.Favorite -> null
-            is NodeRootType.SystemRoot -> resources.getString(R.string.system_root)
+            is NodeRootInfo.Favorite -> null
+            is NodeRootInfo.SystemRoot -> resources.getString(R.string.system_root)
         }
     }
 
@@ -60,12 +60,12 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     }
 
     override fun onBind(item: NodeRoot, position: Int) = binding.run {
-        val withArc = item.type is NodeRootType.Storage
+        val withArc = item.info is NodeRootInfo.Storage
         cardArc.isVisible = withArc
         root.isSelected = item.isSelected
         root.isEnabled = item.isEnabled
         root.alpha = Alpha.enabled(item.isEnabled)
-        cardTitle.text = item.type.getTitle(itemView.resources)
+        cardTitle.text = item.info.getTitle(itemView.resources)
         cardThumbnail.imageTintList = if (item.withPreview) null else colors
         cardThumbnail.background = item.getThumbnailBackground()
         when (val thumbnail = item.thumbnail) {
@@ -83,40 +83,40 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     }
 
     private fun NodeRoot.bindType() {
-        if (type is NodeRootType.Storage) {
-            binding.cardArc.set(progress = type.used, max = type.total)
-            binding.cardArc.text = type.used.convert(suffixes, lossless = false, separator = "\u2009")
+        if (info is NodeRootInfo.Storage) {
+            binding.cardArc.set(progress = info.used, max = info.total)
+            binding.cardArc.text = info.used.convert(suffixes, lossless = false, separator = "\u2009")
         }
     }
 
     private fun NodeRoot.getIcon(): Drawable {
-        val resId = when (type) {
-            is NodeRootType.Photos -> R.drawable.ic_thumbnail_camera
-            is NodeRootType.Videos -> R.drawable.ic_thumbnail_videocam
-            is NodeRootType.Camera -> R.drawable.ic_thumbnail_camera
-            is NodeRootType.Downloads -> R.drawable.ic_thumbnail_download
-            is NodeRootType.Bluetooth -> R.drawable.ic_thumbnail_bluetooth
-            is NodeRootType.Screenshots -> R.drawable.ic_thumbnail_screenshot
-            is NodeRootType.Storage -> when (type.kind) {
+        val resId = when (info) {
+            is NodeRootInfo.Photos -> R.drawable.ic_thumbnail_camera
+            is NodeRootInfo.Videos -> R.drawable.ic_thumbnail_videocam
+            is NodeRootInfo.Camera -> R.drawable.ic_thumbnail_camera
+            is NodeRootInfo.Downloads -> R.drawable.ic_thumbnail_download
+            is NodeRootInfo.Bluetooth -> R.drawable.ic_thumbnail_bluetooth
+            is NodeRootInfo.Screenshots -> R.drawable.ic_thumbnail_screenshot
+            is NodeRootInfo.Storage -> when (info.kind) {
                 NodeStorage.Kind.InternalStorage -> R.drawable.ic_thumbnail_memory
                 NodeStorage.Kind.SdCard -> R.drawable.ic_thumbnail_micro_sd
                 NodeStorage.Kind.UsbStorage -> R.drawable.ic_thumbnail_usb_flash
             }
-            is NodeRootType.Favorite -> R.drawable.ic_thumbnail_favorite
-            is NodeRootType.SystemRoot -> R.drawable.ic_thumbnail_system
+            is NodeRootInfo.Favorite -> R.drawable.ic_thumbnail_favorite
+            is NodeRootInfo.SystemRoot -> R.drawable.ic_thumbnail_system
         }
         return ContextCompat.getDrawable(context, resId) as Drawable
     }
 
-    private fun NodeRoot.getThumbnailBackground(): Drawable? = when (type) {
-        is NodeRootType.Storage -> null
-        is NodeRootType.Favorite,
-        is NodeRootType.Photos,
-        is NodeRootType.Videos,
-        is NodeRootType.Camera,
-        is NodeRootType.Screenshots,
-        is NodeRootType.Downloads,
-        is NodeRootType.SystemRoot,
-        is NodeRootType.Bluetooth -> ContextCompat.getDrawable(context, R.drawable.item_root_thumbnail)
+    private fun NodeRoot.getThumbnailBackground(): Drawable? = when (info) {
+        is NodeRootInfo.Storage -> null
+        is NodeRootInfo.Favorite,
+        is NodeRootInfo.Photos,
+        is NodeRootInfo.Videos,
+        is NodeRootInfo.Camera,
+        is NodeRootInfo.Screenshots,
+        is NodeRootInfo.Downloads,
+        is NodeRootInfo.SystemRoot,
+        is NodeRootInfo.Bluetooth -> ContextCompat.getDrawable(context, R.drawable.item_root_thumbnail)
     }
 }

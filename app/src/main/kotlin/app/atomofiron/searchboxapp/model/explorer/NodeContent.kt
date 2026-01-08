@@ -18,7 +18,7 @@ sealed class NodeContent(
         const val AnyType = "*/*"
     }
     val commonMimeType: String by unsafeLazy { mimeType?.run { substring(0, indexOf('/')) + "/*" } ?: AnyType }
-    open val rootType: NodeRootType? = null
+    open val rootType: NodeRootInfo? = null
     open val isCached = true
 
     data object Undefined : NodeContent() {
@@ -29,7 +29,7 @@ sealed class NodeContent(
 
     data class Directory(
         val kind: DirectoryKind = DirectoryKind.Ordinary, // always Ordinary in the garden
-        override val rootType: NodeRootType? = null,
+        override val rootType: NodeRootInfo? = null,
     ) : NodeContent(mimeType = MIME_TYPE) {
         companion object {
             const val MIME_TYPE = "inode/directory"

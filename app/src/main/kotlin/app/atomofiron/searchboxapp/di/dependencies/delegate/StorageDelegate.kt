@@ -10,7 +10,7 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.copy
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.model.explorer.NodeRootType
+import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
@@ -33,7 +33,7 @@ class StorageDelegate @Inject constructor(
 
     init {
         store.updateInternalStorage {
-            val type = NodeRootType.Storage(internalStorage)
+            val type = NodeRootInfo.Storage(internalStorage)
             val content = NodeContent.Directory(rootType = type)
             copy(content = content)
         }

@@ -35,7 +35,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeMeta
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
-import app.atomofiron.searchboxapp.model.explorer.NodeRootType
+import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
@@ -47,6 +47,7 @@ import app.atomofiron.searchboxapp.model.explorer.isMovie
 import app.atomofiron.searchboxapp.model.explorer.isPicture
 import app.atomofiron.searchboxapp.model.explorer.other.Deepest
 import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
+import app.atomofiron.searchboxapp.model.explorer.other.TabRootSorting
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.explorer.replace
 import app.atomofiron.searchboxapp.model.other.toUni
@@ -117,6 +118,7 @@ class ExplorerService @Inject constructor(
                 suDefined.join()
                 if (asSu) checkSu()
                 initRoots()
+                restoreSorting()
             }
             combine(store.storage, preferences.asSu, updateRootTrigger) { volumes, asSu, _ ->
                 updateRootsAsync(volumes, asSu)
@@ -133,7 +135,7 @@ class ExplorerService @Inject constructor(
             deepest ?: return@l
             val tab = store.currentTabKey.value
             val root = garden[tab].getSelectedRoot()
-                ?.takeIf { it.type != NodeRootType.Photos && it.type != NodeRootType.Videos }
+                ?.takeIf { it.info != NodeRootInfo.Photos && it.info != NodeRootInfo.Videos }
                 ?: return@l
             val new = Deepest(tabIndex = tab.index, rootId = root.id, deepest.ref)
             dao.put(new)
@@ -172,7 +174,7 @@ class ExplorerService @Inject constructor(
         }
         val root = getSelectedRoot()
         root ?: return
-        val deepest = dao.get(key.index, root.id)
+        val deepest = dao.getDeepest(key.index, root.id)
         deepest ?: return
         val tree = mutableListOf<NodeRef>()
         var ref = deepest.ref
@@ -194,23 +196,40 @@ class ExplorerService @Inject constructor(
 
     private fun NodeGarden.initRoots() {
         val roots = listOf(
-            NodeRoot(NodeRootType.Photos, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_CAMERA),
-            NodeRoot(NodeRootType.Videos, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_CAMERA),
-            NodeRoot(NodeRootType.Screenshots, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_PIC_SCREENSHOTS, internalStorageRef + SUB_PATH_DCIM_SCREENSHOTS),
-            NodeRoot(NodeRootType.Bluetooth, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_BLUETOOTH, internalStorageRef + SUB_PATH_DOWNLOAD_BLUETOOTH),
-            NodeRoot(NodeRootType.Downloads, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_DOWNLOAD),
-            NodeRoot(NodeRootType.SystemRoot, NodeSorting.Name, NodeRef.Root),
+            NodeRoot(NodeRootInfo.Photos, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_CAMERA),
+            NodeRoot(NodeRootInfo.Videos, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_CAMERA),
+            NodeRoot(NodeRootInfo.Screenshots, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_PIC_SCREENSHOTS, internalStorageRef + SUB_PATH_DCIM_SCREENSHOTS),
+            NodeRoot(NodeRootInfo.Bluetooth, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_BLUETOOTH, internalStorageRef + SUB_PATH_DOWNLOAD_BLUETOOTH),
+            NodeRoot(NodeRootInfo.Downloads, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_DOWNLOAD),
+            NodeRoot(NodeRootInfo.SystemRoot, NodeSorting.Name, NodeRef.Root),
         )
         this.roots.addAll(roots)
+    }
+
+    private fun NodeGarden.restoreSorting() {
+        for (root in roots) {
+            restoreSorting(root)
+        }
+    }
+
+    private fun NodeGarden.restoreSorting(root: NodeRoot) {
+        for (tab in store.mainTabs) {
+            val sorting = dao.getSorting(tab.index, root.id)
+                ?.sorting
+                ?: continue
+            get(tab).setSorting(root.id, sorting)
+        }
     }
 
     suspend fun tryToggleRoot(key: NodeTabKey, root: NodeRoot) {
         render(key) {
             val root = roots.find { it.id == root.id }
-            when {
-                root == null -> return
-                selected(root) -> deselectRoot()
-                else -> select(root)
+                ?: return
+            if (selected(root)) {
+                deselectRoot()
+                store.setSorting(key, null)
+            } else {
+                select(root)
             }
             if (tree.isEmpty()) {
                 restoreTree()
@@ -264,11 +283,11 @@ class ExplorerService @Inject constructor(
             when {
                 roots.none { it.id == tab.selectedRootId } -> tab.deselectRoot()
                 withSu -> Unit
-                tab.getSelectedRoot()?.type is NodeRootType.SystemRoot -> tab.deselectRoot()
+                tab.getSelectedRoot()?.info is NodeRootInfo.SystemRoot -> tab.deselectRoot()
             }
             tab.render()
             roots.forEach { root ->
-                if (withSu || root.type !is NodeRootType.SystemRoot) {
+                if (withSu || root.info !is NodeRootInfo.SystemRoot) {
                     updateRootAsync(key, root)
                 }
             }
@@ -278,7 +297,7 @@ class ExplorerService @Inject constructor(
     private fun updateRootAsync(key: NodeTabKey, root: NodeRoot) {
         when {
             asSu -> Unit
-            root.type !is NodeRootType.SystemRoot -> Unit
+            root.info !is NodeRootInfo.SystemRoot -> Unit
             else -> return
         }
         scope.launch {
@@ -290,7 +309,7 @@ class ExplorerService @Inject constructor(
                         else -> updated
                     }
                     updateRootSync(updated, key, root)
-                    if (root.type is NodeRootType.Screenshots) {
+                    if (root.info is NodeRootInfo.Screenshots) {
                         store.updateScreenshots(root.item.ref)
                     }
                 }
@@ -302,32 +321,45 @@ class ExplorerService @Inject constructor(
         val variants = root.pathVariants?.takeIf { it.isNotEmpty() }
         variants ?: return missing
         val items = variants.map { path ->
-            path.toRoot(root.type).update(asSu)
+            path.toRoot(root.info).update(asSu)
         }
         val alt = items.find { it.error == null }
             ?: items.find { it.error !is NodeError.NoSuchFileOrDir }
         return alt ?: missing
     }
 
+    suspend fun setSorting(key: ExplorerTabKey, root: NodeRootInfo, sorting: NodeSorting) {
+        val root = garden(key) {
+            roots.find { it.info == root }?.also {
+                setSorting(it.id, sorting)
+                render()
+            }
+        }
+        root ?: return
+        dao.put(TabRootSorting(key.index, root.id, sorting))
+    }
+
     private fun NodeGarden.updateStats(storage: NodeStorage) {
-        val index = roots.indexOfFirst { it.type is NodeRootType.Storage && it.type.kind == storage.kind && it.item.ref.string == storage.path }
+        val index = roots.indexOfFirst { it.info is NodeRootInfo.Storage && it.info.kind == storage.kind && it.item.ref.string == storage.path }
         var root = roots.getOrNull(index)
-        var type = root?.type ?: NodeRootType.Storage(storage)
-        type = (type as NodeRootType.Storage).copy(storage)
-        root = root ?: NodeRoot(type, NodeSorting.Name, NodeRef(storage.path))
+        var key = root?.info ?: NodeRootInfo.Storage(storage)
+        key = (key as NodeRootInfo.Storage).copy(info = storage)
+        root = root ?: NodeRoot(key, NodeSorting.Name, NodeRef(storage.path))
+        val restore = roots.none { it.id == root.id }
         roots.put(root) { it.id == root.id }
+        if (restore) restoreSorting(root)
     }
 
     private fun NodeGarden.removeMissed(storage: List<NodeStorage>) {
         roots.removeAll { root ->
-            root.type.removable && storage.none { it.path == root.item.ref.string }
+            root.info.removable && storage.none { it.path == root.item.ref.string }
         }
     }
 
-    private fun filterMediaRootChildren(updated: Node, type: NodeRootType) {
-        val onlyPhotos = type == NodeRootType.Photos || type == NodeRootType.Screenshots
-        val onlyVideos = type == NodeRootType.Videos
-        val onlyMedia = type == NodeRootType.Camera
+    private fun filterMediaRootChildren(updated: Node, type: NodeRootInfo) {
+        val onlyPhotos = type == NodeRootInfo.Photos || type == NodeRootInfo.Screenshots
+        val onlyVideos = type == NodeRootInfo.Videos
+        val onlyMedia = type == NodeRootInfo.Camera
         if (onlyPhotos || onlyVideos || onlyMedia) {
             updated.children?.update(updateMetadata = true) {
                 replace {
@@ -343,19 +375,19 @@ class ExplorerService @Inject constructor(
     }
 
     private fun updateRootThumbnail(updated: Node, targetRoot: NodeRoot): NodeRoot {
-        val newestChild = updated.takeIf { targetRoot.withPreview }
-            ?.sortBy(targetRoot.sorting)
+        val preview = targetRoot.previewSorting
+            ?.let { updated.sortBy(targetRoot.previewSorting) }
             ?.children
             ?.firstOrNull()
         return when {
-            newestChild == null -> targetRoot.copy(item = updated, thumbnail = null, thumbnailPath = "")
-            targetRoot.thumbnailPath == newestChild.ref.string -> targetRoot
-            else -> targetRoot.copy(item = updated, thumbnail = Thumbnail.FilePath, thumbnailPath = newestChild.ref.string)
+            preview == null -> targetRoot.copy(item = updated, thumbnail = null, thumbnailPath = "")
+            targetRoot.thumbnailPath == preview.ref.string -> targetRoot
+            else -> targetRoot.copy(item = updated, thumbnail = Thumbnail.FilePath, thumbnailPath = preview.ref.string)
         }
     }
 
     private suspend fun updateRootSync(updated: Node, key: NodeTabKey, targetRoot: NodeRoot) {
-        filterMediaRootChildren(updated, targetRoot.type)
+        filterMediaRootChildren(updated, targetRoot.info)
         val updatedRoot = updateRootThumbnail(updated, targetRoot)
         garden {
             states.updateState(updatedRoot.id) {
@@ -366,14 +398,13 @@ class ExplorerService @Inject constructor(
                 when (root.id) {
                     targetRoot.id -> {
                         val updatedItem = root.item.updateWith(updatedRoot.item)
-                        root.item.sortBy(targetRoot.sorting)
-                        val type = root.type.takeIf<NodeRootType.Storage,_>()?.run {
+                        val info = root.info.takeIf<NodeRootInfo.Storage,_>()?.run {
                             val stat = StatFs(root.item.ref.string)
                             val info = info.copy(total = stat.totalBytes, used = stat.totalBytes - stat.freeBytes)
                             copy(info = info)
-                        } ?: root.type
-                        if (tab.key == key) updatedRoot.copy(item = updatedItem, type = type) else root.copy(
-                            type = root.type,
+                        } ?: root.info
+                        if (tab.key == key) updatedRoot.copy(item = updatedItem, info = info) else root.copy(
+                            info = root.info,
                             thumbnail = updatedRoot.thumbnail,
                             thumbnailPath = updatedRoot.thumbnailPath,
                             item = updatedItem,
@@ -748,7 +779,7 @@ class ExplorerService @Inject constructor(
                 }
             }
             if (!asSu) {
-                removeOneIf { it.type is NodeRootType.SystemRoot }
+                removeOneIf { it.info is NodeRootInfo.SystemRoot }
             }
         }
     }
@@ -789,7 +820,8 @@ class ExplorerService @Inject constructor(
             .also { items.add(it) }
             .takeIf { !it.isOpened }
             ?.let { return NodeTabItems(roots, items, null) }
-        val sorting = store.getSorting(key)
+        val sorting = getSorting(root.id)
+        store.setSorting(key, sorting)
         var deepest = items.first()
         val openedIndexes = mutableListOf<Int>()
         val filteredCounts = when {

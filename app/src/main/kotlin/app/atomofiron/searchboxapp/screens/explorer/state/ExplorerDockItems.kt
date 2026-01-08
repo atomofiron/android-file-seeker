@@ -13,7 +13,7 @@ object ExplorerDock : DockItem.Id.Factory {
     )
     val Sorting = DockItem(
         nextId(),
-        DockItem.Icon(R.drawable.ic_stub),
+        DockItem.Icon(R.drawable.ic_sort),
         DockItem.Label(R.string.sorting),
         children = NodeSorting.toDockItemChildren(),
     )

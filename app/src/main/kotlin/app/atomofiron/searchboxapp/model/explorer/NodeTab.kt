@@ -9,7 +9,7 @@ private val EmptyMutableList = EmptyMutableList<NodeRef>()
 
 data class NodeTab(
     val key: NodeTabKey,
-    val roots: List<NodeRoot>,
+    val roots: MutableList<NodeRoot>,
     val states: MutableList<NodeStateImpl>,
     val mimeTypes: List<String> = emptyList(),
 ) {
@@ -20,6 +20,7 @@ data class NodeTab(
     var generation = 0
         private set
     val tree: MutableList<NodeRef> get() = _trees[selectedRootId] ?: EmptyMutableList
+    private val _sorting = mutableMapOf<NodeId, NodeSorting>()
     val checked = mutableListOf<Int>()
     val flow = DataFlow(NodeTabItems(emptyList(), emptyList(), null))
 
@@ -27,9 +28,15 @@ data class NodeTab(
 
     fun getSelectedRoot(): NodeRoot? = roots.find { it.isSelected() }
 
-    fun selected(root: NodeRoot): Boolean = root.isSelected()
+    fun getSorting(rootId: NodeId): NodeSorting {
+        return _sorting.getOrPut(rootId) {
+            roots.find { it.id == rootId }
+                ?.previewSorting
+                ?: NodeSorting.Name
+        }
+    }
 
-    fun hasSelectedRoot() = selectedRootId != UNSELECTED_ROOT_ID
+    fun selected(root: NodeRoot): Boolean = root.isSelected()
 
     fun deselectRoot() {
         selectedRootId = UNSELECTED_ROOT_ID
@@ -41,6 +48,10 @@ data class NodeTab(
 
     fun incrementGeneration() {
         generation++
+    }
+
+    fun setSorting(rootId: NodeId, sorting: NodeSorting) {
+        _sorting[rootId] = sorting
     }
 
     fun Node.opened(): Boolean = roots.find { it.item.uniqueId == rootId }

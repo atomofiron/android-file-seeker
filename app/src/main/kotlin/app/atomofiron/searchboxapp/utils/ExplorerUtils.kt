@@ -17,7 +17,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeId
 import app.atomofiron.searchboxapp.model.explorer.NodeMeta
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
-import app.atomofiron.searchboxapp.model.explorer.NodeRootType
+import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
 import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
@@ -179,7 +179,7 @@ object ExplorerUtils {
         return Node(ref = target, parentRef = parent.ref, rootId = parent.rootId, meta = meta.toNodeMeta(), content = content)
     }
 
-    fun NodeRef.toRoot(type: NodeRootType): Node {
+    fun NodeRef.toRoot(type: NodeRootInfo): Node {
         return Node(
             ref = this,
             meta = NodeMeta(),

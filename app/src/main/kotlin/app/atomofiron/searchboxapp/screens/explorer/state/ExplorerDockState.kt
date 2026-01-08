@@ -38,15 +38,19 @@ class ExplorerDockState @Inject constructor(
         }
     }
 
-    private fun sorting(sorting: NodeSorting): DockItem {
-        var selected = ExplorerDock.Sorting.children
+    private fun sorting(sorting: NodeSorting?): DockItem {
+        var children = ExplorerDock.Sorting.children
+        val selected = children
             .find { it.id == sorting }
-            ?: ExplorerDock.Sorting.children.first()
-        selected = selected.copy(selected = true)
-        val children = ExplorerDock.Sorting.children.copy {
-            if (it.id == selected.id) selected else it
+            ?.copy(selected = true)
+        children = when (selected) {
+            null -> children
+            else -> children.copy {
+                if (it.id == selected.id) selected else it
+            }
         }
-        return ExplorerDock.Sorting.copy(icon = selected.icon, children = children)
+        val icon = selected?.icon ?: ExplorerDock.Sorting.icon
+        return ExplorerDock.Sorting.copy(icon = icon, enabled = selected != null, children = children)
     }
 
     private fun copyPaste(deepest: Node?, checked: List<Node>, copied: List<Node>): DockItem {

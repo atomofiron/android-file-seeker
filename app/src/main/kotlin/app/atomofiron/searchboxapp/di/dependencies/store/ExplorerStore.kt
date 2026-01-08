@@ -4,7 +4,7 @@ import android.os.Environment
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.searchboxapp.model.explorer.*
-import app.atomofiron.searchboxapp.model.explorer.NodeRootType
+import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,8 +32,8 @@ class ExplorerStore @Inject constructor() {
     private val _storage = MutableStateFlow<List<NodeStorage>>(emptyList())
     private val _currentTab = MutableStateFlow(middleTab)
     private val _currentDeepest = MutableStateFlow<Node?>(null)
-    private val _internalRoot = MutableStateFlow(NodeRef(internalStoragePath).toRoot(NodeRootType.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
-    private val _sorting = MutableStateFlow<Map<NodeTabKey, NodeSorting>>(mapOf(firstTab to NodeSorting.Name, middleTab to NodeSorting.Name, lastTab to NodeSorting.Name))
+    private val _internalRoot = MutableStateFlow(NodeRef(internalStoragePath).toRoot(NodeRootInfo.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
+    private val _sorting = MutableStateFlow<Map<NodeTabKey, NodeSorting>>(mapOf())
     private val _screenshots = MutableStateFlow<NodeRef?>(null)
     private val _checked = MutableStateFlow<List<Node>>(listOf())
     private val _alerts = EventFlow<Alert>()
@@ -58,11 +58,9 @@ class ExplorerStore @Inject constructor() {
     val updated: Flow<Node> = _updated
     val pasteBuffer: StateFlow<List<Node>> = _pasteBuffer
     val sorting: StateFlow<Map<NodeTabKey, NodeSorting>> = _sorting
-    val currentSorting: Flow<Pair<NodeTabKey, NodeSorting>> = combine(_sorting, _currentTab) { sorting, key ->
-        key to sorting.getOrDefault(key)
+    val currentSorting: Flow<Pair<NodeTabKey, NodeSorting?>> = combine(_sorting, _currentTab) { sorting, key ->
+        key to sorting[key]
     }
-
-    fun getSorting(key: NodeTabKey) = sorting.value.getOrDefault(key)
 
     fun Map<NodeTabKey, NodeSorting>.getOrDefault(key: NodeTabKey): NodeSorting {
         return getOrDefault(key, NodeSorting.Name)
@@ -128,9 +126,12 @@ class ExplorerStore @Inject constructor() {
 
     suspend fun emitAlert(alert: Alert) = _alerts.emit(alert)
 
-    fun setSorting(key: NodeTabKey, sorting: NodeSorting) {
+    fun setSorting(key: NodeTabKey, sorting: NodeSorting?) {
         _sorting.value = _sorting.value.toMutableMap().apply {
-            set(key, sorting)
+            when (sorting) {
+                null -> remove(key)
+                else -> set(key, sorting)
+            }
         }
     }
 

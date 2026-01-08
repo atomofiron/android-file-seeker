@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.explorer.presenter
 import android.Manifest.permission.POST_NOTIFICATIONS
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.extension.debugFailUnreachable
+import app.atomofiron.common.util.flow.value
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.di.dependencies.router.FilePickingDelegate
@@ -30,9 +31,13 @@ class ExplorerDockDelegate @Inject constructor(
     override fun onSearchClick() = router.showFinder()
 
     override fun onSortPick(item: DockItem) {
-        val sorting = NodeSorting(item.id) ?: return
+        val sorting = NodeSorting(item.id)
+            ?: return
+        val root = viewState.currentTabFlow.value
+            .roots.find { it.isSelected }
+            ?: return
         val key = store.currentTabKey.value
-        store.setSorting(key, sorting)
+        interactor.setSorting(key, root.info, sorting)
     }
 
     override fun onCopyClick() {
