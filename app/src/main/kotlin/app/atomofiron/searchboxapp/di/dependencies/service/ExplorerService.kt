@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.di.dependencies.service
 
 import android.content.Context
+import android.media.MediaScannerConnection
 import android.os.StatFs
 import app.atomofiron.common.util.CoroutineSafeList
 import app.atomofiron.common.util.dropLast
@@ -540,6 +541,9 @@ class ExplorerService @Inject constructor(
             }
         }
         if (withMoving) tryCache(key, from)
+        if (new != null) {
+            MediaScannerConnection.scanFile(context, arrayOf(to.ref.string), to.content.mimeType?.let { arrayOf(it) }, null)
+        }
         return new
     }
 
