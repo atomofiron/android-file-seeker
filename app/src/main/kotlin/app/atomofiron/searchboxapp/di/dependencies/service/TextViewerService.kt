@@ -10,9 +10,9 @@ import app.atomofiron.searchboxapp.di.dependencies.store.TextViewerStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
 import app.atomofiron.searchboxapp.model.finder.LocalSearchResult
+import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchTask
-import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
@@ -103,19 +103,19 @@ class TextViewerService @Inject constructor(
         val uuid = SearchTask(params, LocalSearchResult())
             .also { session.tasks { add(it) } }
             .uuid
-        val result = NativeBridge.findLocalText(params, ref, asSu, NotCancelable)
+        val progress = NativeBridge.findLocalText(params, ref, asSu, NotCancelable)
         session.update(uuid) {
-            when (result) {
+            when (progress) {
                 is TextSearchProgress.Match -> {
                     val map: MutableMatchMap = hashMapOf()
-                    result.v3.forEach {
+                    progress.v3.forEach {
                         val index = it.line.toInt()
                         map.getOrPut(index) { mutableListOf() }.add(it)
                     }
-                    toEnded(result = LocalSearchResult(result.v3.size, map, removable = false))
+                    toEnded(result = result.copy(count = progress.v3.size, matches = map))
                 }
                 is TextSearchProgress.Skip -> toEnded()
-                is TextSearchProgress.Err -> toEnded(error = result.v1.error?.toNodeError())
+                is TextSearchProgress.Err -> toEnded(error = progress.v1.error?.toNodeError())
             }
         }
     }
