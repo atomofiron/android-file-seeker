@@ -17,8 +17,9 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.convert
-import app.atomofiron.searchboxapp.utils.getColorByAttr
+import app.atomofiron.searchboxapp.utils.drawable
 import com.bumptech.glide.Glide
 
 class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
@@ -48,7 +49,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     private val colors = ColorStateList(
         arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf(0)),
         intArrayOf(
-            context.getColorByAttr(MaterialAttr.colorPrimary),
+            context.colorAttr(MaterialAttr.colorPrimary),
             binding.cardTitle.textColors.defaultColor,
         )
     )
@@ -66,18 +67,17 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
         root.isEnabled = item.isEnabled
         root.alpha = Alpha.enabled(item.isEnabled)
         cardTitle.text = item.info.getTitle(itemView.resources)
-        cardThumbnail.imageTintList = if (item.withPreview) null else colors
         cardThumbnail.background = item.getThumbnailBackground()
         when (val thumbnail = item.thumbnail) {
-            Thumbnail.FilePath -> Glide
+            is Thumbnail.FilePath -> Glide
                 .with(root.context)
                 .load(item.thumbnailPath)
-                .placeholder(item.getIcon())
+                .placeholder(item.getIcon().tinted())
                 .into(cardThumbnail)
-            null, Thumbnail.Loading -> cardThumbnail.setImageDrawable(item.getIcon())
+            null, Thumbnail.Loading -> cardThumbnail.setImageDrawable(item.getIcon().tinted())
             is Thumbnail.Bitmap -> cardThumbnail.setImageBitmap(thumbnail.value)
             is Thumbnail.Drawable -> cardThumbnail.setImageDrawable(thumbnail.value)
-            is Thumbnail.Res -> cardThumbnail.setImageResource(thumbnail.value)
+            is Thumbnail.Res -> cardThumbnail.setImageDrawable(context.drawable(thumbnail.value).tinted())
         }
         item.bindType()
     }
@@ -105,7 +105,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
             is NodeRootInfo.Favorite -> R.drawable.ic_thumbnail_favorite
             is NodeRootInfo.SystemRoot -> R.drawable.ic_thumbnail_system
         }
-        return ContextCompat.getDrawable(context, resId) as Drawable
+        return ContextCompat.getDrawable(context, resId)?.mutate() as Drawable
     }
 
     private fun NodeRoot.getThumbnailBackground(): Drawable? = when (info) {
@@ -118,5 +118,10 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
         is NodeRootInfo.Downloads,
         is NodeRootInfo.SystemRoot,
         is NodeRootInfo.Bluetooth -> ContextCompat.getDrawable(context, R.drawable.item_root_thumbnail)
+    }
+
+    private fun Drawable.tinted(): Drawable {
+        setTintList(colors)
+        return this
     }
 }
