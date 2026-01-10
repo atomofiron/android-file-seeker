@@ -19,14 +19,16 @@ import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.common.util.ifVisible
+import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
 import app.atomofiron.searchboxapp.custom.LemonDrawable
-import app.atomofiron.searchboxapp.custom.ProgressLineDrawable
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
-import app.atomofiron.searchboxapp.custom.drawable.explorerRippleDrawable
 import app.atomofiron.searchboxapp.custom.drawable.translated
+import app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout.Blue
+import app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout.Green
+import app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout.Red
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -74,7 +76,6 @@ class ExplorerItemBinder(
     private val dirTint = ColorStateList.valueOf(context.colorAttr(MaterialAttr.colorPrimary))
     private val fileTint = ColorStateList.valueOf(context.colorAttr(MaterialAttr.colorAccent))
     private val lemon = LemonDrawable()
-    private val progressDrawable = ProgressLineDrawable(context)
     val rippleDrawable get() = binding.root.background as? RippleDrawable
 
     private var onItemActionListener: ExplorerItemBinderActionListener? = null
@@ -99,13 +100,10 @@ class ExplorerItemBinder(
     constructor(itemView: View, isOpened: Boolean = false) : this(ItemExplorerBinding.bind(itemView), isOpened)
 
     init {
-        if (!isOpened) {
-            val rippleDrawable = context.explorerRippleDrawable()
-            rippleDrawable.addLayer(progressDrawable)
-            progressDrawable.callback = rippleDrawable
-            binding.root.background = rippleDrawable
-        }
         bindStyle(isOpened, isDeepest = false)
+        if (context.isDarkTheme() == isOpened) {
+            binding.root.makeDarker()
+        }
         if (binding.checkBox.buttonTintList == null) {
             binding.checkBox.isUseMaterialThemeColors = true
         }
@@ -166,8 +164,8 @@ class ExplorerItemBinder(
         checkBox.isChecked = item.isChecked
 
         error.isVisible = errorText?.isNotBlank() == true
-        progress.isVisible = item.inProgress
-        checkBox.isInvisible = item.inProgress
+        progress.isVisible = item.isBusy
+        checkBox.isInvisible = item.isBusy
         details.maxWidth = resources.displayMetrics.widthPixels / 3
 
         val iconTint = if (item.isDirectory) dirTint else fileTint
@@ -179,9 +177,15 @@ class ExplorerItemBinder(
         TextViewCompat.setCompoundDrawableTintList(title, iconTint)
         debugRequire(item.isOpened == isOpened) { "${item.name} isOpened change: $isOpened -> ${item.isOpened}, isDeepest=$isDeepest" }
         bindStyle(item.isOpened, item.isDeepest)
-        val copying = item.state.operation as? NodeOperation.Copying
-        progressDrawable.setVisible(copying?.isSource == false)
-        copying?.let { progressDrawable.set(it.progress) }
+        when (val operation = item.state.operation) {
+            null -> root.resetProgress()
+            is NodeOperation.Installing -> root.setProgress(Blue)
+            is NodeOperation.Deleting -> root.setProgress(Red)
+            is NodeOperation.Copying -> when {
+                operation.isSource -> root.setProgress(Green)
+                else -> root.setProgress(Green, operation.progress)
+            }
+        }
     }.unit()
 
     private fun transparentCheckbox(defaultBoxTintList: ColorStateList): ColorStateList {

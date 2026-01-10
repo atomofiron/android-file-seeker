@@ -1,10 +1,14 @@
 package app.atomofiron.common.arch
 
 import android.os.Bundle
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import app.atomofiron.common.util.property.MutableWeakProperty
 
-abstract class BaseViewModel<D : Any, V : Any, S : Any, P : BasePresenter<*,*>> : ViewModel() {
+/* ViewModel has screen's lifecycle,
+then builds di component (and register Android-side things),
+and it doesn't do anything other and shouldn't */
+abstract class BaseViewModel<D : Any, V : LifecycleOwner, S : Any, P : BasePresenter<*,*>> : ViewModel() {
 
     val viewProperty: MutableWeakProperty<V> = MutableWeakProperty()
 

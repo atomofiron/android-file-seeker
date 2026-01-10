@@ -38,7 +38,6 @@
     <dimen name="background_span_border_thickness">1dp</dimen>
     <dimen name="chip_area">40dp</dimen> <!-- 32 + 4 + 4-->
     <dimen name="dense_toolbar">48dp</dimen>
-    <dimen name="progress_line_width">6dp</dimen>
 
 	<!-- ShapeAppearance.M3.Sys.Shape.Corner.ExtraLarge -->
 	<dimen name="corner_extra_large">28dp</dimen>

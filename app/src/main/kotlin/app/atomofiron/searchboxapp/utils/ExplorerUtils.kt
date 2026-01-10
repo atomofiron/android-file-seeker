@@ -640,8 +640,8 @@ object ExplorerUtils {
     private fun List<String>.toNodeError(): NodeError? = takeIf { it.isNotEmpty() }
         ?.let { NodeError.Multiply(it) }
 
-    fun NodeStateImpl?.theSame(cachingJob: Job?, operation: NodeOperation): Boolean {
-        val currentOperation = this?.operation ?: NodeOperation.None
+    fun NodeStateImpl?.theSame(cachingJob: Job?, operation: NodeOperation?): Boolean {
+        val currentOperation = this?.operation
         return when {
             this?.cachingJob != cachingJob -> false
             currentOperation != operation -> false

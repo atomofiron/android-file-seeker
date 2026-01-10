@@ -60,6 +60,11 @@
 	<color name="red">#ffff0000</color>
 	<color name="green">#ff00ff00</color>
 	<color name="blue">#ff0000ff</color>
+	<color name="blue_lite">#ff0088ff</color>
+	<color name="pink_lite">#ffaa55aa</color>
+	<color name="red_lite">#ffff5555</color>
+	<color name="green_lite">#ff55aa55</color>
+	<color name="yellow_lite">#ffaaaa55</color>
 	<color name="red_transparent">#33ff0000</color>
     <color name="ny_ball">#ff3311</color>
     <color name="pumpkin">#FF7518</color>

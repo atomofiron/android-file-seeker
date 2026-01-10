@@ -52,4 +52,8 @@
             <flag name="all" value="0x3" />
         </attr>
     </declare-styleable>
+
+    <declare-styleable name="ProgressLayout">
+        <attr name="ignoreId" format="reference" />
+    </declare-styleable>
 </resources>

@@ -748,7 +748,7 @@ class ExplorerService @Inject constructor(
         delayedRender = null
         incrementGeneration()
         states.replace {
-            if (it.empty) null else it
+            if (it.isEmpty) null else it
         }
         val roots = renderRoots()
         roots.find { it.isSelected }
@@ -789,7 +789,7 @@ class ExplorerService @Inject constructor(
             val iterator = states.listIterator()
             while (iterator.hasNext()) {
                 val state = iterator.next()
-                if (state.empty) continue
+                if (state.isEmpty) continue
                 var item = roots.find { it.id == state.uniqueId }?.item
                 item = item ?: items.find { it.uniqueId == state.uniqueId }
                 if (item == null) {
@@ -1000,18 +1000,18 @@ class ExplorerService @Inject constructor(
         copying: NodeOperation.Copying? = this?.operation as? NodeOperation.Copying,
         installing: NodeOperation.Installing? = this?.operation as? NodeOperation.Installing,
     ): NodeStateImpl? {
-        val nextOperation = when (this?.operation ?: NodeOperation.None) {
-            is NodeOperation.None -> deleting ?: copying ?: installing
+        val nextOperation = when (this?.operation) {
+            null -> deleting ?: copying ?: installing
             is NodeOperation.Deleting -> deleting ?: copying
             is NodeOperation.Copying -> copying ?: deleting
             is NodeOperation.Installing -> installing ?: deleting
-        } ?: NodeOperation.None
+        }
         val nextJob = when (cachingJob) {
             null -> null
             else -> this?.cachingJob ?: cachingJob
         }
         return when {
-            nextJob == null && nextOperation is NodeOperation.None -> null
+            nextJob == null && nextOperation == null -> null
             theSame(nextJob, nextOperation) -> return this
             else -> NodeStateImpl(uniqueId, nextJob, nextOperation)
         }
