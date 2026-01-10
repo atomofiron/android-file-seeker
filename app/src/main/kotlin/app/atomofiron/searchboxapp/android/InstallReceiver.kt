@@ -8,6 +8,7 @@ import android.content.pm.PackageInstaller.EXTRA_STATUS
 import android.content.pm.PackageInstaller.EXTRA_STATUS_MESSAGE
 import android.content.pm.PackageInstaller.STATUS_FAILURE
 import android.content.pm.PackageInstaller.STATUS_PENDING_USER_ACTION
+import android.content.pm.PackageInstaller.STATUS_FAILURE_ABORTED
 import android.content.pm.PackageInstaller.STATUS_SUCCESS
 import androidx.core.content.IntentCompat
 import app.atomofiron.searchboxapp.di.DaggerInjector
@@ -30,6 +31,7 @@ class InstallReceiver : BroadcastReceiver() {
                 val activityIntent = IntentCompat.getParcelableExtra(intent, Intent.EXTRA_INTENT, Intent::class.java)
                 context.startActivity(activityIntent!!.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             }
+            STATUS_FAILURE_ABORTED -> Unit
             else -> channel.errorMessage(intent.getStringExtra(EXTRA_STATUS_MESSAGE))
         }
     }
