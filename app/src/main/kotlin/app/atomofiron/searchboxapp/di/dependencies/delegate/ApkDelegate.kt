@@ -56,8 +56,10 @@ class ApkDelegate @Inject constructor(
 
     fun launchable(info: ApkInfo?): Boolean {
         info ?: return false
-        return apkService.launchable(info.packageName)
+        return launchable(info.packageName)
     }
+
+    fun launchable(packageName: String): Boolean = apkService.launchable(packageName)
 
     fun launch(item: Node) {
         val content = item.content as? AndroidApp

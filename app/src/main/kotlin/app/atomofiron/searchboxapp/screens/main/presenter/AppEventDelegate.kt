@@ -20,6 +20,7 @@ import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.android.dismissUpdateNotification
 import app.atomofiron.searchboxapp.android.showUpdateNotification
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
 import app.atomofiron.searchboxapp.di.dependencies.store.EasterEggStore
@@ -54,6 +55,7 @@ class AppEventDelegate @Inject constructor(
     private val router: MainRouter,
     private val appStoreConsumer: AppStoreConsumer,
     private val operations: ApkOperationsDelegate,
+    private val apks: ApkDelegate,
     private val dialogs: DialogDelegate,
     private val preferences: PreferenceStore,
     updateStore: AppUpdateStore,
@@ -145,8 +147,8 @@ class AppEventDelegate @Inject constructor(
 
     private fun Uri.viewFile() = operations.askForApks(NodeRef(path = toString()), context.contentResolver)
 
-    private fun offerLaunch(packageName: String) {
-        dialogs show DialogConfig(
+    private fun offerLaunch(packageName: String) = when {
+        apks.launchable(packageName) -> dialogs show DialogConfig(
             cancelable = true,
             title = UniText(R.string.install_succeeded),
             negative = DialogDelegate.Cancel,
@@ -156,6 +158,10 @@ class AppEventDelegate @Inject constructor(
                     dialogs.showError()
                 }
             },
+        )
+        else -> dialogs show DialogConfig(
+            cancelable = true,
+            title = UniText(R.string.install_succeeded),
         )
     }
 
