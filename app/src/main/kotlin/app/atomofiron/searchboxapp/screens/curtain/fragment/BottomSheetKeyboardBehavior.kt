@@ -20,16 +20,14 @@ class BottomSheetKeyboardBehavior<V : View>(
 ) : BottomSheetBehavior<V>(context, attrs), KeyboardInsetListener {
 
     private val keyboardCallback = KeyboardInsetCallback(this)
-    private lateinit var controller: WindowInsetsControllerCompat
-    private lateinit var parent: CoordinatorLayout
-    private lateinit var child: V
+    private var controller: WindowInsetsControllerCompat? = null
+    private var parent: CoordinatorLayout? = null
 
     private var isControlling = false
     private var bottomPadding = 0
 
     override fun onLayoutChild(parent: CoordinatorLayout, child: V, layoutDirection: Int): Boolean {
         this.parent = parent
-        this.child = child
         ViewCompat.setWindowInsetsAnimationCallback(parent, keyboardCallback)
         return super.onLayoutChild(parent, child, layoutDirection)
     }
@@ -44,7 +42,7 @@ class BottomSheetKeyboardBehavior<V : View>(
     }
 
     override fun onImeMove(current: Int) {
-        parent.translationY = -max(0, current - bottomPadding).toFloat()
+        parent?.translationY = -max(0, current - bottomPadding).toFloat()
     }
 
     override fun onImeEnd(visible: Boolean) {
