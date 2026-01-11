@@ -360,6 +360,7 @@ object ExplorerUtils {
             (mimeType == FILE_APK) -> content.ifMismatches { AndroidApp.Apk }
             (mimeType == FILE_RAR) -> content.ifMismatches { NodeContent.Rar() }
             (mimeType == FILE_ZIP) -> when (true) {
+                name.hasExt(EXT_XAPK),
                 name.hasExt(EXT_APKS),
                 name.hasExt(EXT_APKM) -> content.ifMismatches { AndroidApp.Apks }
                 (content is AndroidApp) -> return content
@@ -418,17 +419,8 @@ object ExplorerUtils {
     private suspend fun Node.cacheFile(asSu: Boolean): Node {
         val content = when (content) {
             is NodeContent.Picture,
-            is NodeContent.Movie -> content
+            is NodeContent.Movie,
             is NodeContent.Music -> content
-            is NodeContent.Zip -> cacheZip().let { item ->
-                when (children?.possibleContainsMainApk()) {
-                    null, false -> return item
-                    true -> AndroidApp.Apks.let { apks ->
-                        apks.getAppContent(ref, asSu = asSu)
-                            .contentOrNodeError(this, apks.copy(isCached = true)) { return it }
-                    }
-                }
-            }
             is AndroidApp -> content.getAppContent(ref, asSu = asSu)
                 .contentOrNodeError(this, content.copy(isCached = true)) { return it }
             else -> return this
@@ -669,10 +661,10 @@ object ExplorerUtils {
         ref.name.hasExt(EXT_DEX),
         ref.name.hasExt(EXT_ODEX),
         ref.name.hasExt(EXT_VDEX) -> ifMismatches { NodeContent.Java }
+        ref.name.hasExt(EXT_XAPK),
         ref.name.hasExt(EXT_APKS),
         ref.name.hasExt(EXT_APKM) -> ifMismatches { AndroidApp.Apks }
         ref.name.hasExt(EXT_ZIP),
-        ref.name.hasExt(EXT_XAPK) -> ifMismatches { NodeContent.Zip() }
         ref.name.hasExt(EXT_TAR) -> ifMismatches { NodeContent.Tar() }
         ref.name.hasExt(EXT_BZ2) -> ifMismatches { NodeContent.Bzip2() }
         ref.name.hasExt(EXT_GZ) -> ifMismatches { NodeContent.Gz() }
