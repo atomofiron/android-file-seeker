@@ -7,6 +7,9 @@ plugins {
 android {
     namespace = "app.atomofiron.searchboxapp"
 
+    defaultConfig {
+        manifestPlaceholders["SFST"] = "mediaProcessing"
+    }
     kotlin {
         compilerOptions {
             jvmTarget.set(JvmTarget.JVM_17)

@@ -10,6 +10,7 @@ android {
     namespace = "app.atomofiron.searchboxapp"
 
     defaultConfig {
+        manifestPlaceholders["SFST"] = "specialUse"
         val threshold = Date().apply { time += 1000 * 60 * 60 * 8 }
         val date = SimpleDateFormat ("yyyy-MM-dd'T'hh:mm:ss'Z'").format(threshold)
         buildConfigField("String", "UPDATE_THRESHOLD", "\"$date\"")
