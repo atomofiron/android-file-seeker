@@ -156,7 +156,7 @@ class ProgressConstraintLayout @JvmOverloads constructor(
     }
 
     private fun Canvas.drawWave() {
-        paint.color = paint.color withAlpha (Alpha.SMALL * (1f - wave))
+        paint.color = paint.color withAlpha (Alpha.VODKA * (1f - wave))
         drawRect(progressStart, 0f, progressEnd * wave, height.toFloat(), paint)
     }
 
