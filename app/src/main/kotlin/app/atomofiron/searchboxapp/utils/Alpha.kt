@@ -5,7 +5,8 @@ import kotlin.math.max
 
 object Alpha {
     const val INVISIBLE = 0f
-    const val SMALL = 0.125f
+    const val EX_LITE = 0.125f
+    const val LITE = 0.25f
     const val VODKA = 0.4f
     const val HALF = 0.5f
     const val VISIBLE = 1f

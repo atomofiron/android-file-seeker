@@ -5,24 +5,28 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.LinearGradient
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffXfermode
 import android.graphics.Shader.TileMode.CLAMP
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.RippleDrawable
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.withStyledAttributes
-import androidx.core.graphics.blue
-import androidx.core.graphics.green
-import androidx.core.graphics.red
 import androidx.core.graphics.withTranslation
 import androidx.core.view.isVisible
+import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.withAlpha
+import app.atomofiron.searchboxapp.custom.drawable.coloredContent
+import kotlin.math.cos
 
 private const val INDETERMINATE = -2f
 private const val DURATION = 3000L
+private const val HALF_PI = Math.PI.toFloat() / 2
 
 class ProgressConstraintLayout @JvmOverloads constructor(
     context: Context,
@@ -38,11 +42,11 @@ class ProgressConstraintLayout @JvmOverloads constructor(
     object Yellow : Color
     object Pink : Color
 
-    private var red = context.getColor(R.color.red_lite)
-    private var green = context.getColor(R.color.green_lite)
-    private var blue = context.getColor(R.color.blue_lite)
-    private var yellow = context.getColor(R.color.yellow_lite)
-    private var pink = context.getColor(R.color.pink_lite)
+    private var red = 0
+    private var green = 0
+    private var blue = 0
+    private var yellow = 0
+    private var pink = 0
     private val animator = ValueAnimator.ofFloat(0f, 1f)
     private val paint = Paint()
     private var progress = INDETERMINATE
@@ -50,8 +54,10 @@ class ProgressConstraintLayout @JvmOverloads constructor(
     private var color: Color = Pink
     private val colors = intArrayOf(0, 0)
     private var ignoreId = 0
-    private var progressStart = 0f
-    private var progressEnd = 0f
+    private var progressPadding = 0f
+    private val progressStart get() = if (isRtl) width.toFloat() else 0f
+    private val progressEnd get() = if (isRtl) 0f else width.toFloat()
+    private var clipPath = Path()
 
     init {
         context.withStyledAttributes(attrs, R.styleable.ProgressLayout, defStyleAttr, defStyleRes) {
@@ -63,15 +69,17 @@ class ProgressConstraintLayout @JvmOverloads constructor(
         animator.repeatCount = ValueAnimator.INFINITE
     }
 
-    fun makeDarker() {
-        red = red.darker()
-        green = green.darker()
-        blue = blue.darker()
-        yellow = yellow.darker()
-        pink = pink.darker()
+    fun init(inverseColors: Boolean, padding: Float) {
+        progressPadding = padding
+        red = context.coloredContent(R.color.red_lite, inverseColors)
+        green = context.coloredContent(R.color.green_lite, inverseColors)
+        blue = context.coloredContent(R.color.blue_lite, inverseColors)
+        yellow = context.coloredContent(R.color.yellow_lite, inverseColors)
+        pink = context.coloredContent(R.color.pink_lite, inverseColors)
     }
 
     fun setProgress(color: Color, value: Float = INDETERMINATE) {
+        debugRequire(red != 0)
         progress = when (value) {
             INDETERMINATE -> value
             else -> value.coerceIn(0f, 1f)
@@ -87,11 +95,6 @@ class ProgressConstraintLayout @JvmOverloads constructor(
         invalidate()
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-        updateShader()
-    }
-
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         resetProgress()
@@ -99,9 +102,19 @@ class ProgressConstraintLayout @JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
+        if (!changed) {
+            return
+        }
+        updateShader()
         val width = (right - left).toFloat()
-        progressStart = if (isRtl) width else 0f
-        progressEnd = if (isRtl) 0f else width
+        val height = (bottom - top).toFloat()
+        (background as? RippleDrawable)
+            ?.findDrawableByLayerId(android.R.id.mask)
+            ?.let { it as? GradientDrawable }
+            ?.run {
+                clipPath.reset()
+                clipPath.addRoundRect(0f, 0f, width, height, cornerRadius, cornerRadius, Path.Direction.CW)
+            }
     }
 
     private fun anim(value: Boolean) = when (value) {
@@ -137,10 +150,10 @@ class ProgressConstraintLayout @JvmOverloads constructor(
 
     override fun dispatchDraw(canvas: Canvas) {
         if (animator.isStarted && progress != INDETERMINATE) {
-            canvas.drawProgress(Alpha.SMALL_INT)
+            canvas.drawProgress(Alpha.SMALL_INT, clip = true)
             val saved = canvas.saveLayer(0f, 0f, width.toFloat(), height.toFloat(), null)
             super.dispatchDraw(canvas)
-            canvas.drawProgress(Alpha.VISIBLE_INT)
+            canvas.drawProgress(Alpha.VISIBLE_INT, clip = false)
             canvas.restoreToCount(saved)
             canvas.drawIgnored()
         } else {
@@ -149,14 +162,18 @@ class ProgressConstraintLayout @JvmOverloads constructor(
         if (animator.isStarted) canvas.drawWave()
     }
 
-    private fun Canvas.drawProgress(alpha: Int) {
+    private fun Canvas.drawProgress(alpha: Int, clip: Boolean) {
         paint.color = paint.color withAlpha alpha
-        val end = progressStart + (progressEnd - progressStart) * progress
+        val start = if (progressStart == 0f) progressPadding else (progressStart - progressPadding)
+        var end = if (progressEnd == 0f) progressPadding else (progressEnd - progressPadding)
+        end = start + (end - start) * progress
+        if (clip) clip()
         drawRect(progressStart, 0f, end, height.toFloat(), paint)
     }
 
     private fun Canvas.drawWave() {
-        paint.color = paint.color withAlpha (Alpha.VODKA * (1f - wave))
+        paint.color = paint.color withAlpha (Alpha.LITE * cos(wave * HALF_PI))
+        clip()
         drawRect(progressStart, 0f, progressEnd * wave, height.toFloat(), paint)
     }
 
@@ -169,6 +186,8 @@ class ProgressConstraintLayout @JvmOverloads constructor(
             view.draw(this)
         }
     }
-}
 
-fun Int.darker(): Int = 0xff.shl(24) + (red / 2).shl(16) + (green / 2).shl(8) + (blue / 2)
+    private fun Canvas.clip() {
+        if (!clipPath.isEmpty) clipPath(clipPath)
+    }
+}

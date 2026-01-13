@@ -7,14 +7,18 @@ import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.GradientDrawable.Orientation.BOTTOM_TOP
 import android.graphics.drawable.RippleDrawable
 import android.view.View
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.TextField
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.color
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.drawable
 import app.atomofiron.searchboxapp.utils.over
@@ -77,3 +81,12 @@ fun Context.colorSurfaceContainer(): Int {
 fun Context.tonedOverlay(color: Int): ColorStateList = ColorStateList.valueOf(color withAlpha Alpha.VODKA over colorBackground())
 
 private fun Context.colorBackground(): Int = colorAttr(R.attr.colorBackground)
+
+@ColorInt
+fun Context.coloredContent(@ColorRes colorId: Int, inverse: Boolean): Int {
+    val backgroundId = when {
+        inverse -> MaterialAttr.colorOnSurfaceInverse
+        else -> MaterialAttr.colorOnSurfaceVariant
+    }
+    return ColorUtils.blendARGB(color(colorId), colorAttr(backgroundId), 0.5f)
+}

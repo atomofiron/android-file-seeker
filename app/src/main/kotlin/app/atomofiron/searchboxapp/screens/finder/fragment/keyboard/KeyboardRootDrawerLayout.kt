@@ -39,7 +39,7 @@ import kotlin.math.roundToInt
 import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.GestureDirection as Direction
 import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.GestureTracking as Tracking
 
-private const val AlphaThreshold = Alpha.SMALL
+private const val AlphaThreshold = Alpha.EX_LITE
 private const val HorizontalStart = 0
 private const val DistanceThreshold = 16
 private const val SpeedThreshold = 16

@@ -19,7 +19,6 @@ import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.common.util.ifVisible
-import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerBinding
 import app.atomofiron.searchboxapp.custom.LemonDrawable
@@ -29,6 +28,7 @@ import app.atomofiron.searchboxapp.custom.drawable.translated
 import app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout.Blue
 import app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout.Green
 import app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout.Red
+import app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout.Yellow
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -101,9 +101,7 @@ class ExplorerItemBinder(
 
     init {
         bindStyle(isOpened, isDeepest = false)
-        if (context.isDarkTheme() == isOpened) {
-            binding.root.makeDarker()
-        }
+        binding.root.init(inverseColors = isOpened, resources.getDimension(R.dimen.explorer_border_width))
         if (binding.checkBox.buttonTintList == null) {
             binding.checkBox.isUseMaterialThemeColors = true
         }
