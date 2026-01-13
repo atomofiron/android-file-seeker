@@ -10,7 +10,7 @@ private val EmptyMutableList = EmptyMutableList<NodeRef>()
 data class NodeTab(
     val key: NodeTabKey,
     val roots: MutableList<NodeRoot>,
-    val states: MutableList<NodeStateImpl>,
+    val states: MutableMap<NodeId, NodeStateImpl>,
     val mimeTypes: List<String> = emptyList(),
 ) {
     private val _trees = mutableMapOf<NodeId, MutableList<NodeRef>>() // one NodeRef isn't flexible too much
@@ -21,7 +21,7 @@ data class NodeTab(
         private set
     val tree: MutableList<NodeRef> get() = _trees[selectedRootId] ?: EmptyMutableList
     private val _sorting = mutableMapOf<NodeId, NodeSorting>()
-    val checked = mutableListOf<Int>()
+    val checked = mutableListOf<NodeId>()
     val flow = DataFlow(NodeTabItems(emptyList(), emptyList(), null))
 
     fun NodeRoot.isSelected(): Boolean = id == selectedRootId

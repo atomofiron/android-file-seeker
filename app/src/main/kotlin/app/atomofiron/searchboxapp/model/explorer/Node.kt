@@ -2,7 +2,7 @@ package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.extension.debugRequire
 
-val StateStub = NodeStateImpl(0)
+private val StateStub = NodeStateImpl()
 
 data class Node(
     val ref: NodeRef,
@@ -85,7 +85,6 @@ data class Node(
         ref: NodeRef,
         parentRef: NodeRef = ref.parent,
         meta: NodeMeta = this.meta,
-        state: NodeStateImpl = this.state.copy(uniqueId = ref.uniqueId),
         error: NodeError? = this.error,
     ): Node {
         val new = copy(ref = ref, parentRef = parentRef, uniqueId = ref.uniqueId, meta = meta, state = state, error = error)

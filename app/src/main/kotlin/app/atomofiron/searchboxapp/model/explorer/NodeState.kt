@@ -4,7 +4,6 @@ import kotlinx.coroutines.Job
 
 data class NodeStateImpl(
     // fields are hidden from ui
-    val uniqueId: NodeId,
     val cachingJob: Job? = null,
     override val operation: NodeOperation? = null,
 ) : NodeState {

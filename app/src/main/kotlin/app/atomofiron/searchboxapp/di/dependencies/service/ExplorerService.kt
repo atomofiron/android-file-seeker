@@ -31,6 +31,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeGarden
+import app.atomofiron.searchboxapp.model.explorer.NodeId
 import app.atomofiron.searchboxapp.model.explorer.NodeMeta
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -65,7 +66,6 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateWith
 import app.atomofiron.searchboxapp.utils.Rslt
-import app.atomofiron.searchboxapp.utils.findWithIndex
 import app.atomofiron.searchboxapp.utils.mutate
 import app.atomofiron.searchboxapp.utils.removeOneIf
 import app.atomofiron.searchboxapp.utils.replaceEach
@@ -247,7 +247,7 @@ class ExplorerService @Inject constructor(
             }
             val item = findItem(ref.uniqueId)
                 ?.takeIf { it.hasChildren }
-                ?.takeIf { it.isOpened || states.findState(it.uniqueId).second?.isRemoving != true }
+                ?.takeIf { it.isOpened || states[it.uniqueId]?.isRemoving != true }
                 ?: return
             val index = tree.indexOfFirst { it.uniqueId == item.uniqueId }
             if (tree.isEmpty()) {
@@ -401,7 +401,7 @@ class ExplorerService @Inject constructor(
         val updatedRoot = updateRootThumbnail(updated, targetRoot)
         garden {
             states.updateState(updatedRoot.id) {
-                nextState(updatedRoot.id, cachingJob = null)
+                nextState(cachingJob = null)
             }
             val tab = get(key)
             roots.replace { root ->
@@ -452,7 +452,7 @@ class ExplorerService @Inject constructor(
                 .resolveDirChildren(asSu)
             garden {
                 states.updateState(it.uniqueId) {
-                    nextState(it.uniqueId, cachingJob = null)
+                    nextState(cachingJob = null)
                 }
                 if (!done) {
                     return@withCachingState
@@ -539,12 +539,12 @@ class ExplorerService @Inject constructor(
     suspend fun tryCopy(key: NodeTabKey, from: Node, to: Node, withMoving: Boolean, withNotice: Boolean = true): Node? {
         render(key) {
             states.updateState(from.uniqueId) {
-                nextState(from.uniqueId, copying = NodeOperation.Copying(isSource = true, withMoving = withMoving))
+                nextState(copying = NodeOperation.Copying(isSource = true, withMoving = withMoving))
             }.let {
                 if (it?.isCopying != true) return null
             }
             states.updateState(to.uniqueId) {
-                nextState(to.uniqueId, copying = NodeOperation.Copying(isSource = false))
+                nextState(copying = NodeOperation.Copying(isSource = false))
             }
             findItem(to.parentRef.uniqueId) { _, _, item ->
                 val children = item.children
@@ -558,7 +558,7 @@ class ExplorerService @Inject constructor(
                 garden {
                     states.updateState(to.uniqueId) {
                         this ?: return@updateState null
-                        nextState(to.uniqueId, copying = copying)
+                        nextState(copying = copying)
                     }
                     get(key).renderUpdate(to)
                 }
@@ -572,10 +572,10 @@ class ExplorerService @Inject constructor(
         }
         render(key) {
             states.updateState(from.uniqueId) {
-                nextState(from.uniqueId, copying = null)
+                nextState(copying = null)
             }
             states.updateState(to.uniqueId) {
-                nextState(to.uniqueId, copying = null)
+                nextState(copying = null)
             }
             findItem(to.parentRef.uniqueId) { _, _, dst ->
                 val children = dst.children
@@ -595,8 +595,7 @@ class ExplorerService @Inject constructor(
         garden(key) {
             val toRender = mutableListOf<Node>()
             for (item in refs) {
-                val (_, state) = states.findState(item.uniqueId)
-                if (state?.withOperation != true && checked.tryUpdateCheck(item.uniqueId, toChecked)) {
+                if (states[item.uniqueId]?.withOperation != true && checked.tryUpdateCheck(item.uniqueId, toChecked)) {
                     toRender.add(item)
                 }
             }
@@ -613,10 +612,10 @@ class ExplorerService @Inject constructor(
 
     suspend fun tryMarkInstalling(key: NodeTabKey, ref: NodeRef, installing: NodeOperation.Installing?): Boolean? {
         return garden {
-            var state = states.find { it.uniqueId == ref.uniqueId }
+            var state = states[ref.uniqueId]
             if (state?.operation == installing) return false
             state = states.updateState(ref.uniqueId) {
-                nextState(ref.uniqueId, installing = installing)
+                nextState(installing = installing)
             }
             (state?.operation == installing).also {
                 if (it) {
@@ -682,7 +681,7 @@ class ExplorerService @Inject constructor(
                     } else {
                         this?.cachingJob?.cancel()
                         checked.tryUpdateCheck(item.uniqueId, toChecked = false)
-                        nextState(item.uniqueId, cachingJob = null, deleting = NodeOperation.Deleting)
+                        nextState(cachingJob = null, deleting = NodeOperation.Deleting)
                     }
                 }
                 findItem(item.uniqueId)
@@ -761,8 +760,8 @@ class ExplorerService @Inject constructor(
         delayedRender?.cancel()
         delayedRender = null
         incrementGeneration()
-        states.replace {
-            if (it.isEmpty) null else it
+        states.entries.removeAll {
+            it.value.isEmpty
         }
         val roots = renderRoots()
         roots.find { it.isSelected }
@@ -772,7 +771,6 @@ class ExplorerService @Inject constructor(
         val rendered = renderItems(roots)
         flow.emit(rendered)
 
-        updateStates(rendered.items)
         updateChecked(rendered.items)
         val checked = rendered.items.filter { it.isChecked }
         if (key is ExplorerTabKey) {
@@ -794,22 +792,6 @@ class ExplorerService @Inject constructor(
             }
             if (!asSu) {
                 removeOneIf { it.info is NodeRootInfo.SystemRoot }
-            }
-        }
-    }
-
-    private fun NodeTab.updateStates(items: List<Node>) {
-        if (states.isNotEmpty()) {
-            val iterator = states.listIterator()
-            while (iterator.hasNext()) {
-                val state = iterator.next()
-                if (state.isEmpty) continue
-                var item = roots.find { it.id == state.uniqueId }?.item
-                item = item ?: items.find { it.uniqueId == state.uniqueId }
-                if (item == null) {
-                    val next = state.nextState(state.uniqueId, cachingJob = null)
-                    iterator.updateState(state, next)
-                }
             }
         }
     }
@@ -931,7 +913,7 @@ class ExplorerService @Inject constructor(
         return item.copy(
             isChecked = checked.any { it == item.uniqueId },
             isDeepest = isDeepest,
-            state = states.find { it.uniqueId == item.uniqueId } ?: item.state,
+            state = states[item.uniqueId] ?: item.state,
             children = item.children?.fetch(isOpened),
             generation = generation,
             content = content,
@@ -951,11 +933,11 @@ class ExplorerService @Inject constructor(
 
     /** @return already existing caching job */
     private fun NodeTab.withCachingState(id: Int, caching: suspend CoroutineScope.() -> Unit): Job? {
-        var state = states.find { it.uniqueId == id }
+        var state = states[id]
         if (state != null) return state.cachingJob
         val job = scope.launch(start = CoroutineStart.LAZY, block = caching)
         state = states.updateState(id) {
-            nextState(id, cachingJob = job)
+            nextState(cachingJob = job)
         }
         require(state?.cachingJob === job)
         job.start()
@@ -966,7 +948,7 @@ class ExplorerService @Inject constructor(
         var updated = item.update(asSu)
         garden(key) {
             states.updateState(item.uniqueId) {
-                nextState(item.uniqueId, cachingJob = null)
+                nextState(cachingJob = null)
             }
             val current = findItem(item.uniqueId)
             current ?: return
@@ -1008,7 +990,6 @@ class ExplorerService @Inject constructor(
     }
 
     private fun NodeStateImpl?.nextState(
-        uniqueId: Int,
         cachingJob: Job? = this?.cachingJob,
         deleting: NodeOperation.Deleting? = this?.operation as? NodeOperation.Deleting,
         copying: NodeOperation.Copying? = this?.operation as? NodeOperation.Copying,
@@ -1027,30 +1008,20 @@ class ExplorerService @Inject constructor(
         return when {
             nextJob == null && nextOperation == null -> null
             theSame(nextJob, nextOperation) -> return this
-            else -> NodeStateImpl(uniqueId, nextJob, nextOperation)
+            else -> NodeStateImpl(nextJob, nextOperation)
         }
     }
 
-    private fun MutableList<NodeStateImpl>.updateState(
+    private fun MutableMap<NodeId, NodeStateImpl>.updateState(
         uniqueId: Int,
         block: NodeStateImpl?.() -> NodeStateImpl?,
     ): NodeStateImpl? {
-        val (index, state) = findState(uniqueId)
-        val new = state.block()
-        when {
-            state == null && new != null -> add(new)
-            state != null && new == null -> removeAt(index)
-            state != null && new != null -> set(index, new)
+        val new = get(uniqueId).block()
+        when (new) {
+            null -> remove(uniqueId)
+            else -> put(uniqueId, new)
         }
         return new
-    }
-
-    private fun MutableListIterator<NodeStateImpl>.updateState(current: NodeStateImpl?, new: NodeStateImpl?) {
-        when {
-            current == null && new != null -> add(new)
-            current != null && new == null -> remove()
-            current != null && new != null -> set(new)
-        }
     }
 
     private fun NodeTab.findItem(uniqueId: Int): Node? = findItem(uniqueId) { _, _, it -> it }
@@ -1092,6 +1063,4 @@ class ExplorerService @Inject constructor(
         }
         return null
     }
-
-    private fun List<NodeStateImpl>.findState(uniqueId: Int): Pair<Int, NodeStateImpl?> = findWithIndex { it.uniqueId == uniqueId }
 }

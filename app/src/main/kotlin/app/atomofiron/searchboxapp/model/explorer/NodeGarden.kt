@@ -7,7 +7,7 @@ import kotlinx.coroutines.sync.withLock
 class NodeGarden {
 
     val roots = mutableListOf<NodeRoot>()
-    val states = mutableListOf<NodeStateImpl>()
+    val states = mutableMapOf<NodeId, NodeStateImpl>()
     val mutex = Mutex()
     val tabs = mutableMapOf<NodeTabKey, NodeTab>()
 
