@@ -610,7 +610,7 @@ class ExplorerService @Inject constructor(
         }
     }
 
-    suspend fun tryMarkInstalling(key: NodeTabKey, ref: NodeRef, installing: NodeOperation.Installing?): Boolean? {
+    suspend fun tryMarkInstalling(key: NodeTabKey, ref: NodeRef, installing: NodeOperation.Installing?): Boolean {
         return garden {
             var state = states[ref.uniqueId]
             if (state?.operation == installing) return false

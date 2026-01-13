@@ -35,7 +35,7 @@ class ApkDelegate @Inject constructor(
         scope.launch(Dispatchers.IO) {
             if (tab != null) {
                 val allowed = explorerService.tryMarkInstalling(tab, ref, NodeOperation.Installing)
-                if (allowed != true) return@launch
+                if (!allowed) return@launch
             }
             val result = apkService.install(ref, content, Intents.ACTION_INSTALL_APP)
             if (result is Rslt.Err) {

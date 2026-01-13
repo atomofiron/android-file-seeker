@@ -83,7 +83,6 @@ suspend fun AndroidApp.getAppContent(ref: NodeRef, asSu: Boolean, signature: Boo
     }
 }
 
-@Throws(IOException::class)
 suspend fun AndroidApp.getApksContent(input: InputStream?, hash: NodeHash? = null, signature: Boolean = false): Rslt<AndroidApp> {
     val tempDir = System.getProperty("java.io.tmpdir")
         ?: return Rslt.Err("No temp dir")
@@ -112,7 +111,7 @@ suspend fun AndroidApp.getApksContent(input: InputStream?, hash: NodeHash? = nul
         return e.toRslt()
     }
     return when {
-        !containsMainApk -> Rslt.Err("$BASE_APK not found")
+        !containsMainApk -> Rslt.Err("Main .apk not found")
         tmp.length() == 0L -> Rslt.Err("Temp file is empty")
         else -> getApkContent(apkPath = tmp.absolutePath, hash, signature = signature)
     }.also { tmp.delete() }
