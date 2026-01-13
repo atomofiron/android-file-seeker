@@ -4,7 +4,7 @@ use crate::api::api::{CommonProgressCollector, CountingResult};
 use crate::common::{Rslt, JOINING_ERROR, OKI};
 use crate::ext::result::ResultExt;
 use crate::r#impl::delete::delete;
-use crate::r#impl::other::{last_os_error, raw_os_error};
+use crate::r#impl::other::{last_os_result, raw_os_error};
 use crate::r#impl::progress::{convert_progress, send_inc, ProgressChange};
 use libc::off_t;
 use std::ffi::CString;
@@ -288,7 +288,7 @@ fn copy_metadata(metadata: &Metadata, to: &Path) -> Rslt<()> {
             libc::EACCES |
             libc::EROFS |
             libc::EOPNOTSUPP => (), // ignore
-            _ => return last_os_error(),
+            _ => return last_os_result(),
         }
     }
     let path_cstr = CString::new(to.as_os_str().as_bytes()).ok();
@@ -302,7 +302,7 @@ fn copy_metadata(metadata: &Metadata, to: &Path) -> Rslt<()> {
                 libc::EACCES |
                 libc::EROFS |
                 libc::EOPNOTSUPP => (), // ignore
-                _ => return last_os_error(),
+                _ => return last_os_result(),
             }
         }
     }

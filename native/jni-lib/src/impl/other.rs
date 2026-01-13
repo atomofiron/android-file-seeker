@@ -11,7 +11,7 @@ use std::path::PathBuf;
 use std::process::{Child, ExitStatus};
 use std::{fs, io};
 
-pub fn last_os_error<T>() -> Rslt<T> {
+pub fn last_os_result<T>() -> Rslt<T> {
     Err(io::Error::last_os_error().into())
 }
 

@@ -3,7 +3,7 @@
 use crate::api::api::{CommonProgressCollector, CountingResult};
 use crate::common::{Rslt, OKI, PERMISSION_DENIED, RESOURCE_BUSY};
 use crate::ext::result::ResultExt;
-use crate::r#impl::other::last_os_error;
+use crate::r#impl::other::{last_os_result, raw_os_error};
 use crate::r#impl::progress::{convert_progress, send_inc, ProgressChange};
 use libc::{c_int, c_uint, closedir, dev_t, mode_t, opendir, readdir};
 use std::ffi::{CStr, CString};
@@ -41,9 +41,9 @@ pub fn delete_impl(path: &PathBuf, collector: Arc<dyn CommonProgressCollector>) 
 pub fn delete(path: &PathBuf, tx: &Sender<ProgressChange>, range: Range<f32>) -> Rslt<()> {
     let c_path = CString::new(path.as_os_str().as_bytes())?;
     let (dev, _) = get_dev_mode(&c_path)?;
-    delete_recursively(&c_path, dev, tx, range, true)?;
+    delete_recursively(&c_path, dev, tx, &range, true)?;
     match path.exists() { // 1 retry
-        true => delete_recursively(&c_path, dev, tx, 1.0..1.0, false),
+        true => delete_recursively(&c_path, dev, tx, &(1.0..1.0), false),
         _ => Ok(()),
     }
 }
@@ -52,7 +52,7 @@ pub fn delete_recursively(
     path: &CString,
     root_dev: dev_t,
     tx: &Sender<ProgressChange>,
-    range: Range<f32>,
+    range: &Range<f32>,
     first_try: bool,
 ) -> Rslt<()> {
     let mode = match get_dev_mode(path) {
@@ -65,11 +65,13 @@ pub fn delete_recursively(
         Ok(_) => (), // os error
         Err(e) => return send_err(path, e, tx, &range),
     }
-    let error = last_os_error().unwrap_or(0);
+    let error = raw_os_error();
     return if error == libc::ENOENT {
         Ok(()) //            vvvvvvvvv - no AT_RECURSIVE
     } else if error == libc::ENOTEMPTY {
-        delete_children(path, root_dev, tx, range, first_try)
+        delete_with_children(path, root_dev, tx, &range, first_try)
+            .and_then(|_| call_delete(path, true))
+            .and_then(|r| if r == OKI { Ok(()) } else { last_os_result() })
     } else if error == libc::EPERM { // retry
         if !first_try {
             send_err(path, PERMISSION_DENIED, tx, &range)?;
@@ -85,11 +87,11 @@ pub fn delete_recursively(
     };
 }
 
-pub fn delete_children(
+pub fn delete_with_children(
     path: &CString,
     root_dev: dev_t,
     tx: &Sender<ProgressChange>,
-    range: Range<f32>,
+    range: &Range<f32>,
     first_try: bool,
 ) -> Rslt<()> {
     unsafe {
@@ -99,7 +101,7 @@ pub fn delete_children(
         }
         let child_count = match child_count(path) {
             Ok(count) => count,
-            Err(e) => return send_err(path, e, tx, &range),
+            Err(e) => return send_err(path, e, tx, range),
         };
         let step = (range.end - range.start) / child_count as f32;
         let i = 0f32;
@@ -124,11 +126,11 @@ pub fn delete_children(
                 let offset = step * i;
                 let start = range_start + offset;
                 let range = start..(start + step);
-                delete_recursively(&it, root_dev, tx, range, first_try)
+                delete_recursively(&it, root_dev, tx, &range, first_try)
             });
             match result {
-                Ok(_) => send_inc(tx, &range)?,
-                Err(e) => send_err(path, e, tx, &range)?,
+                Ok(_) => send_inc(tx, range)?,
+                Err(e) => send_err(path, e, tx, range)?,
             }
         }
         let _ = closedir(dir);
@@ -140,7 +142,7 @@ pub fn child_count(path: &CString) -> Rslt<u32> {
     unsafe {
         let dir = opendir(path.as_ptr());
         if dir.is_null() {
-            return last_os_error()
+            return last_os_result()
         }
         let mut count = 0u32;
         loop {
@@ -174,7 +176,7 @@ fn get_dev_mode(path: &CString) -> Rslt<(dev_t, c_uint)> {
     };
     return match result {
         OKI => Ok((stat.st_dev as dev_t, stat.st_mode)),
-        _ => last_os_error(),
+        _ => last_os_result(),
     }
 }
 
