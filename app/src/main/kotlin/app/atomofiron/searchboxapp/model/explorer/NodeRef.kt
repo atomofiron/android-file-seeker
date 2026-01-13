@@ -127,17 +127,28 @@ class NodeRef(val bytes: ByteArray) {
 private operator fun ByteArray.plus(child: String): ByteArray = this + child.toByteArray()
 
 private operator fun ByteArray.plus(child: ByteArray): ByteArray {
-    var endIndex = child.size
-    while (child.getOrNull(endIndex.dec()) == SLASH_BYTE) {
-        endIndex--
+    var childStart = 0
+    while (child.getOrNull(childStart) == SLASH_BYTE) { // drop starting slashes
+        childStart++
     }
-    if (endIndex == 0) {
+    var childEnd = child.size
+    while (child.getOrNull(childEnd.dec()) == SLASH_BYTE) { // drop ending slashes
+        childEnd--
+    }
+    if (childStart >= childEnd) {
         return this
     }
-    val new = ByteArray(size + endIndex + 1)
+    val childSize = childEnd - childStart
+    var parentEnd = size
+    while (getOrNull(parentEnd.dec()) == SLASH_BYTE) { // drop ending slashes
+        parentEnd--
+    }
+    val withSeparatingSlash = isNotEmpty()
+    val separatorSize = if (withSeparatingSlash) 1 else 0
+    val new = ByteArray(parentEnd + separatorSize + childSize)
     copyInto(new)
-    new[size] = SLASH_BYTE
-    child.copyInto(new, new.size - endIndex, endIndex = endIndex)
+    if (withSeparatingSlash) new[parentEnd] = SLASH_BYTE
+    child.copyInto(new, parentEnd + separatorSize, startIndex = childStart, endIndex = childEnd)
     return new
 }
 
