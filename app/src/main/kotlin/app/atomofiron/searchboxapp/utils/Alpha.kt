@@ -22,7 +22,8 @@ object Alpha {
     const val LEVEL_90 = 225
 
     const val INVISIBLE_INT = 0
-    const val SMALL_INT = 0x20
+    const val EX_LITE_INT = 0x20
+    const val LITE_INT = 0x40
     const val VODKA_INT = 0x66
     const val HALF_INT = 0x80
     const val VISIBLE_INT = 0xff

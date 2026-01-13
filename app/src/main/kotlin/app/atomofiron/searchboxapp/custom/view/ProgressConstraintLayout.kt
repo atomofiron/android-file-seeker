@@ -49,7 +49,8 @@ class ProgressConstraintLayout @JvmOverloads constructor(
     private var pink = 0
     private val animator = ValueAnimator.ofFloat(0f, 1f)
     private val paint = Paint()
-    private var progress = INDETERMINATE
+    private var progress = 0f
+    private var progressAlpha = 0
     private var wave = 0f
     private var color: Color = Pink
     private val colors = intArrayOf(0, 0)
@@ -71,6 +72,7 @@ class ProgressConstraintLayout @JvmOverloads constructor(
 
     fun init(inverseColors: Boolean, padding: Float) {
         progressPadding = padding
+        progressAlpha = if (inverseColors) Alpha.LITE_INT else Alpha.EX_LITE_INT
         red = context.coloredContent(R.color.red_lite, inverseColors)
         green = context.coloredContent(R.color.green_lite, inverseColors)
         blue = context.coloredContent(R.color.blue_lite, inverseColors)
@@ -150,7 +152,7 @@ class ProgressConstraintLayout @JvmOverloads constructor(
 
     override fun dispatchDraw(canvas: Canvas) {
         if (animator.isStarted && progress != INDETERMINATE) {
-            canvas.drawProgress(Alpha.SMALL_INT, clip = true)
+            canvas.drawProgress(progressAlpha, clip = true)
             val saved = canvas.saveLayer(0f, 0f, width.toFloat(), height.toFloat(), null)
             super.dispatchDraw(canvas)
             canvas.drawProgress(Alpha.VISIBLE_INT, clip = false)
