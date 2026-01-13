@@ -172,13 +172,14 @@ class ItemBorderDecorator(
         val stroke = borderWidth
         val innerRadius = cornerRadius - stroke
         val diameter = cornerRadius * 2
+        val arm = cornerRadius / 2
         framePath.reset()
         framePath.moveTo(left + cornerRadius, top)
-        framePath.rLineTo(-cornerRadius, -cornerRadius)
+        framePath.rCubicTo(-arm, 0f, -cornerRadius, -cornerRadius + arm, -cornerRadius, -cornerRadius)
         framePath.arcTo(left, bottom - diameter, left + diameter, bottom, 180f, -90f, false)
         framePath.arcTo(right - diameter, bottom - diameter, right, bottom, 90f, -90f, false)
         framePath.lineTo(right, top - cornerRadius)
-        framePath.rLineTo(-cornerRadius, cornerRadius)
+        framePath.rCubicTo(0f, arm, -cornerRadius + arm, cornerRadius, -cornerRadius, cornerRadius)
         bottom -= stroke
         val negative = min(0f, height() / 2 - innerRadius)
         left += stroke - negative
