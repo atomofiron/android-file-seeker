@@ -238,15 +238,16 @@ class ExplorerService @Inject constructor(
         tryCache(key, root.item)
     }
 
-    suspend fun tryToggle(key: NodeTabKey, item: Node) {
+    suspend fun tryToggle(key: NodeTabKey, ref: NodeRef) {
         var rootItem: Node? = null
         render(key) {
             val root = getSelectedRoot() ?: return
-            if (tree.isEmpty() && root.item.uniqueId != item.uniqueId) {
+            if (tree.isEmpty() && root.item.uniqueId != ref.uniqueId) {
                 return
             }
-            val item = findItem(item.uniqueId)
+            val item = findItem(ref.uniqueId)
                 ?.takeIf { it.hasChildren }
+                ?.takeIf { it.isOpened || states.findState(it.uniqueId).second?.isRemoving != true }
                 ?: return
             val index = tree.indexOfFirst { it.uniqueId == item.uniqueId }
             if (tree.isEmpty()) {
@@ -270,6 +271,15 @@ class ExplorerService @Inject constructor(
             }
         }
         rootItem?.let { tryCache(key, it) }
+    }
+
+    private fun NodeTab.onRemoving(items: List<Node>): Boolean {
+        return tree.lastOrNull()?.let { deepest ->
+            items.find { deepest == it.ref || deepest.isChildOf(it.ref) }
+        }?.let { item ->
+            val index = tree.indexOfFirst { it == item.ref }
+            tree.clear(index)
+        } != null
     }
 
     suspend fun updateRootsAsync() = updateRootTrigger()
@@ -510,6 +520,9 @@ class ExplorerService @Inject constructor(
     }
 
     suspend fun tryCopy(key: NodeTabKey, targets: List<Node>, dst: Node, withMoving: Boolean) {
+        if (withMoving) garden(key) {
+            if (onRemoving(targets)) render()
+        }
         val items = targets.map {
             scope.async {
                 val to = it.mutate(ref = dst.ref + it.name)
@@ -675,6 +688,7 @@ class ExplorerService @Inject constructor(
                 findItem(item.uniqueId)
                     ?.takeIf { state?.isDeleting == true }
             }.let { items.addAll(it) }
+            onRemoving(items)
         }
         val files = items.filter { !it.isDirectory }
         val dirs = items.filter { it.isDirectory }

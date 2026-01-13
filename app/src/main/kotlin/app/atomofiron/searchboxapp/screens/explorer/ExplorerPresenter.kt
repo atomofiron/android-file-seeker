@@ -92,7 +92,7 @@ class ExplorerPresenter @Inject constructor(
     }
 
     private fun scrollOrOpenParent(item: Node, isTargetVisible: Boolean) = when {
-        isTargetVisible -> interactor.toggleDir(currentTab, item)
+        isTargetVisible -> interactor.toggleDir(currentTab, item.ref)
         else -> viewState.scrollTo(item)
     }
 }

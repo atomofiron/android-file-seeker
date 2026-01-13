@@ -13,6 +13,7 @@ data class NodeStateImpl(
 
     override val isCaching: Boolean get() = cachingJob != null
     override val isDeleting: Boolean get() = operation is NodeOperation.Deleting
+    override val isRemoving: Boolean get() = operation?.removing == true
     override val isCopying: Boolean get() = operation is NodeOperation.Copying
     override val withOperation: Boolean get() = operation != null
     override val isBusy: Boolean get() = operation?.busy == true
@@ -25,6 +26,7 @@ interface NodeState {
     val withOperation: Boolean
     val isCaching: Boolean
     val isDeleting: Boolean
+    val isRemoving: Boolean
     val isCopying: Boolean
     val isBusy: Boolean
 }

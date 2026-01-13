@@ -41,8 +41,8 @@ class ExplorerInteractor @Inject constructor(
         service.tryCheck(tab, items, toChecked)
     }.unit()
 
-    fun toggleDir(key: ExplorerTabKey, dir: Node) = io {
-        service.tryToggle(key, dir)
+    fun toggleDir(key: ExplorerTabKey, ref: NodeRef) = io {
+        service.tryToggle(key, ref)
     }.unit()
 
     fun updateItems(key: ExplorerTabKey, items: List<Node>) = io {
@@ -63,10 +63,6 @@ class ExplorerInteractor @Inject constructor(
 
     fun copy(key: ExplorerTabKey, targets: List<Node>, dst: Node, move: Boolean) = default {
         service.tryCopy(key, targets, dst, move)
-    }.unit()
-
-    fun deleteItems(key: ExplorerTabKey, items: List<Node>) = io {
-        service.tryDelete(key, items)
     }.unit()
 
     fun rename(key: ExplorerTabKey, ref: NodeRef, name: String) = io {
