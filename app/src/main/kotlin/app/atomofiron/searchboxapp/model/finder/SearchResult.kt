@@ -54,7 +54,7 @@ sealed class SearchResult {
         override val countTotal: Int = 0,
         val matches: List<ItemMatch> = listOf(), // todo make List<T : ItemMatch>?
         val errors: List<String> = listOf(),
-        val sorting: NodeSorting = NodeSorting.Date.Reversed,
+        val sorting: NodeSorting = NodeSorting.Date,
         val generation: Int = 0,
     ) : SearchResult() {
 

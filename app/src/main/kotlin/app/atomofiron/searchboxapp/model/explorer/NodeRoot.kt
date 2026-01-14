@@ -7,20 +7,23 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 data class NodeRoot(
     val info: NodeRootInfo,
     val item: Node,
-    val previewSorting: NodeSorting? = null,
-    val thumbnail: Thumbnail? = null,
+    val defaultSorting: NodeSorting,
+    val thumbnail: Thumbnail?,
     val thumbnailPath: String = "",
     // isSelected is always false in the garden
     val isSelected: Boolean = false,
     val pathVariants: Array<out NodeRef>? = null,
 ) {
-
-    constructor(type: NodeRootInfo, sorting: NodeSorting, vararg pathVariants: NodeRef)
-            : this(type, pathVariants.first().toRoot(type), sorting, pathVariants = pathVariants.takeIf { it.size > 1 })
+    constructor(
+        type: NodeRootInfo,
+        defaultSorting: NodeSorting,
+        thumbnail: Thumbnail? = null,
+        vararg pathVariants: NodeRef,
+    ) : this(type, pathVariants.first().toRoot(type), defaultSorting, thumbnail, pathVariants = pathVariants.takeIf { it.size > 1 })
 
     val id: NodeId = item.uniqueId + info.temp
     val isEnabled: Boolean get() = item.isCached || info is NodeRootInfo.Storage
-    val withPreview: Boolean = previewSorting != null
+    val withPreview: Boolean = thumbnail != null
 
     init {
         require(item.children?.isOpened != true)

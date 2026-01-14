@@ -7,9 +7,9 @@ import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.ExplorerTabKey
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeId
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
-import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
@@ -89,7 +89,7 @@ class ExplorerInteractor @Inject constructor(
         }
     }
 
-    fun setSorting(key: ExplorerTabKey, root: NodeRootInfo, sorting: NodeSorting) = default {
-        service.setSorting(key, root, sorting)
+    fun setSorting(key: ExplorerTabKey, rootId: NodeId, sorting: NodeSorting) = default {
+        service.setSorting(key, rootId, sorting)
     }.unit()
 }

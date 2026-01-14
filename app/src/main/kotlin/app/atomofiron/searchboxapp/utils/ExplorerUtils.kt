@@ -482,16 +482,18 @@ object ExplorerUtils {
         sortBy { !what(it).isDirectory }
     }
 
+    // reversed = larger first
     private fun <T> MutableList<T>.sortBySize(what: (T) -> Node, reversed: Boolean) {
         sortBy { what(it).lowercaseName }
         sortBy(reversed) { what(it).length }
         sortBy { !what(it).isDirectory }
     }
 
+    // reversed = older first
     private fun <T> MutableList<T>.sortByDate(what: (T) -> Node, reversed: Boolean) {
         sortBy { what(it).lowercaseName }
-        sortBy(reversed) { what(it).time }
-        sortBy(reversed) { what(it).date }
+        sortBy(!reversed) { what(it).time }
+        sortBy(!reversed) { what(it).date }
         sortBy { !what(it).isDirectory }
     }
 

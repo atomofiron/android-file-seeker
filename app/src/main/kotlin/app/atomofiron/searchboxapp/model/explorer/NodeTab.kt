@@ -31,7 +31,7 @@ data class NodeTab(
     fun getSorting(rootId: NodeId): NodeSorting {
         return _sorting.getOrPut(rootId) {
             roots.find { it.id == rootId }
-                ?.previewSorting
+                ?.defaultSorting
                 ?: NodeSorting.Name
         }
     }

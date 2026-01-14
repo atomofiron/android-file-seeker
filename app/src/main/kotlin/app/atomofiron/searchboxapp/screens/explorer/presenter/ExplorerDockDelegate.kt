@@ -37,7 +37,7 @@ class ExplorerDockDelegate @Inject constructor(
             .roots.find { it.isSelected }
             ?: return
         val key = store.currentTabKey.value
-        interactor.setSorting(key, root.info, sorting)
+        interactor.setSorting(key, root.id, sorting)
     }
 
     override fun onCopyClick() {

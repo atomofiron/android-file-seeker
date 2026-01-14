@@ -196,12 +196,12 @@ class ExplorerService @Inject constructor(
 
     private fun NodeGarden.initRoots() {
         val roots = listOf(
-            NodeRoot(NodeRootInfo.Photos, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_CAMERA),
-            NodeRoot(NodeRootInfo.Videos, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_CAMERA),
-            NodeRoot(NodeRootInfo.Screenshots, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_PIC_SCREENSHOTS, internalStorageRef + SUB_PATH_DCIM_SCREENSHOTS),
-            NodeRoot(NodeRootInfo.Bluetooth, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_BLUETOOTH, internalStorageRef + SUB_PATH_DOWNLOAD_BLUETOOTH),
-            NodeRoot(NodeRootInfo.Downloads, NodeSorting.Date.Reversed, internalStorageRef + SUB_PATH_DOWNLOAD),
-            NodeRoot(NodeRootInfo.SystemRoot, NodeSorting.Name, NodeRef.Root),
+            NodeRoot(NodeRootInfo.Photos, NodeSorting.Date, thumbnail = Thumbnail.FilePath, internalStorageRef + SUB_PATH_CAMERA),
+            NodeRoot(NodeRootInfo.Videos, NodeSorting.Date, thumbnail = Thumbnail.FilePath, internalStorageRef + SUB_PATH_CAMERA),
+            NodeRoot(NodeRootInfo.Screenshots, NodeSorting.Date, thumbnail = Thumbnail.FilePath, internalStorageRef + SUB_PATH_PIC_SCREENSHOTS, internalStorageRef + SUB_PATH_DCIM_SCREENSHOTS),
+            NodeRoot(NodeRootInfo.Bluetooth, NodeSorting.Date, thumbnail = null, internalStorageRef + SUB_PATH_BLUETOOTH, internalStorageRef + SUB_PATH_DOWNLOAD_BLUETOOTH),
+            NodeRoot(NodeRootInfo.Downloads, NodeSorting.Date, thumbnail = null, internalStorageRef + SUB_PATH_DOWNLOAD),
+            NodeRoot(NodeRootInfo.SystemRoot, NodeSorting.Name, thumbnail = null, NodeRef.Root),
         )
         this.roots.addAll(roots)
     }
@@ -338,15 +338,12 @@ class ExplorerService @Inject constructor(
         return alt ?: missing
     }
 
-    suspend fun setSorting(key: ExplorerTabKey, root: NodeRootInfo, sorting: NodeSorting) {
-        val root = garden(key) {
-            roots.find { it.info == root }?.also {
-                setSorting(it.id, sorting)
-                render()
-            }
+    suspend fun setSorting(key: ExplorerTabKey, rootId: NodeId, sorting: NodeSorting) {
+        garden(key) {
+            setSorting(rootId, sorting)
+            render()
         }
-        root ?: return
-        dao.put(TabRootSorting(key.index, root.id, sorting))
+        dao.put(TabRootSorting(key.index, rootId, sorting))
     }
 
     private fun NodeGarden.updateStats(storage: NodeStorage) {
@@ -354,7 +351,7 @@ class ExplorerService @Inject constructor(
         var root = roots.getOrNull(index)
         var key = root?.info ?: NodeRootInfo.Storage(storage)
         key = (key as NodeRootInfo.Storage).copy(info = storage)
-        root = root ?: NodeRoot(key, NodeSorting.Name, NodeRef(storage.path))
+        root = root ?: NodeRoot(key, NodeSorting.Name, thumbnail = null, NodeRef(storage.path))
         val restore = roots.none { it.id == root.id }
         roots.put(root) { it.id == root.id }
         if (restore) restoreSorting(root)
@@ -385,15 +382,12 @@ class ExplorerService @Inject constructor(
     }
 
     private fun updateRootThumbnail(updated: Node, targetRoot: NodeRoot): NodeRoot {
-        val preview = targetRoot.previewSorting
-            ?.let { updated.sortBy(targetRoot.previewSorting) }
+        val preview = targetRoot.defaultSorting
+            .takeIf { targetRoot.thumbnail != null }
+            ?.let { updated.sortBy(targetRoot.defaultSorting) }
             ?.children
             ?.firstOrNull()
-        return when {
-            preview == null -> targetRoot.copy(item = updated, thumbnail = null, thumbnailPath = "")
-            targetRoot.thumbnailPath == preview.ref.string -> targetRoot
-            else -> targetRoot.copy(item = updated, thumbnail = Thumbnail.FilePath, thumbnailPath = preview.ref.string)
-        }
+        return targetRoot.copy(item = updated, thumbnailPath = preview?.ref?.string ?: "")
     }
 
     private suspend fun updateRootSync(updated: Node, key: NodeTabKey, targetRoot: NodeRoot) {

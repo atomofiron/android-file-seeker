@@ -9,7 +9,6 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
-import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isContent
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -18,7 +17,6 @@ import app.atomofiron.searchboxapp.utils.launchable
 import app.atomofiron.searchboxapp.utils.toRslt
 import java.io.BufferedInputStream
 import java.io.FileInputStream
-import java.nio.charset.Charset
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import javax.inject.Inject
@@ -29,11 +27,6 @@ class ApkService @Inject constructor(
     private val context: Context,
     private val installer: PackageInstaller,
 ) {
-    companion object {
-        init {
-            poop("ch ${Charset.availableCharsets()}")
-        }
-    }
     fun install(ref: NodeRef, content: AndroidApp, action: String): Rslt<Unit> = try {
         when {
             content.splitApk -> installApks(ref, content, action)
