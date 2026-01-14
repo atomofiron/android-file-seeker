@@ -8,23 +8,19 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PixelFormat
 import android.graphics.drawable.Drawable
+import androidx.core.graphics.withClip
 import app.atomofiron.common.util.Android
 
 class PathDrawable(
     private val path: Path,
     private val fill: Int,
-    private val stroke: Int,
-    strokeWidth: Float,
+    private val border: PathBorder? = null,
 ) : Drawable() {
-    companion object {
-        fun fill(path: Path, color: Int) = PathDrawable(path, fill = color, stroke = Color.TRANSPARENT, strokeWidth = 0f)
-        fun stroke(path: Path, color: Int, strokeWidth: Float) = PathDrawable(path, fill = Color.TRANSPARENT, stroke = color, strokeWidth)
-    }
 
     private val paint = Paint()
 
     init {
-        paint.strokeWidth = strokeWidth
+        paint.isAntiAlias = true
     }
 
     // needed for shadow to work
@@ -39,10 +35,13 @@ class PathDrawable(
             paint.style = Paint.Style.FILL
             canvas.drawPath(path, paint)
         }
-        if (stroke != Color.TRANSPARENT && paint.strokeWidth > 0f) {
-            paint.color = stroke
+        if (border != null) {
+            paint.color = border.color
+            paint.strokeWidth = 2 * border.width
             paint.style = Paint.Style.STROKE
-            canvas.drawPath(path, paint)
+            canvas.withClip(path) {
+                canvas.drawPath(path, paint)
+            }
         }
     }
 

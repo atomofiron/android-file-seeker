@@ -58,7 +58,6 @@ class DockBottomShape(
 
     override fun onBoundsChange(bounds: Rect) = updatePath()
 
-    @Suppress("DEPRECATION")
     override fun getOutline(outline: Outline) = when {
         style.translucent -> Unit
         Android.R -> outline.setPath(path)

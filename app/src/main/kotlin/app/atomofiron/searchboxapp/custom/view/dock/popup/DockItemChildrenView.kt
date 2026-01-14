@@ -99,7 +99,7 @@ class DockItemChildrenView(
         animator.addUpdateListener(this)
         animator.interpolator = DecelerateInterpolator()
         val style = config.popup.style
-        background = PathDrawable.fill(combinedPath, style.fill)
+        background = PathDrawable(combinedPath, style.fill, style.popupBorder)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {

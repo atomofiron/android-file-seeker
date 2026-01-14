@@ -14,7 +14,9 @@ import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.drawable.PathBorder
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
+import app.atomofiron.searchboxapp.custom.drawable.surfaceContainerBorder
 import app.atomofiron.searchboxapp.custom.view.JoystickView
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.DockMode
@@ -104,7 +106,9 @@ object LayoutDelegate {
             translucent -> context.colorAttr(R.attr.colorBackground)
             else -> context.colorSurfaceContainer()
         }
-        setStyle(DockStyle(fill = fill, translucent = translucent))
+        val border = context.surfaceContainerBorder()
+            ?.let { PathBorder(color = it, width = resources.getDimension(R.dimen.stroke_width)) }
+        setStyle(DockStyle(fill = fill, translucent = translucent, popupBorder = border))
         setMode(DockMode.Pinned(layout.ground, notch.takeIf { layout.run { ground.isBottom && withJoystick } }))
     }
 

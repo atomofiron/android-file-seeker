@@ -10,11 +10,11 @@ import android.view.View
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DimenRes
-import androidx.core.content.ContextCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.isDarkDeep
+import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.TextField
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -28,13 +28,6 @@ import com.google.android.material.textfield.TextInputLayout
 private fun Context.rippleColor() = colorAttr(MaterialAttr.colorControlHighlight)
 
 private fun Context.rippleColorList() = ColorStateList.valueOf(rippleColor())
-
-fun Context.explorerRippleDrawable(): RippleDrawable {
-    val mask = ContextCompat.getColor(this@explorerRippleDrawable, R.color.mask)
-        .let { GradientDrawable(BOTTOM_TOP, intArrayOf(it, it)) }
-    mask.cornerRadius = resources.getDimension(R.dimen.explorer_border_width)
-    return RippleDrawable(rippleColorList(), null, mask)
-}
 
 fun View.setMenuItemBackground() {
     val drawable = context.drawable(R.drawable.item_menu) as RippleDrawable
@@ -75,6 +68,16 @@ fun Context.colorSurfaceContainer(): Int {
     return when {
         isDarkDeep() -> color withAlpha Alpha.VODKA over colorAttr(R.attr.colorBackground)
         else -> color
+    }
+}
+
+@ColorInt
+fun Context.surfaceContainerBorder(): Int? {
+    return if (isDarkTheme()) {
+        val surfaceVariant = colorAttr(MaterialAttr.colorSurfaceVariant)
+        ColorUtils.blendARGB(colorSurfaceContainer(), surfaceVariant, 0.2f)
+    } else {
+        null
     }
 }
 
