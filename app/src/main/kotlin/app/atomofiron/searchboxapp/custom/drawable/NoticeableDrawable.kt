@@ -116,6 +116,7 @@ class NoticeableDrawable(
             return
         }
         if (drawDot || forceDrawDot) {
+            paint.alpha = drawable.alpha
             canvas.drawCircle(holeX, holeY, dotRadius, paint)
             canvas.clipPath(clipOutPath)
         }
