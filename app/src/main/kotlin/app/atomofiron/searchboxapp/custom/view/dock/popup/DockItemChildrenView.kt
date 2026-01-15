@@ -58,7 +58,7 @@ class DockItemChildrenView(
     private var clipPath = Path()
     private var combinedPath = Path()
     private val corner = resources.getDimension(R.dimen.dock_overlay_corner)
-    private val offset = resources.getDimension(R.dimen.dock_item_half_margin).roundToInt().toFloat()
+    private val offset = resources.getDimension(R.dimen.dock_item_half_margin).roundToInt()
     private val animator = ValueAnimator.ofFloat(COLLAPSED)
     private var currentValue = COLLAPSED
     private var targetValue = COLLAPSED
@@ -229,17 +229,26 @@ class DockItemChildrenView(
                 left < rect.left -> rect.left - left
                 right > rect.right -> rect.right - right
                 else -> 0
-            }.toFloat()
+            }
             Ground.Left -> offset + config.width
             Ground.Right -> -(offset + config.width)
-        }
-        translationY = when (ground) {
-            Ground.Bottom -> -offset - config.height
-            Ground.Left, Ground.Right -> when {
-                top < rect.top -> rect.top - top
-                top > rect.top -> rect.top - top
-                else -> 0
-            }.toFloat()
+        }.toFloat()
+        when (ground) {
+            Ground.Bottom -> translationY = (-offset - config.height).toFloat()
+            Ground.Left, Ground.Right -> {
+                val popupHeight = height - offset * 2
+                val popupRows = popupHeight / config.height
+                if (popupRows == 2 || (popupRows % 2 == 0) && popupHeight > rect.height()) {
+                    translationY += config.height / 2
+                }
+                val bottomSpace = config.height + rect.bottom
+                while (y + popupHeight > bottomSpace) {
+                    translationY -= config.height
+                }
+                while (y < rect.top) {
+                    translationY += config.height
+                }
+            }
         }
     }
 
