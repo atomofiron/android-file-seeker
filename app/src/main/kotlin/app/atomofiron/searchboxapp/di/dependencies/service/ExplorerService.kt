@@ -221,15 +221,17 @@ class ExplorerService @Inject constructor(
         }
     }
 
-    suspend fun tryToggleRoot(key: NodeTabKey, root: NodeRoot) {
+    suspend fun tryToggleRoot(key: ExplorerTabKey, root: NodeRoot) {
         render(key) {
             val root = roots.find { it.id == root.id }
                 ?: return
             if (selected(root)) {
                 deselectRoot()
                 store.setSorting(key, null)
+                store.setDeepest(key, null)
             } else {
                 select(root)
+                store.setSorting(key, getSorting(root.id))
             }
             if (tree.isEmpty()) {
                 restoreTree()
@@ -339,6 +341,7 @@ class ExplorerService @Inject constructor(
     }
 
     suspend fun setSorting(key: ExplorerTabKey, rootId: NodeId, sorting: NodeSorting) {
+        store.setSorting(key, sorting)
         garden(key) {
             setSorting(rootId, sorting)
             render()
@@ -768,7 +771,7 @@ class ExplorerService @Inject constructor(
         updateChecked(rendered.items)
         val checked = rendered.items.filter { it.isChecked }
         if (key is ExplorerTabKey) {
-            store.setDeepestNode(key, rendered.deepest)
+            store.setDeepest(key, rendered.deepest)
             store.emitChecked(key, checked)
             store.setCurrentItems(key, rendered.items)
         }
@@ -811,7 +814,6 @@ class ExplorerService @Inject constructor(
             .takeIf { !it.isOpened }
             ?.let { return NodeTabItems(roots, items, null) }
         val sorting = getSorting(root.id)
-        store.setSorting(key, sorting)
         var deepest = items.first()
         val openedIndexes = mutableListOf<Int>()
         val filteredCounts = when {

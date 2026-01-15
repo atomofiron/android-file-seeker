@@ -3,8 +3,13 @@ package app.atomofiron.searchboxapp.di.dependencies.store
 import android.os.Environment
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.EventFlow
-import app.atomofiron.searchboxapp.model.explorer.*
+import app.atomofiron.searchboxapp.model.explorer.ExplorerTabKey
+import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
+import app.atomofiron.searchboxapp.model.explorer.NodeSorting
+import app.atomofiron.searchboxapp.model.explorer.NodeStorage
+import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -62,10 +67,6 @@ class ExplorerStore @Inject constructor() {
         key to sorting[key]
     }
 
-    fun Map<NodeTabKey, NodeSorting>.getOrDefault(key: NodeTabKey): NodeSorting {
-        return getOrDefault(key, NodeSorting.Name)
-    }
-
     fun setCurrentItems(tab: ExplorerTabKey, items: List<Node>) {
         currentLists[tab] = items
         updateCurrentItems(tab)
@@ -76,7 +77,7 @@ class ExplorerStore @Inject constructor() {
         updateChecked(tab)
     }
 
-    fun setDeepestNode(tab: ExplorerTabKey, item: Node?) {
+    fun setDeepest(tab: ExplorerTabKey, item: Node?) {
         deepestNodes[tab] = item
         updateDeepest(tab)
     }
@@ -145,8 +146,7 @@ class ExplorerStore @Inject constructor() {
     private fun updateDeepest(tab: NodeTabKey? = _currentTab.value) {
         tab ?: return
         deepestNodes.takeIf { tab == _currentTab.value }
-            ?.let { it[tab] }
-            ?.let { _currentDeepest.value = it }
+            ?.let { _currentDeepest.value = it[tab] }
     }
 
     private fun updateCurrentItems(tab: NodeTabKey) {
