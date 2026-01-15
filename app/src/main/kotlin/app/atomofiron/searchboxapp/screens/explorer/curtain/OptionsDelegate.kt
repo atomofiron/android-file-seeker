@@ -26,7 +26,7 @@ class OptionsDelegate(private val output: MenuListener) {
         binding.menuView.insetsPadding(ExtType.curtain, bottom = true)
         val single = options.items.size == 1
         binding.itemView.root.isVisible = single
-        binding.title.isVisible = !single
+        binding.header.root.isVisible = !single
         if (single) {
             val binder = ExplorerItemBinder(binding.itemView)
             binder.bind(options.items.first().closed())
@@ -47,7 +47,7 @@ class OptionsDelegate(private val output: MenuListener) {
             if (files > 0) {
                 string.appendWithComma(resources.getQuantityString(R.plurals.x_files, files, files))
             }
-            binding.title.text = string.toString()
+            binding.header.title.text = string.toString()
         }
         bind(options.operations)
         return binding.root

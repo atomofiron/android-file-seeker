@@ -5,6 +5,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
+import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainExplorerCloneBinding
 import app.atomofiron.searchboxapp.custom.drawable.makeToned
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -26,6 +27,7 @@ class CloneDelegate(
 
     private fun CurtainExplorerCloneBinding.init(target: Node, dirFiles: List<String>) {
         root.insetsPadding(ExtType.curtain, vertical = true)
+        header.title.setText(R.string.make_a_clone)
         textField.makeToned(textLayout)
         textField.filters += PathNameCharacterFilter().apply {
             textField.setText(filter(target.name))

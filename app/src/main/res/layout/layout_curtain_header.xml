@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    android:orientation="horizontal"
+    >
+    <ImageView
+        android:id="@+id/back"
+        android:layout_width="@dimen/curtain_title_margin"
+        android:layout_height="match_parent"
+        android:background="@drawable/ripple_32"
+        android:src="@drawable/ic_back"
+        android:scaleType="center"
+        android:tint="?colorControlNormal"
+        />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/curtain_title_size"
+        android:textColor="?attr/colorContent"
+        android:textStyle="bold"
+        tools:text="Title"
+        />
+</LinearLayout>

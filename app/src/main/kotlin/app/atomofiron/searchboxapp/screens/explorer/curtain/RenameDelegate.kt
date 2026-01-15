@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
+import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainExplorerRenameBinding
 import app.atomofiron.searchboxapp.custom.drawable.makeToned
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -14,13 +15,10 @@ import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMen
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.PathNameCharacterFilter
 import lib.atomofiron.insets.insetsPadding
-import kotlin.collections.plus
 
 class RenameDelegate(
     private val output: ExplorerCurtainMenuDelegate,
 ) {
-
-    var data: RenameData? = null
 
     fun getView(data: RenameData, inflater: LayoutInflater): View {
         val binding = CurtainExplorerRenameBinding.inflate(inflater, null, false)
@@ -30,6 +28,7 @@ class RenameDelegate(
 
     private fun CurtainExplorerRenameBinding.init(data: RenameData) {
         root.insetsPadding(ExtType.curtain, vertical = true)
+        header.title.setText(R.string.rename)
         textField.makeToned(textLayout)
         textField.inputType = EditorInfo.TYPE_TEXT_FLAG_NO_SUGGESTIONS
         textField.filters += PathNameCharacterFilter().apply {

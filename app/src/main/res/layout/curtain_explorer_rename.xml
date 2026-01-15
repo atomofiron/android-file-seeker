@@ -6,11 +6,15 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     >
+    <include
+        android:id="@+id/header"
+        layout="@layout/layout_curtain_header"
+        />
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_half"
+        android:layout_marginTop="@dimen/padding_common"
         android:layout_marginHorizontal="@dimen/padding_common"
         android:hint="@string/a_name"
         >

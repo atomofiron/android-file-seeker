@@ -1,32 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     >
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/explorer_create_tv"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/curtain_title_margin"
-        android:layout_marginBottom="@dimen/padding_half"
-        android:textSize="@dimen/curtain_title_size"
-        android:textColor="?attr/colorContent"
-        android:textStyle="bold"
-        android:text="@string/create_a_new"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+    <include
+        android:id="@+id/header"
+        layout="@layout/layout_curtain_header"
         />
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/text_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/padding_half"
-        android:layout_margin="@dimen/padding_common"
+        android:layout_marginTop="@dimen/padding_common"
+        android:layout_marginHorizontal="@dimen/padding_common"
         android:hint="@string/a_name"
-        app:layout_constraintTop_toBottomOf="@+id/explorer_create_tv"
+        app:layout_constraintTop_toBottomOf="@+id/title"
         >
         <app.atomofiron.searchboxapp.custom.view.TextField
             android:id="@+id/text_field"
@@ -35,31 +26,30 @@
             android:imeOptions="actionDone"
             />
     </com.google.android.material.textfield.TextInputLayout>
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/explorer_create_file_btn"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginEnd="@dimen/padding_common"
-        android:layout_marginVertical="@dimen/padding_common"
-        android:text="@string/a_file"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        app:cornerRadius="@dimen/infinity"
-        app:layout_constraintTop_toBottomOf="@+id/text_layout"
-        app:layout_constraintEnd_toStartOf="@+id/explorer_create_dir_btn"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/explorer_create_dir_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:layout_marginEnd="@dimen/padding_common"
-        android:layout_marginVertical="@dimen/padding_common"
-        android:text="@string/a_directory"
-        app:cornerRadius="@dimen/infinity"
-        app:layout_constraintTop_toBottomOf="@+id/text_layout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:gravity="end"
+        android:layout_margin="@dimen/padding_common"
+        >
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/explorer_create_file_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginVertical="@dimen/padding_common"
+            android:text="@string/a_file"
+            app:cornerRadius="@dimen/infinity"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/explorer_create_dir_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginStart="@dimen/padding_common"
+            android:text="@string/a_directory"
+            app:cornerRadius="@dimen/infinity"
+            />
+    </LinearLayout>
+</LinearLayout>

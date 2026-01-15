@@ -3,17 +3,11 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/curtain_title_margin"
-        android:layout_marginBottom="@dimen/content_margin_half"
-        android:textSize="@dimen/curtain_title_size"
-        android:textColor="?attr/colorContent"
-        android:textStyle="bold"
+    android:orientation="vertical"
+    >
+    <include
+        android:id="@+id/header"
+        layout="@layout/layout_curtain_header"
         />
     <include
         android:id="@+id/item_view"

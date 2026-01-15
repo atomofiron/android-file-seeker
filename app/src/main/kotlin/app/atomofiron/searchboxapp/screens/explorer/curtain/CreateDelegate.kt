@@ -15,7 +15,6 @@ import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerCurtainMen
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.PathNameCharacterFilter
 import lib.atomofiron.insets.insetsPadding
-import kotlin.collections.plus
 
 class CreateDelegate(
     private val output: ExplorerCurtainMenuDelegate,
@@ -30,6 +29,7 @@ class CreateDelegate(
 
     private fun CurtainExplorerCreateBinding.init(dir: Node, dirFiles: List<String>) {
         root.insetsPadding(ExtType.curtain, vertical = true)
+        header.title.setText(R.string.create_a_new)
         textField.makeToned(textLayout)
         textField.text?.clear()
         textField.filters += PathNameCharacterFilter()

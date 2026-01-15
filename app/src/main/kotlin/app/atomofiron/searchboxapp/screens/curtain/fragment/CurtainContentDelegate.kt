@@ -1,7 +1,11 @@
 package app.atomofiron.searchboxapp.screens.curtain.fragment
 
+import android.view.View
+import androidx.core.view.isInvisible
 import app.atomofiron.fileseeker.databinding.FragmentCurtainBinding
 import app.atomofiron.common.util.dropLast
+import app.atomofiron.common.util.extension.debugRequire
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.screens.curtain.CurtainPresenter
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
@@ -27,13 +31,15 @@ class CurtainContentDelegate(
     }
 
     fun showNext(id: CurtainId) {
+        if (transitionAnimator.transitionIsRunning) {
+            return
+        }
         val holder = getHolder(id)
         holder ?: return
-        if (transitionAnimator.transitionIsRunning) return
-
         val view = holder.view
         val node = CurtainNode(id, view, holder.isCancelable)
         stack.add(node)
+        holder.initBack()
         node.removeParent()
         binding.curtainSheet.addView(view)
         transitionAnimator.startTransition(forward = true)
@@ -66,6 +72,15 @@ class CurtainContentDelegate(
             null -> presenter.onNullViewGot()
             else -> presenter.setCancelable(holder.isCancelable)
         }
+        holder?.initBack()
         return holder
+    }
+
+    private fun CurtainApi.ViewHolder.initBack() {
+        val back = view.findViewById<View?>(R.id.back)
+        back ?: return
+        back.isInvisible = stack.size == 1
+        back.setOnClickListener { showPrev() }
+        debugRequire(stack.isNotEmpty()) { "stack is empty" }
     }
 }
