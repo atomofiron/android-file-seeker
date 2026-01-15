@@ -25,6 +25,7 @@ import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentPreferenceBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.addLayoutListener
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.custom.preference.DropDownPreference
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
@@ -118,13 +119,11 @@ class PreferenceFragment : PreferenceFragmentCompat(),
             true
         }
         binding.onApplyInsets()
+        viewState.onViewCollect()
     }
 
     override fun FragmentPreferenceBinding.onApplyInsets() {
-        recyclerView.insetsPadding(ExtType { barsWithCutout + ime + joystickBottom + joystickFlank }, start = true, end = true, bottom = true)
-        binding.header.insetsPadding(ExtType { barsWithCutout + joystickFlank }, top = true)
-        binding.toolbar.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, end = true)
-        viewState.onViewCollect()
+        root.apply(recyclerView, header = header, insetsBackground = insetsBackground)
     }
 
     override fun PreferenceViewState.onViewCollect() {

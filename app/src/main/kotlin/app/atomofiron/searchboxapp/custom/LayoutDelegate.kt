@@ -16,6 +16,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.PathBorder
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.custom.drawable.surfaceContainerBorder
+import app.atomofiron.searchboxapp.custom.view.HeaderLayout
 import app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
 import app.atomofiron.searchboxapp.custom.view.JoystickView
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
@@ -31,7 +32,6 @@ import app.atomofiron.searchboxapp.utils.addOnAttachListener
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.getDisplayCompat
 import app.atomofiron.searchboxapp.utils.isRtl
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.button.MaterialButtonToggleGroup
 import lib.atomofiron.insets.InsetsCombining
 import lib.atomofiron.insets.InsetsSource
@@ -46,7 +46,7 @@ object LayoutDelegate {
         recyclerView: RecyclerView? = null,
         dockView: DockBarView? = null,
         tabs: MaterialButtonToggleGroup? = null,
-        appBar: AppBarLayout? = null,
+        header: HeaderLayout? = null,
         insetsBackground: InsetsBackgroundView? = null,
     ) {
         val insetsProvider = (view as View).findInsetsProvider()!!
@@ -57,7 +57,7 @@ object LayoutDelegate {
             DockNotch(size)
         }
         val recycler = ExtType { barsWithCutout + ime + dock + joystickBottom + joystickFlank }
-        val recyclerDelegate = recyclerView?.insetsPadding(recycler, start = true, top = appBar == null, end = true, bottom = true)
+        val recyclerDelegate = recyclerView?.insetsPadding(recycler, start = true, top = header == null, end = true, bottom = true)
         if (dockView != null) insetsBackground?.transparent(ExtType.dock)
         addLayoutListener { layout ->
             if (layout == layoutWas) {
@@ -74,7 +74,7 @@ object LayoutDelegate {
             }*/
             insetsProvider.requestInsets()
         }
-        appBar?.insetsPadding(ExtType { barsWithCutout + dock + joystickFlank }, start = true, top = true, end = true)
+        header?.insetsPadding(ExtType { barsWithCutout + dock + joystickFlank }, start = true, top = true, end = true)
         dockView?.dockView?.insetsSource { view ->
             val layout = layoutWas
             val insets = when {
