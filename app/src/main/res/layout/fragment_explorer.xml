@@ -16,7 +16,6 @@
         android:id="@+id/insets_background"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:navigationBar="none"
         />
     <include
         android:id="@+id/disclaimer"

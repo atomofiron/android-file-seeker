@@ -55,6 +55,11 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
         />
+    <app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
+        android:id="@+id/insets_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
     <app.atomofiron.searchboxapp.custom.view.SnackbarContainerLayout
         android:id="@+id/snackbar_container"
         android:layout_width="0dp"

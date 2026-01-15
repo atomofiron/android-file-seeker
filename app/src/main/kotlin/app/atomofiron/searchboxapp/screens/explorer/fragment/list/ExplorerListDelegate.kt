@@ -44,6 +44,7 @@ class ExplorerListDelegate(
         layoutManager.spanSizeLookup = spanSizeLookup
         recyclerView.layoutManager = layoutManager
         recyclerView.attachInsetsListener(rootPaddingDecorator)
+        recyclerView.attachInsetsListener(borderDecorator)
         recyclerView.addItemDecoration(rootPaddingDecorator)
         recyclerView.addItemDecoration(backgroundDecorator)
         recyclerView.addItemDecoration(borderDecorator)

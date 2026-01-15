@@ -14,11 +14,14 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerAdapter
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
+import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.colorAttr
+import lib.atomofiron.insets.ExtendedWindowInsets
+import lib.atomofiron.insets.InsetsListener
 import kotlin.math.max
 import kotlin.math.min
 
@@ -26,7 +29,7 @@ class ItemBorderDecorator(
     context: Context,
     private val adapter: ExplorerAdapter,
     private val deepestStickyProvider: () -> View?,
-) : ItemDecoration() {
+) : ItemDecoration(), InsetsListener {
 
     private var deepestStickyView: View? = null
     // примерный размер жестового навбара, чтобы игнорировать равный ему паддинг снизу
@@ -48,6 +51,7 @@ class ItemBorderDecorator(
     private val paint = Paint()
     private val rect = RectF()
     private val framePath = Path()
+    private var ignoreBottom = false
 
     init {
         paint.isAntiAlias = true
@@ -60,6 +64,14 @@ class ItemBorderDecorator(
     fun setDeepestDir(item: Node?) {
         deepestDir = item
         deepestStickyView = deepestStickyProvider()
+    }
+
+    override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
+        val navigation = windowInsets[ExtType.navigationBars].bottom
+        val tappable = windowInsets[ExtType.tappableElement].bottom
+        val gestures = windowInsets[ExtType.systemGestures].bottom
+        val dock = windowInsets[ExtType.dock].bottom
+        ignoreBottom = dock == 0 && navigation == gestures && navigation != tappable // only gesture navigation bar
     }
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
@@ -102,7 +114,7 @@ class ItemBorderDecorator(
         var frameRect: RectF? = null
         val headerBottom = stickyView.measuredHeight + parent.paddingTop
         val paddingBottom = parent.paddingBottom.let { if (it < gestureBar) 0 else it }
-        val parentBottom = (parent.height - paddingBottom).toFloat()
+        val parentBottom = parent.height - if (ignoreBottom) 0f else paddingBottom.toFloat()
 
         val firstIndex = firstItemViewHolder.bindingAdapterPosition
         val lastIndex = firstIndex + itemChildCount.dec()

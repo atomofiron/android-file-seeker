@@ -90,8 +90,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
 
     override fun FragmentResultBinding.onApplyInsets() {
         disclaimer.apply(viewState.mode, insetsBackground, root)
-        root.apply(recyclerView = recyclerView, dockView = dockBar, snackbarContainer = snackbarContainer)
-        snackbarContainer.insetsPadding(ExtType { barsWithCutout + dock }, start = true, end = true, bottom = true)
+        root.apply(recyclerView = recyclerView, dockView = dockBar, insetsBackground = insetsBackground)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {

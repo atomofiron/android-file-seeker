@@ -21,19 +21,20 @@ import lib.atomofiron.insets.TypeSet
 import lib.atomofiron.insets.attachInsetsListener
 import kotlin.math.max
 
+private fun Context.getSystemBarsColor(): Int {
+    val color = getColorByAttr(R.attr.colorBackground)
+    return ColorUtils.setAlphaComponent(color, Alpha.LEVEL_67)
+}
+
 class InsetsBackgroundView : View, InsetsListener {
-    companion object {
-        fun Context.getSystemBarsColor(): Int {
-            val color = getColorByAttr(R.attr.colorBackground)
-            return ColorUtils.setAlphaComponent(color, Alpha.LEVEL_67)
-        }
-        private const val BOTTOM =     0b001
-        private const val HORIZONTAL = 0b010
-        private const val ALL =        0b011
+    private companion object {
+        const val BOTTOM =     0b001
+        const val HORIZONTAL = 0b010
+        const val ALL =        0b011
     }
 
     @JvmInline
-    value class Sides(val value: Int) {
+    private value class Sides(val value: Int) {
         val horizontal: Boolean get() = (value and HORIZONTAL != 0)
         val bottom: Boolean get() = (value and BOTTOM != 0)
         val empty: Boolean get() = (value and ALL == 0)
@@ -41,6 +42,7 @@ class InsetsBackgroundView : View, InsetsListener {
 
     override var types = Type.statusBars + Type.navigationBars
         private set
+    private var transparent = TypeSet.Empty
 
     private var leftInset = 0
     private var topInset = 0
@@ -91,17 +93,22 @@ class InsetsBackgroundView : View, InsetsListener {
         this.types += types
     }
 
+    fun transparent(types: TypeSet) {
+        transparent = types
+    }
+
     override fun onApplyWindowInsets(windowInsets: ExtendedWindowInsets) {
         navigationBar = windowInsets[Type.navigationBars]
         cutout = windowInsets[Type.displayCutout]
         val statusBars = windowInsets[Type.statusBars]
         val common = windowInsets[types]
-        val navigationBars = windowInsets[Type.navigationBars]
-        val tappableElement = windowInsets[Type.tappableElement]
-        leftInset = max(common.left, navigationBars.left.only(tappableElement.left))
+        val navigation = windowInsets[Type.navigationBars]
+        val tappable = windowInsets[Type.tappableElement]
+        val transparent = windowInsets[transparent]
+        leftInset = resolve(common.left, navigation.left, tappable.left, transparent.left)
         topInset = common.top
-        rightInset = max(common.right, navigationBars.right.only(tappableElement.right))
-        bottomInset = max(common.bottom, navigationBars.bottom.only(tappableElement.bottom))
+        rightInset = resolve(common.right, navigation.right, tappable.right, transparent.right)
+        bottomInset = resolve(common.bottom, navigation.bottom, tappable.bottom, transparent.bottom)
         statusBarTop = statusBars.top
         invalidate()
     }
@@ -145,16 +152,12 @@ class InsetsBackgroundView : View, InsetsListener {
         return topInset.toFloat()
     }
 
-    fun update(
-        statusBar: Boolean = this.statusBar,
-        sides: Sides = this.sides,
-    ) {
-        this.statusBar = statusBar
-        this.sides = sides
-        invalidate()
+    private fun resolve(target: Int, navigation: Int, tappable: Int, transparent: Int): Int = when {
+        transparent > target -> 0 // something is greater than target
+        target != navigation -> target
+        target == tappable -> target
+        else -> 0 // gesture navigation bar
     }
-
-    private fun Int.only(value: Int): Int = if (this == value) this else 0
 }
 
 fun View.calcStatusBarPadding(insets: ExtendedWindowInsets): Insets {

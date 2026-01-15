@@ -19,7 +19,8 @@ class SnackbarContainerLayout : CoordinatorLayout {
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
 
     init {
-        insetsPadding(ExtType { barsWithCutout + joystickBottom + joystickFlank + dock })
+        val types = ExtType { barsWithCutout + joystickBottom + joystickFlank + dock + ime }
+        insetsPadding(types, start = true, end = true, bottom = true)
         if (isInEditMode) {
             layoutParams = FrameLayout.LayoutParams(0, 0)
         }

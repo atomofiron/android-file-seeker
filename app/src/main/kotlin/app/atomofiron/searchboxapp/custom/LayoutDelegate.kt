@@ -6,7 +6,6 @@ import android.view.Surface
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.graphics.Insets
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat.Type
@@ -17,6 +16,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.PathBorder
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.custom.drawable.surfaceContainerBorder
+import app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
 import app.atomofiron.searchboxapp.custom.view.JoystickView
 import app.atomofiron.searchboxapp.custom.view.dock.DockBarView
 import app.atomofiron.searchboxapp.custom.view.dock.DockMode
@@ -35,7 +35,6 @@ import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.button.MaterialButtonToggleGroup
 import lib.atomofiron.insets.InsetsCombining
 import lib.atomofiron.insets.InsetsSource
-import lib.atomofiron.insets.TypeSet
 import lib.atomofiron.insets.ViewInsetsDelegate
 import lib.atomofiron.insets.findInsetsProvider
 import lib.atomofiron.insets.insetsPadding
@@ -48,8 +47,7 @@ object LayoutDelegate {
         dockView: DockBarView? = null,
         tabs: MaterialButtonToggleGroup? = null,
         appBar: AppBarLayout? = null,
-        snackbarContainer: CoordinatorLayout? = null,
-        recyclerAddInsetType: TypeSet = TypeSet.Empty,
+        insetsBackground: InsetsBackgroundView? = null,
     ) {
         val insetsProvider = (view as View).findInsetsProvider()!!
         var layoutWas: Layout? = null
@@ -58,7 +56,9 @@ object LayoutDelegate {
             val size = getDimensionPixelSize(R.dimen.joystick_size) - 2 * getDimensionPixelSize(R.dimen.joystick_padding)
             DockNotch(size)
         }
-        val recyclerDelegate = recyclerView?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock + joystick + recyclerAddInsetType }, start = true, top = appBar == null, end = true, bottom = true)
+        val recycler = ExtType { barsWithCutout + ime + dock + joystickBottom + joystickFlank }
+        val recyclerDelegate = recyclerView?.insetsPadding(recycler, start = true, top = appBar == null, end = true, bottom = true)
+        if (dockView != null) insetsBackground?.transparent(ExtType.dock)
         addLayoutListener { layout ->
             if (layout == layoutWas) {
                 return@addLayoutListener
@@ -67,15 +67,14 @@ object LayoutDelegate {
             val tappableBottom = insetsProvider.current[ExtType.tappableElement].bottom > 0
             tabs?.isVisible = !layout.isWide
             dockView?.apply(layout, notch, dockDelegate!!, tappableBottom)
-            recyclerDelegate?.combining(if (layout.isBottom) null else InsetsCombining(ExtType.invoke { displayCutout + dock }) )
+            recyclerDelegate?.combining(if (layout.isBottom) null else InsetsCombining(ExtType { displayCutout + dock }) )
             /* нужно только когда есть табы
             explorerViews?.forEach {
                 it.systemUiView.update(statusBar = landscape)
             }*/
             insetsProvider.requestInsets()
         }
-        snackbarContainer?.insetsPadding(ExtType.invoke { barsWithCutout + ime + dock })
-        appBar?.insetsPadding(ExtType.invoke { barsWithCutout + dock + joystickFlank }, start = true, top = true, end = true)
+        appBar?.insetsPadding(ExtType { barsWithCutout + dock + joystickFlank }, start = true, top = true, end = true)
         dockView?.dockView?.insetsSource { view ->
             val layout = layoutWas
             val insets = when {
@@ -89,7 +88,12 @@ object LayoutDelegate {
         }
     }
 
-    private fun DockBarView.apply(layout: Layout, notch: DockNotch, delegate: ViewInsetsDelegate, tappableBottom: Boolean) {
+    private fun DockBarView.apply(
+        layout: Layout,
+        notch: DockNotch,
+        delegate: ViewInsetsDelegate,
+        tappableBottom: Boolean,
+    ) {
         delegate.changeInsets {
             when {
                 !tappableBottom && !layout.isBottom -> when {
@@ -144,7 +148,7 @@ object LayoutDelegate {
         var verticalWas: ScreenSize? = null
         val compactThreshold = resources.getDimensionPixelSize(R.dimen.screen_compact)
         val mediumThreshold = resources.getDimensionPixelSize(R.dimen.screen_medium)
-        addOnLayoutChangeListener { view, left, top, right, bottom, _, _, _, _ ->
+        addOnLayoutChangeListener { _, left, top, right, bottom, _, _, _, _ ->
             val width = right - left
             val height = bottom - top
             val horizontal = when {

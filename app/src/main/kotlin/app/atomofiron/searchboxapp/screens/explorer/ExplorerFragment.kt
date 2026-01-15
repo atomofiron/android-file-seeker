@@ -98,7 +98,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 
     override fun FragmentExplorerBinding.onApplyInsets() {
         disclaimer.apply(viewState.mode, insetsBackground, root)
-        root.apply(dockView = binding.dockBar)
+        root.apply(dockView = binding.dockBar, insetsBackground = insetsBackground)
     }
 
     override fun onBack(soft: Boolean): Boolean = presenter.onBack(soft, getCurrentTabView()::scrollToTop)

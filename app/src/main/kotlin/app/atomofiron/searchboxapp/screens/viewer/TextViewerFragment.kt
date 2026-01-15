@@ -74,7 +74,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
     }
 
     override fun FragmentTextViewerBinding.onApplyInsets() {
-        root.apply(recyclerView = recyclerView, dockView = dockBar, appBar = header)
+        root.apply(recyclerView = recyclerView, dockView = dockBar, appBar = header, insetsBackground = insetsBackground)
     }
 
     private fun FragmentTextViewerBinding.configureAppBar() {

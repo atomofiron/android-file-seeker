@@ -75,7 +75,7 @@ fun Context.colorSurfaceContainer(): Int {
 fun Context.surfaceContainerBorder(): Int? {
     return if (isDarkTheme()) {
         val surfaceVariant = colorAttr(MaterialAttr.colorSurfaceVariant)
-        ColorUtils.blendARGB(colorSurfaceContainer(), surfaceVariant, 0.2f)
+        ColorUtils.blendARGB(colorSurfaceContainer(), surfaceVariant, 0.3f)
     } else {
         null
     }
