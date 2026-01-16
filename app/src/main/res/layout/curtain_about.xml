@@ -103,7 +103,7 @@
             android:layout_marginVertical="@dimen/padding_common"
             android:fontFamily="monospace"
             android:paddingBottom="@dimen/padding_half"
-            android:text="@string/ui"
+            android:text="@string/ui_ux"
             app:layout_constraintStart_toStartOf="@+id/dev"
             app:layout_constraintTop_toBottomOf="@id/dev"
             app:layout_constraintEnd_toEndOf="@id/dev"
