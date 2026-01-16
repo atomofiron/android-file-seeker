@@ -5,6 +5,7 @@ import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.AppOpsManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -437,4 +438,15 @@ fun ValueAnimator.setFloatValues(start: Float, vararg stepsToPoint: Pair<Int, Fl
         }
         setFloatValues(*toFloatArray())
     }
+}
+
+fun Context.clipboardAlertsEnabled(): Boolean {
+    if (Android.Below.T) {
+        return false
+    }
+    val appOps = getSystemService(AppOpsManager::class.java)
+    val info = packageManager.getApplicationInfo("com.android.systemui", 0)
+    val mode = appOps.checkOpNoThrow("android:read_clipboard", info.uid, "com.android.systemui")
+    // 0/4 allow, 1 ignore, 3 default
+    return mode == 0 || mode == 4
 }

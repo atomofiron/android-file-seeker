@@ -69,7 +69,10 @@ class TextViewerPresenter @Inject constructor(
 
     fun onNextClick() = onMoveClick(forward = true)
 
-    fun onCopyPathClick() = interactor.copy(viewState.item.value)
+    fun onCopyPathClick() {
+        interactor.copy(viewState.item.value)
+            ?.let { viewState.showAlert(it) }
+    }
 
     private fun onMoveClick(forward: Boolean) {
         when (val result = viewState.switchCursor(forward)) {

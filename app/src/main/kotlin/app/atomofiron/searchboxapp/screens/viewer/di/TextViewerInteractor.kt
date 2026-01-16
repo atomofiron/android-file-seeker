@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.viewer.di
 
+import app.atomofiron.common.util.Alert
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.di.dependencies.service.TextViewerService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
@@ -66,5 +67,5 @@ class TextViewerInteractor @Inject constructor(
         }
     }
 
-    fun copy(item: Node) = utils.copyToClipboard(item)
+    fun copy(item: Node): Alert.Uni?  = utils.copyToClipboard(item)
 }

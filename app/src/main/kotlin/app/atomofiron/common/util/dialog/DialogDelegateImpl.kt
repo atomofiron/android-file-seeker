@@ -62,7 +62,7 @@ class DialogDelegateImpl(activity: ActivityProperty) : DialogDelegate {
         val activity = activity
         activity?.getSystemService(Context.CLIPBOARD_SERVICE)
             ?.let { it as ClipboardManager }
-            ?.copy(activity, label = activity.resources.getString(R.string.error), text = text, activity.resources, withAlert = true)
+            ?.copy(activity, label = activity.resources.getString(R.string.error), text = text, activity.resources, showToast = true)
     }
 
     private class UpdaterImpl(

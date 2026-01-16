@@ -13,6 +13,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.other.ApkSignature
 import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.clipboardAlertsEnabled
 import java.security.MessageDigest
 import java.security.cert.CertificateFactory
 import java.security.cert.X509Certificate
@@ -26,7 +27,7 @@ fun ClipboardManager.copy(
     label: String,
     text: String,
     resources: Resources = context.resources,
-    withAlert: Boolean = false,
+    showToast: Boolean = false,
 ): Alert.Uni? {
     val clip = ClipData.newPlainText(label, text)
     val alert = try {
@@ -36,8 +37,8 @@ fun ClipboardManager.copy(
         AlertErr(e.toString())
     }
     return when {
-        Android.T -> null
-        !withAlert -> alert
+        context.clipboardAlertsEnabled() -> null
+        !showToast -> alert
         else -> Toast.makeText(context, resources[alert.text], Toast.LENGTH_LONG).show()
             .let { null }
     }
@@ -67,3 +68,5 @@ fun PackageInfo.signature(): ApkSignature? {
         bytes = bytes.size,
     )
 }
+
+

@@ -126,7 +126,7 @@ class FileOperationDelegate @Inject constructor(
             InstallApp.id -> apks.install(first, key)
             LaunchApp.id -> apks.launch(first)
             UseAs.id -> utils.useAs(first)
-            CopyPath.id -> return utils.copyToClipboard(first, withAlert = false) to null
+            CopyPath.id -> return utils.copyToClipboard(first) to null
             Copy.id -> {
                 store.setForCopy(targets)
                 return Alert(R.string.copied) to buildOperations(targets, first, readOnly = key == null)
