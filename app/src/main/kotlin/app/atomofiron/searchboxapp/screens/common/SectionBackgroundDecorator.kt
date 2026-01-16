@@ -113,8 +113,8 @@ class SectionBackgroundDecorator(
             }
             current = group
             group ?: continue
-            val top = child.top - child.marginTop
-            val bottom = child.bottom + child.marginBottom
+            val top = child.y.toInt() - child.marginTop
+            val bottom = child.run { y.toInt() + height } + child.marginBottom
             range = when {
                 range == null -> top..bottom
                 else -> min(range.first, top)..max(range.last, bottom)

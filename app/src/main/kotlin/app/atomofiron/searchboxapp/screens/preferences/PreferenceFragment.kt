@@ -26,6 +26,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentPreferenceBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.addLayoutListener
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
+import app.atomofiron.searchboxapp.custom.overscroll.setupSpringOverscroll
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.custom.preference.DropDownPreference
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
@@ -88,6 +89,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         (recyclerView.parent as ViewGroup).removeView(recyclerView)
         recyclerView.removeItemDecorationAt(0)
+        recyclerView.setupSpringOverscroll()
         recyclerView.isVerticalScrollBarEnabled = false
         recyclerView.layoutParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
             behavior = AppBarLayout.ScrollingViewBehavior()

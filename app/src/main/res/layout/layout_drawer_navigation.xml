@@ -13,7 +13,6 @@
         android:id="@+id/drawer_rv"
         android:paddingTop="36dp"
         android:clipToPadding="false"
-        android:overScrollMode="never"
         android:scrollbars="none"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         />

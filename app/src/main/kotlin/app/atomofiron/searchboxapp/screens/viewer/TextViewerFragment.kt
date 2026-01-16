@@ -11,6 +11,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentTextViewerBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.setScreenSizeListener
+import app.atomofiron.searchboxapp.custom.overscroll.setupSpringOverscroll
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
@@ -43,6 +44,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
                 adapter = textAdapter
                 itemAnimator = null
                 addItemDecoration(ItemSeparatorDecorator())
+                setupSpringOverscroll()
             }
             dockBar.submit(DefaultDockState)
             dockBar.setListener(::onBottomMenuItemClick)

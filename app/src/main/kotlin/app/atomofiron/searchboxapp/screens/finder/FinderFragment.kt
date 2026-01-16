@@ -16,6 +16,7 @@ import app.atomofiron.common.util.showKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
+import app.atomofiron.searchboxapp.custom.overscroll.setupSpringOverscroll
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.other.LabeledAction
 import app.atomofiron.searchboxapp.screens.common.SectionBackgroundDecorator
@@ -59,12 +60,14 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
             itemAnimator = null
             adapter = finderAdapter
             spanSizeLookup.setRecyclerView(this)
+            setupSpringOverscroll()
         }
         binding.root.setWindow(requireActivity().window)
         binding.drawer.run {
             onGravityChangeListener = presenter::onDrawerGravityChange
             recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = historyAdapter
+            recyclerView.setupSpringOverscroll()
         }
 
         viewState.onViewCollect()

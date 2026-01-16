@@ -10,6 +10,7 @@ import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentLicensesBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
+import app.atomofiron.searchboxapp.custom.overscroll.setupSpringOverscroll
 import app.atomofiron.searchboxapp.screens.licenses.fragment.LicenseAdapter
 
 class LicensesFragment : Fragment(R.layout.fragment_licenses)
@@ -30,6 +31,7 @@ class LicensesFragment : Fragment(R.layout.fragment_licenses)
         binding = FragmentLicensesBinding.bind(view).apply {
             toolbar.setNavigationOnClickListener { presenter.onNavigationClick() }
             recyclerView.adapter = adapter
+            recyclerView.setupSpringOverscroll()
             applyInsets()
         }
         viewState.onViewCollect()
