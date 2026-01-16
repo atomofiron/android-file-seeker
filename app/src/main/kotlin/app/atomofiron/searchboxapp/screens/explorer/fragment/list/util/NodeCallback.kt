@@ -7,6 +7,7 @@ object NodeCallback : DiffUtil.ItemCallback<Node>() {
 
     override fun areItemsTheSame(oldItem: Node, newItem: Node): Boolean {
         return newItem.uniqueId == oldItem.uniqueId && newItem.isDeepest == oldItem.isDeepest && newItem.isOpened == oldItem.isOpened
+                && newItem.content.rootType?.temp == oldItem.content.rootType?.temp
     }
 
     override fun areContentsTheSame(oldItem: Node, newItem: Node): Boolean = newItem.areContentsTheSame(oldItem)

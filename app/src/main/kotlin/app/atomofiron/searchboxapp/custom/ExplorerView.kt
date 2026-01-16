@@ -89,9 +89,10 @@ class ExplorerView(
     fun submit(items: NodeTabItems) {
         title = items.deepest?.getTitle(resources)
         rootAdapter.submitList(items.roots)
-        val oldFirst = items.items.firstOrNull()
+        val oldFirst = explorerAdapter.items.firstOrNull()
         val newFirst = items.items.firstOrNull()
         val isNew = oldFirst == null || newFirst == null || oldFirst.ref != newFirst.ref
+                || oldFirst.content.rootType?.temp != newFirst.content.rootType?.temp
         explorerAdapter.submit(items.items, isNew)
     }
 

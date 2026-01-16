@@ -187,9 +187,17 @@ object ExplorerUtils {
         )
     }
 
+    fun Meta.toNodeMeta() = toNodeMeta(
+        length = when (access.firstOrNull()) {
+            FILE_CHAR -> length.toLong()
+            else -> NodeMeta.Empty.length
+        },
+        size = "",
+    )
+
     fun Meta.toNodeMeta(
-        length: Long? = null,
-        size: String? = null,
+        length: Long,
+        size: String,
     ) = NodeMeta(
         access = access,
         owner = owner,
@@ -197,11 +205,10 @@ object ExplorerUtils {
         date = date,
         time = time,
         length = when {
-            length != null -> length
-            access.firstOrNull() == FILE_CHAR -> this.length.toLong()
-            else -> 0
+            length == NodeMeta.Empty.length -> this.length.toLong()
+            else -> length
         },
-        size = this.size.takeIf { it.isNotEmpty() } ?: size ?: "",
+        size = this.size.takeIf { it.isNotEmpty() } ?: size,
     )
 
     private const val DIMENS = "BKMGTPEZYRQ"
@@ -269,7 +276,7 @@ object ExplorerUtils {
         val type = NativeBridge.type(ref, asSu)
         return when (type) {
             is Rslt.Ok -> parseNode(type.value.meta).resolveType(type.value.mime)
-                .run { if (ensureCached) ensureCached(asSu, oldProps = meta) else this }
+                .run { if (ensureCached) ensureCached(asSu, oldMeta = meta) else this }
             is Rslt.Err -> copy(error = type.message.toNodeError())
         }
     }
@@ -289,11 +296,11 @@ object ExplorerUtils {
         return meta.copy(length = length, size = size)
     }
 
-    private suspend fun Node.ensureCached(asSu: Boolean, oldProps: NodeMeta): Node = when {
+    private suspend fun Node.ensureCached(asSu: Boolean, oldMeta: NodeMeta): Node = when {
         isDirectory -> cacheDir(asSu)
-        length == 0L && oldProps.size != size -> resolveFileType()
+        length == 0L && oldMeta.size != size -> resolveFileType()
         length == 0L -> this
-        isCached && oldProps.size == size -> this
+        isCached && oldMeta.size == size -> this
         // if size changed -> cache again
         else -> try {
             cacheFile(asSu)
@@ -522,7 +529,7 @@ object ExplorerUtils {
         val files = MutableList<Node>(metas.size)
         for (i in metas.indices) {
             val m = metas[i]
-            var meta = m.toNodeMeta()
+            var meta = m.toNodeMeta(length = length, size = size)
             val parentRef = this@parseDir.ref
             val ref = NodeRef(m.path)
             val child = children?.findOnMut { it.ref == ref }
@@ -599,10 +606,7 @@ object ExplorerUtils {
             ref.theSame(rMeta.path) -> ref
             else -> NodeRef(rMeta.path)
         }
-        val meta = when (ref) {
-            this.ref -> rMeta.toNodeMeta(length, size)
-            else -> rMeta.toNodeMeta()
-        }
+        val meta = rMeta.toNodeMeta(length, size)
         val error = rMeta.error
             ?.toNodeError()
             ?: (result as? CountingResult.Ok)

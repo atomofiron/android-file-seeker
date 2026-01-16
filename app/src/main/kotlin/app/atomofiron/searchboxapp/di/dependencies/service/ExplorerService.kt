@@ -324,6 +324,7 @@ class ExplorerService @Inject constructor(
                     if (root.info is NodeRootInfo.Screenshots) {
                         store.updateScreenshots(root.item.ref)
                     }
+                    if (root.item.isDirectory) resolveSizeAsync(key, root.item)
                 }
             }
         }
@@ -429,7 +430,7 @@ class ExplorerService @Inject constructor(
     suspend fun tryCache(key: NodeTabKey, item: Node) {
         garden(key) {
             roots.takeIf { item.isRoot }
-                ?.find { it.item.uniqueId == item.uniqueId }
+                ?.find { it.item.uniqueId == item.uniqueId && it.info.temp == item.content.rootType?.temp  }
                 ?.let { return updateRootAsync(key, it) }
 
             val current = findItem(item.uniqueId)
@@ -978,7 +979,14 @@ class ExplorerService @Inject constructor(
                 current ?: return@launch
                 val updated = current.copy(meta = item.meta.copy(length = length, size = size))
                 val replaced = replaceItem(updated)
-                if (replaced && !updated.areContentsTheSame(item)) {
+                if (updated.isRoot) roots.replace { root ->
+                    when {
+                        root.item.uniqueId != updated.uniqueId -> root
+                        root.info.temp != updated.content.rootType?.temp -> root
+                        else -> root.copy(item = updated)
+                    }
+                }
+                if ((replaced || updated.isRoot) && !updated.areContentsTheSame(item)) {
                     renderUpdate(updated)
                 }
             }

@@ -5,7 +5,7 @@ sealed class NodeRootInfo(
     val temp: Int = 0,
 ) {
     data object SystemRoot : NodeRootInfo()
-    // todo replace with Camera with segmented buttons and remove NodeRootType.temp
+    // todo replace with Camera with segmented buttons and remove NodeRootInfo.temp
     data object Photos : NodeRootInfo()
     data object Videos : NodeRootInfo(temp = 1)
     data object Camera : NodeRootInfo()
