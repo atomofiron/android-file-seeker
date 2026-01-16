@@ -14,6 +14,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentResultBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.addExplorerFastScroll
+import app.atomofiron.searchboxapp.custom.overscroll.setupSpringOverscroll
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.screens.common.delegates.apply
@@ -56,6 +57,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             layoutManager = LinearLayoutManager(requireContext())
             adapter = resultAdapter
             addExplorerFastScroll()
+            setupSpringOverscroll()
             addItemDecoration(gravityDecorator)
             addItemDecoration(backgroundDecorator)
             backgroundDecorator.init(resources)

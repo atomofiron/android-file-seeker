@@ -44,7 +44,9 @@ class ItemBackgroundDecorator(
             if ((position % 2 == 0) == evenNumbered) {
                 val left = parent.paddingLeft.toFloat()
                 val right = parent.paddingRight.toFloat()
-                canvas.drawRoundRect(left, child.top.toFloat(), parent.width - right, child.bottom.toFloat(), cornerRadius, cornerRadius, paint)
+                val top = child.y
+                val bottom = child.y + child.height
+                canvas.drawRoundRect(left, top, parent.width - right, bottom, cornerRadius, cornerRadius, paint)
             }
         }
     }

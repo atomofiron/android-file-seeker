@@ -13,6 +13,7 @@ import android.widget.FrameLayout
 import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.databinding.ViewExplorerBinding
+import app.atomofiron.searchboxapp.custom.overscroll.setupSpringOverscroll
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
@@ -52,6 +53,7 @@ class ExplorerView(
 
     init {
         binding.recyclerView.addExplorerFastScroll()
+        binding.recyclerView.setupSpringOverscroll()
         binding.applyInsets()
         binding.init()
     }

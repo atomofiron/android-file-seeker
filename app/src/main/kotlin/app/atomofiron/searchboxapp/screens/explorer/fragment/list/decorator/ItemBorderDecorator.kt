@@ -119,31 +119,33 @@ class ItemBorderDecorator(
         val firstIndex = firstItemViewHolder.bindingAdapterPosition
         val lastIndex = firstIndex + itemChildCount.dec()
         var currentIndex = firstIndex
+        var prevChildBottom = 0f
         for (child in parent) {
             if (child.id != R.id.item_explorer) continue
             val prev = if (currentIndex == firstIndex) null else items[currentIndex.dec()]
             val item = items[currentIndex]
             val next = if (currentIndex == lastIndex) null else items[currentIndex.inc()]
+            val childBottom = child.trueBottom()
             when {
                 // под открытой пустой папкой всё просто
                 item.isOpenedAndEmpty(next) -> {
                     frameRect = rect
-                    rect.top = child.bottom.toFloat()
-                    rect.bottom = child.bottom + doubleSpace
+                    rect.top = childBottom
+                    rect.bottom = childBottom + doubleSpace
                 }
                 // под глубочайшей открытой директорией задаём с рассчётом на то,
                 // что дочерние айтемы может быть не видно
                 item.isOpened && item.ref == deepestDir?.ref -> {
                     frameRect = rect
-                    rect.top = child.bottom.toFloat()
-                    rect.bottom = child.bottom + frameBottomOffset
+                    rect.top = childBottom
+                    rect.bottom = childBottom + frameBottomOffset
                 }
                 item.parentRef == deepestDir?.ref -> {
                     frameRect = rect
                     // верхняя граница рамки или у низа хедера текущей директории,
                     // или у низа айтема текущей директории
                     if (item.parentRef != prev?.parentRef) {
-                        rect.top = child.top - space
+                        rect.top = prevChildBottom
                         rect.top = max(rect.top, headerBottom.toFloat())
                     }
                     // top: хедер уезжает вместе с низом последнего айтема текущей директории
@@ -152,17 +154,20 @@ class ItemBorderDecorator(
                     // но только если айтем текущей директории не оказывается слишком низко,
                     // чтобы игнорировать область видимости
                     if (item.parentRef != next?.parentRef) {
-                        rect.top = min(rect.top, child.bottom + space)
-                        rect.bottom = child.bottom + frameBottomOffset
+                        rect.top = min(rect.top, childBottom + space)
+                        rect.bottom = childBottom + frameBottomOffset
                         rect.bottom = min(rect.bottom, parentBottom)
                         rect.bottom = max(rect.bottom, rect.top)
                     }
                 }
             }
             currentIndex++
+            prevChildBottom = childBottom
         }
         frameRect?.drawFrame(canvas)
     }
+
+    private fun View.trueBottom() = y + height
 
     /** @return the first item view and node item count */
     private fun RecyclerView.getFirstItemView(): Pair<ViewHolder, Int>? {

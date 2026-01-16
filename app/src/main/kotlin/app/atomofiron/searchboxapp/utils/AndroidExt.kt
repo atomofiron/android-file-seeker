@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.utils
 import android.Manifest.permission.FOREGROUND_SERVICE
 import android.Manifest.permission.POST_NOTIFICATIONS
 import android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
@@ -421,4 +422,19 @@ fun WebView.secureLoad(url: String) {
         else -> url
     }
     loadUrl(url)
+}
+
+fun ValueAnimator.setFloatValues(start: Float, vararg stepsToPoint: Pair<Int, Float>) {
+    buildList(stepsToPoint.sumOf { it.first }.inc()) {
+        add(start)
+        var prev = start
+        for (period in stepsToPoint) {
+            val dif = period.second - prev
+            for (i in 1..period.first) {
+                add(prev + dif / period.first * i)
+            }
+            prev = period.second
+        }
+        setFloatValues(*toFloatArray())
+    }
 }
