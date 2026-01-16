@@ -2,12 +2,17 @@ package app.atomofiron.searchboxapp.custom.overscroll
 
 import android.animation.ValueAnimator
 import android.view.MotionEvent
+import android.view.MotionEvent.ACTION_CANCEL
+import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_MOVE
+import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.EdgeEffect
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.searchboxapp.utils.setFloatValues
+import com.google.android.material.math.MathUtils
 import kotlin.math.max
 import kotlin.math.min
 
@@ -24,7 +29,10 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
         Down(1),
     }
 
-    private var touchY = 0f
+    private var startY = 0f
+    private var pullY = 0f
+    private var ignorePulling = false
+    private var resetOnPull = false
 
     override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
         return when (direction) {
@@ -35,10 +43,19 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
     }
 
     val touchListener = object : RecyclerView.SimpleOnItemTouchListener() {
+
         override fun onInterceptTouchEvent(view: RecyclerView, event: MotionEvent): Boolean {
-            when (event.action) {
-                MotionEvent.ACTION_DOWN -> touchY = event.y
-                MotionEvent.ACTION_MOVE -> touchY = event.y
+            if (event.pointerCount > 1) {
+                ignorePulling = true
+                resetOnPull = true
+            } else when (event.action) {
+                ACTION_DOWN -> {
+                    resetOnPull = true
+                    startY = event.y
+                }
+                ACTION_MOVE -> pullY = event.y
+                ACTION_CANCEL,
+                ACTION_UP -> ignorePulling = event.pointerCount > 1
             }
             return false
         }
@@ -56,7 +73,7 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
         private val direction: Direction,
     ) : EdgeEffect(view.context), ValueAnimator.AnimatorUpdateListener {
 
-        private val halfDuration = 512L * 2
+        private val halfDuration = 512L
         private var maxVelocity = 21000
 
         private var distance = 0f
@@ -72,16 +89,26 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
         }
 
         override fun onPull(deltaDistance: Float) {
-            onPullDistance(deltaDistance, .5f)
+            onPullDistance(deltaDistance)
         }
 
         override fun onPull(deltaDistance: Float, displacement: Float) {
-            onPullDistance(deltaDistance, displacement)
+            onPullDistance(deltaDistance)
         }
 
         override fun onPullDistance(deltaDistance: Float, displacement: Float): Float {
+            return onPullDistance(deltaDistance)
+        }
+
+        private fun onPullDistance(deltaDistance: Float): Float {
+            if (resetOnPull || animator.isStarted) {
+                resetOnPull = false
+                reset()
+            }
+            if (ignorePulling) {
+                return 0f
+            }
             released = false
-            animator.cancel()
 
             var delta = deltaDistance
             val distance = distance + delta
@@ -116,9 +143,14 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
                     Interpolators.SpringOut
                 }
                 else -> {
-                    touchY = when (direction) {
-                        Direction.Down -> view.height.toFloat()
+                    val height = view.height.toFloat()
+                    startY = when (direction) {
+                        Direction.Down -> height
                         Direction.Up -> 0f
+                    }
+                    pullY = when (direction) {
+                        Direction.Down -> height * 2
+                        Direction.Up -> -height
                     }
                     val overDistance = velocity / maxVelocity.toFloat()
                     animator.setFloatValues(distance, 1 to overDistance, 9 to zeroDistance)
@@ -136,36 +168,45 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
 
         override fun onAnimationUpdate(animation: ValueAnimator) {
             val new = animation.animatedValue as Float
-            val delta = new - distance
-            applyEffect(delta)
+            applyEffect(delta = new - distance)
         }
 
         private fun applyEffect(delta: Float) {
             distance += delta
-            val offset = distance * view.height * direction.sign / 3
+            val offset = distance * view.height / 3
             view.applyEffect(offset, direction)
             view.parent?.requestDisallowInterceptTouchEvent(true)
         }
 
         private fun reset() {
+            distance = 0f
+            animator.cancel()
             for (child in view.children) {
                 child.translationY = 0f
             }
         }
 
         private fun RecyclerView.applyEffect(offset: Float, direction: Direction) {
+            val startY = when (direction) {
+                Direction.Up -> height - startY
+                Direction.Down -> startY
+            }
             val touchY = when (direction) {
-                Direction.Up -> height - touchY
-                Direction.Down -> touchY
+                Direction.Up -> height - pullY
+                Direction.Down -> pullY
             }
             for (child in children) {
                 val childEdge = when (direction) {
-                    Direction.Up -> height - child.y
-                    Direction.Down -> child.height + child.y
+                    Direction.Up -> height - child.top
+                    Direction.Down -> child.bottom
                 }
-                when {
-                    touchY > childEdge -> child.translationY = childEdge / touchY * offset
-                    else -> child.translationY = offset
+                val childFastEdge = childEdge + offset
+                val slowOffset = childEdge / touchY * offset
+                child.translationY = direction.sign * when {
+                    childEdge <= startY -> slowOffset // items are above/below the finger
+                    childFastEdge >= touchY -> offset // items are below/above the finger (in the current iteration)
+                    // at first they were below/above, later they became above/below
+                    else -> MathUtils.lerp(slowOffset, offset, (childEdge - startY) / (touchY - startY - offset))
                 }
             }
             invalidate()
