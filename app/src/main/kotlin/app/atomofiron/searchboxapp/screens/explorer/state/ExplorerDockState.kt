@@ -74,7 +74,7 @@ class ExplorerDockState @Inject constructor(
         val pasteCopy = (if (allCopiedAreDirs) R.drawable.ic_insert_copy_folder else R.drawable.ic_insert_copy_file)
             .let { DockItem.Icon(it) }
             .let { PasteCopy.copy(enabled = pasteable, icon = it) }
-        val pasteMove = (if (allCopiedAreDirs) R.drawable.ic_insert_copy_folder else R.drawable.ic_insert_copy_file)
+        val pasteMove = (if (allCopiedAreDirs) R.drawable.ic_insert_move_folder else R.drawable.ic_insert_move_file)
             .let { DockItem.Icon(it) }
             .let { PasteMove.copy(enabled = pasteable, icon = it) }
         val notice = DockItem.Notice.Normal.takeIf { copied.isNotEmpty() }
