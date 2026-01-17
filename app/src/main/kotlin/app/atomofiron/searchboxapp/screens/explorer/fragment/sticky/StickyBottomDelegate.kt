@@ -33,7 +33,7 @@ class StickyBottomDelegate(
 
     fun sync(separators: List<Pair<Int,Node>>) {
         for (sticky in stickies.entries.toList()) {
-            if (!separators.any { it.second.uniqueId == sticky.value.item.uniqueId }) {
+            if (separators.none { it.second.uniqueId == sticky.value.item.uniqueId }) {
                 removeSticky(sticky.key)
             }
         }

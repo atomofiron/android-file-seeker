@@ -46,7 +46,7 @@ class ResultPresenter @Inject constructor(
     private val resources by resources
 
     init {
-        if (!finderStore.tasks.any { it.uniqueId == taskId }) {
+        if (finderStore.tasks.none { it.uniqueId == taskId }) {
             logE("No task found!")
             router.navigateBack()
         }

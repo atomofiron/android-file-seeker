@@ -48,7 +48,7 @@ class StickyTopDelegate(
 
     fun sync(opened: List<Pair<Int,Node>>) {
         for (sticky in stickies.entries.toList()) {
-            if (!opened.any { it.second.uniqueId == sticky.value.item.uniqueId }) {
+            if (opened.none { it.second.uniqueId == sticky.value.item.uniqueId }) {
                 removeSticky(sticky.key)
             }
         }

@@ -63,7 +63,7 @@ class FlexSpanSizeLookup(
     }
 
     override fun onCreate(holder: Holder, viewType: Int) {
-        if (!holders.any { it === holder }) {
+        if (holders.none { it === holder }) {
             holders.add(holder)
         }
     }
