@@ -8,6 +8,7 @@ import app.atomofiron.common.recycler.CoroutineListDiffer
 import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.common.util.noClip
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
@@ -25,7 +26,7 @@ class ExplorerStickyDelegate(
     , View.OnLayoutChangeListener
 {
     private val holders = HashMap<Int, HolderInfo>()
-    private val top = StickyTopDelegate(holders.values, stickyBox, listener, adapter)
+    private val top = StickyTopDelegate(holders.values, stickyBox, listener)
     private val bottom = StickyBottomDelegate(holders.values, stickyBox, listener)
 
     init {
@@ -72,8 +73,8 @@ class ExplorerStickyDelegate(
                 bottom.valid(new) -> separators.add(i to new)
             }
         }
-        top.sync(opened)
-        bottom.sync(separators)
+        top.sync(opened, current)
+        bottom.sync(separators, current)
         recyclerView.doOnPreDraw {
             top.updateOffset()
             bottom.updateOffset()
@@ -83,7 +84,7 @@ class ExplorerStickyDelegate(
     override fun onChanged(index: Int, new: Node) {
         syncHolders(new, index)
         if (top.valid(new)) {
-            top.sync(new, index)
+            top.sync(new, index, adapter.items)
         }
     }
 
@@ -91,7 +92,7 @@ class ExplorerStickyDelegate(
 
     private fun syncHolders(new: Node, position: Int) {
         val holder = holders[new.uniqueId] ?: return
-        if (holder.position != position || !holder.item.areContentsTheSame(new)) {
+        if (holder.position != position || !holder.areContentsTheSame(new)) {
             holders[new.uniqueId] = HolderInfo(position, new, holder.holder)
         }
     }
@@ -104,5 +105,17 @@ class ExplorerStickyDelegate(
     private fun updateOffset() {
         top.updateOffset()
         bottom.updateOffset()
+    }
+}
+
+fun List<Node>.takeChildrenOf(parent: Node): List<NodeRef> {
+    return buildList(parent.children?.size ?: 1) {
+        for (item in this@takeChildrenOf) {
+            if (item.parentRef == parent.ref) {
+                add(item.ref)
+            } else if (isNotEmpty() && item.parentRef == parent.parentRef) {
+                break // we passed all children
+            }
+        }
     }
 }

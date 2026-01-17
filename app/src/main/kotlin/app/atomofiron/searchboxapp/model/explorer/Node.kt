@@ -60,7 +60,7 @@ data class Node(
         other.isDeepest != isDeepest -> false
         other.hasChildren != hasChildren -> false
         other.childCount != childCount -> false
-        isOpened && other.getOpenedIndex() != getOpenedIndex() -> false
+        isOpened && other.getOpenedId() != getOpenedId() -> false
         other.content != content -> false
         else -> true
     }
@@ -73,7 +73,7 @@ data class Node(
         else -> true
     }
 
-    fun getOpenedIndex(): Int = children?.indexOfFirst { it.isOpened } ?: -1
+    fun getOpenedId(): NodeId = children?.find { it.isOpened }?.uniqueId ?: 0
 
     fun closed() = when {
         children == null -> this

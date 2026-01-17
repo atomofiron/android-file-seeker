@@ -55,7 +55,7 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
                 }
                 ACTION_MOVE -> pullY = event.y
                 ACTION_CANCEL,
-                ACTION_UP -> ignorePulling = event.pointerCount > 1
+                ACTION_UP -> ignorePulling = false
             }
             return false
         }
@@ -179,10 +179,12 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
         }
 
         private fun reset() {
-            distance = 0f
             animator.cancel()
-            for (child in view.children) {
-                child.translationY = 0f
+            if (distance != zeroDistance) {
+                distance = zeroDistance
+                for (child in view.children) {
+                    child.translationY = 0f
+                }
             }
         }
 

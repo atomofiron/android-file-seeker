@@ -5,7 +5,6 @@ import android.widget.FrameLayout
 import android.widget.FrameLayout.LayoutParams.MATCH_PARENT
 import android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
 import androidx.core.view.isVisible
-import app.atomofiron.common.recycler.GeneralAdapter
 import app.atomofiron.common.util.extension.indexOfFirst
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.ExplorerStickyTopView
@@ -24,9 +23,7 @@ class StickyTopDelegate(
     private val holders: Collection<HolderInfo>,
     private val stickyBox: FrameLayout,
     private var listener: ExplorerItemBinderActionListener,
-    private val adapter: GeneralAdapter<Node, *>,
 ) {
-    private val items get() = adapter.items
     private val stickies = HashMap<Int, StickyTop>()
     private val threshold get() = stickyBox.paddingTop
     private var composition: ExplorerItemComposition? = null
@@ -44,30 +41,31 @@ class StickyTopDelegate(
 
     fun valid(item: Node) = item.isOpened && item.isEmpty == false && !item.isSeparator()
 
-    fun getDeepest() = stickies.values.find { it.item.isDeepest }?.view
+    fun getDeepest() = stickies.values.find { it.isDeepest }?.view
 
-    fun sync(opened: List<Pair<Int,Node>>) {
+    fun sync(opened: List<Pair<Int,Node>>, items: List<Node>) {
         for (sticky in stickies.entries.toList()) {
-            if (opened.none { it.second.uniqueId == sticky.value.item.uniqueId }) {
+            if (opened.none { it.second.uniqueId == sticky.value.uniqueId }) {
                 removeSticky(sticky.key)
             }
         }
         for ((position, item) in opened) {
-            sync(item, position)
+            sync(item, position, items)
         }
     }
 
-    fun sync(new: Node, position: Int) {
+    fun sync(new: Node, position: Int, items: List<Node>) {
         val sticky = stickies[new.uniqueId]
         var view = when {
             sticky == null -> null
             sticky.position != position -> sticky.view
-            sticky.item.isDeepest != new.isDeepest -> null.also { removeSticky(new.uniqueId) }
-            !sticky.item.areContentsTheSame(new) -> sticky.view.apply { bind(new) }
+            sticky.isDeepest != new.isDeepest -> null.also { removeSticky(new.uniqueId) }
+            !sticky.areContentsTheSame(new) -> sticky.view.apply { bind(new) }
             else -> return
         }
         view = view ?: newSticky(new)
-        stickies[new.uniqueId] = StickyInfo(position, new, view)
+        val sorted = items.takeChildrenOf(new)
+        stickies[new.uniqueId] = StickyInfo(position, new, view, sorted)
     }
 
     private fun removeSticky(uniqueId: Int) {
@@ -116,14 +114,14 @@ class StickyTopDelegate(
         find { it.position == sticky.position }
             ?.let { return it.view.top }
         // don't use item.children
-        val fromIndex = sticky.position.inc()
-        val limitIndex = items.indexOfFirst(fromIndex, orElse = items.size) {
-            it.isOpened || it.parentRef != sticky.item.ref
+        val openedId = sticky.getOpenedId()
+        val limitIndex = sticky.sortedChildren.indexOfFirst(orElse = sticky.sortedChildren.size) {
+            it.uniqueId == openedId || it.parent != sticky.ref
         }
         for (holder in this) {
-            items.takeIf { !holder.item.isSeparator() && holder.item.parentRef == sticky.item.ref }
-                ?.indexOfFirst(fromIndex) { it.uniqueId == holder.item.uniqueId }
-                ?.takeIf { it in fromIndex..<limitIndex }
+            sticky.sortedChildren.takeIf { !holder.isSeparator && holder.ref.parent == sticky.ref }
+                ?.indexOfFirst { it.uniqueId == holder.uniqueId }
+                ?.takeIf { it in 0..<limitIndex }
                 ?.let { return holder.view.top }
         }
         return null
@@ -137,9 +135,9 @@ class StickyTopDelegate(
                 // skip above the target
                 info.position <= sticky.position -> continue
                 // next opened dir below
-                !sticky.item.isDeepest && info.item.isOpened -> info.view.top - space
+                !sticky.isDeepest && info.isOpened -> info.view.top - space
                 // skip children
-                info.item.parentRef == sticky.item.ref -> continue
+                info.ref.parent == sticky.ref -> continue
                 // nothing above
                 i == 0 -> return null
                 // the last child
