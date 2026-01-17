@@ -108,12 +108,14 @@ class ExplorerStickyDelegate(
     }
 }
 
-fun List<Node>.takeChildrenOf(parent: Node): List<NodeRef> {
+fun List<Node>.takeChildrenOf(parent: Node, index: Int = 0): List<NodeRef> {
+    val src = this
     return buildList(parent.children?.size ?: 1) {
-        for (item in this@takeChildrenOf) {
+        for (i in index.inc()..<src.size) {
+            val item = src[i]
             if (item.parentRef == parent.ref) {
                 add(item.ref)
-            } else if (isNotEmpty() && item.parentRef == parent.parentRef) {
+            } else if (isNotEmpty() && item.parentRef.length <= parent.ref.length) {
                 break // we passed all children
             }
         }

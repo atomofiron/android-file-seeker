@@ -64,7 +64,7 @@ class StickyTopDelegate(
             else -> return
         }
         view = view ?: newSticky(new)
-        val sorted = items.takeChildrenOf(new)
+        val sorted = items.takeChildrenOf(new, position)
         stickies[new.uniqueId] = StickyInfo(position, new, view, sorted)
     }
 
