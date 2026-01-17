@@ -24,7 +24,7 @@ import app.atomofiron.searchboxapp.utils.withAlpha
 
 class NoticeableDrawable(
     private val drawable: Drawable,
-    dotColor: Int,
+    private val dotColor: Int,
     private val placement: Placement = Placement.TopEnd,
 ) : Drawable(), Drawable.Callback {
     enum class Placement(
@@ -116,7 +116,7 @@ class NoticeableDrawable(
             return
         }
         if (drawDot || forceDrawDot) {
-            paint.alpha = drawable.alpha
+            paint.alpha = drawable.alpha * dotColor.alpha / Alpha.VISIBLE_INT
             canvas.drawCircle(holeX, holeY, dotRadius, paint)
             canvas.clipPath(clipOutPath)
         }
