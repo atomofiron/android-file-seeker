@@ -12,7 +12,6 @@ import android.widget.EdgeEffect
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.searchboxapp.utils.setFloatValues
-import com.google.android.material.math.MathUtils
 import kotlin.math.max
 import kotlin.math.min
 
@@ -189,29 +188,43 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
         }
 
         private fun RecyclerView.applyEffect(offset: Float, direction: Direction) {
+            val childStart = when (direction) {
+                Direction.Down -> paddingTop
+                Direction.Up -> paddingBottom
+            }
             val startY = when (direction) {
-                Direction.Up -> height - startY
                 Direction.Down -> startY
+                Direction.Up -> height - startY
             }
             val touchY = when (direction) {
-                Direction.Up -> height - pullY
                 Direction.Down -> pullY
+                Direction.Up -> height - pullY
             }
+            val swipe = touchY - startY
             for (child in children) {
                 val childEdge = when (direction) {
-                    Direction.Up -> height - child.top
                     Direction.Down -> child.bottom
+                    Direction.Up -> height - child.top
                 }
-                val childFastEdge = childEdge + offset
-                val slowOffset = childEdge / touchY * offset
+                val slowOffset = (childEdge - childStart) / (touchY - childStart) * offset
                 child.translationY = direction.sign * when {
                     childEdge <= startY -> slowOffset // items are above/below the finger
-                    childFastEdge >= touchY -> offset // items are below/above the finger (in the current iteration)
-                    // at first they were below/above, later they became above/below
-                    else -> MathUtils.lerp(slowOffset, offset, (childEdge - startY) / (touchY - startY - offset))
+                    childEdge + offset >= touchY -> offset // items are below/above the finger (in the current iteration)
+                    else -> { // at first they were below/above, later they became above/below
+                        val threshold = startY + swipe * (childEdge - startY) / (swipe - offset)
+                        val fastPart = offset * (threshold - startY) / swipe
+                        val slowPart = slowOffset * (touchY - threshold) / swipe
+                        fastPart + slowPart
+                    }
                 }
             }
             invalidate()
         }
     }
 }
+
+/*
+finger's path:    |--------X------->
+item edge's path:       |--X->
+X (threshold) - the moment after which the item should move slower
+*/
