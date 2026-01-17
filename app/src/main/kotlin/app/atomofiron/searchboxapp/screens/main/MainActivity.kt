@@ -14,7 +14,6 @@ import androidx.activity.enableEdgeToEdge
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.Insets
-import androidx.core.view.WindowCompat.enableEdgeToEdge
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -66,7 +65,6 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        enableEdgeToEdge(window)
         val color = colorAttr(R.attr.colorBackground) withAlpha 1
         enableEdgeToEdge(navigationBarStyle = SystemBarStyle.auto(color, color))
         if (Android.Q) window.isNavigationBarContrastEnforced = false
