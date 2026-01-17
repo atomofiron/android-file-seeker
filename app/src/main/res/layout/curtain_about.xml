@@ -113,7 +113,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="monospace"
-            android:text="@string/dmitrii_pavlov"
+            android:text="@string/dmitriy_pavlov"
             app:layout_constraintStart_toStartOf="@id/yaroslav"
             app:layout_constraintTop_toTopOf="@id/ui"
             />

@@ -215,7 +215,7 @@
     <string name="twice">Duplo</string>
     <string name="heavy">Težak</string>
     <string name="yaroslav_nesterov">Jaroslav Nesterov</string>
-    <string name="dmitrii_pavlov">Dmitrij Pavlov</string>
+    <string name="dmitriy_pavlov">Dmitrij Pavlov</string>
     <string name="file_access_expired">Pristup fajlu je istekao</string>
     <string name="file_not_found">Fajl nije pronađen</string>
 </resources>

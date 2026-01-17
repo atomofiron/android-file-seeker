@@ -215,7 +215,7 @@
     <string name="twice">Двойной</string>
     <string name="heavy">Тяжёлый</string>
     <string name="yaroslav_nesterov">Ярослав Нестеров</string>
-    <string name="dmitrii_pavlov">Дмитрий Павлов</string>
+    <string name="dmitriy_pavlov">Дмитрий Павлов</string>
     <string name="file_access_expired">Доступ к файлу истёк</string>
     <string name="file_not_found">Файл не найден</string>
 </resources>

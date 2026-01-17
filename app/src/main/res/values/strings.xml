@@ -226,7 +226,7 @@
     <string name="dev_ui_ux" translatable="false">Dev/UI/UX</string>
     <string name="ui_ux" translatable="false">UI/UX</string>
     <string name="yaroslav_nesterov">Yaroslav Nesterov</string>
-    <string name="dmitrii_pavlov">Dmitrii Pavlov</string>
+    <string name="dmitriy_pavlov">Dmitriy Pavlov</string>
     <string name="file_access_expired">File access expired</string>
     <string name="file_not_found">File not found</string>
 </resources>
