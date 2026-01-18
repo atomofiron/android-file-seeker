@@ -19,6 +19,7 @@
     <string name="warning">Niste izabrali nijednu fasciklu. Pretraga će biti izvršena u korenom odeljku</string>
     <string name="ok">U redu</string>
     <string name="cancel">Otkaži</string>
+    <string name="do_cancel">Otkazati</string>
     <string name="close">Zatvori</string>
     <string name="stop">Zaustavi</string>
     <string name="completed">Završeno</string>

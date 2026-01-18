@@ -60,6 +60,8 @@ class ExplorerDockDelegate @Inject constructor(
         store.resetCopyBuffer()
     }
 
+    override fun onCancelPastingClick() = store.resetCopyBuffer()
+
     override fun onSettingsClick() = router.showSettings()
 
     override fun onConfirmClick() {

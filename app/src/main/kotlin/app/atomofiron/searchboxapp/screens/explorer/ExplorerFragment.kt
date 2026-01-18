@@ -68,6 +68,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
             ExplorerDock.Copy.id -> presenter.onCopyClick()
             ExplorerDock.PasteMove.id -> presenter.onPasteClick(move = true)
             ExplorerDock.PasteCopy.id -> presenter.onPasteClick(move = false)
+            ExplorerDock.Cancel.id -> presenter.onCancelPastingClick()
             ExplorerDock.Settings.id -> presenter.onSettingsClick()
             ExplorerDock.Confirm.id -> presenter.onConfirmClick()
             in ExplorerDock.Sorting.children.ids() -> presenter.onSortPick(item)

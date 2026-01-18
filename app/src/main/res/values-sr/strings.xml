@@ -19,6 +19,7 @@
     <string name="warning">Нисте изабрали ниједну фасциклу. Претрага ће бити извршена у кореном одељку</string>
     <string name="ok">У реду</string>
     <string name="cancel">Откажи</string>
+    <string name="do_cancel">Отказати</string>
     <string name="close">Затвори</string>
     <string name="stop">Заустави</string>
     <string name="completed">Завршено</string>

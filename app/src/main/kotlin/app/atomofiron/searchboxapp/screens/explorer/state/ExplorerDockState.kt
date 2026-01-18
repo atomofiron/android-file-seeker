@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.common.delegates.copiable
 import app.atomofiron.searchboxapp.screens.common.delegates.pasteable
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
+import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock.Cancel
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock.PasteCopy
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock.PasteMove
 import kotlinx.coroutines.flow.Flow
@@ -77,8 +78,9 @@ class ExplorerDockState @Inject constructor(
         val pasteMove = (if (allCopiedAreDirs) R.drawable.ic_insert_move_folder else R.drawable.ic_insert_move_file)
             .let { DockItem.Icon(it) }
             .let { PasteMove.copy(enabled = pasteable, icon = it) }
+        val cancel = Cancel.copy(enabled = copied.isNotEmpty())
         val notice = DockItem.Notice.Normal.takeIf { copied.isNotEmpty() }
-        val children = DockItemChildren(pasteCopy, pasteMove, secondary = copyable)
+        val children = DockItemChildren(pasteCopy, pasteMove, cancel, secondary = copyable)
         return when {
             !copyable && pasteable -> ExplorerDock.Paste.copy(icon = icon, notice = notice, children = children)
             else -> ExplorerDock.Copy.copy(icon = icon, enabled = copyable, notice = notice, children = children)

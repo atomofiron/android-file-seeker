@@ -23,6 +23,7 @@
     <string name="warning">You have not selected any folder. The search will be made around the root section</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="do_cancel">Cancel</string>
     <string name="close">Close</string>
     <string name="stop">Stop</string>
     <string name="completed">Completed</string>

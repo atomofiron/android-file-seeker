@@ -7,6 +7,7 @@ interface ExplorerDockListener {
     fun onSortPick(item: DockItem)
     fun onCopyClick()
     fun onPasteClick(move: Boolean)
+    fun onCancelPastingClick()
     fun onSettingsClick()
     fun onConfirmClick()
 }

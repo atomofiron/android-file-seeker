@@ -27,6 +27,11 @@ object ExplorerDock : DockItem.Id.Factory {
         DockItem.Icon(R.drawable.ic_stub),
         DockItem.Label(R.string.by_moving),
     )
+    val Cancel = DockItem(
+        nextId(),
+        DockItem.Icon(R.drawable.ic_circle_cross),
+        DockItem.Label(R.string.do_cancel),
+    )
     val Copy = DockItem(
         nextId(),
         DockItem.Icon(R.drawable.ic_stub),
