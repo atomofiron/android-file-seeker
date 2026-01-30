@@ -14,6 +14,8 @@ pub fn config() -> Configuration { bincode::config::standard() }
 
 pub fn empty_string() -> String { String::new() }
 
+pub fn string(value: &str) -> String { String::from(value) }
+
 pub const DATE: &str = "%Y-%m-%d";
 pub const TIME: &str = "%H:%M:%S";
 pub const DATE_STUB: &str = "????-??-??";

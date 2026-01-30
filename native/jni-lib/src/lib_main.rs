@@ -20,6 +20,7 @@ pub extern "C" fn lib_main() {
     let cancellation = Arc::new(CancellationHandle::new());
     let canceller = cancellation.clone();
     ctrlc::set_handler(move || canceller.cancel())
+        // todo send an error
         .expect("error setting SIGINT handler");
     loop {
         let result = get_request()
@@ -81,6 +82,7 @@ fn run(request: Request, cancellation: Arc<dyn CancellationState>) -> EncodedRes
 
 pub fn write_response<E>(response: &E) where E: enc::Encode {
     let bytes = encode_to_vec(&response, config())
+        // todo send an error
         .expect("encode response failed");
     let mut stdout = stdout();
     let len_buf = len_to_frame(bytes.len());
