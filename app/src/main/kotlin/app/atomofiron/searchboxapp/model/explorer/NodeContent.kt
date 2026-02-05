@@ -190,7 +190,6 @@ sealed class NodeContent(
     data object Cert : File()
     data object Dmg : File()
     data object Firefox : File()
-    data object Other : File()
     data object Unknown : File()
 
     fun matchesAny(mimeType: List<String>): Boolean {

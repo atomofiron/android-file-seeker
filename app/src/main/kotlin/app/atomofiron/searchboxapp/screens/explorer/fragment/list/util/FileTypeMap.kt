@@ -55,7 +55,6 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.Firefox -> R.drawable.ic_firefox
     is NodeContent.Font -> R.drawable.ic_fnt
     is NodeContent.Empty -> R.drawable.ic_empty
-    is NodeContent.Other,
     is NodeContent.Flash,
     is NodeContent.Unknown -> R.drawable.ic_unknown
 }

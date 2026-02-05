@@ -718,7 +718,7 @@ object ExplorerUtils {
         ref.name.hasExt(EXT_OSB) -> ifMismatches { NodeContent.Osu.Storyboard() }
         ref.name.hasExt(EXT_XPI) -> ifMismatches { NodeContent.Firefox }
         ref.name.hasExt(EXT_ASS) -> ifMismatches { NodeContent.Text.Subtitles }
-        else -> NodeContent.Other
+        else -> NodeContent.Unknown
     }
 
     fun Node.updateWith(item: Node): Node {
