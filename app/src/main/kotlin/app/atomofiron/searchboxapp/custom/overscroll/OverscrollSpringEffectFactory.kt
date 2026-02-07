@@ -4,13 +4,17 @@ import android.animation.ValueAnimator
 import android.view.MotionEvent
 import android.view.MotionEvent.ACTION_CANCEL
 import android.view.MotionEvent.ACTION_DOWN
+import android.view.MotionEvent.ACTION_MASK
 import android.view.MotionEvent.ACTION_MOVE
+import android.view.MotionEvent.ACTION_POINTER_DOWN
+import android.view.MotionEvent.ACTION_POINTER_UP
 import android.view.MotionEvent.ACTION_UP
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.widget.EdgeEffect
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.searchboxapp.utils.setFloatValues
 import kotlin.math.max
 import kotlin.math.min
@@ -30,7 +34,6 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
 
     private var startY = 0f
     private var pullY = 0f
-    private var ignorePulling = false
     private var resetOnPull = false
 
     override fun createEdgeEffect(view: RecyclerView, direction: Int): EdgeEffect {
@@ -43,18 +46,38 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
 
     val touchListener = object : RecyclerView.SimpleOnItemTouchListener() {
 
+        private var ids = mutableListOf<Int>()
+
         override fun onInterceptTouchEvent(view: RecyclerView, event: MotionEvent): Boolean {
-            if (event.pointerCount > 1) {
-                ignorePulling = true
-                resetOnPull = true
-            } else when (event.action) {
-                ACTION_DOWN -> {
+            when (val action = event.action and ACTION_MASK) {
+                ACTION_DOWN, ACTION_POINTER_DOWN -> {
+                    val id = event.getPointerId(event.actionIndex)
+                    ids.add(id)
+                    startY = event.getY(event.actionIndex)
                     resetOnPull = true
-                    startY = event.y
                 }
-                ACTION_MOVE -> pullY = event.y
-                ACTION_CANCEL,
-                ACTION_UP -> ignorePulling = false
+                ACTION_MOVE -> if (ids.isNotEmpty()) {
+                    val index = event.findPointerIndex(ids.last())
+                    pullY = event.getY(index)
+                } else {
+                    debugFail { "ids is empty on ACTION_MOVE" }
+                }
+                ACTION_UP,
+                ACTION_POINTER_UP,
+                ACTION_CANCEL -> {
+                    val id = event.getPointerId(event.actionIndex)
+                    val i = ids.indexOfFirst { it == id }
+                    if (i >= 0) {
+                        ids.removeAt(i)
+                        if (i == ids.size && ids.isNotEmpty()) {
+                            val index = event.findPointerIndex(ids.last())
+                            startY = event.getY(index)
+                            resetOnPull = true
+                        }
+                    } else {
+                        debugFail { "id not found for index=${event.actionIndex} id=$id on action=$action" }
+                    }
+                }
             }
             return false
         }
@@ -103,9 +126,6 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
             if (resetOnPull || animator.isStarted) {
                 resetOnPull = false
                 reset()
-            }
-            if (ignorePulling) {
-                return 0f
             }
             released = false
 
