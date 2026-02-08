@@ -57,7 +57,6 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
     private lateinit var viewState: MainViewState
     private lateinit var presenter: MainPresenter
     override lateinit var appStore: AppStore
-    private var isFirstStart = true
 
     override var activityMode: ActivityMode = ActivityMode.Default
         protected set
@@ -116,14 +115,6 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
         presenter.updateLightStatusBar(isDarkTheme())
         onCollect()
         applyInsets()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        when {
-            isFirstStart -> isFirstStart = false
-            //else -> presenter.onState()
-        }
     }
 
     override fun onDestroy() {
