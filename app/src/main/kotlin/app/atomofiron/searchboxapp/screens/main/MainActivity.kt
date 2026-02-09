@@ -227,9 +227,9 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
 
     @RequiresApi(Build.VERSION_CODES.R)
     private fun unlockHighFrameRate() {
-        window.attributes.preferredDisplayModeId = display.supportedModes
+        window.attributes.preferredRefreshRate = display.supportedModes
             .maxByOrNull { it.refreshRate }
-            ?.modeId
+            ?.refreshRate
             ?: return
         window.attributes = window.attributes
     }
