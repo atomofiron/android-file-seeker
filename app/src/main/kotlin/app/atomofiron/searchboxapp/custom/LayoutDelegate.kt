@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.custom
 
+import android.content.res.Resources
 import android.view.Display
 import android.view.Gravity
 import android.view.Surface
@@ -133,7 +134,7 @@ object LayoutDelegate {
         val display = view.context.getDisplayCompat()
         var was: Layout? = null
         val action = {
-            val layout = view.getLayout(display)
+            val layout = view.resources.getLayout(view.withJoystick(), display)
             if (layout != was) {
                 was = layout
                 callback(layout)
@@ -171,23 +172,31 @@ object LayoutDelegate {
         }
     }
 
-    fun ViewGroup.getLayout(): Layout = getLayout(context.getDisplayCompat())
+    fun ViewGroup.getLayout(): Layout = resources.getLayout(withJoystick(), context.getDisplayCompat())
 
-    fun ViewGroup.getLayout(display: Display?): Layout {
-        val metrics = resources.displayMetrics // size should be the same for each place in the view tree
+    fun Resources.getLayout(withJoystick: Boolean, display: Display?): Layout {
+        val metrics = displayMetrics // size should be the same for each place in the view tree
         val width = metrics.widthPixels
         val height = metrics.heightPixels
-        val maxSpace = resources.getDimensionPixelSize(R.dimen.bottom_bar_max_width)
-        val minSpace = resources.getDimensionPixelSize(R.dimen.min_space_with_joystick)
-        val ground = when {
+        val maxSpace = getDimensionPixelSize(R.dimen.bottom_bar_max_width)
+        val minSpace = getDimensionPixelSize(R.dimen.min_space_with_joystick)
+        val ground = getGround(display)
+        val largeScreen = width >= maxSpace && height >= maxSpace
+        val smallScreen = width < minSpace && height < minSpace
+        val withJoystick = !smallScreen && (largeScreen || withJoystick)
+        return Layout(ground, withJoystick, isRtl())
+    }
+
+    fun Resources.getGround(display: Display?): Layout.Ground {
+        val metrics = displayMetrics // size should be the same for each place in the view tree
+        val width = metrics.widthPixels
+        val height = metrics.heightPixels
+        val maxSpace = getDimensionPixelSize(R.dimen.bottom_bar_max_width)
+        return when {
             width < height && width < maxSpace -> Layout.Ground.Bottom
             display?.rotation == Surface.ROTATION_270 -> Layout.Ground.Left
             else -> Layout.Ground.Right
         }
-        val largeScreen = width >= maxSpace && height >= maxSpace
-        val smallScreen = width < minSpace && height < minSpace
-        val withJoystick = !smallScreen && (largeScreen || withJoystick())
-        return Layout(ground, withJoystick, isRtl())
     }
 
     fun JoystickView.syncWithLayout(root: RootFrameLayout) {

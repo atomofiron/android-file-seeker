@@ -7,6 +7,7 @@ import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.explorer.di.ExplorerInteractor
@@ -23,7 +24,7 @@ import javax.inject.Inject
 class ExplorerViewState @Inject constructor(
     private val scope: CoroutineScope,
     val mode: ActivityMode,
-    dockState: ExplorerDockState,
+    private val dockState: ExplorerDockState,
     private val store: ExplorerStore,
     interactor: ExplorerInteractor,
     preferences: PreferenceStore,
@@ -48,6 +49,8 @@ class ExplorerViewState @Inject constructor(
     val updates: Flow<Node> = store.updated
     val permissionRequiredWarning = EventFlow<Unit>()
     val dock: Flow<List<DockItem>> = dockState.state
+
+    fun setGround(ground: Layout.Ground) = dockState.setGround(ground)
 
     fun showPermissionRequiredWarning() = permissionRequiredWarning(scope)
 

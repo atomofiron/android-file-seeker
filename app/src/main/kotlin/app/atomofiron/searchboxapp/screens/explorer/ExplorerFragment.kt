@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.explorer
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.KeyEvent
 import android.view.View
@@ -16,6 +17,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentExplorerBinding
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.getGround
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.other.LabeledAction
@@ -39,6 +41,12 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initViewModel(this, ExplorerViewModel::class, savedInstanceState)
+        updateGround()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        updateGround()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -116,6 +124,8 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
             presenter.onVolumeUp(it)
         } != null
     }
+
+    private fun updateGround() = viewState.setGround(resources.getGround(null))
 
     private fun getCurrentTabView(): ExplorerView = explorerViews[binding.pager.currentItem]
 
