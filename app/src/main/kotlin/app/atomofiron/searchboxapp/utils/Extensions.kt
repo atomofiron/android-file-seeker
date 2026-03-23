@@ -41,8 +41,6 @@ fun Long.convert(suffixes: Array<String>, lossless: Boolean = true, separator: S
     return "$value$separator${suffixes.last()}"
 }
 
-fun String.convert(): Int = convertOrNull() as Int
-
 fun String.convertOrNull(): Int? {
     val digits = Regex("\\d+")
     val metrics = Regex("([gGгГ]|[mMмМ]|[kKкК])?[bBбБ]?$")

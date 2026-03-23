@@ -67,7 +67,7 @@ class ByteSizeDelegate(
             setSelection(min(selection, withoutStartingZero.length))
         }
         if (!isFocused) try {
-            valid = string.convert()
+            valid = string.convertOrNull() ?: valid
             val converted = valid.convert(suffixes)
             if (converted != string) {
                 setText(converted)
