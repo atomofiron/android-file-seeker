@@ -158,6 +158,7 @@ class ExplorerService @Inject constructor(
         if (!garden.has(key)) {
             scope.launchOnIO {
                 garden(key) {
+                    store.setSorting(key, getSortingForSelected())
                     render()
                 }
             }

@@ -7,11 +7,11 @@ import app.atomofiron.searchboxapp.utils.EmptyMutableList
 private const val UNSELECTED_ROOT_ID = 0
 private val EmptyMutableList = EmptyMutableList<NodeRef>()
 
-data class NodeTab(
+data class NodeTab private constructor(
     val key: NodeTabKey,
     val roots: MutableList<NodeRoot>,
     val states: MutableMap<NodeId, NodeStateImpl>,
-    val mimeTypes: List<String> = emptyList(),
+    val mimeTypes: List<String>,
 ) {
     private val _trees = mutableMapOf<NodeId, MutableList<NodeRef>>() // one NodeRef isn't flexible too much
     val trees: Map<NodeId, MutableList<NodeRef>> = _trees
@@ -20,16 +20,24 @@ data class NodeTab(
     var generation = 0
         private set
     val tree: MutableList<NodeRef> get() = _trees[selectedRootId] ?: EmptyMutableList
-    private val _sorting = mutableMapOf<NodeId, NodeSorting>()
+    private val sorting = mutableMapOf<NodeId, NodeSorting>()
     val checked = mutableListOf<NodeId>()
     val flow = DataFlow(NodeTabItems(emptyList(), emptyList(), null))
+
+    constructor(
+        key: NodeTabKey,
+        roots: MutableList<NodeRoot>,
+        states: MutableMap<NodeId, NodeStateImpl>,
+    ) : this(key, roots, states, emptyList())
 
     fun NodeRoot.isSelected(): Boolean = id == selectedRootId
 
     fun getSelectedRoot(): NodeRoot? = roots.find { it.isSelected() }
 
+    fun getSortingForSelected(): NodeSorting = getSorting(selectedRootId)
+
     fun getSorting(rootId: NodeId): NodeSorting {
-        return _sorting.getOrPut(rootId) {
+        return sorting.getOrPut(rootId) {
             roots.find { it.id == rootId }
                 ?.defaultSorting
                 ?: NodeSorting.Name
@@ -51,7 +59,7 @@ data class NodeTab(
     }
 
     fun setSorting(rootId: NodeId, sorting: NodeSorting) {
-        _sorting[rootId] = sorting
+        this.sorting[rootId] = sorting
     }
 
     fun Node.opened(): Boolean = roots.find { it.item.uniqueId == rootId }
@@ -62,6 +70,7 @@ data class NodeTab(
     fun clone(key: NodeTabKey, mimeTypes: List<String>): NodeTab {
         val copy = copy(key = key, mimeTypes = mimeTypes)
         copy.selectedRootId = selectedRootId
+        copy.sorting.putAll(sorting)
         _trees.forEach { (key, tree) ->
             copy._trees[key] = tree.mutableCopy()
         }
