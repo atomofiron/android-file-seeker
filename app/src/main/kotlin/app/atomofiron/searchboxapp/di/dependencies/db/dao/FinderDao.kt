@@ -25,6 +25,6 @@ interface FinderDao {
     @Delete
     fun delete(item: SearchResultCache)
 
-    @Query("DELETE FROM $RESULT WHERE :id = id")
+    @Query("DELETE FROM $RESULT WHERE id = :id")
     fun delete(id: Int)
 }

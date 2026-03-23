@@ -11,10 +11,10 @@ data class SearchTask<Result : SearchResult>(
     val query: QueryParams,
     val result: Result,
     val uuid: UUID = UUID.randomUUID(),
+    val uniqueId: Int = uuid.hashCode(), // for restored from cache, todo move back to fields, replace UUID with Uuid and replace SearchResultCache.id with Uuid
     val status: SearchStatus = SearchStatus.Progress,
     val error: NodeError? = null,
 ) {
-    val uniqueId: Int get() = uuid.hashCode()
     val count: Int = result.count
 
     val isRemovable get() = result.removable
