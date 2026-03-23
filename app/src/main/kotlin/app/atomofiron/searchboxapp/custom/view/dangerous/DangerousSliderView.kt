@@ -119,6 +119,7 @@ class DangerousSliderView @JvmOverloads constructor(
             setThumbBorder(thumbBorder)
             setIcon(getDrawable(R.styleable.DangerousSliderView_icon))
             button.compoundDrawablePadding = getDimensionPixelSize(R.styleable.DangerousSliderView_iconPadding, button.paddingStart)
+            button.gravity = Gravity.CENTER_VERTICAL
         }
 
         done.setTint(textColor)

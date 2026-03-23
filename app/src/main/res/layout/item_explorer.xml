@@ -102,6 +102,7 @@
         app:layout_constraintStart_toStartOf="@+id/description"
         app:layout_constraintTop_toBottomOf="@+id/description"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         tools:text="No such file or directory"
         />
     <com.google.android.material.textview.MaterialTextView
@@ -130,10 +131,15 @@
     <com.google.android.material.checkbox.MaterialCheckBox
         android:id="@+id/check_box"
         android:layout_width="@dimen/edge_size"
-        android:layout_height="@dimen/edge_size"
+        android:layout_height="0dp"
         android:layout_marginTop="-2dp"
         android:gravity="top"
+        android:minHeight="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constrainedHeight="true"
+        app:layout_constraintHeight_max="@dimen/edge_size"
         />
 </app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout>
