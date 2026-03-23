@@ -115,6 +115,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     override fun onStart() {
         super.onStart()
         explorerViews.forEach { it.onItemsVisible() }
+        presenter.onContinue()
     }
 
     override fun onKeyDown(keyCode: Int): Boolean = when {

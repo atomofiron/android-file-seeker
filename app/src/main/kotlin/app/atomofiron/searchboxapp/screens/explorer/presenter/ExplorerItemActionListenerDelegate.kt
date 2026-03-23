@@ -74,9 +74,10 @@ class ExplorerItemActionListenerDelegate @Inject constructor(
             }
         } else {
             interactor.check(currentTab, item, toChecked)
-            val checked = explorerStore.checked.value
+            explorerStore.checked.value
                 .filter { item.ref.isChildOf(it.ref) }
-            interactor.check(currentTab, checked, false)
+                .takeIf { it.isNotEmpty() }
+                ?.let { interactor.check(currentTab, it, false) }
         }
         return true
     }

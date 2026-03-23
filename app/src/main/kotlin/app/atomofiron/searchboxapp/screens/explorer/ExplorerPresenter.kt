@@ -61,6 +61,8 @@ class ExplorerPresenter @Inject constructor(
         interactor.setCurrentTab(currentTab)
     }
 
+    fun onContinue() = interactor.setCurrentTab(currentTab)
+
     fun onVolumeUp(isCurrentDirVisible: Boolean) {
         val currentNode = viewState.deepest
         currentNode ?: return
