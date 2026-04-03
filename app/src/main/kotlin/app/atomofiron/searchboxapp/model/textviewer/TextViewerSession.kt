@@ -31,6 +31,7 @@ class TextViewerSession(
     private var byteBuf = ByteBuffer.wrap(bytes)
     private val lineBuilder = ByteArrayBuilder()
     private var byteCount = 0
+    private var afterCr = false
     var isFullyRead = false
         private set
 
@@ -92,8 +93,15 @@ class TextViewerSession(
     private fun fillBuffer(): Boolean {
         byteBuf.clear()
         return when (val result = input.next()) {
-            is ReadResult.Ok -> byteBuf.put(result.v1).flip()
-                .let { false }
+            is ReadResult.Ok -> {
+                byteBuf.put(result.v1).flip()
+                if (afterCr && result.v1.firstOrNull() == LF) {
+                    byteCount++
+                    byteBuf.position(1)
+                }
+                afterCr = false
+                false
+            }
             is ReadResult.End -> byteBuf.limit(0)
                 .let { true }
             is ReadResult.Err -> {
@@ -116,7 +124,9 @@ class TextViewerSession(
         }
         val skip = when {
             next != LF && next != CR -> 0
-            byteBuf.remaining() == 1 -> 1 // todo process the case when previous chunk ends with \r, and next chunk starts with \n
+            byteBuf.remaining() == 1 -> 1.also {
+                afterCr = next == CR
+            }
             next == CR && afterNext == LF -> 2 // skip \r\n
             else -> 1 // skip \r or \n
         }
