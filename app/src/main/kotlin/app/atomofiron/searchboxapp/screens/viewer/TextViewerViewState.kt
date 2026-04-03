@@ -111,6 +111,8 @@ class TextViewerViewState private constructor(
         if (forward && matchIndex == matches.size) {
             index = index.inc() % indexes.size
             lineIndex = indexes[index]
+            this.matches[lineIndex]
+                ?: return noMatchesErr(lineIndex)
             matchIndex = 0
         } else if (!forward && matchIndex < 0) {
             index = indexes.run { (size + index.dec()) % size }
@@ -132,15 +134,14 @@ class TextViewerViewState private constructor(
     private fun noMatchesErr(lineIndex: Int) = CursorResult.Err("no matches for line index $lineIndex (max: ${currentTask.value?.result?.matches?.keys?.sorted()?.max()})")
 
     private fun LocalSearchResult.startNavigation(forward: Boolean): CursorResult {
-        val statusIndex = when {
-            forward -> 1
-            indexes.last() < textLines.value.size -> status.value.max
-            else -> return CursorResult.Load(indexes.last())
+        val lineIndex = if (forward) indexes.first() else indexes.last()
+        if (lineIndex >= textLines.value.size) {
+            return CursorResult.Load(lineIndex)
         }
+        val statusIndex = if (forward) 1 else status.value.max
         status.update {
             it.copy(current = statusIndex)
         }
-        val lineIndex = if (forward) indexes.first() else indexes.last()
         val matchIndex = if (forward) 0 else matches[lineIndex]?.lastIndex ?: 0
         matchingCursor.value = MatchCursor(lineIndex = lineIndex, matchIndex = matchIndex)
         return CursorResult.Ok
