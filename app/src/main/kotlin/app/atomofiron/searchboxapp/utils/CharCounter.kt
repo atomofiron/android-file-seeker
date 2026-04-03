@@ -20,7 +20,7 @@ fun ByteArray.countChars(charset: Charset, range: IntRange): Int {
         throw UnreachableException()
     }
     var count = 0
-    val byteBuf = ByteBuffer.wrap(this, range.start, range.size)
+    val byteBuf = ByteBuffer.wrap(this, range.first, range.size)
     val decoder = decoders[charset]
     decoder ?: throw IllegalArgumentException("$charset doesn't exist in ${decoders.keys}")
 

@@ -116,7 +116,7 @@ class FlexSpanSizeLookup(
         }
         var rowId = when (position) {
             0 -> itemId.toInt()
-            else -> cells[position.dec()].rowId
+            else -> cells[position.dec()].rowId // todo IndexOutOfBoundsException: Index: 0, Size: 0
         }
         val consumed = consumed(rowId, position)
         var left = COLUMNS
