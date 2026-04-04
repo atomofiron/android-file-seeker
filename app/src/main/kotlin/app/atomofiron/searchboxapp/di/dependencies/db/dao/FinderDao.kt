@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.di.dependencies.db.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 
@@ -19,7 +20,7 @@ interface FinderDao {
     @Query("SELECT * FROM $RESULT WHERE version = $VERSION AND id = :id")
     fun get(id: Int): SearchResultCache?
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun put(item: SearchResultCache): Long
 
     @Delete
