@@ -14,7 +14,9 @@ import android.view.animation.DecelerateInterpolator
 import android.widget.EdgeEffect
 import androidx.core.view.children
 import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.common.util.extension.debug
 import app.atomofiron.common.util.extension.debugFail
+import app.atomofiron.common.util.extension.logE
 import app.atomofiron.searchboxapp.utils.setFloatValues
 import kotlin.math.max
 import kotlin.math.min
@@ -58,7 +60,10 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
                 }
                 ACTION_MOVE -> if (ids.isNotEmpty()) {
                     val index = event.findPointerIndex(ids.last())
-                    pullY = event.getY(index)
+                    when {
+                        index >= 0 -> pullY = event.getY(index)
+                        else -> debug { logE("index $index is last of ids $ids") }
+                    }
                 } else {
                     debugFail { "ids is empty on ACTION_MOVE" }
                 }
