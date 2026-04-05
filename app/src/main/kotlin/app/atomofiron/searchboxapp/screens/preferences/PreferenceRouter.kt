@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.pm.ResolveInfo
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseRouter
+import app.atomofiron.common.util.extension.unit
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
@@ -17,9 +18,11 @@ class PreferenceRouter @Inject constructor(
 
     override val currentDestinationId = R.id.preferenceFragment
 
-    fun goToGithub() = context { startActivity(Intents.github) }
+    fun goToGithub() = context { startActivity(Intents.github) }.unit()
 
-    fun goToForPda() = context { startActivity(Intents.forPda) }
+    fun goToForPda() = context { startActivity(Intents.forPda) }.unit()
+
+    fun goToDonate() = context { startActivity(Intents.donate) }.unit()
 
     fun goTelegram(info: ResolveInfo) = context {
         Intents.telegram.apply {

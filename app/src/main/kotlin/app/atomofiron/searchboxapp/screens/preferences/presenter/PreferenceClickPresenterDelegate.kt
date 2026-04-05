@@ -67,6 +67,8 @@ class PreferenceClickPresenterDelegate @Inject constructor(
 
     override fun onAboutClick() = router.showCurtain(AboutCurtainKey, recipient)
 
+    override fun onDonateClick() = router.goToDonate()
+
     override fun onColorSchemeClick() = router.showCurtain(ColorSchemeCurtainKey, recipient)
 
     override fun onExportImportClick() = router.showCurtain(ExportImportCurtainKey, recipient)

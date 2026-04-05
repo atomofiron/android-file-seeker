@@ -80,6 +80,7 @@
     <string name="exclude_dirs_summary">Из резултата претраге</string>
     <string name="pref_use_su">Користи root</string>
     <string name="pref_su_cmd">Root команда</string>
+    <string name="donate">Похвала</string>
     <string name="pref_about">О апликацији</string>
     <string name="look_github">GitHub репозиторијум</string>
     <string name="faq_4pda">FAQ / Дискусија</string>

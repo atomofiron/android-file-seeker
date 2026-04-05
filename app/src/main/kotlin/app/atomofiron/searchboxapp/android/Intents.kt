@@ -27,14 +27,14 @@ object Intents {
     private const val PACKAGE_SCHEME = "package:"
     private const val MAX_REQUEST_CODE = 65536
 
-    //val telegramLink get() = Intent(Intent.ACTION_VIEW, Uri.parse(Const.TELEGRAM_LINK))
+    val telegram = Intent(Intent.ACTION_VIEW, Const.TELEGRAM_URL.toUri())
     val github = Intent(Intent.ACTION_VIEW, Const.GITHUB_URL.toUri())
     val forPda = Intent(Intent.ACTION_VIEW, Const.FORPDA_URL.toUri())
+    val donate = Intent(Intent.ACTION_VIEW, Const.DONATE_URL.toUri())
     @SuppressLint("InlinedApi")
     val locales = Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
         data = Uri.fromParts(Const.SCHEME_PACKAGE, BuildConfig.PACKAGE_NAME, null)
     }
-    val telegram get() = Intent(Intent.ACTION_VIEW, Uri.parse(Const.TELEGRAM_URL))
 
     fun mainActivity(context: Context, action: String? = null) = Intent(context, MainActivity::class.java).setAction(action)
 

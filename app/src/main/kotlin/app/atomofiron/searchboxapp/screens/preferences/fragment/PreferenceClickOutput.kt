@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.preferences.fragment
 
 interface PreferenceClickOutput {
     fun onAboutClick()
+    fun onDonateClick()
     fun onColorSchemeClick()
     fun onExportImportClick()
     fun onExplorerItemClick()

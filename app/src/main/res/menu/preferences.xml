@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     >
     <item
+        android:id="@+id/pref_donate"
+        android:title="@string/donate"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/ic_commend"
+        />
+    <item
         android:id="@+id/pref_about"
         android:title="@string/pref_about"
         app:showAsAction="ifRoom"

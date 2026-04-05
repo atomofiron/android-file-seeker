@@ -19,6 +19,7 @@ import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.viewCollect
@@ -30,12 +31,10 @@ import app.atomofiron.searchboxapp.custom.overscroll.setupSpringOverscroll
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.custom.preference.DropDownPreference
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
-import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.performHapticLite
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.showSnackbar
 import com.google.android.material.appbar.AppBarLayout
-import lib.atomofiron.insets.insetsPadding
 
 class PreferenceFragment : PreferenceFragmentCompat(),
     BaseFragment<PreferenceFragment, PreferenceViewState, PreferencePresenter, FragmentPreferenceBinding> by BaseFragmentImpl()
@@ -117,6 +116,8 @@ class PreferenceFragment : PreferenceFragmentCompat(),
             view.performHapticLite()
             when (item.itemId) {
                 R.id.pref_about -> presenter.onAboutClick()
+                R.id.pref_donate -> presenter.onDonateClick()
+                else -> debugFail { "unexpected ${resources.getResourceEntryName(item.itemId)}" }
             }
             true
         }
