@@ -41,7 +41,7 @@ class FinderService @Inject constructor(
         }
         scope.launchOnDefault {
             val cached = dao.all().map {
-                GlobalSearchTask(it.params, it.result, uniqueId = it.id, status = SearchStatus.Ended(stopped = it.stopped))
+                GlobalSearchTask(it.params, it.result, uniqueId = it.id, status = SearchStatus.Ended(stopped = it.stopped), cached = true)
             }
             store.addAll(cached)
         }

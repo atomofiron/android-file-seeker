@@ -17,6 +17,7 @@
 	<dimen name="corner_half">8dp</dimen>
 	<dimen name="corner_nano">4dp</dimen>
 	<dimen name="icon_size">24dp</dimen>
+	<dimen name="icon_size_mini">16dp</dimen>
 	<dimen name="icon_button_size">40dp</dimen>
 	<dimen name="explorer_item_icon_offset">-2dp</dimen>
 

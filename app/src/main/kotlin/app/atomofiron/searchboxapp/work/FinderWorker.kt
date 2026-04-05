@@ -209,14 +209,12 @@ class FinderWorker(
         val error = err()?.message?.toNodeError()
         val stopped = isStopping
         val ended = toEnded(error = error, stopped = stopped)
-        if (!isStopping) store {
-            delay(Const.LONG_DELAY)
-            update {
-                ended
-            }
+        try {
+            db.put(SearchResultCache(ended.uniqueId, stopped, ended.query, ended.result))
+            ended.copy(cached = true)
+        } catch (_: Exception) {
+            ended
         }
-        db.put(SearchResultCache(ended.uniqueId, stopped, ended.query, ended.result))
-        ended
     }
 
     private suspend fun work(params: Params): Result {

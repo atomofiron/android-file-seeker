@@ -14,7 +14,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHold
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.SearchTaskHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
 import app.atomofiron.searchboxapp.screens.finder.fragment.history.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderAdapterPresenterDelegate
@@ -43,7 +43,7 @@ class FinderPresenter @Inject constructor(
     EditMaxSizeHolder.OnEditMaxSizeListener by finderAdapterDelegate,
     EditOptionsHolder.FinderConfigListener by finderAdapterDelegate,
     ButtonsHolder.FinderButtonsListener by finderAdapterDelegate,
-    TaskHolder.OnActionListener<SearchResult> by finderAdapterDelegate,
+    SearchTaskHolder.OnActionListener<SearchResult> by finderAdapterDelegate,
     TargetsHolder.FinderTargetsOutput by targetsDelegate,
     HistoryAdapter.OnItemClickListener by historyDelegate
 {

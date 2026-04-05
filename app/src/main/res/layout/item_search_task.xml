@@ -22,7 +22,7 @@
         android:id="@+id/params"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="@dimen/padding_common"
+        android:layout_marginEnd="@dimen/padding_half"
         android:textColor="?attr/colorContent"
         android:ellipsize="end"
         android:singleLine="true"
@@ -39,22 +39,12 @@
         android:layout_height="wrap_content"
         android:textColor="?attr/colorContent"
         tools:text="[ ] 144 [ ]36 [ ]96"
-        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/params"
-        app:layout_constraintEnd_toStartOf="@+id/space"
-        app:layout_constraintBottom_toBottomOf="parent"
-        />
-    <Space
-        android:id="@+id/space"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintStart_toEndOf="@+id/status"
-        app:layout_constraintTop_toTopOf="@+id/status"
         app:layout_constraintEnd_toStartOf="@+id/label"
-        app:layout_constraintBottom_toBottomOf="@+id/status"
+        app:layout_constraintBottom_toBottomOf="parent"
         />
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/label"
@@ -68,8 +58,18 @@
         android:singleLine="true"
         app:layout_constraintHorizontal_bias="1"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/space"
         app:layout_constraintEnd_toStartOf="@+id/action"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+    <ImageView
+        android:id="@+id/uncached"
+        android:layout_width="@dimen/icon_size_mini"
+        android:layout_height="@dimen/icon_size_mini"
+        android:src="@drawable/ic_save_off"
+        android:layout_margin="@dimen/padding_half"
+        app:tint="?attr/colorAccent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/label"
         app:layout_constraintBottom_toBottomOf="parent"
         />
     <com.google.android.material.button.MaterialButton

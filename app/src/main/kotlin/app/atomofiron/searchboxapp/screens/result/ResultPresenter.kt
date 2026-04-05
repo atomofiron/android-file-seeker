@@ -22,7 +22,6 @@ import app.atomofiron.searchboxapp.screens.result.presenter.ResultItemActionDele
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import app.atomofiron.searchboxapp.utils.formatDate
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ResultScope
@@ -103,8 +102,8 @@ class ResultPresenter @Inject constructor(
         default {
             val new = finderStore.setSorting(taskId, sorting)
             new ?: return@default
-            val old = dao.get(taskId) ?: return@default
-            dao.put(old.copy(result = new))
+            val cache = dao.get(taskId) ?: return@default
+            dao.put(cache.copy(result = new))
         }
     }
 }

@@ -13,4 +13,4 @@ interface FinderAdapterOutput<Result : SearchResult> :
         EditMaxSizeHolder.OnEditMaxSizeListener,
         ButtonsHolder.FinderButtonsListener,
         TargetsHolder.FinderTargetsOutput,
-        TaskHolder.OnActionListener<Result>
+        SearchTaskHolder.OnActionListener<Result>

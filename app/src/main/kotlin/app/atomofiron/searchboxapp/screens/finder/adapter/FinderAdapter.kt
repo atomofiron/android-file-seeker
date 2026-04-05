@@ -15,8 +15,8 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHold
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.MiniEditOptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.SearchTaskHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TitleHolder
 import app.atomofiron.searchboxapp.screens.finder.state.FinderItemType
@@ -25,7 +25,7 @@ import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 class FinderAdapter<Result : SearchResult>(
     private val isLocal: Boolean,
     private val output: FinderAdapterOutput<Result>,
-) : ListAdapter<FinderStateItem, GeneralHolder<out FinderStateItem>>(FinderDiffUtilCallback()) {
+) : ListAdapter<FinderStateItem, GeneralHolder<FinderStateItem>>(FinderDiffUtilCallback()) {
 
     var holderListener: AdapterHolderListener? = null
 
@@ -37,7 +37,7 @@ class FinderAdapter<Result : SearchResult>(
 
     override fun getItemViewType(position: Int): Int = getItem(position).viewType
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GeneralHolder<out FinderStateItem> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GeneralHolder<FinderStateItem> {
         return when (FinderItemType[viewType]) {
             FinderItemType.FIND -> QueryFieldHolder(parent, output)
             FinderItemType.CHARACTERS -> CharactersHolder(parent, output)
@@ -46,17 +46,18 @@ class FinderAdapter<Result : SearchResult>(
             FinderItemType.TITLE -> TitleHolder(parent)
             FinderItemType.TEST -> TestHolder(parent, output)
             FinderItemType.BUTTONS -> ButtonsHolder(parent, output)
-            FinderItemType.PROGRESS -> TaskHolder(parent, output)
+            FinderItemType.PROGRESS -> SearchTaskHolder(parent, output)
             FinderItemType.MAX_DEPTH -> EditMaxDepthHolder(parent, output)
             FinderItemType.MAX_SIZE -> EditMaxSizeHolder(parent, output)
             FinderItemType.EDIT_CHARS -> EditCharactersHolder(parent, output)
             FinderItemType.TARGETS -> TargetsHolder(parent, output)
             null -> throw IllegalArgumentException("viewType = $viewType")
-        }.also { holderListener?.onCreate(it, viewType) }
+        }.upcast()
+            .also { holderListener?.onCreate(it, viewType) }
     }
 
-    override fun onBindViewHolder(holder: GeneralHolder<out FinderStateItem>, position: Int) {
-        (holder as GeneralHolder<FinderStateItem>).bind(getItem(position), position)
+    override fun onBindViewHolder(holder: GeneralHolder<FinderStateItem>, position: Int) {
+        holder.bind(getItem(position), position)
         holderListener?.onBind(holder, position)
     }
 
@@ -65,3 +66,6 @@ class FinderAdapter<Result : SearchResult>(
         recyclerView.noClip()
     }
 }
+
+@Suppress("UNCHECKED_CAST")
+fun <D : Any> GeneralHolder<out D>.upcast() = this as GeneralHolder<D>

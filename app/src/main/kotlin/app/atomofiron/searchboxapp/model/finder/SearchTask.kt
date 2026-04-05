@@ -14,6 +14,7 @@ data class SearchTask<Result : SearchResult>(
     val uniqueId: Int = uuid.hashCode(), // for restored from cache, todo move back to fields, replace UUID with Uuid and replace SearchResultCache.id with Uuid
     val status: SearchStatus = SearchStatus.Progress,
     val error: NodeError? = null,
+    val cached: Boolean = false,
 ) {
     val count: Int = result.count
 

@@ -18,7 +18,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHol
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TaskHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.SearchTaskHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
 import app.atomofiron.searchboxapp.screens.finder.di.history.HistoryDao
 import app.atomofiron.searchboxapp.screens.finder.di.history.ItemHistory
@@ -46,7 +46,7 @@ class FinderAdapterPresenterDelegate @Inject constructor(
     EditMaxSizeHolder.OnEditMaxSizeListener,
     TestHolder.OnTestChangeListener,
     ButtonsHolder.FinderButtonsListener,
-    TaskHolder.OnActionListener<SearchResult> {
+    SearchTaskHolder.OnActionListener<SearchResult> {
 
     override fun onOptionsChange(options: SearchOptions) {
         preferences { setSearchOptions(options) }
