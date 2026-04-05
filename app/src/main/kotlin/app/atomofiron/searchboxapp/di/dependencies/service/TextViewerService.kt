@@ -64,7 +64,7 @@ class TextViewerService @Inject constructor(
         } as? ItemMatch.Many
         item ?: return null
         val local = LocalSearchResult(item.count, item.matches, item.hash, removable = false)
-        val task = LocalSearchTask(finderTask.query, result = local, finderTask.uuid, status = finderTask.status, error = finderTask.error)
+        val task = LocalSearchTask(finderTask.query, result = local, finderTask.uuid, status = finderTask.status, error = finderTask.error, cached = finderTask.cached)
         session.tasks { add(task) }
         return task
     }
