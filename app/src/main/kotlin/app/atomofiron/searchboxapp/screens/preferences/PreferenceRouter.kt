@@ -3,8 +3,10 @@ package app.atomofiron.searchboxapp.screens.preferences
 import android.content.ComponentName
 import android.content.Intent
 import android.content.pm.ResolveInfo
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.arch.BaseRouter
+import app.atomofiron.common.util.AndroidSdk
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
@@ -34,5 +36,6 @@ class PreferenceRouter @Inject constructor(
 
     fun goToLicenses() = navigate(R.id.licensesFragment)
 
+    @RequiresApi(AndroidSdk.TIRAMISU)
     fun showLocaleSettings() = activity { startActivity(Intents.locales) }
 }

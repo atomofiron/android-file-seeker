@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.android
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -31,7 +30,7 @@ object Intents {
     val github = Intent(Intent.ACTION_VIEW, Const.GITHUB_URL.toUri())
     val forPda = Intent(Intent.ACTION_VIEW, Const.FORPDA_URL.toUri())
     val donate = Intent(Intent.ACTION_VIEW, Const.DONATE_URL.toUri())
-    @SuppressLint("InlinedApi")
+    @RequiresApi(AndroidSdk.TIRAMISU)
     val locales = Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
         data = Uri.fromParts(Const.SCHEME_PACKAGE, BuildConfig.PACKAGE_NAME, null)
     }
