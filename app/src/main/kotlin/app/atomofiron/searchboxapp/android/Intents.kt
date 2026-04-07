@@ -29,7 +29,6 @@ object Intents {
     val telegram = Intent(Intent.ACTION_VIEW, Const.TELEGRAM_URL.toUri())
     val github = Intent(Intent.ACTION_VIEW, Const.GITHUB_URL.toUri())
     val forPda = Intent(Intent.ACTION_VIEW, Const.FORPDA_URL.toUri())
-    val donate = Intent(Intent.ACTION_VIEW, Const.DONATE_URL.toUri())
     @RequiresApi(AndroidSdk.TIRAMISU)
     val locales = Intent(Settings.ACTION_APP_LOCALE_SETTINGS).apply {
         data = Uri.fromParts(Const.SCHEME_PACKAGE, BuildConfig.PACKAGE_NAME, null)

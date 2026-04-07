@@ -7,6 +7,7 @@
         android:title="@string/donate"
         app:showAsAction="ifRoom"
         android:icon="@drawable/ic_commend"
+        android:visible="false"
         />
     <item
         android:id="@+id/pref_about"

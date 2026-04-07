@@ -24,8 +24,6 @@ class PreferenceRouter @Inject constructor(
 
     fun goToForPda() = context { startActivity(Intents.forPda) }.unit()
 
-    fun goToDonate() = context { startActivity(Intents.donate) }.unit()
-
     fun goTelegram(info: ResolveInfo) = context {
         Intents.telegram.apply {
             component = ComponentName(info.activityInfo.packageName, info.activityInfo.name)
