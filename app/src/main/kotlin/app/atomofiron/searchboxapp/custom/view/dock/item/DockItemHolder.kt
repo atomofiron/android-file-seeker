@@ -26,7 +26,6 @@ class DockItemHolder(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private lateinit var item: DockItem
-    private var longClicked = false
     private var config: DockItemConfig? = null
     private val drawable = DockItemDrawable(
         ripple = binding.root.context.colorAttr(MaterialAttr.colorControlHighlight),

@@ -106,6 +106,7 @@ class DockItemChildrenView(
         super.onLayout(changed, left, top, right, bottom)
         childrenView.place()
         updateBackgroundPath()
+        onAnimationValue(currentValue) // for case animation scale = 0
     }
 
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
