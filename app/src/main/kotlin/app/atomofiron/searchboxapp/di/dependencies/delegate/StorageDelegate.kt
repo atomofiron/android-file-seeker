@@ -12,6 +12,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
+import app.atomofiron.searchboxapp.model.explorer.NodeStorage.Kind
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.asExecutor
 import javax.inject.Inject
@@ -28,7 +29,7 @@ class StorageDelegate @Inject constructor(
 
     private var storageList = mutableListOf<NodeStorage>()
     private val internalStorage = store.internalStorage.value.run {
-        NodeStorage(NodeStorage.Kind.InternalStorage, ref.string, name, "Internal alias")
+        NodeStorage(Kind.InternalStorage, ref.string, name, "Internal storage")
     }
 
     init {
@@ -59,8 +60,9 @@ class StorageDelegate @Inject constructor(
         val item = storageList.getOrNull(index)
         val path = volume.directory?.path ?: item?.path
         val kind = when {
-            alias?.contains("SD") == true -> NodeStorage.Kind.SdCard
-            else -> NodeStorage.Kind.UsbStorage
+            !volume.isRemovable -> Kind.InternalStorage
+            alias?.contains("SD") == true -> Kind.SdCard
+            else -> Kind.UsbStorage
         }
         val new = when {
             path == null -> null
