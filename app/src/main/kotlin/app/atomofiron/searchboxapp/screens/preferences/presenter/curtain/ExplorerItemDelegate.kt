@@ -92,7 +92,6 @@ class ExplorerItemDelegate @Inject constructor(
         holders.bind()
 
         explorerDir.icon.alpha = Alpha.VISIBLE
-        explorerDir.size.text = dir.size
     }
 
     private fun Array<out ExplorerItemBinder>.bind() {

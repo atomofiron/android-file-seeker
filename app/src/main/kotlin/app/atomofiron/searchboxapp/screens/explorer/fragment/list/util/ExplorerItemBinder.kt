@@ -148,7 +148,7 @@ class ExplorerItemBinder(
             is Thumbnail.Loading -> thumbnail.setImageDrawable(placeholder)
             null -> thumbnail.setImageDrawable(null)
         }
-        apply(hasThumbnail = item.content.instantThumbnail())
+        binding.apply(hasThumbnail = item.content.instantThumbnail())
 
         title.text = when {
             item.isRoot -> item.getTitle(resources)
@@ -233,14 +233,14 @@ class ExplorerItemBinder(
         binding.checkBox.buttonTintList = if (composition.visibleBox) defaultBoxTintList else transparentBoxTintList
     }
 
-    fun disableClicks() {
-        binding.checkBox.isEnabled = false
-        binding.root.setOnClickListener(null)
-        binding.root.setOnLongClickListener(null)
-        binding.root.background = null
-        binding.root.isFocusable = false
-        binding.root.isClickable = false
-        binding.root.isLongClickable = false
+    fun disableClicks() = binding.run {
+        checkBox.isEnabled = false
+        root.setOnClickListener(null)
+        root.setOnLongClickListener(null)
+        root.background = null
+        root.isFocusable = false
+        root.isClickable = false
+        root.isLongClickable = false
     }
 
     fun hideCheckBox() {
@@ -302,10 +302,10 @@ class ExplorerItemBinder(
         else -> true
     }
 
-    private fun apply(hasThumbnail: Boolean) {
-        binding.icon.isVisible = !hasThumbnail
-        binding.thumbnail.isVisible = hasThumbnail
-        binding.title.setCompoundDrawablesRelativeWithIntrinsicBounds(if (hasThumbnail) item.getIcon() else 0, 0, 0, 0)
+    private fun ItemExplorerBinding.apply(hasThumbnail: Boolean) {
+        icon.isVisible = !hasThumbnail
+        thumbnail.isVisible = hasThumbnail
+        title.setCompoundDrawablesRelativeWithIntrinsicBounds(if (hasThumbnail) item.getIcon() else 0, 0, 0, 0)
     }
 
     interface ExplorerItemBinderActionListener {
@@ -323,7 +323,7 @@ class ExplorerItemBinder(
             target: Target<Bitmap?>,
             isFirstResource: Boolean,
         ): Boolean {
-            apply(hasThumbnail = false)
+            binding.apply(hasThumbnail = false)
             return false
         }
 
@@ -334,7 +334,7 @@ class ExplorerItemBinder(
             dataSource: DataSource,
             isFirstResource: Boolean,
         ): Boolean {
-            apply(hasThumbnail = true)
+            binding.apply(hasThumbnail = true)
             return false
         }
     }
