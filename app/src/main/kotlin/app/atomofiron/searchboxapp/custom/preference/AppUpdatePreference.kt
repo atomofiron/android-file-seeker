@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.Button
+import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
@@ -67,6 +68,7 @@ class AppUpdatePreference @JvmOverloads constructor(
             }
             is AppUpdateState.Downloading,
             is AppUpdateState.Installing -> R.drawable.ic_progress_download
+            is AppUpdateState.Checking,
             is AppUpdateState.UpToDate -> R.drawable.ic_smile
             is AppUpdateState.Unknown,
             is AppUpdateState.Error -> R.drawable.ic_error
@@ -80,6 +82,7 @@ class AppUpdatePreference @JvmOverloads constructor(
             is AppUpdateState.Available -> R.string.update_available
             is AppUpdateState.Downloading -> R.string.update_loading
             is AppUpdateState.Installing -> R.string.update_installing
+            is AppUpdateState.Checking,
             is AppUpdateState.UpToDate -> R.string.is_up_to_date
             is AppUpdateState.Completable -> R.string.update_ready
         }.let { setTitle(it) }
@@ -93,14 +96,16 @@ class AppUpdatePreference @JvmOverloads constructor(
             is AppUpdateState.Available -> R.string.download.also { buttonStyle.filled(button) }
             is AppUpdateState.Completable -> R.string.install.also { buttonStyle.filled(button) }
             is AppUpdateState.Downloading,
+            is AppUpdateState.Checking,
             is AppUpdateState.Installing -> null
         }
-        button.isVisible = stringId != null
+        button.isInvisible = stringId == null
         stringId?.let { button.setText(it) }
     }
 
     private fun AppUpdateState.bindProgress() {
         val value = when (this) {
+            is AppUpdateState.Checking,
             is AppUpdateState.Installing -> null
             is AppUpdateState.Downloading -> progress
             is AppUpdateState.Unknown,
@@ -114,7 +119,7 @@ class AppUpdatePreference @JvmOverloads constructor(
         }
         progress.isVisible = true
         progress.isIndeterminate = value == null
-        value?.let { progress.setProgress((progress.max * value).toInt()) }
+        value?.let { progress.progress = (progress.max * value).toInt() }
     }
 
     override fun onClick(v: View) {
@@ -127,6 +132,7 @@ class AppUpdatePreference @JvmOverloads constructor(
                 else -> return showChoice()
             }
             is AppUpdateState.Completable -> AppUpdateAction.Install
+            is AppUpdateState.Checking,
             is AppUpdateState.Downloading,
             is AppUpdateState.Installing -> null
         }?.let { listener?.invoke(it) }

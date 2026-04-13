@@ -12,6 +12,7 @@ sealed class AppUpdateState(val waiting: Boolean = false) {
     data object Unknown : AppUpdateState()
     data class Error(val message: String?) : AppUpdateState()
     data object UpToDate : AppUpdateState()
+    data object Checking : AppUpdateState(waiting = true)
     data class Available(val type: UpdateType, val code: Int) : AppUpdateState(waiting = true)
     data class Downloading(val progress: Float?) : AppUpdateState()
     data object Completable : AppUpdateState(waiting = true)

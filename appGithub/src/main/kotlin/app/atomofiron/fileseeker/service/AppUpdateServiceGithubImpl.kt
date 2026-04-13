@@ -63,6 +63,7 @@ class AppUpdateServiceGithubImpl(
     override fun onActivityCreate(activity: AppCompatActivity) = Unit
 
     override fun check(userAction: Boolean) {
+        store.set(AppUpdateState.Checking)
         scope.launch {
             when (val releases = api.releases()) {
                 is Ok -> releases.value

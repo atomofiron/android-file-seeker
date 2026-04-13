@@ -97,6 +97,7 @@ class AppUpdateServiceGoogleImpl(
     }
 
     override fun check(userAction: Boolean) {
+        store.set(AppUpdateState.Checking)
         appUpdateManager.appUpdateInfo.addOnSuccessListener { appUpdateInfo ->
             this.appUpdateInfo = appUpdateInfo
             when (appUpdateInfo.updateAvailability()) {
