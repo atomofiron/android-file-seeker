@@ -72,6 +72,7 @@ object ExplorerUtils {
     private const val FILE_SCRIPT = "application/x-shellscript"
     private const val FILE_FLASH = "application/vnd.adobe.flash.movie"
     private const val FILE_EXE = "application/vnd.microsoft.portable-executable"
+    private const val FILE_EXED = "application/x-msdownload"
     private const val FILE_CA_CERT = "application/x-x509-ca-cert"
     private const val FILE_ELF_EXE = "application/x-executable"
     private const val FILE_ELF_RE = "application/x-object"
@@ -386,7 +387,8 @@ object ExplorerUtils {
             (mimeType == FILE_TAR) -> content.ifMismatches { NodeContent.Tar() }
             (mimeType == FILE_XZ) -> content.ifMismatches { NodeContent.Xz }
             mimeType.startsWith(FILE_FLASH) -> content.ifMismatches { NodeContent.Flash }
-            mimeType.startsWith(FILE_EXE) -> content.ifMismatches { NodeContent.ExeMs }
+            mimeType.startsWith(FILE_EXE),
+            mimeType.startsWith(FILE_EXED) -> content.ifMismatches { NodeContent.ExeMs }
             mimeType.startsWith(FILE_MESSAGE) -> NodeContent.Text.Plain
             (mimeType == FILE_XML) -> content.ifMismatches { NodeContent.Text.Xml }
             mimeType.startsWith(FILE_AUDIO) -> content.ifMismatches { NodeContent.Music.resolve(mimeType) }
