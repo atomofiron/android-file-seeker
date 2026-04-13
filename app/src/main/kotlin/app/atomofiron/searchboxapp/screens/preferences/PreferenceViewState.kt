@@ -13,7 +13,6 @@ import debug.LeakWatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import javax.inject.Inject
 
@@ -27,7 +26,7 @@ class PreferenceViewState @Inject constructor(
     appWatcher: LeakWatcher,
 ) {
     private val _alerts = EventFlow<Alert>()
-    val alerts = merge(preferenceChannel.appUpdateStatus.map(Alert::invoke), _alerts)
+    val alerts = merge(_alerts, preferenceChannel.appUpdateStatus)
     val showDeepBlack = MutableStateFlow(false)
     val asSu: StateFlow<Boolean> = preferenceStore.asSu
     val hapticFeedback: StateFlow<Boolean> = preferenceStore.hapticFeedback

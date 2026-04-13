@@ -8,6 +8,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import app.atomofiron.common.util.Alert
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.fileseeker.R
 import app.atomofiron.common.util.extension.debugFailUnreachable
@@ -105,7 +106,7 @@ class AppUpdateServiceGoogleImpl(
                 UpdateAvailability.UPDATE_NOT_AVAILABLE -> when {
                     knownActualCode > BuildConfig.VERSION_CODE -> AppUpdateState.Unknown // something went wrong
                     else -> AppUpdateState.UpToDate.also {
-                        if (userAction) preferenceChannel.notifyUpdateStatus(context.getString(R.string.is_up_to_date))
+                        if (userAction) preferenceChannel.showUpdateAlert(Alert(context.getString(R.string.is_up_to_date)))
                     }
                 }
                 UpdateAvailability.UPDATE_AVAILABLE -> appUpdateInfo.type()?.let {
@@ -117,7 +118,7 @@ class AppUpdateServiceGoogleImpl(
                     onStateUpdate(appUpdateInfo.installStatus(), downloadingProgress = null)
                     return@addOnSuccessListener
                 }
-                else -> return@addOnSuccessListener
+                else -> return@addOnSuccessListener debugFailUnreachable()
             }.let { store.set(it ?: AppUpdateState.Unknown) }
         }.addOnFailureListener {
             store.set(AppUpdateState.Unknown)

@@ -3,6 +3,8 @@ package app.atomofiron.fileseeker.service
 import android.Manifest.permission.REQUEST_INSTALL_PACKAGES
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
+import app.atomofiron.common.util.Alert
+import app.atomofiron.common.util.AlertErr
 import app.atomofiron.searchboxapp.BuildConfig
 import app.atomofiron.common.util.extension.debugFailUnreachable
 import app.atomofiron.fileseeker.R
@@ -71,9 +73,12 @@ class AppUpdateServiceGithubImpl(
                     .also { asset = it }
                     ?.checkFile()
                     ?: AppUpdateState.UpToDate.also {
-                        if (userAction) preferenceChannel.notifyUpdateStatus(context.getString(R.string.is_up_to_date))
+                        if (userAction) preferenceChannel.showUpdateAlert(Alert(context.getString(R.string.is_up_to_date)))
                     }
-                is Err -> AppUpdateState.Unknown
+                is Err -> {
+                    preferenceChannel.showUpdateAlert(AlertErr(releases.message))
+                    AppUpdateState.Unknown
+                }
             }.let { store.set(it) }
         }
     }

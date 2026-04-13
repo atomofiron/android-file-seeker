@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.di.dependencies.channel
 
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
@@ -16,9 +17,9 @@ class PreferenceChannel @Inject constructor(
     updates: AppUpdateStore,
 ) {
     val onHistoryImported = EventFlow<Unit>()
-    val appUpdateStatus = EventFlow<String>()
+    val appUpdateStatus = EventFlow<Alert>()
     val notification: Flow<Boolean> = updates.state.map { it.waiting }
 
-    fun notifyHistoryImported() = onHistoryImported.invoke(scope)
-    fun notifyUpdateStatus(message: String) = appUpdateStatus.set(scope, message)
+    fun showHistoryImported() = onHistoryImported.invoke(scope)
+    fun showUpdateAlert(message: Alert) = appUpdateStatus.set(scope, message)
 }
