@@ -51,7 +51,7 @@ class UpdateApi {
             response.status.ok() -> response.body<List<GithubRelease>>()
                 .toOk()
             else -> response.body<GithubError>()
-                .run { "[$status] $message" }
+                .run { "${status?.let { "[$it] " } ?: ""}$message" }
                 .toErr()
         }
     } catch (t: Throwable) {
