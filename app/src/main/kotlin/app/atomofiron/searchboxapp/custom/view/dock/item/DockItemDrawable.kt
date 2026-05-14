@@ -16,6 +16,7 @@ import androidx.core.graphics.Insets
 import androidx.core.graphics.alpha
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.corner
+import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.searchboxapp.utils.inverseColor
 import app.atomofiron.searchboxapp.utils.withAlpha
 
@@ -94,22 +95,26 @@ private class DockItemShape(
     private val inset: Float = 0f,
 ) : RectShape() {
 
+    private val minSize = (radius + inset) * 2
     private val path = Path()
 
     override fun onResize(width: Float, height: Float) {
         super.onResize(width, height)
         path.reset()
-        path.corner(inset, inset, left = true, top = true, clockWise = true, radius)
-        path.corner(width - inset, inset, left = false, top = true, clockWise = true, radius)
-        path.corner(width - inset, height - inset, left = false, top = false, clockWise = true, radius)
-        path.corner(inset, height - inset, left = true, top = false, clockWise = true, radius)
-        path.close()
+        if (width >= minSize && height >= minSize) {
+            path.corner(inset, inset, left = true, top = true, clockWise = true, radius)
+            path.corner(width - inset, inset, left = false, top = true, clockWise = true, radius)
+            path.corner(width - inset, height - inset, left = false, top = false, clockWise = true, radius)
+            path.corner(inset, height - inset, left = true, top = false, clockWise = true, radius)
+            path.close()
+        }
     }
 
     override fun draw(canvas: Canvas, paint: Paint) = canvas.drawPath(path, paint)
 
     override fun getOutline(outline: Outline) = when {
         Android.R -> outline.setPath(path)
-        else -> outline.setConvexPath(path)
+        path.isConvex -> outline.setConvexPath(path)
+        else -> debugFail()
     }
 }
