@@ -19,6 +19,7 @@ import androidx.annotation.DimenRes
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.utils.Alpha
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.min
@@ -32,29 +33,39 @@ private const val EPSILON = 0.05f
 private const val ARC_60 = 60f
 private const val ROTATE_90 = 90f
 private const val ROTATE_180 = 180f
+private const val CIRCLE = 360f
 private const val STROKE_WIDTH = 1f / 12
 private const val CIRCLES_PADDING = 1f / 6
-private const val STUB_SIZE = 1
+private const val STUB_VALUE = 1
 
 class MuonsDrawable private constructor(
     private val defaultColor: Int,
     private val fillCenter: Boolean,
     val intrinsicSize: Int,
+    val indeterminateThickness: Int,
 ) : Drawable(), ValueAnimator.AnimatorUpdateListener {
     companion object {
 
         operator fun invoke(color: Int = Color.MAGENTA, fillCenter: Boolean = true): MuonsDrawable {
-            return MuonsDrawable(color, fillCenter, STUB_SIZE)
+            return MuonsDrawable(color, fillCenter, STUB_VALUE, STUB_VALUE)
         }
 
-        operator fun invoke(context: Context, @DimenRes sizeRes: Int = R.dimen.icon_size, fillCenter: Boolean = true): MuonsDrawable {
+        operator fun invoke(
+            context: Context,
+            fillCenter: Boolean = true,
+            @DimenRes sizeRes: Int? = null,
+        ): MuonsDrawable {
             val color = context.colorAttr(MaterialAttr.colorAccent)
-            val intrinsicSize = context.resources.getDimensionPixelSize(sizeRes)
-            return MuonsDrawable(color, fillCenter, intrinsicSize)
+            val intrinsicSize = context.resources.getDimensionPixelSize(sizeRes?.takeIf { it > 0 } ?: R.dimen.progress_common_size)
+            val thickness = context.resources.getDimensionPixelSize(R.dimen.progress_thickness)
+            return MuonsDrawable(color, fillCenter, intrinsicSize, thickness)
         }
 
-        fun ImageView.setMuonsDrawable(fillCenter: Boolean = true): MuonsDrawable {
-            val drawable = MuonsDrawable(context, fillCenter = fillCenter)
+        fun ImageView.setMuonsDrawable(
+            fillCenter: Boolean = true,
+            @DimenRes sizeRes: Int? = null,
+        ): MuonsDrawable {
+            val drawable = MuonsDrawable(context, fillCenter, sizeRes)
             setImageDrawable(drawable)
             return drawable
         }
@@ -70,6 +81,7 @@ class MuonsDrawable private constructor(
     private val paint = Paint()
     private var animValue = START
     private var drawn = true
+    private var progress: Float? = null
 
     private val path = Path()
     private var tint: ColorStateList? = null
@@ -100,7 +112,10 @@ class MuonsDrawable private constructor(
     }
 
     override fun draw(canvas: Canvas) {
-        if (fillCenter) {
+        val progress = progress
+        if (progress != null) {
+            canvas.drawIndeterminate(progress)
+        } else if (fillCenter) {
             canvas.draw(slugs = true, animValue)
             canvas.drawMuons()
         } else {
@@ -108,7 +123,7 @@ class MuonsDrawable private constructor(
             canvas.draw(slugs = false, animValue - PI / 2)
         }
         drawn = true
-        anim(true)
+        anim(progress == null)
     }
 
     override fun onAnimationUpdate(animation: ValueAnimator) {
@@ -135,6 +150,11 @@ class MuonsDrawable private constructor(
 
     fun setSpeed(speed: Speed) {
         animator.duration = speed.duration
+    }
+
+    fun setProgress(progress: Float?) {
+        this.progress = progress?.coerceIn(0f, 1f)
+        invalidateSelf()
     }
 
     private fun updateSize() {
@@ -177,6 +197,26 @@ class MuonsDrawable private constructor(
     private fun Canvas.drawMuons() {
         paint.style = Paint.Style.FILL
         drawPath(path, paint)
+    }
+
+    private fun Canvas.drawIndeterminate(progress: Float) {
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = indeterminateThickness.toFloat()
+        val inset = paint.strokeWidth / 2
+        rect.set(bounds)
+        rect.inset(inset, inset)
+
+        val startAngle = -ROTATE_90
+        val sweepAngle = CIRCLE * progress
+        drawArc(rect, startAngle, max(sweepAngle, EPSILON), false, paint)
+        val offset = paint.strokeWidth * 1.5f
+        val offsetAngle = offset / (rect.width() * PI) * CIRCLE
+        val trackAngle = CIRCLE - sweepAngle - offsetAngle * 2
+        if (trackAngle > 0f) {
+            paint.alpha = Alpha.HALF_INT
+            drawArc(rect, startAngle + sweepAngle + offsetAngle, trackAngle, false, paint)
+            paint.alpha = Alpha.VISIBLE_INT
+        }
     }
 
     private fun Canvas.draw(slugs: Boolean, value: Float) {

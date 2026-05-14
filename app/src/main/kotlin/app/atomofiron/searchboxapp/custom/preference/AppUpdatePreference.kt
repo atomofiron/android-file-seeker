@@ -11,12 +11,12 @@ import androidx.preference.PreferenceViewHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.ButtonStyle
 import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
+import app.atomofiron.searchboxapp.custom.view.MuonsView
 import app.atomofiron.searchboxapp.model.other.AppUpdateAction
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
 import app.atomofiron.searchboxapp.model.other.UpdateType
 import app.atomofiron.searchboxapp.utils.getAttr
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.progressindicator.CircularProgressIndicator
 
 class AppUpdatePreference @JvmOverloads constructor(
     context: Context,
@@ -26,10 +26,11 @@ class AppUpdatePreference @JvmOverloads constructor(
         android.R.attr.preferenceStyle,
     )
 ) : Preference(context, attrs, defStyleRes), View.OnClickListener {
+
     private var state: AppUpdateState = AppUpdateState.Unknown
     private val buttonStyle = ButtonStyle(context)
     private lateinit var button: Button
-    private lateinit var progress: CircularProgressIndicator
+    private lateinit var progress: MuonsView
     var listener: UpdateActionListener? = null
 
     init {
@@ -44,7 +45,6 @@ class AppUpdatePreference @JvmOverloads constructor(
         button = holder.itemView.findViewById(R.id.widgetButton)
         progress = holder.itemView.findViewById(R.id.widgetProgress)
         button.setOnClickListener(this)
-        progress.max = 100
         state.bindButton()
         state.bindProgress()
     }
@@ -118,8 +118,7 @@ class AppUpdatePreference @JvmOverloads constructor(
             }
         }
         progress.isVisible = true
-        progress.isIndeterminate = value == null
-        value?.let { progress.progress = (progress.max * value).toInt() }
+        progress.setProgress(value)
     }
 
     override fun onClick(v: View) {
