@@ -50,17 +50,18 @@ class StickyTopDelegate(
             }
         }
         for ((position, item) in opened) {
-            sync(item, position, items)
+            sync(item, position, items, force = true)
         }
     }
 
-    fun sync(new: Node, position: Int, items: List<Node>) {
+    fun sync(new: Node, position: Int, items: List<Node>, force: Boolean = false) {
         val sticky = stickies[new.uniqueId]
         var view = when {
             sticky == null -> null
             sticky.position != position -> sticky.view
             sticky.isDeepest != new.isDeepest -> null.also { removeSticky(new.uniqueId) }
             !sticky.areContentsTheSame(new) -> sticky.view.apply { bind(new) }
+            force -> sticky.view
             else -> return
         }
         view = view ?: newSticky(new)

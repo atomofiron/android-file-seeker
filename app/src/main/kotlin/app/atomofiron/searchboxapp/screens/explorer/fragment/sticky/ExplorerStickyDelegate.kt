@@ -86,6 +86,9 @@ class ExplorerStickyDelegate(
         if (top.valid(new)) {
             top.sync(new, index, adapter.items)
         }
+        if (bottom.valid(new)) {
+            bottom.sync(new, index, adapter.items)
+        }
     }
 
     override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) = updateOffset()

@@ -39,7 +39,7 @@ class StickyBottomDelegate(
             }
         }
         for ((position, item) in separators) {
-            sync(item, position, items)
+            sync(item, position, items, force = true)
         }
     }
 
@@ -56,13 +56,14 @@ class StickyBottomDelegate(
         }
     }
 
-    private fun sync(new: Node, position: Int, items: List<Node>) {
+    fun sync(new: Node, position: Int, items: List<Node>, force: Boolean = false) {
         debugRequire(new.isSeparator()) { "sync ${new.ref}" }
         val sticky = stickies[new.uniqueId]
         val view = when {
             sticky == null -> newSticky(new)
             sticky.position != position -> sticky.view
             !sticky.areContentsTheSame(new) -> sticky.view
+            force -> sticky.view
             else -> return
         }
         val sorted = items.takeChildrenOf(new)
