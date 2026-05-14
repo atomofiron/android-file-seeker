@@ -40,6 +40,7 @@ class ArcView : MaterialTextView {
     constructor(context: Context) : this(context, null)
     constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
     constructor(context: Context, attrs: AttributeSet?, defStyleRes: Int) : super(context, attrs, defStyleRes) {
+        paint.isAntiAlias = true
         paint.style = Paint.Style.STROKE
         paint.strokeCap = Paint.Cap.ROUND
         paint.color = context.colorAttr(MaterialAttr.colorPrimary)

@@ -29,8 +29,8 @@ class ExplorerSpanSizeLookup(
             return
         }
         val frameWidth = availableWidth - recyclerView.run { paddingStart + paddingEnd }
-        val spanWidth = frameWidth / EXPLORER_SPAN_COUNT
-        val column = minWidth / spanWidth //+?
+        val spanWidth = frameWidth.toFloat() / EXPLORER_SPAN_COUNT
+        val column = (minWidth / spanWidth).toInt()
         val columns = EXPLORER_SPAN_COUNT / column
         val rowCount = rootCount / columns + if ((rootCount % columns) == 0) 0 else 1
         var count = rootCount
