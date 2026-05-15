@@ -276,7 +276,8 @@ object ExplorerUtils {
     suspend fun Node.update(asSu: Boolean, ensureCached: Boolean = true): Node {
         val type = NativeBridge.type(ref, asSu)
         return when (type) {
-            is Rslt.Ok -> parseNode(type.value.meta).resolveType(type.value.mime)
+            is Rslt.Ok -> parseNode(type.value.meta)
+                .resolveType(type.value.mime)
                 .run { if (ensureCached) ensureCached(asSu, oldMeta = meta) else this }
             is Rslt.Err -> copy(error = type.message.toNodeError())
         }
@@ -371,7 +372,8 @@ object ExplorerUtils {
                 name.hasExt(EXT_XAPK),
                 name.hasExt(EXT_APKS),
                 name.hasExt(EXT_APKM) -> content.ifMismatches { AndroidApp.Apks }
-                (content is AndroidApp) -> return content
+                name.hasExt(EXT_APK) -> content.ifMismatches { AndroidApp.Apk }
+                (content is AndroidApp) -> content
                 name.hasExt(EXT_OSZ) -> content.ifMismatches { NodeContent.Osu.Map() }
                 name.hasExt(EXT_OSK) -> content.ifMismatches { NodeContent.Osu.Skin() }
                 name.hasExt(EXT_OLZ) -> content.ifMismatches { NodeContent.Osu.LazerMap() }

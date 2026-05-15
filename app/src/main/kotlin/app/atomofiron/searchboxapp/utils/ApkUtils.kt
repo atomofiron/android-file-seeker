@@ -134,6 +134,6 @@ private fun NodeRef.getCachedApkInfo(asSu: Boolean, signature: Boolean): Pair<No
         ?.let { ApkInfoCache.get(it, withIcon = true, withSignature = signature) }
 }
 
-private fun AndroidApp.update(info: ApkInfo): AndroidApp = copy(info = info, isCached = true)
+private fun AndroidApp.update(info: ApkInfo): AndroidApp = copy(info = info)
 
 private fun String.possibleMainApk() = this == BASE_APK || !startsWith("config.") && endsWith(DOT_APK)

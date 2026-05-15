@@ -128,16 +128,12 @@ sealed class NodeContent(
     data class AndroidApp(
         val splitApk: Boolean,
         val info: ApkInfo? = null,
-        override val isCached: Boolean = false,
+        override val isCached: Boolean = info != null,
     ) : Archive(mimeType = if (splitApk) FILE_ZIP else FILE_APK) {
 
         override val details: String? = info?.versionName
+        override val thumbnail: Thumbnail? = info?.icon
 
-        override val thumbnail: Thumbnail? get() = when {
-            info != null -> info.icon
-            !isCached -> Thumbnail.Loading
-            else -> null
-        }
         companion object {
             val Apk = AndroidApp(splitApk = false)
             val Apks = AndroidApp(splitApk = true)

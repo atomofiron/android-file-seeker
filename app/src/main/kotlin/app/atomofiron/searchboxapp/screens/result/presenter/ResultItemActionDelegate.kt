@@ -49,7 +49,7 @@ class ResultItemActionDelegate @Inject constructor(
     override fun onItemLongClick(item: Node) = viewState.run {
         val items = when {
             item.isChecked -> cache.values.mapNotNull { item ->
-                item.item.takeIf { checked.contains(item.uniqueId) }
+                item.item.takeIf { checked.value.contains(item.uniqueId) }
             }
             else -> listOf(item)
         }

@@ -145,7 +145,11 @@ class ExplorerItemBinder(
             is Thumbnail.Bitmap -> thumbnail.setImageBitmap(tn.value)
             is Thumbnail.Drawable -> thumbnail.setImageDrawable(tn.value)
             is Thumbnail.Res -> thumbnail.setImageResource(tn.value)
-            is Thumbnail.Loading -> thumbnail.setImageDrawable(placeholder)
+            is Thumbnail.Loading -> when {
+                item.content.isCached -> thumbnail.setImageDrawable(null)
+                item.content is NodeContent.AndroidApp && item.error != null -> thumbnail.setImageDrawable(null)
+                else -> thumbnail.setImageDrawable(placeholder)
+            }
             null -> thumbnail.setImageDrawable(null)
         }
         binding.apply(hasThumbnail = item.content.instantThumbnail())
@@ -273,7 +277,7 @@ class ExplorerItemBinder(
             builder.append("*")
             builder.setSpan(ImageSpan(dirDrawable, ALIGN_BASELINE), builder.length.dec(), builder.length, SPAN_EXCLUSIVE_EXCLUSIVE)
             builder.append(Const.SPACE)
-            for (i in 0..<(3 - files.length)) {
+            repeat(3 - files.length) {
                 builder.append(Const.SPACE)
             }
         }
