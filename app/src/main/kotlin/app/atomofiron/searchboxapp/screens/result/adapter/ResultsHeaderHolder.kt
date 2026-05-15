@@ -13,11 +13,11 @@ import app.atomofiron.searchboxapp.utils.colorAttr
 
 class ResultsHeaderHolder(private val binding: ItemHeaderBinding) : ResultsHolder<ResultItem.Header>(binding.root) {
 
-    lateinit var listener: ResultItemActionListener
+    var listener: ResultItemActionListener? = null
 
     init {
         binding.root.setOnClickListener {
-            listener.onErrorsClick()
+            listener?.onErrorsClick()
         }
     }
 

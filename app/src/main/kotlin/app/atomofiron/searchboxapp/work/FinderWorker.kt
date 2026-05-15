@@ -92,7 +92,6 @@ class FinderWorker(
     }
 
     private val taskMutex = Mutex()
-    // todo remove deleting files from results
     private lateinit var task: GlobalSearchTask
     private val taskId = id
     private val cancellation = object : CancellationState {

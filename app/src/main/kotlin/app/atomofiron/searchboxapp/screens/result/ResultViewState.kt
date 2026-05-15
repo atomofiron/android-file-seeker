@@ -42,8 +42,11 @@ class ResultViewState @Inject constructor(
 
     private val mimeTypes = mode.mimeFilters() ?: emptyList()
     private val taskId = params.taskId
-    lateinit var taskUuid: UUID
-        private set
+    val taskUuid: UUID = finderStore
+        .tasksFlow.value
+        .find { it.uniqueId == taskId }?.uuid
+        ?: UUID.randomUUID()
+
     private var error: NodeError? = null
     private val mutex = Mutex()
 
@@ -71,7 +74,6 @@ class ResultViewState @Inject constructor(
     }
 
     fun reduce(task: GlobalSearchTask, checked: Set<Int>) {
-        taskUuid = task.uuid
         if (error != task.error) {
             error = task.error
             task.error?.let {

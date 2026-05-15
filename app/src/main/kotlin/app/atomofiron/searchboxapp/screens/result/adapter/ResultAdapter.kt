@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.result.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import app.atomofiron.common.recycler.GeneralAdapter
+import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ItemVisibilityDelegate
 
@@ -11,8 +12,8 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder<ResultItem>>(Resu
 {
     private val itemVisibilityDelegate = ItemVisibilityDelegate(this, this)
 
-    lateinit var itemActionListener: ResultItemActionListener
-    private lateinit var composition: ExplorerItemComposition
+    var itemActionListener: ResultItemActionListener? = null
+    private var composition: ExplorerItemComposition? = null
 
     fun setComposition(composition: ExplorerItemComposition) {
         this.composition = composition
@@ -22,6 +23,8 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder<ResultItem>>(Resu
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int, inflater: LayoutInflater): ResultsHolder<ResultItem> {
         val holder = ResultViewType(viewType).createHolder(parent, inflater) as ResultsHolder<ResultItem>
+        debugRequire(itemActionListener != null)
+        debugRequire(composition != null)
         when (holder) {
             is ResultsItemHolder -> holder.setOnItemActionListener(itemActionListener)
             is ResultsHeaderHolder -> holder.listener = itemActionListener
@@ -32,7 +35,7 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder<ResultItem>>(Resu
     override fun onBindViewHolder(holder: ResultsHolder<ResultItem>, position: Int) {
         super.onBindViewHolder(holder, position)
         if (holder is ResultsItemHolder) {
-            holder.bindComposition(composition)
+            composition?.let { holder.bindComposition(it) }
         }
     }
 
@@ -43,7 +46,7 @@ class ResultAdapter : GeneralAdapter<ResultItem, ResultsHolder<ResultItem>>(Resu
     override fun onItemsBecomeVisible(items: List<ResultItem>) {
         items.forEach {
             if (it is ResultItem.Item) {
-                itemActionListener.onItemVisible(it)
+                itemActionListener?.onItemVisible(it)
             }
         }
     }
