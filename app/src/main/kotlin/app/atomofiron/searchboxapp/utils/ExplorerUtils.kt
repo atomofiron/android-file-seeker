@@ -433,15 +433,15 @@ object ExplorerUtils {
             is NodeContent.Movie,
             is NodeContent.Music -> content
             is AndroidApp -> content.getAppContent(ref, asSu = asSu)
-                .contentOrNodeError(this, content.copy(isCached = true)) { return it }
+                .contentOrNodeError(this) { return it }
             else -> return this
         }
         return copy(content = content)
     }
 
-    private inline fun <C : NodeContent> Rslt<C>.contentOrNodeError(node: Node, content: NodeContent, action: (withError: Node) -> Nothing): C {
+    private inline fun <C : NodeContent> Rslt<C>.contentOrNodeError(node: Node, action: (withError: Node) -> Nothing): C {
         return unwrapOrElse {
-            action(node.copy(content = content, error = NodeError.Message.orUnknown(it)))
+            action(node.copy(error = NodeError.Message.orUnknown(it)))
         }
     }
 
