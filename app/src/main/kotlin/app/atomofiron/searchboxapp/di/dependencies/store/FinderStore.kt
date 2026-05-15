@@ -17,15 +17,12 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FinderStore @Inject constructor(
-    private val scope: AppScope,
-) {
+class FinderStore @Inject constructor() {
+
     private val mutex = Mutex()
     private val _tasksFlow = MutableStateFlow(listOf<GlobalSearchTask>())
     val tasksFlow: StateFlow<List<GlobalSearchTask>> = _tasksFlow
     val tasks: List<GlobalSearchTask> get() = _tasksFlow.value
-
-    operator fun invoke(block: suspend FinderStore.() -> Unit) = scope.launch { block() }
 
     suspend fun add(item: GlobalSearchTask) {
         updateTasks { add(item) }

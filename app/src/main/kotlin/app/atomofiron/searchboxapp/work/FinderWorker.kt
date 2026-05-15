@@ -42,7 +42,6 @@ import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
-import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeMeta
@@ -51,7 +50,9 @@ import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.ifCanNotice
 import app.atomofiron.searchboxapp.utils.mutate
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.serialization.Serializable
@@ -107,9 +108,9 @@ class FinderWorker(
         DaggerInjector.appComponent.inject(this)
     }
 
-    private fun Params.searchText(type: Params.Text) {
+    private fun CoroutineScope.searchText(params: Params, type: Params.Text) {
         val errors = GrowingList<String>()
-        NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, asSu, cancellation) { match ->
+        NativeBridge.findText(params.query, params.refs(), maxDepth = params.maxDepth, maxSize = type.maxSize, params.asSu, cancellation) { match ->
             updateAsync {
                 val new = when (match) {
                     is TextSearchProgress.Skip -> result.copy(countTotal = result.countTotal.inc())
@@ -130,7 +131,7 @@ class FinderWorker(
                 }
                 copy(result = new)
             }
-        }.apply()
+        }.apply(this)
     }
 
     private fun TypedMeta.toNodeHash(result: CrcResult? = null): NodeInfo {
@@ -148,9 +149,9 @@ class FinderWorker(
         )
     }
 
-    private fun Params.searchNames(type: Params.Names) {
+    private fun CoroutineScope.searchNames(params: Params, type: Params.Names) {
         val errors = GrowingList<String>()
-        NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu, cancellation) { match ->
+        NativeBridge.findNames(params.query, params.refs(), params.maxDepth, type.excludeDirs, params.asSu, cancellation) { match ->
             updateAsync {
                 when (match) {
                     is NameSearchProgress.Skip -> copy(result = result.copy(countTotal = result.countTotal.inc()))
@@ -166,7 +167,7 @@ class FinderWorker(
                     }
                 }
             }
-        }.apply()
+        }.apply(this)
     }
 
     override suspend fun doWork(): Result {
@@ -199,13 +200,13 @@ class FinderWorker(
         store.addOrUpdate(task)
     }
 
-    private fun updateAsync(transform: GlobalSearchTask.() -> GlobalSearchTask) {
-        store {
+    private fun CoroutineScope.updateAsync(transform: GlobalSearchTask.() -> GlobalSearchTask) {
+        launch {
             update(transform)
         }
     }
 
-    private fun Rslt<Unit>.apply() = updateAsync {
+    private fun Rslt<Unit>.apply(scope: CoroutineScope) = scope.updateAsync {
         val error = err()?.message?.toNodeError()
         val stopped = isStopping
         val ended = toEnded(error = error, stopped = stopped)
@@ -219,29 +220,29 @@ class FinderWorker(
 
     private suspend fun work(params: Params): Result {
         val dataBuilder = Data.Builder()
-        try {
-            store {
+        coroutineScope {
+            try {
                 when (val type = params.type) {
-                    is Params.Text -> params.searchText(type)
-                    is Params.Names -> params.searchNames(type)
+                    is Params.Text -> searchText(params, type)
+                    is Params.Names -> searchNames(params, type)
                 }
-            }.join()
-        } catch (_: CancellationException) {
-            updateAsync {
-                when {
-                    task.isProgress -> copy(status = SearchStatus.Stopping)
-                    else -> task
+            } catch (_: CancellationException) {
+                updateAsync {
+                    when {
+                        task.isProgress -> copy(status = SearchStatus.Stopping)
+                        else -> task
+                    }
                 }
+                dataBuilder.putBoolean(KEY_CANCELLED, true)
+            } catch (e: Exception) {
+                logE(e.toString())
+                updateAsync {
+                    copy(error = NodeError.Message(e.toString()))
+                }
+                dataBuilder.putString(KEY_EXCEPTION, e.toString())
+            } finally {
+                context.ifCanNotice(::showNotification)
             }
-            dataBuilder.putBoolean(KEY_CANCELLED, true)
-        } catch (e: Exception) {
-            logE(e.toString())
-            updateAsync {
-                copy(error = NodeError.Message(e.toString()))
-            }
-            dataBuilder.putString(KEY_EXCEPTION, e.toString())
-        } finally {
-            context.ifCanNotice(::showNotification)
         }
         return Result.success(dataBuilder.build())
     }

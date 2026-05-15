@@ -19,6 +19,8 @@ import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
+import app.atomofiron.searchboxapp.utils.CoroutineLauncher
+import app.atomofiron.searchboxapp.utils.CoroutineLauncher.Companion.invoke
 import app.atomofiron.searchboxapp.work.FinderWorker
 import java.util.UUID
 import javax.inject.Inject
@@ -33,7 +35,8 @@ class FinderService @Inject constructor(
     private val preferenceStore: PreferenceStore,
     explorerStore: ExplorerStore,
     dao: FinderDao,
-) {
+) : CoroutineLauncher by CoroutineLauncher(scope) {
+
     init {
         workManager.cancelAllWork()
         explorerStore.deleted.collect(scope) {
@@ -69,8 +72,8 @@ class FinderService @Inject constructor(
     }
 
     fun drop(task: GenericSearchTask) {
-        store {
-            drop(task.uuid)
+        default {
+            store.drop(task.uuid)
         }
         notificationManager.cancel(task.uniqueId)
     }
