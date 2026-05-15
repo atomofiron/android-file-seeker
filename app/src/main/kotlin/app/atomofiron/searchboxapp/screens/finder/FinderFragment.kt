@@ -43,8 +43,6 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
         finderAdapter = FinderAdapter(isLocal = viewState.isLocal, output = presenter)
         layoutManager = GridLayoutManager(context, 1)
-        spanSizeLookup = FlexSpanSizeLookup(null, finderAdapter, layoutManager, resources)
-        finderAdapter.holderListener = spanSizeLookup
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -54,12 +52,13 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
         binding.root.setCallback(presenter::onExitAnimationEnd)
         layoutManager.reverseLayout = true
+        spanSizeLookup = FlexSpanSizeLookup(binding.recyclerView, finderAdapter, layoutManager, resources)
+        finderAdapter.holderListener = spanSizeLookup
         binding.recyclerView.run {
             addItemDecoration(SectionBackgroundDecorator(context, FinderStateItem.groups))
             layoutManager = this@FinderFragment.layoutManager
             itemAnimator = null
             adapter = finderAdapter
-            spanSizeLookup.setRecyclerView(this)
             setupSpringOverscroll()
         }
         binding.root.setWindow(requireActivity().window)

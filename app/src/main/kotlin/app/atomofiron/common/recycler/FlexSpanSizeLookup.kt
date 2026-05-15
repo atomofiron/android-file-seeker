@@ -31,13 +31,12 @@ interface AdapterHolderListener {
 }
 
 class FlexSpanSizeLookup(
-    recyclerView: MeasuringRecyclerView?,
+    private val recyclerView: MeasuringRecyclerView,
     private val adapter: ListAdapter<out GeneralItem, *>,
     private val manager: GridLayoutManager,
     resources: Resources,
 )  : GridLayoutManager.SpanSizeLookup(), AdapterHolderListener {
 
-    private lateinit var recycler: MeasuringRecyclerView
     private val portraitWidth = resources.getDimension(R.dimen.screen_compact)
     private val itemCount get() = adapter.itemCount
     private val holders = mutableListOf<Holder>()
@@ -50,16 +49,10 @@ class FlexSpanSizeLookup(
     private val repeatTrigger = this@FlexSpanSizeLookup.RepeatTrigger()
 
     init {
-        if (recyclerView != null) setRecyclerView(recyclerView)
         manager.spanCount = COLUMNS_INT
         manager.spanSizeLookup = this
         adapter.registerAdapterDataObserver(this@FlexSpanSizeLookup.ItemObserver())
-    }
-
-    fun setRecyclerView(view: MeasuringRecyclerView) {
-        if (::recycler.isInitialized) throw IllegalStateException()
-        recycler = view
-        view.addMeasureListener { width, _ -> updateArea(width) }
+        recyclerView.addMeasureListener { width, _ -> updateArea(width) }
     }
 
     override fun onCreate(holder: Holder, viewType: Int) {
@@ -77,8 +70,8 @@ class FlexSpanSizeLookup(
         }
     }
 
-    private fun updateArea(width: Int = recycler.availableWidth) {
-        val available = width.toFloat() - recycler.run { paddingStart + paddingEnd }
+    private fun updateArea(width: Int = recyclerView.availableWidth) {
+        val available = width.toFloat() - recyclerView.run { paddingStart + paddingEnd }
         if (available > 0 && available != availableArea) {
             availableArea = available
             columnWidth = availableArea / COLUMNS_INT
@@ -214,11 +207,11 @@ class FlexSpanSizeLookup(
 
     private inner class RepeatTrigger : View.OnLayoutChangeListener {
 
-        val parent get() = recycler.parent as View
+        val parent get() = recyclerView.parent as View
 
         override fun onLayoutChange(v: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
             parent.removeOnLayoutChangeListener(this)
-            recycler.requestLayout()
+            recyclerView.requestLayout()
         }
 
         operator fun invoke() {
