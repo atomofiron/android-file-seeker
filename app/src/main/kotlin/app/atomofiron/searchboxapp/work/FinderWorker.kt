@@ -25,9 +25,11 @@ import app.atomofiron.searchboxapp.android.flags
 import app.atomofiron.searchboxapp.android.notification
 import app.atomofiron.searchboxapp.android.tryShow
 import app.atomofiron.searchboxapp.di.DaggerInjector
-import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
+import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
+import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -38,10 +40,10 @@ import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.model.finder.SearchTask
-import app.atomofiron.searchboxapp.model.other.AppScreen
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeMeta
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -49,8 +51,6 @@ import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.ifCanNotice
 import app.atomofiron.searchboxapp.utils.mutate
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -69,7 +69,6 @@ private const val UPDATING_FLAG = PendingIntent.FLAG_UPDATE_CURRENT or PendingIn
 private const val KEY_EXCEPTION = "KEY_EXCEPTION"
 private const val KEY_CANCELLED = "KEY_CANCELLED"
 
-// todo stop native calls?
 class FinderWorker(
     private val context: Context,
     workerParams: WorkerParameters,
@@ -102,15 +101,15 @@ class FinderWorker(
     @Inject
     lateinit var db: FinderDao
     @Inject
-    lateinit var commonChannel: CommonChannel
+    lateinit var scope: AppScope
 
     init {
         DaggerInjector.appComponent.inject(this)
     }
 
-    private fun CoroutineScope.searchText(params: Params, type: Params.Text) {
+    private fun Params.searchText(type: Params.Text) {
         val errors = GrowingList<String>()
-        NativeBridge.findText(params.query, params.refs(), maxDepth = params.maxDepth, maxSize = type.maxSize, params.asSu, cancellation) { match ->
+        NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, asSu, cancellation) { match ->
             updateAsync {
                 val new = when (match) {
                     is TextSearchProgress.Skip -> result.copy(countTotal = result.countTotal.inc())
@@ -131,7 +130,7 @@ class FinderWorker(
                 }
                 copy(result = new)
             }
-        }.apply(this)
+        }.apply()
     }
 
     private fun TypedMeta.toNodeHash(result: CrcResult? = null): NodeInfo {
@@ -149,9 +148,9 @@ class FinderWorker(
         )
     }
 
-    private fun CoroutineScope.searchNames(params: Params, type: Params.Names) {
+    private fun Params.searchNames(type: Params.Names) {
         val errors = GrowingList<String>()
-        NativeBridge.findNames(params.query, params.refs(), params.maxDepth, type.excludeDirs, params.asSu, cancellation) { match ->
+        NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu, cancellation) { match ->
             updateAsync {
                 when (match) {
                     is NameSearchProgress.Skip -> copy(result = result.copy(countTotal = result.countTotal.inc()))
@@ -167,7 +166,7 @@ class FinderWorker(
                     }
                 }
             }
-        }.apply(this)
+        }.apply()
     }
 
     override suspend fun doWork(): Result {
@@ -183,9 +182,7 @@ class FinderWorker(
         if (context.canForegroundService()) {
             setForeground(getForegroundInfo())
         }
-        val result = GlobalSearchResult(forText = params.type is Params.Text)
-        val id = db.put(SearchResultCache(stopped = false, params = params.query, result = result))
-        task = SearchTask(params.query, uuid = taskId, uniqueId = id.toInt(), result = result)
+        task = SearchTask(params.query, result = GlobalSearchResult(params.type is Params.Text), taskId)
         store.addOrUpdate(task)
         return work(params)
     }
@@ -202,18 +199,18 @@ class FinderWorker(
         store.addOrUpdate(task)
     }
 
-    private fun CoroutineScope.updateAsync(transform: GlobalSearchTask.() -> GlobalSearchTask) {
-        launch {
+    private fun updateAsync(transform: GlobalSearchTask.() -> GlobalSearchTask) {
+        scope.launch {
             update(transform)
         }
     }
 
-    private fun Rslt<Unit>.apply(scope: CoroutineScope) = scope.updateAsync {
+    private fun Rslt<Unit>.apply() = updateAsync {
         val error = err()?.message?.toNodeError()
         val stopped = isStopping
         val ended = toEnded(error = error, stopped = stopped)
         try {
-            db.put(SearchResultCache(id = task.uniqueId, stopped = stopped, params = ended.query, result = ended.result))
+            db.put(SearchResultCache(ended.uniqueId, stopped, ended.query, ended.result))
             ended.copy(cached = true)
         } catch (_: Exception) {
             ended
@@ -222,38 +219,36 @@ class FinderWorker(
 
     private suspend fun work(params: Params): Result {
         val dataBuilder = Data.Builder()
-        coroutineScope {
-            try {
+        try {
+            scope.launch {
                 when (val type = params.type) {
-                    is Params.Text -> searchText(params, type)
-                    is Params.Names -> searchNames(params, type)
+                    is Params.Text -> params.searchText(type)
+                    is Params.Names -> params.searchNames(type)
                 }
-            } catch (_: CancellationException) {
-                updateAsync {
-                    when {
-                        task.isProgress -> copy(status = SearchStatus.Stopping)
-                        else -> task
-                    }
-                }
-                dataBuilder.putBoolean(KEY_CANCELLED, true)
-            } catch (e: Exception) {
-                logE(e.toString())
-                updateAsync {
-                    copy(error = NodeError.Message(e.toString()))
-                }
-                dataBuilder.putString(KEY_EXCEPTION, e.toString())
-            } finally {
-                val current = commonChannel.currentScreen.value
-                val show = !commonChannel.appState.value.foreground
-                        || current !is AppScreen.Finder
-                        && (current as? AppScreen.Results)?.taskId != task.uniqueId
-                if (show) {
-                    context.ifCanNotice(::showNotification)
+            }.join()
+        } catch (_: CancellationException) {
+            updateAsync {
+                when {
+                    task.isProgress -> copy(status = SearchStatus.Stopping)
+                    else -> task
                 }
             }
+            dataBuilder.putBoolean(KEY_CANCELLED, true)
+        } catch (e: Exception) {
+            logE(e.toString())
+            updateAsync {
+                copy(error = NodeError.Message(e.toString()))
+            }
+            dataBuilder.putString(KEY_EXCEPTION, e.toString())
+        } finally {
+            context.ifCanNotice(::showNotification)
         }
         return Result.success(dataBuilder.build())
     }
+
+    private fun Meta.toNode() = Node(NodeRef(path), rootId = task.uniqueId, content = NodeContent.Unknown, meta = toNodeMeta())
+
+    private fun TypedMeta.toNode() = meta.toNode().resolveType(mime)
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return ForegroundInfo(hashCode(), foregroundNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
@@ -308,12 +303,10 @@ class FinderWorker(
     private fun foregroundNotification(): Notification = context.notification(
         Notifications.CHANNEL_ID_SEARCH,
         R.string.channel_name_search,
-        NotificationManagerCompat.IMPORTANCE_LOW,
+        NotificationManagerCompat.IMPORTANCE_DEFAULT,
     ) {
         val intent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(context, Codes.FOREGROUND, intent, UPDATING_FLAG)
-        setSound(null)
-        setVibrate(null)
         setDefaults(Notification.DEFAULT_ALL)
         setContentTitle(context.getString(R.string.searching))
         setSmallIcon(R.drawable.ic_notification)
