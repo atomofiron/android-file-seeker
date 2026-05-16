@@ -20,7 +20,6 @@ import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.utils.CoroutineLauncher
-import app.atomofiron.searchboxapp.utils.CoroutineLauncher.Companion.invoke
 import app.atomofiron.searchboxapp.work.FinderWorker
 import java.util.UUID
 import javax.inject.Inject

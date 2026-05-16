@@ -183,7 +183,9 @@ class FinderWorker(
         if (context.canForegroundService()) {
             setForeground(getForegroundInfo())
         }
-        task = SearchTask(params.query, result = GlobalSearchResult(params.type is Params.Text), taskId)
+        val result = GlobalSearchResult(forText = params.type is Params.Text)
+        val id = db.put(SearchResultCache(stopped = false, params = params.query, result = result))
+        task = SearchTask(params.query, uuid = taskId, uniqueId = id.toInt(), result = result)
         store.addOrUpdate(task)
         return work(params)
     }
@@ -211,7 +213,7 @@ class FinderWorker(
         val stopped = isStopping
         val ended = toEnded(error = error, stopped = stopped)
         try {
-            db.put(SearchResultCache(ended.uniqueId, stopped, ended.query, ended.result))
+            db.put(SearchResultCache(id = task.uniqueId, stopped = stopped, params = ended.query, result = ended.result))
             ended.copy(cached = true)
         } catch (_: Exception) {
             ended

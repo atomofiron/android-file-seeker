@@ -23,9 +23,6 @@ interface FinderDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun put(item: SearchResultCache): Long
 
-    @Delete
-    fun delete(item: SearchResultCache)
-
     @Query("DELETE FROM $RESULT WHERE id = :id")
     fun delete(id: Int)
 }

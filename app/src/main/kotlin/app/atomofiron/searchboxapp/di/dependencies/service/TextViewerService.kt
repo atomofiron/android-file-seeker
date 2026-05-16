@@ -41,6 +41,7 @@ class TextViewerService @Inject constructor(
         override fun cancelled(): Boolean = false
     }
     private val asSu: Boolean get() = preferences.asSu.value
+    private var localId = 1
 
     fun getFileSession(ref: NodeRef): Rslt<TextViewerSession> {
         return findSession(ref)
@@ -64,7 +65,7 @@ class TextViewerService @Inject constructor(
         } as? ItemMatch.Many
         item ?: return null
         val local = LocalSearchResult(item.count, item.matches, item.hash, removable = false)
-        val task = LocalSearchTask(finderTask.query, result = local, finderTask.uuid, status = finderTask.status, error = finderTask.error, cached = finderTask.cached)
+        val task = LocalSearchTask(finderTask.query, result = local, finderTask.uuid, uniqueId = localId++, status = finderTask.status, error = finderTask.error, cached = finderTask.cached)
         session.tasks { add(task) }
         return task
     }
@@ -95,7 +96,7 @@ class TextViewerService @Inject constructor(
 
     suspend fun search(ref: NodeRef, params: QueryParams) {
         val session = findSession(ref) ?: return
-        val uuid = SearchTask(params, LocalSearchResult())
+        val uuid = SearchTask(params, LocalSearchResult(), uniqueId = localId++)
             .also { session.tasks { add(it) } }
             .uuid
         val progress = NativeBridge.findLocalText(params, ref, asSu, NotCancelable)

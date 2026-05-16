@@ -59,7 +59,7 @@ sealed class FinderStateItem(
     data class Task<R : SearchResult>(
         val task: SearchTask<R>,
         val clickableIfEmpty: Boolean,
-    ) : FinderStateItem(FinderItemType.PROGRESS, task.uniqueId)
+    ) : FinderStateItem(FinderItemType.PROGRESS, task.uniqueId + 100)
 
     data class Targets(val targets: List<Node>) : FinderStateItem(FinderItemType.TARGETS)
 

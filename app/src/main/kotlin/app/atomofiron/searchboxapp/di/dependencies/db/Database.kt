@@ -14,7 +14,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 
 @DatabaseInfo(
     entities = [Deepest::class, TabRootSorting::class, SearchResultCache::class],
-    version = 3,
+    version = 4,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -25,7 +25,8 @@ abstract class Database : RoomDatabase() {
             Database::class.java,
             name = "db",
         ).addMigrations(Migrations.MIGRATION_2_3)
-            .fallbackToDestructiveMigration(BuildConfig.DEBUG)
+            .addMigrations(Migrations.MIGRATION_3_4)
+            //.fallbackToDestructiveMigration(BuildConfig.DEBUG)
             .build()
     }
     abstract fun explorer(): ExplorerDao
