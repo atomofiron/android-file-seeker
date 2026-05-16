@@ -17,6 +17,7 @@ typealias MaterialDimen = com.google.android.material.R.dimen
 
 typealias UnreachableException = Exception
 typealias ActivityProperty = RoProperty<out Activity?>
+typealias TaskId = Int
 
 const val DoesNotMatterFalse = false
 const val NoIcon = 0

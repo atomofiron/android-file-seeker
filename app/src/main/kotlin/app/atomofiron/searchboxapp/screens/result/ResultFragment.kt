@@ -22,15 +22,12 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.Item
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.TAG_EXPLORER_OPENED_ITEM
 import app.atomofiron.searchboxapp.screens.result.adapter.ItemGravityDecorator
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultAdapter
-import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.showSnackbar
-import lib.atomofiron.insets.insetsPadding
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState.Companion.Default as DefaultDockState
 
 class ResultFragment : Fragment(R.layout.fragment_result),
     BaseFragment<ResultFragment, ResultViewState, ResultPresenter, FragmentResultBinding> by BaseFragmentImpl()
 {
-
     private lateinit var binding: FragmentResultBinding
     private lateinit var statusDrawable: Drawable
 

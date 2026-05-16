@@ -4,9 +4,12 @@ import androidx.lifecycle.viewModelScope
 import app.atomofiron.common.arch.BaseViewModel
 import app.atomofiron.common.arch.Registerable
 import app.atomofiron.searchboxapp.di.DaggerInjector
+import app.atomofiron.searchboxapp.model.other.AppScreen
 import javax.inject.Inject
 
 class FinderViewModel : BaseViewModel<FinderComponent, FinderFragment, FinderViewState, FinderPresenter>() {
+
+    override val screen = AppScreen.Finder
 
     @Inject
     override lateinit var presenter: FinderPresenter

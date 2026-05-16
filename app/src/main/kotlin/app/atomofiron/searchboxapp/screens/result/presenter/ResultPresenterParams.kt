@@ -1,16 +1,16 @@
 package app.atomofiron.searchboxapp.screens.result.presenter
 
 import android.os.Bundle
-import app.atomofiron.searchboxapp.screens.result.ResultFragment
+import app.atomofiron.common.util.TaskId
 import app.atomofiron.searchboxapp.utils.Const
 
 class ResultPresenterParams(
-    val taskId: Int,
+    val taskId: TaskId,
 ) {
     companion object {
         private const val KEY_TASK_ID = "KEY_TASK_ID"
 
-        fun arguments(taskId: Int) = Bundle().apply {
+        fun arguments(taskId: TaskId) = Bundle().apply {
             putInt(KEY_TASK_ID, taskId)
         }
 

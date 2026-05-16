@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import app.atomofiron.common.util.property.MutableWeakProperty
+import app.atomofiron.searchboxapp.model.other.AppScreen
 
 /* ViewModel has screen's lifecycle,
 then builds di component (and register Android-side things),
@@ -12,6 +13,7 @@ abstract class BaseViewModel<D : Any, V : LifecycleOwner, S : Any, P : BasePrese
 
     val viewProperty: MutableWeakProperty<V> = MutableWeakProperty()
 
+    open val screen: AppScreen? = null
     abstract val presenter: P
     abstract val viewState: S
     private lateinit var componentRef: D

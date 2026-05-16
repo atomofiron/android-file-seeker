@@ -2,6 +2,9 @@ package app.atomofiron.searchboxapp.screens.root
 
 import androidx.fragment.app.Fragment
 import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ScreenDelegate
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ScreenDelegateImpl
 import app.atomofiron.searchboxapp.screens.common.RootRouting
 import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
 import dagger.Binds
@@ -39,6 +42,12 @@ abstract class RootModule {
     @Binds
     @RootScope
     abstract fun routing(router: RootRouter): RootRouting
+
+    @Binds
+    @RootScope
+    abstract fun provideScreenDelegate(impl: ScreenDelegateImpl): ScreenDelegate
 }
 
-interface RootDependencies
+interface RootDependencies {
+    fun commonChannel(): CommonChannel
+}

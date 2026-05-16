@@ -14,5 +14,6 @@ class RootFragment : Fragment(R.layout.fragment_root),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initViewModel(this, RootViewModel::class, savedInstanceState)
+        presenter.watchScreens(childFragmentManager)
     }
 }

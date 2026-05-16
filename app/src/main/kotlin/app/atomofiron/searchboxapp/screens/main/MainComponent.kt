@@ -6,8 +6,11 @@ import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
 import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ScreenDelegate
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ScreenDelegateImpl
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
 import app.atomofiron.searchboxapp.di.dependencies.store.EasterEggStore
@@ -63,6 +66,10 @@ abstract class MainModule {
     @Binds
     @MainScope
     abstract fun provideAppStoreConsumer(androidStore: AndroidStore): AppStoreConsumer
+
+    @Binds
+    @MainScope
+    abstract fun provideScreenDelegate(impl: ScreenDelegateImpl): ScreenDelegate
 }
 
 interface MainDependencies : DelegateModule.Dependencies {
@@ -74,4 +81,5 @@ interface MainDependencies : DelegateModule.Dependencies {
     fun apks(): ApkDelegate
     fun explorerStore(): ExplorerStore
     fun easterEggStore(): EasterEggStore
+    fun commonChannel(): CommonChannel
 }

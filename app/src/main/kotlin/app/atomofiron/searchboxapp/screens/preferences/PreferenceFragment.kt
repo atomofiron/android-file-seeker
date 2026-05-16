@@ -20,7 +20,6 @@ import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugFail
-import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.fileseeker.R
@@ -31,6 +30,7 @@ import app.atomofiron.searchboxapp.custom.overscroll.setupSpringOverscroll
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
 import app.atomofiron.searchboxapp.custom.preference.DropDownPreference
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.performHapticLite
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
 import app.atomofiron.searchboxapp.utils.showSnackbar

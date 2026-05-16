@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.main
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ScreenDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.WindowService
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.screens.main.presenter.AppEventDelegate
@@ -20,8 +21,10 @@ class MainPresenter @Inject constructor(
     private val windowService: WindowService,
     preferenceStore: PreferenceStore,
     private val initialDelegate: InitialDelegate,
-) : BasePresenter<MainViewModel, MainRouter>(scope, router),
-    AppEventDelegateApi by appEventDelegate
+    private val screenDelegate: ScreenDelegate,
+) : BasePresenter<MainViewModel, MainRouter>(scope, router)
+    , AppEventDelegateApi by appEventDelegate
+    , ScreenDelegate by screenDelegate
 {
     init {
         viewState.tasks.value = Array(16) { XTask() }.toList()

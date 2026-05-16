@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.root
 
 import app.atomofiron.common.arch.BasePresenter
+import app.atomofiron.searchboxapp.di.dependencies.delegate.ScreenDelegate
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
@@ -8,7 +9,10 @@ import javax.inject.Inject
 class RootPresenter @Inject constructor(
     scope: CoroutineScope,
     router: RootRouter,
-) : BasePresenter<RootViewModel, RootRouter>(scope, router) {
+    private val screenDelegate: ScreenDelegate,
+) : BasePresenter<RootViewModel, RootRouter>(scope, router)
+    , ScreenDelegate by screenDelegate
+{
 
     override fun onSubscribeData() = Unit
 

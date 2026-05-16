@@ -25,10 +25,9 @@ import app.atomofiron.searchboxapp.android.flags
 import app.atomofiron.searchboxapp.android.notification
 import app.atomofiron.searchboxapp.android.tryShow
 import app.atomofiron.searchboxapp.di.DaggerInjector
+import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
-import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -39,10 +38,10 @@ import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.other.AppScreen
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeMeta
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -102,6 +101,8 @@ class FinderWorker(
     lateinit var store: FinderStore
     @Inject
     lateinit var db: FinderDao
+    @Inject
+    lateinit var commonChannel: CommonChannel
 
     init {
         DaggerInjector.appComponent.inject(this)
@@ -240,15 +241,17 @@ class FinderWorker(
                 }
                 dataBuilder.putString(KEY_EXCEPTION, e.toString())
             } finally {
-                context.ifCanNotice(::showNotification)
+                val current = commonChannel.currentScreen.value
+                val show = !commonChannel.appState.value.foreground
+                        || current !is AppScreen.Finder
+                        && (current as? AppScreen.Results)?.taskId != task.uniqueId
+                if (show) {
+                    context.ifCanNotice(::showNotification)
+                }
             }
         }
         return Result.success(dataBuilder.build())
     }
-
-    private fun Meta.toNode() = Node(NodeRef(path), rootId = task.uniqueId, content = NodeContent.Unknown, meta = toNodeMeta())
-
-    private fun TypedMeta.toNode() = meta.toNode().resolveType(mime)
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return ForegroundInfo(hashCode(), foregroundNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
@@ -303,10 +306,12 @@ class FinderWorker(
     private fun foregroundNotification(): Notification = context.notification(
         Notifications.CHANNEL_ID_SEARCH,
         R.string.channel_name_search,
-        NotificationManagerCompat.IMPORTANCE_DEFAULT,
+        NotificationManagerCompat.IMPORTANCE_LOW,
     ) {
         val intent = Intent(context, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(context, Codes.FOREGROUND, intent, UPDATING_FLAG)
+        setSound(null)
+        setVibrate(null)
         setDefaults(Notification.DEFAULT_ALL)
         setContentTitle(context.getString(R.string.searching))
         setSmallIcon(R.drawable.ic_notification)

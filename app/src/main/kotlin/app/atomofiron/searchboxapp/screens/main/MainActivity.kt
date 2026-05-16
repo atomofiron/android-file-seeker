@@ -76,6 +76,7 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
         updateTheme(viewState.setTheme.value)
         presenter.onActivityCreate(this)
         onCreateView(savedInstanceState)
+        presenter.watchScreens(supportFragmentManager.fragments.first().childFragmentManager)
         // system insets providing breaks at least on Android 15 after app theme has been changed
         // enableEdgeToEdge() won’t help you in this hell
         // UPD 29.04.2025: WindowCompat.setDecorFitsSystemWindows() is not enough
