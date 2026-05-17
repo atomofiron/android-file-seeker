@@ -26,26 +26,7 @@ object Migrations {
             """)
         }
     }
-    fun from3to4() = object : Migration(3, 4) {
-        override fun migrate(db: SupportSQLiteDatabase) {
-            db.execIndentless("""
-                CREATE TABLE $TMP (
-                    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-                    stopped INTEGER NOT NULL,
-                    params BLOB NOT NULL,
-                    result BLOB NOT NULL,
-                    version INTEGER NOT NULL
-                )
-            """)
-            db.execIndentless("""
-                INSERT INTO $TMP (stopped, params, result, version)
-                SELECT stopped, params, result, version FROM ${FinderDao.RESULT}
-            """)
-            db.execSQL("DROP TABLE ${FinderDao.RESULT}")
-            db.execSQL("ALTER TABLE $TMP RENAME TO ${FinderDao.RESULT}")
-        }
-    }
-    fun from4to5(context: Context) = object : Migration(4, 5) {
+    fun from3to4(context: Context) = object : Migration(3, 4) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execIndentless("""
                 CREATE TABLE $TMP (
@@ -60,13 +41,13 @@ object Migrations {
                 INSERT INTO $TMP (stopped, params, sorting, version)
                 SELECT stopped, params, '', version FROM ${FinderDao.RESULT}
             """)
-            db.query("SELECT id, result FROM ${FinderDao.RESULT}").use { cursor ->
-                val idIndex = cursor.getColumnIndexOrThrow("id")
+            db.query("SELECT result FROM ${FinderDao.RESULT}").use { cursor ->
                 val resultIndex = cursor.getColumnIndexOrThrow("result")
 
+                var id = 0
                 val provider = ResultProvider(context)
                 while (cursor.moveToNext()) {
-                    val id = cursor.getInt(idIndex)
+                    id++
                     val bytes = cursor.getBlob(resultIndex)
 
                     val lr = bytes.decode<LegacyGlobalSearchResult>()
