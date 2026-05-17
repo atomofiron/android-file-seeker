@@ -1,15 +1,13 @@
 package app.atomofiron.searchboxapp.di.dependencies.store
 
 import app.atomofiron.common.util.extension.put
-import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
-import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
+import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.mutate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.UUID
@@ -38,13 +36,12 @@ class FinderStore @Inject constructor() {
         put(item) { it.uuid == item.uuid }
     }
 
-    suspend fun setSorting(id: Int, sorting: NodeSorting): GlobalSearchResult? {
+    suspend fun setSorting(id: Int, sorting: NodeSorting): Rslt<Unit> {
         return updateTasks {
             val index = indexOfFirst { it.uniqueId == id }
-            val task = getOrNull(index) ?: return null
-            val new = task.result.copy(sorting = sorting)
-            set(index, task.copy(result = new))
-            new
+            val task = getOrNull(index) ?: return Rslt.Err
+            set(index, task.copy(sorting = sorting))
+            Rslt.Ok
         }
     }
 

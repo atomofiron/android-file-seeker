@@ -3,7 +3,6 @@ package app.atomofiron.searchboxapp.model.finder
 import app.atomofiron.common.util.extension.hash
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeInfo
-import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.textviewer.MatchMap
 import kotlinx.serialization.Serializable
 import java.util.Objects
@@ -54,7 +53,6 @@ sealed class SearchResult {
         override val countTotal: Int = 0,
         val matches: List<ItemMatch> = listOf(), // todo make List<T : ItemMatch>?
         val errors: List<String> = listOf(),
-        val sorting: NodeSorting = NodeSorting.Date,
         val generation: Int = 0,
     ) : SearchResult() {
 
@@ -91,7 +89,7 @@ sealed class SearchResult {
 
         fun contains(match: ItemMatch) = matches.contains(match)
 
-        override fun hashCode(): Int = hash(this::class, count, countTotal, errors.size, sorting)
+        override fun hashCode(): Int = hash(this::class, count, countTotal, errors.size)
 
         override fun equals(other: Any?): Boolean = when {
             other === this -> true
@@ -99,7 +97,6 @@ sealed class SearchResult {
             other.count != count -> false
             other.countTotal != countTotal -> false
             other.generation != generation -> false
-            other.sorting != sorting -> false
             other.errors.size != errors.size -> false
             else -> other::class == this::class
         }

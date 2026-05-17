@@ -26,6 +26,7 @@ import app.atomofiron.searchboxapp.android.notification
 import app.atomofiron.searchboxapp.android.tryShow
 import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
+import app.atomofiron.searchboxapp.di.dependencies.db.ResultProvider
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -210,7 +211,9 @@ class FinderWorker(
         val stopped = isStopping
         val ended = toEnded(error = error, stopped = stopped)
         try {
-            db.put(SearchResultCache(ended.uniqueId, stopped, ended.query, ended.result))
+            val provider = ResultProvider(context)
+            provider.store(ended.uniqueId, ended.result)
+            db.put(SearchResultCache(ended.uniqueId, stopped, ended.query))
             ended.copy(cached = true)
         } catch (_: Exception) {
             ended

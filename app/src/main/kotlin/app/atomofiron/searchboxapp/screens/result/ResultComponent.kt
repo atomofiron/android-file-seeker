@@ -16,6 +16,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.ResultStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
+import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import dagger.BindsInstance
@@ -58,6 +59,14 @@ class ResultModule {
     fun activity(property: WeakProperty<out Fragment>): ActivityProperty {
         return property.map { it?.activity }
     }
+
+    @Provides
+    fun task(
+        finderStore: FinderStore,
+        params: ResultPresenterParams,
+    ): GlobalSearchTask? = finderStore
+        .tasksFlow.value
+        .find { it.uniqueId == params.taskId }
 }
 
 interface ResultDependencies : DelegateModule.Dependencies {

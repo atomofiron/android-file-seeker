@@ -10,5 +10,9 @@ inline fun <reified T : Any> ByteArray.decode(): T = ProtoBuf.decodeFromByteArra
 
 inline fun <reified T : Any> ByteArray.decodeOrNull(): T? = when {
     isEmpty() -> null
-    else -> decode()
+    else -> try {
+        decode()
+    } catch (_: Exception) {
+        null
+    }
 }

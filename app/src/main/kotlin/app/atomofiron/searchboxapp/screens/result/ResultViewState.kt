@@ -7,7 +7,6 @@ import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
-import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeId
@@ -17,7 +16,6 @@ import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
 import app.atomofiron.searchboxapp.model.toDockItem
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
-import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortBy
 import app.atomofiron.searchboxapp.utils.toAlert
@@ -33,27 +31,19 @@ import javax.inject.Inject
 
 @ResultScope
 class ResultViewState @Inject constructor(
-    params: ResultPresenterParams,
     val mode: ActivityMode,
-    finderStore: FinderStore,
+    task: GlobalSearchTask?,
     private val scope: CoroutineScope,
     preferenceStore: PreferenceStore,
 ) : ResultViewStateTmp {
 
     private val mimeTypes = mode.mimeFilters() ?: emptyList()
-    private val taskId = params.taskId
-    val taskUuid: UUID = finderStore
-        .tasksFlow.value
-        .find { it.uniqueId == taskId }?.uuid
-        ?: UUID.randomUUID()
+    val taskUuid: UUID = task?.uuid ?: UUID.randomUUID()
 
     private var error: NodeError? = null
     private val mutex = Mutex()
 
-    private var _result: GlobalSearchResult = finderStore
-        .tasksFlow.value
-        .find { it.uniqueId == taskId }?.result
-        ?: GlobalSearchResult(forText = false)
+    private var _result: GlobalSearchResult = task?.result ?: GlobalSearchResult(forText = false)
     val result: GlobalSearchResult get() = _result
     private val _cache = mutableMapOf<NodeId, ResultItem.Item>()
     val cache: Map<NodeId, ResultItem.Item> = _cache
@@ -63,7 +53,7 @@ class ResultViewState @Inject constructor(
     override val updates: Flow<ResultItem> = _updates
     private val _checked = MutableStateFlow<Set<NodeId>>(emptySet())
     val checked: StateFlow<Set<NodeId>> = _checked
-    private val _dock = MutableStateFlow(ResultDockState.Default.reduce(inProgress = false, result.sorting, checked = checked.value.size, hasMatches = result.matches.isNotEmpty()))
+    private val _dock = MutableStateFlow(ResultDockState.Default.reduce(inProgress = false, task?.sorting ?: NodeSorting.Name, checked = checked.value.size, hasMatches = result.matches.isNotEmpty()))
     override val dock: StateFlow<ResultDockState> = _dock
 
     override val composition = preferenceStore.explorerItemComposition
@@ -81,8 +71,8 @@ class ResultViewState @Inject constructor(
             }
         }
         _result = result
-        _dock.value = _dock.value.reduce(task.isProgress, result.sorting, checked = checked.size, hasMatches = result.matches.isNotEmpty())
-        _items.renderItems(checked, result.sorting, result.errors.size)
+        _dock.value = _dock.value.reduce(task.isProgress, task.sorting, checked = checked.size, hasMatches = result.matches.isNotEmpty())
+        _items.renderItems(checked, task.sorting, result.errors.size)
     }
 
     private fun ResultDockState.reduce(

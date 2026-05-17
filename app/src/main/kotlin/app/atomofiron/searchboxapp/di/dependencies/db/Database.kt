@@ -5,7 +5,6 @@ import androidx.room.Database as DatabaseInfo
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.model.explorer.other.Deepest
@@ -14,7 +13,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 
 @DatabaseInfo(
     entities = [Deepest::class, TabRootSorting::class, SearchResultCache::class],
-    version = 4,
+    version = 5,
     exportSchema = false,
 )
 @TypeConverters(Converters::class)
@@ -24,8 +23,9 @@ abstract class Database : RoomDatabase() {
             context,
             Database::class.java,
             name = "db",
-        ).addMigrations(Migrations.MIGRATION_2_3)
-            .addMigrations(Migrations.MIGRATION_3_4)
+        ).addMigrations(Migrations.from2to3())
+            .addMigrations(Migrations.from3to4())
+            .addMigrations(Migrations.from4to5(context))
             //.fallbackToDestructiveMigration(BuildConfig.DEBUG)
             .build()
     }

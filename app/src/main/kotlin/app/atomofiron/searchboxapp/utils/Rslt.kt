@@ -15,6 +15,11 @@ sealed class Rslt<T>(val isOk: Boolean) {
     }
 
     open class Err<T>(open val message: String = "") : Rslt<T>(isOk = false) {
+        companion object : Rslt.Err<Unit>() {
+            private data class Err<T>(override val message: String) : Rslt.Err<T>()
+            operator fun <T> invoke(value: T): Rslt.Err<T> = Err(value)
+            override fun toString() = "Err"
+        }
         val isEmpty: Boolean get() = message.isEmpty()
     }
 

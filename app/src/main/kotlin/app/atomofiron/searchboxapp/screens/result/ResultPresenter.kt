@@ -143,9 +143,9 @@ class ResultPresenter @Inject constructor(
     fun onSortingSelected(sorting: NodeSorting) {
         default {
             val new = finderStore.setSorting(taskId, sorting)
-            new ?: return@default
+            new.ok() ?: return@default
             val cache = dao.get(taskId) ?: return@default
-            dao.put(cache.copy(result = new))
+            dao.put(cache.copy(sorting = sorting))
         }
     }
 }

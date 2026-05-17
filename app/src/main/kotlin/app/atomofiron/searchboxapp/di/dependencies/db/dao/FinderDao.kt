@@ -12,6 +12,7 @@ interface FinderDao {
     companion object {
         const val RESULT = "search"
         const val VERSION = 1
+        const val DIR_NAME = "results"
     }
 
     @Query("SELECT * FROM $RESULT WHERE version = $VERSION order by id")
