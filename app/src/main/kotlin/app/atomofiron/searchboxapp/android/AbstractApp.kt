@@ -1,11 +1,12 @@
 package app.atomofiron.searchboxapp.android
 
+import android.annotation.SuppressLint
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import app.atomofiron.common.util.extension.debugContext
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.android.ScreenshotService.Companion.initScreenshotService
@@ -18,10 +19,14 @@ import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.model.other.AppState
 import com.google.android.material.color.DynamicColors
-import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 abstract class AbstractApp : Application(), LifecycleEventObserver {
+    companion object {
+        @SuppressLint("StaticFieldLeak")
+        lateinit var appContext: Context // this is the Application instance
+            private set
+    }
 
     @Inject
     lateinit var initialDelegate: InitialDelegate
@@ -42,7 +47,7 @@ abstract class AbstractApp : Application(), LifecycleEventObserver {
     override fun onCreate() {
         super.onCreate()
 
-        debugContext = WeakReference(this)
+        appContext = this
 
         DynamicColors.applyToActivitiesIfAvailable(this)
 

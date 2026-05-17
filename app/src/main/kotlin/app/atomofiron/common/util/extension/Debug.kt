@@ -1,16 +1,13 @@
 package app.atomofiron.common.util.extension
 
-import android.content.Context
 import android.util.Log
 import android.widget.Toast
 import app.atomofiron.fileseeker.BuildConfig
+import app.atomofiron.searchboxapp.android.AbstractApp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.lang.ref.WeakReference
-
-var debugContext = WeakReference<Context>(null)
 
 fun stub(): String = "check the stack trace"
 
@@ -29,10 +26,8 @@ inline fun Any.debugRequireNotNull(any: Any?, lazyMessage: () -> Any = ::stub) =
 inline fun Any.debugRequire(value: Boolean, lazyMessage: () -> Any = ::stub)  {
     if (BuildConfig.DEBUG) require(value) {
         val message = "$simpleName: ${lazyMessage()}"
-        debugContext.get()?.let {
-            GlobalScope.launch(Dispatchers.Main) {
-                Toast.makeText(it, message, Toast.LENGTH_LONG).show()
-            }
+        GlobalScope.launch(Dispatchers.Main) {
+            Toast.makeText(AbstractApp.appContext, message, Toast.LENGTH_LONG).show()
         }
         message
     }
