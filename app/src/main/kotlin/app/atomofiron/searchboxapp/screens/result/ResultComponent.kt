@@ -62,7 +62,7 @@ class ResultModule {
 
     @Provides
     @ResultScope
-    fun viewState(state: ResultScreenState): ResultViewStateTmp = state
+    fun viewState(state: ResultScreenState): ResultViewState = state
 
     @Provides
     fun task(

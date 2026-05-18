@@ -35,7 +35,7 @@ class ResultScreenState @Inject constructor(
     task: GlobalSearchTask?,
     private val scope: CoroutineScope,
     preferenceStore: PreferenceStore,
-) : ResultViewStateTmp {
+) : ResultViewState {
 
     private val mimeTypes = mode.mimeFilters() ?: emptyList()
     val taskUuid: UUID = task?.uuid ?: UUID.randomUUID()

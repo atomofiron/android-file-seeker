@@ -8,7 +8,7 @@ import app.atomofiron.searchboxapp.screens.result.state.ResultDockState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
-interface ResultViewStateTmp {
+interface ResultViewState {
     val mode: ActivityMode
     val items: StateFlow<List<ResultItem>>
     val updates: Flow<ResultItem>
