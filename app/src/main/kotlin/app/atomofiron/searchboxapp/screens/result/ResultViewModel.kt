@@ -8,13 +8,13 @@ import app.atomofiron.searchboxapp.screens.common.activityMode
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import javax.inject.Inject
 
-class ResultViewModel : BaseViewModel<ResultComponent, ResultFragment, ResultViewState, ResultPresenter>() {
+class ResultViewModel : BaseViewModel<ResultComponent, ResultFragment, ResultViewStateTmp, ResultPresenter>() {
 
     override var screen: AppScreen? = null
     @Inject
     override lateinit var presenter: ResultPresenter
     @Inject
-    override lateinit var viewState: ResultViewState
+    override lateinit var viewState: ResultViewStateTmp
 
     override fun component(view: ResultFragment): ResultComponent {
         val params = ResultPresenterParams.params(view.requireArguments())

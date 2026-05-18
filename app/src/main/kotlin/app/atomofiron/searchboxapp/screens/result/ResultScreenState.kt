@@ -30,8 +30,8 @@ import java.util.UUID
 import javax.inject.Inject
 
 @ResultScope
-class ResultViewState @Inject constructor(
-    val mode: ActivityMode,
+class ResultScreenState @Inject constructor(
+    override val mode: ActivityMode,
     task: GlobalSearchTask?,
     private val scope: CoroutineScope,
     preferenceStore: PreferenceStore,

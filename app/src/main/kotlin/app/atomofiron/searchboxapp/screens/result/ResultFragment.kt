@@ -26,7 +26,7 @@ import app.atomofiron.searchboxapp.utils.showSnackbar
 import app.atomofiron.searchboxapp.screens.result.state.ResultDockState.Companion.Default as DefaultDockState
 
 class ResultFragment : Fragment(R.layout.fragment_result),
-    BaseFragment<ResultFragment, ResultViewState, ResultPresenter, FragmentResultBinding> by BaseFragmentImpl()
+    BaseFragment<ResultFragment, ResultViewStateTmp, ResultPresenter, FragmentResultBinding> by BaseFragmentImpl()
 {
     private lateinit var binding: FragmentResultBinding
     private lateinit var statusDrawable: Drawable
@@ -76,7 +76,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
         }
     }
 
-    override fun ResultViewState.onViewCollect() {
+    override fun ResultViewStateTmp.onViewCollect() {
         viewCollect(composition) {
             backgroundDecorator.enabled = it.visibleBg
             resultAdapter.setComposition(it)

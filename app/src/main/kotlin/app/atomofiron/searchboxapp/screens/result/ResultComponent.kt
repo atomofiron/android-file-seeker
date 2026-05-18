@@ -61,6 +61,10 @@ class ResultModule {
     }
 
     @Provides
+    @ResultScope
+    fun viewState(state: ResultScreenState): ResultViewStateTmp = state
+
+    @Provides
     fun task(
         finderStore: FinderStore,
         params: ResultPresenterParams,

@@ -35,7 +35,7 @@ import javax.inject.Inject
 class ResultPresenter @Inject constructor(
     params: ResultPresenterParams,
     scope: CoroutineScope,
-    private val viewState: ResultViewState,
+    private val state: ResultScreenState,
     private val finderStore: FinderStore,
     private val interactor: ResultInteractor,
     router: ResultRouter,
@@ -65,10 +65,10 @@ class ResultPresenter @Inject constructor(
         val tasks = finderStore.tasksFlow.mapNotNull { tasks ->
             tasks.find { it.uniqueId == taskId }
         }
-        combineTransform<_, _, Unit>(tasks, viewState.checked) { task, checked ->
+        combineTransform<_, _, Unit>(tasks, state.checked) { task, checked ->
             val result = task.result
             val cached = result.matches.mapNotNull { match ->
-                val cached = viewState.cache[match.uniqueId]
+                val cached = state.cache[match.uniqueId]
                 when {
                     cached == null -> {
                         val content = match.ref.resolveContent(match.hash.mime, match.hash.meta)
@@ -81,8 +81,8 @@ class ResultPresenter @Inject constructor(
                     else -> null
                 }
             }
-            viewState.cache(cached)
-            viewState.reduce(task, checked)
+            state.cache(cached)
+            state.reduce(task, checked)
         }.run {
             default { collect() }
         }
@@ -91,46 +91,46 @@ class ResultPresenter @Inject constructor(
     private fun cacheAsync(item: ResultItem.Item) {
         io {
             val new = item.copy(item = item.item.update(asSu))
-            viewState.cache(new)
+            state.cache(new)
         }
     }
 
-    fun onStopClick() = interactor.stop(viewState.taskUuid)
+    fun onStopClick() = interactor.stop(state.taskUuid)
 
     fun onShareClick() {
-        val checkedOnly = viewState.checked.value.isNotEmpty()
-        val items = viewState.items.value.mapCast<_, ResultItem.Item, _> {
+        val checkedOnly = state.checked.value.isNotEmpty()
+        val items = state.items.value.mapCast<_, ResultItem.Item, _> {
             item.takeIf { !checkedOnly || isChecked }
         }
         sharing.shareWith(items)
     }
 
     fun onExportClick() {
-        val checked = viewState.checked.value
+        val checked = state.checked.value
         val checkedOnly = checked.isNotEmpty()
         val data = when {
-            checkedOnly -> viewState.result.toMarkdown {
+            checkedOnly -> state.result.toMarkdown {
                 checked.contains(it.uniqueId)
             }
-            else -> viewState.result.toMarkdown()
+            else -> state.result.toMarkdown()
         }
         val title = "search_${resources.formatDate()}.md.txt";
         if (!router.shareFile(title, data)) {
-            viewState.showAlert(AlertErr(R.string.no_activity))
+            state.showAlert(AlertErr(R.string.no_activity))
         }
     }
 
     fun onConfirmClick() {
-        val items = viewState.items.value.mapCast<_, ResultItem.Item, _> {
-            item.takeIf { viewState.checked.value.contains(uniqueId) }
+        val items = state.items.value.mapCast<_, ResultItem.Item, _> {
+            item.takeIf { state.checked.value.contains(uniqueId) }
         }
-        val mode = viewState.mode
+        val mode = state.mode
         val first = items.firstOrNull() ?: return
         when {
             mode is ActivityMode.Default -> debugFailUnreachable()
             mode is ActivityMode.Receive -> {
                 main {
-                    workManager.startReceiveInto(first.ref, viewState.mode)
+                    workManager.startReceiveInto(first.ref, state.mode)
                     router.finish()
                 }
             }

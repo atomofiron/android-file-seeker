@@ -13,7 +13,7 @@ import app.atomofiron.searchboxapp.screens.common.delegates.ApkOperationsDelegat
 import app.atomofiron.searchboxapp.screens.common.delegates.FileOperationDelegate
 import app.atomofiron.searchboxapp.screens.result.ResultRouter
 import app.atomofiron.searchboxapp.screens.result.ResultScope
-import app.atomofiron.searchboxapp.screens.result.ResultViewState
+import app.atomofiron.searchboxapp.screens.result.ResultScreenState
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
 import app.atomofiron.searchboxapp.screens.result.di.ResultInteractor
@@ -24,7 +24,7 @@ import javax.inject.Inject
 
 @ResultScope
 class ResultItemActionDelegate @Inject constructor(
-    private val viewState: ResultViewState,
+    private val state: ResultScreenState,
     private val scope: CoroutineScope,
     private val operations: FileOperationDelegate,
     private val apks: ApkOperationsDelegate,
@@ -39,14 +39,14 @@ class ResultItemActionDelegate @Inject constructor(
         when (true) {
             item.isDirectory -> Unit // todo open dir
             (item.error is NodeError.NoSuchFileOrDir),
-            (item.error is NodeError.PermissionDenied) -> viewState.showAlert(item.error.toAlert(item.content))
-            (item.content is NodeContent.Text) -> router.openFile(item.ref, viewState.taskUuid)
+            (item.error is NodeError.PermissionDenied) -> state.showAlert(item.error.toAlert(item.content))
+            (item.content is NodeContent.Text) -> router.openFile(item.ref, state.taskUuid)
             (item.content is NodeContent.AndroidApp) -> apks.askForAndroidApp(item.ref, item.content)
             else -> sharing.openWith(item)
         }
     }
 
-    override fun onItemLongClick(item: Node) = viewState.run {
+    override fun onItemLongClick(item: Node) = state.run {
         val items = when {
             item.isChecked -> cache.values.mapNotNull { item ->
                 item.item.takeIf { checked.value.contains(item.uniqueId) }
@@ -59,12 +59,12 @@ class ResultItemActionDelegate @Inject constructor(
             is Rslt.Err -> when {
                 options.isEmpty -> AlertErr(R.string.unknown_error)
                 else -> AlertErr(options.message)
-            }.let { viewState.showAlert(it) }
+            }.let { state.showAlert(it) }
         }
     }
 
     override fun onItemCheck(item: Node, toChecked: Boolean): Boolean {
-        viewState.setChecked(item.uniqueId, toChecked)
+        state.setChecked(item.uniqueId, toChecked)
         return true
     }
 
@@ -76,12 +76,12 @@ class ResultItemActionDelegate @Inject constructor(
                 .takeIf { it != item.item }
                 ?.copy(isChecked = false)
                 ?.let { item.copy(item = it) }
-                ?.let { viewState.cache(it) }
+                ?.let { state.cache(it) }
         }
     }
 
     override fun onErrorsClick() {
-        val error = viewState.result.errors.joinToString(separator = "\n")
+        val error = state.result.errors.joinToString(separator = "\n")
         dialogs.showErrors(error.toUni())
     }
 }
