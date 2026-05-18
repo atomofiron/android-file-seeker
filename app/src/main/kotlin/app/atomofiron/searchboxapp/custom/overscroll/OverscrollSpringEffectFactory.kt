@@ -76,7 +76,7 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
                         ids.removeAt(i)
                         if (i == ids.size && ids.isNotEmpty()) {
                             val index = event.findPointerIndex(ids.last())
-                            startY = event.getY(index)
+                            startY = event.getY(index) // wtf? IllegalArgumentException
                             resetOnPull = true
                         }
                     } else {

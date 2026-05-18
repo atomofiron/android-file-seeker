@@ -63,9 +63,9 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
             val bytesStart = match.offset.toInt() - item.offset
             val bytesEnd = (bytesStart + match.length.toInt())
             val start = item.text.countChars(charset, 0..<bytesStart)
-            if (bytesStart < 0 || bytesEnd < 0) {
-                debugFail { "$bytesStart < 0 || $bytesEnd < 0, text ${item.text.decode()}" }
-                return bind(item, position)
+            if (bytesStart < 0 || bytesEnd > item.text.size) {
+                debugFail { "$bytesStart < 0 || $bytesEnd > ${item.text.size}, text ${item.text.decode()}" }
+                return@forEachIndexed
             }
             val length = item.text.countChars(charset, bytesStart..<bytesEnd)
             val end = start + length
@@ -76,7 +76,10 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
                 index == indexFocus -> spanPartFocus
                 else -> spanPart
             }
-            spannable.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            when {
+                start < 0 || end > spannable.length -> debugFail { "$start < 0 || $end > ${spannable.length}, spannable $spannable" }
+                else -> spannable.setSpan(span, start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
         }
         textView.text = spannable
         // android:textIsSelectable="true" breaks down
