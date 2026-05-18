@@ -45,14 +45,13 @@ object Migrations {
                 val resultIndex = cursor.getColumnIndexOrThrow("result")
 
                 var id = 0
-                val provider = ResultProvider(context)
                 while (cursor.moveToNext()) {
                     id++
                     val bytes = cursor.getBlob(resultIndex)
 
                     val lr = bytes.decode<LegacyGlobalSearchResult>()
                     val result = GlobalSearchResult(lr.forText, lr.count, lr.countTotal, lr.matches, lr.errors, lr.generation)
-                    provider.store(id, result)
+                    FinderDao.store(id, result)
                     db.compileStatement("UPDATE $TMP SET sorting = ? WHERE id = ?").run {
                         clearBindings()
                         bindString(1, Converters.fromNodeSorting(lr.sorting))

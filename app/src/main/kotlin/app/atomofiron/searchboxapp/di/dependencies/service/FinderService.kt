@@ -8,9 +8,7 @@ import androidx.work.WorkManager
 import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.launchOnDefault
 import app.atomofiron.common.util.flow.collect
-import app.atomofiron.searchboxapp.android.AbstractApp
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
-import app.atomofiron.searchboxapp.di.dependencies.db.ResultProvider
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
@@ -44,9 +42,8 @@ class FinderService @Inject constructor(
             store.deleteResultFromTasks(it)
         }
         scope.launchOnDefault {
-            val provider = ResultProvider(AbstractApp.appContext)
             val cached = dao.all().mapNotNull {
-                val result = provider.read(it.id)
+                val result = dao.read(it.id)
                     ?: return@mapNotNull null
                 GlobalSearchTask(query = it.params, result = result, uniqueId = it.id, status = SearchStatus.Ended(stopped = it.stopped), cached = true)
             }

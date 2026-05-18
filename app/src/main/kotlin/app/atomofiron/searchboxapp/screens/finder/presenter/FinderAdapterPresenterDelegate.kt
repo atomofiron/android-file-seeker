@@ -74,7 +74,7 @@ class FinderAdapterPresenterDelegate @Inject constructor(
 
     override fun onTaskRemoveClick(item: FinderStateItem.Task<SearchResult>) {
         interactor.drop(item.task)
-        io { cache.delete(item.task.uniqueId) }
+        io { cache.drop(item.task.uniqueId) }
     }
 
     override fun onReplaceClick(value: String) = Unit
