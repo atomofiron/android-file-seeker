@@ -24,9 +24,10 @@ class ItemSeparatorDecorator : RecyclerView.ItemDecoration() {
         parent.children.forEachIndexed { index, child ->
             val startX = parent.paddingLeft.toFloat()
             val stopX = parent.width - parent.paddingRight.toFloat()
-            val nextY = parent.getChildAt(index.inc())?.y?.toInt()
-                ?: parent.run { height - paddingBottom }
             val bottom = child.run { y + height }
+            val nextY = parent.getChildAt(index.inc())
+                ?.y?.toInt()
+                ?: bottom.toInt()
             val y = bottom + (nextY - bottom) / 2
             canvas.drawLine(startX, y, stopX, y, paint)
         }
