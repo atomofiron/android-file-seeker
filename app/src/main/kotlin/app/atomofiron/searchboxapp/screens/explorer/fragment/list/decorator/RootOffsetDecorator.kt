@@ -19,7 +19,7 @@ class RootOffsetDecorator(
     private val spanSizeLookup: ExplorerSpanSizeLookup,
 ) : RecyclerView.ItemDecoration() {
 
-    private val padding = recyclerView.resources.getDimensionPixelSize(R.dimen.padding_half)
+    private val padding = recyclerView.resources.getDimensionPixelSize(R.dimen.item_root_padding)
     private var layout = Layout.Stub
     private val rootView = LayoutInflater.from(recyclerView.context)
         .inflate(R.layout.item_explorer_card, recyclerView, false)
@@ -41,11 +41,9 @@ class RootOffsetDecorator(
         }
     }
 
-    fun cells(): Int = spanSizeLookup.getSpanSizeOrNull(0)
+    private fun cells(): Int = spanSizeLookup.getSpanSizeOrNull(0)
         ?.let { layoutManager.spanCount / it }
         ?: 0
-
-    fun offset(recyclerView: RecyclerView) = offset(recyclerView, cells())
 
     private fun offset(recyclerView: RecyclerView, cells: Int): Int {
         val roots = rootAdapter.itemCount

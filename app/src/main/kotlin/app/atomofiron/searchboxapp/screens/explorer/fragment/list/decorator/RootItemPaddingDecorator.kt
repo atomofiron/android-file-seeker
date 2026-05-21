@@ -19,7 +19,7 @@ class RootItemPaddingDecorator(
     private val adapter: RootAdapter,
 ) : RecyclerView.ItemDecoration(), InsetsListener {
 
-    private val padding = resources.getDimensionPixelSize(R.dimen.padding_half)
+    private val padding = resources.getDimensionPixelSize(R.dimen.item_root_padding)
     private var rows = IntArray(0)
     private var paddings = mutableListOf<Int>()
     private var leftPadding = 0

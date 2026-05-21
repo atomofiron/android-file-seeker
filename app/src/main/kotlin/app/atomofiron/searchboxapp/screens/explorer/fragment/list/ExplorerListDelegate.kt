@@ -49,7 +49,7 @@ class ExplorerListDelegate(
     private val items get() = nodeAdapter.items
 
     init {
-        recyclerView.animateRootOffset(rootAdapter, nodeAdapter, rootOffsetDecorator)
+        recyclerView.animateRootOffset(rootAdapter)
         recyclerView.attachInsetsListener(rootPaddingDecorator)
         recyclerView.attachInsetsListener(borderDecorator)
         recyclerView.addItemDecoration(rootOffsetDecorator)
