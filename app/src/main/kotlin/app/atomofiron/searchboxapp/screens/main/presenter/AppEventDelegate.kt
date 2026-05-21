@@ -14,12 +14,14 @@ import androidx.lifecycle.LifecycleOwner
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.dialog.DialogConfig
 import app.atomofiron.common.util.dialog.DialogDelegate
+import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.android.dismissUpdateNotification
 import app.atomofiron.searchboxapp.android.showUpdateNotification
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
+import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
 import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
@@ -27,6 +29,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.EasterEggStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.other.AppUpdateState
+import app.atomofiron.searchboxapp.model.other.UiMode
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.UpdateNotification
 import app.atomofiron.searchboxapp.model.preference.AppLocale
@@ -46,12 +49,14 @@ interface AppEventDelegateApi {
     fun onActivityDestroy()
     fun onIntent(intent: Intent)
     fun onActivityFinish()
+    fun onUserInteraction()
+    fun onConfiguration(isDark: Boolean, isBlack: Boolean)
 }
 
 @MainScope
 class AppEventDelegate @Inject constructor(
     private val context: Context,
-    scope: CoroutineScope,
+    private val scope: CoroutineScope,
     private val router: MainRouter,
     private val appStoreConsumer: AppStoreConsumer,
     private val operations: ApkOperationsDelegate,
@@ -61,6 +66,7 @@ class AppEventDelegate @Inject constructor(
     updateStore: AppUpdateStore,
     private val eggStore: EasterEggStore,
     apkChannel: ApkChannel,
+    private val commonChannel: CommonChannel,
     private val updateService: AppUpdateService,
 ) : AppEventDelegateApi, LifecycleEventObserver {
 
@@ -109,6 +115,12 @@ class AppEventDelegate @Inject constructor(
             }
             eggStore.set(value)
         }
+    }
+
+    override fun onUserInteraction() = commonChannel.userInteraction.invoke(scope)
+
+    override fun onConfiguration(isDark: Boolean, isBlack: Boolean) {
+        commonChannel.uiMode[scope] = UiMode(isDark, isBlack)
     }
 
     private fun onThemeApplied(theme: AppTheme) {

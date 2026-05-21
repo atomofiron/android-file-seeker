@@ -46,6 +46,8 @@ class MainPresenter @Inject constructor(
         router.onBack(soft = false) -> Unit
         viewState.activityMode.default -> router.minimize()
         else -> router.finish()
+    }.also {
+        onUserInteraction()
     }
 
     fun onThemeApplied(isDarkTheme: Boolean) {

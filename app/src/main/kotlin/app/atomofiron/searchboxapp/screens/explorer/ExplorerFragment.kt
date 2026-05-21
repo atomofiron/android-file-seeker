@@ -6,6 +6,7 @@ import android.view.KeyEvent
 import android.view.View
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
@@ -27,8 +28,10 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerAlert
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerPagerAdapter
 import app.atomofiron.searchboxapp.screens.explorer.state.ExplorerDock
 import app.atomofiron.searchboxapp.screens.main.util.KeyCodeConsumer
+import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.recyclerView
 import app.atomofiron.searchboxapp.utils.showSnackbar
+import kotlinx.coroutines.delay
 
 class ExplorerFragment : Fragment(R.layout.fragment_explorer),
     BaseFragment<ExplorerFragment, ExplorerViewState, ExplorerPresenter, FragmentExplorerBinding> by BaseFragmentImpl(),
@@ -103,6 +106,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
             binding.pager.currentItem = it.index
         }
         viewCollect(permissionRequiredWarning, collector = ::showPermissionRequiredWarning)
+        viewCollect(showEasterEgg, collector = ::showEasterEgg)
     }
 
     override fun FragmentExplorerBinding.onApplyInsets() {
@@ -156,5 +160,19 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
             Alert(R.string.access_to_storage_forbidden),
             LabeledAction(R.string.allow) { presenter.onAllowStorageClick() },
         )
+    }
+
+    private suspend fun showEasterEgg(u: Unit) {
+        val recyclerView = getCurrentTabView().recyclerView
+        val topView = recyclerView.getChildAt(0)
+            ?: return
+        val height = binding.smile.drawable.intrinsicHeight
+        val space = topView.top - recyclerView.paddingTop
+        if (space >= height) {
+            binding.smile.translationY = recyclerView.paddingTop + (space - height) / 2f
+            binding.smile.isVisible = true
+            delay(Const.MINI_DELAY)
+            binding.smile.isVisible = false
+        }
     }
 }

@@ -26,6 +26,7 @@ object Const {
     const val COMMON_DELAY = 256L
     const val SMALL_DELAY = 128L
     const val MINI_DELAY = 64L
+    const val MINUTE = 60000L
 
     const val MIME_TYPE = "mimeType"
     const val DATE_PATTERN = "yyyy-MM-dd_HH-mm-ss"

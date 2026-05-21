@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.explorer
 
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.EventFlow
+import app.atomofiron.common.util.flow.TriggerFlow
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
@@ -49,6 +50,7 @@ class ExplorerViewState @Inject constructor(
     val updates: Flow<Node> = store.updated
     val permissionRequiredWarning = EventFlow<Unit>()
     val dock: Flow<List<DockItem>> = dockState.state
+    val showEasterEgg = TriggerFlow<Unit>()
 
     fun setGround(ground: Layout.Ground) = dockState.setGround(ground)
 

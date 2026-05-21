@@ -13,7 +13,7 @@ import dagger.Provides
 @Module
 class DelegateModule {
     interface Dependencies {
-        val preferenceStore: PreferenceStore
+        val preferences: PreferenceStore
     }
 
     @Provides

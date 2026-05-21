@@ -17,6 +17,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Build.VERSION.SDK_INT
 import android.os.Environment
+import android.os.SystemClock
 import android.provider.OpenableColumns
 import android.util.LayoutDirection
 import android.util.TypedValue
@@ -450,3 +451,5 @@ fun Context.clipboardAlertsEnabled(): Boolean {
     // 0/4 allow, 1 ignore, 3 default
     return mode == 0 || mode == 4
 }
+
+fun now() = SystemClock.elapsedRealtime()

@@ -5,6 +5,14 @@
     android:layout_height="match_parent"
     android:background="?colorBackground"
     >
+    <ImageView
+        android:id="@+id/smile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:src="@drawable/smile"
+        android:visibility="gone"
+        />
     <androidx.viewpager2.widget.ViewPager2
         android:id="@+id/pager"
         android:layout_width="match_parent"

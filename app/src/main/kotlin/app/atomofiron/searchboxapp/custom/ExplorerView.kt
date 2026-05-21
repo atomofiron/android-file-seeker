@@ -36,6 +36,7 @@ class ExplorerView(
 ) : FrameLayout(context) {
 
     private val binding = ViewExplorerBinding.inflate(LayoutInflater.from(context), this)
+    val recyclerView = binding.recyclerView
     var title: String? = null
         private set
 

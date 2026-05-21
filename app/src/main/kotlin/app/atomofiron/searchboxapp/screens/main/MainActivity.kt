@@ -1,7 +1,7 @@
 package app.atomofiron.searchboxapp.screens.main
 
-import android.app.Service
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
@@ -25,6 +25,7 @@ import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.first
 import app.atomofiron.common.util.hideKeyboard
+import app.atomofiron.common.util.isBlackDeep
 import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.common.util.reallyDisableFitsSystemWindows
 import app.atomofiron.fileseeker.R
@@ -87,6 +88,7 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
             window.setSoftInputMode(SOFT_INPUT_ADJUST_NOTHING)
             unlockHighFrameRate()
         }
+        presenter.onConfiguration(isDarkTheme(), isBlackDeep())
     }
 
     private fun onCreateView(savedInstanceState: Bundle?) {
@@ -99,7 +101,7 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
 
         savedInstanceState ?: onIntent(intent)
 
-        val manager = getSystemService(Service.INPUT_METHOD_SERVICE) as InputMethodManager
+        val manager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         val onBackStackChangedListener: () -> Unit = {
             presenter.updateLightStatusBar(isDarkTheme())
             manager.hideSoftInputFromWindow(binding.root.windowToken, 0)
@@ -164,6 +166,13 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
     private fun onIntent(intent: Intent?) {
         presenter.onIntent(intent ?: return)
     }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        presenter.onConfiguration(isDarkTheme(), isBlackDeep())
+    }
+
+    override fun onUserInteraction() = presenter.onUserInteraction()
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent): Boolean {
         when  {

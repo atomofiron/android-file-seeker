@@ -2,20 +2,25 @@ package app.atomofiron.searchboxapp.screens.explorer
 
 import app.atomofiron.common.arch.BasePresenter
 import app.atomofiron.common.util.flow.collect
+import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.valueOrNull
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
-import app.atomofiron.searchboxapp.screens.explorer.di.ExplorerInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
+import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
+import app.atomofiron.searchboxapp.screens.explorer.di.ExplorerInteractor
+import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerDockListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
-import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerItemActionListenerDelegate
-import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
-import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerDockListener
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerDockDelegate
+import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerItemActionListenerDelegate
+import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.now
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @ExplorerScope
@@ -42,6 +47,21 @@ class ExplorerPresenter @Inject constructor(
             if (it.started && it.rise) {
                 interactor.updateRoots()
             }
+        }
+        var threshold = easterEggThreshold()
+        scope.launch {
+            while (true) {
+                delay(threshold - now())
+                if (now() > threshold) {
+                    threshold = easterEggThreshold()
+                    if (commonChannel.uiMode.valueOrNull?.isBlack == true) {
+                        viewState.showEasterEgg.invoke()
+                    }
+                }
+            }
+        }
+        commonChannel.userInteraction.collect(scope) {
+            threshold = easterEggThreshold()
         }
     }
 
@@ -97,4 +117,6 @@ class ExplorerPresenter @Inject constructor(
         isTargetVisible -> interactor.toggleDir(currentTab, item.ref)
         else -> viewState.scrollTo(item)
     }
+
+    private fun easterEggThreshold() = now() + Const.MINUTE
 }
