@@ -11,18 +11,15 @@ import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.getSortedChildren
 
 class ItemBackgroundDecorator(
-    private val targetId: Int = 0,
+    private val targetId: Int,
     private val evenNumbered: Boolean,
-    private val ignoringTag: String? = null,
+    private val ignoringTag: String,
+    resources: Resources,
 ) : RecyclerView.ItemDecoration() {
 
-    private var cornerRadius = 0f
+    private var cornerRadius = resources.getDimension(R.dimen.explorer_border_width)
     private val paint = Paint()
     var enabled = true
-
-    fun init(resources: Resources) {
-        cornerRadius = resources.getDimension(R.dimen.explorer_border_width)
-    }
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         paint.color = parent.context.colorSurfaceContainer()

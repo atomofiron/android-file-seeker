@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.flow.viewCollect
+import app.atomofiron.common.util.unsafeLazy
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentResultBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
@@ -33,7 +34,9 @@ class ResultFragment : Fragment(R.layout.fragment_result),
 
     private val resultAdapter = ResultAdapter()
     private val gravityDecorator = ItemGravityDecorator()
-    private val backgroundDecorator = ItemBackgroundDecorator(R.id.item_explorer, evenNumbered = false, ignoringTag = TAG_EXPLORER_OPENED_ITEM)
+    private val backgroundDecorator by unsafeLazy {
+        ItemBackgroundDecorator(R.id.item_explorer, evenNumbered = false, ignoringTag = TAG_EXPLORER_OPENED_ITEM, resources)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,7 +60,6 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             setupSpringOverscroll()
             addItemDecoration(gravityDecorator)
             addItemDecoration(backgroundDecorator)
-            backgroundDecorator.init(resources)
         }
         binding.dockBar.submit(DefaultDockState)
         binding.dockBar.setListener(::onBottomMenuItemClick)

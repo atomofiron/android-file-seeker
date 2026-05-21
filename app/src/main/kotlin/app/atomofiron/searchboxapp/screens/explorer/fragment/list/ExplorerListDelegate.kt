@@ -9,9 +9,11 @@ import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
+import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerOffsetScroller.Companion.animateRootOffset
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemBorderDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.RootItemPaddingDecorator
+import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.RootOffsetDecorator
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.ExplorerHolder
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.TAG_EXPLORER_OPENED_ITEM
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder.ExplorerItemBinderActionListener
@@ -29,22 +31,28 @@ class ExplorerListDelegate(
     private val output: ExplorerItemActionListener,
 ) : CoroutineListDiffer.ListListener<Node> {
 
-    private val stickyDelegate = ExplorerStickyDelegate(recyclerView, rootAdapter, nodeAdapter, stickyBox, StickyListener())
-    private val rootPaddingDecorator = RootItemPaddingDecorator(recyclerView.resources, rootAdapter)
-    private val backgroundDecorator = ItemBackgroundDecorator(R.id.item_explorer, evenNumbered = true, ignoringTag = TAG_EXPLORER_OPENED_ITEM)
     private val layoutManager = GridLayoutManager(recyclerView.context, EXPLORER_SPAN_COUNT)
-    private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter, stickyDelegate::getDeepest)
+    private val rootPaddingDecorator = RootItemPaddingDecorator(recyclerView.resources, rootAdapter)
     private val spanSizeLookup = ExplorerSpanSizeLookup(recyclerView, rootAdapter, rootPaddingDecorator)
+
+    init {
+        layoutManager.spanSizeLookup = spanSizeLookup
+        recyclerView.layoutManager = layoutManager
+    }
+
+    private val rootOffsetDecorator = RootOffsetDecorator(recyclerView, rootAdapter, layoutManager, spanSizeLookup)
+    private val stickyDelegate = ExplorerStickyDelegate(recyclerView, rootAdapter, nodeAdapter, stickyBox, StickyListener())
+    private val backgroundDecorator = ItemBackgroundDecorator(R.id.item_explorer, evenNumbered = true, ignoringTag = TAG_EXPLORER_OPENED_ITEM, recyclerView.resources)
+    private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter, stickyDelegate::getDeepest)
 
     private var deepestDir: Node? = null
     private val items get() = nodeAdapter.items
 
     init {
-        backgroundDecorator.init(recyclerView.resources)
-        layoutManager.spanSizeLookup = spanSizeLookup
-        recyclerView.layoutManager = layoutManager
+        recyclerView.animateRootOffset(rootAdapter, nodeAdapter, rootOffsetDecorator)
         recyclerView.attachInsetsListener(rootPaddingDecorator)
         recyclerView.attachInsetsListener(borderDecorator)
+        recyclerView.addItemDecoration(rootOffsetDecorator)
         recyclerView.addItemDecoration(rootPaddingDecorator)
         recyclerView.addItemDecoration(backgroundDecorator)
         recyclerView.addItemDecoration(borderDecorator)

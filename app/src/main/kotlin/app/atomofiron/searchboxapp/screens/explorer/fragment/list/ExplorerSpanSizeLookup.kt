@@ -24,6 +24,11 @@ class ExplorerSpanSizeLookup(
         else -> EXPLORER_SPAN_COUNT
     }
 
+    fun getSpanSizeOrNull(position: Int): Int? = when {
+        position >= spans.size -> null
+        else -> getSpanSize(position)
+    }
+
     fun update(availableWidth: Int) {
         if (rootCount == 0) {
             return

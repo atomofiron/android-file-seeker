@@ -10,12 +10,13 @@ class RecycleItemViewFactory(
     context: Context,
     private val layoutId: Int,
 ) : AsyncLayoutInflater.OnInflateFinishedListener {
+
     private val asyncInflater = AsyncLayoutInflater(context)
     private val inflater = LayoutInflater.from(context)
     private val views = mutableListOf<View>()
 
     private var inProgress = 0
-    private var limit = 8
+    private var limit = 16
 
     fun setLimit(value: Int) {
         limit = value

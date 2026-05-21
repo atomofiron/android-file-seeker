@@ -131,17 +131,29 @@ object LayoutDelegate {
     }
 
     fun MeasureProvider.addLayoutListener(callback: (Layout) -> Unit) {
-        val display = view.context.getDisplayCompat()
-        var was: Layout? = null
+        var layout: Layout? = null
         val action = {
-            val layout = view.resources.getLayout(view.withJoystick(), display)
-            if (layout != was) {
-                was = layout
-                callback(layout)
+            val new = view.getLayout()
+            if (new != layout) {
+                layout = new
+                callback(new)
             }
         }
         view.addOnAttachListener(oneTime = true, onAttach = action)
         addMeasureListener { _, _ -> action() }
+    }
+
+    fun ViewGroup.addPostLayoutListener(callback: (Layout) -> Unit) {
+        var layout: Layout? = null
+        val action = {
+            val new = getLayout()
+            if (new != layout) {
+                layout = new
+                callback(new)
+            }
+        }
+        addOnAttachListener(oneTime = true, onAttach = action)
+        addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> action() }
     }
 
     fun View.setScreenSizeListener(listener: (width: ScreenSize, height: ScreenSize) -> Unit) {

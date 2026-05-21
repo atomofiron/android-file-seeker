@@ -36,7 +36,7 @@ class ExplorerFragment : Fragment(R.layout.fragment_explorer),
 {
     private lateinit var binding: FragmentExplorerBinding
     private lateinit var pagerAdapter: ExplorerPagerAdapter
-    private val explorerViews get() = pagerAdapter.items
+    private val explorerViews: Array<ExplorerView> get() = pagerAdapter.items
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

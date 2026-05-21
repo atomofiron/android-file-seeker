@@ -13,6 +13,8 @@ value class Layout private constructor(val value: Int = 0) {
         private const val BOTTOM =      0b0110
         private const val RTL =         0b1000
 
+        val Stub = Layout(Ground.Bottom, withJoystick = false, rtl = false)
+
         private fun get(ground: Ground, withJoystick: Boolean, rtl: Boolean): Int {
             var value = if (withJoystick) JOYSTICK else 0
             value = when (ground) {
