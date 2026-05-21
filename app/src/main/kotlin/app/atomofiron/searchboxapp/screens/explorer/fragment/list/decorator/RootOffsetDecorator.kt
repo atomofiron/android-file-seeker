@@ -7,7 +7,7 @@ import android.view.View.MeasureSpec
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
-import app.atomofiron.searchboxapp.custom.LayoutDelegate.addPostLayoutListener
+import app.atomofiron.searchboxapp.custom.LayoutDelegate.getLayout
 import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerSpanSizeLookup
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
@@ -21,13 +21,19 @@ class RootOffsetDecorator(
 
     private val padding = recyclerView.resources.getDimensionPixelSize(R.dimen.item_root_padding)
     private var layout = Layout.Stub
+    private var offset = 0
     private val rootView = LayoutInflater.from(recyclerView.context)
         .inflate(R.layout.item_explorer_card, recyclerView, false)
 
     init {
         val wrapContent = MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED)
         rootView.measure(wrapContent, wrapContent)
-        recyclerView.addPostLayoutListener { layout = it }
+        recyclerView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
+            layout = recyclerView.getLayout()
+            if (offset != offset(recyclerView, cells())) {
+                rootAdapter.notifyDataSetChanged()
+            }
+        }
     }
 
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
@@ -37,7 +43,8 @@ class RootOffsetDecorator(
         val holder = parent.getChildViewHolder(view)
         val cells = cells()
         if (holder.bindingAdapterPosition < cells && layout.isBottom) {
-            outRect.top = offset(parent, cells)
+            offset = offset(parent, cells)
+            outRect.top = offset
         }
     }
 
