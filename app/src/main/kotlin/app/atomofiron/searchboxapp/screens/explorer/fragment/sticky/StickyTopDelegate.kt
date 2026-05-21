@@ -25,7 +25,7 @@ class StickyTopDelegate(
     private var listener: ExplorerItemBinderActionListener,
 ) {
     private val stickies = HashMap<Int, StickyTop>()
-    private val threshold get() = stickyBox.paddingTop
+    private val threshold get() = stickyBox.paddingTop.toFloat()
     private var composition: ExplorerItemComposition? = null
     private val space = stickyBox.resources.getDimensionPixelSize(R.dimen.padding_nano)
     private val lastChildOffset = stickyBox.resources.run {
@@ -103,17 +103,17 @@ class StickyTopDelegate(
             var top = max(holderTop, threshold)
             holders.findBarrier(sticky)?.let { barrier ->
                 val bottom = top + sticky.view.measuredHeight
-                top -= max(0, bottom - barrier)
+                top -= max(0f, bottom - barrier)
             }
-            sticky.view.translationY = top - threshold.toFloat()
+            sticky.view.translationY = top - threshold
             sticky.view.drawTop(top - holderTop)
         }
     }
 
     /** @return some holder to move sticky with, the same opened dir or some child above the next opened */
-    private fun List<HolderInfo>.findTop(sticky: StickyTop): Int? {
+    private fun List<HolderInfo>.findTop(sticky: StickyTop): Float? {
         find { it.position == sticky.position }
-            ?.let { return it.view.top }
+            ?.let { return it.view.y }
         // don't use item.children
         val openedId = sticky.getOpenedId()
         val limitIndex = sticky.sortedChildren.indexOfFirst(orElse = sticky.sortedChildren.size) {
@@ -123,26 +123,26 @@ class StickyTopDelegate(
             sticky.sortedChildren.takeIf { !holder.isSeparator && holder.ref.parent == sticky.ref }
                 ?.indexOfFirst { it.uniqueId == holder.uniqueId }
                 ?.takeIf { it in 0..<limitIndex }
-                ?.let { return holder.view.top }
+                ?.let { return holder.view.y }
         }
         return null
     }
 
     /** @return the top of the next opened dir or the bottom of the last child */
-    private fun List<HolderInfo>.findBarrier(sticky: StickyTop): Int? {
+    private fun List<HolderInfo>.findBarrier(sticky: StickyTop): Float? {
         for (i in indices) {
             val info = get(i)
             return when {
                 // skip above the target
                 info.position <= sticky.position -> continue
                 // next opened dir below
-                !sticky.isDeepest && info.isOpened -> info.view.top - space
+                !sticky.isDeepest && info.isOpened -> info.view.y - space
                 // skip children
                 info.ref.parent == sticky.ref -> continue
                 // nothing above
-                i == 0 -> return null
+                i == 0 -> null
                 // the last child
-                else -> get(i.dec()).view.bottom + lastChildOffset
+                else -> get(i.dec()).view.bottom + lastChildOffset.toFloat()
             }
         }
         return null

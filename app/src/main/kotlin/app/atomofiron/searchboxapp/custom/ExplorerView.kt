@@ -54,7 +54,7 @@ class ExplorerView(
 
     init {
         binding.recyclerView.addExplorerFastScroll()
-        binding.recyclerView.setupSpringOverscroll()
+        binding.recyclerView.setupSpringOverscroll(listDelegate::updateStickies)
         binding.applyInsets()
         binding.init()
     }

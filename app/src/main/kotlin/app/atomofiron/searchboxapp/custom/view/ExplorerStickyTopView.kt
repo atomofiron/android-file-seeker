@@ -58,8 +58,8 @@ class ExplorerStickyTopView(
         composition?.let { binder.bindComposition(it) }
     }
 
-    fun drawTop(size: Int) {
-        drawTop = size.toFloat()
+    fun drawTop(size: Float) {
+        drawTop = size
         invalidate()
     }
 }

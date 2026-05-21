@@ -105,7 +105,7 @@ class ExplorerStickyDelegate(
             .takeIf { it.absoluteAdapterPosition >= roots.itemCount }
     }
 
-    private fun updateOffset() {
+    fun updateOffset() {
         top.updateOffset()
         bottom.updateOffset()
     }

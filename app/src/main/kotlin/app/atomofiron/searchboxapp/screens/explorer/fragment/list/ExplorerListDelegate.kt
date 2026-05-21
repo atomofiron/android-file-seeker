@@ -160,6 +160,8 @@ class ExplorerListDelegate(
         }
     }
 
+    fun updateStickies() = stickyDelegate.updateOffset()
+
     private inner class StickyListener : ExplorerItemBinderActionListener {
 
         override fun onItemLongClick(item: Node) = output.onItemLongClick(item)

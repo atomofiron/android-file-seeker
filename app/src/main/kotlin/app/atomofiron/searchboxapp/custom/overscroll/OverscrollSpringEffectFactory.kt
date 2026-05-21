@@ -21,14 +21,16 @@ import app.atomofiron.searchboxapp.utils.setFloatValues
 import kotlin.math.max
 import kotlin.math.min
 
-fun RecyclerView.setupSpringOverscroll() {
-    val factory = OverscrollSpringEffectFactory()
+fun RecyclerView.setupSpringOverscroll(callback: (() -> Unit)? = null) {
+    val factory = OverscrollSpringEffectFactory(callback)
     addOnChildAttachStateChangeListener(factory.attachChildListener)
     addOnItemTouchListener(factory.touchListener)
     edgeEffectFactory = factory
 }
 
-private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
+private class OverscrollSpringEffectFactory(
+    private val callback: (() -> Unit)?,
+) : RecyclerView.EdgeEffectFactory() {
     private enum class Direction(val sign: Int) {
         Up(-1),
         Down(1),
@@ -196,6 +198,7 @@ private class OverscrollSpringEffectFactory : RecyclerView.EdgeEffectFactory() {
         }
 
         private fun applyEffect(delta: Float) {
+            callback?.invoke()
             distance += delta
             val offset = distance * view.height / 3
             view.applyEffect(offset, direction)
