@@ -5,8 +5,6 @@ import android.util.AttributeSet
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.TextView
 import androidx.core.content.withStyledAttributes
 import androidx.core.view.updateLayoutParams
 import androidx.drawerlayout.widget.DrawerLayout
@@ -31,8 +29,7 @@ class DrawerView @JvmOverloads constructor(
     private val titleInsetsDelegate = binding.drawerTitleContainer.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
     private val rvInsetsDelegate = binding.drawerRv.insetsPadding(ExtType { barsWithCutout + joystickFlank + joystickBottom })
 
-    private val ibDrawerSide: ImageButton = findViewById(R.id.drawer_ib_drawer_side)
-    val recyclerView: RecyclerView = findViewById(R.id.drawer_rv)
+    val recyclerView: RecyclerView = binding.drawerRv
     val isOpened: Boolean get() = drawerStateListener.isOpened
     val gravity: Int get() = (layoutParams as? DrawerLayout.LayoutParams)?.gravity ?: Gravity.NO_GRAVITY
 
@@ -40,13 +37,12 @@ class DrawerView @JvmOverloads constructor(
     var onGravityChangeListener: ((gravity: Int) -> Unit)? = null
 
     init {
-        ibDrawerSide.setOnClickListener {
+        binding.drawerIbDrawerSide.setOnClickListener {
             val gravity = if (gravity == Gravity.START) Gravity.END else Gravity.START
             onGravityChangeListener?.invoke(gravity)
         }
-        val tvTitle = findViewById<TextView>(R.id.drawer_title)
         context.withStyledAttributes(attrs, R.styleable.DrawerView, defStyleAttr, 0) {
-            tvTitle.text = getString(R.styleable.DrawerView_title)
+            binding.drawerTitle.text = getString(R.styleable.DrawerView_title)
         }
         binding.drawerTitleContainer.run {
             val color = (this@DrawerView.background as MaterialShapeDrawable).resolvedTintColor
@@ -61,7 +57,7 @@ class DrawerView @JvmOverloads constructor(
 
         val gravity = (params as? DrawerLayout.LayoutParams)?.gravity ?: Gravity.START
         val icDrawer = if (gravity == Gravity.START) R.drawable.ic_drawer_end else R.drawable.ic_drawer_start
-        ibDrawerSide.setImageResource(icDrawer)
+        binding.drawerIbDrawerSide.setImageResource(icDrawer)
         updateInsets()
     }
 

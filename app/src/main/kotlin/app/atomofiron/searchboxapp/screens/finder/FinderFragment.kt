@@ -64,7 +64,6 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
         binding.root.setWindow(requireActivity().window)
         binding.drawer.run {
             onGravityChangeListener = presenter::onDrawerGravityChange
-            recyclerView.layoutManager = LinearLayoutManager(requireContext())
             recyclerView.adapter = historyAdapter
             recyclerView.setupSpringOverscroll()
         }

@@ -15,6 +15,7 @@
         android:clipToPadding="false"
         android:scrollbars="none"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:reverseLayout="true"
         />
     <LinearLayout
         android:id="@+id/drawer_title_container"
