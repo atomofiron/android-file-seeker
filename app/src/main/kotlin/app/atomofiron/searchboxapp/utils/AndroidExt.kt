@@ -54,6 +54,7 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.debugRequire
+import app.atomofiron.common.util.extension.takeIf
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -65,6 +66,7 @@ import app.atomofiron.searchboxapp.model.other.toUni
 import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
+import kotlin.math.min
 
 fun Context.findResIdByAttr(@AttrRes attr: Int): Int = findResIdsByAttr(attr)[0]
 
@@ -260,24 +262,46 @@ fun TextView.updateDrawables(
     bottom: Drawable? = compoundDrawablesRelative[3],
 ) = setCompoundDrawablesRelative(start, top, end, bottom)
 
-fun RecyclerView.scrollToTop(): Boolean {
+fun RecyclerView.scrollToTop(fastScrollPosition: Int = layoutManager.fastScrollPosition(adapter?.itemCount)): Boolean {
     if (isEmpty()) return false
     val topChild = getChildAt(0)
     val topHolder = getChildViewHolder(topChild)
     if (topHolder.absoluteAdapterPosition == 0) {
-        smoothScrollToPosition(0)
         return false
     }
-    val spanCount = when (val manager = layoutManager) {
-        is GridLayoutManager -> manager.spanCount
-        is StaggeredGridLayoutManager -> manager.spanCount
-        else -> 1
-    }
-    scrollToPosition(spanCount)
+    val limit = adapter?.itemCount
+        ?.takeIf { it > 0 }
+        ?.dec()
+        ?: return false
+    val position = min(limit, fastScrollPosition)
+    scrollToPosition(position)
     post {
         smoothScrollToPosition(0)
     }
     return true
+}
+
+private fun RecyclerView.LayoutManager?.fastScrollPosition(itemCount: Int?): Int {
+    return when (this) {
+        is GridLayoutManager -> when (itemCount) {
+            null -> 0
+            else -> {
+                var position = 0
+                var spanCount = spanCount
+                while (true) {
+                    when {
+                        spanCount < 0 -> return position.dec()
+                        position >= itemCount -> return 0
+                        spanCount == 0 -> break
+                        else -> spanCount -= spanSizeLookup.getSpanSize(position++)
+                    }
+                }
+                position
+            }
+        }
+        is StaggeredGridLayoutManager -> spanCount
+        else -> 1
+    }
 }
 
 fun RecyclerView.postToPosition(index: Int) = post {

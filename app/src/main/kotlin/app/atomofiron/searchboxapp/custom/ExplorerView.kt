@@ -83,7 +83,7 @@ class ExplorerView(
 
     fun scrollTo(item: Node) = listDelegate.scrollTo(item)
 
-    fun scrollToTop(): Boolean = binding.recyclerView.scrollToTop()
+    fun scrollToTop(): Boolean = binding.recyclerView.scrollToTop(fastScrollPosition = rootAdapter.itemCount)
 
     fun isDeepestDirVisible(): Boolean? = listDelegate.isDeepestDirVisible()
 
