@@ -75,6 +75,8 @@
     <string name="pref_theme">App theme</string>
     <string name="pref_deep_black">Deep black</string>
     <string name="pref_haptic_feedback">Haptic feedback</string>
+    <string name="pref_volume_up">Close deepest folder</string>
+    <string name="pref_volume_up_summary">with volume up</string>
     <string name="pref_screenshot_operations">Screenshot operations</string>
     <string name="screenshot_operations_active">Screenshot operations active</string>
     <string name="pref_max_depth">Max depth</string>

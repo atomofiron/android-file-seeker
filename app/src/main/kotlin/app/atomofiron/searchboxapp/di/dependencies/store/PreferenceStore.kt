@@ -45,6 +45,7 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySpecialCh
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySuCmd
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTestField
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyUseSu
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyFolderVolumeUp
 import app.atomofiron.searchboxapp.utils.preferences.get
 import app.atomofiron.searchboxapp.utils.preferences.set
 import kotlinx.coroutines.CoroutineScope
@@ -99,6 +100,7 @@ class PreferenceStore @Inject constructor(
     val shownNotificationUpdateCode = getFlow(KeyShownNotificationUpdateCode)
     val maxDepthForSearch = getFlow(KeyMaxDepth)
     val hapticFeedback = getFlow(KeyHapticFeedback)
+    val folderVolumeUp = getFlow(KeyFolderVolumeUp)
     val screenshotOperations = getFlow(KeyScreenshotOperations)
     val eggHalloween = getFlow(KeyHalloween)
     val eggNewYear = getFlow(KeyNewYear)

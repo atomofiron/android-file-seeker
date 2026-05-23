@@ -50,6 +50,12 @@
             app:key="pref_haptic_feedback"
             app:icon="@drawable/ic_vibrate"
             />
+        <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
+            app:title="@string/pref_volume_up"
+            app:summary="@string/pref_volume_up_summary"
+            app:key="pref_volume_up"
+            app:icon="@drawable/ic_volume_up"
+            />
     </PreferenceCategory>
     <PreferenceCategory
         android:key="pref_category_system"

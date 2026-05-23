@@ -75,7 +75,7 @@ class ExplorerListDelegate(
 
     fun onMeasure(availableWidth: Int) = spanSizeLookup.update(availableWidth)
 
-    fun isDeepestDirVisible(): Boolean? = deepestDir?.let { isVisible(it) }?.takeIf { !it || deepestDir?.isRoot == false }
+    fun isDeepestDirVisible(): Boolean? = deepestDir?.let { isVisible(it) }
 
     fun isVisible(item: Node): Boolean {
         val index = items.indexOfFirst { it.ref == item.ref }

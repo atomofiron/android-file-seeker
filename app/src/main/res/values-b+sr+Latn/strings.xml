@@ -71,6 +71,8 @@
     <string name="pref_theme">Tema aplikacije</string>
     <string name="pref_deep_black">Duboka crna</string>
     <string name="pref_haptic_feedback">Taktilni odziv</string>
+    <string name="pref_volume_up">Zatvaranje najdubljeg foldera</string>
+    <string name="pref_volume_up_summary">tasterom za zvuk</string>
     <string name="pref_screenshot_operations">Operacije sa screenshotovima</string>
     <string name="screenshot_operations_active">Operacije ekrana su aktivne</string>
     <string name="pref_max_depth">Maks. dubina</string>

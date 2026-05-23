@@ -71,6 +71,8 @@
     <string name="pref_theme">Тема оформления</string>
     <string name="pref_deep_black">Глубокий чёрный</string>
     <string name="pref_haptic_feedback">Тактильный отклик</string>
+    <string name="pref_volume_up">Закрывать глубочайшую папку</string>
+    <string name="pref_volume_up_summary">кнопкой громкости</string>
     <string name="pref_screenshot_operations">Операции со скриншотами</string>
     <string name="screenshot_operations_active">Операции со скриншотами активны</string>
     <string name="pref_max_depth">Макс. глубина</string>

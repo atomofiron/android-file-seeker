@@ -7,6 +7,7 @@ import app.atomofiron.common.util.flow.valueOrNull
 import app.atomofiron.searchboxapp.custom.ExplorerView
 import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
+import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
@@ -31,6 +32,7 @@ class ExplorerPresenter @Inject constructor(
     private val storagePermissionDelegate: StoragePermissionDelegate,
     private val interactor: ExplorerInteractor,
     private val store: ExplorerStore,
+    private val preferences: PreferenceStore,
     itemListener: ExplorerItemActionListenerDelegate,
     commonChannel: CommonChannel,
     dockDelegate: ExplorerDockDelegate,
@@ -40,6 +42,7 @@ class ExplorerPresenter @Inject constructor(
     ExplorerDockListener by dockDelegate,
     ExplorerItemActionListener by itemListener {
 
+    private val folderVolumeUp by preferences.folderVolumeUp
     private val currentTab get() = viewState.currentTab.value
 
     init {
@@ -83,10 +86,12 @@ class ExplorerPresenter @Inject constructor(
 
     fun onContinue() = interactor.setCurrentTab(currentTab)
 
-    fun onVolumeUp(isCurrentDirVisible: Boolean) {
+    fun onVolumeUp(isCurrentDirVisible: Boolean): Boolean {
         val currentNode = viewState.deepest
-        currentNode ?: return
+            ?.takeIf { folderVolumeUp }
+            ?: return false
         scrollOrOpenParent(currentNode, isCurrentDirVisible)
+        return true
     }
 
     fun onBack(soft: Boolean, scrollToTop: () -> Boolean): Boolean = when {
@@ -118,5 +123,5 @@ class ExplorerPresenter @Inject constructor(
         else -> viewState.scrollTo(item)
     }
 
-    private fun easterEggThreshold() = now() + Const.MINUTE
+    private fun easterEggThreshold() = now() + Const.MINUTE / 10
 }
