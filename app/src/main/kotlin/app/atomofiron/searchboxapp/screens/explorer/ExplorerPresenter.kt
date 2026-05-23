@@ -123,5 +123,5 @@ class ExplorerPresenter @Inject constructor(
         else -> viewState.scrollTo(item)
     }
 
-    private fun easterEggThreshold() = now() + Const.MINUTE / 10
+    private fun easterEggThreshold() = now() + Const.MINUTE
 }
