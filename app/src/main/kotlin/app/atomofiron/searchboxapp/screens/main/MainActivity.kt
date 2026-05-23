@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.screens.main
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
@@ -65,7 +66,10 @@ open class MainActivity : AppCompatActivity(), AppStoreProvider, ActivityModePro
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val color = colorAttr(R.attr.colorBackground) withAlpha 1
+        val color = when {
+            Android.O -> colorAttr(R.attr.colorBackground) withAlpha 1
+            else -> Color.BLACK
+        }
         enableEdgeToEdge(navigationBarStyle = SystemBarStyle.auto(color, color))
         if (Android.Q) window.isNavigationBarContrastEnforced = false
 
