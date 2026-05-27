@@ -45,6 +45,8 @@ class ResultScreenState @Inject constructor(
 
     private var _result: GlobalSearchResult = task?.result ?: GlobalSearchResult(forText = false)
     val result: GlobalSearchResult get() = _result
+    private var _isReady = MutableStateFlow(task?.result?.matches?.isEmpty() == true)
+    override val isReady: StateFlow<Boolean> get() = _isReady
     private val _cache = mutableMapOf<NodeId, ResultItem.Item>()
     val cache: Map<NodeId, ResultItem.Item> = _cache
     private val _items = MutableStateFlow<List<ResultItem>>(emptyList())
@@ -70,9 +72,12 @@ class ResultScreenState @Inject constructor(
                 alerts[scope] = it.toAlert()
             }
         }
-        _result = result
-        _dock.value = _dock.value.reduce(task.isProgress, task.sorting, checked = checked.size, hasMatches = result.matches.isNotEmpty())
-        _items.renderItems(checked, task.sorting, result.errors.size)
+        if (result.matches.isEmpty() && task.result.matches.isNotEmpty()) {
+            _isReady.value = false
+        }
+        _result = task.result
+        _dock.value = _dock.value.reduce(task.isProgress, task.sorting, checked = checked.size, hasMatches = task.result.matches.isNotEmpty())
+        _items.renderItems(checked, task.sorting, task.result.errors.size)
     }
 
     private fun ResultDockState.reduce(
@@ -137,6 +142,7 @@ class ResultScreenState @Inject constructor(
             add(ResultItem.Header(dirCount, fileCount, errors))
             addAll(items)
         }
+        _isReady.value = true
     }
 
     suspend fun cache(item: ResultItem.Item) {

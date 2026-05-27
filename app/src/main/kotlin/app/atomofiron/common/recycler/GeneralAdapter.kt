@@ -36,7 +36,7 @@ abstract class GeneralAdapter<D : Any, H : GeneralHolder<D>>(
     override fun onBindViewHolder(holder: H, position: Int) = holder.bind(mutableItems[position], position)
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submit(items: List<D>, isNew: Boolean = false) {
+    fun submit(items: List<D>, isNew: Boolean = mutableItems.isEmpty()) {
         val differ = differ
         if (differ == null) {
             mutableItems.clear()

@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface ResultViewState {
     val mode: ActivityMode
+    val isReady: StateFlow<Boolean>
     val items: StateFlow<List<ResultItem>>
     val updates: Flow<ResultItem>
     val dock: StateFlow<ResultDockState>

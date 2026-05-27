@@ -5,6 +5,8 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import androidx.core.content.ContextCompat
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import app.atomofiron.common.arch.BaseFragment
@@ -84,6 +86,7 @@ class ResultFragment : Fragment(R.layout.fragment_result),
             resultAdapter.setComposition(it)
         }
         viewCollect(items) { resultAdapter.submit(it) }
+        viewCollect(isReady) { binding.progress.isGone = it }
         viewCollect(updates) { resultAdapter.submit(it) }
         viewCollect(alerts) { binding.snackbarContainer.showSnackbar(it) }
         viewCollect(dock, collector = binding.dockBar::submit)
