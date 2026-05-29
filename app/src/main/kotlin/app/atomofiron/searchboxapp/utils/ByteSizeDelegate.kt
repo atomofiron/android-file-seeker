@@ -16,7 +16,7 @@ import kotlin.math.min
 
 private val startingZeros = Regex("^0+(?=\\d)")
 
-fun TextField.makeByteSize(listener: (Int) -> Unit) {
+fun TextField.makeByteSize(listener: (Long) -> Unit) {
     val delegate = ByteSizeDelegate(this, listener)
     filters += arrayOf<InputFilter>(delegate)
     inputType = inputType and InputType.TYPE_NUMBER_FLAG_DECIMAL.inv()
@@ -27,14 +27,14 @@ fun TextField.makeByteSize(listener: (Int) -> Unit) {
 
 class ByteSizeDelegate(
     private val textField: EditText,
-    private val listener: (Int) -> Unit,
+    private val listener: (Long) -> Unit,
 ) : TextWatcher, InputFilter, TextField.Listener, View.OnFocusChangeListener {
 
     private val inputLayout = textField.parent.parent as? TextInputLayout
 
     private val suffixes = textField.resources.getStringArray(R.array.size_suffix_arr)
     private val regex = Regex("(\\d+|0)([gGгГ]|[mMмМ]|[kKкК])?[bBбБ]?")
-    private var valid = 0
+    private var valid = 0L
 
     override fun filter(
         source: CharSequence?,

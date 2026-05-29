@@ -41,23 +41,24 @@ fun Long.convert(suffixes: Array<String>, lossless: Boolean = true, separator: S
     return "$value$separator${suffixes.last()}"
 }
 
-fun String.convertOrNull(): Int? {
+fun String.convertOrNull(): Long? {
     val digits = Regex("\\d+")
     val metrics = Regex("([gGгГ]|[mMмМ]|[kKкК])?[bBбБ]?$")
     val value = digits.find(this)
         ?.value
-        ?.toIntOrNull()
+        ?.toLongOrNull()
         ?: return null
     val rate = metrics.find(this)
         ?.value
         ?.takeIf { it.isNotEmpty() }
         ?: return value
-    return value * when (rate.firstOrNull()) {
-        'g', 'G', 'г', 'Г' -> 1024 * 1024 * 1024
-        'm', 'M', 'м', 'М' -> 1024 * 1024
-        'k', 'K', 'к', 'К' -> 1024
-        else -> 1
-    }
+    return when (rate.firstOrNull()) {
+        'g', 'G', 'г', 'Г' -> 1024L * 1024L * 1024L
+        'm', 'M', 'м', 'М' -> 1024L * 1024L
+        'k', 'K', 'к', 'К' -> 1024L
+        else -> 1L
+    }.takeIf { value <= Long.MAX_VALUE / it }
+        ?.let { value * it }
 }
 
 fun Int.immutable(): Int = this or PendingIntent.FLAG_IMMUTABLE

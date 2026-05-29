@@ -12,7 +12,7 @@ import app.atomofiron.searchboxapp.utils.makeByteSize
 class ByteSizePreference(context: Context, attrs: AttributeSet) : Preference(context, attrs) {
 
     private var editText: TextField? = null
-    private var value = 0
+    private var value = 0L
 
     init {
         widgetLayoutResource = R.layout.preference_byte_size
@@ -21,7 +21,7 @@ class ByteSizePreference(context: Context, attrs: AttributeSet) : Preference(con
     override fun onGetDefaultValue(array: TypedArray, index: Int): Int = array.getInt(index, 0)
 
     override fun onSetInitialValue(defaultValue: Any?) {
-        value = getPersistedInt((defaultValue as? Int) ?: value)
+        value = getPersistedLong((defaultValue as? Long) ?: value)
     }
 
     override fun onBindViewHolder(holder: PreferenceViewHolder) {
@@ -29,7 +29,7 @@ class ByteSizePreference(context: Context, attrs: AttributeSet) : Preference(con
         if (editText == null) {
             val editText = holder.itemView.findViewById<TextField>(R.id.size)
             editText.makeByteSize(::onSubmit)
-            editText.setText(value)
+            editText.setText(value.toString())
             this.editText = editText
         }
     }
@@ -43,9 +43,9 @@ class ByteSizePreference(context: Context, attrs: AttributeSet) : Preference(con
         editText?.performClick()
     }
 
-    private fun onSubmit(value: Int) {
+    private fun onSubmit(value: Long) {
         if (callChangeListener(value)) {
-            persistInt(value)
+            persistLong(value)
             this.value = value
         }
     }
