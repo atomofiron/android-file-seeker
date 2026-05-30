@@ -14,10 +14,13 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import java.io.InputStream
 import java.io.OutputStream
 
+const val K = 1024
+private val KUL = 1024.toULong()
+
 fun String.escapeQuotes(): String = this.replace(Const.QUOTE, "\\" + Const.QUOTE)
 
 inline fun InputStream.writeTo(out: OutputStream, callback: (Long) -> Unit = {}): Long {
-    val buffer = ByteArray(16 * 1024)
+    val buffer = ByteArray(16 * K)
     var copied: Long = 0
     var bytes = read(buffer)
     while (bytes >= 0) {
@@ -41,11 +44,10 @@ fun ULong.convert(
     separator: String = "",
 ): String {
     var value = this
-    val k = 1024.toULong()
     for (i in suffixes.indices) {
-        if (value / k == ULong.MIN_VALUE) return "$value$separator${suffixes[i]}"
-        if (lossless && value % k != ULong.MIN_VALUE) return "$value${suffixes[i]}"
-        if (i < suffixes.lastIndex) value /= k
+        if (value / KUL == ULong.MIN_VALUE) return "$value$separator${suffixes[i]}"
+        if (lossless && value % KUL != ULong.MIN_VALUE) return "$value${suffixes[i]}"
+        if (i < suffixes.lastIndex) value /= KUL
     }
     return "$value$separator${suffixes.last()}"
 }
@@ -62,10 +64,10 @@ fun String.convertOrNull(): ULong? {
         ?.takeIf { it.isNotEmpty() }
         ?: return value
     return when (rate.firstOrNull()) {
-        'g', 'G', 'г', 'Г' -> 1024L * 1024L * 1024L
-        'm', 'M', 'м', 'М' -> 1024L * 1024L
-        'k', 'K', 'к', 'К' -> 1024L
-        else -> 1L
+        'g', 'G', 'г', 'Г' -> K * K * K
+        'm', 'M', 'м', 'М' -> K * K
+        'k', 'K', 'к', 'К' -> K
+        else -> 1
     }.toULong()
         .takeIf { value <= ULong.MAX_VALUE / it }
         ?.let { value * it }

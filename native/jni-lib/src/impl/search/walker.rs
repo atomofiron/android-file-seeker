@@ -23,6 +23,10 @@ pub fn walk<F, P: Send + Sync>(
     for path in targets.iter().skip(1) {
         builder.add(path);
     }
+    let max_depth = match max_depth {
+        0 => None,
+        _ => Some(max_depth),
+    };
     let walker = builder
         .standard_filters(false)
         .ignore(false)
@@ -34,7 +38,7 @@ pub fn walk<F, P: Send + Sync>(
         .parents(false)
         .follow_links(false)
         .same_file_system(false)
-        .max_depth(Some(max_depth))
+        .max_depth(max_depth)
         .threads(num_cpus::get())
         .build_parallel();
 

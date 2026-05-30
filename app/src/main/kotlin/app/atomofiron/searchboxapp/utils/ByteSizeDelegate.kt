@@ -70,13 +70,12 @@ private class ByteSizeDelegate(
             setText(withoutStartingZero)
             setSelection(min(selection, withoutStartingZero.length))
         }
-        if (!isFocused) try {
+        if (!isFocused) {
             valid = string.convertOrNull() ?: valid.takeIf { string.isNotEmpty() }
             val converted = valid?.convert(suffixes) ?: ""
             if (converted != string) {
                 setText(converted)
             }
-        } catch (_: NumberFormatException) {
         } else {
             inputLayout?.showError(string.convertOrNull() == null && string.isNotEmpty())
         }

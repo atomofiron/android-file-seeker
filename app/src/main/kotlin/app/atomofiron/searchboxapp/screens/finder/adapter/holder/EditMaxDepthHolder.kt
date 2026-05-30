@@ -33,7 +33,8 @@ class EditMaxDepthHolder(
     override fun minWidth(): Float = delegate.minWidth()
 
     override fun onBind(item: FinderStateItem.MaxDepth, position: Int) {
-        binding.field.setText(item.value.toString())
+        val value = if (item.value == 0) "" else item.value.toString()
+        binding.field.setText(value)
     }
 
     override fun onFocusChange(v: View?, hasFocus: Boolean) {
@@ -43,14 +44,12 @@ class EditMaxDepthHolder(
         }
     }
 
-    override fun onSubmitCheck(value: String): Boolean = try {
-        value.toInt()
-        true
-    } catch (_: NumberFormatException) {
-        false
-    }.also { binding.box.showError(!it) }
+    override fun onSubmitCheck(value: String): Boolean {
+        return (value.isEmpty() || value.toIntOrNull() != null)
+            .also { binding.box.showError(!it) }
+    }
 
-    override fun onSubmit(value: String) = output.onEditMaxDepth(value.toInt())
+    override fun onSubmit(value: String) = output.onEditMaxDepth(if (value.isEmpty()) 0 else value.toInt())
 
     interface OnEditMaxDepthListener {
         fun onEditMaxDepth(new: Int)
