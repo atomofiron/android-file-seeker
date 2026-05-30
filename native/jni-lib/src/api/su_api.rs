@@ -1,4 +1,4 @@
-use crate::api::api::{Check, CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SearchQuery, TextSearchCollector, TextSearchProgress};
+use crate::api::api::{CommonProgress, CommonProgressCollector, NameSearchCollector, NameSearchProgress, SearchQuery, TextSearchCollector, TextSearchProgress};
 use crate::ext::raw_path::RawPath;
 use bincode::{Decode, Encode};
 use std::sync::Arc;
@@ -26,7 +26,7 @@ pub enum Request {
         query: SearchQuery,
         targets: Vec<RawPath>,
         max_depth: u32,
-        check: Check,
+        size_limit: Option<u64>,
     },
     ReadFile(RawPath),
 }

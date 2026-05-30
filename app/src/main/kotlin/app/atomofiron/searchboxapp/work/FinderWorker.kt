@@ -86,7 +86,7 @@ class FinderWorker(
         @Serializable
         data class Names(val excludeDirs: Boolean) : Type
         @Serializable
-        data class Text(val maxSize: Long) : Type
+        data class Text(val maxSize: ULong?) : Type
     }
 
     private val taskMutex = Mutex()

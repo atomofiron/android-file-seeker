@@ -11,12 +11,16 @@ import app.atomofiron.common.util.extension.ctx
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.TextField
 import app.atomofiron.searchboxapp.custom.view.showError
+import app.atomofiron.searchboxapp.model.other.ByteSize
+import app.atomofiron.searchboxapp.model.other.toByteSize
 import com.google.android.material.textfield.TextInputLayout
 import kotlin.math.min
 
 private val startingZeros = Regex("^0+(?=\\d)")
 
-fun TextField.makeByteSize(listener: (Long) -> Unit) {
+private typealias Listener = (ByteSize) -> Unit
+
+fun TextField.makeByteSize(listener: Listener) {
     val delegate = ByteSizeDelegate(this, listener)
     filters += arrayOf<InputFilter>(delegate)
     inputType = inputType and InputType.TYPE_NUMBER_FLAG_DECIMAL.inv()
@@ -25,16 +29,16 @@ fun TextField.makeByteSize(listener: (Long) -> Unit) {
     addTextChangedListener(delegate)
 }
 
-class ByteSizeDelegate(
+private class ByteSizeDelegate(
     private val textField: EditText,
-    private val listener: (Long) -> Unit,
+    private val listener: Listener,
 ) : TextWatcher, InputFilter, TextField.Listener, View.OnFocusChangeListener {
 
     private val inputLayout = textField.parent.parent as? TextInputLayout
 
     private val suffixes = textField.resources.getStringArray(R.array.size_suffix_arr)
     private val regex = Regex("(\\d+|0)([gGгГ]|[mMмМ]|[kKкК])?[bBбБ]?")
-    private var valid = 0L
+    private var valid: ULong? = ByteSize.UNDEFINED
 
     override fun filter(
         source: CharSequence?,
@@ -48,7 +52,7 @@ class ByteSizeDelegate(
         val destination = dest ?: ""
         val result = destination.replaceRange(dstart, dend, source.substring(start, end))
         return when {
-            result.isEmpty() -> "0"
+            result.isEmpty() -> ""
             !result.matches(regex) -> ""
             else -> source
         }
@@ -67,26 +71,29 @@ class ByteSizeDelegate(
             setSelection(min(selection, withoutStartingZero.length))
         }
         if (!isFocused) try {
-            valid = string.convertOrNull() ?: valid
-            val converted = valid.convert(suffixes)
+            valid = string.convertOrNull() ?: valid.takeIf { string.isNotEmpty() }
+            val converted = valid?.convert(suffixes) ?: ""
             if (converted != string) {
                 setText(converted)
             }
         } catch (_: NumberFormatException) {
         } else {
-            inputLayout?.showError(string.convertOrNull() == null)
+            inputLayout?.showError(string.convertOrNull() == null && string.isNotEmpty())
         }
     }
 
     override fun onSubmitCheck(value: String): Boolean {
-        return value.convertOrNull()?.let { valid = it } != null
+        val converted = value.convertOrNull()
+        return (converted != null || value.isEmpty()).also {
+            if (it) valid = converted
+        }
     }
 
-    override fun onSubmit(value: String) = listener(valid)
+    override fun onSubmit(value: String) = listener(valid.toByteSize())
 
     override fun onFocusChange(view: View, hasFocus: Boolean) {
         if (!hasFocus) {
-            textField.setText(valid.convert(suffixes))
+            textField.setText(valid?.convert(suffixes))
             inputLayout?.showError(false)
         }
     }

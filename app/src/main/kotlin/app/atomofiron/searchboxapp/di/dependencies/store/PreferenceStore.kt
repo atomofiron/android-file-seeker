@@ -10,8 +10,10 @@ import app.atomofiron.common.util.extension.launchOnMain
 import app.atomofiron.common.util.flow.StateFlowProperty
 import app.atomofiron.common.util.flow.asProperty
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
+import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchOptionsImpl
+import app.atomofiron.searchboxapp.model.other.toByteSize
 import app.atomofiron.searchboxapp.model.finder.toInt
 import app.atomofiron.searchboxapp.model.preference.AppLocale
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
@@ -86,7 +88,7 @@ class PreferenceStore @Inject constructor(
 
     val asSu = getFlow(KeyUseSu)
     val suCmd = getFlow(KeySuCmd)
-    val specialCharacters = getFlow(KeySpecialCharacters) { it.split(" ").toTypedArray() }
+    val specialCharacters = getFlow(KeySpecialCharacters, ::readCharacters)
     val appOrientation = getFlow(KeyAppOrientation) { AppOrientation.entries[it.toInt()] }
     val explorerItemComposition = getFlow(KeyExplorerItem) { ExplorerItemComposition(it) }
     val joystickComposition = getFlow(KeyJoystick) { JoystickComposition(it) }
@@ -95,7 +97,7 @@ class PreferenceStore @Inject constructor(
     val showSearchOptions = getFlow(KeyShowSearchOptions)
     val searchOptions = getFlow(KeySearchOptions, ::SearchOptionsImpl)
     val localSearchOptions = getFlow(KeyLocalSearchOptions, ::LocalSearchOptions)
-    val maxFileSizeForSearch = getFlow(KeyMaxSize)
+    val maxFileSizeForSearch = getFlow(KeyMaxSize) { it.toByteSize() }
     val appUpdateCode = getFlow(KeyAppUpdateCode)
     val shownNotificationUpdateCode = getFlow(KeyShownNotificationUpdateCode)
     val maxDepthForSearch = getFlow(KeyMaxDepth)
@@ -146,8 +148,8 @@ class PreferenceStore @Inject constructor(
         edit { it[KeySpecialCharacters] = value.joinToString(separator = " ") }
     }
 
-    suspend fun setMaxFileSizeForSearch(value: Long) {
-        edit { it[KeyMaxSize] = value }
+    suspend fun setMaxFileSizeForSearch(value: ByteSize) {
+        edit { it[KeyMaxSize] = value.persistable() }
     }
 
     suspend fun setAppUpdateCode(value: Int) {

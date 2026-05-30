@@ -4,14 +4,15 @@ import app.atomofiron.common.util.flow.mapState
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Buttons
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.EditCharacters
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.EditOptions
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.MaxDepth
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.MaxSize
-import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.EditOptions
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Query
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.SpecialCharacters
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Targets
@@ -51,7 +52,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
     )
     override val items = combine(uniqueItems, targets, tasks, ::composeAllItems)
 
-    private fun composeOptions(config: EditOptions, chars: Array<String>, depth: Int, size: Long, show: Boolean) = when {
+    private fun composeOptions(config: EditOptions, chars: Array<String>, depth: Int, size: ByteSize, show: Boolean) = when {
         show -> listOf(
             config,
             MaxSize(size),

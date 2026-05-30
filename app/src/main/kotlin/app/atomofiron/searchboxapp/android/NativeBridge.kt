@@ -10,7 +10,6 @@ import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
 import uniffi.native_lib.CancellationState
-import uniffi.native_lib.Check
 import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CommonProgressCollector
 import uniffi.native_lib.CountingResult
@@ -161,7 +160,7 @@ object NativeBridge {
         cancellation: CancellationState,
     ): TextSearchProgress {
         var matches: TextSearchProgress = TextSearchProgress.Skip
-        val result = findText(params, listOf(target), maxDepth = 1, Check.No, asSu, cancellation) {
+        val result = findText(params, listOf(target), maxDepth = 1, maxSize = null, asSu, cancellation) {
             matches = it
         }
         return when (result) {
@@ -174,17 +173,7 @@ object NativeBridge {
         params: QueryParams,
         targets: List<NodeRef>,
         maxDepth: Int,
-        maxSize: Long,
-        asSu: Boolean,
-        cancellation: CancellationState,
-        collector: (TextSearchProgress) -> Unit,
-    ): Rslt<Unit> = findText(params, targets, maxDepth, Check.Yes(maxSize.toULong()), asSu, cancellation, collector)
-
-    private fun findText(
-        params: QueryParams,
-        targets: List<NodeRef>,
-        maxDepth: Int,
-        check: Check,
+        maxSize: ULong?,
         asSu: Boolean,
         cancellation: CancellationState,
         collector: (TextSearchProgress) -> Unit,
@@ -193,7 +182,7 @@ object NativeBridge {
             override fun emit(progress: TextSearchProgress) = collector(progress)
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
-        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), check, suCmd = suCmd.takeIf { asSu }, cancellation, collector)
+        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), sizeLimit = maxSize, suCmd = suCmd.takeIf { asSu }, cancellation, collector)
             .toRslt()
     }
 

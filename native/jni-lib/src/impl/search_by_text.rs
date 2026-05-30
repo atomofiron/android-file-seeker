@@ -1,4 +1,3 @@
-use crate::api::api::Check;
 use crate::api::api::{SearchQuery, SimpleResult, TextSearchCollector, TextSearchProgress};
 use crate::api::cancellation::CancellationState;
 use crate::common::{Rslt, JOINING_ERROR};
@@ -21,7 +20,7 @@ pub fn find_text_impl(
     query: SearchQuery,
     targets: Vec<RawPath>,
     max_depth: usize,
-    check: Check,
+    size_limit: Option<u64>,
     cancellation: Arc<dyn CancellationState>,
     collector: Arc<dyn TextSearchCollector>,
 ) -> SimpleResult {
@@ -34,7 +33,7 @@ pub fn find_text_impl(
         Ok(m) => m,
         Err(e) => return SimpleResult::Err(e.to_string())
     };
-    find_text_recursively(matcher, targets, max_depth, check, cancellation, &tx);
+    find_text_recursively(matcher, targets, max_depth, size_limit, cancellation, &tx);
     drop(tx);
     return handle.join()
         .map(|_| SimpleResult::Ok)
@@ -45,17 +44,17 @@ pub fn find_text_recursively(
     matcher: TextMatcher,
     targets: Vec<RawPath>,
     max_depth: usize,
-    check: Check,
+    size_limit: Option<u64>,
     cancellation: Arc<dyn CancellationState>,
     sender: &Sender<TextSearchProgress>,
 ) {
     walk(targets, sender, max_depth, cancellation, |entry, sender| {
         let path = entry.path();
-        let progress = match check {
-            Check::Yes(max_size) => {
+        let progress = match size_limit {
+            Some(size_limit) => {
                 match entry.metadata() {
                     Err(e) => Err(e.into()),
-                    Ok(meta) if !meta.is_file() || meta.len() > max_size || meta.len() == 0 => return WalkState::Continue,
+                    Ok(meta) if !meta.is_file() || meta.len() > size_limit || meta.len() == 0 => return WalkState::Continue,
                     _ => match is_text_file(path) {
                         Err(e) => Err(e.into()),
                         Ok(txt) if !txt => return WalkState::Continue,
@@ -63,7 +62,7 @@ pub fn find_text_recursively(
                     },
                 }
             }
-            _ => Ok(())
+            None => Ok(())
         }.and_then(|_| matcher.search(path))
             .map(|matches| match matches.is_empty() {
                 true => TextSearchProgress::Skip,

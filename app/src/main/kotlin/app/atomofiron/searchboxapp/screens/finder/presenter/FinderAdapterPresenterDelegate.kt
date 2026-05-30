@@ -5,6 +5,7 @@ import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.screens.finder.di.FinderInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
+import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
@@ -112,5 +113,5 @@ class FinderAdapterPresenterDelegate @Inject constructor(
 
     override fun onEditMaxDepth(new: Int) = preferences { setMaxDepthForSearch(new) }
 
-    override fun onEditMaxSize(new: Long) = preferences { setMaxFileSizeForSearch(new) }
+    override fun onEditMaxSize(new: ByteSize) = preferences { setMaxFileSizeForSearch(new) }
 }

@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import app.atomofiron.common.recycler.GeneralItem
 import app.atomofiron.common.util.extension.hash
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
@@ -43,7 +44,7 @@ sealed class FinderStateItem(
 
     data class MaxDepth(val value: Int) : FinderStateItem(FinderItemType.MAX_DEPTH)
 
-    data class MaxSize(val value: Long) : FinderStateItem(FinderItemType.MAX_SIZE)
+    data class MaxSize(val value: ByteSize) : FinderStateItem(FinderItemType.MAX_SIZE)
 
     data class EditCharacters(val value: List<String>) : FinderStateItem(FinderItemType.EDIT_CHARS)
 

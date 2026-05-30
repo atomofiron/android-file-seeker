@@ -71,8 +71,8 @@ fn run(request: Request, cancellation: Arc<dyn CancellationState>) -> EncodedRes
             write_the_end();
             result.to_bytes()
         }
-        Request::FindText { query, targets, max_depth, check } => {
-            let result = find_text(query, targets, max_depth, check, None, cancellation, StdoutProgressWriter::arc());
+        Request::FindText { query, targets, max_depth, size_limit } => {
+            let result = find_text(query, targets, max_depth, size_limit, None, cancellation, StdoutProgressWriter::arc());
             write_the_end();
             result.to_bytes()
         }

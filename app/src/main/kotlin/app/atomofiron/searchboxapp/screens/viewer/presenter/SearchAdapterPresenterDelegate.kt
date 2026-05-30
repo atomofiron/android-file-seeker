@@ -11,6 +11,7 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeError
+import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.model.finder.LocalSearchResult
 import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.model.finder.QueryParams
@@ -90,7 +91,7 @@ class SearchAdapterPresenterDelegate @Inject constructor(
 
     override fun onTestTextChange(value: String?) = Unit
 
-    override fun onEditMaxSize(new: Long) = Unit
+    override fun onEditMaxSize(new: ByteSize) = Unit
 
     fun trySelectTask(task: LocalSearchTask) {
         val hash = task.result.hash

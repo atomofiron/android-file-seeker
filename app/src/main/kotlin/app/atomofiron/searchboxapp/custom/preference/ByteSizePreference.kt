@@ -7,12 +7,14 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.TextField
+import app.atomofiron.searchboxapp.model.other.ByteSize
+import app.atomofiron.searchboxapp.model.other.toByteSize
 import app.atomofiron.searchboxapp.utils.makeByteSize
 
 class ByteSizePreference(context: Context, attrs: AttributeSet) : Preference(context, attrs) {
 
     private var editText: TextField? = null
-    private var value = 0L
+    private var value = ByteSize.UNDEFINED.toLong()
 
     init {
         widgetLayoutResource = R.layout.preference_byte_size
@@ -29,7 +31,7 @@ class ByteSizePreference(context: Context, attrs: AttributeSet) : Preference(con
         if (editText == null) {
             val editText = holder.itemView.findViewById<TextField>(R.id.size)
             editText.makeByteSize(::onSubmit)
-            editText.setText(value.toString())
+            editText.setText(value.toByteSize().toString())
             this.editText = editText
         }
     }
@@ -43,10 +45,10 @@ class ByteSizePreference(context: Context, attrs: AttributeSet) : Preference(con
         editText?.performClick()
     }
 
-    private fun onSubmit(value: Long) {
+    private fun onSubmit(value: ByteSize) {
         if (callChangeListener(value)) {
-            persistLong(value)
-            this.value = value
+            this.value = value.persistable()
+            persistLong(this.value)
         }
     }
 }

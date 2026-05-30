@@ -1,4 +1,4 @@
-use crate::api::api::{Check, CrcResult, FileEventCollector, HandleResult, SuCmd};
+use crate::api::api::{CrcResult, FileEventCollector, HandleResult, SuCmd};
 use crate::api::api::{CommonProgressCollector, CountingResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
 use crate::api::cancellation::CancellationState;
 use crate::api::su_api::Request;
@@ -151,7 +151,7 @@ pub fn copy(
         ).unwrap_or_else(|e| CountingResult::Err(meta_with_error(&from_buf, &e)))
     }
     let from_buf = from.buf();
-    match copy_impl(&from_buf, &to.buf(), moving, collector) {
+    return match copy_impl(&from_buf, &to.buf(), moving, collector) {
         Ok(result) => result,
         Err(e) => CountingResult::Err(meta_with_error(&from_buf, &e)),
     }
@@ -183,20 +183,20 @@ pub fn find_text(
     query: SearchQuery,
     targets: Vec<RawPath>,
     max_depth: u32,
-    check: Check,
+    size_limit: Option<u64>,
     su_cmd: Option<SuCmd>,
     cancellation: Arc<dyn CancellationState>,
     collector: Arc<dyn TextSearchCollector>,
 ) -> SimpleResult {
     if let Some(su_cmd) = su_cmd {
         return as_su_with_progress(
-            Request::FindText { query, targets, max_depth, check },
+            Request::FindText { query, targets, max_depth, size_limit },
             su_cmd,
             cancellation,
             Box::new(collector),
         ).unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
     }
-    return find_text_impl(query, targets, max_depth as usize, check, cancellation, collector);
+    return find_text_impl(query, targets, max_depth as usize, size_limit, cancellation, collector);
 }
 
 #[uniffi::export]

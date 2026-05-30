@@ -57,7 +57,7 @@ class FinderService @Inject constructor(
         val asSu = preferenceStore.asSu.value
         val query = QueryParams(query, regex = config.regex, ignoreCase = config.ignoreCase)
         val type = when {
-            config.contentSearch -> FinderWorker.Params.Text(maxSize = maxSize)
+            config.contentSearch -> FinderWorker.Params.Text(maxSize = maxSize.resolve())
             else -> FinderWorker.Params.Names(excludeDirs = config.excludeDirs)
         }
         val params = FinderWorker.Params(query, type, maxDepth = maxDepth, targets = where.map { it.bytes }, asSu = asSu)

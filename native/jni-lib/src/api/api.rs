@@ -108,13 +108,6 @@ pub struct TextMatch {
     pub line: u64,
 }
 
-#[derive(Debug, Encode, Decode, PartialEq)]
-#[derive(uniffi::Enum)]
-pub enum Check {
-    Yes(u64), // txt + file size
-    No,
-}
-
 #[derive(Debug, Encode, Decode, PartialEq, Clone)]
 #[derive(uniffi::Record)]
 pub struct CommonProgress {

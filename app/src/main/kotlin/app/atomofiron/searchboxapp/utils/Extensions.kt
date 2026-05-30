@@ -29,24 +29,33 @@ inline fun InputStream.writeTo(out: OutputStream, callback: (Long) -> Unit = {})
     return copied
 }
 
-fun Int.convert(suffixes: Array<String>, lossless: Boolean = true): String = toLong().convert(suffixes, lossless)
+fun Long.convert(
+    suffixes: Array<String>,
+    lossless: Boolean = true,
+    separator: String = "",
+): String = toULong().convert(suffixes, lossless, separator)
 
-fun Long.convert(suffixes: Array<String>, lossless: Boolean = true, separator: String = ""): String {
+fun ULong.convert(
+    suffixes: Array<String>,
+    lossless: Boolean = true,
+    separator: String = "",
+): String {
     var value = this
+    val k = 1024.toULong()
     for (i in suffixes.indices) {
-        if (value / 1024 == 0L) return "$value$separator${suffixes[i]}"
-        if (lossless && value % 1024 != 0L) return "$value${suffixes[i]}"
-        if (i < suffixes.lastIndex) value /= 1024
+        if (value / k == ULong.MIN_VALUE) return "$value$separator${suffixes[i]}"
+        if (lossless && value % k != ULong.MIN_VALUE) return "$value${suffixes[i]}"
+        if (i < suffixes.lastIndex) value /= k
     }
     return "$value$separator${suffixes.last()}"
 }
 
-fun String.convertOrNull(): Long? {
+fun String.convertOrNull(): ULong? {
     val digits = Regex("\\d+")
     val metrics = Regex("([gGгГ]|[mMмМ]|[kKкК])?[bBбБ]?$")
     val value = digits.find(this)
         ?.value
-        ?.toLongOrNull()
+        ?.toULongOrNull()
         ?: return null
     val rate = metrics.find(this)
         ?.value
@@ -57,7 +66,8 @@ fun String.convertOrNull(): Long? {
         'm', 'M', 'м', 'М' -> 1024L * 1024L
         'k', 'K', 'к', 'К' -> 1024L
         else -> 1L
-    }.takeIf { value <= Long.MAX_VALUE / it }
+    }.toULong()
+        .takeIf { value <= ULong.MAX_VALUE / it }
         ?.let { value * it }
 }
 
