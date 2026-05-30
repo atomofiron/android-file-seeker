@@ -18,9 +18,9 @@ class CharactersHolder(
     override fun minWidth(): Float = itemView.resources.run {
         itemOrNull
             ?.characters
-            ?.size
-            ?.let { it * getDimension(R.dimen.finder_char) }
-            ?: getDimension(R.dimen.finder_query_field)
+            ?.run { size * getDimension(R.dimen.finder_char) }
+            .let { it ?: 0f }
+            .coerceAtLeast(getDimension(R.dimen.finder_query_field))
     }
 
     override fun onBind(item: FinderStateItem.SpecialCharacters, position: Int) {

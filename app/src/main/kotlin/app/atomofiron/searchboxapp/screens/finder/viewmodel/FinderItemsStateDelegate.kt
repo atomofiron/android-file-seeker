@@ -66,7 +66,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
     private fun composeUniqueItems(query: String, test: String?, chars: Array<String>, options: List<FinderStateItem>, config: EditOptions): List<FinderStateItem> {
         return buildList {
             add(Query(query, regex = config.regex))
-            add(SpecialCharacters(chars))
+            if (chars.isNotEmpty()) add(SpecialCharacters(chars))
             if (!isLocal) add(Buttons)
             add(TestField(value = test, query = query, regex = config.regex, ignoreCase = config.ignoreCase))
             addAll(options)

@@ -88,7 +88,7 @@ class PreferenceStore @Inject constructor(
 
     val asSu = getFlow(KeyUseSu)
     val suCmd = getFlow(KeySuCmd)
-    val specialCharacters = getFlow(KeySpecialCharacters) { it.split(" ").toTypedArray() }
+    val specialCharacters = getFlow(KeySpecialCharacters, ::readCharacters)
     val appOrientation = getFlow(KeyAppOrientation) { AppOrientation.entries[it.toInt()] }
     val explorerItemComposition = getFlow(KeyExplorerItem) { ExplorerItemComposition(it) }
     val joystickComposition = getFlow(KeyJoystick) { JoystickComposition(it) }
@@ -189,6 +189,12 @@ class PreferenceStore @Inject constructor(
             }
             it[key] = value
         }
+    }
+
+    private fun readCharacters(value: String): Array<String> {
+        return value.split(" ")
+            .filter { it.isNotBlank() }
+            .toTypedArray()
     }
 
     private fun <V : Any> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {
