@@ -9,6 +9,7 @@ pub const OKL: c_long = 0;
 pub const OKS: ssize_t = 0;
 
 pub const CHUNK_SIZE: usize = 8192;
+pub const UNDEFINED_SIZE: u64 = 0;
 
 pub fn config() -> Configuration { bincode::config::standard() }
 

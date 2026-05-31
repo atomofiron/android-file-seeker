@@ -975,7 +975,7 @@ class ExplorerService @Inject constructor(
         scope.launch {
             val (length, size) = NativeBridge.usage(item.ref, asSu)
                 .unwrapOrElse { NodeMeta.Empty.run { length to size } }
-            if (length != item.length && size != item.size) garden(key) {
+            if (length != item.length || size != item.size) garden(key) {
                 val current = findItem(item.uniqueId)
                 current ?: return@launch
                 val updated = current.copy(meta = item.meta.copy(length = length, size = size))

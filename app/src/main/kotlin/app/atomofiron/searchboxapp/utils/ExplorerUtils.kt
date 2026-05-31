@@ -22,6 +22,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
 import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.utils.Const.LF
+import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_SIZE
 import kotlinx.coroutines.Job
 import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CountingResult
@@ -189,27 +190,30 @@ object ExplorerUtils {
     }
 
     fun Meta.toNodeMeta() = toNodeMeta(
-        length = when (access.firstOrNull()) {
-            FILE_CHAR -> length.toLong()
+        oldLength = when (access.firstOrNull()) {
+            DIR_CHAR -> UNDEFINED_SIZE
             else -> NodeMeta.Empty.length
         },
-        size = "",
+        oldSize = "",
     )
 
     fun Meta.toNodeMeta(
-        length: Long,
-        size: String,
+        oldLength: Long,
+        oldSize: String,
     ) = NodeMeta(
         access = access,
         owner = owner,
         group = group,
         date = date,
         time = time,
-        length = when {
-            length == NodeMeta.Empty.length -> this.length.toLong()
-            else -> length
+        length = length.toLong().let { new ->
+            val undefined = when (access.firstOrNull()) {
+                DIR_CHAR -> UNDEFINED_SIZE
+                else -> NodeMeta.Empty.length
+            }
+            new.takeIf { it != undefined } ?: oldLength
         },
-        size = this.size.takeIf { it.isNotEmpty() } ?: size,
+        size = size.takeIf { it.isNotEmpty() } ?: oldSize,
     )
 
     private const val DIMENS = "BKMGTPEZYRQ"
@@ -333,7 +337,7 @@ object ExplorerUtils {
             children.run {
                 val child = items[index]
                 items[index] = child.resolveType(mimeType = entry.mime)
-                    .copy(meta = entry.meta.toNodeMeta(length = child.length, size = child.size))
+                    .copy(meta = entry.meta.toNodeMeta(oldLength = child.length, oldSize = child.size))
             }
         }
         return entries.isNotEmpty()
@@ -533,7 +537,7 @@ object ExplorerUtils {
         val files = MutableList<Node>(metas.size)
         for (i in metas.indices) {
             val m = metas[i]
-            var meta = m.toNodeMeta(length = length, size = size)
+            var meta = m.toNodeMeta()
             val parentRef = this@parseDir.ref
             val ref = NodeRef(m.path)
             val child = children?.findOnMut { it.ref == ref }
