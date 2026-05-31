@@ -50,7 +50,8 @@ class RootOffsetDecorator(
 
     private fun cells(): Int = spanSizeLookup.getSpanSizeOrNull(0)
         ?.let { layoutManager.spanCount / it }
-        ?: 0
+        ?.coerceAtLeast(1)
+        ?: 1
 
     private fun offset(recyclerView: RecyclerView, cells: Int): Int {
         val roots = rootAdapter.itemCount
