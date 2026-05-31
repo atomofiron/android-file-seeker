@@ -3,24 +3,33 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/padding_mini"
     android:orientation="horizontal"
     android:gravity="center_vertical"
     >
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/item_config_history"
+        android:id="@+id/history"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:layout_marginEnd="@dimen/padding_half"
+        android:layout_marginHorizontal="@dimen/padding_mini"
         android:text="@string/history"
         style="?materialTonalButton"
         />
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/item_config_visibility"
+        android:id="@+id/test"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:layout_marginHorizontal="@dimen/padding_mini"
+        android:text="@string/test"
+        style="?materialTonalButton"
+        />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/options"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:layout_marginHorizontal="@dimen/padding_mini"
         android:text="@string/options"
         style="?materialTonalButton"
         />

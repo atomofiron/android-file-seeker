@@ -57,6 +57,7 @@
     <string name="started">Запущен</string>
     <string name="stopping">Остановка</string>
     <string name="stopped">Остановлено</string>
+    <string name="test">Тест</string>
     <string name="options">Опции</string>
     <string name="options_title">Опции:</string>
     <string name="explorer">Проводник</string>

@@ -51,7 +51,7 @@ sealed class FinderStateItem(
 
     data class EditCharacters(val value: List<String>) : FinderStateItem(FinderItemType.EDIT_CHARS)
 
-    data object Buttons : FinderStateItem(FinderItemType.BUTTONS)
+    data class Buttons(val withTest: Boolean) : FinderStateItem(FinderItemType.BUTTONS)
 
     data class TestField(
         val value: String? = null,

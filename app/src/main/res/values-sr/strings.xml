@@ -57,6 +57,7 @@
     <string name="started">Покренуто</string>
     <string name="stopping">Заустављање</string>
     <string name="stopped">Заустављено</string>
+    <string name="test">Тест</string>
     <string name="options">Опције</string>
     <string name="options_title">Опције:</string>
     <string name="explorer">Фајлови</string>

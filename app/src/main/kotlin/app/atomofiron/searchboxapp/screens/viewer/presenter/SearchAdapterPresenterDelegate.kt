@@ -60,9 +60,11 @@ class SearchAdapterPresenterDelegate @Inject constructor(
         preferences { setLocalSearchOptions(options.toLocal()) }
     }
 
-    override fun onConfigVisibilityClick() = Unit
+    override fun onOptionsVisibilityClick() = Unit
 
     override fun onHistoryClick() = Unit
+
+    override fun onTestClick() = Unit
 
     override fun onCharacterClick(value: String) = viewState.sendInsertInQuery(value)
 

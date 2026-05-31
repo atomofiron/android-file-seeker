@@ -14,7 +14,10 @@ import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 class EditMaxDepthHolder(
     parent: ViewGroup,
     private val output: OnEditMaxDepthListener,
-) : GeneralHolder<FinderStateItem.MaxDepth>(parent, R.layout.item_text_field), TextField.Listener, View.OnFocusChangeListener {
+) : GeneralHolder<FinderStateItem.MaxDepth>(parent, R.layout.item_text_field)
+    , TextField.Listener
+    , View.OnFocusChangeListener
+{
 
     override val hungry = true
 
@@ -23,11 +26,13 @@ class EditMaxDepthHolder(
 
     init {
         binding.box.setHint(R.string.pref_max_depth)
-        binding.field.maxLines = 1
-        binding.field.addListener(this)
-        binding.field.addOnFocusChangeListener(this)
-        binding.field.run { inputType = inputType or InputType.TYPE_CLASS_NUMBER }
-        binding.field.makeHoled(binding.box)
+        binding.field.run {
+            maxLines = 1
+            addListener(this@EditMaxDepthHolder)
+            addOnFocusChangeListener(this@EditMaxDepthHolder)
+            run { inputType = inputType or InputType.TYPE_CLASS_NUMBER }
+            makeHoled(binding.box)
+        }
     }
 
     override fun minWidth(): Float = delegate.minWidth()

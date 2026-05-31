@@ -59,7 +59,7 @@
 	<dimen name="screen_medium">600dp</dimen>
 	<dimen name="finder_query_field">300dp</dimen>
 	<dimen name="finder_test_field">300dp</dimen>
-	<dimen name="finder_buttons">240dp</dimen>
+	<dimen name="finder_buttons">300dp</dimen>
 	<dimen name="finder_config">400dp</dimen>
 	<dimen name="finder_char">48dp</dimen>
 	<dimen name="finder_task">320dp</dimen>

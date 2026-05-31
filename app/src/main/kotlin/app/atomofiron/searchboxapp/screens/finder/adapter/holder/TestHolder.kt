@@ -1,25 +1,24 @@
 package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 
-import android.text.Editable
-import android.text.InputType
 import android.text.Spannable
-import android.text.TextWatcher
+import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.EditorInfo
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.common.util.MaterialAttr
-import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemTextFieldBinding
 import app.atomofiron.searchboxapp.custom.drawable.makeHoled
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.TestField
+import app.atomofiron.searchboxapp.utils.colorAttr
 import java.util.regex.Pattern
 
 class TestHolder(
     parent: ViewGroup,
     private val output: OnTestChangeListener,
-) : GeneralHolder<TestField>(parent, R.layout.item_text_field), TextWatcher {
+) : GeneralHolder<TestField>(parent, R.layout.item_text_field)
+    , View.OnFocusChangeListener
+{
 
     override val hungry = true
 
@@ -37,13 +36,10 @@ class TestHolder(
         binding.box.setHint(R.string.try_find_this_text)
         binding.field.run {
             isSingleLine = false
-            maxLines = 5
-            setText(default)
-            addTextChangedListener(this@TestHolder)
-            imeOptions = imeOptions and EditorInfo.IME_ACTION_DONE.inv()
-            inputType = inputType or InputType.TYPE_TEXT_FLAG_MULTI_LINE
+            maxLines = 3
+            addOnFocusChangeListener(this@TestHolder)
+            makeHoled(binding.box)
         }
-        binding.field.makeHoled(binding.box)
     }
 
     override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_test_field)
@@ -104,18 +100,18 @@ class TestHolder(
         }
     }
 
-    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
-    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
-
-    override fun afterTextChanged(s: Editable?) {
+    override fun onFocusChange(v: View, hasFocus: Boolean) {
+        val value = binding.takeIf { !hasFocus }
+            ?.field?.text
+            ?.toString()
+            ?: return
         val item = itemOrNull ?: return
-        val string = s?.toString()
-        when (string) {
-            null, item.value -> Unit
-            default, "" -> output.onTestTextChange(null)
-            else -> output.onTestTextChange(string)
+        when (value) {
+            item.value -> Unit
+            default -> output.onTestTextChange(null)
+            else -> output.onTestTextChange(value)
         }
-        test(item.copy(value = string ?: ""))
+        test(item.copy(value = value))
     }
 
     interface OnTestChangeListener {

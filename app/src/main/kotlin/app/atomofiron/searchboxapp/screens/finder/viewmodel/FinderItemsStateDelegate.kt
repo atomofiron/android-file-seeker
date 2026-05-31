@@ -4,15 +4,16 @@ import app.atomofiron.common.util.flow.mapState
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Buttons
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.EditCharacters
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.EditOptions
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.MaxDepth
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.MaxSize
+import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Options
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Query
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.SpecialCharacters
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem.Targets
@@ -60,15 +61,15 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
             EditCharacters(chars.toList()),
             Title(R.string.options_title),
         )
-        else -> listOf(FinderStateItem.Options(config.toggles))
+        else -> listOf(Options(config.toggles))
     }
 
     private fun composeUniqueItems(query: String, test: String?, chars: Array<String>, options: List<FinderStateItem>, config: EditOptions): List<FinderStateItem> {
         return buildList {
             add(Query(query, regex = config.regex))
             if (chars.isNotEmpty()) add(SpecialCharacters(chars))
-            if (!isLocal) add(Buttons)
-            add(TestField(value = test, query = query, regex = config.regex, ignoreCase = config.ignoreCase))
+            if (!isLocal) add(Buttons(withTest = test == ""))
+            if (test != "") add(TestField(value = test, query = query, regex = config.regex, ignoreCase = config.ignoreCase))
             addAll(options)
         }
     }
@@ -78,7 +79,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
             addAll(items)
             replaceOne<Query, _> { copy(enabled = query.isNotEmpty() && (isLocal || targets.any { it.isChecked })) }
             if (!isLocal && targets.isNotEmpty()) {
-                val index = items.indexOfFirst { it is TestField }.inc()
+                val index = items.indexOfFirst { it is EditOptions || it is Options }
                 add(index, Title(R.string.search_here))
                 add(index, Targets(targets.toList()))
             }

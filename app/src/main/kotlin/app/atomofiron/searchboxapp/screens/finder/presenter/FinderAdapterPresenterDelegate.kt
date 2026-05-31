@@ -53,11 +53,13 @@ class FinderAdapterPresenterDelegate @Inject constructor(
         preferences { setSearchOptions(options) }
     }
 
-    override fun onConfigVisibilityClick() = preferences {
+    override fun onOptionsVisibilityClick() = preferences {
         setShowSearchOptions(!showSearchOptions.value)
     }
 
     override fun onHistoryClick() = viewState.showHistory()
+
+    override fun onTestClick() = preferences { setTestField(null) }
 
     override fun onCharacterClick(value: String) = viewState.insertInQuery(value)
 

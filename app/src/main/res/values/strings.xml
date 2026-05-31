@@ -61,6 +61,7 @@
     <string name="started">Started</string>
     <string name="stopping">Stopping</string>
     <string name="stopped">Stopped</string>
+    <string name="test">Test</string>
     <string name="options">Options</string>
     <string name="options_title">Options:</string>
     <string name="explorer">Files</string>
