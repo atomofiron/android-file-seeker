@@ -44,7 +44,10 @@ sealed class FinderStateItem(
 
     data class MaxDepth(val value: Int) : FinderStateItem(FinderItemType.MAX_DEPTH)
 
-    data class MaxSize(val value: ByteSize) : FinderStateItem(FinderItemType.MAX_SIZE)
+    data class MaxSize(
+        val value: ByteSize,
+        val enabled: Boolean,
+    ) : FinderStateItem(FinderItemType.MAX_SIZE)
 
     data class EditCharacters(val value: List<String>) : FinderStateItem(FinderItemType.EDIT_CHARS)
 

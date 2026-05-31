@@ -30,6 +30,7 @@ class EditMaxSizeHolder(
 
     override fun onBind(item: FinderStateItem.MaxSize, position: Int) {
         binding.field.setText(item.value.toString())
+        binding.box.isEnabled = item.enabled
     }
 
     interface OnEditMaxSizeListener {

@@ -55,7 +55,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
     private fun composeOptions(config: EditOptions, chars: Array<String>, depth: Int, size: ByteSize, show: Boolean) = when {
         show -> listOf(
             config,
-            MaxSize(size),
+            MaxSize(size, enabled = config.toggles.contentSearch),
             MaxDepth(depth),
             EditCharacters(chars.toList()),
             Title(R.string.options_title),
