@@ -22,7 +22,8 @@ import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
 import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.utils.Const.LF
-import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_SIZE
+import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_DIR_LENGTH
+import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_FILE_LENGTH
 import kotlinx.coroutines.Job
 import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CountingResult
@@ -184,15 +185,15 @@ object ExplorerUtils {
     fun NodeRef.toRoot(type: NodeRootInfo): Node {
         return Node(
             ref = this,
-            meta = NodeMeta(),
+            meta = NodeMeta.Empty,
             content = NodeContent.Directory(rootType = type),
         )
     }
 
     fun Meta.toNodeMeta() = toNodeMeta(
         oldLength = when (access.firstOrNull()) {
-            DIR_CHAR -> UNDEFINED_SIZE
-            else -> NodeMeta.Empty.length
+            DIR_CHAR -> UNDEFINED_DIR_LENGTH
+            else -> UNDEFINED_FILE_LENGTH
         },
         oldSize = "",
     )
@@ -207,13 +208,16 @@ object ExplorerUtils {
         date = date,
         time = time,
         length = length.toLong().let { new ->
-            val undefined = when (access.firstOrNull()) {
-                DIR_CHAR -> UNDEFINED_SIZE
-                else -> NodeMeta.Empty.length
+            when {
+                access.firstOrNull() != DIR_CHAR -> new
+                new == UNDEFINED_DIR_LENGTH -> oldLength
+                else -> new
             }
-            new.takeIf { it != undefined } ?: oldLength
         },
-        size = size.takeIf { it.isNotEmpty() } ?: oldSize,
+        size = when {
+            size.isEmpty() -> oldSize
+            else -> size
+        },
     )
 
     private const val DIMENS = "BKMGTPEZYRQ"

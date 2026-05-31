@@ -12,7 +12,8 @@ object Const {
     const val DEFAULT_SPECIAL_CHARACTERS = "\\ [ { ? + * ^ $"
     const val DEFAULT_MAX_SIZE = 10485760L
     const val DEFAULT_MAX_DEPTH = 1024
-    const val UNDEFINED_SIZE = 0L
+    const val UNDEFINED_DIR_LENGTH = 0L
+    const val UNDEFINED_FILE_LENGTH = -1L
 
     const val SCHEME_PACKAGE = "package"
     const val SCHEME_CONTENT = "content"

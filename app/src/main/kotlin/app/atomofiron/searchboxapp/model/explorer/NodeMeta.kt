@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_FILE_LENGTH
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -10,7 +11,7 @@ data class NodeMeta(
     override val size: String = "",
     override val date: String = "",
     override val time: String = "",
-    override val length: Long = -1,
+    override val length: Long = UNDEFINED_FILE_LENGTH,
 ) : NodeMetaData {
     companion object {
         const val DATE_TIME_SEPARATOR = " "
