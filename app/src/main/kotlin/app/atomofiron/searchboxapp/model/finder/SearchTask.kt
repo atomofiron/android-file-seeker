@@ -13,7 +13,7 @@ data class SearchTask<Result : SearchResult>(
     val query: QueryParams,
     val result: Result,
     val uuid: UUID = UUID.randomUUID(), // todo replace with Uuid
-    val uniqueId: TaskId = 0,
+    val uniqueId: TaskId,
     val status: SearchStatus = SearchStatus.Progress,
     val error: NodeError? = null,
     val cached: Boolean = false,

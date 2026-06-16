@@ -37,6 +37,10 @@ suspend inline fun withMain(
     noinline action: suspend CoroutineScope.() -> Unit,
 ) = withContext(if (now) Dispatchers.Main.immediate else Dispatchers.Main, action)
 
+suspend inline fun withIO(
+    noinline action: suspend CoroutineScope.() -> Unit,
+) = withContext(Dispatchers.IO, action)
+
 inline infix fun <T> Boolean.then(action: () -> T): T? {
     return if (this) action() else null
 }

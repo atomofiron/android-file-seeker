@@ -14,6 +14,7 @@ import androidx.work.Data
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import app.atomofiron.common.util.GrowingList
+import app.atomofiron.common.util.TaskId
 import app.atomofiron.common.util.extension.debug
 import app.atomofiron.common.util.extension.get
 import app.atomofiron.common.util.extension.logE
@@ -75,6 +76,7 @@ class FinderWorker(
 ) : CoroutineWorker(context, workerParams) {
     @Serializable
     data class Params(
+        val uniqueId: TaskId,
         val query: QueryParams,
         val type: Type,
         val maxDepth: Int,
@@ -182,7 +184,8 @@ class FinderWorker(
         if (context.canForegroundService()) {
             setForeground(getForegroundInfo())
         }
-        task = SearchTask(params.query, result = GlobalSearchResult(params.type is Params.Text), taskId)
+        val result = GlobalSearchResult(params.type is Params.Text)
+        task = SearchTask(params.query, result = result, uuid = taskId, uniqueId = params.uniqueId)
         store.addOrUpdate(task)
         return work(params)
     }

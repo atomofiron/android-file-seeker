@@ -34,9 +34,10 @@ interface FinderDao {
     @Query("DELETE FROM $RESULT WHERE id = :id")
     fun delete(id: TaskId) // don't use outside
 
-    fun store(item: SearchResultCache, result: GlobalSearchResult) {
+    fun store(item: SearchResultCache, result: GlobalSearchResult): Int {
         val id = put(item).toInt()
         Store.store(id, result)
+        return id
     }
 
     fun read(id: TaskId) = Store.read(id)

@@ -7,6 +7,7 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.launchOnDefault
+import app.atomofiron.common.util.extension.withIO
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
@@ -15,11 +16,12 @@ import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.GenericSearchTask
+import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
+import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
-import app.atomofiron.searchboxapp.utils.CoroutineLauncher
 import app.atomofiron.searchboxapp.work.FinderWorker
 import java.util.UUID
 import javax.inject.Inject
@@ -32,9 +34,9 @@ class FinderService @Inject constructor(
     private val notificationManager: NotificationManagerCompat,
     private val store: FinderStore,
     private val preferenceStore: PreferenceStore,
+    private val dao: FinderDao,
     explorerStore: ExplorerStore,
-    dao: FinderDao,
-) : CoroutineLauncher by CoroutineLauncher(scope) {
+) {
 
     init {
         workManager.cancelAllWork()
@@ -51,7 +53,7 @@ class FinderService @Inject constructor(
         }
     }
 
-    fun search(query: String, where: List<NodeRef>, config: SearchOptions) {
+    suspend fun search(query: String, where: List<NodeRef>, config: SearchOptions) = withIO {
         val maxSize = preferenceStore.maxFileSizeForSearch.value
         val maxDepth = preferenceStore.maxDepthForSearch.value
         val asSu = preferenceStore.asSu.value
@@ -60,7 +62,10 @@ class FinderService @Inject constructor(
             config.contentSearch -> FinderWorker.Params.Text(maxSize = maxSize.resolve())
             else -> FinderWorker.Params.Names(excludeDirs = config.excludeDirs)
         }
-        val params = FinderWorker.Params(query, type, maxDepth = maxDepth, targets = where.map { it.bytes }, asSu = asSu)
+        val result = GlobalSearchResult(forText = config.contentSearch)
+        val cache = SearchResultCache(stopped = false, params = query)
+        val uniqueId = dao.store(cache, result)
+        val params = FinderWorker.Params(uniqueId, query, type, maxDepth = maxDepth, targets = where.map { it.bytes }, asSu = asSu)
         val request = OneTimeWorkRequest.Builder(FinderWorker::class.java)
             .setInputData(Data(params))
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
@@ -72,10 +77,8 @@ class FinderService @Inject constructor(
         workManager.cancelWorkById(uuid)
     }
 
-    fun drop(task: GenericSearchTask) {
-        default {
-            store.drop(task.uuid)
-        }
+    suspend fun drop(task: GenericSearchTask) {
+        store.drop(task.uuid)
         notificationManager.cancel(task.uniqueId)
     }
 }
