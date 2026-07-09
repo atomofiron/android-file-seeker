@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeId
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
+import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.model.toDockItem
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
@@ -55,7 +56,12 @@ class ResultScreenState @Inject constructor(
     override val updates: Flow<ResultItem> = _updates
     private val _checked = MutableStateFlow<Set<NodeId>>(emptySet())
     val checked: StateFlow<Set<NodeId>> = _checked
-    private val _dock = MutableStateFlow(ResultDockState.Default.reduce(inProgress = false, task?.sorting ?: NodeSorting.Name, checked = checked.value.size, hasMatches = result.matches.isNotEmpty()))
+    private val _dock = MutableStateFlow(ResultDockState.Default.reduce(
+        taskStatus = task?.status ?: SearchStatus.Ended(),
+        newSorting = task?.sorting ?: NodeSorting.Name,
+        checked = checked.value.size,
+        hasMatches = result.matches.isNotEmpty()
+    ))
     override val dock: StateFlow<ResultDockState> = _dock
 
     override val composition = preferenceStore.explorerItemComposition
@@ -76,12 +82,12 @@ class ResultScreenState @Inject constructor(
             _isReady.value = false
         }
         _result = task.result
-        _dock.value = _dock.value.reduce(task.isProgress, task.sorting, checked = checked.size, hasMatches = task.result.matches.isNotEmpty())
+        _dock.value = _dock.value.reduce(task.status, task.sorting, checked = checked.size, hasMatches = task.result.matches.isNotEmpty())
         _items.renderItems(checked, task.sorting, task.result.errors.size)
     }
 
     private fun ResultDockState.reduce(
-        inProgress: Boolean,
+        taskStatus: SearchStatus,
         newSorting: NodeSorting,
         checked: Int,
         hasMatches: Boolean,
@@ -90,10 +96,21 @@ class ResultScreenState @Inject constructor(
             sorting.children.selectionMatches(newSorting) -> sorting
             else -> newSorting.toDockItem(sorting.id, sorting.label).copy(children = sorting.children.makeSelected(newSorting))
         }
-        val status = if (status.clickable == inProgress) status else status.copy(
-            clickable = inProgress,
-            icon = DockItem.Icon(if (inProgress) R.drawable.ic_circle_stop else R.drawable.ic_circle_check),
-            label = DockItem.Label(if (inProgress) R.string.stop else R.string.completed),
+        val status = status.copy(
+            clickable = taskStatus is SearchStatus.Progress,
+            icon = when (taskStatus) {
+                is SearchStatus.Progress -> DockItem.Icon(R.drawable.ic_circle_stop)
+                is SearchStatus.Ended -> DockItem.Icon(R.drawable.ic_circle_check)
+                is SearchStatus.Stopping -> null
+            },
+            label = DockItem.Label(
+                when (taskStatus) {
+                    is SearchStatus.Progress -> R.string.stop
+                    is SearchStatus.Ended -> if (taskStatus.stopped) R.string.stopped else R.string.completed
+                    is SearchStatus.Stopping -> R.string.stopping
+                }
+            ),
+            progress = taskStatus is SearchStatus.Stopping,
         )
         return copy(
             status = status,
