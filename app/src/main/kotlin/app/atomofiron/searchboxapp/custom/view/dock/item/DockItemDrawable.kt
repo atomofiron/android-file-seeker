@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.custom.view.dock.item
 
 import android.content.res.ColorStateList
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Outline
 import android.graphics.Paint
 import android.graphics.Path
@@ -21,7 +22,7 @@ import app.atomofiron.searchboxapp.utils.inverseColor
 import app.atomofiron.searchboxapp.utils.withAlpha
 
 class DockItemDrawable private constructor(
-    ripple: ColorStateList,
+    private val ripple: ColorStateList,
     layers: Drawable,
     private val content: Drawable,
     private val focused: Drawable,
@@ -49,6 +50,8 @@ class DockItemDrawable private constructor(
             )
             return DockItemDrawable(rippleList, layers, content, focused, hovered, mask)
         }
+
+        private val NoRipple = ColorStateList.valueOf(Color.TRANSPARENT)
     }
 
     private var insets = Insets.NONE
@@ -74,6 +77,11 @@ class DockItemDrawable private constructor(
             arrayOf(intArrayOf(android.R.attr.state_activated), intArrayOf()),
             intArrayOf(colors.hovered.inverseColor(), colors.hovered),
         ).let { hovered.setTintList(it) }
+    }
+
+    fun setRipple(visible: Boolean) = when {
+        visible -> setColor(ripple)
+        else -> setColor(NoRipple)
     }
 
     fun setInsets(insets: Insets) {

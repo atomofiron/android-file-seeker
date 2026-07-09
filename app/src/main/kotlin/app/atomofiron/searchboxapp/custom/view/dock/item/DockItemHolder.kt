@@ -27,8 +27,9 @@ class DockItemHolder(
 
     private lateinit var item: DockItem
     private var config: DockItemConfig? = null
+    private val rippleColor = binding.root.context.colorAttr(MaterialAttr.colorControlHighlight)
     private val drawable = DockItemDrawable(
-        ripple = binding.root.context.colorAttr(MaterialAttr.colorControlHighlight),
+        ripple = rippleColor,
         primary = binding.root.context.colorAttr(MaterialAttr.colorPrimary),
         surface = binding.root.context.colorAttr(MaterialAttr.colorSurface),
         stroke = binding.root.resources.getDimension(R.dimen.stroke_width),
@@ -65,6 +66,7 @@ class DockItemHolder(
         config ?: return
         drawable.setColors(config.colors)
         drawable.setInsets(config.insets)
+        drawable.setRipple(visible = item.shouldBeClickable())
     }
 
     private fun bind(item: DockItem) = binding.run {
@@ -91,13 +93,15 @@ class DockItemHolder(
         button.isEnabled = item.enabled
         button.isSelected = item.selected
         button.isActivated = item.primary
-        button.isClickable = item.clickable ?: item.enabled
+        button.isClickable = item.shouldBeClickable()
+        button.isFocusable = item.shouldBeClickable()
         button.alpha = Alpha.enabled(item.enabled)
         popup.bind(item)
     }
 
     private fun ItemDockBinding.onClick() {
         when {
+            !item.shouldBeClickable() -> return
             item.children.isEmpty() || item.children.secondary -> selectListener(item)
             else -> togglePopup()
         }

@@ -70,6 +70,8 @@ data class DockItem(
         }
     }
 
+    fun shouldBeClickable() = clickable ?: enabled
+
     fun with(@DrawableRes resId: Int) = copy(icon = Icon.Res(resId))
 
     fun with(drawable: Drawable) = copy(icon = Icon.Value(drawable))
