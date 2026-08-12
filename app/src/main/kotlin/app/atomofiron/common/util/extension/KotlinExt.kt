@@ -60,6 +60,8 @@ fun Float.ceilToInt(): Int = ceil(this).toInt()
 
 inline fun <reified T> Any.cast() = this as T
 
+inline fun <reified T> Any?.tryAs() = this as? T
+
 fun Int.pow(exp: Int): Int = toLong().pow(exp.toLong()).toInt()
 
 fun Long.pow(exp: Int): Long = pow(exp.toLong())

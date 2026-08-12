@@ -18,6 +18,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.ResultStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
+import app.atomofiron.searchboxapp.screens.common.AlertConsumer
 import app.atomofiron.searchboxapp.screens.result.presenter.ResultPresenterParams
 import dagger.BindsInstance
 import dagger.Component
@@ -63,6 +64,10 @@ class ResultModule {
     @Provides
     @ResultScope
     fun viewState(state: ResultScreenState): ResultViewState = state
+
+    @Provides
+    @ResultScope
+    fun alertConsumer(state: ResultScreenState) = AlertConsumer(state::showAlert)
 
     @Provides
     fun task(

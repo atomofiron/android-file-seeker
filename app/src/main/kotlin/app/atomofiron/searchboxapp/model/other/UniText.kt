@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.model.other
 import android.content.res.Resources
 import androidx.annotation.PluralsRes
 import androidx.annotation.StringRes
+import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.model.other.UniText.Fmt
 import app.atomofiron.searchboxapp.model.other.UniText.Plr
 import app.atomofiron.searchboxapp.model.other.UniText.Res
@@ -25,11 +26,23 @@ sealed interface UniText {
         operator fun invoke(@StringRes res: Int, vararg args: Any) = Fmt(res, args.toList())
         operator fun invoke(@StringRes res: Int, args: List<Any>) = Fmt(res, args)
         operator fun invoke(@PluralsRes res: Int, quantity: Int, vararg args: Any) = Plr(res, quantity, args.toList())
+
+        val Empty = UniText("")
     }
+
+    val isEmpty: Boolean get() = when (this) {
+        is Str -> value.isEmpty()
+        is Res -> value == 0
+        is Fmt -> res == 0
+        is Plr -> res == 0
+    }
+    val isNotEmpty get() = !isEmpty
 }
 
 @JvmName("getNullable")
 operator fun Resources.get(text: UniText?) = text?.let { get(it) }
+
+operator fun AppResources.get(text: UniText) = this()[text]
 
 operator fun Resources.get(text: UniText) = when (text) {
     is Str -> text.value

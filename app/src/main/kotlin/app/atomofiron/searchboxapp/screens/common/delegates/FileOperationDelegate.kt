@@ -12,12 +12,14 @@ import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
+import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.other.ExplorerItemOptions
+import app.atomofiron.searchboxapp.screens.common.AlertConsumer
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations.ByCopying
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations.ByMoving
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations.Copy
@@ -32,6 +34,7 @@ import app.atomofiron.searchboxapp.screens.common.delegates.Operations.Paste
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations.Rename
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations.Share
 import app.atomofiron.searchboxapp.screens.common.delegates.Operations.UseAs
+import app.atomofiron.searchboxapp.screens.common.errToAlert
 import app.atomofiron.searchboxapp.utils.CoroutineLauncher
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isInaccessible
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.merge
@@ -54,12 +57,14 @@ fun List<Node>.pasteable(dst: Node) = isNotEmpty() && none { it.ref == dst.ref |
 
 class FileOperationDelegate @Inject constructor(
     private val scope: CoroutineScope,
+    private val appResources: AppResources,
     preferences: PreferenceStore,
     private val apks: ApkDelegate,
     private val utils: UtilService,
     private val store: ExplorerStore,
     private val sharing: FileSharingDelegate,
     private val service: ExplorerService,
+    private val alertConsumer: AlertConsumer,
 ) : CoroutineLauncher by CoroutineLauncher(scope) {
     private enum class Mode(
         val rw: Boolean,
@@ -76,8 +81,8 @@ class FileOperationDelegate @Inject constructor(
     fun operations(targets: List<Node>, readOnly: Boolean = false): Rslt<ExplorerItemOptions> {
         val merged = targets.merge()
         when {
-            merged.isEmpty() -> return Rslt.Err(utils[R.string.empty])
-            merged.all { it.isInaccessible() } -> return Rslt.Err(utils[R.string.inaccessible])
+            merged.isEmpty() -> return Rslt.Err()
+            merged.all { it.isInaccessible() } -> return Rslt.Err(appResources[R.string.inaccessible])
         }
         val operations = buildOperations(merged, first = merged.first(), readOnly)
         return ExplorerItemOptions(operations, merged, itemComposition).toOk()
@@ -122,6 +127,7 @@ class FileOperationDelegate @Inject constructor(
         when (item.id) {
             Delete.id -> deleteFile(targets, key)
             Share.id -> sharing.shareWith(targets.filter { it.isFile })
+                .errToAlert(alertConsumer)
             OpenWith.id -> sharing.openWith(first)
             InstallApp.id -> apks.install(first, key)
             LaunchApp.id -> apks.launch(first)

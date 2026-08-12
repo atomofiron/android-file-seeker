@@ -60,7 +60,7 @@ class ApkOperationsDelegate @Inject constructor(
             var result = content.resolve(ref, contentResolver, signature = forSignature)
             withMain {
                 content = result.unwrapOrElse {
-                    if (!forSignature) updater.showError(it)
+                    if (!forSignature) updater.showError(UniText(it))
                     return@withMain
                 }
                 updater.update { update(content, forSignature) }

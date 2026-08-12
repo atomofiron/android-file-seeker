@@ -16,6 +16,8 @@ import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
+import app.atomofiron.searchboxapp.screens.common.AlertConsumer
+import app.atomofiron.searchboxapp.screens.common.errToAlert
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItemActionListener
 import app.atomofiron.searchboxapp.screens.result.di.ResultInteractor
@@ -46,6 +48,7 @@ class ResultPresenter @Inject constructor(
     private val workManager: WorkManager,
     preferences: PreferenceStore,
     private val dao: FinderDao,
+    private val alertConsumer: AlertConsumer,
 ) : BasePresenter<ResultViewModel, ResultRouter>(scope, router),
     ResultItemActionListener by itemActionDelegate {
 
@@ -102,7 +105,7 @@ class ResultPresenter @Inject constructor(
         val items = state.items.value.mapCast<_, ResultItem.Item, _> {
             item.takeIf { !checkedOnly || isChecked }
         }
-        sharing.shareWith(items)
+        sharing.shareWith(items).errToAlert(alertConsumer)
     }
 
     fun onExportClick() {

@@ -67,7 +67,7 @@ class ResultScreenState @Inject constructor(
     override val composition = preferenceStore.explorerItemComposition
     override val alerts = EventFlow<Alert>()
 
-    fun showAlert(message: Alert.Uni) {
+    fun showAlert(message: Alert) {
         alerts[scope] = message
     }
 

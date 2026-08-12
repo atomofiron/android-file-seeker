@@ -13,9 +13,11 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
+import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.module.DelegateModule
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
+import app.atomofiron.searchboxapp.screens.common.AlertConsumer
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
 import dagger.BindsInstance
 import dagger.Component
@@ -68,11 +70,16 @@ class ExplorerModule {
         router: ExplorerRouter,
         storagePermissionDelegate: StoragePermissionDelegate,
     ) = Registerable(router, storagePermissionDelegate)
+
+    @Provides
+    @ExplorerScope
+    fun alertConsumer(state: ExplorerViewState) = AlertConsumer(state::showAlert)
 }
 
 interface ExplorerDependencies : DelegateModule.Dependencies {
     fun context(): Context
     fun assetManager(): AssetManager
+    fun appResources(): AppResources
     fun explorerStore(): ExplorerStore
     fun curtainChannel(): CurtainChannel
     fun mainChannel(): CommonChannel

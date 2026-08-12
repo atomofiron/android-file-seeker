@@ -39,7 +39,7 @@ impl<T> OptionExt<T> for Option<T> {
 
     fn or_err<E : Display, F: FnOnce() -> E>(self, f: F) -> Result<T, E> {
         match self {
-            Some(t) => Ok (t),
+            Some(t) => Ok(t),
             None => Err(f()),
         }
     }

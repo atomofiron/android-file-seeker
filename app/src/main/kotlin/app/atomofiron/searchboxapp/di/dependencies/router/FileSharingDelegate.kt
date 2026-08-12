@@ -9,6 +9,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import app.atomofiron.common.util.ActivityProperty
+import app.atomofiron.common.util.extension.calcSize
 import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.searchboxapp.android.Intents
@@ -18,6 +19,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.utils.Const
+import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.getUriForFile
 import app.atomofiron.searchboxapp.work.ReceiveData
 import app.atomofiron.searchboxapp.work.ReceiveWorker
@@ -26,7 +28,7 @@ import java.io.File
 
 interface FileSharingDelegate {
     fun openWith(item: Node)
-    fun shareWith(items: List<Node>)
+    fun shareWith(items: List<Node>): Rslt<Unit>
 }
 
 interface FilePickingDelegate {
@@ -48,15 +50,17 @@ class FileSharingDelegateImpl(
         activity.startActivity(chooser)
     }
 
-    override fun shareWith(items: List<Node>) {
-        val context = activity ?: return
-        if (items.isEmpty()) return
+    override fun shareWith(items: List<Node>): Rslt<Unit> {
+        val context = activity ?: return Rslt.Err
+        if (items.isEmpty()) {
+            return Rslt.Err
+        }
         if (items.size == 1) {
-            val activity = activity ?: return
+            val activity = activity ?: return Rslt.Err
             val item = items.first()
             val chooser = Intents.shareWith(activity, item.ref, asSu,item.content)
             activity.startActivity(chooser)
-            return
+            return Rslt.Ok
         }
         val intent = Intent(Intent.ACTION_SEND_MULTIPLE)
         var (mimeType, commonMimeType) = items.first().content.run { mimeType to commonMimeType }
@@ -77,12 +81,18 @@ class FileSharingDelegateImpl(
             files.add(context.getUriForFile(file, asSu))
         }
         if (files.isEmpty()) {
-            return
+            return Rslt.Err
         }
         intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val size = intent.extras.calcSize()
+            ?: return Rslt.Err
+        if (size > Const.BUNDLE_SIZE_LIMIT) {
+            return Rslt.Err
+        }
         val chooser = Intent.createChooser(intent, null)
         context.startActivity(chooser)
+        return Rslt.Ok
     }
 
     override fun shareSinglePicked(item: Node) = activity?.run {

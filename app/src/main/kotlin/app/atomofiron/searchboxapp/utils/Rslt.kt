@@ -9,18 +9,20 @@ sealed class Rslt<T>(val isOk: Boolean) {
             private data class Ok<T>(override val value: T) : Rslt.Ok<T>()
             override val value = Unit
             operator fun <T> invoke(value: T): Rslt.Ok<T> = Ok(value)
-            override fun toString() = "Ok"
+            override fun toString() = "Rslt.Ok"
         }
         abstract val value: T
+
+        override fun toString(): String = "Rslt.Ok($value)"
     }
 
     open class Err<T>(open val message: String = "") : Rslt<T>(isOk = false) {
-        companion object : Rslt.Err<Unit>() {
-            private data class Err<T>(override val message: String) : Rslt.Err<T>()
-            operator fun <T> invoke(value: T): Rslt.Err<T> = Err(value)
-            override fun toString() = "Err"
+        companion object : Err<Unit>() {
+            override fun toString() = "Rslt.Err"
         }
         val isEmpty: Boolean get() = message.isEmpty()
+
+        override fun toString(): String = "Rslt.Err($message)"
     }
 
     fun ok(): Ok<T>? = this as? Ok<T>

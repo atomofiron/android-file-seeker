@@ -25,20 +25,17 @@ private const val STUB = "stub"
 class DialogDelegateImpl(activity: ActivityProperty) : DialogDelegate {
 
     private val activity by activity
-    private val resources get() = activity?.resources
 
     override fun loadingIcon(): Drawable? = activity?.let { MuonsDrawable(it) }
 
     override operator fun get(text: UniText): String = activity?.resources?.get(text).toString()
 
     override fun showError(message: UniText?) {
-        val text = resources?.get(message)
-        show(errorDialogConfig(text, onCopyClick = ::copy))
+        show(errorDialogConfig(message, onCopyClick = ::copy))
     }
 
     override fun showErrors(message: UniText?) {
-        val text = resources?.get(message)
-        show(errorDialogConfig(text, many = true, onCopyClick = ::copy))
+        show(errorDialogConfig(message, many = true, onCopyClick = ::copy))
     }
 
     override fun show(config: DialogConfig): DialogUpdater? {
@@ -58,11 +55,11 @@ class DialogDelegateImpl(activity: ActivityProperty) : DialogDelegate {
             .let { dialog -> UpdaterImpl(inflater, resources, dialog, config, ::copy) }
     }
 
-    private fun copy(text: String) {
-        val activity = activity
-        activity?.getSystemService(Context.CLIPBOARD_SERVICE)
+    private fun copy(text: UniText) {
+        val activity = activity ?: return
+        activity.getSystemService(Context.CLIPBOARD_SERVICE)
             ?.let { it as ClipboardManager }
-            ?.copy(activity, label = activity.resources.getString(R.string.error), text = text, activity.resources, showToast = true)
+            ?.copy(activity, label = activity.resources.getString(R.string.error), text = activity.resources[text], activity.resources, showToast = true)
     }
 
     private class UpdaterImpl(
@@ -70,7 +67,7 @@ class DialogDelegateImpl(activity: ActivityProperty) : DialogDelegate {
         private val resources: Resources,
         private val dialog: AlertDialog,
         private var config: DialogConfig,
-        private var onCopyClick: (text: String) -> Unit,
+        private var onCopyClick: (text: UniText) -> Unit,
     ) : DialogUpdater {
 
         private var checked = false
@@ -94,7 +91,7 @@ class DialogDelegateImpl(activity: ActivityProperty) : DialogDelegate {
             update()
         }
 
-        override fun showError(message: String?) = update {
+        override fun showError(message: UniText?) = update {
             errorDialogConfig(message, onCopyClick = onCopyClick)
         }
 

@@ -14,6 +14,7 @@ object Const {
     const val DEFAULT_MAX_DEPTH = 1024
     const val UNDEFINED_DIR_LENGTH = 0L
     const val UNDEFINED_FILE_LENGTH = -1L
+    const val BUNDLE_SIZE_LIMIT = 512 * 1024
 
     const val SCHEME_PACKAGE = "package"
     const val SCHEME_CONTENT = "content"

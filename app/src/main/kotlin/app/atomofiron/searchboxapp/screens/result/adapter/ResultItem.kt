@@ -21,6 +21,5 @@ sealed class ResultItem(
         val ref get() = item.ref
         val isDirectory get() = item.isDirectory
         val isChecked get() = item.isChecked
-        val isCached get() = item.isCached
     }
 }

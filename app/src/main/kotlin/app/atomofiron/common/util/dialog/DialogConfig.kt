@@ -19,19 +19,19 @@ data class DialogConfig(
 )
 
 fun errorDialogConfig(
-    message: String?,
+    message: UniText?,
     many: Boolean = false,
-    onCopyClick: (message: String) -> Unit,
+    onCopyClick: (message: UniText) -> Unit,
 ): DialogConfig {
-    val text = message?.takeIf { it.isNotEmpty() }
+    val message = message?.takeIf { it.isNotEmpty }
     return DialogConfig(
         cancelable = false,
         title = when {
-            text == null -> UniText(R.string.unknown_error)
+            message == null -> UniText(R.string.unknown_error)
             many -> UniText(R.string.errors)
             else -> UniText(R.string.error)
         },
-        message = UniText(text),
-        neutral = text?.let { UniText(R.string.copy) to { onCopyClick(text) } },
+        message = message,
+        neutral = message?.let { UniText(R.string.copy) to { onCopyClick(message) } },
     )
 }

@@ -2,6 +2,7 @@ package app.atomofiron.common.util.extension
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Parcel
 import androidx.work.Data
 import java.util.UUID
 
@@ -38,3 +39,15 @@ fun Bundle.put(uuid: UUID): Bundle {
 }
 
 fun Bundle.getUUID(): UUID? = getByteArray(UUID::class.java.simpleName)?.toUUID()
+
+fun Bundle?.calcSize(): Int? {
+    val parcel = Parcel.obtain()
+    return try {
+        parcel.writeBundle(this)
+        parcel.dataSize()
+    } catch (_: Exception) {
+        null
+    } finally {
+        parcel.recycle()
+    }
+}
