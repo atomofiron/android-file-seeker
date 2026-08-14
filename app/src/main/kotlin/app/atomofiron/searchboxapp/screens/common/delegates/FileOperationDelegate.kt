@@ -94,7 +94,10 @@ class FileOperationDelegate @Inject constructor(
 
     private fun buildOperations(targets: List<Node>, first: Node, mode: Mode): List<MenuItem> = buildList {
         val single = targets.size == 1
-        if (targets.all { it.isFile }) add(Share)
+        if (targets.all { it.isFile }) {
+            add(Share)
+            add(OpenWith)
+        }
         if (single && mode.rw && first.isDirectory) add(Create)
         if (single) add(CopyPath)
         if (single && mode.rw && !first.isRoot) add(Duplicate)
