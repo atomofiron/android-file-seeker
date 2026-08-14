@@ -23,7 +23,7 @@ class FinderTargetsPresenterDelegate @Inject constructor(
         val merged = combine(
             explorerStore.currentDeepest,
             explorerStore.checked,
-            explorerStore.internalStorage,
+            explorerStore.mainStorage,
         ) { deepest, targets, storage ->
             when {
                 targets.isNotEmpty() -> targets

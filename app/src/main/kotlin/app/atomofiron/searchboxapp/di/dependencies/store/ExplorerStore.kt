@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.di.dependencies.store
 
-import android.os.Environment
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.searchboxapp.model.explorer.ExplorerTabKey
@@ -26,9 +25,6 @@ class ExplorerStore @Inject constructor() {
     val lastTab = NodeTabKey.Explorer(2)
     val mainTabs = listOf(firstTab, middleTab, lastTab)
 
-    private val internalStoragePath: String = Environment
-        .getExternalStorageDirectory()
-        .absolutePath
 
     private val deepestNodes = mutableMapOf<NodeTabKey, Node?>()
     private val checkedLists = mutableMapOf<NodeTabKey, List<Node>?>()
@@ -37,7 +33,7 @@ class ExplorerStore @Inject constructor() {
     private val _storage = MutableStateFlow<List<NodeStorage>>(emptyList())
     private val _currentTab = MutableStateFlow(middleTab)
     private val _currentDeepest = MutableStateFlow<Node?>(null)
-    private val _internalRoot = MutableStateFlow(NodeRef(internalStoragePath).toRoot(NodeRootInfo.Storage(NodeStorage(NodeStorage.Kind.InternalStorage, internalStoragePath, "qwerty", "alias"))))
+    private val _mainStorage = MutableStateFlow<Node?>(null)
     private val _sorting = MutableStateFlow<Map<NodeTabKey, NodeSorting>>(mapOf())
     private val _screenshots = MutableStateFlow<NodeRef?>(null)
     private val _checked = MutableStateFlow<List<Node>>(listOf())
@@ -52,8 +48,8 @@ class ExplorerStore @Inject constructor() {
 
     val currentTabKey: StateFlow<ExplorerTabKey> = _currentTab
     val currentDeepest: StateFlow<Node?> = _currentDeepest
-    val storage: StateFlow<List<NodeStorage>> = _storage
-    val internalStorage: StateFlow<Node> = _internalRoot
+    val storages: StateFlow<List<NodeStorage>> = _storage
+    val mainStorage: StateFlow<Node?> = _mainStorage
     val screenshots: StateFlow<NodeRef?> = _screenshots
     val checked: StateFlow<List<Node>> = _checked
     val alerts: Flow<Alert> = _alerts
@@ -97,9 +93,9 @@ class ExplorerStore @Inject constructor() {
         _pasteBuffer.value = list
     }
 
-    fun updateInternalStorage(action: Node.() -> Node) {
-        _internalRoot.run {
-            value = value.action()
+    fun setMainStorage(item: NodeStorage?) {
+        _mainStorage.value = item?.let {
+            NodeRef(it.path).toRoot(NodeRootInfo.Storage(it))
         }
     }
 

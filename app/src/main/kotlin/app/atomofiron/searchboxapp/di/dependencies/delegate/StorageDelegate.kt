@@ -9,8 +9,6 @@ import androidx.annotation.RequiresApi
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.copy
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
-import app.atomofiron.searchboxapp.model.explorer.NodeContent
-import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage.Kind
 import kotlinx.coroutines.Dispatchers
@@ -28,23 +26,21 @@ class StorageDelegate @Inject constructor(
     //private val statManager = context.getSystemService(Context.STORAGE_STATS_SERVICE) as StorageStatsManager
 
     private var storageList = mutableListOf<NodeStorage>()
-    private val internalStorage = store.internalStorage.value.run {
-        NodeStorage(Kind.InternalStorage, ref.string, name, "Internal storage")
-    }
+    private val internalStorage = Environment.getExternalStorageDirectory()
+        .takeIf { it.exists() }
+        ?.run { NodeStorage(Kind.InternalStorage, absolutePath, name, "unused for internal storage") }
 
     init {
-        store.updateInternalStorage {
-            val type = NodeRootInfo.Storage(internalStorage)
-            val content = NodeContent.Directory(rootType = type)
-            copy(content = content)
+        if (internalStorage != null) {
+            storageList.add(internalStorage)
+            store.setMainStorage(internalStorage)
         }
-        storageList.add(internalStorage)
         store.setStorage(storageList.copy())
         if (Android.R) {
             storageManager.registerStorageVolumeCallback(Dispatchers.Default.asExecutor(), StorageVolumeCallbackImpl())
             for (volume in storageManager.storageVolumes) {
                 val path = volume.directory?.path
-                if (path != null && path != internalStorage.path) {
+                if (path != null && path != internalStorage?.path) {
                     onStateChanged(volume)
                 }
             }
@@ -69,6 +65,9 @@ class StorageDelegate @Inject constructor(
             volume.state == Environment.MEDIA_EJECTING -> null
             !storageManager.storageVolumes.contains(volume) -> null
             else -> NodeStorage(kind, path, volume.mediaStoreVolumeName, alias)
+        }
+        if (internalStorage == null && kind == Kind.SdCard && store.mainStorage.value?.path != new?.path) {
+            store.setMainStorage(new)
         }
         when {
             item != null && new != null -> storageList[index] = new

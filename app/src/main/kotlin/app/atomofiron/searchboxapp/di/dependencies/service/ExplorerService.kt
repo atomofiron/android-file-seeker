@@ -107,7 +107,7 @@ class ExplorerService @Inject constructor(
 
     private val asSu by preferences.asSu
     private val garden = NodeGarden()
-    private val internalStorageRef = store.internalStorage.value.ref
+    private val mainStorageRef: NodeRef? get() = store.mainStorage.value?.ref
     private val updateRootTrigger = TriggerFlow<Unit>()
 
     init {
@@ -117,10 +117,12 @@ class ExplorerService @Inject constructor(
                 store.mainTabs.forEach { get(it) } // init
                 suDefined.join()
                 if (asSu) checkSu()
-                initRoots()
                 restoreSorting()
+                store.mainStorage.collectOn {
+                    it.initRoots()
+                }
             }
-            combine(store.storage, preferences.asSu, updateRootTrigger) { volumes, asSu, _ ->
+            combine(store.storages, preferences.asSu, updateRootTrigger) { volumes, asSu, _ ->
                 updateRootsAsync(volumes, asSu)
             }.collect()
         }
@@ -195,16 +197,22 @@ class ExplorerService @Inject constructor(
 
     fun drop(vararg keys: NodeTabKey) = garden.drop(*keys)
 
-    private fun NodeGarden.initRoots() {
-        val roots = listOf(
-            NodeRoot(NodeRootInfo.Photos, NodeSorting.Date, thumbnail = Thumbnail.FilePath, internalStorageRef + SUB_PATH_CAMERA),
-            NodeRoot(NodeRootInfo.Videos, NodeSorting.Date, thumbnail = Thumbnail.FilePath, internalStorageRef + SUB_PATH_CAMERA),
-            NodeRoot(NodeRootInfo.Screenshots, NodeSorting.Date, thumbnail = Thumbnail.FilePath, internalStorageRef + SUB_PATH_PIC_SCREENSHOTS, internalStorageRef + SUB_PATH_DCIM_SCREENSHOTS),
-            NodeRoot(NodeRootInfo.Bluetooth, NodeSorting.Date, thumbnail = null, internalStorageRef + SUB_PATH_BLUETOOTH, internalStorageRef + SUB_PATH_DOWNLOAD_BLUETOOTH),
-            NodeRoot(NodeRootInfo.Downloads, NodeSorting.Date, thumbnail = null, internalStorageRef + SUB_PATH_DOWNLOAD),
-            NodeRoot(NodeRootInfo.SystemRoot, NodeSorting.Name, thumbnail = null, NodeRef.Root),
-        )
-        this.roots.addAll(roots)
+    private suspend fun Node?.initRoots() {
+        val systemRoot = NodeRoot(NodeRootInfo.SystemRoot, NodeSorting.Name, thumbnail = null, NodeRef.Root)
+        val roots = this?.run {
+            listOf(
+                NodeRoot(NodeRootInfo.Photos, NodeSorting.Date, thumbnail = Thumbnail.FilePath, ref + SUB_PATH_CAMERA),
+                NodeRoot(NodeRootInfo.Videos, NodeSorting.Date, thumbnail = Thumbnail.FilePath, ref + SUB_PATH_CAMERA),
+                NodeRoot(NodeRootInfo.Screenshots, NodeSorting.Date, thumbnail = Thumbnail.FilePath, ref + SUB_PATH_PIC_SCREENSHOTS, ref + SUB_PATH_DCIM_SCREENSHOTS),
+                NodeRoot(NodeRootInfo.Bluetooth, NodeSorting.Date, thumbnail = null, ref + SUB_PATH_BLUETOOTH, ref + SUB_PATH_DOWNLOAD_BLUETOOTH),
+                NodeRoot(NodeRootInfo.Downloads, NodeSorting.Date, thumbnail = null, ref + SUB_PATH_DOWNLOAD),
+                systemRoot,
+            )
+        } ?: listOf(systemRoot)
+        garden {
+            this.roots.clear()
+            this.roots.addAll(roots)
+        }
     }
 
     private fun NodeGarden.restoreSorting() {
@@ -876,6 +884,7 @@ class ExplorerService @Inject constructor(
             }
         }
         var offset = 0
+        // I've checked!!! it's nullable
         if (filteredCounts != null) items.forEachIndexed { i, it ->
             if (!it.isOpened || it.isSeparator()) return@forEachIndexed
             val offset = offset++
@@ -918,15 +927,18 @@ class ExplorerService @Inject constructor(
         )
     }
 
-    private fun Node.defineDirKind(levelIndex: Int = -1): NodeContent = when {
-        levelIndex > 0 -> content
-        content !is NodeContent.Directory -> content
-        internalStorageRef.length != (ref.length.dec() - name.length) -> content
-        !ref.isChildOf(internalStorageRef) -> content
-        else -> ExplorerUtils.getDirectoryType(name)
-            .takeIf { it != DirectoryKind.Ordinary }
-            ?.let { content.copy(kind = it) }
-            ?: content
+    private fun Node.defineDirKind(levelIndex: Int = -1): NodeContent {
+        val mainStorageRef = mainStorageRef ?: return content
+        return when {
+            levelIndex > 0 -> content
+            content !is NodeContent.Directory -> content
+            mainStorageRef.length != (ref.length.dec() - name.length) -> content
+            !ref.isChildOf(mainStorageRef) -> content
+            else -> ExplorerUtils.getDirectoryType(name)
+                .takeIf { it != DirectoryKind.Ordinary }
+                ?.let { content.copy(kind = it) }
+                ?: content
+        }
     }
 
     /** @return already existing caching job */
