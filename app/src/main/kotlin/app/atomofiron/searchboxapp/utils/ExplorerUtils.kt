@@ -59,14 +59,15 @@ object ExplorerUtils {
     private const val FILE_MESSAGE = "message/rfc822"
     private const val FILE_UNKNOWN = "application/octet-stream"
     private const val FILE_XML = "application/xml"
-    private const val FILE_RAR = "application/vnd.rar"
+    const val FILE_RAR = "application/vnd.rar"
     const val FILE_ZIP = "application/zip"
     const val FILE_APK = "application/vnd.android.package-archive"
-    private const val FILE_GZIP = "application/gzip"
+    const val FILE_XAR = "application/x-xar"
+    const val FILE_GZIP = "application/gzip"
     private const val FILE_JAVA = "application/java-vm"
-    private const val FILE_XZ = "application/x-xz"
-    private const val FILE_BZIP2 = "application/x-bzip2"
-    private const val FILE_TAR = "application/x-tar"
+    const val FILE_XZ = "application/x-xz"
+    const val FILE_BZIP2 = "application/x-bzip2"
+    const val FILE_TAR = "application/x-tar"
     private const val FILE_PDF = "application/pdf"
     private const val FILE_MATROSKA = "application/x-matroska"
     private const val FILE_PEM = "application/pkix-cert+pem"
@@ -96,6 +97,7 @@ object ExplorerUtils {
     private const val EXT_SVG = ".svg"
     private const val EXT_APK = Const.DOT_APK
     private const val EXT_ZIP = ".zip"
+    private const val EXT_XAR = ".xar"
     private const val EXT_XAPK = ".xapk"
     private const val EXT_APKS = ".apks"
     private const val EXT_APKM = ".apkm"
@@ -105,6 +107,7 @@ object ExplorerUtils {
     private const val EXT_TAR = ".tar"
     private const val EXT_BZ2 = ".bz2"
     private const val EXT_DMG = ".dmg"
+    private const val EXT_PKG = ".pkg"
     private const val EXT_GZ = ".gz"
     private const val EXT_RAR = ".rar"
     private const val EXT_TXT = ".txt"
@@ -376,6 +379,10 @@ object ExplorerUtils {
             (mimeType == FILE_XRIFF) -> content.ifMismatches { NodeContent.Picture(mimeType) }
             (mimeType == FILE_APK) -> content.ifMismatches { AndroidApp.Apk }
             (mimeType == FILE_RAR) -> content.ifMismatches { NodeContent.Rar() }
+            (mimeType == FILE_XAR) -> when {
+                name.hasExt(EXT_PKG) -> content.ifMismatches { NodeContent.Pkg() }
+                else -> content.ifMismatches { NodeContent.Xar() }
+            }
             (mimeType == FILE_ZIP) -> when (true) {
                 name.hasExt(EXT_XAPK),
                 name.hasExt(EXT_APKS),
@@ -390,12 +397,12 @@ object ExplorerUtils {
                 else -> content.ifMismatches { NodeContent.Zip() }
             }
             (mimeType == FILE_BZIP2) -> when {
-                name.hasExt(EXT_DMG) -> content.ifMismatches { NodeContent.Dmg }
+                name.hasExt(EXT_DMG) -> content.ifMismatches { NodeContent.Dmg() }
                 else -> content.ifMismatches { NodeContent.Bzip2() }
             }
             (mimeType == FILE_GZIP) -> content.ifMismatches { NodeContent.Gz() }
             (mimeType == FILE_TAR) -> content.ifMismatches { NodeContent.Tar() }
-            (mimeType == FILE_XZ) -> content.ifMismatches { NodeContent.Xz }
+            (mimeType == FILE_XZ) -> content.ifMismatches { NodeContent.Xz() }
             mimeType.startsWith(FILE_FLASH) -> content.ifMismatches { NodeContent.Flash }
             mimeType.startsWith(FILE_EXE),
             mimeType.startsWith(FILE_EXED) -> content.ifMismatches { NodeContent.ExeMs }
@@ -682,7 +689,8 @@ object ExplorerUtils {
         ref.name.hasExt(EXT_XAPK),
         ref.name.hasExt(EXT_APKS),
         ref.name.hasExt(EXT_APKM) -> ifMismatches { AndroidApp.Apks }
-        ref.name.hasExt(EXT_ZIP),
+        ref.name.hasExt(EXT_ZIP) -> ifMismatches { NodeContent.Zip() }
+        ref.name.hasExt(EXT_XAR) -> ifMismatches { NodeContent.Xar() }
         ref.name.hasExt(EXT_TAR) -> ifMismatches { NodeContent.Tar() }
         ref.name.hasExt(EXT_BZ2) -> ifMismatches { NodeContent.Bzip2() }
         ref.name.hasExt(EXT_GZ) -> ifMismatches { NodeContent.Gz() }

@@ -1,13 +1,10 @@
 package app.atomofiron.searchboxapp.di.dependencies.service
 
-import android.app.AppOpsManager
 import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import app.atomofiron.common.util.Alert
-import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.copy
-import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.android.Intents.useAs
 import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore

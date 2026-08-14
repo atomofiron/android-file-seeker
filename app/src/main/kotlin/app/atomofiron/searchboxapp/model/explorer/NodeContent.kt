@@ -5,6 +5,12 @@ import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_APK
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_BZIP2
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_GZIP
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_RAR
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_TAR
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_XAR
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_XZ
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.FILE_ZIP
 
 sealed class NodeContent(
@@ -30,7 +36,7 @@ sealed class NodeContent(
     data class Directory(
         val kind: DirectoryKind = DirectoryKind.Ordinary, // always Ordinary in the garden
         override val rootType: NodeRootInfo? = null,
-    ) : NodeContent(mimeType = MIME_TYPE) {
+    ) : NodeContent(mimeType = MIME_TYPE,) {
         companion object {
             const val MIME_TYPE = "inode/directory"
             val mimeTypes = listOf(MIME_TYPE)
@@ -43,7 +49,7 @@ sealed class NodeContent(
         open val thumbnail: Thumbnail? = null,
         open val description: String? = null,
         override val details: String? = null,
-    ) : NodeContent(mimeType)
+    ) : NodeContent(mimeType,)
 
     data object Empty : File()
 
@@ -120,10 +126,14 @@ sealed class NodeContent(
         override val isCached: Boolean = false,
     ) : Archive(mimeType)
 
-    data class Bzip2(override val isCached: Boolean = true) : Archive("application/x-bzip2")
-    data class Gz(override val isCached: Boolean = true) : Archive("application/gzip")
-    data class Tar(override val isCached: Boolean = true) : Archive("application/x-tar")
-    data class Rar(override val isCached: Boolean = true) : Archive("application/vnd.rar")
+    data class Bzip2(override val isCached: Boolean = true) : Archive(FILE_BZIP2)
+    data class Gz(override val isCached: Boolean = true) : Archive(FILE_GZIP)
+    data class Xar(override val isCached: Boolean = true) : Archive(FILE_XAR)
+    data class Tar(override val isCached: Boolean = true) : Archive(FILE_TAR)
+    data class Rar(override val isCached: Boolean = true) : Archive(FILE_RAR)
+    data class Dmg(override val isCached: Boolean = true) : Archive(FILE_BZIP2)
+    data class Pkg(override val isCached: Boolean = true) : Archive(FILE_XAR)
+    data class Xz(override val isCached: Boolean = true) : Archive(FILE_XZ)
 
     data class AndroidApp(
         val splitApk: Boolean,
@@ -171,7 +181,6 @@ sealed class NodeContent(
     data object Pdf : File("application/pdf")
     data object Torrent : File("application/x-bittorrent")
     data object Document : File()
-    data object Xz : File()
     data object DB : File()
     data object DataImage : File()
     data object Elf : File()
@@ -184,7 +193,6 @@ sealed class NodeContent(
     data object Flash : File()
     data object Font : File()
     data object Cert : File()
-    data object Dmg : File()
     data object Firefox : File()
     data object Unknown : File()
 

@@ -21,9 +21,7 @@ fun NodeContent.File.getIcon(): Int = when (this) {
     is NodeContent.Picture -> R.drawable.ic_picture
     is NodeContent.Movie -> R.drawable.ic_movie
     is NodeContent.AndroidApp -> R.drawable.ic_apk
-    is NodeContent.Archive,
-    is NodeContent.Xz,
-    is NodeContent.Dmg -> R.drawable.ic_archive_file
+    is NodeContent.Archive -> R.drawable.ic_archive_file
     is NodeContent.Text.Ir -> R.drawable.ic_fz_ir
     is NodeContent.Text.Sub -> R.drawable.ic_fz_sub
     is NodeContent.Text.Rfid -> R.drawable.ic_fz_rfid

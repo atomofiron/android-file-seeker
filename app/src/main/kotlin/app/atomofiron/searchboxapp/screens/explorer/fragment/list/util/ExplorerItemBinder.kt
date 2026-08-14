@@ -28,7 +28,6 @@ import app.atomofiron.searchboxapp.custom.drawable.translated
 import app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout.Blue
 import app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout.Green
 import app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout.Red
-import app.atomofiron.searchboxapp.custom.view.ProgressConstraintLayout.Yellow
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
