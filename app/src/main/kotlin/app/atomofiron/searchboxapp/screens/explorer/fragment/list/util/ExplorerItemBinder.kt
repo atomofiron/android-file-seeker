@@ -47,6 +47,7 @@ import app.atomofiron.searchboxapp.utils.context
 import app.atomofiron.searchboxapp.utils.isRtl
 import app.atomofiron.searchboxapp.utils.remember
 import app.atomofiron.searchboxapp.utils.resources
+import app.atomofiron.searchboxapp.utils.setOnSecondaryClickListener
 import app.atomofiron.searchboxapp.utils.toUni
 import com.bumptech.glide.Glide
 import com.bumptech.glide.RequestBuilder
@@ -85,7 +86,7 @@ class ExplorerItemBinder(
     private val onClickListener: ((View) -> Unit) = {
         onItemActionListener?.onItemClick(item)
     }
-    private val onLongClickListener: ((View) -> Boolean) = {
+    private val onSecondaryClickListener: (() -> Boolean) = {
         onItemActionListener?.onItemLongClick(item)
         true
     }
@@ -130,7 +131,7 @@ class ExplorerItemBinder(
         this@ExplorerItemBinder.item = item
 
         binding.root.setOnClickListener(onClickListener)
-        binding.root.setOnLongClickListener(onLongClickListener)
+        binding.root.setOnSecondaryClickListener(onSecondaryClickListener)
         checkBox.setOnCheckedChangeListener(onCheckListener)
 
         when (val tn = (item.content as? NodeContent.File)?.thumbnail) {

@@ -19,6 +19,7 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Label
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.performHapticLite
+import app.atomofiron.searchboxapp.utils.setOnSecondaryClickListener
 
 class DockItemHolder(
     private val binding: ItemDockBinding,
@@ -42,7 +43,7 @@ class DockItemHolder(
             popup.noClip()
             button.background = drawable
             button.setOnClickListener { onClick() }
-            button.setOnLongClickListener { onLongClick() }
+            button.setOnSecondaryClickListener { onSecondaryClick() }
             ColorStateList(
                 arrayOf(intArrayOf(android.R.attr.state_activated), intArrayOf()),
                 intArrayOf(
@@ -108,7 +109,7 @@ class DockItemHolder(
         root.performHapticLite()
     }
 
-    private fun ItemDockBinding.onLongClick(): Boolean = when {
+    private fun ItemDockBinding.onSecondaryClick(): Boolean = when {
         item.children.isEmpty() -> false
         !item.children.secondary -> false
         !togglePopup(hideIfShown = false) -> false

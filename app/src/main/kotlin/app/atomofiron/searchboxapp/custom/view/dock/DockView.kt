@@ -30,6 +30,7 @@ import app.atomofiron.searchboxapp.custom.view.dock.shape.DockStyle
 import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.removeOneIf
+import app.atomofiron.searchboxapp.utils.setOnSecondaryClickListener
 
 interface DockView {
     val canDrawShadow get() = Android.R
@@ -91,6 +92,7 @@ class DockViewImpl(
             mode = DockMode.Pinned(Layout.Ground.Bottom, null)
         }
         mode?.apply()
+        setOnSecondaryClickListener { true }
     }
 
     override fun setLayoutParams(params: ViewGroup.LayoutParams?) {

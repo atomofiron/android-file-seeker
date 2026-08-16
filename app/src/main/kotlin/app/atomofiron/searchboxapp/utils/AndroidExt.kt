@@ -405,6 +405,11 @@ fun View.updateLayoutParams(width: Int = Int.MIN_VALUE, height: Int = Int.MIN_VA
     }
 }
 
+fun View.setOnSecondaryClickListener(listener: () -> Boolean) {
+    setOnLongClickListener { listener() }
+    setOnContextClickListener { listener() }
+}
+
 var Slider.intValue: Int
     get() = value.toInt()
     set(value) { this.value = value.toFloat() }
