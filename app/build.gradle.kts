@@ -4,11 +4,9 @@ import org.gradle.api.tasks.Exec
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.serialization)
     alias(libs.plugins.protobuf)
-    alias(libs.plugins.kapt)
     id("app.fileseeker.convention.library")
 }
 
@@ -55,9 +53,6 @@ android {
             /*proto {
                 srcDir("../proto")
             }*/
-            java {
-                srcDirs("$kotlinDir/uniffi/$nativeLibName")
-            }
             jniLibs {
                 srcDirs(jniLibsDir)
             }
@@ -114,8 +109,8 @@ dependencies {
     implementation(libs.insets)
     implementation(libs.glide)
     implementation(libs.jna) { artifact { type = "aar" } }
-    kapt(libs.dagger.compiler)
-    kapt(libs.dagger.processor)
+    ksp(libs.dagger.compiler)
+    ksp(libs.dagger.processor)
     ksp(libs.androidx.room.compiler)
     ksp(libs.glide.ksp)
     debugImplementation(libs.leakcanary)

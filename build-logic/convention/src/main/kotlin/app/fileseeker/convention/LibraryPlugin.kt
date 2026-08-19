@@ -1,8 +1,8 @@
 package app.fileseeker.convention
 
-import app.fileseeker.convention.app.fileseeker.convention.configureKotlinAndroid
+import app.fileseeker.convention.configureKotlinAndroid
+import com.android.build.api.dsl.LibraryExtension
 import com.android.build.api.dsl.VariantDimension
-import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
@@ -12,7 +12,6 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         project.pluginManager.run {
             apply("com.android.library")
-            apply("org.jetbrains.kotlin.android")
             apply("maven-publish")
         }
         project.extensions.configure<LibraryExtension> {

@@ -1,7 +1,7 @@
 package app.fileseeker.convention
 
-import app.fileseeker.convention.app.fileseeker.convention.configureKotlinAndroid
-import com.android.build.gradle.internal.dsl.BaseAppModuleExtension
+import app.fileseeker.convention.configureKotlinAndroid
+import com.android.build.api.dsl.ApplicationExtension
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
@@ -14,10 +14,9 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         with(target) {
             with(pluginManager) {
                 apply("com.android.application")
-                apply("org.jetbrains.kotlin.android")
                 apply("com.google.android.gms.oss-licenses-plugin")
             }
-            extensions.configure<BaseAppModuleExtension> {
+            extensions.configure<ApplicationExtension> {
                 namespace = AppConfig.packageId
                 configureKotlinAndroid()
                 configureAndroidCommon()
@@ -28,7 +27,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
         }
     }
 
-    private fun BaseAppModuleExtension.configureAndroidCommon() {
+    private fun ApplicationExtension.configureAndroidCommon() {
         buildFeatures {
             buildConfig = true
         }

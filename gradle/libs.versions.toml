@@ -1,7 +1,6 @@
 [versions]
 agp = "9.3.1"
-ksp = "2.3.2"
-kapt = "2.4.10"
+ksp = "2.3.11"
 kotlin = "2.4.10"
 coreKtx = "1.19.0"
 junit = "4.13.2"
@@ -83,10 +82,8 @@ androidx-documentfile = { group = "androidx.documentfile", name = "documentfile"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 protobuf = { id = "com.google.protobuf", version.ref = "protobuf-plugin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kapt" }
 licenses = { id = "com.google.android.gms.oss-licenses-plugin", version = "0.13.0" }
