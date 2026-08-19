@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView.LayoutParams.MATCH_PARENT
 import androidx.recyclerview.widget.RecyclerView.LayoutParams.WRAP_CONTENT
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
@@ -56,9 +57,9 @@ class DockViewImpl(
     private val colors = DockItemColors(
         default = Color.TRANSPARENT,
         selected = context.colorAttr(MaterialAttr.colorSecondaryContainer),
-        activated = context.colorAttr(MaterialAttr.colorPrimary),
-        hovered = context.colorAttr(MaterialAttr.colorControlHighlight),
-        focused = context.colorAttr(MaterialAttr.colorPrimary),
+        activated = context.colorAttr(AppCompatAttr.colorPrimary),
+        hovered = context.colorAttr(AppCompatAttr.colorControlHighlight),
+        focused = context.colorAttr(AppCompatAttr.colorPrimary),
     )
     private val padding = resources.getDimensionPixelSize(R.dimen.dock_item_half_margin)
     private val contentPadding = resources.getDimensionPixelSize(R.dimen.content_margin)

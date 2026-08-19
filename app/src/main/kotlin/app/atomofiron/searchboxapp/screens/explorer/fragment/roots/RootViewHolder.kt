@@ -7,7 +7,7 @@ import android.view.View
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import app.atomofiron.common.recycler.GeneralHolder
-import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemExplorerCardBinding
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
@@ -49,7 +49,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     private val colors = ColorStateList(
         arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf(0)),
         intArrayOf(
-            context.colorAttr(MaterialAttr.colorPrimary),
+            context.colorAttr(AppCompatAttr.colorPrimary),
             binding.cardTitle.textColors.defaultColor,
         )
     )

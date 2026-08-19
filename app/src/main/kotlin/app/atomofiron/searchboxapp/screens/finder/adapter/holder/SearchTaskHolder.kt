@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
-import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.extension.debugFailUnreachable
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
@@ -62,8 +62,8 @@ class SearchTaskHolder<Result : SearchResult>(
             is SearchStatus.Ended -> if (task.status.stopped) R.string.stopped else R.string.completed
         }
         val colorLabel = when {
-            task.isError -> context.colorAttr(MaterialAttr.colorError)
-            else -> context.colorAttr(MaterialAttr.colorAccent)
+            task.isError -> context.colorAttr(AppCompatAttr.colorError)
+            else -> context.colorAttr(AppCompatAttr.colorAccent)
         }
         label.setText(idLabel)
         label.setTextColor(colorLabel)

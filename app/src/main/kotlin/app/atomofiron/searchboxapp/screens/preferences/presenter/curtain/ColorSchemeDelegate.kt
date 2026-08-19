@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainColorSchemeBinding
@@ -47,7 +48,7 @@ class ColorSchemeDelegate @Inject constructor() : CurtainApi.Adapter<CurtainApi.
 }
 
 private fun attrs() = listOf(
-    MaterialAttr.colorPrimary,
+    AppCompatAttr.colorPrimary,
     MaterialAttr.colorOnPrimary,
     MaterialAttr.colorPrimaryContainer,
     MaterialAttr.colorOnPrimaryContainer,
@@ -59,7 +60,7 @@ private fun attrs() = listOf(
     MaterialAttr.colorOnTertiary,
     MaterialAttr.colorTertiaryContainer,
     MaterialAttr.colorOnTertiaryContainer,
-    MaterialAttr.colorError,
+    AppCompatAttr.colorError,
     MaterialAttr.colorErrorContainer,
     MaterialAttr.colorOnError,
     MaterialAttr.colorOnErrorContainer,

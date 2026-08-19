@@ -9,6 +9,7 @@ import androidx.core.view.isNotEmpty
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemDockBinding
@@ -28,10 +29,10 @@ class DockItemHolder(
 
     private lateinit var item: DockItem
     private var config: DockItemConfig? = null
-    private val rippleColor = binding.root.context.colorAttr(MaterialAttr.colorControlHighlight)
+    private val rippleColor = binding.root.context.colorAttr(AppCompatAttr.colorControlHighlight)
     private val drawable = DockItemDrawable(
         ripple = rippleColor,
-        primary = binding.root.context.colorAttr(MaterialAttr.colorPrimary),
+        primary = binding.root.context.colorAttr(AppCompatAttr.colorPrimary),
         surface = binding.root.context.colorAttr(MaterialAttr.colorSurface),
         stroke = binding.root.resources.getDimension(R.dimen.stroke_width),
         corners = binding.root.resources.getDimension(R.dimen.dock_item_corner),

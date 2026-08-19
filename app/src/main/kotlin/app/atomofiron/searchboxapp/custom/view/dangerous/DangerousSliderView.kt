@@ -25,6 +25,7 @@ import androidx.annotation.StringRes
 import androidx.core.content.ContextCompat
 import androidx.core.content.withStyledAttributes
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
@@ -57,11 +58,11 @@ class DangerousSliderView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr, defStyleRes), ValueAnimator.AnimatorUpdateListener {
 
     private val defaultPadding = resources.getDimensionPixelSize(MaterialDimen.m3_btn_padding_left)
-    private val strokeWidth = resources.getDimensionPixelSize(MaterialDimen.m3_comp_outlined_button_outline_width)
+    private val strokeWidth = resources.getDimensionPixelSize(MaterialDimen.m3_comp_button_medium_outlined_outline_width)
     private val textColor = MaterialColors.getColor(context, MaterialAttr.colorOnError, 0)
     private var thumbColor = MaterialColors.getColor(context, MaterialAttr.colorSurfaceContainer, 0)
     private var startBorderColor = thumbColor
-    private var endBorderColor = MaterialColors.getColor(context, MaterialAttr.colorError, 0)
+    private var endBorderColor = MaterialColors.getColor(context, AppCompatAttr.colorError, 0)
     private val tipColor = MaterialColors.getColor(context, MaterialAttr.colorOnErrorContainer, 0)
     private val done = ContextCompat.getDrawable(context, R.drawable.ic_done)!!
 

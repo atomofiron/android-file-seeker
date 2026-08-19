@@ -15,6 +15,7 @@ import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.arch.TranslucentFragment
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.isDarkTheme
@@ -173,7 +174,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         if (!context.isDarkTheme()) {
             val background = context.colorAttr(if (alert.error) MaterialAttr.colorErrorContainer else MaterialAttr.colorSurface)
             val text = context.colorAttr(if (alert.error) MaterialAttr.colorOnErrorContainer else MaterialAttr.colorOnSurface)
-            val action = context.colorAttr(if (alert.error) MaterialAttr.colorError else MaterialAttr.colorPrimaryDark)
+            val action = context.colorAttr(if (alert.error) AppCompatAttr.colorError else AppCompatAttr.colorPrimaryDark)
             val alpha = ResourcesCompat.getFloat(resources, MaterialDimen.mtrl_snackbar_background_overlay_color_alpha)
             val backgroundTint = MaterialColors.layer(text, background, alpha)
             snackbar

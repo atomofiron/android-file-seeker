@@ -4,7 +4,7 @@ import android.graphics.Typeface
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
-import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.extension.appendWithComma
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemHeaderBinding
@@ -36,7 +36,7 @@ class ResultsHeaderHolder(private val binding: ItemHeaderBinding) : ResultsHolde
             val start = string.length
             string.append(context.resources.getString(R.string.show))
             SpannableString(string).apply {
-                val span = ForegroundColorSpan(context.colorAttr(MaterialAttr.colorPrimary))
+                val span = ForegroundColorSpan(context.colorAttr(AppCompatAttr.colorPrimary))
                 setSpan(span, start, length, 0)
                 setSpan(StyleSpan(Typeface.BOLD), 0, start, 0)
             }

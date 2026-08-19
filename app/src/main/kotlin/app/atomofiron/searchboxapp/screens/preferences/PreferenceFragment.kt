@@ -18,7 +18,7 @@ import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Android
-import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.viewCollect
@@ -135,7 +135,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
 
     private fun PreferenceGroup.fixIcons() {
         // todo foresee NoticeableDrawable and colored icons
-        val iconTint = requireContext().colorAttr(MaterialAttr.colorControlNormal)
+        val iconTint = requireContext().colorAttr(AppCompatAttr.colorControlNormal)
         forEach {
             it.icon?.setTint(iconTint)
             if (it is PreferenceGroup) it.fixIcons()

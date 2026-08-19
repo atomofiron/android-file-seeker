@@ -13,6 +13,7 @@ import androidx.annotation.DimenRes
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.updatePaddingRelative
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.fileseeker.R
@@ -25,7 +26,7 @@ import app.atomofiron.searchboxapp.utils.over
 import app.atomofiron.searchboxapp.utils.withAlpha
 import com.google.android.material.textfield.TextInputLayout
 
-private fun Context.rippleColor() = colorAttr(MaterialAttr.colorControlHighlight)
+private fun Context.rippleColor() = colorAttr(AppCompatAttr.colorControlHighlight)
 
 private fun Context.rippleColorList() = ColorStateList.valueOf(rippleColor())
 

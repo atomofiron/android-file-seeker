@@ -12,6 +12,7 @@ fun <T> MutableList<T>.dropLast() = dropLast()
 
 typealias MaterialId = com.google.android.material.R.id
 typealias MaterialAttr = com.google.android.material.R.attr
+typealias AppCompatAttr = androidx.appcompat.R.attr
 typealias MaterialColor = com.google.android.material.R.color
 typealias MaterialDimen = com.google.android.material.R.dimen
 

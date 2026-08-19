@@ -15,7 +15,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.core.widget.TextViewCompat
-import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.common.util.ifVisible
@@ -73,8 +73,8 @@ class ExplorerItemBinder(
     private var dirDrawable = ContextCompat.getDrawable(context, R.drawable.ic_folder)!!.mutate().translated()
     private var fileDrawable = ContextCompat.getDrawable(context, R.drawable.ic_file)!!.mutate().translated()
     private val placeholder = MuonsDrawable(context)
-    private val dirTint = ColorStateList.valueOf(context.colorAttr(MaterialAttr.colorPrimary))
-    private val fileTint = ColorStateList.valueOf(context.colorAttr(MaterialAttr.colorAccent))
+    private val dirTint = ColorStateList.valueOf(context.colorAttr(AppCompatAttr.colorPrimary))
+    private val fileTint = ColorStateList.valueOf(context.colorAttr(AppCompatAttr.colorAccent))
     private val lemon = LemonDrawable()
     val rippleDrawable get() = binding.root.background as? RippleDrawable
 

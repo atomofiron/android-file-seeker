@@ -10,7 +10,7 @@ import android.view.Gravity
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.withTranslation
 import app.atomofiron.searchboxapp.utils.colorAttr
-import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import com.google.android.material.textview.MaterialTextView
@@ -26,7 +26,7 @@ class ArcView : MaterialTextView {
         private const val STEP_MAX = 0.01f
     }
 
-    private val colorProgress = context.colorAttr(MaterialAttr.colorPrimary)
+    private val colorProgress = context.colorAttr(AppCompatAttr.colorPrimary)
     private val colorTrack = ColorUtils.setAlphaComponent(colorProgress, Alpha.LEVEL_30)
     private val strokeWidth = resources.getDimension(R.dimen.arc_stroke_width)
 
@@ -43,7 +43,7 @@ class ArcView : MaterialTextView {
         paint.isAntiAlias = true
         paint.style = Paint.Style.STROKE
         paint.strokeCap = Paint.Cap.ROUND
-        paint.color = context.colorAttr(MaterialAttr.colorPrimary)
+        paint.color = context.colorAttr(AppCompatAttr.colorPrimary)
         paint.strokeWidth = strokeWidth
 
         gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL

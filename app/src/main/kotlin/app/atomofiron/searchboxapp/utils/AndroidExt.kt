@@ -52,9 +52,9 @@ import androidx.work.Data
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.debugRequire
-import app.atomofiron.common.util.extension.takeIf
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -180,7 +180,7 @@ private fun CoordinatorLayout.makeSnackbar(
     val duration = if (important) Snackbar.LENGTH_INDEFINITE else Snackbar.LENGTH_LONG
     return Snackbar.make(this, resources[text], duration).apply {
         if (error) {
-            setBackgroundTint(view.context.colorAttr(MaterialAttr.colorError))
+            setBackgroundTint(view.context.colorAttr(AppCompatAttr.colorError))
             setTextColor(view.context.colorAttr(MaterialAttr.colorOnError))
             setActionTextColor(view.context.colorAttr(MaterialAttr.colorErrorContainer))
         }

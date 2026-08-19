@@ -16,7 +16,7 @@ import android.graphics.drawable.Drawable
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
 import androidx.annotation.DimenRes
-import app.atomofiron.common.util.MaterialAttr
+import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -55,7 +55,7 @@ class MuonsDrawable private constructor(
             fillCenter: Boolean = true,
             @DimenRes sizeRes: Int? = null,
         ): MuonsDrawable {
-            val color = context.colorAttr(MaterialAttr.colorAccent)
+            val color = context.colorAttr(AppCompatAttr.colorAccent)
             val intrinsicSize = context.resources.getDimensionPixelSize(sizeRes?.takeIf { it > 0 } ?: R.dimen.progress_common_size)
             val thickness = context.resources.getDimensionPixelSize(R.dimen.progress_thickness)
             return MuonsDrawable(color, fillCenter, intrinsicSize, thickness)
