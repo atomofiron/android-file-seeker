@@ -10,9 +10,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.uuid.Uuid
 
 @Singleton
 class FinderStore @Inject constructor() {
@@ -26,7 +26,7 @@ class FinderStore @Inject constructor() {
         updateTasks { add(item) }
     }
 
-    suspend fun drop(uuid: UUID) = update(uuid) { null }
+    suspend fun drop(uuid: Uuid) = update(uuid) { null }
 
     suspend fun addAll(items: List<GlobalSearchTask>) = updateTasks {
         addAll(items)
@@ -68,7 +68,7 @@ class FinderStore @Inject constructor() {
         }
     }
 
-    suspend fun update(uuid: UUID, action: GlobalSearchTask.() -> GlobalSearchTask?) {
+    suspend fun update(uuid: Uuid, action: GlobalSearchTask.() -> GlobalSearchTask?) {
         mutex.withLock {
             val index = tasks.indexOfFirst { it.uuid == uuid }
             val task = tasks.getOrNull(index) ?: return

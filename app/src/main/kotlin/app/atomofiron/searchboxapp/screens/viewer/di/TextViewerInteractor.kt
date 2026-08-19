@@ -18,8 +18,8 @@ import app.atomofiron.searchboxapp.utils.Rslt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.util.UUID
 import javax.inject.Inject
+import kotlin.uuid.Uuid
 
 @TextViewerScope
 class TextViewerInteractor @Inject constructor(
@@ -51,7 +51,7 @@ class TextViewerInteractor @Inject constructor(
         }
     }
 
-    suspend fun fetchTask(ref: NodeRef, taskId: UUID): LocalSearchTask? = service.fetchTask(ref, taskId)
+    suspend fun fetchTask(ref: NodeRef, taskId: Uuid): LocalSearchTask? = service.fetchTask(ref, taskId)
 
     fun getHash(ref: NodeRef): Rslt<Int> = NativeBridge.crcHash(ref, asSu)
 

@@ -23,9 +23,10 @@ import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.work.FinderWorker
-import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.uuid.Uuid
+import kotlin.uuid.toJavaUuid
 
 @Singleton
 class FinderService @Inject constructor(
@@ -73,8 +74,8 @@ class FinderService @Inject constructor(
         workManager.beginWith(request).enqueue()
     }
 
-    fun stop(uuid: UUID) {
-        workManager.cancelWorkById(uuid)
+    fun stop(uuid: Uuid) {
+        workManager.cancelWorkById(uuid.toJavaUuid())
     }
 
     suspend fun drop(task: GenericSearchTask) {

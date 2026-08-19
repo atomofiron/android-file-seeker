@@ -26,9 +26,9 @@ import app.atomofiron.searchboxapp.utils.removeOneIf
 import kotlinx.coroutines.CoroutineScope
 import uniffi.native_lib.CancellationState
 import uniffi.native_lib.TextSearchProgress
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.math.max
+import kotlin.uuid.Uuid
 
 @TextViewerScope
 class TextViewerService @Inject constructor(
@@ -54,7 +54,7 @@ class TextViewerService @Inject constructor(
                 }
     }
 
-    suspend fun fetchTask(ref: NodeRef, taskId: UUID): LocalSearchTask? {
+    suspend fun fetchTask(ref: NodeRef, taskId: Uuid): LocalSearchTask? {
         val finderTask = finderStore.tasks.find { it.uuid == taskId }
         finderTask ?: return null
         val session = findSession(ref)
@@ -131,7 +131,7 @@ class TextViewerService @Inject constructor(
         }
     }
 
-    private inline fun TextViewerSession.update(uuid: UUID, crossinline action: LocalSearchTask.() -> LocalSearchTask) {
+    private inline fun TextViewerSession.update(uuid: Uuid, crossinline action: LocalSearchTask.() -> LocalSearchTask) {
         scope.launchOnDefault {
             tasks {
                 val index = indexOfFirst { it.uuid == uuid }

@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.di.dependencies.delegate
 
+import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
@@ -8,13 +9,11 @@ import app.atomofiron.searchboxapp.di.dependencies.service.ApkService
 import app.atomofiron.searchboxapp.di.dependencies.service.ExplorerService
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
-import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
+import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
 import app.atomofiron.searchboxapp.model.explorer.other.ApkInfo
 import app.atomofiron.searchboxapp.utils.Rslt
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -32,10 +31,10 @@ class ApkDelegate @Inject constructor(
     }
 
     fun install(ref: NodeRef, content: AndroidApp, tab: NodeTabKey? = null) {
-        scope.launch(Dispatchers.IO) {
+        scope.launchOnIO {
             if (tab != null) {
                 val allowed = explorerService.tryMarkInstalling(tab, ref, NodeOperation.Installing)
-                if (!allowed) return@launch
+                if (!allowed) return@launchOnIO
             }
             val result = apkService.install(ref, content, Intents.ACTION_INSTALL_APP)
             if (result is Rslt.Err) {

@@ -7,8 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.nio.ByteBuffer
-import java.util.UUID
 import kotlin.math.ceil
+import kotlin.uuid.Uuid
 
 inline fun <T> T.ctx(action: T.() -> Unit) = action()
 
@@ -175,19 +175,6 @@ inline fun <reified R> Sequence<*>.findAs(): R? = find { it is R } as R?
 val IntRange.size: Int get() = if (isEmpty()) 0 else last - first + 1
 
 fun Int.hasBits(bits: Int) = (this and bits) == bits
-
-fun UUID.toBytes(): ByteArray {
-    val buffer = ByteBuffer.allocate(16)
-    buffer.putLong(mostSignificantBits)
-    buffer.putLong(leastSignificantBits)
-    return buffer.array()
-}
-
-fun ByteArray.toUUID(): UUID {
-    require(size == 16) { "ByteArray[$size].toUUID()" }
-    val buffer = ByteBuffer.wrap(this)
-    return UUID(buffer.long, buffer.long)
-}
 
 fun StringBuilder.appendWithComma(part: String): StringBuilder {
     if (isNotBlank()) append(", ")

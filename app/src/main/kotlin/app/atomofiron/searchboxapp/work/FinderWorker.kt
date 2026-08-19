@@ -63,6 +63,7 @@ import uniffi.native_lib.NameSearchProgress
 import uniffi.native_lib.TextSearchProgress
 import uniffi.native_lib.TypedMeta
 import javax.inject.Inject
+import kotlin.uuid.toKotlinUuid
 
 @SuppressLint("InlinedApi")
 private const val UPDATING_FLAG = PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -93,7 +94,7 @@ class FinderWorker(
 
     private val taskMutex = Mutex()
     private lateinit var task: GlobalSearchTask
-    private val taskId = id
+    private val taskId = id.toKotlinUuid()
     private val cancellation = object : CancellationState {
         override fun cancelled(): Boolean = !task.isProgress
     }

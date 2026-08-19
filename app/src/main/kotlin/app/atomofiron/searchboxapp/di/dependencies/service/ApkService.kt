@@ -82,7 +82,7 @@ class ApkService @Inject constructor(
         silently: Boolean = false,
         installLocation: Int? = null,
         block: PackageInstaller.Session.() -> Rslt<Unit>,
-    ) = try {
+    ): Rslt<Unit> = try {
         val params = PackageInstaller.SessionParams(PackageInstaller.SessionParams.MODE_FULL_INSTALL)
         installLocation?.let { params.setInstallLocation(it) }
         if (silently) {

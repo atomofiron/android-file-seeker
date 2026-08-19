@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Parcel
 import androidx.work.Data
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 inline fun <reified T : Any> protobufBytesKey(): String = T::class.java.name
 
@@ -33,12 +33,13 @@ inline fun <reified T : Any> Data.Builder.put(data: T): Data.Builder {
     return this
 }
 
-fun Bundle.put(uuid: UUID): Bundle {
-    putByteArray(UUID::class.java.simpleName, uuid.toBytes())
+fun Bundle.put(uuid: Uuid): Bundle {
+    putByteArray(Uuid::class.java.simpleName, uuid.toByteArray())
     return this
 }
 
-fun Bundle.getUUID(): UUID? = getByteArray(UUID::class.java.simpleName)?.toUUID()
+fun Bundle.getUuid(): Uuid? = getByteArray(Uuid::class.java.simpleName)
+    ?.let { Uuid.fromByteArray(it) }
 
 fun Bundle?.calcSize(): Int? {
     val parcel = Parcel.obtain()

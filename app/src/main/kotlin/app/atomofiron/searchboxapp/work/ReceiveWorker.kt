@@ -36,22 +36,23 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
-import java.util.UUID
 import kotlin.math.max
+import kotlin.uuid.Uuid
+import kotlin.uuid.toKotlinUuid
 
 private const val RECEIVED_UNKNOWN = -1L
 private const val MB = 1024 * 1024
 
-private val gates = mutableMapOf<UUID, WaitingGate>()
+private val gates = mutableMapOf<Uuid, WaitingGate>()
 private val lock = Mutex()
 
-private suspend fun get(id: UUID): WaitingGate = lock.withLock {
+private suspend fun get(id: Uuid): WaitingGate = lock.withLock {
     gates.getOrPut(id) { WaitingGate() }
 }
 
-suspend fun OneTimeWorkRequest.waitForDataRead() = get(id).await()
+suspend fun OneTimeWorkRequest.waitForDataRead() = get(id.toKotlinUuid()).await()
 
-private suspend fun ListenableWorker.dataRead() = get(id).finish()
+private suspend fun ListenableWorker.dataRead() = get(id.toKotlinUuid()).finish()
 class ReceiveWorker(
     private val context: Context,
     params: WorkerParameters,

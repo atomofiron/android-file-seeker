@@ -7,8 +7,8 @@ import app.atomofiron.searchboxapp.model.explorer.NodeMeta
 import app.atomofiron.searchboxapp.screens.result.ResultScope
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateUsage
-import java.util.UUID
 import javax.inject.Inject
+import kotlin.uuid.Uuid
 
 @ResultScope
 class ResultInteractor @Inject constructor(
@@ -17,7 +17,7 @@ class ResultInteractor @Inject constructor(
 ) {
     private val asSu by preferences.asSu
 
-    fun stop(uuid: UUID) = finderService.stop(uuid)
+    fun stop(uuid: Uuid) = finderService.stop(uuid)
 
     fun usage(item: Node): NodeMeta = item.updateUsage(asSu)
 

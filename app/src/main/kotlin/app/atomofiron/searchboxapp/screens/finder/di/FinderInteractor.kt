@@ -7,8 +7,8 @@ import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.screens.finder.FinderScope
 import app.atomofiron.searchboxapp.utils.CoroutineLauncher
 import kotlinx.coroutines.CoroutineScope
-import java.util.UUID
 import javax.inject.Inject
+import kotlin.uuid.Uuid
 
 @FinderScope
 class FinderInteractor @Inject constructor(
@@ -20,7 +20,7 @@ class FinderInteractor @Inject constructor(
         finderService.search(query, where, config)
     }
 
-    fun stop(uuid: UUID) = finderService.stop(uuid)
+    fun stop(uuid: Uuid) = finderService.stop(uuid)
 
     fun drop(task: GenericSearchTask) = default {
         finderService.drop(task)

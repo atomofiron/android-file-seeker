@@ -8,8 +8,8 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
 import app.atomofiron.searchboxapp.utils.Const
-import java.util.*
 import javax.inject.Inject
+import kotlin.uuid.Uuid
 
 @ResultScope
 class ResultRouter @Inject constructor(property: WeakProperty<out Fragment>) : BaseRouter(property) {
@@ -33,7 +33,7 @@ class ResultRouter @Inject constructor(property: WeakProperty<out Fragment>) : B
         return success
     }
 
-    fun openFile(ref: NodeRef, taskId: UUID) {
+    fun openFile(ref: NodeRef, taskId: Uuid) {
         val arguments = TextViewerParams.arguments(ref, taskId)
         navigate(R.id.textViewerFragment, arguments)
     }

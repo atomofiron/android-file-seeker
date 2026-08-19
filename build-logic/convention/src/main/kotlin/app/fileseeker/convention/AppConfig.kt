@@ -14,10 +14,10 @@ object AppConfig {
     const val externalProviderDebug = "$packageIdDebug.ExternalProvider"
 
     const val minSdk = 24
-    const val targetSdk = 35
+    const val targetSdk = 37
     const val compileSdk = 36
     const val buildToolsVersion = "36.0.0"
 
     const val versionCode = 33
-    const val versionName = "1.5.4"
+    const val versionName = "1.5.5"
 }

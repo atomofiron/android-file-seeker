@@ -10,7 +10,6 @@ import app.atomofiron.common.util.extension.then
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.di.dependencies.store.ApkInfoCache
-import app.atomofiron.searchboxapp.model.explorer.NodeChildren
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeHash
 import app.atomofiron.searchboxapp.model.explorer.NodeRef

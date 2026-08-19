@@ -3,7 +3,7 @@ package app.atomofiron.searchboxapp.model.finder
 import app.atomofiron.common.util.TaskId
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
-import java.util.UUID
+import kotlin.uuid.Uuid
 
 typealias LocalSearchTask = SearchTask<LocalSearchResult>
 typealias GlobalSearchTask = SearchTask<GlobalSearchResult>
@@ -12,7 +12,7 @@ typealias GenericSearchTask = SearchTask<SearchResult>
 data class SearchTask<Result : SearchResult>(
     val query: QueryParams,
     val result: Result,
-    val uuid: UUID = UUID.randomUUID(), // todo replace with Uuid
+    val uuid: Uuid = Uuid.random(),
     val uniqueId: TaskId,
     val status: SearchStatus = SearchStatus.Progress,
     val error: NodeError? = null,

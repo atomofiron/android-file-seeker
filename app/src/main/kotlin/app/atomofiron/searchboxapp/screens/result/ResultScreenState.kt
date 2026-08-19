@@ -27,8 +27,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import java.util.UUID
 import javax.inject.Inject
+import kotlin.uuid.Uuid
 
 @ResultScope
 class ResultScreenState @Inject constructor(
@@ -39,7 +39,7 @@ class ResultScreenState @Inject constructor(
 ) : ResultViewState {
 
     private val mimeTypes = mode.mimeFilters() ?: emptyList()
-    val taskUuid: UUID = task?.uuid ?: UUID.randomUUID()
+    val taskUuid: Uuid = task?.uuid ?: Uuid.random()
 
     private var error: NodeError? = null
     private val mutex = Mutex()
