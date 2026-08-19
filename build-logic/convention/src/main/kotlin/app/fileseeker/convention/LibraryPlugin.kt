@@ -24,6 +24,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         buildFeatures {
             viewBinding = true
             buildConfig = true
+            resValues = true
         }
         defaultConfig {
             resValue("string", "version_name", "v${AppConfig.versionName} (${AppConfig.versionCode})")
