@@ -11,7 +11,7 @@
     <attr name="materialTonalButton" format="color" />
 
     <declare-styleable name="HeaderLayout">
-        <attr name="expandedHeight" format="reference" />
+        <attr name="headerExpandedHeight" format="reference" />
     </declare-styleable>
 
     <declare-styleable name="DrawerView">

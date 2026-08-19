@@ -57,7 +57,7 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
 
     private fun AttributeSet.apply(defStyleAttr: Int = 0) {
         context.withStyledAttributes(this, R.styleable.HeaderLayout, defStyleAttr, 0) {
-            val resId = getResourceId(R.styleable.HeaderLayout_expandedHeight, 0)
+            val resId = getResourceId(R.styleable.HeaderLayout_headerExpandedHeight, 0)
             if (resId != 0) {
                 collapsing.updateLayoutParams {
                     height = resources.getDimensionPixelSize(resId)

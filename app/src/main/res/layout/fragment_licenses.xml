@@ -10,7 +10,7 @@
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:expandedHeight="?attr/collapsingToolbarLayoutLargeSize"
+        app:headerExpandedHeight="?attr/collapsingToolbarLayoutLargeSize"
         >
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
