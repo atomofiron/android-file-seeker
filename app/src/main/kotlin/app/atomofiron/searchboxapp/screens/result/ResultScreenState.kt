@@ -44,25 +44,25 @@ class ResultScreenState @Inject constructor(
     private var error: NodeError? = null
     private val mutex = Mutex()
 
-    private var _result: GlobalSearchResult = task?.result ?: GlobalSearchResult(forText = false)
-    val result: GlobalSearchResult get() = _result
-    private var _isReady = MutableStateFlow(task?.result?.matches?.isEmpty() == true)
-    override val isReady: StateFlow<Boolean> get() = _isReady
-    private val _cache = mutableMapOf<NodeId, ResultItem.Item>()
-    val cache: Map<NodeId, ResultItem.Item> = _cache
-    private val _items = MutableStateFlow<List<ResultItem>>(emptyList())
-    override val items: StateFlow<List<ResultItem>> = _items
-    private val _updates = EventFlow<ResultItem>()
-    override val updates: Flow<ResultItem> = _updates
-    private val _checked = MutableStateFlow<Set<NodeId>>(emptySet())
-    val checked: StateFlow<Set<NodeId>> = _checked
-    private val _dock = MutableStateFlow(ResultDockState.Default.reduce(
-        taskStatus = task?.status ?: SearchStatus.Ended(),
-        newSorting = task?.sorting ?: NodeSorting.Name,
-        checked = checked.value.size,
-        hasMatches = result.matches.isNotEmpty()
-    ))
-    override val dock: StateFlow<ResultDockState> = _dock
+    var result: GlobalSearchResult = task?.result ?: GlobalSearchResult(forText = false)
+        private set
+    override val isReady: StateFlow<Boolean>
+        field = MutableStateFlow(task?.result?.matches?.isEmpty() == true)
+    val cache: Map<NodeId, ResultItem.Item>
+        field = mutableMapOf()
+    override val items: StateFlow<List<ResultItem>>
+        field = MutableStateFlow(emptyList())
+    override val updates: Flow<ResultItem>
+        field = EventFlow<ResultItem>()
+    val checked: StateFlow<Set<NodeId>>
+        field = MutableStateFlow(emptySet())
+    override val dock: StateFlow<ResultDockState>
+        field = MutableStateFlow(ResultDockState.Default.reduce(
+            taskStatus = task?.status ?: SearchStatus.Ended(),
+            newSorting = task?.sorting ?: NodeSorting.Name,
+            checked = checked.value.size,
+            hasMatches = result.matches.isNotEmpty()
+        ))
 
     override val composition = preferenceStore.explorerItemComposition
     override val alerts = EventFlow<Alert>()
@@ -79,11 +79,11 @@ class ResultScreenState @Inject constructor(
             }
         }
         if (result.matches.isEmpty() && task.result.matches.isNotEmpty()) {
-            _isReady.value = false
+            isReady.value = false
         }
-        _result = task.result
-        _dock.value = _dock.value.reduce(task.status, task.sorting, checked = checked.size, hasMatches = task.result.matches.isNotEmpty())
-        _items.renderItems(checked, task.sorting, task.result.errors.size)
+        result = task.result
+        dock.value = dock.value.reduce(task.status, task.sorting, checked = checked.size, hasMatches = task.result.matches.isNotEmpty())
+        items.renderItems(checked, task.sorting, task.result.errors.size)
     }
 
     private fun ResultDockState.reduce(
@@ -159,29 +159,29 @@ class ResultScreenState @Inject constructor(
             add(ResultItem.Header(dirCount, fileCount, errors))
             addAll(items)
         }
-        _isReady.value = true
+        isReady.value = true
     }
 
     suspend fun cache(item: ResultItem.Item) {
         mutex.withLock {
-            _cache[item.uniqueId] = item
+            cache[item.uniqueId] = item
         }
-        _updates.emit(item)
+        updates.emit(item)
     }
 
     suspend fun cache(items: List<ResultItem.Item>) {
         mutex.withLock {
             items.forEach {
-                _cache[it.uniqueId] = it
+                cache[it.uniqueId] = it
             }
         }
         items.forEach {
-            _updates.emit(it)
+            updates.emit(it)
         }
     }
 
     fun setChecked(uniqueId: NodeId, toChecked: Boolean) {
-        _checked.update {
+        checked.update {
             it.toMutableSet().apply {
                 when {
                     toChecked -> add(uniqueId)

@@ -9,10 +9,10 @@ import javax.inject.Singleton
 @Singleton
 class EasterEggStore @Inject constructor() {
 
-    private val _value = MutableStateFlow<EasterEgg?>(null)
-    val value: StateFlow<EasterEgg?> = _value
+    val value: StateFlow<EasterEgg?>
+        field = MutableStateFlow<EasterEgg?>(null)
 
     fun set(value: EasterEgg?) {
-        _value.value = value
+        this.value.value = value
     }
 }

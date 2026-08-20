@@ -55,8 +55,8 @@ class TextViewerViewState private constructor(
     val item: StateFlow<Node> = session?.item ?: MutableStateFlow(ref.toNode())
     val textLines: StateFlow<List<TextLine>> = session?.lines ?: MutableStateFlow(emptyList())
     val currentTask = MutableStateFlow<LocalSearchTask?>(null)
-    private val _alerts: MutableStateFlow<Alert?> = DataFlow((session?.error?.value ?: error)?.toAlert())
-    val alerts: SharedFlow<Alert?> = _alerts
+    val alerts: SharedFlow<Alert?>
+        field = DataFlow<Alert?>((session?.error?.value ?: error)?.toAlert())
 
     val dock = status.map { state ->
         var index: Int? = null
@@ -164,7 +164,7 @@ class TextViewerViewState private constructor(
     }
 
     fun showAlert(alert: Alert) {
-        _alerts.value = alert
+        alerts.value = alert
     }
 
     fun trySelectTask(task: LocalSearchTask): Boolean {

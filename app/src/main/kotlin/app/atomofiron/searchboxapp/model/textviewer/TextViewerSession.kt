@@ -36,16 +36,16 @@ class TextViewerSession(
         private set
 
     val mutex = Mutex()
-    private val _item = MutableStateFlow(ref.toNode())
-    val item: StateFlow<Node> = _item
-    private val _error = MutableStateFlow<NodeError?>(null)
-    val error: StateFlow<NodeError?> = _error
+    val item: StateFlow<Node>
+        field = MutableStateFlow(ref.toNode())
+    val error: StateFlow<NodeError?>
+        field = MutableStateFlow<NodeError?>(null)
     private val lineList = GrowingList<TextLine>()
-    private val _lines = MutableStateFlow<List<TextLine>>(listOf())
-    val lines: StateFlow<List<TextLine>> = _lines
+    val lines: StateFlow<List<TextLine>>
+        field = MutableStateFlow(listOf())
     val loading = MutableStateFlow(false)
-    private val _tasks = MutableStateFlow<List<LocalSearchTask>>(listOf())
-    val tasks: StateFlow<List<LocalSearchTask>> = _tasks
+    val tasks: StateFlow<List<LocalSearchTask>>
+        field = MutableStateFlow(listOf())
 
     init {
         Charset.availableCharsets().keys.forEach { println(it) }
@@ -53,18 +53,18 @@ class TextViewerSession(
     }
 
     fun updateItem(item: Node) {
-        _item.value = item
+        this.item.value = item
     }
 
     suspend fun tasks(action: suspend MutableList<LocalSearchTask>.() -> Unit) = mutex.withLock {
-        _tasks.run {
+        tasks.run {
             value = value.toMutableList()
                 .apply { action() }
         }
     }
 
     suspend fun textLines(action: suspend GrowingList<TextLine>.() -> Unit) = mutex.withLock {
-        _lines.run {
+        lines.run {
             lineList.action()
             value = lineList.fetch()
         }
@@ -106,7 +106,7 @@ class TextViewerSession(
                 .let { true }
             is ReadResult.Err -> {
                 byteBuf.limit(0)
-                _error.value = result.v1.toNodeError()
+                error.value = result.v1.toNodeError()
                 true
             }
         }

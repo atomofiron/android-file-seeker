@@ -10,8 +10,8 @@ import javax.inject.Singleton
 class AppUpdateStore @Inject constructor() {
 
     private var fallback: AppUpdateState = AppUpdateState.Unknown
-    private val _state = MutableStateFlow<AppUpdateState>(AppUpdateState.Unknown)
-    val state: StateFlow<AppUpdateState> = _state
+    val state: StateFlow<AppUpdateState>
+        field = MutableStateFlow<AppUpdateState>(AppUpdateState.Unknown)
 
     fun set(state: AppUpdateState) {
         when (state) {
@@ -19,10 +19,10 @@ class AppUpdateStore @Inject constructor() {
             is AppUpdateState.Available -> fallback = state
             else -> Unit
         }
-        _state.value = state
+        this.state.value = state
     }
 
     fun fallback() {
-        _state.value = fallback
+        state.value = fallback
     }
 }

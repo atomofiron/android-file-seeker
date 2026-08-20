@@ -15,11 +15,10 @@ open class GeneralHolder<D : Any>(view: View) : RecyclerView.ViewHolder(view) {
     protected val context: Context = view.context
     protected val resources: Resources = view.resources
 
-    private var _itemOrNull: D? = null
-    protected val itemOrNull: D?
-        get() = _itemOrNull
+    protected var itemOrNull: D? = null
+        private set
     protected val item: D
-        get() = _itemOrNull!!
+        get() = itemOrNull!!
 
     open val hungry = true
     var truePosition = NO_POSITION
@@ -28,9 +27,9 @@ open class GeneralHolder<D : Any>(view: View) : RecyclerView.ViewHolder(view) {
     constructor(parent: ViewGroup, layoutId: Int) : this(LayoutInflater.from(parent.context).inflate(layoutId, parent, false))
 
     fun bind(item: D, position: Int) {
-        onPreBind(_itemOrNull, item, position)
+        onPreBind(itemOrNull, item, position)
         truePosition = position
-        _itemOrNull = item
+        itemOrNull = item
         onBind(item, position)
     }
 

@@ -25,41 +25,41 @@ class ExplorerStore @Inject constructor() {
     val lastTab = NodeTabKey.Explorer(2)
     val mainTabs = listOf(firstTab, middleTab, lastTab)
 
-
     private val deepestNodes = mutableMapOf<NodeTabKey, Node?>()
     private val checkedLists = mutableMapOf<NodeTabKey, List<Node>?>()
     private val currentLists = mutableMapOf<NodeTabKey, List<Node>?>()
 
-    private val _storage = MutableStateFlow<List<NodeStorage>>(emptyList())
-    private val _currentTab = MutableStateFlow(middleTab)
-    private val _currentDeepest = MutableStateFlow<Node?>(null)
-    private val _mainStorage = MutableStateFlow<Node?>(null)
-    private val _sorting = MutableStateFlow<Map<NodeTabKey, NodeSorting>>(mapOf())
-    private val _screenshots = MutableStateFlow<NodeRef?>(null)
-    private val _checked = MutableStateFlow<List<Node>>(listOf())
-    private val _alerts = EventFlow<Alert>()
-    private val _deleted = EventFlow<List<Node>>()
-    private val _copied = EventFlow<List<Node>>()
-    private val _moved = EventFlow<List<Node>>()
-    private val _updated = EventFlow<Node>()
-    private val _pasteBuffer = MutableStateFlow<List<Node>>(emptyList())
+    val storages: StateFlow<List<NodeStorage>>
+        field = MutableStateFlow(emptyList())
+    val currentTab: StateFlow<ExplorerTabKey>
+        field = MutableStateFlow(middleTab)
+    val currentDeepest: StateFlow<Node?>
+        field = MutableStateFlow(null)
+    val mainStorage: StateFlow<Node?>
+        field = MutableStateFlow(null)
+    val sorting: StateFlow<Map<NodeTabKey, NodeSorting>>
+        field = MutableStateFlow(mapOf())
+    val screenshots: StateFlow<NodeRef?>
+        field = MutableStateFlow(null)
+    val checked: StateFlow<List<Node>>
+        field = MutableStateFlow(listOf())
+    val alerts: Flow<Alert>
+        field = EventFlow<Alert>()
+    val deleted: Flow<List<Node>>
+        field = EventFlow<List<Node>>()
+    val copied: Flow<List<Node>>
+        field = EventFlow<List<Node>>()
+    val moved: Flow<List<Node>>
+        field = EventFlow<List<Node>>()
+    val updated: Flow<Node>
+        field = EventFlow<Node>()
+    val pasteBuffer: StateFlow<List<Node>>
+        field = MutableStateFlow(emptyList())
     var currentItems = listOf<Node>()
         private set
 
-    val currentTabKey: StateFlow<ExplorerTabKey> = _currentTab
-    val currentDeepest: StateFlow<Node?> = _currentDeepest
-    val storages: StateFlow<List<NodeStorage>> = _storage
-    val mainStorage: StateFlow<Node?> = _mainStorage
-    val screenshots: StateFlow<NodeRef?> = _screenshots
-    val checked: StateFlow<List<Node>> = _checked
-    val alerts: Flow<Alert> = _alerts
-    val deleted: Flow<List<Node>> = _deleted
-    val copied: Flow<List<Node>> = _copied
-    val moved: Flow<List<Node>> = _moved
-    val updated: Flow<Node> = _updated
-    val pasteBuffer: StateFlow<List<Node>> = _pasteBuffer
-    val sorting: StateFlow<Map<NodeTabKey, NodeSorting>> = _sorting
-    val currentSorting: Flow<Pair<NodeTabKey, NodeSorting?>> = combine(_sorting, _currentTab) { sorting, key ->
+    val currentTabKey: StateFlow<ExplorerTabKey> = currentTab
+    val currentSorting: Flow<Pair<NodeTabKey, NodeSorting?>> = combine(sorting, currentTab) { sorting, key ->
         key to sorting[key]
     }
 
@@ -79,8 +79,8 @@ class ExplorerStore @Inject constructor() {
     }
 
     fun setCurrentTab(tab: ExplorerTabKey) {
-        if (tab != _currentTab.value) {
-            _currentTab.value = tab
+        if (tab != currentTab.value) {
+            currentTab.value = tab
             updateChecked(tab)
             updateCurrentItems(tab)
             updateDeepest(tab)
@@ -90,41 +90,41 @@ class ExplorerStore @Inject constructor() {
     fun resetCopyBuffer() = setForCopy(emptyList())
 
     fun setForCopy(list: List<Node>) {
-        _pasteBuffer.value = list
+        pasteBuffer.value = list
     }
 
     fun setMainStorage(item: NodeStorage?) {
-        _mainStorage.value = item?.let {
+        mainStorage.value = item?.let {
             NodeRef(it.path).toRoot(NodeRootInfo.Storage(it))
         }
     }
 
     fun updateScreenshots(ref: NodeRef) {
-        _screenshots.value = ref
+        screenshots.value = ref
     }
 
     fun setStorage(item: List<NodeStorage>) {
-        _storage.value = item
+        storages.value = item
     }
 
-    suspend fun emitUpdate(item: Node) = _updated.emit(item)
+    suspend fun emitUpdate(item: Node) = updated.emit(item)
 
-    suspend fun emitDeleted(item: Node) = _deleted.emit(listOf(item))
+    suspend fun emitDeleted(item: Node) = deleted.emit(listOf(item))
 
-    suspend fun emitDeleted(items: List<Node>) = _deleted.emit(items)
+    suspend fun emitDeleted(items: List<Node>) = deleted.emit(items)
 
-    suspend fun emitCopied(item: Node) = _copied.emit(listOf(item))
+    suspend fun emitCopied(item: Node) = copied.emit(listOf(item))
 
-    suspend fun emitCopied(items: List<Node>) = _copied.emit(items)
+    suspend fun emitCopied(items: List<Node>) = copied.emit(items)
 
-    suspend fun emitMoved(item: Node) = _moved.emit(listOf(item))
+    suspend fun emitMoved(item: Node) = moved.emit(listOf(item))
 
-    suspend fun emitMoved(items: List<Node>) = _moved.emit(items)
+    suspend fun emitMoved(items: List<Node>) = moved.emit(items)
 
-    suspend fun emitAlert(alert: Alert) = _alerts.emit(alert)
+    suspend fun emitAlert(alert: Alert) = alerts.emit(alert)
 
     fun setSorting(key: NodeTabKey, sorting: NodeSorting?) {
-        _sorting.value = _sorting.value.toMutableMap().apply {
+        this.sorting.value = this.sorting.value.toMutableMap().apply {
             when (sorting) {
                 null -> remove(key)
                 else -> set(key, sorting)
@@ -132,21 +132,21 @@ class ExplorerStore @Inject constructor() {
         }
     }
 
-    private fun updateChecked(tab: NodeTabKey? = _currentTab.value) {
+    private fun updateChecked(tab: NodeTabKey? = currentTab.value) {
         tab ?: return
-        checkedLists.takeIf { tab == _currentTab.value }
+        checkedLists.takeIf { tab == currentTab.value }
             ?.let { it[tab] }
-            ?.let { _checked.value = it }
+            ?.let { checked.value = it }
     }
 
-    private fun updateDeepest(tab: NodeTabKey? = _currentTab.value) {
+    private fun updateDeepest(tab: NodeTabKey? = currentTab.value) {
         tab ?: return
-        deepestNodes.takeIf { tab == _currentTab.value }
-            ?.let { _currentDeepest.value = it[tab] }
+        deepestNodes.takeIf { tab == currentTab.value }
+            ?.let { currentDeepest.value = it[tab] }
     }
 
     private fun updateCurrentItems(tab: NodeTabKey) {
-        tab.takeIf { it == _currentTab.value }
+        tab.takeIf { it == currentTab.value }
             ?.let { currentLists[it] }
             ?.let { currentItems = it }
     }

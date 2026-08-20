@@ -13,13 +13,13 @@ data class NodeTab private constructor(
     val states: MutableMap<NodeId, NodeStateImpl>,
     val mimeTypes: List<String>,
 ) {
-    private val _trees = mutableMapOf<NodeId, MutableList<NodeRef>>() // one NodeRef isn't flexible too much
-    val trees: Map<NodeId, MutableList<NodeRef>> = _trees
+    val trees: Map<NodeId, MutableList<NodeRef>>
+        field = mutableMapOf() // one NodeRef isn't flexible too much
     var selectedRootId = UNSELECTED_ROOT_ID
         private set
     var generation = 0
         private set
-    val tree: MutableList<NodeRef> get() = _trees[selectedRootId] ?: EmptyMutableList
+    val tree: MutableList<NodeRef> get() = trees[selectedRootId] ?: EmptyMutableList
     private val sorting = mutableMapOf<NodeId, NodeSorting>()
     val checked = mutableListOf<NodeId>()
     val flow = DataFlow(NodeTabItems(emptyList(), emptyList(), null))
@@ -63,7 +63,7 @@ data class NodeTab private constructor(
     }
 
     fun Node.opened(): Boolean = roots.find { it.item.uniqueId == rootId }
-        ?.let { _trees[it.id] }
+        ?.let { trees[it.id] }
         ?.any { it.uniqueId == uniqueId }
         .let { it == true }
 
@@ -71,13 +71,13 @@ data class NodeTab private constructor(
         val copy = copy(key = key, mimeTypes = mimeTypes)
         copy.selectedRootId = selectedRootId
         copy.sorting.putAll(sorting)
-        _trees.forEach { (key, tree) ->
-            copy._trees[key] = tree.mutableCopy()
+        trees.forEach { (key, tree) ->
+            copy.putTree(key, tree.mutableCopy())
         }
         return copy
     }
 
     fun putTree(id: NodeId, tree: List<NodeRef>) {
-        _trees[id] = tree.toMutableList()
+        trees[id] = tree.toMutableList()
     }
 }

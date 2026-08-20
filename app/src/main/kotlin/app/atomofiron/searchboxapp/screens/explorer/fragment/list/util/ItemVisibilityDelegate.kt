@@ -8,19 +8,19 @@ class ItemVisibilityDelegate<D : Any>(
     private val listener: ItemVisibilityListener<D>,
 ) {
 
-    private val _visibleItems = mutableSetOf<Int>()
-    val visibleItems: Set<Int> = _visibleItems
+    val visibleItems: Set<Int>
+        field = mutableSetOf()
 
     fun onItemAttached(holder: RecyclerView.ViewHolder) {
         if (holder.bindingAdapterPosition < 0) return
-        _visibleItems.add(holder.bindingAdapterPosition)
+        visibleItems.add(holder.bindingAdapterPosition)
         val item = adapter.items[holder.bindingAdapterPosition]
         listener.onItemsBecomeVisible(listOf(item))
     }
 
     fun onItemDetached(holder: RecyclerView.ViewHolder) {
         if (holder.bindingAdapterPosition < 0) return
-        _visibleItems.remove(holder.bindingAdapterPosition)
+        visibleItems.remove(holder.bindingAdapterPosition)
     }
 
     fun interface ItemVisibilityListener<D> {

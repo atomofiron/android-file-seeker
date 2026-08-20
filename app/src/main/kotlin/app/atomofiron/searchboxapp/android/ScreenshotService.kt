@@ -38,8 +38,8 @@ class ScreenshotServiceDependencies @Inject constructor(
 
 class ScreenshotService : Service() {
     companion object {
-        private val _error = MutableStateFlow<String?>(null)
-        val error: StateFlow<String?> = _error
+        val error: StateFlow<String?>
+            field = MutableStateFlow<String?>(null)
 
         fun Context.initScreenshotService(deps: ScreenshotServiceDependencies) {
             combine(
@@ -49,7 +49,7 @@ class ScreenshotService : Service() {
             ) { enable, target, state ->
                 val intent = Intent(this, ScreenshotService::class.java)
                 target?.let { intent.put(it) }
-                _error.value = when {
+                error.value = when {
                     target == null || !enable -> stopService(intent)
                         .nil()
                     state != AppState.Foreground -> return@combine
@@ -86,7 +86,7 @@ class ScreenshotService : Service() {
             onEventResult(it, target)
         }
         handle = result.ok()?.value
-        _error.value = when (result) {
+        error.value = when (result) {
             is Rslt.Ok -> null
             is Rslt.Err -> {
                 stopSelf()

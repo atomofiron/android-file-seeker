@@ -8,10 +8,10 @@ import javax.inject.Inject
 @LicensesScope
 class LicensesViewState @Inject constructor() {
 
-    private val _items = MutableStateFlow<List<License>>(emptyList())
-    val items: StateFlow<List<License>> = _items
+    val items: StateFlow<List<License>>
+        field = MutableStateFlow(emptyList())
 
     fun set(licenses: List<License>) {
-        _items.value = licenses
+        items.value = licenses
     }
 }
