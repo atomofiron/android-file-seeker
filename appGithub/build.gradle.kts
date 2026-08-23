@@ -1,3 +1,4 @@
+import app.fileseeker.convention.AppConfig
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -7,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "app.atomofiron.searchboxapp"
+    namespace = AppConfig.packageId
 
     defaultConfig {
         manifestPlaceholders["SFST"] = "specialUse"

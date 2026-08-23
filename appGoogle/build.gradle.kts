@@ -1,3 +1,4 @@
+import app.fileseeker.convention.AppConfig
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -5,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "app.atomofiron.searchboxapp"
+    namespace = AppConfig.packageId
 
     defaultConfig {
         manifestPlaceholders["SFST"] = "mediaProcessing"
