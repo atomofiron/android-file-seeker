@@ -105,9 +105,9 @@ class AppUpdateServiceGithubImpl(
                 store.set(AppUpdateState.Installing)
                 scope.launch {
                     val rslt = apks.installApk(NodeRef(file.path), Intents.ACTION_INSTALL_UPDATE, silently = true)
-                    if (rslt is Err) AppUpdateState.Error(rslt.message)
-                    if (!context.granted(REQUEST_INSTALL_PACKAGES)) {
+                    if (rslt is Err) {
                         store.set(state)
+                        preferenceChannel.showUpdateAlert(AlertErr(rslt.message))
                     }
                 }
             }
