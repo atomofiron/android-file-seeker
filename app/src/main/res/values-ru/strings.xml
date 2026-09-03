@@ -130,6 +130,7 @@
     <string name="allow">Разрешить</string>
     <string name="confirm">Подтвердить</string>
     <string name="root_photos">Фото</string>
+    <string name="all">Все</string>
     <string name="root_videos">Видео</string>
     <string name="root_camera">Камера</string>
     <string name="root_downloads">Загруз&#x00AD;ки</string>

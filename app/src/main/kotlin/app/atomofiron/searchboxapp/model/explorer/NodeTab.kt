@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.model.explorer
 
 import app.atomofiron.common.util.extension.mutableCopy
 import app.atomofiron.common.util.flow.DataFlow
+import app.atomofiron.searchboxapp.model.explorer.NodeRootOption.CameraToggle
 import app.atomofiron.searchboxapp.utils.EmptyMutableList
 
 private const val UNSELECTED_ROOT_ID = 0
@@ -21,8 +22,10 @@ data class NodeTab private constructor(
         private set
     val tree: MutableList<NodeRef> get() = trees[selectedRootId] ?: EmptyMutableList
     private val sorting = mutableMapOf<NodeId, NodeSorting>()
+    var camera = CameraToggle.All
+        private set
     val checked = mutableListOf<NodeId>()
-    val flow = DataFlow(NodeTabItems(emptyList(), emptyList(), null))
+    val flow = DataFlow(NodeTabItems(emptyList(), null, emptyList(), null))
 
     constructor(
         key: NodeTabKey,
@@ -42,6 +45,10 @@ data class NodeTab private constructor(
                 ?.defaultSorting
                 ?: NodeSorting.Name
         }
+    }
+
+    fun setCameraToggle(toggle: CameraToggle) {
+        camera = toggle
     }
 
     fun selected(root: NodeRoot): Boolean = root.isSelected()

@@ -118,6 +118,11 @@
 		<item name="cornerSize">8dp</item>
 	</style>
 
+	<style name="ShapeAppearance.SegmentGroup" parent="">
+		<item name="cornerFamily">rounded</item>
+		<item name="cornerSize">50%</item>
+	</style>
+
 	<style name="SnackbarStyle" parent="Widget.Material3.Snackbar">
 		<item name="shapeAppearance">?shapeAppearanceCornerExtraLarge</item>
 	</style>

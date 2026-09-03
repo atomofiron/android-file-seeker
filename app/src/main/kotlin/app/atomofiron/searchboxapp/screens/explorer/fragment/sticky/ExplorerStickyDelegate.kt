@@ -12,11 +12,13 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.preference.ExplorerItemComposition
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
+import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.options.RootOptionAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.info.HolderInfo
 
 class ExplorerStickyDelegate(
     private val recyclerView: RecyclerView,
     private val roots: RootAdapter,
+    private val options: RootOptionAdapter,
     private val adapter: GeneralAdapter<Node,*>,
     stickyBox: FrameLayout,
     listener: ExplorerItemBinderActionListener,
@@ -102,7 +104,7 @@ class ExplorerStickyDelegate(
 
     private fun View.getHolder(): RecyclerView.ViewHolder? {
         return recyclerView.getChildViewHolder(this)
-            .takeIf { it.absoluteAdapterPosition >= roots.itemCount }
+            .takeIf { it.absoluteAdapterPosition >= (roots.itemCount + options.itemCount) }
     }
 
     fun updateOffset() {

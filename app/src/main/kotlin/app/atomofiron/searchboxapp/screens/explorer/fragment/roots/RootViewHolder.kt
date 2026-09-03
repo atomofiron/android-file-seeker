@@ -28,8 +28,6 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
         fun Node.getTitle(resources: Resources): String = content.rootType?.getTitle(resources) ?: name
 
         fun NodeRootInfo.getTitle(resources: Resources): String? = when (this) {
-            is NodeRootInfo.Photos -> resources.getString(R.string.root_photos)
-            is NodeRootInfo.Videos -> resources.getString(R.string.root_videos)
             is NodeRootInfo.Camera -> resources.getString(R.string.root_camera)
             is NodeRootInfo.Screenshots -> resources.getString(R.string.root_screenshots)
             is NodeRootInfo.Downloads -> resources.getString(R.string.root_downloads)
@@ -91,8 +89,6 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
 
     private fun NodeRoot.getIcon(): Drawable {
         val resId = when (info) {
-            is NodeRootInfo.Photos -> R.drawable.ic_thumbnail_camera
-            is NodeRootInfo.Videos -> R.drawable.ic_thumbnail_videocam
             is NodeRootInfo.Camera -> R.drawable.ic_thumbnail_camera
             is NodeRootInfo.Downloads -> R.drawable.ic_thumbnail_download
             is NodeRootInfo.Bluetooth -> R.drawable.ic_thumbnail_bluetooth
@@ -111,8 +107,6 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     private fun NodeRoot.getThumbnailBackground(): Drawable? = when (info) {
         is NodeRootInfo.Storage -> null
         is NodeRootInfo.Favorite,
-        is NodeRootInfo.Photos,
-        is NodeRootInfo.Videos,
         is NodeRootInfo.Camera,
         is NodeRootInfo.Screenshots,
         is NodeRootInfo.Downloads,

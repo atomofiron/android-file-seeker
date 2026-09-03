@@ -15,8 +15,10 @@ import app.atomofiron.searchboxapp.screens.explorer.di.ExplorerInteractor
 import app.atomofiron.searchboxapp.screens.explorer.fragment.ExplorerDockListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerItemActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
+import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.options.RootOptionAdapter.RootOptionListener
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerDockDelegate
 import app.atomofiron.searchboxapp.screens.explorer.presenter.ExplorerItemActionListenerDelegate
+import app.atomofiron.searchboxapp.screens.explorer.presenter.RootOptionDelegate
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.now
 import kotlinx.coroutines.CoroutineScope
@@ -32,15 +34,17 @@ class ExplorerPresenter @Inject constructor(
     private val storagePermissionDelegate: StoragePermissionDelegate,
     private val interactor: ExplorerInteractor,
     private val store: ExplorerStore,
-    private val preferences: PreferenceStore,
+    preferences: PreferenceStore,
     itemListener: ExplorerItemActionListenerDelegate,
     commonChannel: CommonChannel,
     dockDelegate: ExplorerDockDelegate,
+    rootOptionDelegate: RootOptionDelegate,
 ) : BasePresenter<ExplorerViewModel, ExplorerRouter>(scope, router),
     ExplorerView.ExplorerViewOutput,
     RootAdapter.RootClickListener,
     ExplorerDockListener by dockDelegate,
-    ExplorerItemActionListener by itemListener {
+    ExplorerItemActionListener by itemListener,
+    RootOptionListener by rootOptionDelegate {
 
     private val folderVolumeUp by preferences.folderVolumeUp
     private val currentTab get() = viewState.currentTab.value

@@ -21,7 +21,7 @@ data class NodeRoot(
         vararg pathVariants: NodeRef,
     ) : this(type, pathVariants.first().toRoot(type), defaultSorting, thumbnail, pathVariants = pathVariants.takeIf { it.size > 1 })
 
-    val id: NodeId = item.uniqueId + info.temp
+    val id: NodeId = item.uniqueId
     val isEnabled: Boolean get() = item.isCached || info is NodeRootInfo.Storage
     val withPreview: Boolean = thumbnail != null
 

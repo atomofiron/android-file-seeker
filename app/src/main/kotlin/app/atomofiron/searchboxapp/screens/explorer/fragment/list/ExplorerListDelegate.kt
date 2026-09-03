@@ -18,6 +18,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.Explore
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.TAG_EXPLORER_OPENED_ITEM
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.ExplorerItemBinder.ExplorerItemBinderActionListener
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
+import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.options.RootOptionAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.sticky.ExplorerStickyDelegate
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.isSeparator
 import lib.atomofiron.insets.attachInsetsListener
@@ -26,6 +27,7 @@ import kotlin.math.min
 class ExplorerListDelegate(
     private val recyclerView: RecyclerView,
     private val rootAdapter: RootAdapter,
+    private val optionAdapter: RootOptionAdapter,
     private val nodeAdapter: ExplorerAdapter,
     stickyBox: FrameLayout,
     private val output: ExplorerItemActionListener,
@@ -41,7 +43,7 @@ class ExplorerListDelegate(
     }
 
     private val rootOffsetDecorator = RootOffsetDecorator(recyclerView, rootAdapter, layoutManager, spanSizeLookup)
-    private val stickyDelegate = ExplorerStickyDelegate(recyclerView, rootAdapter, nodeAdapter, stickyBox, StickyListener())
+    private val stickyDelegate = ExplorerStickyDelegate(recyclerView, rootAdapter, optionAdapter, nodeAdapter, stickyBox, StickyListener())
     private val backgroundDecorator = ItemBackgroundDecorator(R.id.item_explorer, evenNumbered = true, ignoringTag = TAG_EXPLORER_OPENED_ITEM, recyclerView.resources)
     private val borderDecorator = ItemBorderDecorator(recyclerView.context, nodeAdapter, stickyDelegate::getDeepest)
 
@@ -79,7 +81,7 @@ class ExplorerListDelegate(
 
     fun isVisible(item: Node): Boolean {
         val index = items.indexOfFirst { it.ref == item.ref }
-        return isVisible(index + rootAdapter.itemCount)
+        return isVisible(index + rootAdapter.itemCount + optionAdapter.itemCount)
     }
 
     fun isVisible(position: Int): Boolean {
@@ -114,7 +116,7 @@ class ExplorerListDelegate(
 
     fun scrollTo(item: Node) {
         val nodePosition = items.indexOfFirst { it.ref == item.ref }
-        val position = nodePosition + rootAdapter.itemCount
+        val position = nodePosition + rootAdapter.itemCount + optionAdapter.itemCount
         recyclerView.findViewHolderForAdapterPosition(position)
             ?.takeIf { recyclerView.run { it.itemView.top > paddingTop && it.itemView.bottom < height - paddingBottom } }
             ?.let { return }

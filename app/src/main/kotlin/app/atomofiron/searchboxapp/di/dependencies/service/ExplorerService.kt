@@ -32,20 +32,19 @@ import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeGarden
 import app.atomofiron.searchboxapp.model.explorer.NodeId
+import app.atomofiron.searchboxapp.model.explorer.NodeMatcher
 import app.atomofiron.searchboxapp.model.explorer.NodeMeta
 import app.atomofiron.searchboxapp.model.explorer.NodeOperation
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
+import app.atomofiron.searchboxapp.model.explorer.NodeRootOption.CameraToggle
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import app.atomofiron.searchboxapp.model.explorer.NodeTab
 import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
-import app.atomofiron.searchboxapp.model.explorer.isMedia
-import app.atomofiron.searchboxapp.model.explorer.isMovie
-import app.atomofiron.searchboxapp.model.explorer.isPicture
 import app.atomofiron.searchboxapp.model.explorer.other.Deepest
 import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.other.TabRootSorting
@@ -137,7 +136,7 @@ class ExplorerService @Inject constructor(
             deepest ?: return@l
             val tab = store.currentTabKey.value
             val root = garden[tab].getSelectedRoot()
-                ?.takeIf { it.info != NodeRootInfo.Photos && it.info != NodeRootInfo.Videos }
+                ?.takeIf { it.info != NodeRootInfo.Camera }
                 ?: return@l
             val new = Deepest(tabIndex = tab.index, rootId = root.id, deepest.ref)
             dao.put(new)
@@ -201,8 +200,7 @@ class ExplorerService @Inject constructor(
         val systemRoot = NodeRoot(NodeRootInfo.SystemRoot, NodeSorting.Name, thumbnail = null, NodeRef.Root)
         val roots = this?.run {
             listOf(
-                NodeRoot(NodeRootInfo.Photos, NodeSorting.Date, thumbnail = Thumbnail.FilePath, ref + SUB_PATH_CAMERA),
-                NodeRoot(NodeRootInfo.Videos, NodeSorting.Date, thumbnail = Thumbnail.FilePath, ref + SUB_PATH_CAMERA),
+                NodeRoot(NodeRootInfo.Camera, NodeSorting.Date, thumbnail = Thumbnail.FilePath, ref + SUB_PATH_CAMERA),
                 NodeRoot(NodeRootInfo.Screenshots, NodeSorting.Date, thumbnail = Thumbnail.FilePath, ref + SUB_PATH_PIC_SCREENSHOTS, ref + SUB_PATH_DCIM_SCREENSHOTS),
                 NodeRoot(NodeRootInfo.Bluetooth, NodeSorting.Date, thumbnail = null, ref + SUB_PATH_BLUETOOTH, ref + SUB_PATH_DOWNLOAD_BLUETOOTH),
                 NodeRoot(NodeRootInfo.Downloads, NodeSorting.Date, thumbnail = null, ref + SUB_PATH_DOWNLOAD),
@@ -376,24 +374,6 @@ class ExplorerService @Inject constructor(
         }
     }
 
-    private fun filterMediaRootChildren(updated: Node, type: NodeRootInfo) {
-        val onlyPhotos = type == NodeRootInfo.Photos || type == NodeRootInfo.Screenshots
-        val onlyVideos = type == NodeRootInfo.Videos
-        val onlyMedia = type == NodeRootInfo.Camera
-        if (onlyPhotos || onlyVideos || onlyMedia) {
-            updated.children?.update(updateMetadata = true) {
-                replace {
-                    when {
-                        onlyPhotos && !it.content.isPicture() -> null
-                        onlyVideos && !it.content.isMovie() -> null
-                        onlyMedia && !it.content.isMedia() -> null
-                        else -> it
-                    }
-                }
-            }
-        }
-    }
-
     private fun updateRootThumbnail(updated: Node, targetRoot: NodeRoot): NodeRoot {
         val preview = targetRoot.defaultSorting
             .takeIf { targetRoot.thumbnail != null }
@@ -403,8 +383,11 @@ class ExplorerService @Inject constructor(
         return targetRoot.copy(item = updated, thumbnailPath = preview?.ref?.string ?: "")
     }
 
-    private suspend fun updateRootSync(updated: Node, key: NodeTabKey, targetRoot: NodeRoot) {
-        filterMediaRootChildren(updated, targetRoot.info)
+    private suspend fun updateRootSync(
+        updated: Node,
+        key: NodeTabKey,
+        targetRoot: NodeRoot,
+    ) {
         val updatedRoot = updateRootThumbnail(updated, targetRoot)
         garden {
             states.updateState(updatedRoot.id) {
@@ -439,7 +422,7 @@ class ExplorerService @Inject constructor(
     suspend fun tryCache(key: NodeTabKey, item: Node) {
         garden(key) {
             roots.takeIf { item.isRoot }
-                ?.find { it.item.uniqueId == item.uniqueId && it.info.temp == item.content.rootType?.temp  }
+                ?.find { it.item.uniqueId == item.uniqueId }
                 ?.let { return updateRootAsync(key, it) }
 
             val current = findItem(item.uniqueId)
@@ -815,23 +798,29 @@ class ExplorerService @Inject constructor(
         }
     }
 
+    suspend fun setCameraOption(key: ExplorerTabKey, option: CameraToggle) {
+        garden(key) {
+            setCameraToggle(option)
+            render()
+        }
+    }
+
     private fun NodeTab.renderItems(roots: List<NodeRoot>): NodeTabItems {
         val root = getSelectedRoot()
-            ?: return NodeTabItems(roots, emptyList(), null)
+            ?: return NodeTabItems(roots, null, emptyList(), null)
         val items = mutableListOf<Node>()
+        val option = when (root.info) {
+            is NodeRootInfo.Camera -> camera
+            else -> null
+        }
         renderNode(root.item, content = root.item.defineDirKind(), isOpened = tree.isNotEmpty(), isDeepest = tree.size == 1)
             .also { items.add(it) }
             .takeIf { !it.isOpened }
-            ?.let { return NodeTabItems(roots, items, null) }
+            ?.let { return NodeTabItems(roots, option, items, null) }
+        val matcher = NodeMatcher(tree.size, mimeTypes, root.info, option)
         val sorting = getSorting(root.id)
         var deepest = items.first()
         val openedIndexes = mutableListOf<Int>()
-        val filteredCounts = when {
-            mimeTypes.isEmpty() -> null
-            mimeTypes == NodeContent.Directory.mimeTypes -> null
-            // filteredCounts isn't always null! >:(
-            else -> IntArray(tree.size)
-        }
         var parent = items.first()
         for (i in tree.indices) {
             val level = findItem(tree[i].uniqueId)
@@ -840,8 +829,7 @@ class ExplorerService @Inject constructor(
             val nextLevelId = tree.getOrNull(i.inc())?.uniqueId
             for (j in 0..<level.childCount) {
                 var item = level.children!![j]
-                if (mismatch(item)) {
-                    filteredCounts?.inc(i)
+                if (!matcher.matches(item, i)) {
                     continue
                 }
                 val isOpened = item.uniqueId == nextLevelId
@@ -870,8 +858,7 @@ class ExplorerService @Inject constructor(
             val opened = openedIndexes[i]
             for (j in opened.inc() until level.childCount) {
                 var item = level.children!![j]
-                if (mismatch(item)) {
-                    filteredCounts?.inc(i)
+                if (!matcher.matches(item, i)) {
                     continue
                 }
                 item = renderNode(item, content = item.defineDirKind(i))
@@ -884,18 +871,18 @@ class ExplorerService @Inject constructor(
             }
         }
         var offset = 0
-        // I've checked!!! it's nullable
-        if (filteredCounts != null) items.forEachIndexed { i, it ->
-            if (!it.isOpened || it.isSeparator()) return@forEachIndexed
-            val offset = offset++
-            items[i] = it.copy(children = it.children?.copy(filteredOut = filteredCounts[offset]))
+        matcher.filteredCounters?.let { counters ->
+            items.forEachIndexed { i, it ->
+                if (it.isOpened && !it.isSeparator()) {
+                    val offset = offset++
+                    items[i] = it.copy(children = it.children?.copy(filteredOut = counters[offset]))
+                }
+            }
         }
-        return NodeTabItems(roots, items, deepest)
+        return NodeTabItems(roots, option, items, deepest)
     }
 
     private fun IntArray.inc(i: Int) = set(i, get(i).inc())
-
-    private fun NodeTab.mismatch(item: Node): Boolean = mimeTypes.isNotEmpty() && item.isFile && !item.content.matchesAny(mimeTypes)
 
     private suspend fun NodeTab.renderUpdate(new: Node) {
         store.emitUpdate(renderNode(new))
@@ -995,7 +982,6 @@ class ExplorerService @Inject constructor(
                 if (updated.isRoot) roots.replace { root ->
                     when {
                         root.item.uniqueId != updated.uniqueId -> root
-                        root.info.temp != updated.content.rootType?.temp -> root
                         else -> root.copy(item = updated)
                     }
                 }

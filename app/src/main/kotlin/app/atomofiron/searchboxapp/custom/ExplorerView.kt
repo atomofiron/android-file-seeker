@@ -23,6 +23,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.ExplorerListDe
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.SwipeMarkerDelegate
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootAdapter
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
+import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.options.RootOptionAdapter
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.addFastScroll
 import app.atomofiron.searchboxapp.utils.disallowInterceptTouches
@@ -41,13 +42,15 @@ class ExplorerView(
         private set
 
     private val rootAdapter = RootAdapter(output)
-    private val explorerAdapter = ExplorerAdapter(output, ::onSeparatorClick)
+    private val optionAdapter = RootOptionAdapter(output)
+    private val nodeAdapter = ExplorerAdapter(output, ::onSeparatorClick)
     private val swipeMarker = SwipeMarkerDelegate(resources, binding.stickyBox)
 
     private val listDelegate: ExplorerListDelegate = ExplorerListDelegate(
         binding.recyclerView,
         rootAdapter,
-        explorerAdapter,
+        optionAdapter,
+        nodeAdapter,
         binding.stickyBox,
         output,
     )
@@ -69,7 +72,7 @@ class ExplorerView(
             .setStableIdMode(ConcatAdapter.Config.StableIdMode.SHARED_STABLE_IDS)
             .setIsolateViewTypes(false)
             .build()
-        recyclerView.adapter = ConcatAdapter(config, rootAdapter, explorerAdapter)
+        recyclerView.adapter = ConcatAdapter(config, rootAdapter, optionAdapter, nodeAdapter)
     }
 
     private fun ViewExplorerBinding.applyInsets() {
@@ -83,29 +86,29 @@ class ExplorerView(
 
     fun scrollTo(item: Node) = listDelegate.scrollTo(item)
 
-    fun scrollToTop(): Boolean = binding.recyclerView.scrollToTop(fastScrollPosition = rootAdapter.itemCount)
+    fun scrollToTop(): Boolean = binding.recyclerView.scrollToTop(fastScrollPosition = rootAdapter.itemCount + optionAdapter.itemCount)
 
     fun isDeepestDirVisible(): Boolean? = listDelegate.isDeepestDirVisible()
 
     fun submit(items: NodeTabItems) {
         title = items.deepest?.getTitle(resources)
         rootAdapter.submitList(items.roots)
-        val oldFirst = explorerAdapter.items.firstOrNull()
+        optionAdapter.set(items.option)
+        val oldFirst = nodeAdapter.items.firstOrNull()
         val newFirst = items.items.firstOrNull()
         val isNew = oldFirst == null || newFirst == null || oldFirst.ref != newFirst.ref
-                || oldFirst.content.rootType?.temp != newFirst.content.rootType?.temp
-        explorerAdapter.submit(items.items, isNew)
+        nodeAdapter.submit(items.items, isNew)
     }
 
-    fun submit(item: Node) = explorerAdapter.submit(item)
+    fun submit(item: Node) = nodeAdapter.submit(item)
 
     fun setComposition(composition: ExplorerItemComposition) {
         listDelegate.setComposition(composition)
-        explorerAdapter.setComposition(composition)
+        nodeAdapter.setComposition(composition)
     }
 
     fun onItemsVisible() {
-        val items = explorerAdapter.visibleItems.mapNotNull { explorerAdapter.items.getOrNull(it) }
+        val items = nodeAdapter.visibleItems.mapNotNull { nodeAdapter.items.getOrNull(it) }
         output.onItemsBecomeVisible(items)
     }
 
@@ -114,7 +117,9 @@ class ExplorerView(
         else -> listDelegate.scrollTo(item)
     }
 
-    interface ExplorerViewOutput : ExplorerItemActionListener, RootAdapter.RootClickListener
+    interface ExplorerViewOutput : ExplorerItemActionListener
+        , RootAdapter.RootClickListener
+        , RootOptionAdapter.RootOptionListener
 }
 
 fun RecyclerView.addExplorerFastScroll() {

@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeId
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
+import app.atomofiron.searchboxapp.model.explorer.NodeRootOption.CameraToggle
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.explorer.ExplorerScope
@@ -92,4 +93,8 @@ class ExplorerInteractor @Inject constructor(
     fun setSorting(key: ExplorerTabKey, rootId: NodeId, sorting: NodeSorting) = default {
         service.setSorting(key, rootId, sorting)
     }.unit()
+
+    fun setCameraOption(key: ExplorerTabKey, option: CameraToggle) = default {
+        service.setCameraOption(key, option)
+    }
 }

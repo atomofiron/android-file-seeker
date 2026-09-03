@@ -60,6 +60,7 @@ data class Node(
         other.isDeepest != isDeepest -> false
         other.hasChildren != hasChildren -> false
         other.childCount != childCount -> false
+        other.children?.filteredOut != children?.filteredOut -> false
         isOpened && other.getOpenedId() != getOpenedId() -> false
         other.content != content -> false
         else -> true
