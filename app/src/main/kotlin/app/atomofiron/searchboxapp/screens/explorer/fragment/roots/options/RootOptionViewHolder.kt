@@ -1,11 +1,16 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.roots.options
 
+import android.content.res.ColorStateList
+import androidx.core.view.children
 import app.atomofiron.common.recycler.GeneralHolder
+import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemRootOptionCameraBinding
+import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.model.explorer.NodeRootOption
 import app.atomofiron.searchboxapp.model.explorer.NodeRootOption.CameraToggle
 import app.atomofiron.searchboxapp.utils.check
+import app.atomofiron.searchboxapp.utils.colorAttr
 
 class RootOptionViewHolder(
     private val binding: ItemRootOptionCameraBinding,
@@ -24,6 +29,16 @@ class RootOptionViewHolder(
                 else -> return@addOnButtonCheckedListener
             }
             output.onClick(target)
+        }
+        val list = ColorStateList(
+            arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+            intArrayOf(
+                context.colorAttr(MaterialAttr.colorSecondaryContainer),
+                context.colorSurfaceContainer(),
+            ),
+        )
+        binding.group.children.forEach {
+            it.backgroundTintList = list
         }
     }
 

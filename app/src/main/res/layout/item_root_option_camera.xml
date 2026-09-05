@@ -29,7 +29,6 @@
             android:layout_weight="1"
             android:text="@string/root_photos"
             android:textColor="?attr/colorOnSecondaryContainer"
-            app:backgroundTint="@color/segment_button_tint"
             />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/all"
@@ -38,7 +37,6 @@
             android:layout_weight="1"
             android:text="@string/all"
             android:textColor="?attr/colorOnSecondaryContainer"
-            app:backgroundTint="@color/segment_button_tint"
             />
         <com.google.android.material.button.MaterialButton
             android:id="@+id/videos"
@@ -47,7 +45,6 @@
             android:layout_weight="1"
             android:text="@string/root_videos"
             android:textColor="?attr/colorOnSecondaryContainer"
-            app:backgroundTint="@color/segment_button_tint"
             />
     </com.google.android.material.button.MaterialButtonToggleGroup>
 </androidx.constraintlayout.widget.ConstraintLayout>
