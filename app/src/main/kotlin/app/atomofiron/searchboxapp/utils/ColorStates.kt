@@ -1,8 +1,9 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.content.res.ColorStateList
+import androidx.annotation.ColorInt
 
-enum class State(val value: Int) {
+enum class ColorState(val value: Int) {
     Checked(android.R.attr.state_checked),
     Unchecked(-android.R.attr.state_checked),
     Selected(android.R.attr.state_selected),
@@ -22,44 +23,53 @@ enum class State(val value: Int) {
 }
 
 interface ColorStates {
-    val checked get() = State.Checked
-    val unchecked get() = State.Unchecked
-    val selected get() = State.Selected
-    val unselected get() = State.Unselected
-    val hovered get() = State.Hovered
-    val unhovered get() = State.Unhovered
-    val focused get() = State.Focused
-    val unfocused get() = State.Unfocused
-    val pressed get() = State.Pressed
-    val unpressed get() = State.Unpressed
-    val enabled get() = State.Enabled
-    val disabled get() = State.Disabled
-    val active get() = State.Active
-    val inactive get() = State.Inactive
-    val activated get() = State.Activated
-    val inactivated get() = State.Inactivated
+    val checked get() = ColorState.Checked
+    val unchecked get() = ColorState.Unchecked
+    val selected get() = ColorState.Selected
+    val unselected get() = ColorState.Unselected
+    val hovered get() = ColorState.Hovered
+    val unhovered get() = ColorState.Unhovered
+    val focused get() = ColorState.Focused
+    val unfocused get() = ColorState.Unfocused
+    val pressed get() = ColorState.Pressed
+    val unpressed get() = ColorState.Unpressed
+    val enabled get() = ColorState.Enabled
+    val disabled get() = ColorState.Disabled
+    val active get() = ColorState.Active
+    val inactive get() = ColorState.Inactive
+    val activated get() = ColorState.Activated
+    val inactivated get() = ColorState.Inactivated
 
-    fun Int.add(vararg states: State)
+    fun Int.add(first: ColorState, vararg other: ColorState)
 
     companion object {
-        operator fun invoke(builder: ColorStates.() -> Unit): ColorStateList = ColorStatesImpl()
+        operator fun invoke(
+            @ColorInt default: Int,
+            builder: ColorStates.() -> Unit,
+        ): ColorStateList = ColorStatesImpl()
             .apply(builder)
-            .build()
+            .build(default)
     }
 }
 
 private class ColorStatesImpl : ColorStates {
 
-    private val map = mutableSetOf<Pair<Int, Set<State>>>()
+    private val map = linkedSetOf<Pair<Int, Set<ColorState>>>()
 
-    override fun Int.add(vararg states: State) {
-        map.add(this to states.toSet())
+    override fun Int.add(first: ColorState, vararg other: ColorState) {
+        val states = buildSet {
+            add(first)
+            addAll(other)
+        }
+        map.add(this to states)
     }
 
-    fun build(): ColorStateList {
+    fun build(@ColorInt default: Int): ColorStateList {
+        map.add(default to emptySet())
         val (colors, states) = map.asSequence().map { (color, states) ->
             color to states.map { it.value }.toIntArray()
         }.unzip()
+        map.clear()
         return ColorStateList(states.toTypedArray(), colors.toIntArray())
     }
 }

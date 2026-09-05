@@ -30,9 +30,8 @@ class RootOptionViewHolder(
             }
             output.onClick(target)
         }
-        val list = ColorStates {
+        val list = ColorStates(default = context.colorSurfaceContainer()) {
             context.colorAttr(MaterialAttr.colorSecondaryContainer).add(checked)
-            context.colorSurfaceContainer().add()
         }
         binding.group.children.forEach {
             it.backgroundTintList = list
