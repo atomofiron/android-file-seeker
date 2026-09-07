@@ -2,10 +2,11 @@ package app.atomofiron.searchboxapp.screens.explorer.state
 
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.utils.Id
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.toDockItemChildren
 
-object ExplorerDock : DockItem.Id.Factory {
+object ExplorerDock : Id.Factory {
     val Search = DockItem(
         nextId(),
         DockItem.Icon(R.drawable.ic_search),

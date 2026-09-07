@@ -24,6 +24,7 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemColors
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemConfig
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemHolder
+import app.atomofiron.searchboxapp.utils.Id
 import app.atomofiron.searchboxapp.custom.view.dock.popup.DockPopupConfig
 import app.atomofiron.searchboxapp.custom.view.dock.shape.DockBottomShape
 import app.atomofiron.searchboxapp.custom.view.dock.shape.DockNotch
@@ -42,7 +43,7 @@ interface DockView {
     fun setListener(listener: (DockItem) -> Unit)
 }
 
-private val NotchStub = DockItem(DockItem.Id.Undefined, enabled = false)
+private val NotchStub = DockItem(Id.Undefined, enabled = false)
 
 @SuppressLint("ViewConstructor")
 class DockViewImpl(
@@ -88,7 +89,7 @@ class DockViewImpl(
         setPadding(padding, padding, padding, padding)
         super.setAdapter(adapter)
         if (isInEditMode) {
-            adapter.submit(Array(5) { DockItem(DockItem.Id(it), DockItem.Icon(R.drawable.ic_circle_cross), DockItem.Label(R.string.done)) }.toList())
+            adapter.submit(Array(5) { DockItem(Id(it), DockItem.Icon(R.drawable.ic_circle_cross), DockItem.Label(R.string.done)) }.toList())
             layoutParams = FrameLayout.LayoutParams(MATCH_PARENT, WRAP_CONTENT)
             mode = DockMode.Pinned(Layout.Ground.Bottom, null)
         }

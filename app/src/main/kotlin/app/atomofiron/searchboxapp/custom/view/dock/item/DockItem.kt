@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.custom.view.dock.item
 import android.graphics.drawable.Drawable
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import app.atomofiron.searchboxapp.utils.Id
 
 data class DockItem(
     val id: Id,
@@ -46,28 +47,6 @@ data class DockItem(
     enum class Notice(val alert: Boolean) {
         Normal(false),
         Alert(true),
-    }
-    interface Id {
-        val value: Long
-
-        @JvmInline
-        private value class Digit(override val value: Long) : Id
-
-        open class Auto : Id {
-            override val value = next++
-        }
-
-        interface Factory {
-            fun nextId(): Id = Digit(next++)
-        }
-
-        companion object {
-            val Undefined: Id = Digit(-1L)
-            private var next = Int.MAX_VALUE.toLong()
-
-            operator fun invoke(value: Int): Id = Digit(value.toLong())
-            operator fun invoke(value: Long): Id = Digit(value)
-        }
     }
 
     fun shouldBeClickable() = clickable ?: enabled

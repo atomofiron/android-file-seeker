@@ -86,7 +86,7 @@ inline fun <E> Iterable<E>.findWithIndex(predicate: (E) -> Boolean): Pair<Int, E
     return -1 to null
 }
 
-operator fun DockBarView.set(id: DockItem.Id, value: Boolean) {
+operator fun DockBarView.set(id: Id, value: Boolean) {
     for (item in items) {
         if (item.id != id) continue
         val drawable = (item.icon as? DockItem.Icon.Value)?.drawable as? NoticeableDrawable

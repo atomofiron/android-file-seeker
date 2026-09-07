@@ -1,6 +1,6 @@
 package app.atomofiron.searchboxapp.model.explorer
 
-import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.utils.Id
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerializationException
@@ -12,7 +12,7 @@ import kotlinx.serialization.encoding.Encoder
 import kotlin.LazyThreadSafetyMode.NONE
 
 @Serializable(with = NodeSortingSerializer::class)
-sealed class NodeSorting(val reversed: Boolean) : DockItem.Id.Auto() {
+sealed class NodeSorting(val reversed: Boolean) : Id.Auto() {
 
     abstract val name: String
 
@@ -74,7 +74,7 @@ sealed class NodeSorting(val reversed: Boolean) : DockItem.Id.Auto() {
 
         val entries by lazy(NONE) { listOf(Name, Name.Reversed, Date, Date.Reversed, Size, Size.Reversed) }
 
-        operator fun invoke(id: DockItem.Id): NodeSorting? = entries.find { it == id }
+        operator fun invoke(id: Id): NodeSorting? = entries.find { it == id }
     }
 }
 

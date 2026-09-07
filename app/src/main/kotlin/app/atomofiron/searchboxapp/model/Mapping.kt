@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.model
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItemChildren
+import app.atomofiron.searchboxapp.utils.Id
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 
 fun NodeSorting.Companion.toDockItemChildren() = DockItemChildren(
@@ -17,7 +18,7 @@ fun NodeSorting.Companion.toDockItemChildren() = DockItemChildren(
 
 fun NodeSorting.toDockItem(): DockItem = toDockItem(this, null)
 
-fun NodeSorting.toDockItem(id: DockItem.Id, label: DockItem.Label?): DockItem {
+fun NodeSorting.toDockItem(id: Id, label: DockItem.Label?): DockItem {
     return when (this) {
         NodeSorting.Name -> DockItem(id, DockItem.Icon(R.drawable.ic_sort_az_asc), label ?: DockItem.Label(R.string.sorting_a_z))
         NodeSorting.Name.Reversed -> DockItem(id, DockItem.Icon(R.drawable.ic_sort_az_desc), label ?: DockItem.Label(R.string.sorting_z_a))
