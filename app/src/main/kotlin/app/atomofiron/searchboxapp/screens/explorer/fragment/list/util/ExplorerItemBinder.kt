@@ -40,6 +40,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeDee
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeOpened
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.ColorStates
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.audio.AudioCover
 import app.atomofiron.searchboxapp.utils.colorAttr
@@ -73,8 +74,8 @@ class ExplorerItemBinder(
     private var dirDrawable = ContextCompat.getDrawable(context, R.drawable.ic_folder)!!.mutate().translated()
     private var fileDrawable = ContextCompat.getDrawable(context, R.drawable.ic_file)!!.mutate().translated()
     private val placeholder = MuonsDrawable(context)
-    private val dirTint = ColorStateList.valueOf(context.colorAttr(AppCompatAttr.colorPrimary))
-    private val fileTint = ColorStateList.valueOf(context.colorAttr(AppCompatAttr.colorAccent))
+    private val dirTint = ColorStates(default = context.colorAttr(AppCompatAttr.colorPrimary))
+    private val fileTint = ColorStates(default = context.colorAttr(AppCompatAttr.colorAccent))
     private val lemon = LemonDrawable()
     val rippleDrawable get() = binding.root.background as? RippleDrawable
 
@@ -191,15 +192,14 @@ class ExplorerItemBinder(
     }.unit()
 
     private fun transparentCheckbox(defaultBoxTintList: ColorStateList): ColorStateList {
-        val stateEnabledChecked = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked)
-        val stateDisabledChecked = intArrayOf(-android.R.attr.state_enabled, android.R.attr.state_checked)
-        val stateEnabledUnchecked = intArrayOf(android.R.attr.state_enabled, -android.R.attr.state_checked)
-        val stateDisabledUnchecked = intArrayOf(-android.R.attr.state_enabled, -android.R.attr.state_checked)
-        val colorEnabledChecked = defaultBoxTintList.getColorForState(stateEnabledChecked, Color.MAGENTA)
-        val colorDisabledChecked = defaultBoxTintList.getColorForState(stateDisabledChecked, Color.MAGENTA)
-        val states = arrayOf(stateEnabledChecked, stateDisabledChecked, stateEnabledUnchecked, stateDisabledUnchecked)
-        val colors = intArrayOf(colorEnabledChecked, colorDisabledChecked, Color.TRANSPARENT, Color.TRANSPARENT)
-        return ColorStateList(states, colors)
+        val enabledChecked = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked)
+        val disabledChecked = intArrayOf(-android.R.attr.state_enabled, android.R.attr.state_checked)
+        val colorEnabledChecked = defaultBoxTintList.getColorForState(enabledChecked, Color.MAGENTA)
+        val colorDisabledChecked = defaultBoxTintList.getColorForState(disabledChecked, Color.MAGENTA)
+        return ColorStates(default = Color.TRANSPARENT) {
+            colorEnabledChecked.add(enabled, checked)
+            colorDisabledChecked.add(disabled, checked)
+        }
     }
 
     private fun bindStyle(isOpened: Boolean, isDeepest: Boolean) {

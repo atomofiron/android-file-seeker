@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.screens.explorer.fragment.roots
 
-import android.content.res.ColorStateList
 import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.view.View
@@ -17,6 +16,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.ColorStates
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.convert
 import app.atomofiron.searchboxapp.utils.drawable
@@ -44,13 +44,9 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
 
     private val suffixes = itemView.resources.getStringArray(R.array.size_suffix_arr)
     private val binding = ItemExplorerCardBinding.bind(itemView)
-    private val colors = ColorStateList(
-        arrayOf(intArrayOf(android.R.attr.state_selected), intArrayOf(0)),
-        intArrayOf(
-            context.colorAttr(AppCompatAttr.colorPrimary),
-            binding.cardTitle.textColors.defaultColor,
-        )
-    )
+    private val colors = ColorStates(default = binding.cardTitle.textColors.defaultColor) {
+        context.colorAttr(AppCompatAttr.colorPrimary).add(selected)
+    }
 
     init {
         binding.cardTitle.setTextColor(colors)

@@ -432,7 +432,7 @@ class FastScroller2(
         }
     }
 
-    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) {}
+    override fun onRequestDisallowInterceptTouchEvent(disallowIntercept: Boolean) = Unit
 
     private fun verticalScrollTo(y: Float) {
         if (abs(mVerticalThumbCenterY - y) < 2) {

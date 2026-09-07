@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.custom.view
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
@@ -22,6 +21,7 @@ import app.atomofiron.common.util.extension.debugRequireNotNull
 import app.atomofiron.common.util.extension.simpleName
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.HybridTextLayoutDrawable
+import app.atomofiron.searchboxapp.utils.ColorStates
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.textfield.TextInputLayout
 import com.google.android.material.textfield.TextInputLayout.BOX_BACKGROUND_FILLED
@@ -160,8 +160,8 @@ private class FilledDelegate(
     fun makeBackgroundFilled(background: Drawable?): Drawable? {
         debugRequire(background is MaterialShapeDrawable) { background.simpleName }
         background as MaterialShapeDrawable
-        if (filledColor != Color.TRANSPARENT) background.fillColor = ColorStateList.valueOf(filledColor)
-        background.strokeColor = ColorStateList.valueOf(Color.TRANSPARENT)
+        if (filledColor != Color.TRANSPARENT) background.fillColor = ColorStates(default = filledColor)
+        background.strokeColor = ColorStates(default = Color.TRANSPARENT)
         background.strokeWidth = 0f
         if (!textField.isFocused) {
             return background

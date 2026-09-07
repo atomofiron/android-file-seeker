@@ -1,13 +1,13 @@
 package app.atomofiron.searchboxapp.custom.view
 
 import android.content.Context
-import android.content.res.ColorStateList
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.withStyledAttributes
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Companion.setMuonsDrawable
+import app.atomofiron.searchboxapp.utils.ColorStates
 
 class MuonsView @JvmOverloads constructor(
     context: Context,
@@ -26,7 +26,7 @@ class MuonsView @JvmOverloads constructor(
     }
 
     fun setTint(color: Int) {
-        imageTintList = ColorStateList.valueOf(color)
+        imageTintList = ColorStates(default = color)
     }
 
     fun setSpeed(speed: MuonsDrawable.Speed) = drawable.setSpeed(speed)

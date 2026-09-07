@@ -45,9 +45,9 @@ interface ColorStates {
     companion object {
         operator fun invoke(
             @ColorInt default: Int,
-            builder: ColorStates.() -> Unit,
+            builder: (ColorStates.() -> Unit)? = null,
         ): ColorStateList = ColorStatesImpl()
-            .apply(builder)
+            .also { builder?.invoke(it) }
             .build(default)
     }
 }

@@ -19,6 +19,7 @@ import app.atomofiron.common.util.isDarkTheme
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.TextField
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.ColorStates
 import app.atomofiron.searchboxapp.utils.color
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.drawable
@@ -28,7 +29,7 @@ import com.google.android.material.textfield.TextInputLayout
 
 private fun Context.rippleColor() = colorAttr(AppCompatAttr.colorControlHighlight)
 
-private fun Context.rippleColorList() = ColorStateList.valueOf(rippleColor())
+private fun Context.rippleColorList() = ColorStates(default = rippleColor())
 
 fun View.setMenuItemBackground() {
     val drawable = context.drawable(R.drawable.item_menu) as RippleDrawable
@@ -82,7 +83,7 @@ fun Context.surfaceContainerBorder(): Int? {
     }
 }
 
-fun Context.tonedOverlay(color: Int): ColorStateList = ColorStateList.valueOf(color withAlpha Alpha.VODKA over colorBackground())
+fun Context.tonedOverlay(color: Int): ColorStateList = ColorStates(default = color withAlpha Alpha.VODKA over colorBackground())
 
 private fun Context.colorBackground(): Int = colorAttr(R.attr.colorBackground)
 

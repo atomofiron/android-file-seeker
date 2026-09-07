@@ -18,6 +18,7 @@ import androidx.core.graphics.alpha
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.corner
 import app.atomofiron.common.util.extension.debugFail
+import app.atomofiron.searchboxapp.utils.ColorStates
 import app.atomofiron.searchboxapp.utils.inverseColor
 import app.atomofiron.searchboxapp.utils.withAlpha
 
@@ -44,14 +45,13 @@ class DockItemDrawable private constructor(
                 )
             )
             val mask = ShapeDrawable(DockItemShape(corners))
-            val rippleList = ColorStateList(
-                arrayOf(intArrayOf(android.R.attr.state_activated), intArrayOf(0)),
-                intArrayOf(surface withAlpha ripple.alpha, ripple),
-            )
+            val rippleList = ColorStates(default = ripple) {
+                (surface withAlpha ripple.alpha).add(activated)
+            }
             return DockItemDrawable(rippleList, layers, content, focused, hovered, mask)
         }
 
-        private val NoRipple = ColorStateList.valueOf(Color.TRANSPARENT)
+        private val NoRipple = ColorStates(default = Color.TRANSPARENT)
     }
 
     private var insets = Insets.NONE
@@ -65,18 +65,16 @@ class DockItemDrawable private constructor(
     }
 
     fun setColors(colors: DockItemColors) {
-        ColorStateList(
-            arrayOf(intArrayOf(android.R.attr.state_activated), intArrayOf(android.R.attr.state_selected), intArrayOf()),
-            intArrayOf(colors.activated, colors.selected, colors.default),
-        ).let { content.setTintList(it) }
-        ColorStateList(
-            arrayOf(intArrayOf(android.R.attr.state_activated), intArrayOf()),
-            intArrayOf(colors.focused.inverseColor(), colors.focused),
-        ).let { focused.setTintList(it) }
-        ColorStateList(
-            arrayOf(intArrayOf(android.R.attr.state_activated), intArrayOf()),
-            intArrayOf(colors.hovered.inverseColor(), colors.hovered),
-        ).let { hovered.setTintList(it) }
+        ColorStates(default = colors.default) {
+            colors.activated.add(activated)
+            colors.selected.add(selected)
+        }.let { content.setTintList(it) }
+        ColorStates(default = colors.focused) {
+            colors.focused.inverseColor().add(activated)
+        }.let { focused.setTintList(it) }
+        ColorStates(default = colors.hovered) {
+            colors.hovered.inverseColor().add(activated)
+        }.let { hovered.setTintList(it) }
     }
 
     fun setRipple(visible: Boolean) = when {

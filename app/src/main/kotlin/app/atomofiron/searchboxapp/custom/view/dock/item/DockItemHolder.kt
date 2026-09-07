@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.custom.view.dock.item
 
-import android.content.res.ColorStateList
 import android.graphics.Color
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -18,6 +17,7 @@ import app.atomofiron.searchboxapp.custom.drawable.NoticeableDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Icon
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem.Label
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.ColorStates
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.performHapticLite
 import app.atomofiron.searchboxapp.utils.setOnSecondaryClickListener
@@ -45,13 +45,9 @@ class DockItemHolder(
             button.background = drawable
             button.setOnClickListener { onClick() }
             button.setOnSecondaryClickListener { onSecondaryClick() }
-            ColorStateList(
-                arrayOf(intArrayOf(android.R.attr.state_activated), intArrayOf()),
-                intArrayOf(
-                    root.context.colorAttr(MaterialAttr.colorOnPrimary),
-                    root.context.colorAttr(MaterialAttr.colorOnSurface),
-                ),
-            ).let {
+            ColorStates(default = root.context.colorAttr(MaterialAttr.colorOnSurface)) {
+                root.context.colorAttr(MaterialAttr.colorOnPrimary).add(activated)
+            }.let {
                 icon.imageTintList = it
                 label.setTextColor(it)
             }
