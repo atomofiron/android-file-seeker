@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.utils
 
 import android.content.res.ColorStateList
+import android.graphics.Color
 import androidx.annotation.ColorInt
 
 enum class ColorState(val value: Int) {
@@ -22,7 +23,7 @@ enum class ColorState(val value: Int) {
     Inactivated(-android.R.attr.state_activated),
 }
 
-interface ColorStates {
+interface States {
     val checked get() = ColorState.Checked
     val unchecked get() = ColorState.Unchecked
     val selected get() = ColorState.Selected
@@ -39,16 +40,35 @@ interface ColorStates {
     val inactive get() = ColorState.Inactive
     val activated get() = ColorState.Activated
     val inactivated get() = ColorState.Inactivated
+}
+
+interface ColorStates : States {
 
     fun Int.add(first: ColorState, vararg other: ColorState)
 
     companion object {
+
+        operator fun invoke(@ColorInt default: Int): ColorStateList = ColorStatesImpl().build(default)
+
         operator fun invoke(
             @ColorInt default: Int,
-            builder: (ColorStates.() -> Unit)? = null,
+            builder: ColorStates.() -> Unit,
         ): ColorStateList = ColorStatesImpl()
-            .also { builder?.invoke(it) }
+            .also(builder)
             .build(default)
+    }
+}
+
+interface ColorForState : States {
+
+    fun get(vararg other: ColorState): Int
+
+    companion object {
+
+        operator fun <T> invoke(
+            list: ColorStateList,
+            extractor: ColorForState.() -> T,
+        ): T = ColorForStateImpl(list).let(extractor)
     }
 }
 
@@ -71,5 +91,15 @@ private class ColorStatesImpl : ColorStates {
         }.unzip()
         map.clear()
         return ColorStateList(states.toTypedArray(), colors.toIntArray())
+    }
+}
+
+private class ColorForStateImpl(
+    private val list: ColorStateList,
+) : ColorForState {
+
+    override fun get(vararg other: ColorState): Int {
+        val states = other.map { it.value }.toIntArray()
+        return list.getColorForState(states, Color.MAGENTA)
     }
 }

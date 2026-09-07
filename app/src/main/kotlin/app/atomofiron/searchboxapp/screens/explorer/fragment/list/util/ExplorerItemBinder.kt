@@ -40,6 +40,7 @@ import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeDee
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.holder.makeOpened
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.ColorForState
 import app.atomofiron.searchboxapp.utils.ColorStates
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.audio.AudioCover
@@ -192,13 +193,11 @@ class ExplorerItemBinder(
     }.unit()
 
     private fun transparentCheckbox(defaultBoxTintList: ColorStateList): ColorStateList {
-        val enabledChecked = intArrayOf(android.R.attr.state_enabled, android.R.attr.state_checked)
-        val disabledChecked = intArrayOf(-android.R.attr.state_enabled, android.R.attr.state_checked)
-        val colorEnabledChecked = defaultBoxTintList.getColorForState(enabledChecked, Color.MAGENTA)
-        val colorDisabledChecked = defaultBoxTintList.getColorForState(disabledChecked, Color.MAGENTA)
-        return ColorStates(default = Color.TRANSPARENT) {
-            colorEnabledChecked.add(enabled, checked)
-            colorDisabledChecked.add(disabled, checked)
+        return ColorForState(defaultBoxTintList) {
+            ColorStates(default = Color.TRANSPARENT) {
+                get(enabled, checked).add(enabled, checked)
+                get(disabled, checked).add(disabled, checked)
+            }
         }
     }
 
