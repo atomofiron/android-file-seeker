@@ -4,11 +4,11 @@
     <item
         android:state_checkable="true"
         android:state_pressed="true"
-        app:cornerSize="4dp"
+        app:cornerSize="6dp"
         />
     <item
         android:state_checked="true"
         app:cornerSize="50%"
         />
-    <item app:cornerSize="8dp" />
+    <item app:cornerSize="12dp" />
 </selector>
