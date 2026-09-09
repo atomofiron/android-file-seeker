@@ -9,7 +9,7 @@ import app.atomofiron.searchboxapp.custom.view.menu.holder.DangerousMenuItemHold
 import app.atomofiron.searchboxapp.custom.view.menu.holder.MenuHolder
 import app.atomofiron.searchboxapp.custom.view.menu.holder.MenuItemHolder
 
-private const val ShortItem = 1
+const val ShortItem = 1
 const val LongItem = 2
 
 class MenuAdapter : GeneralAdapter<MenuItem, MenuHolder>() {

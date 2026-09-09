@@ -49,7 +49,7 @@
 	<!-- (320 - 8 * 3) / 2 = 148 -->
 	<dimen name="column_min_width">148dp</dimen>
 	<dimen name="compact_column_min_width">100dp</dimen>
-	<dimen name="min_portrait_screen_half">160dp</dimen>
+	<dimen name="min_portrait_screen_half">148dp</dimen>
 	<dimen name="option_width">160dp</dimen>
 	<dimen name="item_ripple_corner_radius">16dp</dimen>
 	<dimen name="content_padding_bottom">32dp</dimen>

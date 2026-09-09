@@ -1,16 +1,15 @@
 package app.atomofiron.searchboxapp.custom.view
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.view.menu.LongItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuAdapter
 import app.atomofiron.searchboxapp.custom.view.menu.MenuItem
 import app.atomofiron.searchboxapp.custom.view.menu.MenuListener
-import kotlin.math.max
+import app.atomofiron.searchboxapp.custom.view.menu.ShortItem
 
 class MenuView : RecyclerView {
 
@@ -20,11 +19,12 @@ class MenuView : RecyclerView {
 
     private val minColumnWidth = resources.getDimensionPixelSize(R.dimen.min_portrait_screen_half)
     private val adapter = MenuAdapter()
+    private val gridLayoutManager = GridLayoutManager(context, 2)
 
     init {
         overScrollMode = OVER_SCROLL_NEVER
-        layoutManager = GridLayoutManager(context, 2)
-            .apply { spanSizeLookup = adapter.spanSizeLookup }
+        layoutManager = gridLayoutManager
+        gridLayoutManager.spanSizeLookup = adapter.spanSizeLookup
         isVerticalScrollBarEnabled = false
         super.setAdapter(adapter)
     }
@@ -35,12 +35,12 @@ class MenuView : RecyclerView {
         adapter.menuListener = listener
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        super.onLayout(changed, l, t, r, b)
-        max(1, width / minColumnWidth)
-            .takeIf { it != adapter.spanLimit }
-            ?.let { adapter.spanLimit = it }
-            ?.let { adapter.notifyDataSetChanged() }
+    override fun onMeasure(widthSpec: Int, heightSpec: Int) {
+        super.onMeasure(widthSpec, heightSpec)
+
+        val width = MeasureSpec.getSize(widthSpec)
+        val spanCount = (width / minColumnWidth).coerceIn(ShortItem..LongItem)
+        gridLayoutManager.spanCount = spanCount
+        adapter.spanLimit = spanCount
     }
 }
