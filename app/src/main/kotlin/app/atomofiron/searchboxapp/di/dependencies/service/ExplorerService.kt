@@ -2,7 +2,9 @@ package app.atomofiron.searchboxapp.di.dependencies.service
 
 import android.content.Context
 import android.media.MediaScannerConnection
+import android.os.Environment
 import android.os.StatFs
+import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.CoroutineSafeList
 import app.atomofiron.common.util.dropLast
 import app.atomofiron.common.util.extension.clear
@@ -52,6 +54,7 @@ import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.other.TabRootSorting
 import app.atomofiron.searchboxapp.model.explorer.other.Thumbnail
 import app.atomofiron.searchboxapp.model.explorer.replace
+import app.atomofiron.searchboxapp.model.explorer.toRef
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.CoroutineLauncher
@@ -90,6 +93,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private const val SUB_PATH_CAMERA = "DCIM/Camera"
+private const val SUB_PATH_SCREENSHOTS = "Screenshots"
 private const val SUB_PATH_PIC_SCREENSHOTS = "Pictures/Screenshots"
 private const val SUB_PATH_DCIM_SCREENSHOTS = "DCIM/Screenshots"
 private const val SUB_PATH_DOWNLOAD = "Download"
@@ -204,13 +208,13 @@ class ExplorerService @Inject constructor(
     fun drop(vararg keys: NodeTabKey) = garden.drop(*keys)
 
     private suspend fun Node?.initRoots() {
-        val systemRoot = NodeRoot(NodeRootInfo.SystemRoot, NodeSorting.Name, NodeRef.Root)
+        val systemRoot = NodeRoot(NodeRootInfo.SystemRoot, NodeRef.Root, NodeSorting.Name)
         val roots = this?.run {
             listOf(
-                NodeRoot(NodeRootInfo.Camera, NodeSorting.Date, ref + SUB_PATH_CAMERA, Thumbnail.FilePath),
-                NodeRoot(NodeRootInfo.Screenshots, NodeSorting.Date, thumbnail = Thumbnail.FilePath, NodeRootSrc(ref + SUB_PATH_PIC_SCREENSHOTS), NodeRootSrc(ref + SUB_PATH_DCIM_SCREENSHOTS)),
-                NodeRoot(NodeRootInfo.Bluetooth, NodeSorting.Date, thumbnail = null, NodeRootSrc.Bluetooth, NodeRootSrc(ref + SUB_PATH_BLUETOOTH), NodeRootSrc(ref + SUB_PATH_DOWNLOAD_BLUETOOTH)),
-                NodeRoot(NodeRootInfo.Downloads, NodeSorting.Date, ref + SUB_PATH_DOWNLOAD),
+                NodeRoot(NodeRootInfo.Bluetooth, NodeRootSrc.Bluetooth.ref, NodeSorting.Date, thumbnail = null, NodeRootSrc.Bluetooth, NodeRootSrc(ref + SUB_PATH_BLUETOOTH), NodeRootSrc(ref + SUB_PATH_DOWNLOAD_BLUETOOTH)),
+                NodeRoot(NodeRootInfo.Downloads, ref + SUB_PATH_DOWNLOAD, NodeSorting.Date),
+                NodeRoot(NodeRootInfo.Screenshots, NodeRootSrc.Screenshots.ref, NodeSorting.Date, Thumbnail.FilePath, NodeRootSrc(ref + SUB_PATH_PIC_SCREENSHOTS), NodeRootSrc(ref + SUB_PATH_SCREENSHOTS), NodeRootSrc(ref + SUB_PATH_DCIM_SCREENSHOTS), NodeRootSrc.Screenshots),
+                NodeRoot(NodeRootInfo.Camera, ref + SUB_PATH_CAMERA, NodeSorting.Date, Thumbnail.FilePath),
                 systemRoot,
             )
         } ?: listOf(systemRoot)
@@ -346,11 +350,10 @@ class ExplorerService @Inject constructor(
     }
 
     private suspend fun NodeRoot.update(): Node {
-        item.takeIf { !it.ref.isStub }
+        item.takeIf { !it.ref.isFake }
             ?.let { item.update(asSu) }
             ?.takeIf { it.error !is NodeError.NoSuchFileOrDir }
             ?.let { return it }
-        sources ?: return item
         for (src in sources) when (src) {
             is NodeRootSrc.Ref -> {
                 val updated = src.ref
@@ -363,13 +366,27 @@ class ExplorerService @Inject constructor(
             }
             is NodeRootSrc.Bluetooth -> when {
                 bluetoothFiles == null -> continue
-                else -> return bluetoothFiles.files.value.map { ref ->
+                else -> bluetoothFiles.files.value.map { ref ->
                     item.children
                         ?.find { it.ref == ref }
                         ?: ref.toNode(rootId = src.ref.uniqueId, parentRef = src.ref)
                 }.let {
-                    src.ref.toRoot(info, children = NodeChildren(it.toMutableList()))
+                    return src.ref.toRoot(info, children = NodeChildren(it.toMutableList()))
                 }
+            }
+            is NodeRootSrc.Screenshots -> when {
+                Android.Q -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_SCREENSHOTS)
+                    ?.absolutePath
+                    ?.toRef()
+                    ?.toRoot(info)
+                    ?.update(asSu)
+                    ?.let {
+                        when (it.error) {
+                            is NodeError.NoSuchFileOrDir -> continue
+                            else -> return it
+                        }
+                    }
+                else -> continue
             }
         }
         return item
@@ -389,7 +406,7 @@ class ExplorerService @Inject constructor(
         var root = roots.getOrNull(index)
         var key = root?.info ?: NodeRootInfo.Storage(storage)
         key = (key as NodeRootInfo.Storage).copy(info = storage)
-        root = root ?: NodeRoot(key, NodeSorting.Name, NodeRef(storage.path))
+        root = root ?: NodeRoot(key, NodeRef(storage.path), NodeSorting.Name)
         val restore = roots.none { it.id == root.id }
         roots.put(root) { it.id == root.id }
         if (restore) restoreSorting(root)

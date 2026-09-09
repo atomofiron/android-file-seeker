@@ -18,6 +18,7 @@ class NodeRef(val bytes: ByteArray) {
     }
 
     val isStub: Boolean get() = bytes.isEmpty()
+    val isFake: Boolean get() = bytes.isNotEmpty() && bytes.first() != SLASH_BYTE
     val isEmpty: Boolean get() = bytes.isEmpty()
     val isRoot: Boolean get() = !isEmpty && bytes.all { it == SLASH_BYTE }
 
@@ -225,3 +226,5 @@ fun NodeRef.replace(parent: NodeRef, replace: Int): NodeRef {
     System.arraycopy(bytes, replace, new, parent.length, length - replace)
     return NodeRef(new)
 }
+
+fun String.toRef() = NodeRef(this)

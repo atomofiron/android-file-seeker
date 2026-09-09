@@ -10,6 +10,10 @@ sealed interface NodeRootSrc {
         override val ref = NodeRef("bluetooth")
     }
 
+    data object Screenshots : NodeRootSrc {
+        override val ref = NodeRef("screenshots")
+    }
+
     companion object {
         operator fun invoke(ref: NodeRef): Ref = Ref(ref)
     }

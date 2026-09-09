@@ -9,24 +9,18 @@ data class NodeRoot(
     val item: Node,
     val defaultSorting: NodeSorting,
     val thumbnail: Thumbnail?,
-    val sources: Array<out NodeRootSrc>? = null,
+    val sources: Array<out NodeRootSrc>,
     val thumbnailPath: String = "",
     // isSelected is always false in the garden
     val isSelected: Boolean = false,
 ) {
     constructor(
         info: NodeRootInfo,
+        ref: NodeRef,
         defaultSorting: NodeSorting,
         thumbnail: Thumbnail? = null,
         vararg sources: NodeRootSrc,
-    ) : this(info, NodeRef.Stub.toRoot(info, uniqueId = info.id), defaultSorting, thumbnail, sources)
-
-    constructor(
-        info: NodeRootInfo,
-        defaultSorting: NodeSorting,
-        ref: NodeRef,
-        thumbnail: Thumbnail? = null,
-    ) : this(info, ref.toRoot(info), defaultSorting, thumbnail)
+    ) : this(info, ref.toRoot(info), defaultSorting, thumbnail, sources)
 
     val id: NodeId = item.uniqueId
     val isEnabled: Boolean get() = item.isCached || info is NodeRootInfo.Storage
