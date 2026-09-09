@@ -30,7 +30,7 @@ class NodeMatcher(
     }?.let { IntArray(treeSize) }
 
     fun matches(item: Node, levelIndex: Int): Boolean = when {
-        item.isDirectory -> true
+        item.isDirectory -> item.isRoot || !onlyPhotos && !onlyVideos && !onlyMedia
         mimeTypes.isNotEmpty() && item.isFile && !item.content.matchesAny(mimeTypes) -> false
         onlyPhotos && !item.content.isPicture() -> false
         onlyVideos && !item.content.isMovie() -> false

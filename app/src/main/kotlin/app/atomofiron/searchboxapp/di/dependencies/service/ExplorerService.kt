@@ -49,6 +49,9 @@ import app.atomofiron.searchboxapp.model.explorer.NodeStorage
 import app.atomofiron.searchboxapp.model.explorer.NodeTab
 import app.atomofiron.searchboxapp.model.explorer.NodeTabItems
 import app.atomofiron.searchboxapp.model.explorer.NodeTabKey
+import app.atomofiron.searchboxapp.model.explorer.isMedia
+import app.atomofiron.searchboxapp.model.explorer.isMovie
+import app.atomofiron.searchboxapp.model.explorer.isPicture
 import app.atomofiron.searchboxapp.model.explorer.other.Deepest
 import app.atomofiron.searchboxapp.model.explorer.other.DirectoryKind
 import app.atomofiron.searchboxapp.model.explorer.other.TabRootSorting
@@ -440,7 +443,13 @@ class ExplorerService @Inject constructor(
             .takeIf { targetRoot.thumbnail != null }
             ?.let { updated.sortBy(targetRoot.defaultSorting) }
             ?.children
-            ?.firstOrNull()
+            ?.firstOrNull {
+                when {
+                    targetRoot.info.onlyPhotos -> it.content.isPicture()
+                    targetRoot.info.onlyVideos -> it.content.isMovie()
+                    else -> it.content.isMedia()
+                }
+            }
         return targetRoot.copy(item = updated, thumbnailPath = preview?.ref?.string ?: "")
     }
 
@@ -978,6 +987,7 @@ class ExplorerService @Inject constructor(
             content !is NodeContent.Directory -> content
             mainStorageRef.length != (ref.length.dec() - name.length) -> content
             !ref.isChildOf(mainStorageRef) -> content
+            content.kind != DirectoryKind.Ordinary -> content
             else -> ExplorerUtils.getDirectoryType(name)
                 .takeIf { it != DirectoryKind.Ordinary }
                 ?.let { content.copy(kind = it) }

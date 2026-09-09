@@ -12,4 +12,5 @@ enum class DirectoryKind {
     Ringtones,
     Bluetooth,
     Screenshots,
+    Screencasts,
 }

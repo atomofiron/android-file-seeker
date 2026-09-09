@@ -192,6 +192,7 @@ object ExplorerUtils {
     private fun NodeRootInfo.dirKind(): DirectoryKind = when (this) {
         NodeRootInfo.Bluetooth -> DirectoryKind.Bluetooth
         NodeRootInfo.Screenshots -> DirectoryKind.Screenshots
+        NodeRootInfo.Screencasts -> DirectoryKind.Screencasts
         else -> DirectoryKind.Ordinary
     }
 
