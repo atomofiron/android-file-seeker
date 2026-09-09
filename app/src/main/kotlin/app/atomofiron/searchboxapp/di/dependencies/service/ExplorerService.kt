@@ -22,6 +22,7 @@ import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.verifyNativeBin
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
+import app.atomofiron.searchboxapp.di.dependencies.BluetoothFilesProvider
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -39,6 +40,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.explorer.NodeRoot
 import app.atomofiron.searchboxapp.model.explorer.NodeRootInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeRootOption.CameraToggle
+import app.atomofiron.searchboxapp.model.explorer.NodeRootSrc
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.explorer.NodeStateImpl
 import app.atomofiron.searchboxapp.model.explorer.NodeStorage
@@ -61,6 +63,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortBy
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateWith
@@ -100,6 +103,7 @@ class ExplorerService @Inject constructor(
     private val store: ExplorerStore,
     private val dao: ExplorerDao,
     private val preferences: PreferenceStore,
+    private val bluetoothFiles: BluetoothFilesProvider?,
 ) : CoroutineLauncher by CoroutineLauncher(scope) {
 
     private var delayedRender: Job? = null
@@ -134,12 +138,15 @@ class ExplorerService @Inject constructor(
         }
         store.currentDeepest.drop(1)[scope] = l@{ deepest ->
             deepest ?: return@l
-            val tab = store.currentTabKey.value
-            val root = garden[tab].getSelectedRoot()
+            val key = store.currentTabKey.value
+            val tab = garden[key]
+            val root = tab.getSelectedRoot()
                 ?.takeIf { it.info != NodeRootInfo.Camera }
                 ?: return@l
-            val new = Deepest(tabIndex = tab.index, rootId = root.id, deepest.ref)
-            dao.put(new)
+            when {
+                tab.tree.size < 2 -> dao.removeDeepest(tabIndex = key.index, rootId = root.id)
+                else -> dao.put(Deepest(tabIndex = key.index, rootId = root.id, deepest.ref))
+            }
         }
     }
 
@@ -197,13 +204,13 @@ class ExplorerService @Inject constructor(
     fun drop(vararg keys: NodeTabKey) = garden.drop(*keys)
 
     private suspend fun Node?.initRoots() {
-        val systemRoot = NodeRoot(NodeRootInfo.SystemRoot, NodeSorting.Name, thumbnail = null, NodeRef.Root)
+        val systemRoot = NodeRoot(NodeRootInfo.SystemRoot, NodeSorting.Name, NodeRef.Root)
         val roots = this?.run {
             listOf(
-                NodeRoot(NodeRootInfo.Camera, NodeSorting.Date, thumbnail = Thumbnail.FilePath, ref + SUB_PATH_CAMERA),
-                NodeRoot(NodeRootInfo.Screenshots, NodeSorting.Date, thumbnail = Thumbnail.FilePath, ref + SUB_PATH_PIC_SCREENSHOTS, ref + SUB_PATH_DCIM_SCREENSHOTS),
-                NodeRoot(NodeRootInfo.Bluetooth, NodeSorting.Date, thumbnail = null, ref + SUB_PATH_BLUETOOTH, ref + SUB_PATH_DOWNLOAD_BLUETOOTH),
-                NodeRoot(NodeRootInfo.Downloads, NodeSorting.Date, thumbnail = null, ref + SUB_PATH_DOWNLOAD),
+                NodeRoot(NodeRootInfo.Camera, NodeSorting.Date, ref + SUB_PATH_CAMERA, Thumbnail.FilePath),
+                NodeRoot(NodeRootInfo.Screenshots, NodeSorting.Date, thumbnail = Thumbnail.FilePath, NodeRootSrc(ref + SUB_PATH_PIC_SCREENSHOTS), NodeRootSrc(ref + SUB_PATH_DCIM_SCREENSHOTS)),
+                NodeRoot(NodeRootInfo.Bluetooth, NodeSorting.Date, thumbnail = null, NodeRootSrc.Bluetooth, NodeRootSrc(ref + SUB_PATH_BLUETOOTH), NodeRootSrc(ref + SUB_PATH_DOWNLOAD_BLUETOOTH)),
+                NodeRoot(NodeRootInfo.Downloads, NodeSorting.Date, ref + SUB_PATH_DOWNLOAD),
                 systemRoot,
             )
         } ?: listOf(systemRoot)
@@ -322,12 +329,13 @@ class ExplorerService @Inject constructor(
         scope.launch {
             garden(key) {
                 withCachingState(root.id) {
-                    var updated = root.item.update(asSu)
-                    updated = when (updated.error) {
-                        is NodeError.NoSuchFileOrDir -> tryAlternative(root, updated)
-                        else -> updated
-                    }
+                    val updated = root.update()
                     updateRootSync(updated, key, root)
+                    roots.replace {
+                        it.takeIf { it.info.theSame(root.info) }
+                            ?.copy(item = updated)
+                            ?: it
+                    }
                     if (root.info is NodeRootInfo.Screenshots) {
                         store.updateScreenshots(root.item.ref)
                     }
@@ -337,15 +345,34 @@ class ExplorerService @Inject constructor(
         }
     }
 
-    private suspend fun tryAlternative(root: NodeRoot, missing: Node): Node {
-        val variants = root.pathVariants?.takeIf { it.isNotEmpty() }
-        variants ?: return missing
-        val items = variants.map { path ->
-            path.toRoot(root.info).update(asSu)
+    private suspend fun NodeRoot.update(): Node {
+        item.takeIf { !it.ref.isStub }
+            ?.let { item.update(asSu) }
+            ?.takeIf { it.error !is NodeError.NoSuchFileOrDir }
+            ?.let { return it }
+        sources ?: return item
+        for (src in sources) when (src) {
+            is NodeRootSrc.Ref -> {
+                val updated = src.ref
+                    .toRoot(info)
+                    .update(asSu)
+                when (updated.error) {
+                    is NodeError.NoSuchFileOrDir -> continue
+                    else -> return updated
+                }
+            }
+            is NodeRootSrc.Bluetooth -> when {
+                bluetoothFiles == null -> continue
+                else -> return bluetoothFiles.files.value.map { ref ->
+                    item.children
+                        ?.find { it.ref == ref }
+                        ?: ref.toNode(rootId = src.ref.uniqueId, parentRef = src.ref)
+                }.let {
+                    src.ref.toRoot(info, children = NodeChildren(it.toMutableList()))
+                }
+            }
         }
-        val alt = items.find { it.error == null }
-            ?: items.find { it.error !is NodeError.NoSuchFileOrDir }
-        return alt ?: missing
+        return item
     }
 
     suspend fun setSorting(key: ExplorerTabKey, rootId: NodeId, sorting: NodeSorting) {
@@ -362,7 +389,7 @@ class ExplorerService @Inject constructor(
         var root = roots.getOrNull(index)
         var key = root?.info ?: NodeRootInfo.Storage(storage)
         key = (key as NodeRootInfo.Storage).copy(info = storage)
-        root = root ?: NodeRoot(key, NodeSorting.Name, thumbnail = null, NodeRef(storage.path))
+        root = root ?: NodeRoot(key, NodeSorting.Name, NodeRef(storage.path))
         val restore = roots.none { it.id == root.id }
         roots.put(root) { it.id == root.id }
         if (restore) restoreSorting(root)
@@ -581,11 +608,11 @@ class ExplorerService @Inject constructor(
         return new
     }
 
-    suspend fun tryCheck(key: ExplorerTabKey, refs: List<Node>, toChecked: Boolean) {
+    suspend fun tryMark(key: ExplorerTabKey, refs: List<Node>, toChecked: Boolean) {
         garden(key) {
             val toRender = mutableListOf<Node>()
             for (item in refs) {
-                if (states[item.uniqueId]?.withOperation != true && checked.tryUpdateCheck(item.uniqueId, toChecked)) {
+                if (states[item.uniqueId]?.withOperation != true && checked.tryUpdateMark(item.uniqueId, toChecked)) {
                     toRender.add(item)
                 }
             }
@@ -618,7 +645,7 @@ class ExplorerService @Inject constructor(
     }
 
     /** @return action succeed */
-    private fun MutableList<Int>.tryUpdateCheck(uniqueId: Int, toChecked: Boolean): Boolean {
+    private fun MutableList<Int>.tryUpdateMark(uniqueId: Int, toChecked: Boolean): Boolean {
         val iter = iterator()
         while (iter.hasNext()) {
             val item = iter.next()
@@ -670,7 +697,7 @@ class ExplorerService @Inject constructor(
                         null
                     } else {
                         this?.cachingJob?.cancel()
-                        checked.tryUpdateCheck(item.uniqueId, toChecked = false)
+                        checked.tryUpdateMark(item.uniqueId, toChecked = false)
                         nextState(cachingJob = null, deleting = NodeOperation.Deleting)
                     }
                 }
@@ -819,9 +846,9 @@ class ExplorerService @Inject constructor(
             ?.let { return NodeTabItems(roots, option, items, null) }
         val matcher = NodeMatcher(tree.size, mimeTypes, root.info, option)
         val sorting = getSorting(root.id)
-        var deepest = items.first()
         val openedIndexes = mutableListOf<Int>()
         var parent = items.first()
+        var deepest = parent
         for (i in tree.indices) {
             val level = findItem(tree[i].uniqueId)
             level ?: break
@@ -882,8 +909,6 @@ class ExplorerService @Inject constructor(
         return NodeTabItems(roots, option, items, deepest)
     }
 
-    private fun IntArray.inc(i: Int) = set(i, get(i).inc())
-
     private suspend fun NodeTab.renderUpdate(new: Node) {
         store.emitUpdate(renderNode(new))
     }
@@ -903,16 +928,14 @@ class ExplorerService @Inject constructor(
         isOpened: Boolean = tree.any { it.uniqueId == item.uniqueId },
         isDeepest: Boolean = tree.lastOrNull()?.uniqueId == item.uniqueId,
         content: NodeContent = item.defineDirKind(),
-    ): Node {
-        return item.copy(
-            isChecked = checked.any { it == item.uniqueId },
-            isDeepest = isDeepest,
-            state = states[item.uniqueId] ?: item.state,
-            children = item.children?.fetch(isOpened),
-            generation = generation,
-            content = content,
-        )
-    }
+    ): Node = item.copy(
+        isChecked = checked.any { it == item.uniqueId },
+        isDeepest = isDeepest,
+        state = states[item.uniqueId] ?: item.state,
+        children = item.children?.fetch(isOpened),
+        generation = generation,
+        content = content,
+    )
 
     private fun Node.defineDirKind(levelIndex: Int = -1): NodeContent {
         val mainStorageRef = mainStorageRef ?: return content

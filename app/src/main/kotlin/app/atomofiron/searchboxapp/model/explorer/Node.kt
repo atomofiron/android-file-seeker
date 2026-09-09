@@ -39,7 +39,7 @@ data class Node(
     val childCount: Int get() = children?.size ?: 0
 
     init {
-        debugRequire(uniqueId == ref.uniqueId || uniqueId == -ref.uniqueId) { ref.toString() }
+        debugRequire(isRoot || uniqueId == ref.uniqueId || uniqueId == -ref.uniqueId) { ref.toString() }
     }
 
     fun areContentsTheSame(other: Node?): Boolean = when {

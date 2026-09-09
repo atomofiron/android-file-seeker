@@ -17,6 +17,9 @@ interface ExplorerDao {
     @Query("SELECT * FROM $DEEPEST WHERE tabIndex = :tabIndex AND rootId = :rootId")
     fun getDeepest(tabIndex: Int, rootId: Int): Deepest?
 
+    @Query("DELETE FROM $DEEPEST WHERE tabIndex = :tabIndex AND rootId = :rootId")
+    fun removeDeepest(tabIndex: Int, rootId: Int)
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun put(item: Deepest): Long
 

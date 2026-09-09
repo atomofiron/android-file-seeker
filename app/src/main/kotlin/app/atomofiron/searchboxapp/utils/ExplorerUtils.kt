@@ -185,12 +185,22 @@ object ExplorerUtils {
         return Node(ref = target, parentRef = parent.ref, rootId = parent.rootId, meta = meta.toNodeMeta(), content = content)
     }
 
-    fun NodeRef.toRoot(type: NodeRootInfo): Node {
-        return Node(
-            ref = this,
-            meta = NodeMeta.Empty,
-            content = NodeContent.Directory(rootType = type),
-        )
+    fun NodeRef.toRoot(
+        info: NodeRootInfo,
+        uniqueId: NodeId = this.uniqueId,
+        children: NodeChildren? = null,
+    ) = Node(
+        ref = this,
+        meta = NodeMeta.Empty,
+        content = NodeContent.Directory(rootInfo = info, kind = info.dirKind()),
+        uniqueId = uniqueId,
+        children = children,
+    )
+
+    private fun NodeRootInfo.dirKind(): DirectoryKind = when (this) {
+        NodeRootInfo.Bluetooth -> DirectoryKind.Bluetooth
+        NodeRootInfo.Screenshots -> DirectoryKind.Screenshots
+        else -> DirectoryKind.Ordinary
     }
 
     fun Meta.toNodeMeta() = toNodeMeta(
@@ -270,17 +280,23 @@ object ExplorerUtils {
         )
     }
 
-    fun getDirectoryType(name: String): DirectoryKind {
-        return when (name) {
-            "Alarms" -> DirectoryKind.Alarms
-            "Android" -> DirectoryKind.Android
-            "DCIM" -> DirectoryKind.Camera
-            "Download" -> DirectoryKind.Download
-            "Movies" -> DirectoryKind.Movies
-            "Music" -> DirectoryKind.Music
-            "Pictures" -> DirectoryKind.Pictures
-            "Ringtones" -> DirectoryKind.Ringtones
-            else -> DirectoryKind.Ordinary
+    fun getDirectoryType(name: String): DirectoryKind = when (name) {
+        "Alarms" -> DirectoryKind.Alarms
+        "Android" -> DirectoryKind.Android
+        "DCIM" -> DirectoryKind.Camera
+        "Download" -> DirectoryKind.Download
+        "Movies" -> DirectoryKind.Movies
+        "Music" -> DirectoryKind.Music
+        "Pictures" -> DirectoryKind.Pictures
+        "Ringtones" -> DirectoryKind.Ringtones
+        else -> DirectoryKind.Ordinary
+    }
+
+    fun NodeRef.check(asSu: Boolean): NodeError? {
+        val type = NativeBridge.type(this, asSu)
+        return when (type) {
+            is Rslt.Ok -> null
+            is Rslt.Err -> type.message.toNodeError()
         }
     }
 
@@ -573,7 +589,7 @@ object ExplorerUtils {
         }
         return copy(
             children = NodeChildren(items),
-            content = NodeContent.Directory(directoryKind, content.rootType),
+            content = NodeContent.Directory(directoryKind, content.rootInfo),
             error = null,
         )
     }

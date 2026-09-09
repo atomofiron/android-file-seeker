@@ -10,4 +10,6 @@ enum class DirectoryKind {
     Music,
     Pictures,
     Ringtones,
+    Bluetooth,
+    Screenshots,
 }

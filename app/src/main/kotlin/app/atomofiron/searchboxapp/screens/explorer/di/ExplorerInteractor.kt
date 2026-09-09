@@ -39,7 +39,7 @@ class ExplorerInteractor @Inject constructor(
     fun check(tab: ExplorerTabKey, item: Node, toChecked: Boolean) = check(tab, listOf(item), toChecked)
 
     fun check(tab: ExplorerTabKey, items: List<Node>, toChecked: Boolean) = io {
-        service.tryCheck(tab, items, toChecked)
+        service.tryMark(tab, items, toChecked)
     }.unit()
 
     fun toggleDir(key: ExplorerTabKey, ref: NodeRef) = io {

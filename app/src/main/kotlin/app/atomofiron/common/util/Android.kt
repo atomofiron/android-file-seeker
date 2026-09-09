@@ -1,8 +1,9 @@
 package app.atomofiron.common.util
 
 import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES as Sdk
 import androidx.annotation.ChecksSdkIntAtLeast
+
+typealias Sdk = android.os.Build.VERSION_CODES
 
 object Android {
 

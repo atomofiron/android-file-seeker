@@ -17,6 +17,7 @@ import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.android.BluetoothFilesObserver
 import app.atomofiron.searchboxapp.android.Intents
 import app.atomofiron.searchboxapp.android.dismissUpdateNotification
 import app.atomofiron.searchboxapp.android.showUpdateNotification
@@ -68,6 +69,7 @@ class AppEventDelegate @Inject constructor(
     apkChannel: ApkChannel,
     private val commonChannel: CommonChannel,
     private val updateService: AppUpdateService,
+    private val bluetoothFilesObserver: BluetoothFilesObserver?,
 ) : AppEventDelegateApi, LifecycleEventObserver {
 
     private var currentTheme: AppTheme? = null
@@ -86,6 +88,7 @@ class AppEventDelegate @Inject constructor(
         updateService.onActivityCreate(activity)
         if (Android.T) updateLocalePreference()
         activity.lifecycle.addObserver(this)
+        bluetoothFilesObserver?.register()
     }
 
     override fun onIntent(intent: Intent) {
@@ -98,7 +101,10 @@ class AppEventDelegate @Inject constructor(
         }
     }
 
-    override fun onActivityDestroy() = appStoreConsumer.onActivityDestroy()
+    override fun onActivityDestroy() {
+        appStoreConsumer.onActivityDestroy()
+        bluetoothFilesObserver?.unregister()
+    }
 
     override fun onActivityFinish() = updateService.completeUpdate()
 

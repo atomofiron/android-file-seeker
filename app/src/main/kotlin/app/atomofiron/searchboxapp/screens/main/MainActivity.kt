@@ -22,7 +22,6 @@ import androidx.lifecycle.lifecycleScope
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.CornerPathDebug
 import app.atomofiron.common.util.findBooleanByAttr
-import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.first
 import app.atomofiron.common.util.hideKeyboard
@@ -43,6 +42,7 @@ import app.atomofiron.searchboxapp.screens.main.di.AppStoreProvider
 import app.atomofiron.searchboxapp.screens.main.model.EasterEgg
 import app.atomofiron.searchboxapp.screens.main.util.offerKeyCodeToChildren
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.setHapticEffect
 import app.atomofiron.searchboxapp.utils.withAlpha
 import com.google.android.material.color.DynamicColors

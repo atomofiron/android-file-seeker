@@ -4,8 +4,12 @@ import android.content.ClipboardManager
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
+import app.atomofiron.common.util.Android
+import app.atomofiron.searchboxapp.android.BluetoothFilesObserver
+import app.atomofiron.searchboxapp.android.BluetoothFilesObserverImpl
 import app.atomofiron.searchboxapp.android.WebClient
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
+import app.atomofiron.searchboxapp.di.dependencies.BluetoothFilesProvider
 import app.atomofiron.searchboxapp.di.dependencies.channel.PreferenceChannel
 import app.atomofiron.searchboxapp.di.dependencies.service.ApkService
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
@@ -34,6 +38,24 @@ class CommonModule {
     @Singleton
     fun provideClipboardManager(context: Context): ClipboardManager {
         return context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    }
+
+    @Provides
+    @Singleton
+    fun provideBluetoothFilesProvider(): BluetoothFilesProvider? = when {
+        Android.Q -> BluetoothFilesProvider()
+        else -> null
+    }
+
+    @Provides
+    @Singleton
+    fun provideBluetoothFilesObserver(
+        context: Context,
+        provider: BluetoothFilesProvider?,
+    ): BluetoothFilesObserver? = when {
+        provider == null -> null
+        Android.Q -> BluetoothFilesObserverImpl(context, provider)
+        else -> null
     }
 
     @Provides

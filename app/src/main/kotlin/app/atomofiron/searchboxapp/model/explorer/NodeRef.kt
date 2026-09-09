@@ -17,13 +17,14 @@ class NodeRef(val bytes: ByteArray) {
         val Root = NodeRef(byteArrayOf(SLASH_BYTE))
     }
 
+    val isStub: Boolean get() = bytes.isEmpty()
     val isEmpty: Boolean get() = bytes.isEmpty()
     val isRoot: Boolean get() = !isEmpty && bytes.all { it == SLASH_BYTE }
 
     var string: String = STUB_STRING
         private set
         get() {
-            if (field !== STUB_STRING) return field
+            if (field !== STUB_STRING) return field ?: STUB_STRING
             field = String(bytes)
             return field
         }
@@ -31,7 +32,7 @@ class NodeRef(val bytes: ByteArray) {
     var parent: NodeRef = Stub
         private set
         get() {
-            if (field !== Stub) return field
+            if (field !== Stub) return field ?: Stub
             field = bytes.getParent()
             return field
         }
@@ -39,7 +40,7 @@ class NodeRef(val bytes: ByteArray) {
     var name: String = STUB_STRING
         private set
         get() {
-            if (field !== STUB_STRING) return field
+            if (field !== STUB_STRING) return field ?: STUB_STRING
             field = bytes.getName()
             return field
         }
@@ -47,7 +48,7 @@ class NodeRef(val bytes: ByteArray) {
     var lowercaseName: String = STUB_STRING
         private set
         get() {
-            if (field !== STUB_STRING) return field
+            if (field !== STUB_STRING) return field ?: STUB_STRING
             field = name.lowercase()
             return field
         }
@@ -55,9 +56,7 @@ class NodeRef(val bytes: ByteArray) {
     var ext: String = STUB_STRING
         private set
         get() {
-            if (field !== STUB_STRING) {
-                return field
-            }
+            if (field !== STUB_STRING) return field ?: STUB_STRING
             field = bytes.getExt()
             return field
         }

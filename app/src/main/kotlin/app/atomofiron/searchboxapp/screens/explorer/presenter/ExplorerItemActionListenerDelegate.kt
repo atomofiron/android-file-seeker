@@ -60,7 +60,7 @@ class ExplorerItemActionListenerDelegate @Inject constructor(
     override fun onItemCheck(item: Node, toChecked: Boolean): Boolean {
         if (item.isOpened && toChecked) {
             val checked = explorerStore.checked.value
-                .filter { it.ref.isChildOf(item.ref) }
+                .filter { it.ref.isChildOf(item.ref) || it.rootId == item.uniqueId }
             if (checked.isEmpty()) {
                 interactor.check(currentTab, item, true)
             } else {
@@ -75,7 +75,7 @@ class ExplorerItemActionListenerDelegate @Inject constructor(
         } else {
             interactor.check(currentTab, item, toChecked)
             explorerStore.checked.value
-                .filter { item.ref.isChildOf(it.ref) }
+                .filter { item.ref.isChildOf(it.ref) || item.rootId == it.uniqueId }
                 .takeIf { it.isNotEmpty() }
                 ?.let { interactor.check(currentTab, it, false) }
         }

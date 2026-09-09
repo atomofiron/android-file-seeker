@@ -96,4 +96,12 @@ fun DirectoryKind.getIcon(isEmpty: Boolean): Int = when (this) {
         isEmpty -> R.drawable.ic_folder_bell_empty
         else -> R.drawable.ic_folder_bell
     }
+    DirectoryKind.Bluetooth -> when {
+        isEmpty -> R.drawable.ic_folder_bluetooth_empty
+        else -> R.drawable.ic_folder_bluetooth
+    }
+    DirectoryKind.Screenshots -> when {
+        isEmpty -> R.drawable.ic_folder_screenshots_empty
+        else -> R.drawable.ic_folder_screenshots
+    }
 }

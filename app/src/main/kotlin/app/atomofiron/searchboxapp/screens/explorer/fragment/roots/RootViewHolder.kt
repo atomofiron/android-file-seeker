@@ -25,7 +25,7 @@ import com.bumptech.glide.Glide
 class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
     companion object {
 
-        fun Node.getTitle(resources: Resources): String = content.rootType?.getTitle(resources) ?: name
+        fun Node.getTitle(resources: Resources): String = content.rootInfo?.getTitle(resources) ?: name
 
         fun NodeRootInfo.getTitle(resources: Resources): String? = when (this) {
             is NodeRootInfo.Camera -> resources.getString(R.string.root_camera)

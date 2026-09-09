@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
 import app.atomofiron.common.util.ActivityProperty
 import app.atomofiron.common.util.property.WeakProperty
+import app.atomofiron.searchboxapp.android.BluetoothFilesObserver
 import app.atomofiron.searchboxapp.di.dependencies.channel.ApkChannel
 import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
 import app.atomofiron.searchboxapp.di.dependencies.delegate.ApkDelegate
@@ -82,4 +83,5 @@ interface MainDependencies : DelegateModule.Dependencies {
     fun explorerStore(): ExplorerStore
     fun easterEggStore(): EasterEggStore
     fun commonChannel(): CommonChannel
+    fun bluetoothFilesObserver(): BluetoothFilesObserver?
 }
