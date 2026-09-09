@@ -7,6 +7,8 @@ import app.atomofiron.fileseeker.BuildConfig.NATIVE_LIB
 import app.atomofiron.fileseeker.BuildConfig.NATIVE_LIB_SO
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.QueryParams
+import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_FILE_LENGTH
+import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_FILE_TIMESTAMP
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
 import uniffi.native_lib.CancellationState
@@ -100,10 +102,10 @@ object NativeBridge {
         }
     }
 
-    fun usage(ref: NodeRef, asSu: Boolean): Rslt<Pair<Long, String>> {
+    fun usage(ref: NodeRef, asSu: Boolean): Rslt<Pair<ULong, String>> {
         val response = uniffi.native_lib.getUsage(ref.bytes, suCmd = suCmd.takeIf { asSu })
         return when (response) {
-            is UsageResult.Ok -> Rslt.Ok(response.v1.toLong() to response.v2)
+            is UsageResult.Ok -> Rslt.Ok(response.v1 to response.v2)
             is UsageResult.Err -> Rslt.Err(response.v1)
         }
     }
@@ -280,7 +282,7 @@ fun Context.verifyNativeLib(): Rslt<Unit> {
 }
 
 private fun metaWithError(path: ByteArray, error: String): Meta {
-    return Meta(path = path, access = "", owner = "", group = "", length = 0u, size = "", date = "", time = "", error = error)
+    return Meta(path = path, access = "", owner = "", group = "", length = UNDEFINED_FILE_LENGTH, size = "", date = "", time = "", timestamp = UNDEFINED_FILE_TIMESTAMP, error = error)
 }
 
 private fun SimpleResult.toRslt(): Rslt<Unit> = when (this) {

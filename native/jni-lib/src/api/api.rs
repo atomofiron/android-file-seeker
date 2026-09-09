@@ -124,6 +124,7 @@ pub struct Meta {
     pub owner: String,
     pub group: String,
     pub length: u64,
+    pub timestamp: i64,
     pub size: String,
     pub date: String,
     pub time: String,

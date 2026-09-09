@@ -366,10 +366,10 @@ class ExplorerService @Inject constructor(
             }
             is NodeRootSrc.Bluetooth -> when {
                 bluetoothFiles == null -> continue
-                else -> bluetoothFiles.files.value.map { ref ->
+                else -> bluetoothFiles.files.value.map { item ->
                     item.children
-                        ?.find { it.ref == ref }
-                        ?: ref.toNode(rootId = src.ref.uniqueId, parentRef = src.ref)
+                        ?.find { it.ref == item.ref }
+                        ?: item
                 }.let {
                     return src.ref.toRoot(info, children = NodeChildren(it.toMutableList()))
                 }

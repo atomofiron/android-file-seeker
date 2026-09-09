@@ -1,5 +1,5 @@
 use crate::api::api::Meta;
-use crate::common::{empty_string, DATE, DATE_STUB, TIME, TIME_STUB, UNDEFINED_SIZE};
+use crate::common::{empty_string, DATE, DATE_STUB, TIME, TIME_STUB, UNDEFINED_SIZE, UNDEFINED_TIMESTAMP};
 use crate::ext::raw_path::PathExt;
 use crate::r#impl::fs_mode::HumanReadableMode;
 use crate::r#impl::hr_size::HumanReadableSize;
@@ -33,15 +33,18 @@ impl HumanReadableMeta for io::Result<Metadata> {
                     true => UNDEFINED_SIZE,
                     false => meta.size(),
                 };
+                let timestamp = date_time.map(|it| it.timestamp())
+                    .unwrap_or(UNDEFINED_TIMESTAMP);
                 Meta {
+                    path: path.clone().raw(),
                     access: meta.mode().to_hr_mode(),
                     owner: meta.to_hr_owner(),
                     group: meta.to_hr_group(),
+                    length,
+                    timestamp,
                     size,
                     date,
                     time,
-                    path: path.clone().raw(),
-                    length,
                     error: None,
                 }
             },

@@ -5,7 +5,6 @@ import app.atomofiron.common.util.MutableList
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.extension.takeIfDebug
-import app.atomofiron.common.util.forHumans
 import app.atomofiron.common.util.property.MutableWeakProperty
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -28,13 +27,6 @@ import kotlinx.coroutines.Job
 import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CountingResult
 import uniffi.native_lib.Meta
-import java.io.BufferedInputStream
-import java.io.FileInputStream
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.zip.ZipEntry
-import java.util.zip.ZipInputStream
 import kotlin.math.roundToInt
 
 object ExplorerUtils {
@@ -212,7 +204,7 @@ object ExplorerUtils {
     )
 
     fun Meta.toNodeMeta(
-        oldLength: Long,
+        oldLength: ULong,
         oldSize: String,
     ) = NodeMeta(
         access = access,
@@ -220,7 +212,7 @@ object ExplorerUtils {
         group = group,
         date = date,
         time = time,
-        length = length.toLong().let { new ->
+        length = length.let { new ->
             when {
                 access.firstOrNull() != DIR_CHAR -> new
                 new == UNDEFINED_DIR_LENGTH -> oldLength
@@ -231,6 +223,7 @@ object ExplorerUtils {
             size.isEmpty() -> oldSize
             else -> size
         },
+        timestamp = timestamp,
     )
 
     private const val DIMENS = "BKMGTPEZYRQ"
@@ -327,8 +320,8 @@ object ExplorerUtils {
 
     private suspend fun Node.ensureCached(asSu: Boolean, oldMeta: NodeMeta): Node = when {
         isDirectory -> cacheDir(asSu)
-        length == 0L && oldMeta.size != size -> resolveFileType()
-        length == 0L -> this
+        length == UNDEFINED_FILE_LENGTH && oldMeta.size != size -> resolveFileType()
+        length == UNDEFINED_FILE_LENGTH -> this
         isCached && oldMeta.size == size -> this
         // if size changed -> cache again
         else -> try {
@@ -373,7 +366,7 @@ object ExplorerUtils {
             (meta.access.firstOrNull() == DIR_CHAR),
             (mimeType == DIRECTORY),
             (content is NodeContent.Directory) -> content.ifMismatches { NodeContent.Directory() }
-            (meta.length == 0L) -> NodeContent.Empty
+            (meta.length == UNDEFINED_FILE_LENGTH) -> NodeContent.Empty
             mimeType.isBlank(),
             (mimeType == FILE_UNKNOWN) -> content.resolveFileType(this)
             mimeType.startsWith(FILE_PICTURE) -> content.ifMismatches { NodeContent.Picture.resolve(mimeType) }
@@ -476,34 +469,6 @@ object ExplorerUtils {
         }
     }
 
-    private fun Node.cacheZip(): Node = try {
-        val children = mutableListOf<Node>()
-        ZipInputStream(BufferedInputStream(FileInputStream(ref.string))).use { stream ->
-            var entry: ZipEntry? = stream.nextEntry
-            while (entry != null) {
-                if (entry.name.isEmpty()) {
-                    entry = stream.nextEntry
-                    continue
-                }
-                val content = when {
-                    entry.isDirectory -> NodeContent.Directory()
-                    else -> NodeContent.Unknown
-                }
-                val dateTime = SimpleDateFormat(NodeMeta.DATE_TIME_FORMAT, Locale.ROOT)
-                    .format(Date(entry.time))
-                    .split(NodeMeta.DATE_TIME_SEPARATOR)
-                val meta = NodeMeta(date = dateTime.first(), time = dateTime.last(), size = entry.size.toSize(), length = entry.size)
-                val child = Node(ref + entry.name, parentRef = ref, rootId = uniqueId, meta = meta, content = content)
-                children.add(child)
-                entry = stream.nextEntry
-            }
-        }
-        val content = (content as NodeContent.Zip).copy(isCached = true)
-        copy(children = NodeChildren(children), content = content)
-    } catch (e: Exception) {
-        copy(error = NodeError.Message(e.forHumans()))
-    }
-
     private inline fun <reified T : NodeContent> NodeContent?.ifMismatches(action: () -> T): T = this as? T ?: action()
 
     fun Node.sortBy(how: NodeSorting): Node {
@@ -534,8 +499,7 @@ object ExplorerUtils {
     // reversed = older first
     private fun <T> MutableList<T>.sortByDate(what: (T) -> Node, reversed: Boolean) {
         sortBy { what(it).lowercaseName }
-        sortBy(!reversed) { what(it).time }
-        sortBy(!reversed) { what(it).date }
+        sortBy(!reversed) { what(it).timestamp }
         sortBy { !what(it).isDirectory }
     }
 
@@ -683,7 +647,7 @@ object ExplorerUtils {
     }
 
     private fun Node.resolveFileType(): Node {
-        val currentOrNull = content.takeIf { !isCached || length > 0L }
+        val currentOrNull = content.takeIf { !isCached || length > UNDEFINED_FILE_LENGTH }
         val new = currentOrNull.resolveFileType(ref)
         return if (new == content) this else copy(content = new)
     }

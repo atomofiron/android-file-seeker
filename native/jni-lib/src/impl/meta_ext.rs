@@ -1,5 +1,5 @@
 use crate::api::api::Meta;
-use crate::common::empty_string;
+use crate::common::{empty_string, UNDEFINED_SIZE, UNDEFINED_TIMESTAMP};
 use crate::ext::raw_path::PathExt;
 use std::fmt::Display;
 use std::path::PathBuf;
@@ -26,7 +26,8 @@ impl Meta {
             date: empty_string(),
             time: empty_string(),
             path: path.clone().raw(),
-            length: 0,
+            length: UNDEFINED_SIZE,
+            timestamp: UNDEFINED_TIMESTAMP,
             error: error.map(|e| e.to_string()),
         }
     }

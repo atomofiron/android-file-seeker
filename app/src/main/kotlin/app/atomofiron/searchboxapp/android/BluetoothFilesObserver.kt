@@ -13,7 +13,11 @@ import app.atomofiron.common.util.Sdk
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.searchboxapp.di.dependencies.BluetoothFilesProvider
+import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeMeta
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
+import app.atomofiron.searchboxapp.model.explorer.NodeRootSrc
+import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import java.io.File
 
 interface BluetoothFilesObserver {
@@ -27,10 +31,10 @@ class BluetoothFilesObserverImpl(
     private val provider: BluetoothFilesProvider,
 ) : ContentObserver(Handler(Looper.getMainLooper())), BluetoothFilesObserver {
 
-    private val projection = arrayOf(FileColumns.DATA, FileColumns.OWNER_PACKAGE_NAME, FileColumns._ID)
+    private val projection = arrayOf(FileColumns._ID, FileColumns.DATA, FileColumns.DATE_ADDED, FileColumns.SIZE, FileColumns.OWNER_PACKAGE_NAME)
     private val selection = "${Downloads.OWNER_PACKAGE_NAME} = 'com.android.bluetooth'"
 
-    private val idToRef = mutableMapOf<Long, NodeRef>()
+    private val idToNode = mutableMapOf<Long, Node>()
 
     override fun onChange(selfChange: Boolean, uri: Uri?) {
         super.onChange(selfChange, uri)
@@ -42,7 +46,7 @@ class BluetoothFilesObserverImpl(
             null -> uri.pathSegments
                 .lastOrNull()
                 ?.toLongOrNull()
-                ?.let { idToRef.remove(it) }
+                ?.let { idToNode.remove(it) }
                 ?.also { provider.remove(it) }
             else -> provider.add(item)
         }
@@ -59,14 +63,16 @@ class BluetoothFilesObserverImpl(
     override fun unregister() {
         context.contentResolver
             .unregisterContentObserver(this)
-        idToRef.clear()
+        idToNode.clear()
     }
 
-    private fun ContentResolver.getBluetoothFiles(uri: Uri): List<NodeRef> = buildList {
+    private fun ContentResolver.getBluetoothFiles(uri: Uri): List<Node> = buildList {
         val cursor = query(uri, projection, selection, null, null)
         try {
             cursor?.run {
                 val dataColumn = getColumnIndexOrThrow(FileColumns.DATA)
+                val dateColumn = getColumnIndexOrThrow(FileColumns.DATE_ADDED)
+                val sizeColumn = getColumnIndexOrThrow(FileColumns.SIZE)
                 val idColumn = getColumnIndexOrThrow(FileColumns._ID)
                 while (moveToNext()) {
                     val path = getString(dataColumn)
@@ -74,9 +80,14 @@ class BluetoothFilesObserverImpl(
                         val file = File(path)
                         if (file.exists()) {
                             val id = getLong(idColumn)
+                            val timestamp = getLong(dateColumn)
+                            val size = getLong(sizeColumn).toULong()
                             val ref = NodeRef(file.absolutePath)
-                            idToRef[id] = ref
-                            add(ref)
+                            val parent = NodeRootSrc.Bluetooth.ref
+                            val meta = NodeMeta(length = size, timestamp = timestamp)
+                            val node = ref.toNode(parent.uniqueId, parent, meta = meta)
+                            idToNode[id] = node
+                            add(node)
                         }
                     }
                 }
