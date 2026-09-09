@@ -337,7 +337,7 @@ class ExplorerService @Inject constructor(
                             ?: it
                     }
                     if (root.info is NodeRootInfo.Screenshots) {
-                        store.updateScreenshots(root.item.ref)
+                        store.updateScreenshots(updated.ref)
                     }
                     if (root.item.isDirectory) resolveSizeAsync(key, root.item)
                 }
