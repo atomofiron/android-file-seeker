@@ -30,6 +30,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
         fun NodeRootInfo.getTitle(resources: Resources): String? = when (this) {
             is NodeRootInfo.Camera -> resources.getString(R.string.root_camera)
             is NodeRootInfo.Screenshots -> resources.getString(R.string.root_screenshots)
+            is NodeRootInfo.Screencasts -> resources.getString(R.string.root_screencasts)
             is NodeRootInfo.Downloads -> resources.getString(R.string.root_downloads)
             is NodeRootInfo.Bluetooth -> resources.getString(R.string.root_bluetooth)
             is NodeRootInfo.Storage -> when (kind) {
@@ -89,6 +90,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
             is NodeRootInfo.Downloads -> R.drawable.ic_thumbnail_download
             is NodeRootInfo.Bluetooth -> R.drawable.ic_thumbnail_bluetooth
             is NodeRootInfo.Screenshots -> R.drawable.ic_thumbnail_screenshot
+            is NodeRootInfo.Screencasts -> R.drawable.ic_thumbnail_screencast
             is NodeRootInfo.Storage -> when (info.kind) {
                 NodeStorage.Kind.InternalStorage -> R.drawable.ic_thumbnail_memory
                 NodeStorage.Kind.SdCard -> R.drawable.ic_thumbnail_micro_sd
@@ -105,6 +107,7 @@ class RootViewHolder(itemView: View) : GeneralHolder<NodeRoot>(itemView) {
         is NodeRootInfo.Favorite,
         is NodeRootInfo.Camera,
         is NodeRootInfo.Screenshots,
+        is NodeRootInfo.Screencasts,
         is NodeRootInfo.Downloads,
         is NodeRootInfo.SystemRoot,
         is NodeRootInfo.Bluetooth -> ContextCompat.getDrawable(context, R.drawable.item_root_thumbnail)

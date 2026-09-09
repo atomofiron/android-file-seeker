@@ -99,6 +99,15 @@ private const val SUB_PATH_DCIM_SCREENSHOTS = "DCIM/Screenshots"
 private const val SUB_PATH_DOWNLOAD = "Download"
 private const val SUB_PATH_DOWNLOAD_BLUETOOTH = "Download/Bluetooth"
 private const val SUB_PATH_BLUETOOTH = "Bluetooth"
+private const val SUB_MOVIES_SCREEN_RECORDS = "Movies/Screen records"
+private const val SUB_MOVIES_SCREENRECORDS = "Movies/ScreenRecords"
+private const val SUB_MOVIES_SCREENRECORDINGS = "Movies/ScreenRecordings"
+private const val SUB_MOVIES_CAPTURES = "Movies/Captures"
+private const val SUB_DCIM_SCREEN = "Dcim/Screen recordings"
+private const val SUB_DCIM_SCREENRECORDER = "DCIM/ScreenRecorder"
+private const val SUB_MOVIES_SCREENRECORDER = "Movies/ScreenRecorder"
+private const val SUB_PICTURES_SCREENRECORDS = "Pictures/ScreenRecords"
+private const val SUB_MOVIES = "Movies"
 
 @Singleton
 class ExplorerService @Inject constructor(
@@ -225,6 +234,7 @@ class ExplorerService @Inject constructor(
                 NodeRoot(NodeRootInfo.Bluetooth, NodeRootSrc.Bluetooth.ref, NodeSorting.Date, thumbnail = null, NodeRootSrc.Bluetooth, NodeRootSrc(ref + SUB_PATH_BLUETOOTH), NodeRootSrc(ref + SUB_PATH_DOWNLOAD_BLUETOOTH)),
                 NodeRoot(NodeRootInfo.Downloads, ref + SUB_PATH_DOWNLOAD, NodeSorting.Date),
                 NodeRoot(NodeRootInfo.Screenshots, NodeRootSrc.Screenshots.ref, NodeSorting.Date, Thumbnail.FilePath, NodeRootSrc(ref + SUB_PATH_PIC_SCREENSHOTS), NodeRootSrc(ref + SUB_PATH_SCREENSHOTS), NodeRootSrc(ref + SUB_PATH_DCIM_SCREENSHOTS), NodeRootSrc.Screenshots),
+                NodeRoot(NodeRootInfo.Screencasts, NodeRootSrc.Screencasts.ref, NodeSorting.Date, Thumbnail.FilePath, NodeRootSrc(ref + SUB_MOVIES_SCREEN_RECORDS), NodeRootSrc(ref + SUB_MOVIES_SCREENRECORDS), NodeRootSrc(ref + SUB_MOVIES_SCREENRECORDINGS), NodeRootSrc(ref + SUB_MOVIES_CAPTURES), NodeRootSrc(ref + SUB_DCIM_SCREEN), NodeRootSrc(ref + SUB_DCIM_SCREENRECORDER), NodeRootSrc(ref + SUB_MOVIES_SCREENRECORDER), NodeRootSrc(ref + SUB_PICTURES_SCREENRECORDS), NodeRootSrc(ref + SUB_MOVIES)),
                 NodeRoot(NodeRootInfo.Camera, ref + SUB_PATH_CAMERA, NodeSorting.Date, Thumbnail.FilePath),
                 systemRoot,
             )
@@ -385,18 +395,14 @@ class ExplorerService @Inject constructor(
                     return src.ref.toRoot(info, children = NodeChildren(it.toMutableList()))
                 }
             }
+            is NodeRootSrc.Screencasts -> continue
             is NodeRootSrc.Screenshots -> when {
                 Android.Q -> Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_SCREENSHOTS)
                     ?.absolutePath
                     ?.toRef()
                     ?.toRoot(info)
                     ?.update(asSu)
-                    ?.let {
-                        when (it.error) {
-                            is NodeError.NoSuchFileOrDir -> continue
-                            else -> return it
-                        }
-                    }
+                    ?.let { return it }
                 else -> continue
             }
         }

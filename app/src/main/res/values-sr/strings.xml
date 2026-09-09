@@ -135,6 +135,7 @@
     <string name="root_camera">Камера</string>
     <string name="root_downloads">Преузи&#x00AD;мања</string>
     <string name="root_screenshots">Снимци екрана</string>
+    <string name="root_screencasts">Снимање екрана</string>
     <string name="internal_storage">Интерна меморија</string>
     <string name="external_storage">Екстерна меморија</string>
     <string name="system_root">Системски корен</string>

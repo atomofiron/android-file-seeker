@@ -14,6 +14,10 @@ sealed interface NodeRootSrc {
         override val ref = NodeRef("screenshots")
     }
 
+    data object Screencasts : NodeRootSrc {
+        override val ref = NodeRef("screencasts")
+    }
+
     companion object {
         operator fun invoke(ref: NodeRef): Ref = Ref(ref)
     }

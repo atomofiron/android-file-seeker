@@ -140,6 +140,7 @@
     <string name="root_downloads">Down&#x00AD;loads</string>
     <string name="root_bluetooth" translatable="false">Blue&#x00AD;tooth</string>
     <string name="root_screenshots">Screen&#x00AD;shots</string>
+    <string name="root_screencasts">Screen&#x00AD;cats</string>
     <string name="internal_storage">Internal storage</string>
     <string name="external_storage">External storage</string>
     <string name="system_root">System root</string>

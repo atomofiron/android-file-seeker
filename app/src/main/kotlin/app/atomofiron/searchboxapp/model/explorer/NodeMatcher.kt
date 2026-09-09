@@ -1,5 +1,7 @@
 package app.atomofiron.searchboxapp.model.explorer
 
+import app.atomofiron.searchboxapp.model.explorer.NodeContent.Directory
+
 class NodeMatcher(
     private val treeSize: Int,
     private val mimeTypes: List<String>,
@@ -11,19 +13,19 @@ class NodeMatcher(
         treeSize: Int,
         mimeTypes: List<String>,
         info: NodeRootInfo,
-        option: NodeRootOption.CameraToggle?,
+        option: NodeRootOption?,
     ) : this(
         treeSize,
         mimeTypes,
-        onlyPhotos = info is NodeRootInfo.Screenshots || info is NodeRootInfo.Camera && option?.photos() == true,
-        onlyVideos = info is NodeRootInfo.Camera && option?.videos() == true,
-        onlyMedia = info is NodeRootInfo.Camera,
+        onlyPhotos = info.onlyPhotos || option?.onlyPhotos == true,
+        onlyVideos = info.onlyVideos || option?.onlyVideos == true,
+        onlyMedia = info.onlyMedia,
     )
 
     val filteredCounters: IntArray? = when {
         onlyPhotos || onlyVideos || onlyMedia -> Unit
         mimeTypes.isEmpty() -> null
-        mimeTypes == NodeContent.Directory.mimeTypes -> null
+        mimeTypes == Directory.mimeTypes -> null
         else -> Unit
     }?.let { IntArray(treeSize) }
 
