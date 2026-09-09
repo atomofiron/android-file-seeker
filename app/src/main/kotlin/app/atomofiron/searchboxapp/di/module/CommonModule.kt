@@ -42,8 +42,8 @@ class CommonModule {
 
     @Provides
     @Singleton
-    fun provideBluetoothFilesProvider(): BluetoothFilesProvider? = when {
-        Android.Q -> BluetoothFilesProvider()
+    fun provideBluetoothFilesProvider(scope: AppScope): BluetoothFilesProvider? = when {
+        Android.Q -> BluetoothFilesProvider(scope)
         else -> null
     }
 

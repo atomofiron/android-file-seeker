@@ -22,7 +22,7 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.ifOk
 import app.atomofiron.searchboxapp.utils.map
-import app.atomofiron.searchboxapp.utils.removeOneIf
+import app.atomofiron.searchboxapp.utils.removeOne
 import kotlinx.coroutines.CoroutineScope
 import uniffi.native_lib.CancellationState
 import uniffi.native_lib.TextSearchProgress
@@ -90,7 +90,7 @@ class TextViewerService @Inject constructor(
 
     suspend fun removeTask(ref: NodeRef, taskId: Int) {
         findSession(ref)?.tasks {
-            removeOneIf { it.uniqueId == taskId }
+            removeOne { it.uniqueId == taskId }
         }
     }
 

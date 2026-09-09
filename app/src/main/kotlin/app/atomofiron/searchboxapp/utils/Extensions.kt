@@ -97,7 +97,7 @@ operator fun DockBarView.set(id: Id, value: Boolean) {
 
 fun Boolean.toInt(): Int = if (this) 1 else -1
 
-fun <E> MutableList<E>.removeOneIf(predicate: (E) -> Boolean): E? {
+fun <E> MutableList<E>.removeOne(predicate: (E) -> Boolean): E? {
     val each = listIterator()
     while (each.hasNext()) {
         val item = each.next()
@@ -119,15 +119,16 @@ inline fun <I> MutableList<I>.replaceEach(action: (I) -> I) {
     }
 }
 
-inline fun <T> MutableList<T>.replaceOne(new: T, predicate: T.() -> Boolean) {
+inline fun <T> MutableList<T>.replaceOne(new: T, predicate: T.() -> Boolean): T? {
     val each = listIterator()
     while (each.hasNext()) {
         val item = each.next()
         if (predicate(item)) {
             each.set(new)
-            return
+            return item
         }
     }
+    return null
 }
 
 fun <T> MutableList<T>.replaceAll(items: List<T>) {

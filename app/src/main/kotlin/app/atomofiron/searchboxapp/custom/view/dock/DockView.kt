@@ -31,7 +31,7 @@ import app.atomofiron.searchboxapp.custom.view.dock.shape.DockNotch
 import app.atomofiron.searchboxapp.custom.view.dock.shape.DockStyle
 import app.atomofiron.searchboxapp.model.Layout
 import app.atomofiron.searchboxapp.utils.colorAttr
-import app.atomofiron.searchboxapp.utils.removeOneIf
+import app.atomofiron.searchboxapp.utils.removeOne
 import app.atomofiron.searchboxapp.utils.setOnSecondaryClickListener
 
 interface DockView {
@@ -182,7 +182,7 @@ class DockViewImpl(
         if ((notch == null) == mutableItems.any { it === NotchStub }) {
            mutableItems.run {
                 when (notch) {
-                    null -> removeOneIf { it === NotchStub }
+                    null -> removeOne { it === NotchStub }
                     else -> add(size / 2, NotchStub)
                 }
                 adapter.submit(mutableItems)

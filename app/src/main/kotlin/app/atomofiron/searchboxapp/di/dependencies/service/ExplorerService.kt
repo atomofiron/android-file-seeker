@@ -66,14 +66,14 @@ import app.atomofiron.searchboxapp.utils.ExplorerUtils.rename
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveDirChildren
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.sortBy
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.theSame
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toRoot
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.update
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.updateWith
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.mutate
-import app.atomofiron.searchboxapp.utils.removeOneIf
+import app.atomofiron.searchboxapp.utils.removeOne
 import app.atomofiron.searchboxapp.utils.replaceEach
+import app.atomofiron.searchboxapp.utils.replaceOne
 import app.atomofiron.searchboxapp.utils.showLongToast
 import app.atomofiron.searchboxapp.utils.toAlert
 import app.atomofiron.searchboxapp.utils.unwrapOrElse
@@ -127,6 +127,17 @@ class ExplorerService @Inject constructor(
                 restoreSorting()
                 store.mainStorage.collectOn {
                     it.initRoots()
+                }
+                bluetoothFiles?.updates?.collectOn { (item, added) ->
+                    render(store.currentTab.value) {
+                        val root = roots.find { it.info is NodeRootInfo.Bluetooth }
+                            ?: return@collectOn
+                        val items = root.item.children?.items ?: return@collectOn
+                        when {
+                            !added -> items.removeOne { it.ref == item.ref }
+                            else -> items.replaceOne(item) { ref == item.ref } ?: items.add(item)
+                        }
+                    }
                 }
             }
             combine(store.storages, preferences.asSu, updateRootTrigger) { volumes, asSu, _ ->
@@ -825,7 +836,7 @@ class ExplorerService @Inject constructor(
                 }
             }
             if (!asSu) {
-                removeOneIf { it.info is NodeRootInfo.SystemRoot }
+                removeOne { it.info is NodeRootInfo.SystemRoot }
             }
         }
     }
@@ -934,7 +945,7 @@ class ExplorerService @Inject constructor(
         store.checked.value.mutate {
             when {
                 toChecked -> add(item)
-                else -> removeOneIf { it.uniqueId == item.uniqueId }
+                else -> removeOne { it.uniqueId == item.uniqueId }
             }
             store.emitChecked(key, this)
         }
