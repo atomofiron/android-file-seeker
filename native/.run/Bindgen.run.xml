@@ -1,0 +1,18 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Bindgen" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+    <option name="buildProfileId" value="dev" />
+    <option name="command" value="run --bin uniffi-gen -- generate --library target/aarch64-linux-android/debug/libnative_lib.so --language kotlin --no-format --out-dir target/generated/" />
+    <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+    <envs />
+    <option name="emulateTerminal" value="true" />
+    <option name="channel" value="DEFAULT" />
+    <option name="requiredFeatures" value="false" />
+    <option name="allFeatures" value="false" />
+    <option name="withSudo" value="false" />
+    <option name="buildTarget" value="REMOTE" />
+    <option name="backtrace" value="SHORT" />
+    <option name="isRedirectInput" value="false" />
+    <option name="redirectInputPath" value="" />
+    <method v="2" />
+  </configuration>
+</component>
