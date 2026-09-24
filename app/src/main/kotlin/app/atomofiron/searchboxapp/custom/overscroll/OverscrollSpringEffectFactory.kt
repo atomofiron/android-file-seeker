@@ -78,7 +78,9 @@ private class OverscrollSpringEffectFactory(
                         ids.removeAt(i)
                         if (i == ids.size && ids.isNotEmpty()) {
                             val index = event.findPointerIndex(ids.last())
-                            startY = event.getY(index) // wtf? IllegalArgumentException
+                            if (index >= 0) {
+                                startY = event.getY(index)
+                            }
                             resetOnPull = true
                         }
                     } else {
