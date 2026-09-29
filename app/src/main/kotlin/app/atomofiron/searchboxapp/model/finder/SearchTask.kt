@@ -15,7 +15,6 @@ data class SearchTask<Result : SearchResult>(
     val uuid: Uuid = Uuid.random(),
     val uniqueId: TaskId,
     val status: SearchStatus = SearchStatus.Progress,
-    val error: NodeError? = null,
     val cached: Boolean = false,
     val sorting: NodeSorting = NodeSorting.Date,
 ) {
@@ -27,14 +26,14 @@ data class SearchTask<Result : SearchResult>(
     val isEnded: Boolean get() = status is SearchStatus.Ended
     val isStopped: Boolean get() = status is SearchStatus.Ended && status.stopped
     val isError: Boolean get() = status is SearchStatus.Ended && error != null
+    val error: NodeError? get() = result.error
 
     fun toEnded(
         result: Result = this.result,
-        error: NodeError? = this.error,
         stopped: Boolean = false,
     ): SearchTask<Result> {
         val state = SearchStatus.Ended(stopped = stopped)
-        return copy(status = state, result = result, error = error)
+        return copy(status = state, result = result)
     }
 
     @Suppress("UNCHECKED_CAST")

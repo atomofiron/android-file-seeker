@@ -74,8 +74,8 @@ class TextViewerService @Inject constructor(
         } as? ItemMatch.Many
         item ?: return null
         val type = result.type as SearchType.Text
-        val local = LocalSearchResult(item.count, item.matches, type.charset, hash = item.hash, removable = false)
-        val task = LocalSearchTask(finderTask.query, result = local, finderTask.uuid, uniqueId = localId++, status = finderTask.status, error = finderTask.error, cached = finderTask.cached)
+        val local = LocalSearchResult(item.count, item.matches, type.charset, hash = item.hash, removable = false, error = finderTask.error)
+        val task = LocalSearchTask(finderTask.query, result = local, finderTask.uuid, uniqueId = localId++, status = finderTask.status, cached = finderTask.cached)
         session.tasks { add(task) }
         return task
     }
@@ -121,7 +121,7 @@ class TextViewerService @Inject constructor(
                     toEnded(result = result.copy(count = progress.v3.size, matches = map))
                 }
                 is TextSearchProgress.Skip -> toEnded()
-                is TextSearchProgress.Err -> toEnded(error = progress.v1.error?.toNodeError())
+                is TextSearchProgress.Err -> toEnded(result = result.copy(error = progress.v1.error?.toNodeError()))
             }
         }
     }

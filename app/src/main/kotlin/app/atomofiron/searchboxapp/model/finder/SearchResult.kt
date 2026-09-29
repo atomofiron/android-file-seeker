@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.model.finder
 
 import app.atomofiron.common.util.extension.hash
 import app.atomofiron.searchboxapp.model.explorer.Node
+import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeInfo
 import app.atomofiron.searchboxapp.model.textviewer.MatchMap
 import kotlinx.serialization.Serializable
@@ -16,6 +17,7 @@ sealed class SearchResult {
     abstract val count: Int
     abstract val countTotal: Int
     open val removable: Boolean get() = true
+    abstract val error: NodeError?
 
     val isEmpty: Boolean get() = count == 0
 
@@ -27,6 +29,7 @@ sealed class SearchResult {
         val charset: String?,
         val hash: NodeInfo? = null,
         override val removable: Boolean = true,
+        override val error: NodeError? = null,
     ) : SearchResult() {
 
         val indexes: List<Int> by lazy(NONE) { matches.keys.sorted() }
@@ -55,6 +58,7 @@ sealed class SearchResult {
         val matches: List<ItemMatch> = listOf(), // todo make List<T : ItemMatch>?
         val errors: List<String> = listOf(),
         val generation: Int = 0,
+        override val error: NodeError? = null,
     ) : SearchResult() {
 
         override fun getCounters(): IntArray = when (type) {

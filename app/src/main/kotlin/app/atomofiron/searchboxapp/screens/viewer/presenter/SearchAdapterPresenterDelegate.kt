@@ -101,8 +101,9 @@ class SearchAdapterPresenterDelegate @Inject constructor(
             hash != null -> scope.launchOnIO {
                 val result = interactor.getHash(hash.ref)
                 withMain {
+                    val error = task.error
                     when {
-                        task.error != null -> task.error.toUni().showError()
+                        error != null -> error.toUni().showError()
                         hash.hash == result.ok()?.value -> task.trySelect()
                         result is Rslt.Err -> result.message.toUni().showError()
                         else -> NodeError.FileWasChanged.toUni().showError()

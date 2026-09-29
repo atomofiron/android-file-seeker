@@ -219,12 +219,13 @@ class FinderWorker(
     private fun Rslt<Unit>.apply() = updateAsync {
         val error = err()?.message?.toNodeError()
         val stopped = isStopping
-        val ended = toEnded(error = error, stopped = stopped)
+        var ended = toEnded(result.copy(error = error), stopped = stopped)
         try {
             val cache = SearchResultCache(ended.uniqueId, stopped, ended.query)
             db.store(cache, ended.result)
             ended.copy(cached = true)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            if (error == null) ended = ended.copy(result = result.copy(error = NodeError.Message(e.toString())))
             ended
         }
     }
@@ -249,7 +250,7 @@ class FinderWorker(
         } catch (e: Exception) {
             logE(e.toString())
             updateAsync {
-                copy(error = NodeError.Message(e.toString()))
+                copy(result = result.copy(error = NodeError.Message(e.toString())))
             }
             dataBuilder.putString(KEY_EXCEPTION, e.toString())
         } finally {
