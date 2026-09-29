@@ -63,7 +63,7 @@
     <string name="stopped">Stopped</string>
     <string name="test">Test</string>
     <string name="options">Options</string>
-    <string name="options_title">Options:</string>
+    <string name="options_title">Options</string>
     <string name="explorer">Files</string>
     <string name="replace">Replace</string>
     <string name="tasks">Tasks</string>
@@ -217,7 +217,7 @@
     <string name="launch">Launch</string>
     <string name="apk_info">Package: %1$s\nVersion: %2$s\nMin SDK: %3$s\nTarget SDK: %4$s\nCompile SDK: %5$s\nSignature: %6$s</string>
     <string name="update">Update</string>
-    <string name="search_here">Search here:</string>
+    <string name="search_here">Search here</string>
     <string name="by_default">Reset to defaults</string>
     <string name="dash" translatable="false">—</string>
     <string name="fetching">Fetching metadata…</string>

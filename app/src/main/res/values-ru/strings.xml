@@ -59,7 +59,7 @@
     <string name="stopped">Остановлено</string>
     <string name="test">Тест</string>
     <string name="options">Опции</string>
-    <string name="options_title">Опции:</string>
+    <string name="options_title">Опции</string>
     <string name="explorer">Проводник</string>
     <string name="replace">Заменить</string>
     <string name="tasks">Задачи</string>
@@ -209,7 +209,7 @@
     <string name="launch">Запустить</string>
     <string name="apk_info">Имя пакета: %1$s\nВерсия: %2$s\nМинимальная SDK: %3$s\nЦелевая SDK: %4$s\nСборочная SDK: %5$s\nПодпись: %6$s</string>
     <string name="update">Обновить</string>
-    <string name="search_here">Места поиска:</string>
+    <string name="search_here">Места поиска</string>
     <string name="by_default">Восстановить по умолчанию</string>
     <string name="fetching">Получение метаданных…</string>
     <string name="and">\u0020и\u0020</string>

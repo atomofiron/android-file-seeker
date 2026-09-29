@@ -59,7 +59,7 @@
     <string name="stopped">Zaustavljeno</string>
     <string name="test">Test</string>
     <string name="options">Opcije</string>
-    <string name="options_title">Opcije:</string>
+    <string name="options_title">Opcije</string>
     <string name="explorer">Fajlovi</string>
     <string name="replace">Zameni</string>
     <string name="tasks">Zadaci</string>
@@ -209,7 +209,7 @@
     <string name="launch">Pokreni</string>
     <string name="apk_info">Paket: %1$s\nVerzija: %2$s\nMin. SDK: %3$s\nCiljna SDK: %4$s\nKompil. SDK: %5$s\nPotpis: %6$s</string>
     <string name="update">Ažuriraj</string>
-    <string name="search_here">Pretraga ovde:</string>
+    <string name="search_here">Pretraga ovde</string>
     <string name="by_default">Vrati na podrazumevano</string>
     <string name="fetching">Dobavljanje metapodataka…</string>
     <string name="and">\u0020i\u0020</string>
