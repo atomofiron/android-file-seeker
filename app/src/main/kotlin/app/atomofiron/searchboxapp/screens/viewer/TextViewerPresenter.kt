@@ -45,7 +45,7 @@ class TextViewerPresenter @Inject constructor(
             session.updateItem(item)
 
             params.initialTaskId
-                ?.let { interactor.fetchTask(itemRef, it) }
+                .let { interactor.syncTasks(itemRef, it) }
                 ?.let { searchDelegate.trySelectTask(it) }
         }
     }

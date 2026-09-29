@@ -49,9 +49,7 @@ class TextViewerService @Inject constructor(
 
     fun getFileSession(ref: NodeRef, length: ULong, charset: String?): Rslt<TextViewerSession> {
         return findSession(ref)
-            ?.apply {
-                scope.launchOnIO { setCharset(charset) }
-            }
+            ?.apply { scope.launchOnIO { setCharset(charset) } }
             ?.let { Rslt.Ok(it) }
             ?: NativeBridge.readFile(ref, asSu)
                 .map { TextViewerSession(it, length, ref, charsets, charset) }
@@ -61,23 +59,26 @@ class TextViewerService @Inject constructor(
                 }
     }
 
-    suspend fun fetchTask(ref: NodeRef, taskId: Uuid): LocalSearchTask? {
+    suspend fun syncTasks(ref: NodeRef, taskId: Uuid?): LocalSearchTask? {
         val session = findSession(ref)
         session ?: return null
-        session.getOrNull(taskId)
-            ?.let { return it }
-        val finderTask = finderStore.tasks.find { it.uuid == taskId }
-        finderTask ?: return null
-        val result = finderTask.result
-        val item = result.matches.find {
-            it.uniqueId == ref.uniqueId
-        } as? ItemMatch.Many
-        item ?: return null
-        val type = result.type as SearchType.Text
-        val local = LocalSearchResult(item.count, item.matches, type.charset, hash = item.hash, removable = false, error = finderTask.error)
-        val task = LocalSearchTask(finderTask.query, result = local, finderTask.uuid, uniqueId = localId++, status = finderTask.status, cached = finderTask.cached)
-        session.tasks { add(task) }
-        return task
+        val tasks = finderStore.tasks.mapNotNull { task ->
+            val result = task.result
+            val item = result.matches
+                .find { it.uniqueId == ref.uniqueId }
+                    as? ItemMatch.Many
+                ?: return@mapNotNull null
+            val type = result.type as SearchType.Text
+            val local = LocalSearchResult(item.count, item.matches, type.charset, hash = item.hash, removable = false, error = task.error)
+            LocalSearchTask(task.query, result = local, task.uuid, uniqueId = localId++, status = task.status, cached = task.cached)
+        }
+        session.tasks {
+            clear()
+            addAll(tasks)
+        }
+        return tasks
+            .takeIf { taskId != null }
+            ?.find { it.uuid == taskId }
     }
 
     /** @return true if success */

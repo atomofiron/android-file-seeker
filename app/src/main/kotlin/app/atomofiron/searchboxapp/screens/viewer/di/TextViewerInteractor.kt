@@ -53,7 +53,7 @@ class TextViewerInteractor @Inject constructor(
         }
     }
 
-    suspend fun fetchTask(ref: NodeRef, taskId: Uuid): LocalSearchTask? = service.fetchTask(ref, taskId)
+    suspend fun syncTasks(ref: NodeRef, taskId: Uuid?): LocalSearchTask? = service.syncTasks(ref, taskId)
 
     fun getHash(ref: NodeRef): Rslt<Int> = NativeBridge.crcHash(ref, asSu)
 
