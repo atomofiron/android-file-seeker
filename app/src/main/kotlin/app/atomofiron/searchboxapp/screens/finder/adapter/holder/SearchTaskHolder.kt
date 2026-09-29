@@ -65,14 +65,17 @@ class SearchTaskHolder<Result : SearchResult>(
             else -> R.string.remove
         }
         action.setText(idAction)
-        action.isEnabled = task.isProgress || task.isRemovable
+        action.isEnabled = !task.isStopping && (task.isProgress || task.isRemovable)
         itemView.isEnabled = item.clickableIfEmpty || !task.result.isEmpty
     }
 
     private fun ImageView.updateIcon(task: SearchTask<Result>) {
         val inProgress = when (val status = task.status.takeIf { !task.isError }) {
             null -> R.drawable.ic_circle_cross
-            is SearchStatus.Ended -> if (status.stopped) R.drawable.ic_circle_stop else R.drawable.ic_circle_check
+            is SearchStatus.Ended -> when {
+                status.stopped -> R.drawable.ic_circle_cross
+                else -> R.drawable.ic_circle_check
+            }
             is SearchStatus.Progress,
             is SearchStatus.Stopping -> setMuonsDrawable()
                 .setSpeed(if (task.isProgress) Speed.Medium else Speed.Slow)
