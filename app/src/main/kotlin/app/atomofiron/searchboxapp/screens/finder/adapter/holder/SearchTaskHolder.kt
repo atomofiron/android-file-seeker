@@ -5,20 +5,25 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.ImageSpan
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.setPadding
 import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.extension.debugFailUnreachable
-import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemSearchTaskBinding
+import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Companion.setMuonsDrawable
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Speed
+import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
+import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.utils.Alpha
+import app.atomofiron.searchboxapp.utils.ColorStates
+import app.atomofiron.searchboxapp.utils.colorAttr
 
 class SearchTaskHolder<Result : SearchResult>(
     parent: ViewGroup,
@@ -50,23 +55,10 @@ class SearchTaskHolder<Result : SearchResult>(
     override fun onBind(item: FinderStateItem.Task<Result>, position: Int) = binding.run {
         val task = item.task
         params.setParams(task.query)
-        status.setStatus(task.result, task.query.charset)
+        statusText.setStatus(task.result, task.query.charset)
         action.isActivated = !task.isProgress
-        progress.isInvisible = !task.status.running
-        progress.setSpeed(if (task.isProgress) Speed.Medium else Speed.Slow)
-        uncached.isVisible = item.task.isEnded && !item.task.cached
-
-        val idLabel = if (task.isError) R.string.error else when (task.status) {
-            is SearchStatus.Progress -> R.string.started
-            is SearchStatus.Stopping -> R.string.stopping
-            is SearchStatus.Ended -> if (task.status.stopped) R.string.stopped else R.string.completed
-        }
-        val colorLabel = when {
-            task.isError -> context.colorAttr(AppCompatAttr.colorError)
-            else -> context.colorAttr(AppCompatAttr.colorAccent)
-        }
-        label.setText(idLabel)
-        label.setTextColor(colorLabel)
+        uncached.isVisible = task.isEnded && !task.cached
+        statusIcon.updateIcon(task)
 
         val idAction = when {
             task.status.running -> R.string.stop
@@ -75,6 +67,31 @@ class SearchTaskHolder<Result : SearchResult>(
         action.setText(idAction)
         action.isEnabled = task.isProgress || task.isRemovable
         itemView.isEnabled = item.clickableIfEmpty || !task.result.isEmpty
+    }
+
+    private fun ImageView.updateIcon(task: SearchTask<Result>) {
+        val inProgress = when (val status = task.status.takeIf { !task.isError }) {
+            null -> R.drawable.ic_circle_cross
+            is SearchStatus.Ended -> if (status.stopped) R.drawable.ic_circle_stop else R.drawable.ic_circle_check
+            is SearchStatus.Progress,
+            is SearchStatus.Stopping -> setMuonsDrawable()
+                .setSpeed(if (task.isProgress) Speed.Medium else Speed.Slow)
+                .let { null }
+        }?.let { setImageResource(it) } == null
+        val color = when {
+            task.isError -> context.colorAttr(AppCompatAttr.colorError)
+            else -> context.colorAttr(AppCompatAttr.colorAccent)
+        }
+        if (inProgress) {
+            setPadding(resources.getDimensionPixelSize(R.dimen.padding_half))
+            imageTintList = ColorStates(context.colorSurfaceContainer())
+            setBackgroundResource(R.drawable.ic_circle)
+            backgroundTintList = ColorStates(color)
+        } else {
+            setPadding(0)
+            imageTintList = ColorStates(color)
+            background = null
+        }
     }
 
     private fun TextView.setParams(params: QueryParams) {

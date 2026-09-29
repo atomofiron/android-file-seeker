@@ -15,6 +15,7 @@ import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.view.animation.LinearInterpolator
 import android.widget.ImageView
+import androidx.annotation.ColorInt
 import androidx.annotation.DimenRes
 import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.searchboxapp.utils.colorAttr
@@ -54,8 +55,9 @@ class MuonsDrawable private constructor(
             context: Context,
             fillCenter: Boolean = true,
             @DimenRes sizeRes: Int? = null,
+            @ColorInt defaultColor: Int? = null,
         ): MuonsDrawable {
-            val color = context.colorAttr(AppCompatAttr.colorAccent)
+            val color = defaultColor ?: context.colorAttr(AppCompatAttr.colorAccent)
             val intrinsicSize = context.resources.getDimensionPixelSize(sizeRes?.takeIf { it > 0 } ?: R.dimen.progress_common_size)
             val thickness = context.resources.getDimensionPixelSize(R.dimen.progress_thickness)
             return MuonsDrawable(color, fillCenter, intrinsicSize, thickness)
@@ -64,8 +66,9 @@ class MuonsDrawable private constructor(
         fun ImageView.setMuonsDrawable(
             fillCenter: Boolean = true,
             @DimenRes sizeRes: Int? = null,
+            @ColorInt defaultColor: Int? = null,
         ): MuonsDrawable {
-            val drawable = MuonsDrawable(context, fillCenter, sizeRes)
+            val drawable = MuonsDrawable(context, fillCenter, sizeRes, defaultColor)
             setImageDrawable(drawable)
             return drawable
         }
@@ -148,8 +151,9 @@ class MuonsDrawable private constructor(
         }
     }
 
-    fun setSpeed(speed: Speed) {
+    fun setSpeed(speed: Speed): MuonsDrawable {
         animator.duration = speed.duration
+        return this
     }
 
     fun setProgress(progress: Float?) {
