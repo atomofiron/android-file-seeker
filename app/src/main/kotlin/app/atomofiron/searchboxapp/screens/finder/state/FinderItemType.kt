@@ -18,6 +18,7 @@ enum class FinderItemType(val id: Int) {
     TITLE(ids()),
     TASK(ids()),
     TARGETS(ids()),
+    LOADING(ids()),
     ;
 
     companion object {

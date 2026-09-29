@@ -74,8 +74,7 @@ class ResultModule {
         finderStore: FinderStore,
         params: ResultPresenterParams,
     ): GlobalSearchTask? = finderStore
-        .tasksFlow.value
-        .find { it.uniqueId == params.taskId }
+        .tasks.find { it.uniqueId == params.taskId }
 }
 
 interface ResultDependencies : DelegateModule.Dependencies {

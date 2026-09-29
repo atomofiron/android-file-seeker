@@ -18,9 +18,9 @@ import kotlin.uuid.Uuid
 class FinderStore @Inject constructor() {
 
     private val mutex = Mutex()
-    val tasksFlow: StateFlow<List<GlobalSearchTask>>
-        field = MutableStateFlow(listOf<GlobalSearchTask>())
-    val tasks: List<GlobalSearchTask> get() = tasksFlow.value
+    val tasksFlow: StateFlow<List<GlobalSearchTask>?>
+        field = MutableStateFlow(null)
+    val tasks: List<GlobalSearchTask> get() = tasksFlow.value ?: emptyList()
 
     suspend fun add(item: GlobalSearchTask) {
         updateTasks { add(item) }
@@ -61,7 +61,7 @@ class FinderStore @Inject constructor() {
 
     private suspend inline fun <R> updateTasks(action: MutableList<GlobalSearchTask>.() -> R): R {
         return mutex.withLock {
-            val new = tasksFlow.value.toMutableList()
+            val new = tasks.toMutableList()
             val result = new.action()
             tasksFlow.value = new
             result

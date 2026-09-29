@@ -66,7 +66,7 @@ class ResultPresenter @Inject constructor(
 
     override fun onSubscribeData() {
         val tasks = finderStore.tasksFlow.mapNotNull { tasks ->
-            tasks.find { it.uniqueId == taskId }
+            tasks?.find { it.uniqueId == taskId }
         }
         combineTransform<_, _, Unit>(tasks, state.checked) { task, checked ->
             val result = task.result

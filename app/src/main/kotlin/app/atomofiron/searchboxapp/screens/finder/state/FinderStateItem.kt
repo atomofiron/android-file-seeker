@@ -57,6 +57,8 @@ sealed class FinderStateItem(
 
     data class Buttons(val withTest: Boolean) : FinderStateItem(FinderItemType.BUTTONS)
 
+    data object Loading : FinderStateItem(FinderItemType.LOADING)
+
     data class TestField(
         val value: String? = null,
         val query: String = "",

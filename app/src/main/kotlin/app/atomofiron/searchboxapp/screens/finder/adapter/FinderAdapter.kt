@@ -15,6 +15,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersH
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.LoadingHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.MiniEditOptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.SearchTaskHolder
@@ -63,6 +64,7 @@ class FinderAdapter<Result : SearchResult>(
                     topMargin = it.getDimensionPixelSize(R.dimen.padding_semi)
                 }
             }
+            FinderItemType.LOADING -> LoadingHolder(parent)
             null -> throw IllegalArgumentException("viewType = $viewType")
         }.upcast()
             .also { holderListener?.onCreate(it, viewType) }

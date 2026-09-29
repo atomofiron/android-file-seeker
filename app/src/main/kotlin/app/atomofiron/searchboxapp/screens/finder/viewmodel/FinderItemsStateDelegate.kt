@@ -33,7 +33,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
     override val isLocal: Boolean,
     preferences: PreferenceStore,
     charsets: SupportedCharsets,
-    tasks: Flow<List<Task>>,
+    tasks: Flow<List<Task>?>,
 ) : FinderItemsState {
 
     private val query = MutableStateFlow("")
@@ -76,12 +76,13 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
     override val items = combine(
         firstItems,
         if (isLocal) localOptions else globalOptions,
-        tasks.map { task -> task.reversed().map { FinderStateItem.Task(it, clickableIfEmpty = !isLocal) } },
+        tasks.map { task -> task?.reversed()?.map { FinderStateItem.Task(it, clickableIfEmpty = !isLocal) } },
     ) { first, options, tasks ->
         buildList {
             addAll(first)
             addAll(options)
-            addAll(tasks)
+            tasks?.let { addAll(tasks) }
+                ?: add(FinderStateItem.Loading)
         }
     }
 
