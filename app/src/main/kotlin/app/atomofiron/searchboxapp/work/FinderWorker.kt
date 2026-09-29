@@ -53,6 +53,7 @@ import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.ifCanNotice
 import app.atomofiron.searchboxapp.utils.mutate
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -234,6 +235,7 @@ class FinderWorker(
         val dataBuilder = Data.Builder()
         try {
             scope.launch {
+                debug { delay(1000) }
                 when (val type = params.type) {
                     is Params.Text -> params.searchText(type)
                     is Params.Names -> params.searchNames(type)
