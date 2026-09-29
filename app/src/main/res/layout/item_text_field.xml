@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.textfield.TextInputLayout
+<app.atomofiron.searchboxapp.custom.view.TextFieldBox
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/box"
@@ -19,4 +19,4 @@
         android:imeOptions="flagNoFullscreen|flagNoExtractUi"
         app:hideKeyboardOnFocusLost="false"
         />
-</com.google.android.material.textfield.TextInputLayout>
+</app.atomofiron.searchboxapp.custom.view.TextFieldBox>
