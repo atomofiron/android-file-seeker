@@ -40,7 +40,7 @@ class ResultItemActionDelegate @Inject constructor(
             item.isDirectory -> Unit // todo open dir
             (item.error is NodeError.NoSuchFileOrDir),
             (item.error is NodeError.PermissionDenied) -> state.showAlert(item.error.toAlert(item.content))
-            (item.content is NodeContent.Text) -> router.openFile(item.ref, item.length, state.taskUuid)
+            (item.content is NodeContent.Text) -> router.openFile(item.ref, item.length, state.taskUuid, state.result.type.charset)
             (item.content is NodeContent.AndroidApp) -> apks.askForAndroidApp(item.ref, item.content)
             else -> sharing.openWith(item)
         }

@@ -27,6 +27,7 @@ pub enum Request {
         targets: Vec<RawPath>,
         max_depth: u32,
         size_limit: Option<u64>,
+        charset: Option<String>,
     },
     ReadFile(RawPath),
 }

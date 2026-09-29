@@ -2,41 +2,35 @@ package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
-import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ItemChipsBinding
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 
 class TargetsHolder(
     parent: ViewGroup,
     output: FinderTargetsOutput,
-) : GeneralHolder<FinderStateItem.Targets>(parent, R.layout.item_finder_targets) {
+) : GeneralHolder<FinderStateItem.Targets>(parent, R.layout.item_chips) {
 
     override val hungry = true
 
-    private val recyclerView = itemView.findViewById<RecyclerView>(R.id.item_rv_targets)
-    private val adapter = TargetAdapter(output)
+    private val binding = ItemChipsBinding.bind(itemView)
+    private val adapter = Adapter(output)
 
     init {
-        recyclerView.adapter = adapter
-        recyclerView.itemAnimator = null
-        recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-    }
-
-    override fun onBind(item: FinderStateItem.Targets, position: Int) {
-        adapter.submitList(item.targets)
-    }
-
-    private class TargetAdapter(private val output: FinderTargetsOutput): ListAdapter<Node, TargetHolder>(DiffUtilCallback) {
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = TargetHolder(parent, output)
-
-        override fun onBindViewHolder(holder: TargetHolder, position: Int) {
-            holder.bind(currentList[position], position)
+        binding.root.run {
+            adapter = this@TargetsHolder.adapter
+            itemAnimator = null
         }
+    }
+
+    override fun onBind(item: FinderStateItem.Targets, position: Int) = adapter.submitList(item.targets)
+
+    private class Adapter(private val output: FinderTargetsOutput): ListAdapter<Node, TargetHolder>(DiffUtilCallback) {
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = TargetHolder(parent, output)
+        override fun onBindViewHolder(holder: TargetHolder, position: Int) = holder.bind(currentList[position], position)
     }
 
     private object DiffUtilCallback : DiffUtil.ItemCallback<Node>() {

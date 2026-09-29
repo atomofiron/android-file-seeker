@@ -1,4 +1,3 @@
-mod literal_matcher;
 mod regex_matcher;
 mod simple_matcher;
 mod text_matches;

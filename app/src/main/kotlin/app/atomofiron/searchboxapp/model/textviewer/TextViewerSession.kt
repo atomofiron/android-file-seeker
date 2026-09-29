@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.model.textviewer
 
 import app.atomofiron.common.util.GrowingList
+import app.atomofiron.searchboxapp.di.dependencies.store.SupportedCharsets
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -14,20 +15,29 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import uniffi.native_lib.FileReader
 import uniffi.native_lib.ReadResult
+import uniffi.native_lib.SupportedCharset
 import java.io.Closeable
 import java.nio.ByteBuffer
 import java.nio.charset.Charset
-import kotlin.toULong
+import kotlin.uuid.Uuid
 
 private const val BUFFER_SIZE = 8 * 1024
 private const val CR: Byte = 0x0D
 private const val LF: Byte = 0x0A
+private const val NULL: Byte = 0x00
 
 class TextViewerSession(
     private val input: FileReader,
     private val length: ULong,
     ref: NodeRef,
+    private val charsets: SupportedCharsets,
+    charset: String?,
 ) : Closeable {
+
+    private var dual = false
+    private val byteStep get() = if (dual) 2 else 1
+    var charset = Charsets.UTF_8
+        private set
 
     private var bytes = ByteArray(BUFFER_SIZE)
     private var byteBuf = ByteBuffer.wrap(bytes)
@@ -37,6 +47,7 @@ class TextViewerSession(
             field = value
             updateReading(value)
         }
+    private var utf8byteCount = 0uL
     private var afterCr = false
     var isFullyRead = false
         private set
@@ -46,7 +57,7 @@ class TextViewerSession(
         field = MutableStateFlow(ref.toNode())
     val error: StateFlow<NodeError?>
         field = MutableStateFlow<NodeError?>(null)
-    private val lineList = GrowingList<TextLine>()
+    private var lineList = GrowingList<TextLine>()
     val lines: StateFlow<List<TextLine>>
         field = MutableStateFlow(listOf())
     val loading = MutableStateFlow(false)
@@ -56,13 +67,45 @@ class TextViewerSession(
         field = MutableStateFlow(listOf())
 
     init {
-        Charset.availableCharsets().keys.forEach { println(it) }
+        val charset = charsets.get(charset)
+        this.charset = charset?.name
+            ?.let{ Charset.forName(it) }
+            ?: this.charset
+        dual = charset?.dual ?: dual
         byteBuf.limit(0)
     }
 
     fun updateItem(item: Node) {
         this.item.value = item
     }
+
+    suspend fun setCharset(name: String?): Boolean {
+        val charset = charsets.get(name)
+            .takeIf { it != this.charset }
+            ?: return false
+        mutex.withLock {
+            this.charset = Charset.forName(charset.name)
+            dual = charset.dual
+            lines.value = emptyList()
+            byteCount = 0uL
+            utf8byteCount = 0uL
+            byteBuf.clear()
+            byteBuf.limit(0)
+            reading.value = Reading.Stub
+            lineList = GrowingList()
+            isFullyRead = false
+            input.reset()
+            afterCr = false
+            error.value = null
+            return true
+        }
+    }
+
+    private fun SupportedCharsets.get(name: String?): SupportedCharset? = list.value
+        .takeIf { name != null }
+        ?.find { it.name == name }
+
+    fun getOrNull(uuid: Uuid) = tasks.value.find { it.uuid == uuid }
 
     suspend fun tasks(action: suspend MutableList<LocalSearchTask>.() -> Unit) = mutex.withLock {
         tasks.run {
@@ -81,7 +124,6 @@ class TextViewerSession(
     override fun close() = input.close()
 
     fun readLine(): TextLine? {
-        val offset = byteCount
         if (isFullyRead) {
             return null
         }
@@ -94,7 +136,11 @@ class TextViewerSession(
         }
         val text = lineBuilder.toByteArray()
         lineBuilder.clear()
-        return TextLine(offset, text)
+        val string = String(text, charset)
+        val offset = utf8byteCount
+        val bytes = string.toByteArray(Charsets.UTF_8)
+        utf8byteCount += bytes.size.inc().toULong()
+        return TextLine(offset, bytes)
     }
 
     /** @return true if EOF */
@@ -121,7 +167,7 @@ class TextViewerSession(
     }
 
     /** @return count of skipped bytes */
-    private fun skipCrLf(): Int {
+    private fun skipCrLf(): Int { // todo skip UTF-16
         if (!byteBuf.hasRemaining()) {
             return 0
         }
@@ -172,10 +218,20 @@ class TextViewerSession(
 
     private fun ByteBuffer.findEndOfLine(): Int {
         val array = array()
-        for (i in position()..<limit()) {
-            if (array[i] == LF || array[i] == CR) {
-                return i
+        for (i in position()..<limit() step byteStep) {
+            val byte = array[i]
+            when (byteStep) {
+                1 if (byte == LF || byte == CR) -> Unit
+                1 -> continue
+                else -> when (array.getOrNull(i.inc())) {
+                    NULL if byte == LF -> Unit
+                    NULL if byte == CR -> Unit
+                    LF if byte == NULL -> Unit
+                    CR if byte == NULL -> Unit
+                    else -> continue
+                }
             }
+            return i
         }
         return -1
     }

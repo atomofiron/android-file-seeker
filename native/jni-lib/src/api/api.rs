@@ -1,7 +1,7 @@
-use std::sync::Arc;
 use crate::ext::raw_path::RawPath;
-use bincode::{Decode, Encode};
 use crate::r#impl::inotify::api::WatchHandle;
+use bincode::{Decode, Encode};
+use std::sync::Arc;
 
 #[derive(Debug, Encode, Decode, PartialEq)]
 #[derive(uniffi::Record)]
@@ -138,6 +138,13 @@ pub struct TypedMeta {
     pub mime: String,
 }
 
+#[derive(Debug, Encode, Decode, PartialEq)]
+#[derive(uniffi::Record)]
+pub struct SupportedCharset {
+    pub name: String,
+    pub dual: bool,
+}
+
 #[uniffi::export(with_foreign)]
 pub trait CommonProgressCollector: Send + Sync {
     fn emit(&self, progress: CommonProgress);
@@ -173,4 +180,3 @@ pub trait FileEventCollector: Send + Sync {
     fn emit(&self, event: FileEvent);
     fn error(&self, message: String);
 }
-

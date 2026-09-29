@@ -41,6 +41,7 @@ import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
 import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.finder.SearchType
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
@@ -81,11 +82,17 @@ class FinderWorker(
         val query: QueryParams,
         val type: Type,
         val maxDepth: Int,
+        val charset: String?,
         val targets: List<ByteArray>,
         val asSu: Boolean,
     ) {
         @Serializable
-        sealed interface Type
+        sealed interface Type {
+            fun toResultType(charset: String?): SearchType = when (this) {
+                is Names -> SearchType.Names
+                is Text -> SearchType.Text(charset)
+            }
+        }
         @Serializable
         data class Names(val excludeDirs: Boolean) : Type
         @Serializable
@@ -112,7 +119,7 @@ class FinderWorker(
 
     private fun Params.searchText(type: Params.Text) {
         val errors = GrowingList<String>()
-        NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, asSu, cancellation) { match ->
+        NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, charset, asSu, cancellation) { match ->
             updateAsync {
                 val new = when (match) {
                     is TextSearchProgress.Skip -> result.copy(countTotal = result.countTotal.inc())
@@ -185,7 +192,7 @@ class FinderWorker(
         if (context.canForegroundService()) {
             setForeground(getForegroundInfo())
         }
-        val result = GlobalSearchResult(params.type is Params.Text)
+        val result = GlobalSearchResult(params.type.toResultType(params.charset))
         task = SearchTask(params.query, result = result, uuid = taskId, uniqueId = params.uniqueId)
         store.addOrUpdate(task)
         return work(params)

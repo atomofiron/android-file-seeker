@@ -6,6 +6,7 @@ import app.atomofiron.common.util.flow.invoke
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.SupportedCharsets
 import app.atomofiron.searchboxapp.screens.finder.di.history.HistoryDao
 import app.atomofiron.searchboxapp.screens.finder.di.history.ItemHistory
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
@@ -20,10 +21,12 @@ class FinderViewState @Inject constructor(
     private val scope: CoroutineScope,
     preferencesStore: PreferenceStore,
     val finderStore: FinderStore,
+    charsets: SupportedCharsets,
     history: HistoryDao,
 ) : FinderItemsState by FinderItemsStateDelegate(
     isLocal = false,
     preferencesStore,
+    charsets,
     finderStore.tasksFlow,
 ) {
 

@@ -8,6 +8,7 @@ import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchTask
+import app.atomofiron.searchboxapp.model.finder.SelectableCharset
 
 sealed class FinderStateItem(
     val type: FinderItemType,
@@ -38,7 +39,10 @@ sealed class FinderStateItem(
 
     data class Title(@StringRes val stringId: Int) : FinderStateItem(FinderItemType.TITLE, stringId)
 
-    data class Options(val toggles: SearchOptions) : FinderStateItem(FinderItemType.EDIT_OPTIONS_MINI), SearchOptions by toggles
+    data class Options(
+        val toggles: SearchOptions,
+        val charset: String?,
+    ) : FinderStateItem(FinderItemType.EDIT_OPTIONS_MINI), SearchOptions by toggles
 
     data class EditOptions(val toggles: SearchOptions) : FinderStateItem(FinderItemType.EDIT_OPTIONS), SearchOptions by toggles
 
@@ -63,9 +67,11 @@ sealed class FinderStateItem(
     data class Task<R : SearchResult>(
         val task: SearchTask<R>,
         val clickableIfEmpty: Boolean,
-    ) : FinderStateItem(FinderItemType.PROGRESS, task.uniqueId + 100)
+    ) : FinderStateItem(FinderItemType.TASK, task.uniqueId + 100)
 
     data class Targets(val targets: List<Node>) : FinderStateItem(FinderItemType.TARGETS)
+
+    data class Charsets(val charsets: List<SelectableCharset>) : FinderStateItem(FinderItemType.CHARSETS)
 
     companion object {
         val groups = listOf(

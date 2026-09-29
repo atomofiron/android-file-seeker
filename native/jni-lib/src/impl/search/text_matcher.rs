@@ -1,44 +1,36 @@
 use crate::api::api::{SearchQuery, TextMatch};
 use crate::common::{Rslt, EMPTY_VALUE_ERROR};
-use crate::r#impl::search::literal_matcher::LiteralMatcher;
 use crate::r#impl::search::text_matches::TextMatches;
 use crate::r#impl::search::text_sink::TextSink;
 use grep_regex::{RegexMatcher, RegexMatcherBuilder};
-use grep_searcher::SearcherBuilder;
+use grep_searcher::{Encoding, SearcherBuilder};
 use std::path::Path;
 
-pub enum TextMatcher {
-    Literal(LiteralMatcher),
-    Regex(RegexMatcher),
+pub trait TextMatcher {
+    fn from_query(query: SearchQuery) -> Rslt<RegexMatcher>;
+    fn search(&self, path: &Path, encoding: Option<Encoding>) -> Rslt<Vec<TextMatch>>;
 }
 
-impl TextMatcher {
+impl TextMatcher for RegexMatcher {
 
-    pub fn new(query: SearchQuery) -> Rslt<Self> {
+    fn from_query(query: SearchQuery) -> Rslt<RegexMatcher> {
         if query.query.is_empty() {
             return Err(EMPTY_VALUE_ERROR.into());
         }
-        let matcher = match query.regex {
-            false => Self::Literal(LiteralMatcher::new(query.query, query.case_insensitive)),
-            true => {
-                let matcher = RegexMatcherBuilder::new()
-                    .case_insensitive(query.case_insensitive)
-                    .build(query.query.as_str())?;
-                Self::Regex(matcher)
-            },
-        };
+        let matcher = RegexMatcherBuilder::new()
+            .case_insensitive(query.case_insensitive)
+            .fixed_strings(!query.regex)
+            .build(query.query.as_str())?;
         return Ok(matcher);
     }
 
-    pub fn search(&self, path: &Path) -> Rslt<Vec<TextMatch>> {
+    fn search(&self, path: &Path, encoding: Option<Encoding>) -> Rslt<Vec<TextMatch>> {
         let mut searcher = SearcherBuilder::new()
             .line_number(true)
+            .encoding(encoding)
             .build();
         let matches = TextMatches::new();
-        match &self {
-            TextMatcher::Literal(matcher) => searcher.search_path(matcher, path, TextSink::new(&matcher, &matches))?,
-            TextMatcher::Regex(matcher) => searcher.search_path(matcher, path, TextSink::new(&matcher, &matches))?,
-        };
+        searcher.search_path(self, path, TextSink::new(&self, &matches))?;
         return Ok(matches.take());
     }
 }

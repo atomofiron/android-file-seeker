@@ -11,11 +11,12 @@ enum class FinderItemType(val id: Int) {
     BUTTONS(ids()),
     EDIT_OPTIONS_MINI(ids()),
     EDIT_OPTIONS(ids()),
+    CHARSETS(ids()),
     MAX_SIZE(ids()),
     MAX_DEPTH(ids()),
     EDIT_CHARS(ids()),
     TITLE(ids()),
-    PROGRESS(ids()),
+    TASK(ids()),
     TARGETS(ids()),
     ;
 

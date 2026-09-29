@@ -11,6 +11,7 @@ import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_FILE_LENGTH
 import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_FILE_TIMESTAMP
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
+import io.ktor.utils.io.charsets.name
 import uniffi.native_lib.CancellationState
 import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CommonProgressCollector
@@ -29,6 +30,7 @@ import uniffi.native_lib.ReaderResult
 import uniffi.native_lib.SearchQuery
 import uniffi.native_lib.SimpleResult
 import uniffi.native_lib.SuCmd
+import uniffi.native_lib.SupportedCharset
 import uniffi.native_lib.TextSearchCollector
 import uniffi.native_lib.TextSearchProgress
 import uniffi.native_lib.TypedMeta
@@ -38,6 +40,7 @@ import uniffi.native_lib.UsageResult
 import uniffi.native_lib.WatchHandle
 import java.io.File
 import java.io.FileOutputStream
+import java.nio.charset.Charset
 import java.util.zip.ZipFile
 
 private lateinit var suCmd: SuCmd
@@ -158,11 +161,12 @@ object NativeBridge {
     fun findLocalText(
         params: QueryParams,
         target: NodeRef,
+        charset: String?,
         asSu: Boolean,
         cancellation: CancellationState,
     ): TextSearchProgress {
         var matches: TextSearchProgress = TextSearchProgress.Skip
-        val result = findText(params, listOf(target), maxDepth = 1, maxSize = null, asSu, cancellation) {
+        val result = findText(params, listOf(target), maxDepth = 1, maxSize = null, charset, asSu, cancellation) {
             matches = it
         }
         return when (result) {
@@ -176,6 +180,7 @@ object NativeBridge {
         targets: List<NodeRef>,
         maxDepth: Int,
         maxSize: ULong?,
+        charset: String?,
         asSu: Boolean,
         cancellation: CancellationState,
         collector: (TextSearchProgress) -> Unit,
@@ -184,8 +189,25 @@ object NativeBridge {
             override fun emit(progress: TextSearchProgress) = collector(progress)
         }
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
-        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), sizeLimit = maxSize, suCmd = suCmd.takeIf { asSu }, cancellation, collector)
+        return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), sizeLimit = maxSize, charset = charset, suCmd = suCmd.takeIf { asSu }, cancellation, collector)
             .toRslt()
+    }
+
+    fun getSupportedCharsets(): List<SupportedCharset> {
+        val charsets = Charset.availableCharsets()
+            .asSequence()
+            .map { it.value.name }
+            .sortedBy { it }
+            .sortedBy { it.length }
+            .sortedBy {
+                when {
+                    it.startsWith("utf", ignoreCase = true) -> 0
+                    it.startsWith("windows", ignoreCase = true) -> 1
+                    it.startsWith("iso", ignoreCase = true) -> 2
+                    else -> 3
+                }
+            }.toList()
+        return uniffi.native_lib.filterCharsets(charsets)
     }
 
     fun observeDir(

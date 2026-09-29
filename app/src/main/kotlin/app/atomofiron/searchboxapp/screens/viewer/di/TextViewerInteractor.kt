@@ -40,7 +40,9 @@ class TextViewerInteractor @Inject constructor(
         return item.update(asSu)
     }
 
-    fun fetchFileSession(ref: NodeRef, length: ULong): Rslt<TextViewerSession> = service.getFileSession(ref, length)
+    fun fetchFileSession(ref: NodeRef, length: ULong, charset: String?): Rslt<TextViewerSession> {
+        return service.getFileSession(ref, length, charset)
+    }
 
     /** invoke the callback after success */
     fun readFileToLine(ref: NodeRef, index: Int, callback: (() -> Unit)? = null) {
@@ -68,4 +70,6 @@ class TextViewerInteractor @Inject constructor(
     }
 
     fun copy(item: Node): Alert.Uni?  = utils.copyToClipboard(item)
+
+    fun setCharset(ref: NodeRef, name: String?) = service.setCharset(ref, name)
 }

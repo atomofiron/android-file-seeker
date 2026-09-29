@@ -95,20 +95,20 @@ class FinderAdapterPresenterDelegate @Inject constructor(
                 .request(POST_NOTIFICATIONS)
                 .any {
                     storagePermissionDelegate.request(
-                        granted = { startSearch(value, targets.map { it.ref }) },
+                        granted = { startSearch(value, charset = viewState.charset.value, targets.map { it.ref }) },
                         denied = { viewState.showPermissionRequiredWarning() }
                     )
                 }
         }
     }
 
-    private fun startSearch(query: String, targets: List<NodeRef>) {
+    private fun startSearch(query: String, charset: String?, targets: List<NodeRef>) {
         io {
             if (history.exists(query)) history.delete(query)
             history.put(ItemHistory(query = query))
         }
         val config = viewState.toggles.value.toggles
-        interactor.search(query, targets, config)
+        interactor.search(query, charset, targets, config)
     }
 
     override fun onEditCharacters(new: List<String>) = preferences { setSpecialCharacters(new.toTypedArray()) }

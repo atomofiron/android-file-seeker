@@ -7,6 +7,7 @@ import app.atomofiron.searchboxapp.di.dependencies.service.UtilService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.SupportedCharsets
 import app.atomofiron.searchboxapp.di.dependencies.store.TextViewerStore
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
@@ -56,7 +57,7 @@ class TextViewerModule {
     fun textViewerSession(
         params: TextViewerParams,
         interactor: TextViewerInteractor,
-    ): TextViewerSessionResult = TextViewerSessionResult(interactor.fetchFileSession(params.ref, params.length))
+    ): TextViewerSessionResult = TextViewerSessionResult(interactor.fetchFileSession(params.ref, params.length, params.charset))
 }
 
 interface TextViewerDependencies {
@@ -66,4 +67,5 @@ interface TextViewerDependencies {
     fun finderStore(): FinderStore
     fun curtainChannel(): CurtainChannel
     fun utilService(): UtilService
+    fun supportedCharsets(): SupportedCharsets
 }

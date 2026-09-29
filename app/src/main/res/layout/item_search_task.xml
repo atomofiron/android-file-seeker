@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="?attr/colorContent"
-        tools:text="[ ] 144 [ ]36 [ ]96"
+        tools:text="[ ] 144 [ ]36 [ ]96 charset"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"

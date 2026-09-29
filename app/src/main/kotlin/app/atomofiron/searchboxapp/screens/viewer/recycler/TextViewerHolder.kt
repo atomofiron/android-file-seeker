@@ -6,17 +6,27 @@ import android.widget.TextView
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugFail
-import app.atomofiron.searchboxapp.utils.colorAttr
+import app.atomofiron.common.util.extension.size
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.style.EntireLineSpan
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
 import app.atomofiron.searchboxapp.model.textviewer.MatchList
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
-import app.atomofiron.searchboxapp.utils.countChars
+import app.atomofiron.searchboxapp.utils.colorAttr
+import java.nio.ByteBuffer
+import java.nio.CharBuffer
+import java.nio.charset.CodingErrorAction
 
-class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>(textView) {
+private val charBuf = CharBuffer.allocate(1024)
+private val Utf8Decoder = Charsets.UTF_8
+    .newDecoder()
+    .onMalformedInput(CodingErrorAction.REPLACE)
+    .onUnmappableCharacter(CodingErrorAction.REPLACE)
 
-    private val charset = Charsets.UTF_8
+
+class TextViewerHolder(
+    private val textView: TextView,
+) : GeneralHolder<TextLine>(textView) {
 
     private val spanPart: RoundedBackgroundSpan
         get() = RoundedBackgroundSpan(
@@ -62,12 +72,12 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
         matches.forEachIndexed { index, match ->
             val bytesStart = (match.offset - item.offset).toInt()
             val bytesEnd = (bytesStart + match.length.toInt())
-            val start = item.text.countChars(charset, 0..<bytesStart)
+            val start = item.text.countChars(0..<bytesStart)
             if (bytesStart < 0 || bytesEnd > item.text.size) {
                 debugFail { "$bytesStart < 0 || $bytesEnd > ${item.text.size}, text ${item.text.decode()}" }
                 return@forEachIndexed
             }
-            val length = item.text.countChars(charset, bytesStart..<bytesEnd)
+            val length = item.text.countChars(bytesStart..<bytesEnd)
             val end = start + length
             val forTheEntireLine = start == 0 && end == item.length
             val span: Any = when {
@@ -86,5 +96,39 @@ class TextViewerHolder(private val textView: TextView) : GeneralHolder<TextLine>
         textView.setTextIsSelectable(true)
     }
 
-    private fun ByteArray.decode() = String(this, charset)
+    private fun ByteArray.decode(): String {
+        val builder = StringBuilder()
+        val byteBuffer = ByteBuffer.wrap(this, 0, size)
+        while (byteBuffer.position() < size) {
+            Utf8Decoder.decode(byteBuffer, charBuf, true)
+            builder.appendRange(charBuf.array(), 0, charBuf.position())
+            charBuf.clear()
+        }
+        return builder.toString()
+    }
+}
+
+private fun ByteArray.countChars(range: IntRange): Int {
+    var count = 0
+    val byteBuf = ByteBuffer.wrap(this, range.first, range.size)
+
+    while (true) {
+        val result = Utf8Decoder.decode(byteBuf, charBuf, true)
+        count += charBuf.position()
+        charBuf.clear()
+        when {
+            result.isUnderflow -> break
+            result.isOverflow -> continue
+            result.isError -> result.throwException()
+        }
+    }
+    val result = Utf8Decoder.flush(charBuf)
+    count += charBuf.position()
+    charBuf.clear()
+    Utf8Decoder.reset()
+
+    if (result.isError) {
+        result.throwException()
+    }
+    return count
 }

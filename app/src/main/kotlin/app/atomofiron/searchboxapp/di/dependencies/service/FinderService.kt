@@ -22,6 +22,7 @@ import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
+import app.atomofiron.searchboxapp.model.finder.SearchType
 import app.atomofiron.searchboxapp.work.FinderWorker
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -54,19 +55,24 @@ class FinderService @Inject constructor(
         }
     }
 
-    suspend fun search(query: String, where: List<NodeRef>, config: SearchOptions) = withIO {
+    suspend fun search(
+        query: String,
+        charset: String?,
+        where: List<NodeRef>,
+        config: SearchOptions,
+    ) = withIO {
         val maxSize = preferenceStore.maxFileSizeForSearch.value
         val maxDepth = preferenceStore.maxDepthForSearch.value
         val asSu = preferenceStore.asSu.value
-        val query = QueryParams(query, regex = config.regex, ignoreCase = config.ignoreCase)
+        val query = QueryParams(query, regex = config.regex, ignoreCase = config.ignoreCase, charset = charset)
         val type = when {
             config.contentSearch -> FinderWorker.Params.Text(maxSize = maxSize.resolve())
             else -> FinderWorker.Params.Names(excludeDirs = config.excludeDirs)
         }
-        val result = GlobalSearchResult(forText = config.contentSearch)
+        val result = GlobalSearchResult(if (config.contentSearch) SearchType.Text(charset) else SearchType.Names)
         val cache = SearchResultCache(stopped = false, params = query)
         val uniqueId = dao.store(cache, result)
-        val params = FinderWorker.Params(uniqueId, query, type, maxDepth = maxDepth, targets = where.map { it.bytes }, asSu = asSu)
+        val params = FinderWorker.Params(uniqueId, query, type, maxDepth = maxDepth, charset = charset, targets = where.map { it.bytes }, asSu = asSu)
         val request = OneTimeWorkRequest.Builder(FinderWorker::class.java)
             .setInputData(Data(params))
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)

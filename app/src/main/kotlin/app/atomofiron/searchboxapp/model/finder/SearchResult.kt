@@ -24,6 +24,7 @@ sealed class SearchResult {
     data class Local(
         override val count: Int,
         val matches: MatchMap,
+        val charset: String?,
         val hash: NodeInfo? = null,
         override val removable: Boolean = true,
     ) : SearchResult() {
@@ -32,7 +33,7 @@ sealed class SearchResult {
 
         override val countTotal = 1
 
-        constructor() : this(0, mapOf())
+        constructor(charset: String?) : this(0, mapOf(), charset)
 
         override fun getCounters(): IntArray = intArrayOf(count)
 
@@ -48,7 +49,7 @@ sealed class SearchResult {
 
     @Serializable
     data class Global(
-        private val forText: Boolean,
+        val type: SearchType,
         override val count: Int = 0,
         override val countTotal: Int = 0,
         val matches: List<ItemMatch> = listOf(), // todo make List<T : ItemMatch>?
@@ -56,9 +57,9 @@ sealed class SearchResult {
         val generation: Int = 0,
     ) : SearchResult() {
 
-        override fun getCounters(): IntArray = when {
-            forText -> intArrayOf(count, matches.size, countTotal)
-            else -> intArrayOf(matches.size)
+        override fun getCounters(): IntArray = when (type) {
+            is SearchType.Text -> intArrayOf(count, matches.size, countTotal)
+            is SearchType.Names -> intArrayOf(matches.size)
         }
 
         fun toMarkdown(filter: ((ItemMatch) -> Boolean)? = null): String {
@@ -84,7 +85,7 @@ sealed class SearchResult {
                 removed.none { match.ref.isChildOf(it.ref) }
             }
             val count = left.sumOf { it.count }
-            return copy(forText = forText, count = count, countTotal = left.size, matches = left)
+            return copy(count = count, countTotal = left.size, matches = left)
         }
 
         fun contains(match: ItemMatch) = matches.contains(match)

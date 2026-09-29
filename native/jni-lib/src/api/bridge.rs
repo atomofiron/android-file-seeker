@@ -1,5 +1,5 @@
+use crate::api::api::{CommonProgressCollector, CountingResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, SupportedCharset, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
 use crate::api::api::{CrcResult, FileEventCollector, HandleResult, SuCmd};
-use crate::api::api::{CommonProgressCollector, CountingResult, MetaResult, MetasResult, NameSearchCollector, SearchQuery, SimpleResult, TextSearchCollector, TypedMetaResult, TypedMetasResult, UsageResult};
 use crate::api::cancellation::CancellationState;
 use crate::api::su_api::Request;
 use crate::api::su_bridge::{as_su, as_su_with_progress, get_child, write_request};
@@ -15,6 +15,8 @@ use crate::r#impl::r#type::{file_type, file_types};
 use crate::r#impl::reader::api::{FileReader, ReaderResult};
 use crate::r#impl::search_by_name::find_names_impl;
 use crate::r#impl::search_by_text::find_text_impl;
+use encoding_rs::{Encoding as EncodingRs, ISO_2022_JP, UTF_16BE, UTF_16LE};
+use grep_searcher::Encoding;
 use std::fs::File;
 use std::sync::Arc;
 
@@ -179,24 +181,39 @@ pub fn find_names(
 }
 
 #[uniffi::export]
+pub fn filter_charsets(charsets: Vec<String>) -> Vec<SupportedCharset> {
+    charsets.into_iter()
+        .filter_map(|name| match EncodingRs::for_label_no_replacement(name.as_bytes()) {
+            None => None,
+            Some(en) if en == ISO_2022_JP => None, // stateful encoding
+            Some(_) if Encoding::new(&name).is_err() => None,
+            Some(en) => Some(SupportedCharset {
+                name: name.clone(),
+                dual: en == UTF_16BE || en == UTF_16LE,
+            }),
+        }).collect()
+}
+
+#[uniffi::export]
 pub fn find_text(
     query: SearchQuery,
     targets: Vec<RawPath>,
     max_depth: u32,
     size_limit: Option<u64>,
+    charset: Option<String>,
     su_cmd: Option<SuCmd>,
     cancellation: Arc<dyn CancellationState>,
     collector: Arc<dyn TextSearchCollector>,
 ) -> SimpleResult {
     if let Some(su_cmd) = su_cmd {
         return as_su_with_progress(
-            Request::FindText { query, targets, max_depth, size_limit },
+            Request::FindText { query, targets, max_depth, size_limit, charset },
             su_cmd,
             cancellation,
             Box::new(collector),
         ).unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
     }
-    return find_text_impl(query, targets, max_depth as usize, size_limit, cancellation, collector);
+    return find_text_impl(query, targets, max_depth as usize, size_limit, charset, cancellation, collector);
 }
 
 #[uniffi::export]
@@ -211,9 +228,9 @@ pub fn observe_dir(target: RawPath, collector: Arc<dyn FileEventCollector>) -> H
 pub fn read_file(path: RawPath, su_cmd: Option<SuCmd>) -> ReaderResult {
     let reader = match su_cmd {
         Some(su_cmd) => get_child(&su_cmd).and_then(|(mut child, pid)| {
-            let request = Request::ReadFile(path);
+            let request = Request::ReadFile(path.clone());
             write_request(&mut child, request)?;
-            Ok(FileReader::with(child, pid))
+            Ok(FileReader::with(child, pid, path))
         }),
         None => File::open(path.buf())
             .map(|p| FileReader::new(p))

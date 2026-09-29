@@ -9,6 +9,7 @@ import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
+import app.atomofiron.searchboxapp.model.finder.SearchType
 import kotlinx.serialization.Serializable
 
 private const val TMP = "tmp"
@@ -50,7 +51,8 @@ object Migrations {
                     val bytes = cursor.getBlob(resultIndex)
 
                     val lr = bytes.decode<LegacyGlobalSearchResult>()
-                    val result = GlobalSearchResult(lr.forText, lr.count, lr.countTotal, lr.matches, lr.errors, lr.generation)
+                    val type = if (lr.forText) SearchType.Text(null) else SearchType.Names
+                    val result = GlobalSearchResult(type, lr.count, lr.countTotal, lr.matches, lr.errors, lr.generation)
                     FinderDao.store(id, result)
                     db.compileStatement("UPDATE $TMP SET sorting = ? WHERE id = ?").run {
                         clearBindings()
@@ -76,5 +78,15 @@ data class LegacyGlobalSearchResult(
     val matches: List<ItemMatch>,
     val errors: List<String>,
     val sorting: NodeSorting = NodeSorting.Date,
+    val generation: Int = 0,
+)
+
+@Serializable
+data class LegacyGlobalSearchResult2(
+    val forText: Boolean,
+    val count: Int = 0,
+    val countTotal: Int = 0,
+    val matches: List<ItemMatch> = listOf(),
+    val errors: List<String> = listOf(),
     val generation: Int = 0,
 )

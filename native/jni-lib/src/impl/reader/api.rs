@@ -1,3 +1,4 @@
+use crate::ext::raw_path::RawPath;
 use bincode::{Decode, Encode};
 use std::fs::File;
 use std::io::BufReader;
@@ -6,7 +7,7 @@ use std::sync::{Arc, Mutex};
 
 pub enum TextProvider {
     Direct(BufReader<File>),
-    Child(Child, u32),
+    Child(Child, u32, RawPath),
 }
 
 #[derive(uniffi::Object)]
@@ -30,6 +31,13 @@ pub enum ReadResult {
 
 #[uniffi::export]
 impl FileReader {
+
+    pub fn reset(&self) -> ReadResult {
+        match self.try_reset() {
+            Ok(_) => ReadResult::Ok(vec![]),
+            Err(e) => ReadResult::Err(e.to_string()),
+        }
+    }
 
     pub fn next(&self) -> ReadResult {
         self.try_next()

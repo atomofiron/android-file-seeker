@@ -17,33 +17,49 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/dense_toolbar"
             app:navigationIcon="@drawable/ic_back"
+            app:menu="@menu/text_viewer"
             tools:title="Title"
             />
         <LinearLayout
-            android:id="@+id/path_bar"
+            android:id="@+id/sub_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:background="@drawable/bg_ripple_16"
-            android:contentDescription="@string/copy"
+            android:orientation="vertical"
             >
-            <ImageView
-                android:layout_width="56dp"
-                android:layout_height="@dimen/icon_button_size"
-                android:paddingVertical="@dimen/padding_semi"
-                android:src="@drawable/ic_copy"
-                android:contentDescription="@string/copy"
-                app:tint="?colorContent"
-                />
-            <TextView
-                android:id="@+id/path"
-                android:layout_width="0dp"
+            <LinearLayout
+                android:id="@+id/path_bar"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="@dimen/padding_mini"
-                android:layout_gravity="center_vertical"
-                android:typeface="monospace"
-                tools:text="/sdcard/fadb/file.txt"
+                android:layout_marginHorizontal="@dimen/padding_mini"
+                android:orientation="horizontal"
+                android:background="@drawable/bg_ripple_16"
+                android:contentDescription="@string/copy"
+                >
+                <ImageView
+                    android:layout_width="@dimen/icon_button_size"
+                    android:layout_height="@dimen/icon_button_size"
+                    android:padding="@dimen/padding_semi"
+                    android:src="@drawable/ic_copy"
+                    android:contentDescription="@string/copy"
+                    app:tint="?colorContent"
+                    />
+                <TextView
+                    android:id="@+id/path"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="@dimen/padding_mini"
+                    android:layout_gravity="center_vertical"
+                    android:typeface="monospace"
+                    tools:text="/sdcard/fadb/file.txt"
+                    />
+            </LinearLayout>
+            <include
+                android:id="@+id/charsets"
+                layout="@layout/item_chips"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="@dimen/padding_half"
                 />
         </LinearLayout>
         <ProgressBar

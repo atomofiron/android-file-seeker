@@ -1,6 +1,7 @@
 package app.atomofiron.searchboxapp.screens.viewer
 
 import app.atomofiron.common.util.Alert
+import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.flow.DataFlow
 import app.atomofiron.common.util.flow.EventFlow
 import app.atomofiron.common.util.flow.set
@@ -8,11 +9,13 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.SupportedCharsets
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.LocalSearchResult
 import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
+import app.atomofiron.searchboxapp.model.finder.SelectableCharset
 import app.atomofiron.searchboxapp.model.textviewer.Reading
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
@@ -24,12 +27,14 @@ import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
 import app.atomofiron.searchboxapp.screens.viewer.state.Status
 import app.atomofiron.searchboxapp.screens.viewer.state.TextViewerDockState
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
+import app.atomofiron.searchboxapp.utils.replaceOne
 import app.atomofiron.searchboxapp.utils.toAlert
 import app.atomofiron.searchboxapp.utils.toInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -40,11 +45,13 @@ class TextViewerViewState private constructor(
     ref: NodeRef,
     private val scope: CoroutineScope,
     private val session: TextViewerSession?,
+    charsets: SupportedCharsets,
     preferenceStore: PreferenceStore,
     error: NodeError?,
 ) : FinderItemsState by FinderItemsStateDelegate(
     isLocal = true,
     preferenceStore,
+    charsets,
     session?.tasks ?: emptyFlow(),
 ) {
     val insertInQuery = EventFlow<String>()
@@ -55,10 +62,25 @@ class TextViewerViewState private constructor(
     val composition = preferenceStore.explorerItemComposition.value
     val item: StateFlow<Node> = session?.item ?: MutableStateFlow(ref.toNode())
     val textLines: StateFlow<List<TextLine>> = session?.lines ?: MutableStateFlow(emptyList())
-    val currentTask = MutableStateFlow<LocalSearchTask?>(null)
+    val currentTask: StateFlow<LocalSearchTask?>
+        field = MutableStateFlow<LocalSearchTask?>(null)
     val alerts: SharedFlow<Alert?>
         field = DataFlow<Alert?>((session?.error?.value ?: error)?.toAlert())
     val reading = session?.reading ?: MutableStateFlow(Reading.Stub)
+    val charsets = charsets.list.map { list ->
+        list.map { SelectableCharset(it.name) }
+    }.let { charsets ->
+        combine(charsets, charset) { list, selected ->
+            if (selected == null) list else list.toMutableList().apply {
+                replaceOne(SelectableCharset(selected, true)) { name == selected }
+            }
+        }
+    }
+
+    override fun setCharset(name: String?) {
+        hideTask()
+        setCharset2(name)
+    }
 
     val dock = status.map { state ->
         var index: Int? = null
@@ -89,9 +111,10 @@ class TextViewerViewState private constructor(
     @Inject constructor(
         params: TextViewerParams,
         scope: CoroutineScope,
+        charsets: SupportedCharsets,
         preferenceStore: PreferenceStore,
         session: TextViewerSessionResult,
-    ) : this(params.ref, scope, session.result.ok()?.value, preferenceStore, session.error)
+    ) : this(params.ref, scope,session.result.ok()?.value, charsets, preferenceStore, session.error)
 
     fun switchCursor(forward: Boolean): CursorResult {
         val result = currentTask.value?.result
@@ -161,6 +184,10 @@ class TextViewerViewState private constructor(
 
     fun dropTask() {
         status.value = status.value.clear()
+        hideTask()
+    }
+
+    fun hideTask() {
         currentTask.value = null
         matchingCursor.value = null
     }
@@ -172,10 +199,14 @@ class TextViewerViewState private constructor(
     fun trySelectTask(task: LocalSearchTask): Boolean {
         return (task.isEnded && task.count > 0 && task.error == null).also { isOk ->
             if (isOk) {
+                setCharset(task.result.charset)
                 currentTask.value = task
                 matchingCursor.value = null
                 status.run {
                     value = value.copy(current = 0, max = task.count)
+                }
+                scope {
+                    session?.setCharset(task.result.charset)
                 }
             }
         }

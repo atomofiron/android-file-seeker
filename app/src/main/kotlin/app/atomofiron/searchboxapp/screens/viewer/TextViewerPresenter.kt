@@ -8,6 +8,7 @@ import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.LocalSearchResult
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharsetsHolder
 import app.atomofiron.searchboxapp.screens.viewer.di.TextViewerInteractor
 import app.atomofiron.searchboxapp.screens.viewer.presenter.SearchAdapterPresenterDelegate
 import app.atomofiron.searchboxapp.screens.viewer.presenter.TextViewerParams
@@ -27,6 +28,7 @@ class TextViewerPresenter @Inject constructor(
     sessionResult: TextViewerSessionResult,
 ) : BasePresenter<TextViewerViewModel, TextViewerRouter>(scope, router),
     TextViewerAdapter.TextViewerListener,
+    CharsetsHolder.CharsetsOutput,
     FinderAdapterOutput<LocalSearchResult> by searchDelegate
 {
 
@@ -72,6 +74,12 @@ class TextViewerPresenter @Inject constructor(
     fun onCopyPathClick() {
         interactor.copy(viewState.item.value)
             ?.let { viewState.showAlert(it) }
+    }
+
+    override fun onCharsetClick(charset: String, select: Boolean) {
+        val charset = charset.takeIf { select }
+        viewState.setCharset(charset)
+        interactor.setCharset(itemRef, charset)
     }
 
     private fun onMoveClick(forward: Boolean) {

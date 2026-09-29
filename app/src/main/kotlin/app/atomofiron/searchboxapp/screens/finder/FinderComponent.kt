@@ -10,6 +10,7 @@ import app.atomofiron.searchboxapp.di.dependencies.service.FinderService
 import app.atomofiron.searchboxapp.di.dependencies.store.ExplorerStore
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
+import app.atomofiron.searchboxapp.di.dependencies.store.SupportedCharsets
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.finder.di.history.HistoryDao
 import app.atomofiron.searchboxapp.screens.finder.di.history.HistoryDatabase
@@ -69,5 +70,6 @@ interface FinderDependencies {
     fun preferenceStore(): PreferenceStore
     fun finderService(): FinderService
     fun finderStore(): FinderStore
+    fun supportedCharsets(): SupportedCharsets
     fun finderDao(): FinderDao
 }

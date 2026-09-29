@@ -2,6 +2,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/padding_half"
@@ -61,6 +62,15 @@
             app:chipIcon="@drawable/ic_config_folder"
             app:textStartPadding="0dp"
             app:textEndPadding="0dp"
+            />
+        <TextView
+            android:id="@+id/charset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="@dimen/padding_mini"
+            android:maxLines="1"
+            android:ellipsize="end"
+            tools:text="UTF-8"
             />
     </LinearLayout>
 </LinearLayout>

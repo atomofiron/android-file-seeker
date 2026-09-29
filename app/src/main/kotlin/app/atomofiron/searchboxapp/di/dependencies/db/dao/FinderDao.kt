@@ -8,8 +8,10 @@ import app.atomofiron.common.util.TaskId
 import app.atomofiron.common.util.extension.decodeOrNull
 import app.atomofiron.common.util.extension.encode
 import app.atomofiron.searchboxapp.android.AbstractApp
+import app.atomofiron.searchboxapp.di.dependencies.db.LegacyGlobalSearchResult2
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchResultCache
+import app.atomofiron.searchboxapp.model.finder.SearchType
 import java.io.File
 
 @Dao
@@ -63,13 +65,27 @@ private object Store {
     }
 
     fun read(id: TaskId): GlobalSearchResult? {
-        return file(id)
+        val bytes = file(id)
             .takeIf { it.exists() }
             ?.readBytes()
-            ?.decodeOrNull<GlobalSearchResult>()
+            ?: return null
+        return when {
+            bytes.isLegacy() -> bytes.decodeOrNull<LegacyGlobalSearchResult2>()?.run {
+                val type = if (forText) SearchType.Text(null) else SearchType.Names
+                GlobalSearchResult(type, count, countTotal, matches, errors, generation)
+            }
+            else -> bytes.decodeOrNull<GlobalSearchResult>()
+        }
     }
 
     fun delete(id: TaskId) {
         file(id).delete()
     }
+}
+
+private fun ByteArray.isLegacy(): Boolean {
+    if (isEmpty()) return false
+    // 0x08 = Boolean
+    // 0x0A = Length-delimited = sealed class/object
+    return first() == 0x08.toByte()
 }

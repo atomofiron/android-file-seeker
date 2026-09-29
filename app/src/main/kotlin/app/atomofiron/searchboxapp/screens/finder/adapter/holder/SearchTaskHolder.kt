@@ -50,7 +50,7 @@ class SearchTaskHolder<Result : SearchResult>(
     override fun onBind(item: FinderStateItem.Task<Result>, position: Int) = binding.run {
         val task = item.task
         params.setParams(task.query)
-        status.setStatus(task.result)
+        status.setStatus(task.result, task.query.charset)
         action.isActivated = !task.isProgress
         progress.isInvisible = !task.status.running
         progress.setSpeed(if (task.isProgress) Speed.Medium else Speed.Slow)
@@ -94,7 +94,7 @@ class SearchTaskHolder<Result : SearchResult>(
         text = status
     }
 
-    private fun TextView.setStatus(result: SearchResult) {
+    private fun TextView.setStatus(result: SearchResult, charset: String?) {
         val status = SpannableStringBuilder()
         val counters = result.getCounters()
         result.getCounters().forEachIndexed { index, it ->
@@ -108,6 +108,7 @@ class SearchTaskHolder<Result : SearchResult>(
             val star = status.lastIndexOf('*')
             status.setIcon(resId, star, star.inc())
         }
+        status.append(charset.orEmpty())
         text = status
     }
 

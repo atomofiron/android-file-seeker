@@ -1,6 +1,7 @@
 use crate::api::api::{SearchQuery, SimpleResult, TextSearchCollector, TextSearchProgress};
 use crate::api::cancellation::CancellationState;
-use crate::common::{Rslt, JOINING_ERROR};
+use crate::common::{string, Rslt, CHARSET_MISMATCH, JOINING_ERROR, WRONG_CHARSET};
+use crate::ext::option::OptionExt;
 use crate::ext::raw_path::RawPath;
 use crate::r#impl::hash::r#impl::crc32;
 use crate::r#impl::meta::meta_with_error;
@@ -9,6 +10,10 @@ use crate::r#impl::search::progress::proxy_progress;
 use crate::r#impl::search::text_matcher::TextMatcher;
 use crate::r#impl::search::walker::walk;
 use content_inspector::inspect;
+use encoding_rs::Encoding as EncodingRs;
+use encoding_rs::{UTF_16BE, UTF_16LE};
+use grep_regex::RegexMatcher;
+use grep_searcher::Encoding;
 use ignore::WalkState;
 use std::fs::File;
 use std::io::Read;
@@ -21,6 +26,7 @@ pub fn find_text_impl(
     targets: Vec<RawPath>,
     max_depth: usize,
     size_limit: Option<u64>,
+    charset: Option<String>,
     cancellation: Arc<dyn CancellationState>,
     collector: Arc<dyn TextSearchCollector>,
 ) -> SimpleResult {
@@ -29,11 +35,18 @@ pub fn find_text_impl(
         Ok(handle) => handle,
         Err(e) => return SimpleResult::Err(e.to_string()),
     };
-    let matcher = match TextMatcher::new(query) {
+    let encoding = match charset {
+        None => None,
+        Some(charset) => match Encoding::new(&charset) {
+            Err(e) => return SimpleResult::Err(e.to_string()),
+            Ok(en) => Some((charset, en)),
+        },
+    };
+    let matcher = match RegexMatcher::from_query(query) {
         Ok(m) => m,
         Err(e) => return SimpleResult::Err(e.to_string())
     };
-    find_text_recursively(matcher, targets, max_depth, size_limit, cancellation, &tx);
+    find_text_recursively(matcher, targets, max_depth, encoding, size_limit, cancellation, &tx);
     drop(tx);
     return handle.join()
         .map(|_| SimpleResult::Ok)
@@ -41,9 +54,10 @@ pub fn find_text_impl(
 }
 
 pub fn find_text_recursively(
-    matcher: TextMatcher,
+    matcher: RegexMatcher,
     targets: Vec<RawPath>,
     max_depth: usize,
+    encoding: Option<(String, Encoding)>,
     size_limit: Option<u64>,
     cancellation: Arc<dyn CancellationState>,
     sender: &Sender<TextSearchProgress>,
@@ -63,7 +77,9 @@ pub fn find_text_recursively(
                 }
             }
             None => Ok(())
-        }.and_then(|_| matcher.search(path))
+        }.and_then(|_| {
+            matcher.search(path, resolve(encoding.clone(), path)?)
+        })
             .map(|matches| match matches.is_empty() {
                 true => TextSearchProgress::Skip,
                 false => TextSearchProgress::Match(type_or_meta(&path.into()), crc32(path), matches),
@@ -73,6 +89,41 @@ pub fn find_text_recursively(
             Err(_) => WalkState::Quit,
         };
     });
+}
+
+// tries to resolve UTF_16 to UTF_16LE or UTF_16BE
+fn resolve(encoding: Option<(String, Encoding)>, path: &Path) -> Rslt<Option<Encoding>> {
+    let (charset, encoding) = match encoding {
+        None => return Ok(None),
+        Some(values) => values,
+    };
+    let len = charset.len();
+    if len != 6 && len != 8 {
+        return Ok(Some(encoding))
+    }
+    let en_rs = EncodingRs::for_label(charset.as_bytes())
+        .or_err(|| string(WRONG_CHARSET))?;
+    if en_rs != UTF_16LE && en_rs != UTF_16BE {
+        return Ok(Some(encoding))
+    }
+    let mut file = File::open(path)?;
+    let mut bytes = [0u8; 2];
+    file.read_exact(&mut bytes)?;
+    let encoding = match bytes {
+        [0xFF, 0xFE] => match len {
+            6 => Encoding::new(UTF_16LE.name())?,
+            _ if en_rs == UTF_16BE => return Err(string(CHARSET_MISMATCH).into()),
+            _ => encoding, // UTF_16LE
+        }
+        [0xFE, 0xFF] => match len {
+            6 => Encoding::new(UTF_16BE.name())?,
+            _ if en_rs == UTF_16LE => return Err(string(CHARSET_MISMATCH).into()),
+            _ => encoding, // UTF_16BE
+        }
+        _ if len == 6 => return Err(string(CHARSET_MISMATCH).into()),
+        _ => encoding // wdc
+    };
+    return Ok(Some(encoding))
 }
 
 fn is_text_file(path: &Path) -> Rslt<bool> {

@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.flow.viewCollect
+import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentTextViewerBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
@@ -18,6 +19,7 @@ import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
 import app.atomofiron.searchboxapp.model.ScreenSize
 import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.decorator.ItemSeparatorDecorator
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharsetsHolder
 import app.atomofiron.searchboxapp.screens.viewer.recycler.TextViewerAdapter
 import app.atomofiron.searchboxapp.screens.viewer.state.MatchCursor
 import app.atomofiron.searchboxapp.utils.addFastScroll
@@ -31,6 +33,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
 
     private val textAdapter = TextViewerAdapter()
     private var readingDenominator = 1
+    private lateinit var charsetsHolder: CharsetsHolder
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,17 +53,20 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
                 setupSpringOverscroll()
                 addOnScrollListener(OnScrollListenerImpl())
             }
+            subBar.noClip()
             dockBar.submit(DefaultDockState)
             dockBar.setListener(::onBottomMenuItemClick)
             pathBar.setOnClickListener { presenter.onCopyPathClick() }
             toolbar.setNavigationOnClickListener { presenter.onNavigationClick() }
             toolbar.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
+                    R.id.menu_more -> header.setExpanded(!header.isExpanded(), true)
                     R.id.menu_edit -> Unit
                     R.id.menu_save -> Unit
                 }
                 true
             }
+            charsetsHolder = CharsetsHolder(presenter, charsets)
             configureAppBar()
         }
         viewState.onViewCollect()
@@ -83,6 +89,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
             binding.progress.secondaryProgress = it.loaded
             readingDenominator = it.denominator
         }
+        viewCollect(charsets) { charsetsHolder.bind(it) }
     }
 
     override fun FragmentTextViewerBinding.onApplyInsets() {

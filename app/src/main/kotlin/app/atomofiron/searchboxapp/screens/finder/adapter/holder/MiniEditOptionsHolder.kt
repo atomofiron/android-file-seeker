@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.finder.adapter.holder
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.GradientDrawable.Orientation
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemSearchEditOptionsMiniBinding
@@ -53,6 +54,8 @@ class MiniEditOptionsHolder(
         excludeDirs.isChecked = item.excludeDirs
         excludeDirs.isEnabled = !item.contentSearch
         excludeDirs.chipIcon?.alpha = Alpha.enabledInt(!item.excludeDirs || !item.contentSearch)
+        charset.text = item.charset
+        charset.isVisible = item.charset != null
     }
 
     private fun update(block: (SearchOptions) -> SearchOptions) = listener.onOptionsChange(block(item.toggles))

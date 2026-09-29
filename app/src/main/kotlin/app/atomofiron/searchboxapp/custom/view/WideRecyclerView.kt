@@ -4,9 +4,11 @@ import android.content.Context
 import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewParent
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.searchboxapp.utils.isLayoutRtl
+import com.google.android.material.appbar.AppBarLayout
 
 class WideRecyclerView : RecyclerView {
 
@@ -16,26 +18,34 @@ class WideRecyclerView : RecyclerView {
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        val parent = parent as View
+        val parent = findParent()
         tryUpdate(parent)
     }
 
     override fun onConfigurationChanged(newConfig: Configuration?) {
         super.onConfigurationChanged(newConfig)
-        val parent = parent as View
+        val parent = findParent()
         tryUpdate(parent)
     }
 
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
-        val parent = parent as View
+        val parent = findParent()
         tryUpdate(parent)
-        val customWidthSpec = MeasureSpec.makeMeasureSpec(parent.width, MeasureSpec.getMode(widthSpec))
+        val customWidthSpec = MeasureSpec.makeMeasureSpec(parent.measuredWidth, MeasureSpec.getMode(widthSpec))
         super.onMeasure(customWidthSpec, heightSpec)
     }
 
     override fun onLayout(changed: Boolean, l: Int, top: Int, r: Int, bottom: Int) {
-        val parent = parent as View
-        super.onLayout(changed, 0, top, parent.width, bottom)
+        val parent = findParent()
+        super.onLayout(changed, 0, top, parent.measuredWidth, bottom)
+    }
+
+    private fun findParent(): View = parent.findParent()
+
+    private fun ViewParent.findParent(): View = when (this) {
+        is AppBarLayout,
+        is RecyclerView -> this
+        else -> parent.findParent()
     }
 
     private fun tryUpdate(parent: View) {

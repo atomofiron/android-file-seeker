@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <app.atomofiron.searchboxapp.custom.view.WideRecyclerView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/item_rv_targets"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/list"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipToPadding="false"
-    android:layout_marginBottom="@dimen/padding_semi"
+    android:orientation="horizontal"
+    android:overScrollMode="never"
+    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
     />

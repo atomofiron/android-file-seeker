@@ -416,8 +416,13 @@ var Slider.intValue: Int
 
 fun View.addOnAttachListener(
     oneTime: Boolean = false,
-    onDetach: (() -> Unit)? = null,
+    onAttach: () -> Unit,
+) = addOnAttachListener(oneTime, onAttach = onAttach, onDetach = null)
+
+fun View.addOnAttachListener(
+    oneTime: Boolean = false,
     onAttach: (() -> Unit)? = null,
+    onDetach: (() -> Unit)? = null,
 ) {
     if (onAttach == null && onDetach == null) {
         return

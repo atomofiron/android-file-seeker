@@ -13,6 +13,7 @@ import androidx.core.view.updateLayoutParams
 import app.atomofiron.common.util.extension.findAs
 import app.atomofiron.common.util.extension.hasBits
 import app.atomofiron.common.util.isDarkDeep
+import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.tonedOverlay
 import app.atomofiron.searchboxapp.utils.Alpha
@@ -48,6 +49,8 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
         collapsing = findViewById(R.id.collapsing)
         pinToolbar(true)
         addOnOffsetChangedListener(this)
+        noClip()
+        collapsing.noClip()
         if (context.isDarkDeep()) {
             addLiftOnScrollListener { _, color ->
                 val background = background as MaterialShapeDrawable
@@ -77,6 +80,8 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
             scrollFlags = if (pin) SCR or EUC else SCR
         }
     }
+
+    fun isExpanded(): Boolean = behavior.topAndBottomOffset == 0
 
     override fun getBehavior(): CoordinatorLayout.Behavior<AppBarLayout?> = behavior
 
@@ -114,6 +119,11 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
         } else {
             throw IllegalArgumentException()
         }
+    }
+
+    override fun setExpanded(expanded: Boolean, animated: Boolean) {
+        behavior.limitOffset = 0
+        super.setExpanded(expanded, animated)
     }
 
     private fun updateToolbarAlpha(offset: Int) {

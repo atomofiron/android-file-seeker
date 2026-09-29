@@ -6,9 +6,11 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.recycler.AdapterHolderListener
 import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.common.util.noClip
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharsetsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
@@ -21,6 +23,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TitleHolder
 import app.atomofiron.searchboxapp.screens.finder.state.FinderItemType
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
+import app.atomofiron.searchboxapp.utils.updateMarginLayoutParams
 
 class FinderAdapter<Result : SearchResult>(
     private val isLocal: Boolean,
@@ -46,11 +49,20 @@ class FinderAdapter<Result : SearchResult>(
             FinderItemType.TITLE -> TitleHolder(parent)
             FinderItemType.TEST -> TestHolder(parent, output)
             FinderItemType.BUTTONS -> ButtonsHolder(parent, output)
-            FinderItemType.PROGRESS -> SearchTaskHolder(parent, output)
+            FinderItemType.TASK -> SearchTaskHolder(parent, output)
             FinderItemType.MAX_DEPTH -> EditMaxDepthHolder(parent, output)
             FinderItemType.MAX_SIZE -> EditMaxSizeHolder(parent, output)
             FinderItemType.EDIT_CHARS -> EditCharactersHolder(parent, output)
-            FinderItemType.TARGETS -> TargetsHolder(parent, output)
+            FinderItemType.TARGETS -> TargetsHolder(parent, output).apply {
+                itemView.updateMarginLayoutParams {
+                    bottomMargin = it.getDimensionPixelSize(R.dimen.padding_semi)
+                }
+            }
+            FinderItemType.CHARSETS -> CharsetsHolder(parent, output).apply {
+                itemView.updateMarginLayoutParams {
+                    topMargin = it.getDimensionPixelSize(R.dimen.padding_semi)
+                }
+            }
             null -> throw IllegalArgumentException("viewType = $viewType")
         }.upcast()
             .also { holderListener?.onCreate(it, viewType) }

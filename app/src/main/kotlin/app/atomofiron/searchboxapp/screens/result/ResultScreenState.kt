@@ -14,6 +14,7 @@ import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchTask
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
+import app.atomofiron.searchboxapp.model.finder.SearchType
 import app.atomofiron.searchboxapp.model.toDockItem
 import app.atomofiron.searchboxapp.screens.common.ActivityMode
 import app.atomofiron.searchboxapp.screens.result.adapter.ResultItem
@@ -44,7 +45,7 @@ class ResultScreenState @Inject constructor(
     private var error: NodeError? = null
     private val mutex = Mutex()
 
-    var result: GlobalSearchResult = task?.result ?: GlobalSearchResult(forText = false)
+    var result: GlobalSearchResult = task?.result ?: GlobalSearchResult(SearchType.Names)
         private set
     override val isReady: StateFlow<Boolean>
         field = MutableStateFlow(task?.result?.matches?.isEmpty() == true)

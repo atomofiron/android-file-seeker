@@ -8,16 +8,18 @@ import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDel
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.ButtonsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharactersHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.CharsetsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditCharactersHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxDepthHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditMaxSizeHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
-import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.SearchTaskHolder
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TargetsHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
 import app.atomofiron.searchboxapp.screens.finder.fragment.history.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderAdapterPresenterDelegate
+import app.atomofiron.searchboxapp.screens.finder.presenter.FinderCharsetsPresenterDelegate
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderHistoryPresenterDelegate
 import app.atomofiron.searchboxapp.screens.finder.presenter.FinderTargetsPresenterDelegate
 import kotlinx.coroutines.CoroutineScope
@@ -31,6 +33,7 @@ class FinderPresenter @Inject constructor(
     private val storagePermissionDelegate: StoragePermissionDelegate,
     finderAdapterDelegate: FinderAdapterPresenterDelegate,
     targetsDelegate: FinderTargetsPresenterDelegate,
+    charsetsDelegate: FinderCharsetsPresenterDelegate,
     historyDelegate: FinderHistoryPresenterDelegate,
     private val preferenceStore: PreferenceStore,
 ) : BasePresenter<FinderViewModel, FinderRouter>(scope, router),
@@ -45,6 +48,7 @@ class FinderPresenter @Inject constructor(
     ButtonsHolder.FinderButtonsListener by finderAdapterDelegate,
     SearchTaskHolder.OnActionListener<SearchResult> by finderAdapterDelegate,
     TargetsHolder.FinderTargetsOutput by targetsDelegate,
+    CharsetsHolder.CharsetsOutput by charsetsDelegate,
     HistoryAdapter.OnItemClickListener by historyDelegate
 {
 

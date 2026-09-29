@@ -7,6 +7,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.searchboxapp.android.ScreenshotService.Companion.initScreenshotService
@@ -16,6 +17,7 @@ import app.atomofiron.searchboxapp.di.dependencies.channel.CommonChannel
 import app.atomofiron.searchboxapp.di.dependencies.delegate.InitialDelegate
 import app.atomofiron.searchboxapp.di.dependencies.delegate.StorageDelegate
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
+import app.atomofiron.searchboxapp.di.dependencies.store.SupportedCharsets
 import app.atomofiron.searchboxapp.model.AppSource
 import app.atomofiron.searchboxapp.model.other.AppState
 import com.google.android.material.color.DynamicColors
@@ -40,6 +42,8 @@ abstract class AbstractApp : Application(), LifecycleEventObserver {
     lateinit var commonChannel: CommonChannel
     @Inject
     lateinit var scope: AppScope
+    @Inject
+    lateinit var charsets: SupportedCharsets
 
     protected abstract val appSource: AppSource
     protected abstract val updateServiceFactory: AppUpdateService.Factory
@@ -58,6 +62,9 @@ abstract class AbstractApp : Application(), LifecycleEventObserver {
         if (!BuildConfig.DEBUG) updateService.check()
         initScreenshotService(screenshotDeps)
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        scope {
+            charsets.set(NativeBridge.getSupportedCharsets())
+        }
     }
 
     override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {

@@ -11,11 +11,11 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.channel.CurtainChannel
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeError
-import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.model.finder.LocalSearchResult
 import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
+import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.toUni
 import app.atomofiron.searchboxapp.model.textviewer.toLocal
@@ -72,7 +72,7 @@ class SearchAdapterPresenterDelegate @Inject constructor(
 
     override fun onSearchClick(value: String) {
         val config = viewState.toggles.value
-        val params = QueryParams(value, regex = config.regex, ignoreCase = config.ignoreCase)
+        val params = QueryParams(value, regex = config.regex, ignoreCase = config.ignoreCase, charset = viewState.charset.value)
         interactor.search(viewState.item.value.ref, params)
     }
 
@@ -116,6 +116,7 @@ class SearchAdapterPresenterDelegate @Inject constructor(
     private fun LocalSearchTask.trySelect() {
         if (viewState.trySelectTask(this)) {
             curtain.controller?.close()
+            interactor.setCharset(viewState.item.value.ref, result.charset)
         }
     }
 

@@ -1,4 +1,4 @@
-mod su_bridge;
+pub(crate) mod su_bridge;
 pub mod bridge;
 pub mod cancellation;
 pub mod api;

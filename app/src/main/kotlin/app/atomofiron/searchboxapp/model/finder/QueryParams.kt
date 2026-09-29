@@ -7,4 +7,5 @@ data class QueryParams(
     val query: String,
     val regex: Boolean,
     val ignoreCase: Boolean,
+    val charset: String? = null,
 )
