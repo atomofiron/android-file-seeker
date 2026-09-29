@@ -80,24 +80,21 @@ class TextViewerSession(
     }
 
     suspend fun setCharset(name: String?): Boolean {
-        val charset = charsets.get(name)
+        val new = charsets.get(name)
             .takeIf { it != this.charset }
             ?: return false
-        mutex.withLock {
-            this.charset = Charset.forName(charset.name)
-            dual = charset.dual
-            lines.value = emptyList()
-            byteCount = 0uL
+        return mutex.withLock {
+            charset = Charset.forName(new.name)
+            dual = new.dual
             utf8byteCount = 0uL
-            byteBuf.clear()
-            byteBuf.limit(0)
-            reading.value = Reading.Stub
-            lineList = GrowingList()
-            isFullyRead = false
-            input.reset()
-            afterCr = false
-            error.value = null
-            return true
+            val newList = GrowingList<TextLine>(lineList.size)
+            lineList.forEachIndexed { index, it ->
+                val offset = it.text.countUtf8bytes(charset)
+                newList.add(index, TextLine(offset, it.text, charset))
+            }
+            lineList = newList
+            lines.value = newList.fetch()
+            true
         }
     }
 
@@ -136,11 +133,16 @@ class TextViewerSession(
         }
         val text = lineBuilder.toByteArray()
         lineBuilder.clear()
-        val string = String(text, charset)
-        val offset = utf8byteCount
+        val offset = text.countUtf8bytes(charset)
+        return TextLine(offset, text, charset)
+    }
+
+    private fun ByteArray.countUtf8bytes(charset: Charset): ULong {
+        val string = String(this, charset)
         val bytes = string.toByteArray(Charsets.UTF_8)
+        val offset = utf8byteCount
         utf8byteCount += bytes.size.inc().toULong()
-        return TextLine(offset, bytes)
+        return offset
     }
 
     /** @return true if EOF */

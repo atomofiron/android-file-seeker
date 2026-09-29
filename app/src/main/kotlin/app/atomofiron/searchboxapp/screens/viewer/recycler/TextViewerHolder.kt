@@ -15,18 +15,18 @@ import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.utils.colorAttr
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
+import java.nio.charset.Charset
 import java.nio.charset.CodingErrorAction
 
 private val charBuf = CharBuffer.allocate(1024)
-private val Utf8Decoder = Charsets.UTF_8
-    .newDecoder()
-    .onMalformedInput(CodingErrorAction.REPLACE)
-    .onUnmappableCharacter(CodingErrorAction.REPLACE)
-
+private val Utf8Decoder = Charsets.UTF_8.decoder()
 
 class TextViewerHolder(
     private val textView: TextView,
 ) : GeneralHolder<TextLine>(textView) {
+
+    private var charset = Charsets.UTF_8
+    private var decoder = Utf8Decoder
 
     private val spanPart: RoundedBackgroundSpan
         get() = RoundedBackgroundSpan(
@@ -61,23 +61,29 @@ class TextViewerHolder(
     )
 
     override fun onBind(item: TextLine, position: Int) {
-        textView.text = item.text.decode()
+        if (item.charset != charset) {
+            charset = item.charset
+            decoder = item.charset.decoder()
+        }
+        textView.text = String(item.text, item.charset)
         // android:textIsSelectable="true" breaks down
         textView.setTextIsSelectable(true)
     }
 
     fun bindMatches(item: TextLine, position: Int, matches: MatchList, indexFocus: Int) {
         truePosition = position
-        val spannable = SpannableString(item.text.decode())
+        val text = String(item.text, item.charset)
+        val bytes = text.toByteArray(Charsets.UTF_8)
+        val spannable = SpannableString(text)
         matches.forEachIndexed { index, match ->
             val bytesStart = (match.offset - item.offset).toInt()
             val bytesEnd = (bytesStart + match.length.toInt())
-            val start = item.text.countChars(0..<bytesStart)
-            if (bytesStart < 0 || bytesEnd > item.text.size) {
-                debugFail { "$bytesStart < 0 || $bytesEnd > ${item.text.size}, text ${item.text.decode()}" }
+            val start = bytes.countUtf8chars(0..<bytesStart)
+            if (bytesStart < 0 || bytesEnd > bytes.size) {
+                debugFail { "$bytesStart < 0 || $bytesEnd > ${bytes.size}, text $text" }
                 return@forEachIndexed
             }
-            val length = item.text.countChars(bytesStart..<bytesEnd)
+            val length = bytes.countUtf8chars(bytesStart..<bytesEnd)
             val end = start + length
             val forTheEntireLine = start == 0 && end == item.length
             val span: Any = when {
@@ -95,20 +101,9 @@ class TextViewerHolder(
         // android:textIsSelectable="true" breaks down
         textView.setTextIsSelectable(true)
     }
-
-    private fun ByteArray.decode(): String {
-        val builder = StringBuilder()
-        val byteBuffer = ByteBuffer.wrap(this, 0, size)
-        while (byteBuffer.position() < size) {
-            Utf8Decoder.decode(byteBuffer, charBuf, true)
-            builder.appendRange(charBuf.array(), 0, charBuf.position())
-            charBuf.clear()
-        }
-        return builder.toString()
-    }
 }
 
-private fun ByteArray.countChars(range: IntRange): Int {
+private fun ByteArray.countUtf8chars(range: IntRange): Int {
     var count = 0
     val byteBuf = ByteBuffer.wrap(this, range.first, range.size)
 
@@ -132,3 +127,7 @@ private fun ByteArray.countChars(range: IntRange): Int {
     }
     return count
 }
+
+private fun Charset.decoder() = newDecoder()
+    .onMalformedInput(CodingErrorAction.REPLACE)
+    .onUnmappableCharacter(CodingErrorAction.REPLACE)

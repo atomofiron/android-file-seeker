@@ -7,7 +7,7 @@ class GrowingList<E> private constructor(
     private val mutable: MutableList<E>,
 ) : List<E> by mutable {
 
-    constructor() : this(mutableListOf())
+    constructor(initialSize: Int = 0) : this(MutableList<E>(initialSize))
 
     fun add(element: E): Boolean = mutable.add(element)
 
