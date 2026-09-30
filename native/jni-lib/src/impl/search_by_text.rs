@@ -78,12 +78,12 @@ pub fn find_text_recursively(
             }
             None => Ok(())
         }.and_then(|_| {
-            matcher.search(path, resolve(encoding.clone(), path)?)
-        })
-            .map(|matches| match matches.is_empty() {
-                true => TextSearchProgress::Skip,
-                false => TextSearchProgress::Match(type_or_meta(&path.into()), crc32(path), matches),
-            }).unwrap_or_else(|e| TextSearchProgress::Err(meta_with_error(&path.into(), &e)));
+            let (encoding, bom_offset) = resolve(encoding.clone(), path)?;
+            matcher.search(path, encoding, bom_offset)
+        }).map(|matches| match matches.is_empty() {
+            true => TextSearchProgress::Skip,
+            false => TextSearchProgress::Match(type_or_meta(&path.into()), crc32(path), matches),
+        }).unwrap_or_else(|e| TextSearchProgress::Err(meta_with_error(&path.into(), &e)));
         return match sender.send(progress) {
             Ok(_) => WalkState::Continue,
             Err(_) => WalkState::Quit,
@@ -92,19 +92,19 @@ pub fn find_text_recursively(
 }
 
 // tries to resolve UTF_16 to UTF_16LE or UTF_16BE
-fn resolve(encoding: Option<(String, Encoding)>, path: &Path) -> Rslt<Option<Encoding>> {
+fn resolve(encoding: Option<(String, Encoding)>, path: &Path) -> Rslt<(Option<Encoding>, u64)> {
     let (charset, encoding) = match encoding {
-        None => return Ok(None),
+        None => return Ok((None, 0)),
         Some(values) => values,
     };
     let len = charset.len();
     if len != 6 && len != 8 {
-        return Ok(Some(encoding))
+        return Ok((Some(encoding), 0))
     }
     let en_rs = EncodingRs::for_label(charset.as_bytes())
         .or_err(|| string(WRONG_CHARSET))?;
     if en_rs != UTF_16LE && en_rs != UTF_16BE {
-        return Ok(Some(encoding))
+        return Ok((Some(encoding), 0))
     }
     let mut file = File::open(path)?;
     let mut bytes = [0u8; 2];
@@ -123,7 +123,11 @@ fn resolve(encoding: Option<(String, Encoding)>, path: &Path) -> Rslt<Option<Enc
         _ if len == 6 => return Err(string(CHARSET_MISMATCH).into()),
         _ => encoding // wdc
     };
-    return Ok(Some(encoding))
+    let bom_offset = match bytes {
+        [0xFF, 0xFE] | [0xFE, 0xFF] => 3, // UTF-8 bytes
+        _ => 0,
+    };
+    return Ok((Some(encoding), bom_offset))
 }
 
 fn is_text_file(path: &Path) -> Rslt<bool> {

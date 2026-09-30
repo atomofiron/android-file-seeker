@@ -8,7 +8,7 @@ use std::path::Path;
 
 pub trait TextMatcher {
     fn from_query(query: SearchQuery) -> Rslt<RegexMatcher>;
-    fn search(&self, path: &Path, encoding: Option<Encoding>) -> Rslt<Vec<TextMatch>>;
+    fn search(&self, path: &Path, encoding: Option<Encoding>, bom_offset: u64) -> Rslt<Vec<TextMatch>>;
 }
 
 impl TextMatcher for RegexMatcher {
@@ -24,13 +24,13 @@ impl TextMatcher for RegexMatcher {
         return Ok(matcher);
     }
 
-    fn search(&self, path: &Path, encoding: Option<Encoding>) -> Rslt<Vec<TextMatch>> {
+    fn search(&self, path: &Path, encoding: Option<Encoding>, bom_offset: u64) -> Rslt<Vec<TextMatch>> {
         let mut searcher = SearcherBuilder::new()
             .line_number(true)
             .encoding(encoding)
             .build();
         let matches = TextMatches::new();
-        searcher.search_path(self, path, TextSink::new(&self, &matches))?;
+        searcher.search_path(self, path, TextSink::new(&self, &matches, bom_offset))?;
         return Ok(matches.take());
     }
 }
