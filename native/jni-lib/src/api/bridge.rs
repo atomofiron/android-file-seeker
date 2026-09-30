@@ -15,7 +15,7 @@ use crate::r#impl::r#type::{file_type, file_types};
 use crate::r#impl::reader::api::{FileReader, ReaderResult};
 use crate::r#impl::search_by_name::find_names_impl;
 use crate::r#impl::search_by_text::find_text_impl;
-use encoding_rs::{Encoding as EncodingRs, ISO_2022_JP, UTF_16BE, UTF_16LE};
+use encoding_rs::{Encoding as EncodingRs, ISO_2022_JP};
 use grep_searcher::Encoding;
 use std::fs::File;
 use std::sync::Arc;
@@ -181,20 +181,6 @@ pub fn find_names(
 }
 
 #[uniffi::export]
-pub fn filter_charsets(charsets: Vec<String>) -> Vec<SupportedCharset> {
-    charsets.into_iter()
-        .filter_map(|name| match EncodingRs::for_label_no_replacement(name.as_bytes()) {
-            None => None,
-            Some(en) if en == ISO_2022_JP => None, // stateful encoding
-            Some(_) if Encoding::new(&name).is_err() => None,
-            Some(en) => Some(SupportedCharset {
-                name: name.clone(),
-                dual: en == UTF_16BE || en == UTF_16LE,
-            }),
-        }).collect()
-}
-
-#[uniffi::export]
 pub fn find_text(
     query: SearchQuery,
     targets: Vec<RawPath>,
@@ -214,6 +200,17 @@ pub fn find_text(
         ).unwrap_or_else(|e| SimpleResult::Err(e.to_string()))
     }
     return find_text_impl(query, targets, max_depth as usize, size_limit, charset, cancellation, collector);
+}
+
+#[uniffi::export]
+pub fn filter_charsets(charsets: Vec<String>) -> Vec<SupportedCharset> {
+    charsets.into_iter()
+        .filter_map(|name| match EncodingRs::for_label_no_replacement(name.as_bytes()) {
+            None => None,
+            Some(en) if en == ISO_2022_JP => None, // stateful encoding
+            Some(_) if Encoding::new(&name).is_err() => None,
+            Some(_) => Some(SupportedCharset { name }),
+        }).collect()
 }
 
 #[uniffi::export]

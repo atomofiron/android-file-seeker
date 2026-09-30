@@ -17,7 +17,6 @@ import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchTask
 import app.atomofiron.searchboxapp.model.finder.SearchType
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
-import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.model.textviewer.TextViewerSession
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerScope
 import app.atomofiron.searchboxapp.utils.Const
@@ -142,12 +141,9 @@ class TextViewerService @Inject constructor(
     private suspend fun TextViewerSession.readNextLines(count: Int) {
         textLines {
             loading.value = true
-            val lines = ArrayList<TextLine>(count)
-            while (lines.size < count) {
-                val line = readLine() ?: break
-                lines.add(line)
+            for (i in 0..<count) {
+                add(readLine() ?: break)
             }
-            addAll(lines)
             loading.value = false
         }
     }

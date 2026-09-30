@@ -61,18 +61,16 @@ class TextViewerHolder(
     )
 
     override fun onBind(item: TextLine, position: Int) {
-        if (item.charset != charset) {
-            charset = item.charset
-            decoder = item.charset.decoder()
-        }
-        textView.text = String(item.text, item.charset)
+        setCharset(item.charset)
+        textView.text = item.toTextString()
         // android:textIsSelectable="true" breaks down
         textView.setTextIsSelectable(true)
     }
 
     fun bindMatches(item: TextLine, position: Int, matches: MatchList, indexFocus: Int) {
         truePosition = position
-        val text = String(item.text, item.charset)
+        setCharset(item.charset)
+        val text = item.toTextString()
         val bytes = text.toByteArray(Charsets.UTF_8)
         val spannable = SpannableString(text)
         matches.forEachIndexed { index, match ->
@@ -101,6 +99,15 @@ class TextViewerHolder(
         // android:textIsSelectable="true" breaks down
         textView.setTextIsSelectable(true)
     }
+
+    private fun setCharset(charset: Charset) {
+        if (charset != this.charset) {
+            this.charset = charset
+            decoder = charset.decoder()
+        }
+    }
+
+    private fun TextLine.toTextString() = String(text, 0, text.size - skipEnd, charset)
 }
 
 private fun ByteArray.countUtf8chars(range: IntRange): Int {

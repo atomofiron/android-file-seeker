@@ -53,6 +53,7 @@ class TextViewerViewState private constructor(
     preferenceStore,
     charsets,
     session?.tasks ?: emptyFlow(),
+    initialCharset = session?.charset?.name(),
 ) {
     val insertInQuery = EventFlow<String>()
 

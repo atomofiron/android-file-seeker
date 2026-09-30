@@ -34,6 +34,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
     preferences: PreferenceStore,
     charsets: SupportedCharsets,
     tasks: Flow<List<Task>?>,
+    initialCharset: String? = null,
 ) : FinderItemsState {
 
     private val query = MutableStateFlow("")
@@ -41,7 +42,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
     override val toggles = (if (isLocal) preferences.localSearchOptions else preferences.searchOptions).mapState(::EditOptions)
     private val localOptions: Flow<List<FinderStateItem>> = toggles.map { listOf<FinderStateItem>(it) }
     override val charset: StateFlow<String?>
-        field = MutableStateFlow<String?>(null)
+        field = MutableStateFlow<String?>(initialCharset)
 
     private val firstItems = combine(
         query,

@@ -6,7 +6,7 @@ import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.LocalSearchTask
-import app.atomofiron.searchboxapp.utils.ByteArrayBuilder
+import app.atomofiron.searchboxapp.utils.ByteArrayBuffer
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNode
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,14 +17,15 @@ import uniffi.native_lib.FileReader
 import uniffi.native_lib.ReadResult
 import uniffi.native_lib.SupportedCharset
 import java.io.Closeable
-import java.nio.ByteBuffer
 import java.nio.charset.Charset
 import kotlin.uuid.Uuid
 
-private const val BUFFER_SIZE = 8 * 1024
 private const val CR: Byte = 0x0D
 private const val LF: Byte = 0x0A
+private const val FF: Byte = 0xFF.toByte()
+private const val FE: Byte = 0xFE.toByte()
 private const val NULL: Byte = 0x00
+private val window = ByteArray(4)
 
 class TextViewerSession(
     private val input: FileReader,
@@ -34,21 +35,15 @@ class TextViewerSession(
     charset: String?,
 ) : Closeable {
 
-    private var dual = false
-    private val byteStep get() = if (dual) 2 else 1
-    var charset = Charsets.UTF_8
-        private set
-
-    private var bytes = ByteArray(BUFFER_SIZE)
-    private var byteBuf = ByteBuffer.wrap(bytes)
-    private val lineBuilder = ByteArrayBuilder()
+    private val buffer = ByteArrayBuffer()
     private var byteCount = 0uL
         set(value) {
             field = value
             updateReading(value)
         }
+    var charset = Charsets.UTF_8
+        private set
     private var utf8byteCount = 0uL
-    private var afterCr = false
     var isFullyRead = false
         private set
 
@@ -71,8 +66,6 @@ class TextViewerSession(
         this.charset = charset?.name
             ?.let{ Charset.forName(it) }
             ?: this.charset
-        dual = charset?.dual ?: dual
-        byteBuf.limit(0)
     }
 
     fun updateItem(item: Node) {
@@ -85,12 +78,11 @@ class TextViewerSession(
             ?: return false
         return mutex.withLock {
             charset = Charset.forName(new.name)
-            dual = new.dual
             utf8byteCount = 0uL
             val newList = GrowingList<TextLine>(lineList.size)
             lineList.forEachIndexed { index, it ->
-                val offset = it.text.countUtf8bytes(charset)
-                newList.add(index, TextLine(offset, it.text, charset))
+                val new = it.text.toTextLine(newList.firstOrNull(), it.skipEnd)
+                newList.add(index, new)
             }
             lineList = newList
             lines.value = newList.fetch()
@@ -121,21 +113,48 @@ class TextViewerSession(
     override fun close() = input.close()
 
     fun readLine(): TextLine? {
-        if (isFullyRead) {
+        if (isFullyRead && buffer.isEmpty()) {
             return null
         }
-        while (true) when {
-            isFullyRead -> break
-            !byteBuf.hasRemaining() -> fillBuffer()
-                .also { isFullyRead = it }
-            collect() -> skipCrLf()
-                .also { break }
+        var length = 0
+        var skip = 0
+        while (length == 0) {
+            val pair = buffer.findEndOfLine(0)
+            length = pair.first
+            skip = pair.second
+            when (length) {
+                0 if isFullyRead -> return null
+                0 -> byteCount += buffer.readMore()
+            }
         }
-        val text = lineBuilder.toByteArray()
-        lineBuilder.clear()
-        val offset = text.countUtf8bytes(charset)
-        return TextLine(offset, text, charset)
+        val text = buffer.consume(length)
+        return text.toTextLine(first = lineList.firstOrNull(), skipEnd = skip)
     }
+
+    fun ByteArray.toTextLine(first: TextLine?, skipEnd: Int): TextLine {
+        val replacement = when {
+            first != null -> null
+            !charset.isUtf16() -> null
+            else -> bomToUtf16()
+        }
+        val charset = when {
+            replacement != null -> replacement
+            first == null -> charset
+            charset == Charsets.UTF_16 -> first.charset
+            else -> charset
+        }
+        val offset = countUtf8bytes(charset)
+        return TextLine(offset, this, charset, skipEnd)
+    }
+
+    private fun ByteArray.bomToUtf16() = when {
+        size < 2 -> null
+        get(0) == FF && get(1) == FE -> Charsets.UTF_16LE
+        get(0) == FE && get(1) == FF -> Charsets.UTF_16BE
+        else -> null
+    }
+
+    private fun Charset.isUtf16() = this == Charsets.UTF_16
 
     private fun ByteArray.countUtf8bytes(charset: Charset): ULong {
         val string = String(this, charset)
@@ -145,65 +164,17 @@ class TextViewerSession(
         return offset
     }
 
-    /** @return true if EOF */
-    private fun fillBuffer(): Boolean {
-        byteBuf.clear()
-        return when (val result = input.next()) {
-            is ReadResult.Ok -> {
-                byteBuf.put(result.v1).flip()
-                if (afterCr && result.v1.firstOrNull() == LF) {
-                    byteCount++
-                    byteBuf.position(1)
-                }
-                afterCr = false
-                false
-            }
-            is ReadResult.End -> byteBuf.limit(0)
-                .let { true }
+    private fun ByteArrayBuffer.readMore(): ULong {
+        when (val result = input.next()) {
+            is ReadResult.Ok -> append(result.v1)
+                .also { return result.v1.size.toULong() }
+            is ReadResult.End -> isFullyRead = true
             is ReadResult.Err -> {
-                byteBuf.limit(0)
+                isFullyRead = true
                 error.value = result.v1.toNodeError()
-                true
             }
         }
-    }
-
-    /** @return count of skipped bytes */
-    private fun skipCrLf(): Int { // todo skip UTF-16
-        if (!byteBuf.hasRemaining()) {
-            return 0
-        }
-        val next = byteBuf.get(byteBuf.position())
-        val afterNext = when (byteBuf.remaining()) {
-            1 -> null
-            else -> byteBuf.get(byteBuf.position().inc())
-        }
-        val skip = when {
-            next != LF && next != CR -> 0
-            byteBuf.remaining() == 1 -> 1.also {
-                afterCr = next == CR
-            }
-            next == CR && afterNext == LF -> 2 // skip \r\n
-            else -> 1 // skip \r or \n
-        }
-        byteCount += skip.toULong()
-        byteBuf.position(byteBuf.position() + skip)
-        return skip
-    }
-
-    /** @return true end of line reached */
-    private fun collect(): Boolean {
-        val endOfLine = byteBuf.findEndOfLine()
-        val end = when {
-            endOfLine == 0 -> return true
-            endOfLine < 0 -> byteBuf.limit()
-            else -> endOfLine
-        }
-        val limit = byteBuf.limit()
-        byteBuf.limit(end)
-        byteCount += lineBuilder.append(byteBuf).toULong()
-        byteBuf.limit(limit)
-        return endOfLine >= 0
+        return 0uL
     }
 
     private fun updateReading(loaded: ULong) {
@@ -218,23 +189,37 @@ class TextViewerSession(
         reading.value = Reading(loaded.toInt(), length.toInt(), denominator)
     }
 
-    private fun ByteBuffer.findEndOfLine(): Int {
-        val array = array()
-        for (i in position()..<limit() step byteStep) {
-            val byte = array[i]
-            when (byteStep) {
-                1 if (byte == LF || byte == CR) -> Unit
-                1 -> continue
-                else -> when (array.getOrNull(i.inc())) {
-                    NULL if byte == LF -> Unit
-                    NULL if byte == CR -> Unit
-                    LF if byte == NULL -> Unit
-                    CR if byte == NULL -> Unit
-                    else -> continue
-                }
+    private fun ByteArrayBuffer.findEndOfLine(orElse: Int): Pair<Int, Int> {
+        val w = window
+        for (i in indices) {
+            if (i <= size - 4) {
+                copyInto(w, i)
+            } else if (!isFullyRead) {
+                return orElse to 0 // need more bytes
+            } else {
+                w[0] = get(i)
+                w[1] = getOrNull(i + 1) ?: NULL
+                w[2] = getOrNull(i + 2) ?: NULL
+                w[3] = NULL
             }
-            return i
+            val even = (i and 1) == 0
+            val bytes = when {
+                even && w[0] == CR && w[1] == NULL && w[2] == LF && w[3] == NULL -> 4
+                even && w[0] == NULL && w[1] == CR && w[2] == NULL && w[3] == LF -> 4
+                even && w[0] == CR && w[1] == NULL -> 2
+                even && w[0] == NULL && w[1] == CR -> 2
+                even && w[0] == LF && w[1] == NULL -> 2
+                even && w[0] == NULL && w[1] == LF -> 2
+                w[0] == CR && w[1] == LF -> 2
+                w[0] == CR -> 1
+                w[0] == LF -> 1
+                else -> continue
+            }
+            return (i + bytes).coerceAtMost(size) to bytes
         }
-        return -1
+        return when {
+            isFullyRead -> size to 0
+            else -> orElse to 0
+        }
     }
 }

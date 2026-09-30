@@ -142,7 +142,6 @@ pub struct TypedMeta {
 #[derive(uniffi::Record)]
 pub struct SupportedCharset {
     pub name: String,
-    pub dual: bool,
 }
 
 #[uniffi::export(with_foreign)]
