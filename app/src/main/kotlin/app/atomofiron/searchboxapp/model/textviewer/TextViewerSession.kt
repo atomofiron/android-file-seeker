@@ -45,11 +45,14 @@ class TextViewerSession(
             field = value
             updateReading(value)
         }
-    var charset = UTF_8
+    var charset: Charset = UTF_8
         private set(value) {
             field = value
             exactCharset = value.name()
+            charsetName.value = value.name()
         }
+    val charsetName: StateFlow<String>
+        field = MutableStateFlow(this.charset.name())
     var exactCharset: String = this.charset.name()
         private set
     private var utf8byteCount = 0uL

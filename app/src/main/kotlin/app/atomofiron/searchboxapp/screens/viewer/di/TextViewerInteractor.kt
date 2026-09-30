@@ -70,6 +70,4 @@ class TextViewerInteractor @Inject constructor(
     }
 
     fun copy(item: Node): Alert.Uni?  = utils.copyToClipboard(item)
-
-    fun setCharset(ref: NodeRef, name: String?) = service.setCharset(ref, name)
 }

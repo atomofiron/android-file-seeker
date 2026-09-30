@@ -31,18 +31,16 @@ import uniffi.native_lib.SupportedCharset
 
 class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>(
     override val isLocal: Boolean,
+    override val charset: StateFlow<String?>,
     preferences: PreferenceStore,
     charsets: SupportedCharsets,
     tasks: Flow<List<Task>?>,
-    initialCharset: String? = null,
 ) : FinderItemsState {
 
     private val query = MutableStateFlow("")
     override val targets = MutableStateFlow<List<Node>>(mutableListOf())
     override val toggles = (if (isLocal) preferences.localSearchOptions else preferences.searchOptions).mapState(::EditOptions)
     private val localOptions: Flow<List<FinderStateItem>> = toggles.map { listOf<FinderStateItem>(it) }
-    override val charset: StateFlow<String?>
-        field = MutableStateFlow<String?>(initialCharset)
 
     private val firstItems = combine(
         query,
@@ -116,13 +114,5 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
 
     override fun updateTargets(items: List<Node>) {
         targets.value = items
-    }
-
-    override fun setCharset(name: String?) {
-        charset.value = name
-    }
-
-    override fun setCharset2(name: String?) {
-        charset.value = name
     }
 }

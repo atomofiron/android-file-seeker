@@ -15,6 +15,4 @@ interface FinderItemsState {
 
     fun updateSearchQuery(value: String)
     fun updateTargets(items: List<Node>)
-    fun setCharset(name: String?)
-    fun setCharset2(name: String?) // LOL
 }

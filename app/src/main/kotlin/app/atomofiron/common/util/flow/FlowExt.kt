@@ -104,7 +104,7 @@ fun <T,R> StateFlow<T>.mapState(transform: (T) -> R): StateFlow<R> {
 
         override suspend fun collect(collector: FlowCollector<R>): Nothing {
             original.collect {
-                if (it == src) {
+                if (it === src) {
                     return@collect collector.emit(transformed)
                 }
                 src = it
@@ -114,3 +114,5 @@ fun <T,R> StateFlow<T>.mapState(transform: (T) -> R): StateFlow<R> {
         }
     }
 }
+
+fun <T> StateFlow<T>?.orStub(value: T): StateFlow<T> = this ?: MutableStateFlow(value)

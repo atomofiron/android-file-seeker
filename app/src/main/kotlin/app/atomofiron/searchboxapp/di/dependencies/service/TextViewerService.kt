@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.di.dependencies.service
 
 import app.atomofiron.common.util.extension.indexOfFirst
-import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.launchOnDefault
 import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.searchboxapp.android.NativeBridge
@@ -123,12 +122,6 @@ class TextViewerService @Inject constructor(
                 is TextSearchProgress.Skip -> toEnded()
                 is TextSearchProgress.Err -> toEnded(result = result.copy(error = progress.v1.error?.toNodeError()))
             }
-        }
-    }
-
-    fun setCharset(ref: NodeRef, name: String?) {
-        scope {
-            findSession(ref)?.setCharset(name)
         }
     }
 

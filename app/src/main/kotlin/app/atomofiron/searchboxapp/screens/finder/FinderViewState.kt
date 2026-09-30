@@ -9,6 +9,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.dependencies.store.SupportedCharsets
 import app.atomofiron.searchboxapp.screens.finder.di.history.HistoryDao
 import app.atomofiron.searchboxapp.screens.finder.di.history.ItemHistory
+import app.atomofiron.searchboxapp.screens.finder.state.CharsetProvider
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsState
 import app.atomofiron.searchboxapp.screens.finder.viewmodel.FinderItemsStateDelegate
 import kotlinx.coroutines.CoroutineScope
@@ -23,8 +24,10 @@ class FinderViewState @Inject constructor(
     val finderStore: FinderStore,
     charsets: SupportedCharsets,
     history: HistoryDao,
+    private val charsetProvider: CharsetProvider,
 ) : FinderItemsState by FinderItemsStateDelegate(
     isLocal = false,
+    charsetProvider.charset,
     preferencesStore,
     charsets,
     finderStore.tasksFlow,
@@ -51,4 +54,6 @@ class FinderViewState @Inject constructor(
     }
 
     fun showHistory() = showHistory.invoke(scope)
+
+    fun setCharset(charset: String?) = charsetProvider.setCharset(charset)
 }

@@ -25,7 +25,7 @@ class TextViewerPresenter @Inject constructor(
     router: TextViewerRouter,
     private val searchDelegate: SearchAdapterPresenterDelegate,
     private val interactor: TextViewerInteractor,
-    sessionResult: TextViewerSessionResult,
+    private val sessionResult: TextViewerSessionResult,
 ) : BasePresenter<TextViewerViewModel, TextViewerRouter>(scope, router),
     TextViewerAdapter.TextViewerListener,
     CharsetsHolder.CharsetsOutput,
@@ -78,8 +78,10 @@ class TextViewerPresenter @Inject constructor(
 
     override fun onCharsetClick(charset: String, select: Boolean) {
         val charset = charset.takeIf { select }
-        viewState.setCharset(charset)
-        interactor.setCharset(itemRef, charset)
+        viewState.hideTask()
+        launch {
+            sessionResult.result.ok()?.value?.setCharset(charset)
+        }
     }
 
     private fun onMoveClick(forward: Boolean) {

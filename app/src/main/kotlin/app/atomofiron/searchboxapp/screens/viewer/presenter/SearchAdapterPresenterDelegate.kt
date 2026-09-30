@@ -3,6 +3,7 @@ package app.atomofiron.searchboxapp.screens.viewer.presenter
 import android.view.View
 import android.widget.EditText
 import app.atomofiron.common.arch.Recipient
+import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.common.util.flow.set
@@ -123,7 +124,9 @@ class SearchAdapterPresenterDelegate @Inject constructor(
     private fun LocalSearchTask.trySelect() {
         if (viewState.trySelectTask(this)) {
             curtain.controller?.close()
-            interactor.setCharset(viewState.item.value.ref, result.charset)
+            scope {
+                sessionResult.result.ok()?.value?.setCharset(result.charset)
+            }
         }
     }
 
