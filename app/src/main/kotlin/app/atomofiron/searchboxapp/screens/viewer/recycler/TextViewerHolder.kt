@@ -74,14 +74,15 @@ class TextViewerHolder(
         val text = item.toTextString()
         val bytes = text.toByteArray(DefaultCharset)
         val spannable = SpannableString(text)
-        matches.forEachIndexed { index, match ->
+        for (index in matches.indices) {
+            val match = matches[index]
             val skip = item.skipBytes()
             val bytesStart = (match.offset - item.offset - skip).toInt()
             val bytesEnd = (bytesStart + match.length.toInt())
             val start = bytes.countChars(0, bytesStart)
-            if (bytesStart < 0 || bytesEnd > bytes.size) {
-                debugFail { "$bytesStart < 0 || $bytesEnd > ${bytes.size}, text $text" }
-                return@forEachIndexed
+            if (bytesStart < 0 || bytesEnd > bytes.size || bytesStart > bytesEnd) {
+                debugFail { "$bytesStart < 0 || $bytesEnd > ${bytes.size} || $bytesStart > $bytesEnd, text $text" }
+                continue
             }
             val length = bytes.countChars(bytesStart, bytesEnd)
             val end = start + length
