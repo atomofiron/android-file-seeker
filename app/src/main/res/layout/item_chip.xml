@@ -5,7 +5,7 @@
     android:id="@+id/chip"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/padding_half"
+    android:layout_marginHorizontal="@dimen/padding_mini"
     android:textColor="?attr/colorContent"
     android:textStyle="bold"
     android:gravity="bottom"

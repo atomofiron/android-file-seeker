@@ -10,7 +10,7 @@ import com.google.android.material.chip.Chip
 class CharsetHolder(
     parent: ViewGroup,
     private val output: CharsetsHolder.CharsetsOutput,
-) : GeneralHolder<SelectableCharset>(parent, R.layout.item_finder_charset) {
+) : GeneralHolder<SelectableCharset>(parent, R.layout.item_chip) {
 
     private val chipView = itemView.findViewById<Chip>(R.id.chip)
 
