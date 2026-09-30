@@ -215,6 +215,7 @@ class TextViewerSession(
         }
         return when {
             isFullyRead -> size to skip // the last text line
+                .also { cursor = size }
             else -> orElse to 0
         }
     }
