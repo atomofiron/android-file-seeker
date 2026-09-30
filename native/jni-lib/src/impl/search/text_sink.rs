@@ -26,7 +26,7 @@ impl<'l, M: Matcher> Sink for TextSink<'l, M> {
 
     fn matched(&mut self, _searcher: &Searcher, mat: &SinkMatch) -> Result<bool, Self::Error> {
         let line = mat.bytes();
-        let _ = self.matcher.try_find_iter(line, |m| {
+        self.matcher.try_find_iter(line, |m| {
             let the_match = TextMatch {
                 offset: self.bom_offset + mat.absolute_byte_offset() + m.start() as u64,
                 length: (m.end() - m.start()) as u32,
@@ -35,7 +35,7 @@ impl<'l, M: Matcher> Sink for TextSink<'l, M> {
             };
             self.matches.push(the_match);
             Rslt::<_>::Ok(true)
-        }); // no way for Error, because of matched = |m| Ok(matched(m))
+        }).map_err(|e| e.to_string())??;
         Ok(true)
     }
 }
