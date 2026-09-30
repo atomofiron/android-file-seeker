@@ -46,6 +46,11 @@ class TextViewerSession(
             updateReading(value)
         }
     var charset = UTF_8
+        private set(value) {
+            field = value
+            exactCharset = value.name()
+        }
+    var exactCharset: String = this.charset.name()
         private set
     private var utf8byteCount = 0uL
     var isFullyRead = false
@@ -140,6 +145,7 @@ class TextViewerSession(
         val (charset, skip) = when {
             charset == UTF_16 && first != null -> first.charset to skip
             charset == UTF_16 -> bomToUtf16X()
+                ?.also { exactCharset = it.name() }
                 ?.let { it to 2 }
                 ?: (charset to skip)
             first != null || !charset.isOneOfUtf16() -> charset to skip

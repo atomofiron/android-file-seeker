@@ -24,6 +24,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapterOutput
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerRouter
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerScope
+import app.atomofiron.searchboxapp.screens.viewer.TextViewerSessionResult
 import app.atomofiron.searchboxapp.screens.viewer.TextViewerViewState
 import app.atomofiron.searchboxapp.screens.viewer.di.TextViewerInteractor
 import app.atomofiron.searchboxapp.screens.viewer.presenter.curtain.CurtainSearchDelegate
@@ -43,6 +44,7 @@ class SearchAdapterPresenterDelegate @Inject constructor(
     private val interactor: TextViewerInteractor,
     private val preferences: PreferenceStore,
     curtainChannel: CurtainChannel,
+    private val sessionResult: TextViewerSessionResult,
 ) : Recipient, FinderAdapterOutput<LocalSearchResult> {
 
     private val curtain = CurtainSearchDelegate(this, viewState, scope)
@@ -72,7 +74,10 @@ class SearchAdapterPresenterDelegate @Inject constructor(
 
     override fun onSearchClick(value: String) {
         val config = viewState.toggles.value
-        val params = QueryParams(value, regex = config.regex, ignoreCase = config.ignoreCase, charset = viewState.charset.value)
+        val charset = sessionResult.result.ok()
+            ?.value?.exactCharset
+            ?: viewState.charset.value
+        val params = QueryParams(value, regex = config.regex, ignoreCase = config.ignoreCase, charset = charset)
         interactor.search(viewState.item.value.ref, params)
     }
 

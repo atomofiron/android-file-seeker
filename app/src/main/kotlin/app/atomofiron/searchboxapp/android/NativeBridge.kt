@@ -11,7 +11,6 @@ import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_FILE_LENGTH
 import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_FILE_TIMESTAMP
 import app.atomofiron.searchboxapp.utils.Rslt
 import app.atomofiron.searchboxapp.utils.writeTo
-import io.ktor.utils.io.charsets.name
 import uniffi.native_lib.CancellationState
 import uniffi.native_lib.CommonProgress
 import uniffi.native_lib.CommonProgressCollector
@@ -196,7 +195,7 @@ object NativeBridge {
     fun getSupportedCharsets(): List<SupportedCharset> {
         val charsets = Charset.availableCharsets()
             .asSequence()
-            .map { it.value.name }
+            .map { it.value.name() }
             .sortedBy { it }
             .sortedBy { it.length }
             .sortedBy {
