@@ -1,6 +1,5 @@
 use crate::api::api::SimpleResult;
-use crate::api::su_api::{control_frame, from_control_frame, Request};
-use crate::api::su_bridge::write_request;
+use crate::api::su_api::{control_frame, from_control_frame};
 use crate::common::{config, Rslt, CHUNK_SIZE};
 use crate::ext::raw_path::{RawPath, RawPathExt};
 use crate::ext::result::ResultExt;
@@ -9,7 +8,7 @@ use crate::r#impl::other::read_error;
 use crate::r#impl::reader::api::{FileReader, ReadResult, TextProvider};
 use bincode::decode_from_slice;
 use std::fs::File;
-use std::io::{BufReader, Error, Read, Seek, SeekFrom};
+use std::io::{BufReader, Error, Read};
 use std::ops::DerefMut;
 use std::process::Child;
 use std::sync::Mutex;
@@ -24,17 +23,6 @@ impl FileReader {
     pub fn with(child: Child, pid: u32, path: RawPath) -> FileReader {
         let provider = TextProvider::Child(child, pid, path);
         return Self { provider: Mutex::new(provider) }
-    }
-
-    pub fn try_reset(&self) -> Rslt<()> {
-        let mut provider = self.provider.lock()
-            .err_to_string()?;
-        return match provider.deref_mut() {
-            TextProvider::Direct(reader) => reader.seek(SeekFrom::Start(0))
-                .map(|_| ())
-                .map_err(|e| e.to_string().into()),
-            TextProvider::Child(child, _, path) => try_reset(child, path.clone())
-        }
     }
 
     pub fn try_next(&self) -> Rslt<ReadResult> {
@@ -78,10 +66,6 @@ fn try_read_file(path: RawPath) -> Rslt<()> {
         }
     }
     return Ok(())
-}
-
-fn try_reset(child: &mut Child, path: RawPath) -> Rslt<()> {
-    write_request(child, Request::ReadFile(path))
 }
 
 fn try_next(child: &mut Child) -> Rslt<ReadResult> {

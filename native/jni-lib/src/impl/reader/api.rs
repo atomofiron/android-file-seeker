@@ -32,13 +32,6 @@ pub enum ReadResult {
 #[uniffi::export]
 impl FileReader {
 
-    pub fn reset(&self) -> ReadResult {
-        match self.try_reset() {
-            Ok(_) => ReadResult::Ok(vec![]),
-            Err(e) => ReadResult::Err(e.to_string()),
-        }
-    }
-
     pub fn next(&self) -> ReadResult {
         self.try_next()
             .unwrap_or_else(|e| ReadResult::Err(e.to_string()))
