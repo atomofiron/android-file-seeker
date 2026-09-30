@@ -1,6 +1,8 @@
 package app.atomofiron.searchboxapp.model.textviewer
 
 import app.atomofiron.common.util.GrowingList
+import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharset
+import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharsetName
 import app.atomofiron.searchboxapp.di.dependencies.store.SupportedCharsets
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeError
@@ -21,7 +23,6 @@ import java.nio.charset.Charset
 import kotlin.text.Charsets.UTF_16
 import kotlin.text.Charsets.UTF_16BE
 import kotlin.text.Charsets.UTF_16LE
-import kotlin.text.Charsets.UTF_8
 import kotlin.uuid.Uuid
 
 private const val CR: Byte = 0x0D
@@ -36,7 +37,7 @@ class TextViewerSession(
     private val length: ULong,
     ref: NodeRef,
     private val charsets: SupportedCharsets,
-    charset: String?,
+    charset: String,
 ) : Closeable {
 
     private val buffer = ByteArrayBuffer()
@@ -45,7 +46,7 @@ class TextViewerSession(
             field = value
             updateReading(value)
         }
-    var charset: Charset = UTF_8
+    var charset: Charset = Charset.forName( charset)
         private set(value) {
             field = value
             exactCharset = value.name()
@@ -53,7 +54,7 @@ class TextViewerSession(
         }
     val charsetName: StateFlow<String>
         field = MutableStateFlow(this.charset.name())
-    var exactCharset: String = this.charset.name()
+    var exactCharset: String = this.charset.name() // UTF-16 -> UTF-16LE or UTF-16BE
         private set
     private var utf8byteCount = 0uL
     var isFullyRead = false
@@ -73,18 +74,11 @@ class TextViewerSession(
     val tasks: StateFlow<List<LocalSearchTask>>
         field = MutableStateFlow(listOf())
 
-    init {
-        val charset = charsets.get(charset)
-        this.charset = charset?.name
-            ?.let{ Charset.forName(it) }
-            ?: this.charset
-    }
-
     fun updateItem(item: Node) {
         this.item.value = item
     }
 
-    suspend fun setCharset(name: String?): Boolean {
+    suspend fun setCharset(name: String): Boolean {
         val new = charsets.get(name)
             .takeIf { it != this.charset }
             ?: return false
@@ -103,9 +97,9 @@ class TextViewerSession(
         }
     }
 
-    private fun SupportedCharsets.get(name: String?): SupportedCharset? = list.value
-        .takeIf { name != null }
-        ?.find { it.name == name }
+    private fun SupportedCharsets.get(name: String): SupportedCharset = list.value
+        .find { it.name == name }
+        ?: SupportedCharset(DefaultCharsetName)
 
     fun getOrNull(uuid: Uuid) = tasks.value.find { it.uuid == uuid }
 
@@ -155,13 +149,13 @@ class TextViewerSession(
             charset == bomToUtf16X() -> charset to 2
             else -> charset to skip
         }
-        val offset = countUtf8bytes(charset)
+        val offset = countBytes(charset)
         return TextLine(offset, skip, this, charset)
     }
 
-    private fun ByteArray.countUtf8bytes(charset: Charset): ULong {
+    private fun ByteArray.countBytes(charset: Charset): ULong {
         val string = String(this, charset)
-        val bytes = string.toByteArray(UTF_8)
+        val bytes = string.toByteArray(DefaultCharset)
         val offset = utf8byteCount
         utf8byteCount += bytes.size.toULong()
         return offset

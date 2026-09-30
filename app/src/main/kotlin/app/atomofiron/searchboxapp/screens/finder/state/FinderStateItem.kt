@@ -41,7 +41,7 @@ sealed class FinderStateItem(
 
     data class Options(
         val toggles: SearchOptions,
-        val charset: String?,
+        val charset: String,
     ) : FinderStateItem(FinderItemType.EDIT_OPTIONS_MINI), SearchOptions by toggles
 
     data class EditOptions(val toggles: SearchOptions) : FinderStateItem(FinderItemType.EDIT_OPTIONS), SearchOptions by toggles

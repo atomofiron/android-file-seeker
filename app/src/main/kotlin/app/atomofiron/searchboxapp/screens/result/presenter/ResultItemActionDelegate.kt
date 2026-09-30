@@ -5,6 +5,7 @@ import app.atomofiron.common.util.dialog.DialogDelegate
 import app.atomofiron.common.util.extension.launchOnIO
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
+import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharsetName
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
@@ -40,7 +41,7 @@ class ResultItemActionDelegate @Inject constructor(
             item.isDirectory -> Unit // todo open dir
             (item.error is NodeError.NoSuchFileOrDir),
             (item.error is NodeError.PermissionDenied) -> state.showAlert(item.error.toAlert(item.content))
-            (item.content is NodeContent.Text) -> router.openFile(item.ref, item.length, state.taskUuid, state.result.type.charset)
+            (item.content is NodeContent.Text) -> router.openFile(item.ref, item.length, state.taskUuid, state.result.type.charset ?: DefaultCharsetName)
             (item.content is NodeContent.AndroidApp) -> apks.askForAndroidApp(item.ref, item.content)
             else -> sharing.openWith(item)
         }

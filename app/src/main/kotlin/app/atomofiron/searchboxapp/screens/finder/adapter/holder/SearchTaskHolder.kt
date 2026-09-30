@@ -16,6 +16,7 @@ import app.atomofiron.fileseeker.databinding.ItemSearchTaskBinding
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Companion.setMuonsDrawable
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable.Speed
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
+import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharsetName
 import app.atomofiron.searchboxapp.model.finder.QueryParams
 import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchStatus
@@ -114,7 +115,7 @@ class SearchTaskHolder<Result : SearchResult>(
         text = status
     }
 
-    private fun TextView.setStatus(result: SearchResult, charset: String?) {
+    private fun TextView.setStatus(result: SearchResult, charset: String) {
         val status = SpannableStringBuilder()
         val counters = result.getCounters()
         result.getCounters().forEachIndexed { index, it ->
@@ -128,7 +129,9 @@ class SearchTaskHolder<Result : SearchResult>(
             val star = status.lastIndexOf('*')
             status.setIcon(resId, star, star.inc())
         }
-        status.append(charset.orEmpty())
+        if (charset != DefaultCharsetName) {
+            status.append(charset)
+        }
         text = status
     }
 

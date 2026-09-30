@@ -9,24 +9,25 @@ import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.view.style.EntireLineSpan
 import app.atomofiron.searchboxapp.custom.view.style.RoundedBackgroundSpan
+import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharset
 import app.atomofiron.searchboxapp.model.textviewer.MatchList
 import app.atomofiron.searchboxapp.model.textviewer.TextLine
 import app.atomofiron.searchboxapp.utils.colorAttr
 import java.nio.ByteBuffer
 import java.nio.CharBuffer
 import java.nio.charset.Charset
+import java.nio.charset.CharsetDecoder
 import java.nio.charset.CodingErrorAction
-import kotlin.text.Charsets.UTF_8
 
-private val charBuf = CharBuffer.allocate(1024)
-private val Utf8Decoder = UTF_8.decoder()
+private val charBuf: CharBuffer = CharBuffer.allocate(1024)
+private val DefaultDecoder: CharsetDecoder = DefaultCharset.decoder()
 
 class TextViewerHolder(
     private val textView: TextView,
 ) : GeneralHolder<TextLine>(textView) {
 
-    private var charset = UTF_8
-    private var decoder = Utf8Decoder
+    private var charset: Charset = DefaultCharset
+    private var decoder: CharsetDecoder = DefaultDecoder
 
     private val spanPart: RoundedBackgroundSpan
         get() = RoundedBackgroundSpan(
@@ -71,18 +72,18 @@ class TextViewerHolder(
         truePosition = position
         setCharset(item.charset)
         val text = item.toTextString()
-        val bytes = text.toByteArray(UTF_8)
+        val bytes = text.toByteArray(DefaultCharset)
         val spannable = SpannableString(text)
         matches.forEachIndexed { index, match ->
-            val skip = item.skipUtf8bytes()
+            val skip = item.skipBytes()
             val bytesStart = (match.offset - item.offset - skip).toInt()
             val bytesEnd = (bytesStart + match.length.toInt())
-            val start = bytes.countUtf8chars(0, bytesStart)
+            val start = bytes.countChars(0, bytesStart)
             if (bytesStart < 0 || bytesEnd > bytes.size) {
                 debugFail { "$bytesStart < 0 || $bytesEnd > ${bytes.size}, text $text" }
                 return@forEachIndexed
             }
-            val length = bytes.countUtf8chars(bytesStart, bytesEnd)
+            val length = bytes.countChars(bytesStart, bytesEnd)
             val end = start + length
             val forTheEntireLine = start == 0 && end == spannable.length
             val span: Any = when {
@@ -110,20 +111,20 @@ class TextViewerHolder(
 
     private fun TextLine.toTextString() = String(text, skip, text.size - skip, charset)
 
-    private fun TextLine.skipUtf8bytes(): ULong = when (skip) {
+    private fun TextLine.skipBytes(): ULong = when (skip) {
         0 -> 0uL
         else -> String(text, 0, skip, charset)
-            .toByteArray(UTF_8)
+            .toByteArray(DefaultCharset)
             .size.toULong()
     }
 }
 
-private fun ByteArray.countUtf8chars(start: Int, end: Int): Int {
+private fun ByteArray.countChars(start: Int, end: Int): Int {
     var count = 0
     val byteBuf = ByteBuffer.wrap(this, start, end - start)
 
     while (true) {
-        val result = Utf8Decoder.decode(byteBuf, charBuf, true)
+        val result = DefaultDecoder.decode(byteBuf, charBuf, true)
         count += charBuf.position()
         charBuf.clear()
         when {
@@ -132,10 +133,10 @@ private fun ByteArray.countUtf8chars(start: Int, end: Int): Int {
             result.isError -> result.throwException()
         }
     }
-    val result = Utf8Decoder.flush(charBuf)
+    val result = DefaultDecoder.flush(charBuf)
     count += charBuf.position()
     charBuf.clear()
-    Utf8Decoder.reset()
+    DefaultDecoder.reset()
 
     if (result.isError) {
         result.throwException()

@@ -8,6 +8,7 @@ import app.atomofiron.common.recycler.GeneralHolder
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.ItemSearchEditOptionsMiniBinding
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
+import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharsetName
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHolder.FinderConfigListener
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -55,7 +56,7 @@ class MiniEditOptionsHolder(
         excludeDirs.isEnabled = !item.contentSearch
         excludeDirs.chipIcon?.alpha = Alpha.enabledInt(!item.excludeDirs || !item.contentSearch)
         charset.text = item.charset
-        charset.isVisible = item.charset != null
+        charset.isVisible = item.charset != DefaultCharsetName
     }
 
     private fun update(block: (SearchOptions) -> SearchOptions) = listener.onOptionsChange(block(item.toggles))

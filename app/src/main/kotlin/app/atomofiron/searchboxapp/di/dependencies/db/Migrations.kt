@@ -6,6 +6,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import app.atomofiron.common.util.extension.decode
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
+import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharsetName
 import app.atomofiron.searchboxapp.model.explorer.NodeSorting
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
 import app.atomofiron.searchboxapp.model.finder.ItemMatch
@@ -51,7 +52,7 @@ object Migrations {
                     val bytes = cursor.getBlob(resultIndex)
 
                     val lr = bytes.decode<LegacyGlobalSearchResult>()
-                    val type = if (lr.forText) SearchType.Text(null) else SearchType.Names
+                    val type = if (lr.forText) SearchType.Text(DefaultCharsetName) else SearchType.Names
                     val result = GlobalSearchResult(type, lr.count, lr.countTotal, lr.matches, lr.errors, lr.generation)
                     FinderDao.store(id, result)
                     db.compileStatement("UPDATE $TMP SET sorting = ? WHERE id = ?").run {

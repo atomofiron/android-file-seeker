@@ -12,15 +12,15 @@ class TextViewerParams(
     val ref: NodeRef,
     val length: ULong,
     val initialTaskId: Uuid?,
-    val charset: String?,
+    val charset: String,
 ) {
     companion object {
 
         fun arguments(
             ref: NodeRef,
             length: ULong,
+            charset: String,
             taskId: Uuid? = null,
-            charset: String? = null,
         ) = Bundle().put(TextViewerParams(ref, length, taskId, charset))
 
         fun params(arguments: Bundle) = arguments.get<TextViewerParams>()!!

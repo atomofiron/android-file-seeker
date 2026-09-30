@@ -2,12 +2,11 @@ package app.atomofiron.searchboxapp.screens.finder.presenter
 
 import android.Manifest.permission.POST_NOTIFICATIONS
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
-import app.atomofiron.searchboxapp.screens.finder.di.FinderInteractor
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
-import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.finder.SearchResult
+import app.atomofiron.searchboxapp.model.other.ByteSize
 import app.atomofiron.searchboxapp.screens.common.delegates.StoragePermissionDelegate
 import app.atomofiron.searchboxapp.screens.finder.FinderRouter
 import app.atomofiron.searchboxapp.screens.finder.FinderScope
@@ -21,6 +20,7 @@ import app.atomofiron.searchboxapp.screens.finder.adapter.holder.EditOptionsHold
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.SearchTaskHolder
 import app.atomofiron.searchboxapp.screens.finder.adapter.holder.TestHolder
+import app.atomofiron.searchboxapp.screens.finder.di.FinderInteractor
 import app.atomofiron.searchboxapp.screens.finder.di.history.HistoryDao
 import app.atomofiron.searchboxapp.screens.finder.di.history.ItemHistory
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
@@ -102,7 +102,7 @@ class FinderAdapterPresenterDelegate @Inject constructor(
         }
     }
 
-    private fun startSearch(query: String, charset: String?, targets: List<NodeRef>) {
+    private fun startSearch(query: String, charset: String, targets: List<NodeRef>) {
         io {
             if (history.exists(query)) history.delete(query)
             history.put(ItemHistory(query = query))

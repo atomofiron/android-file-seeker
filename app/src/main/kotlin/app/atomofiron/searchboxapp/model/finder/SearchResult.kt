@@ -26,7 +26,7 @@ sealed class SearchResult {
     data class Local(
         override val count: Int,
         val matches: MatchMap,
-        val charset: String?,
+        val charset: String,
         val hash: NodeInfo? = null,
         override val removable: Boolean = true,
         override val error: NodeError? = null,
@@ -36,7 +36,7 @@ sealed class SearchResult {
 
         override val countTotal = 1
 
-        constructor(charset: String?) : this(0, mapOf(), charset)
+        constructor(charset: String) : this(0, mapOf(), charset)
 
         override fun getCounters(): IntArray = intArrayOf(count)
 

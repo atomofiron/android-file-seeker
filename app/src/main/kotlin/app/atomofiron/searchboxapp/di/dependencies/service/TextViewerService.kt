@@ -45,7 +45,7 @@ class TextViewerService @Inject constructor(
     private val asSu: Boolean get() = preferences.asSu.value
     private var localId = 1
 
-    fun getFileSession(ref: NodeRef, length: ULong, charset: String?): Rslt<TextViewerSession> {
+    fun getFileSession(ref: NodeRef, length: ULong, charset: String): Rslt<TextViewerSession> {
         return findSession(ref)
             ?.apply { scope.launchOnIO { setCharset(charset) } }
             ?.let { Rslt.Ok(it) }

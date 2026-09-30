@@ -57,7 +57,7 @@ class FinderService @Inject constructor(
 
     suspend fun search(
         query: String,
-        charset: String?,
+        charset: String,
         where: List<NodeRef>,
         config: SearchOptions,
     ) = withIO {

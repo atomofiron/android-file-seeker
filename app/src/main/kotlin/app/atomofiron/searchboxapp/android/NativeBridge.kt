@@ -7,6 +7,7 @@ import app.atomofiron.fileseeker.BuildConfig.NATIVE_LIB
 import app.atomofiron.fileseeker.BuildConfig.NATIVE_LIB_SO
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.model.finder.QueryParams
+import app.atomofiron.searchboxapp.poop
 import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_FILE_LENGTH
 import app.atomofiron.searchboxapp.utils.Const.UNDEFINED_FILE_TIMESTAMP
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -160,7 +161,7 @@ object NativeBridge {
     fun findLocalText(
         params: QueryParams,
         target: NodeRef,
-        charset: String?,
+        charset: String,
         asSu: Boolean,
         cancellation: CancellationState,
     ): TextSearchProgress {
@@ -179,7 +180,7 @@ object NativeBridge {
         targets: List<NodeRef>,
         maxDepth: Int,
         maxSize: ULong?,
-        charset: String?,
+        charset: String,
         asSu: Boolean,
         cancellation: CancellationState,
         collector: (TextSearchProgress) -> Unit,
@@ -190,6 +191,7 @@ object NativeBridge {
         val query = SearchQuery(params.query, params.regex, params.ignoreCase)
         return uniffi.native_lib.findText(query, targets.map { it.bytes }, maxDepth.toUInt(), sizeLimit = maxSize, charset = charset, suCmd = suCmd.takeIf { asSu }, cancellation, collector)
             .toRslt()
+            .also { poop("nu $it") }
     }
 
     fun getSupportedCharsets(): List<SupportedCharset> {

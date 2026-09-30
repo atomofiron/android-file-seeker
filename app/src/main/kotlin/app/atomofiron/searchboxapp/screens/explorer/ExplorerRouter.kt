@@ -7,6 +7,7 @@ import app.atomofiron.common.util.permission.PermissionDelegate
 import app.atomofiron.common.util.property.WeakProperty
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.router.FileSharingDelegate
+import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharsetName
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.screens.common.RootRoutingModel
@@ -39,7 +40,7 @@ class ExplorerRouter @Inject constructor(
 
     fun showFile(item: Node) {
         if (item.content is NodeContent.Text) {
-            val arguments = TextViewerParams.arguments(item.ref, item.length)
+            val arguments = TextViewerParams.arguments(item.ref, item.length, DefaultCharsetName)
             navigate(R.id.textViewerFragment, arguments)
         } else {
             sharing.openWith(item)

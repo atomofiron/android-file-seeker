@@ -9,7 +9,7 @@ interface FinderItemsState {
     val isLocal: Boolean
     val targets: StateFlow<List<Node>>
     val toggles: StateFlow<FinderStateItem.EditOptions>
-    val charset: StateFlow<String?>
+    val charset: StateFlow<String>
 
     val items: Flow<List<FinderStateItem>>
 

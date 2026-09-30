@@ -33,8 +33,8 @@ class ResultRouter @Inject constructor(property: WeakProperty<out Fragment>) : B
         return success
     }
 
-    fun openFile(ref: NodeRef, length: ULong, taskId: Uuid, charset: String?) {
-        val arguments = TextViewerParams.arguments(ref, length, taskId, charset)
+    fun openFile(ref: NodeRef, length: ULong, taskId: Uuid, charset: String) {
+        val arguments = TextViewerParams.arguments(ref, length, charset, taskId)
         navigate(R.id.textViewerFragment, arguments)
     }
 }

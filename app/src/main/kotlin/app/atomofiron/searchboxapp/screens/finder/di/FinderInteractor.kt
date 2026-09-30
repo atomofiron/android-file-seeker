@@ -16,7 +16,7 @@ class FinderInteractor @Inject constructor(
     private val finderService: FinderService,
 ) : CoroutineLauncher by CoroutineLauncher(scope) {
 
-    fun search(query: String, charset: String?, where: List<NodeRef>, config: SearchOptions) = default {
+    fun search(query: String, charset: String, where: List<NodeRef>, config: SearchOptions) = default {
         finderService.search(query, charset, where, config)
     }
 

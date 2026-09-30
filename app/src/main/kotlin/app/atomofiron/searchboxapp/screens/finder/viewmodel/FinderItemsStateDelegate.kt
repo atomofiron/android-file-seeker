@@ -31,7 +31,7 @@ import uniffi.native_lib.SupportedCharset
 
 class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>(
     override val isLocal: Boolean,
-    override val charset: StateFlow<String?>,
+    override val charset: StateFlow<String>,
     preferences: PreferenceStore,
     charsets: SupportedCharsets,
     tasks: Flow<List<Task>?>,
@@ -94,7 +94,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
         options: EditOptions,
         charsets: List<SelectableCharset>,
         settings: Triple<Array<String>, Int, ByteSize>,
-        charset: String?,
+        charset: String,
         show: Boolean,
     ) = when {
         show -> listOf(

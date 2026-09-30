@@ -9,6 +9,7 @@ import app.atomofiron.common.util.extension.decodeOrNull
 import app.atomofiron.common.util.extension.encode
 import app.atomofiron.searchboxapp.android.AbstractApp
 import app.atomofiron.searchboxapp.di.dependencies.db.LegacyGlobalSearchResult2
+import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharsetName
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 import app.atomofiron.searchboxapp.model.finder.SearchType
@@ -71,7 +72,7 @@ private object Store {
             ?: return null
         return when {
             bytes.isLegacy() -> bytes.decodeOrNull<LegacyGlobalSearchResult2>()?.run {
-                val type = if (forText) SearchType.Text(null) else SearchType.Names
+                val type = if (forText) SearchType.Text(DefaultCharsetName) else SearchType.Names
                 GlobalSearchResult(type, count, countTotal, matches, errors, generation)
             }
             else -> bytes.decodeOrNull<GlobalSearchResult>()

@@ -77,10 +77,11 @@ class TextViewerPresenter @Inject constructor(
     }
 
     override fun onCharsetClick(charset: String, select: Boolean) {
-        val charset = charset.takeIf { select }
-        viewState.hideTask()
-        launch {
-            sessionResult.result.ok()?.setCharset(charset)
+        if (select) {
+            viewState.hideTask()
+            launch {
+                sessionResult.result.ok()?.setCharset(charset)
+            }
         }
     }
 

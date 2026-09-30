@@ -9,6 +9,7 @@ import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.MuonsDrawable
 import app.atomofiron.searchboxapp.custom.view.dock.item.DockItem
+import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharsetName
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
 import app.atomofiron.searchboxapp.di.dependencies.store.SupportedCharsets
 import app.atomofiron.searchboxapp.model.explorer.Node
@@ -51,7 +52,7 @@ class TextViewerViewState private constructor(
     error: NodeError?,
 ) : FinderItemsState by FinderItemsStateDelegate(
     isLocal = true,
-    charset = session?.charsetName.orStub(null),
+    charset = session?.charsetName.orStub(DefaultCharsetName),
     preferenceStore,
     charsets,
     session?.tasks ?: emptyFlow(),
@@ -73,7 +74,7 @@ class TextViewerViewState private constructor(
         list.map { SelectableCharset(it.name) }
     }.let { charsets ->
         combine(charsets, charset) { list, selected ->
-            if (selected == null) list else list.toMutableList().apply {
+            list.toMutableList().apply {
                 replaceOne(SelectableCharset(selected, true)) { name == selected }
             }
         }

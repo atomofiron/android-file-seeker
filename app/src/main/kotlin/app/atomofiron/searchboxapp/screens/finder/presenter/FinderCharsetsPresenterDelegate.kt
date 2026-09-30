@@ -11,6 +11,6 @@ class FinderCharsetsPresenterDelegate @Inject constructor(
 ) : CharsetsHolder.CharsetsOutput {
 
     override fun onCharsetClick(charset: String, select: Boolean) {
-        viewState.setCharset(charset.takeIf { select })
+        if (select) viewState.setCharset(charset)
     }
 }

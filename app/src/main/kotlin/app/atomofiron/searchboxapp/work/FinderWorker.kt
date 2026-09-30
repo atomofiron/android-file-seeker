@@ -83,13 +83,13 @@ class FinderWorker(
         val query: QueryParams,
         val type: Type,
         val maxDepth: Int,
-        val charset: String?,
+        val charset: String,
         val targets: List<ByteArray>,
         val asSu: Boolean,
     ) {
         @Serializable
         sealed interface Type {
-            fun toResultType(charset: String?): SearchType = when (this) {
+            fun toResultType(charset: String): SearchType = when (this) {
                 is Names -> SearchType.Names
                 is Text -> SearchType.Text(charset)
             }

@@ -55,5 +55,5 @@ class FinderViewState @Inject constructor(
 
     fun showHistory() = showHistory.invoke(scope)
 
-    fun setCharset(charset: String?) = charsetProvider.setCharset(charset)
+    fun setCharset(charset: String) = charsetProvider.setCharset(charset)
 }
