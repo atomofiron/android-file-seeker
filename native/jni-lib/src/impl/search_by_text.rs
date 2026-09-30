@@ -101,15 +101,15 @@ fn resolve(encoding: Encoding, charset: &str, path: &Path) -> Rslt<(Encoding, u6
         return Ok((encoding, 0))
     }
     let mut file = File::open(path)?;
-    let mut bytes = [0u8; 2];
+    let mut bytes = [0u8; 3];
     file.read_exact(&mut bytes)?;
     let encoding = match bytes {
-        [0xFF, 0xFE] => match len {
+        [0xFF, 0xFE, _] => match len {
             6 => Encoding::new(UTF_16LE.name())?,
             _ if en_rs == UTF_16BE => return Err(string(CHARSET_MISMATCH).into()),
             _ => encoding, // UTF_16LE
         }
-        [0xFE, 0xFF] => match len {
+        [0xFE, 0xFF, _] => match len {
             6 => Encoding::new(UTF_16BE.name())?,
             _ if en_rs == UTF_16LE => return Err(string(CHARSET_MISMATCH).into()),
             _ => encoding, // UTF_16BE
@@ -118,7 +118,9 @@ fn resolve(encoding: Encoding, charset: &str, path: &Path) -> Rslt<(Encoding, u6
         _ => encoding // wdc
     };
     let bom_offset = match bytes {
-        [0xFF, 0xFE] | [0xFE, 0xFF] => 3, // UTF-8 bytes
+        [0xFF, 0xFE, _] | // UTF-16LE
+        [0xFE, 0xFF, _] | // UTF-16BE
+        [0xEF, 0xBB, 0xBF] => 3, // UTF-8-BOM
         _ => 0,
     };
     return Ok((encoding, bom_offset))

@@ -42,10 +42,6 @@ class TextViewerSession(
 
     private val buffer = ByteArrayBuffer()
     private var byteCount = 0uL
-        set(value) {
-            field = value
-            updateReading(value)
-        }
     var charset: Charset = Charset.forName( charset)
         private set(value) {
             field = value
@@ -131,7 +127,7 @@ class TextViewerSession(
             skip = pair.second
             when (length) {
                 0 if isFullyRead -> return null
-                0 -> byteCount += buffer.readMore()
+                0 -> buffer.readMore()
             }
         }
         val text = buffer.consume(length)
@@ -161,21 +157,23 @@ class TextViewerSession(
         return offset
     }
 
-    private fun ByteArrayBuffer.readMore(): ULong {
+    private fun ByteArrayBuffer.readMore() {
         when (val result = input.next()) {
-            is ReadResult.Ok -> append(result.v1)
-                .also { return result.v1.size.toULong() }
+            is ReadResult.Ok -> {
+                append(result.v1)
+                updateReading(result.v1.size.toULong())
+            }
             is ReadResult.End -> isFullyRead = true
             is ReadResult.Err -> {
                 isFullyRead = true
                 error.value = result.v1.toNodeError()
             }
         }
-        return 0uL
     }
 
-    private fun updateReading(loaded: ULong) {
-        var loaded = loaded
+    private fun updateReading(increment: ULong) {
+        byteCount += increment
+        var loaded = byteCount
         var length = length
         var denominator = 1
         while (length > Int.MAX_VALUE.toULong()) {

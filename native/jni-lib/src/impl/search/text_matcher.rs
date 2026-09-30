@@ -25,9 +25,10 @@ impl TextMatcher for RegexMatcher {
     }
 
     fn search(&self, path: &Path, encoding: Encoding, bom_offset: u64) -> Rslt<Vec<TextMatch>> {
-        let mut searcher = SearcherBuilder::new()
+            let mut searcher = SearcherBuilder::new()
             .line_number(true)
             .encoding(Some(encoding))
+            .bom_sniffing(false)
             .build();
         let matches = TextMatches::new();
         searcher.search_path(self, path, TextSink::new(&self, &matches, bom_offset))?;
