@@ -62,13 +62,13 @@ class TextViewerViewState private constructor(
     val matchingCursor = DataFlow<MatchCursor?>(null)
 
     val composition = preferenceStore.explorerItemComposition.value
-    val item: StateFlow<Node> = session?.item ?: MutableStateFlow(ref.toNode())
-    val textLines: StateFlow<List<TextLine>> = session?.lines ?: MutableStateFlow(emptyList())
+    val item: StateFlow<Node> = session?.item.orStub(ref.toNode())
+    val textLines: StateFlow<List<TextLine>> = session?.lines.orStub(emptyList())
     val currentTask: StateFlow<LocalSearchTask?>
         field = MutableStateFlow<LocalSearchTask?>(null)
     val alerts: SharedFlow<Alert?>
         field = DataFlow<Alert?>((session?.error?.value ?: error)?.toAlert())
-    val reading = session?.reading ?: MutableStateFlow(Reading.Stub)
+    val reading = session?.reading.orStub(Reading.Stub)
     val charsets = charsets.list.map { list ->
         list.map { SelectableCharset(it.name) }
     }.let { charsets ->
