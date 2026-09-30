@@ -4,7 +4,7 @@ use crate::common::{Rslt, JOINING_ERROR};
 use crate::ext::raw_path::RawPath;
 use crate::r#impl::meta::meta;
 use crate::r#impl::r#type::type_or_meta;
-use crate::r#impl::search::matcher::build_matcher;
+use crate::r#impl::search::name_matcher::build_matcher;
 use crate::r#impl::search::progress::proxy_progress;
 use crate::r#impl::search::walker::walk;
 use ignore::WalkState;

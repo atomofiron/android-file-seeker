@@ -1,7 +1,7 @@
 use regex::{Regex, RegexBuilder};
 use crate::api::api::SearchQuery;
 use crate::common::Rslt;
-use crate::r#impl::search::matcher::NameMatcher;
+use crate::r#impl::search::name_matcher::NameMatcher;
 
 pub struct RegexMatcher {
     regex: Regex,

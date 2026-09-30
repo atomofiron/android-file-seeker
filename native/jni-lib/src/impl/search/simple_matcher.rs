@@ -1,5 +1,5 @@
 use crate::api::api::SearchQuery;
-use crate::r#impl::search::matcher::NameMatcher;
+use crate::r#impl::search::name_matcher::NameMatcher;
 
 pub struct SimpleMatcher {
     query: String,
