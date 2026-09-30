@@ -128,7 +128,7 @@ private suspend fun AndroidApp.getApkContent(apkPath: String, hash: NodeHash?, s
 }
 
 private fun NodeRef.getCachedApkInfo(asSu: Boolean, signature: Boolean): Pair<NodeHash?, ApkInfo?> {
-    val hash = NativeBridge.crcHash(this, asSu).ok()?.value
+    val hash = NativeBridge.crcHash(this, asSu).ok()
     return hash to hash
         ?.let { ApkInfoCache.get(it, withIcon = true, withSignature = signature) }
 }

@@ -218,7 +218,7 @@ class FinderWorker(
     }
 
     private fun Rslt<Unit>.apply() = updateAsync {
-        val error = err()?.message?.toNodeError()
+        val error = err()?.toNodeError()
         val stopped = isStopping
         var ended = toEnded(result.copy(error = error), stopped = stopped)
         try {

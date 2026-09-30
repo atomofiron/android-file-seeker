@@ -111,7 +111,7 @@ class TextViewerViewState private constructor(
         charsets: SupportedCharsets,
         preferenceStore: PreferenceStore,
         session: TextViewerSessionResult,
-    ) : this(params.ref, scope, session.result.ok()?.value, charsets, preferenceStore, session.error)
+    ) : this(params.ref, scope, session.result.ok(), charsets, preferenceStore, session.error)
 
     fun switchCursor(forward: Boolean): CursorResult {
         val result = currentTask.value?.result

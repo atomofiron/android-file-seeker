@@ -35,7 +35,7 @@ class TextViewerPresenter @Inject constructor(
     private val itemRef: NodeRef get() = viewState.item.value.ref
 
     init {
-        val session = sessionResult.result.ok()?.value
+        val session = sessionResult.result.ok()
         session?.loading?.collect(scope, viewState::setLoading)
         scope.launchOnIO {
             session ?: return@launchOnIO withMain {
@@ -80,7 +80,7 @@ class TextViewerPresenter @Inject constructor(
         val charset = charset.takeIf { select }
         viewState.hideTask()
         launch {
-            sessionResult.result.ok()?.value?.setCharset(charset)
+            sessionResult.result.ok()?.setCharset(charset)
         }
     }
 

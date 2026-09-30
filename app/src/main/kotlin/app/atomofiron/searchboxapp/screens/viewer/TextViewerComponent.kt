@@ -28,7 +28,7 @@ import javax.inject.Scope
 annotation class TextViewerScope
 
 class TextViewerSessionResult(val result: Rslt<TextViewerSession>) {
-    val error: NodeError? = result.err()?.message?.toNodeError()
+    val error: NodeError? = result.err()?.toNodeError()
 }
 
 @TextViewerScope

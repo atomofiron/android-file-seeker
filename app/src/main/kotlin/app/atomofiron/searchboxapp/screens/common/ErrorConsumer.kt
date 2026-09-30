@@ -10,5 +10,5 @@ fun interface AlertConsumer {
 }
 
 fun <T> Rslt<T>.errToAlert(consumer: AlertConsumer) {
-    err()?.run { consumer.onAlert(UniText(message).toAlert(error = true)) }
+    err()?.let { consumer.onAlert(UniText(it).toAlert(error = true)) }
 }

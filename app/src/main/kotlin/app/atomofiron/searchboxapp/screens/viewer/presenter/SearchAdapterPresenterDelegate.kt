@@ -75,8 +75,8 @@ class SearchAdapterPresenterDelegate @Inject constructor(
 
     override fun onSearchClick(value: String) {
         val config = viewState.toggles.value
-        val charset = sessionResult.result.ok()
-            ?.value?.exactCharset
+        val charset = sessionResult.result
+            .ok()?.exactCharset
             ?: viewState.charset.value
         val params = QueryParams(value, regex = config.regex, ignoreCase = config.ignoreCase, charset = charset)
         interactor.search(viewState.item.value.ref, params)
@@ -110,7 +110,7 @@ class SearchAdapterPresenterDelegate @Inject constructor(
                 withMain {
                     when {
                         error != null -> error.toUni().showError()
-                        hash.hash == result.ok()?.value -> task.trySelect()
+                        hash.hash == result.ok() -> task.trySelect()
                         result is Rslt.Err -> result.message.toUni().showError()
                         else -> NodeError.FileWasChanged.toUni().showError()
                     }
@@ -125,7 +125,7 @@ class SearchAdapterPresenterDelegate @Inject constructor(
         if (viewState.trySelectTask(this)) {
             curtain.controller?.close()
             scope {
-                sessionResult.result.ok()?.value?.setCharset(result.charset)
+                sessionResult.result.ok()?.setCharset(result.charset)
             }
         }
     }

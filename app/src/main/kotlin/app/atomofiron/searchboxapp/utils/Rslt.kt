@@ -25,9 +25,9 @@ sealed class Rslt<T>(val isOk: Boolean) {
         override fun toString(): String = "Rslt.Err($message)"
     }
 
-    fun ok(): Ok<T>? = this as? Ok<T>
+    fun ok(): T? = (this as? Ok<T>)?.value
 
-    fun err(): Err<T>? = this as? Err<T>
+    fun err(): String? = (this as? Err<T>)?.message
 }
 
 fun <T> T.toOk() = Rslt.Ok(this)
@@ -58,6 +58,6 @@ inline fun <T, R> Rslt<T>.map(map: (T) -> R): Rslt<R> = when (this) {
 }
 
 inline fun <T> Rslt<T>.ifOk(action: (T) -> Unit): Rslt<T> {
-    ok()?.let { action(it.value) }
+    ok()?.let { action(it) }
     return this
 }
