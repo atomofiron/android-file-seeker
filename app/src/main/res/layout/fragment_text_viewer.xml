@@ -59,7 +59,7 @@
                 layout="@layout/item_chips"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="@dimen/padding_half"
+                android:layout_marginBottom="6dp"
                 />
         </LinearLayout>
         <ProgressBar

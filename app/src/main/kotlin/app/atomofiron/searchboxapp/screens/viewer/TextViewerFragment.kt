@@ -54,6 +54,7 @@ class TextViewerFragment : Fragment(R.layout.fragment_text_viewer),
                 addOnScrollListener(OnScrollListenerImpl())
             }
             subBar.noClip()
+            charsets.root.setHorizontalPadding(R.dimen.padding_semi)
             dockBar.submit(DefaultDockState)
             dockBar.setListener(::onBottomMenuItemClick)
             pathBar.setOnClickListener { presenter.onCopyPathClick() }

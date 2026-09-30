@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewParent
+import androidx.annotation.DimenRes
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.searchboxapp.utils.isLayoutRtl
@@ -12,9 +13,18 @@ import com.google.android.material.appbar.AppBarLayout
 
 class WideRecyclerView : RecyclerView {
 
+    private var horizontalPadding = 0
+
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
     constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+
+    fun setHorizontalPadding(@DimenRes dimenId: Int = 0) {
+        horizontalPadding = when (dimenId) {
+            0 -> 0
+            else -> resources.getDimensionPixelSize(dimenId)
+        }
+    }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
@@ -49,8 +59,10 @@ class WideRecyclerView : RecyclerView {
     }
 
     private fun tryUpdate(parent: View) {
-        if (paddingStart != parent.paddingStart || paddingEnd != parent.paddingEnd) {
-            updatePadding(parent.paddingStart, parent.paddingEnd)
+        val ps = parent.paddingStart + horizontalPadding
+        val pe = parent.paddingEnd + horizontalPadding
+        if (ps != parent.paddingStart || pe != parent.paddingEnd) {
+            updatePadding(ps, pe)
             updateLayoutParams<MarginLayoutParams> {
                 marginStart = -parent.paddingStart
                 marginEnd = -parent.paddingEnd
