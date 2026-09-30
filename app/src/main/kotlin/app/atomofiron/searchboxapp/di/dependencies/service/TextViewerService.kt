@@ -128,11 +128,7 @@ class TextViewerService @Inject constructor(
 
     fun setCharset(ref: NodeRef, name: String?) {
         scope {
-            findSession(ref)?.let { session ->
-                if (session.setCharset(name)) {
-                    session.readNextLines(Const.TEXT_FILE_PAGINATION_STEP)
-                }
-            }
+            findSession(ref)?.setCharset(name)
         }
     }
 
