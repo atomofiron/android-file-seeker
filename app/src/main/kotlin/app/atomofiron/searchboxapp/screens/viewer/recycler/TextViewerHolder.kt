@@ -107,7 +107,7 @@ class TextViewerHolder(
         }
     }
 
-    private fun TextLine.toTextString() = String(text, 0, text.size - skipEnd, charset)
+    private fun TextLine.toTextString() = String(text, skip, text.size - skip, charset)
 }
 
 private fun ByteArray.countUtf8chars(range: IntRange): Int {

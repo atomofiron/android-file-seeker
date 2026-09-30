@@ -5,9 +5,9 @@ import java.nio.charset.Charset
 
 data class TextLine(
     val offset: ULong,
+    val skip: Int, // skip CR, LF and BOM
     val text: ByteArray,
     val charset: Charset,
-    val skipEnd: Int,
 ) {
     val length get() = text.size
     val end get() = offset + length.toULong()
@@ -16,12 +16,12 @@ data class TextLine(
         this === other -> true
         other !is TextLine -> false
         other.offset != offset -> false
-        other.skipEnd != skipEnd -> false
+        other.skip != skip -> false
         other.charset != charset -> false
         else -> text.contentEquals(other.text)
     }
 
-    override fun hashCode(): Int = hash(offset, length, charset, text, skipEnd)
+    override fun hashCode(): Int = hash(offset, length, charset, text, skip)
 
-    override fun toString(): String = "${this::class.java.simpleName}(offset=$offset, text=[$length], charset=${charset.name()}, skipEnd=$skipEnd)"
+    override fun toString(): String = "${this::class.java.simpleName}(offset=$offset, skip=$skip, text=[$length], charset=${charset.name()})"
 }

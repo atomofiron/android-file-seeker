@@ -10,6 +10,8 @@ class ByteArrayBuffer(initialCapacity: Int = 256) {
 
     val indices: IntRange get() = IntRange(0, lastIndex)
 
+    var cursor = 0
+
     private fun ensureCapacity(newSize: Int) {
         if (newSize <= buffer.size) return
         var newCap = buffer.size
@@ -39,13 +41,14 @@ class ByteArrayBuffer(initialCapacity: Int = 256) {
 
     fun clear() {
         size = 0
+        cursor = 0
     }
 
     fun isEmpty() = size == 0
 
     fun consume(length: Int): ByteArray {
-        if (length > size) {
-            throw IllegalArgumentException("$length/$size")
+        if (length > size || length > cursor) {
+            throw IllegalArgumentException("$length/$cursor/$size")
         }
         val bytes = buffer.sliceArray(0..<length)
         buffer.copyInto(
@@ -55,6 +58,7 @@ class ByteArrayBuffer(initialCapacity: Int = 256) {
             endIndex = size,
         )
         size -= length
+        cursor -= length
         return bytes
     }
 

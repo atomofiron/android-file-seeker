@@ -18,6 +18,9 @@ import uniffi.native_lib.ReadResult
 import uniffi.native_lib.SupportedCharset
 import java.io.Closeable
 import java.nio.charset.Charset
+import kotlin.text.Charsets.UTF_16
+import kotlin.text.Charsets.UTF_16BE
+import kotlin.text.Charsets.UTF_16LE
 import kotlin.uuid.Uuid
 
 private const val CR: Byte = 0x0D
@@ -81,7 +84,8 @@ class TextViewerSession(
             utf8byteCount = 0uL
             val newList = GrowingList<TextLine>(lineList.size)
             lineList.forEachIndexed { index, it ->
-                val new = it.text.toTextLine(newList.firstOrNull(), it.skipEnd)
+                val skip = if (index == 0) 0 else it.skip
+                val new = it.text.toTextLine(newList.firstOrNull(), skip)
                 newList.add(index, new)
             }
             lineList = newList
@@ -128,33 +132,22 @@ class TextViewerSession(
             }
         }
         val text = buffer.consume(length)
-        return text.toTextLine(first = lineList.firstOrNull(), skipEnd = skip)
+        return text.toTextLine(first = lineList.firstOrNull(), skip = skip)
     }
 
-    fun ByteArray.toTextLine(first: TextLine?, skipEnd: Int): TextLine {
-        val replacement = when {
-            first != null -> null
-            !charset.isUtf16() -> null
-            else -> bomToUtf16()
-        }
-        val charset = when {
-            replacement != null -> replacement
-            first == null -> charset
-            charset == Charsets.UTF_16 -> first.charset
-            else -> charset
+    fun ByteArray.toTextLine(first: TextLine?, skip: Int): TextLine {
+        val (charset, skip) = when {
+            charset == UTF_16 && first != null -> first.charset to skip
+            charset == UTF_16 -> bomToUtf16X()
+                ?.let { it to 2 }
+                ?: (charset to skip)
+            first != null || !charset.isOneOfUtf16() -> charset to skip
+            charset == bomToUtf16X() -> charset to 2
+            else -> charset to skip
         }
         val offset = countUtf8bytes(charset)
-        return TextLine(offset, this, charset, skipEnd)
+        return TextLine(offset, skip, this, charset)
     }
-
-    private fun ByteArray.bomToUtf16() = when {
-        size < 2 -> null
-        get(0) == FF && get(1) == FE -> Charsets.UTF_16LE
-        get(0) == FE && get(1) == FF -> Charsets.UTF_16BE
-        else -> null
-    }
-
-    private fun Charset.isUtf16() = this == Charsets.UTF_16
 
     private fun ByteArray.countUtf8bytes(charset: Charset): ULong {
         val string = String(this, charset)
@@ -191,7 +184,8 @@ class TextViewerSession(
 
     private fun ByteArrayBuffer.findEndOfLine(orElse: Int): Pair<Int, Int> {
         val w = window
-        for (i in indices) {
+        val skip = cursor
+        for (i in skip..<size) {
             if (i <= size - 4) {
                 copyInto(w, i)
             } else if (!isFullyRead) {
@@ -215,11 +209,22 @@ class TextViewerSession(
                 w[0] == LF -> 1
                 else -> continue
             }
-            return (i + bytes).coerceAtMost(size) to bytes
+            cursor = (i + bytes).coerceAtMost(size)
+            return i to skip
         }
         return when {
-            isFullyRead -> size to 0
+            isFullyRead -> size to skip // the last text line
             else -> orElse to 0
         }
     }
 }
+
+private fun ByteArray.bomToUtf16X() = when {
+    size < 2 -> null
+    get(0) == FF && get(1) == FE -> UTF_16LE
+    get(0) == FE && get(1) == FF -> UTF_16BE
+    else -> null
+}
+
+private fun Charset.isOneOfUtf16() = this == UTF_16 || this == UTF_16LE || this == UTF_16BE
+
