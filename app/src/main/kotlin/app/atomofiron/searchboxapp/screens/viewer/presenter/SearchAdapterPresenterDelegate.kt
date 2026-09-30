@@ -97,11 +97,11 @@ class SearchAdapterPresenterDelegate @Inject constructor(
 
     fun trySelectTask(task: LocalSearchTask) {
         val hash = task.result.hash
+        val error = task.error
         when {
             hash != null -> scope.launchOnIO {
                 val result = interactor.getHash(hash.ref)
                 withMain {
-                    val error = task.error
                     when {
                         error != null -> error.toUni().showError()
                         hash.hash == result.ok()?.value -> task.trySelect()
@@ -110,6 +110,7 @@ class SearchAdapterPresenterDelegate @Inject constructor(
                     }
                 }
             }
+            error != null -> error.toUni().showError()
             else -> task.trySelect()
         }
     }

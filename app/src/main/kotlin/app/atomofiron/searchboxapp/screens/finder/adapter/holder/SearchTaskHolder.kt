@@ -66,7 +66,7 @@ class SearchTaskHolder<Result : SearchResult>(
         }
         action.setText(idAction)
         action.isEnabled = !task.isStopping && (task.isProgress || task.isRemovable)
-        itemView.isEnabled = item.clickableIfEmpty || !task.result.isEmpty
+        itemView.isEnabled = item.clickableIfEmpty || !task.result.isEmpty || task.result.error != null
     }
 
     private fun ImageView.updateIcon(task: SearchTask<Result>) {
