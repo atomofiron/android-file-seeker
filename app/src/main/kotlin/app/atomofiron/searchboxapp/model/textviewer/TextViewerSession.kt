@@ -21,6 +21,7 @@ import java.nio.charset.Charset
 import kotlin.text.Charsets.UTF_16
 import kotlin.text.Charsets.UTF_16BE
 import kotlin.text.Charsets.UTF_16LE
+import kotlin.text.Charsets.UTF_8
 import kotlin.uuid.Uuid
 
 private const val CR: Byte = 0x0D
@@ -44,7 +45,7 @@ class TextViewerSession(
             field = value
             updateReading(value)
         }
-    var charset = Charsets.UTF_8
+    var charset = UTF_8
         private set
     private var utf8byteCount = 0uL
     var isFullyRead = false
@@ -151,9 +152,9 @@ class TextViewerSession(
 
     private fun ByteArray.countUtf8bytes(charset: Charset): ULong {
         val string = String(this, charset)
-        val bytes = string.toByteArray(Charsets.UTF_8)
+        val bytes = string.toByteArray(UTF_8)
         val offset = utf8byteCount
-        utf8byteCount += bytes.size.inc().toULong()
+        utf8byteCount += bytes.size.toULong()
         return offset
     }
 
