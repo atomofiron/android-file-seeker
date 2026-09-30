@@ -74,7 +74,8 @@ class TextViewerHolder(
         val bytes = text.toByteArray(UTF_8)
         val spannable = SpannableString(text)
         matches.forEachIndexed { index, match ->
-            val bytesStart = (match.offset - item.offset).toInt() - item.skip
+            val skip = item.skipUtf8bytes()
+            val bytesStart = (match.offset - item.offset - skip).toInt()
             val bytesEnd = (bytesStart + match.length.toInt())
             val start = bytes.countUtf8chars(0, bytesStart)
             if (bytesStart < 0 || bytesEnd > bytes.size) {
@@ -108,6 +109,13 @@ class TextViewerHolder(
     }
 
     private fun TextLine.toTextString() = String(text, skip, text.size - skip, charset)
+
+    private fun TextLine.skipUtf8bytes(): ULong = when (skip) {
+        0 -> 0uL
+        else -> String(text, 0, skip, charset)
+            .toByteArray(UTF_8)
+            .size.toULong()
+    }
 }
 
 private fun ByteArray.countUtf8chars(start: Int, end: Int): Int {
