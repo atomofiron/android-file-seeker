@@ -23,9 +23,9 @@ class CharsetsHolder : GeneralHolder<FinderStateItem.Charsets> {
     private val adapter: Adapter
     private val scope by itemView.scope()
     private val scrollToSelected = delayed(Const.COMMON_DELAY) {
-        itemOrNull?.charsets
-            ?.indexOfFirst { it.selected }
-            ?.takeIf { it >= 0 }
+        adapter.currentList
+            .indexOfFirst { it.selected }
+            .takeIf { it >= 0 }
             ?.let { binding.root.smoothScrollToPosition(it) }
     }
 
@@ -49,7 +49,10 @@ class CharsetsHolder : GeneralHolder<FinderStateItem.Charsets> {
 
     override fun onBind(item: FinderStateItem.Charsets, position: Int) = bind(item.charsets)
 
-    fun bind(charsets: List<SelectableCharset>) = adapter.submitList(charsets)
+    fun bind(charsets: List<SelectableCharset>) {
+        adapter.submitList(charsets)
+        scrollToSelected(scope)
+    }
 
     private class Adapter(private val output: CharsetsOutput): ListAdapter<SelectableCharset, CharsetHolder>(DiffUtilCallback) {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = CharsetHolder(parent, output)
