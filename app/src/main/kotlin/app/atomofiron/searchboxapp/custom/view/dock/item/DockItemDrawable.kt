@@ -118,6 +118,7 @@ private class DockItemShape(
 
     override fun draw(canvas: Canvas, paint: Paint) = canvas.drawPath(path, paint)
 
+    @Suppress("DEPRECATION")
     override fun getOutline(outline: Outline) = when {
         Android.R -> outline.setPath(path)
         path.isConvex -> outline.setConvexPath(path)

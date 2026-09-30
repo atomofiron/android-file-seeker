@@ -25,8 +25,6 @@ class EntireLineSpan(
         end: Int,
         lnum: Int,
     ) {
-        text ?: return
-
         val width = paint.measureText(text, start, end)
         rect.set(left.toFloat(), top.toFloat(), left + width, bottom.toFloat())
 

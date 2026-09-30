@@ -52,10 +52,7 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
         noClip()
         collapsing.noClip()
         if (context.isDarkDeep()) {
-            addLiftOnScrollListener { _, color ->
-                val background = background as MaterialShapeDrawable
-                background.fillColor = context.tonedOverlay(color)
-            }
+            addLiftOnScrollProgressListener(LiftListener())
         }
     }
 
@@ -144,6 +141,13 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
         val subHeight = subBar.height
         val alpha = (subHeight + offset) / subHeight.toFloat()
         subBar.alpha = Alpha.halfInvisible(alpha)
+    }
+
+    private inner class LiftListener : LiftOnScrollProgressListener() {
+        override fun onUpdate(elevation: Float, backgroundColor: Int, progres: Float) {
+            val background = background as MaterialShapeDrawable
+            background.fillColor = context.tonedOverlay(backgroundColor)
+        }
     }
 
     private class HeaderBehavior : Behavior() {

@@ -12,20 +12,24 @@ inline fun <T> T.ctx(action: T.() -> Unit) = action()
 
 operator fun CoroutineDispatcher.invoke(parallelism: Int) = Dispatchers.IO.limitedParallelism(parallelism)
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun CoroutineScope.launchOnDefault(
     noinline block: suspend CoroutineScope.() -> Unit,
 ) = launch(Dispatchers.Default, block = block)
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun CoroutineScope.launchOnIO(
     noinline block: suspend CoroutineScope.() -> Unit,
 ) = launch(Dispatchers.IO, block = block)
 
+@Suppress("NOTHING_TO_INLINE")
 inline fun CoroutineScope.launchOnMain(
     immediate: Boolean = false,
     start: CoroutineStart = CoroutineStart.DEFAULT,
     noinline block: suspend CoroutineScope.() -> Unit,
 ) = launch(if (immediate) Dispatchers.Main.immediate else Dispatchers.Main, start, block = block)
 
+@Suppress("NOTHING_TO_INLINE")
 inline operator fun CoroutineScope.invoke(
     noinline block: suspend CoroutineScope.() -> Unit,
 ) = launch(block = block)

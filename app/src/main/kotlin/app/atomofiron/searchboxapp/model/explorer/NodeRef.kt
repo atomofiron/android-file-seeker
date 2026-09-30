@@ -10,6 +10,7 @@ private val lowerBytes = 97..122 // a-z
 private val upperBytes = 65..90 // A-Z
 private val digitBytes = 48..57 // 0-9
 
+@Suppress("USELESS_ELVIS", "StringReferentialEquality") // elvis useful because of Companion.Stub initialization
 @Serializable
 class NodeRef(val bytes: ByteArray) {
     companion object {

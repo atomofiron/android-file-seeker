@@ -24,7 +24,7 @@ class WindowService @Inject constructor(
         controller?.isAppearanceLightNavigationBars = value
     }
 
-    fun setSecureFlag(value: Boolean) = window?.apply {
+    fun setSecureFlag(value: Boolean) = window.apply {
         val appearance = getSystemBarsAppearance()
         when {
             BuildConfig.DEBUG -> Unit
