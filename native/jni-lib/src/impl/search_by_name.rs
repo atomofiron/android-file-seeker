@@ -2,12 +2,14 @@ use crate::api::api::{NameSearchCollector, NameSearchProgress, SearchQuery, Simp
 use crate::api::cancellation::CancellationState;
 use crate::common::{Rslt, JOINING_ERROR};
 use crate::ext::raw_path::RawPath;
-use crate::r#impl::meta::meta;
+use crate::r#impl::meta::{meta, meta_with_error};
 use crate::r#impl::r#type::type_or_meta;
-use crate::r#impl::search::name_matcher::build_matcher;
 use crate::r#impl::search::progress::proxy_progress;
 use crate::r#impl::search::walker::walk;
+use grep_matcher::Matcher;
+use grep_regex::RegexMatcherBuilder;
 use ignore::WalkState;
+use std::os::unix::prelude::OsStrExt;
 use std::sync::mpsc::channel;
 use std::sync::mpsc::Sender;
 use std::sync::Arc;
@@ -42,13 +44,19 @@ pub fn find_names_recursively(
     cancellation: Arc<dyn CancellationState>,
     sender: &Sender<NameSearchProgress>,
 ) -> Rslt<()> {
-    let matcher = build_matcher(&query)?;
+    let matcher = RegexMatcherBuilder::new()
+        .case_insensitive(query.case_insensitive)
+        .fixed_strings(!query.regex)
+        .build(&query.query)?;
     walk(targets, sender, max_depth, cancellation, |entry, sender| {
         let progress = match entry.file_type() {
             None => NameSearchProgress::Err(meta(&entry.path().into())),
             Some(file_type) if exclude_dirs && file_type.is_dir() => NameSearchProgress::Skip,
-            _ if matcher.matches(entry.file_name()) => NameSearchProgress::Match(type_or_meta(&entry.path().into())),
-            _ => NameSearchProgress::Skip,
+            _ => match matcher.is_match(entry.file_name().as_bytes()) {
+                Err(e) => NameSearchProgress::Err(meta_with_error(&entry.path().into(), &e.to_string())),
+                Ok(matches) if matches => NameSearchProgress::Match(type_or_meta(&entry.path().into())),
+                _ => NameSearchProgress::Skip
+            },
         };
         return match sender.send(progress) {
             Ok(_) => WalkState::Continue,
