@@ -26,7 +26,7 @@ pub fn find_text_impl(
     targets: Vec<RawPath>,
     max_depth: usize,
     size_limit: Option<u64>,
-    charset: Option<String>,
+    charset: String,
     cancellation: Arc<dyn CancellationState>,
     collector: Arc<dyn TextSearchCollector>,
 ) -> SimpleResult {
@@ -35,18 +35,15 @@ pub fn find_text_impl(
         Ok(handle) => handle,
         Err(e) => return SimpleResult::Err(e.to_string()),
     };
-    let encoding = match charset {
-        None => None,
-        Some(charset) => match Encoding::new(&charset) {
-            Err(e) => return SimpleResult::Err(e.to_string()),
-            Ok(en) => Some((charset, en)),
-        },
+    let encoding = match Encoding::new(&charset) {
+        Ok(en) => en,
+        Err(e) => return SimpleResult::Err(e.to_string()),
     };
     let matcher = match RegexMatcher::from_query(query) {
         Ok(m) => m,
         Err(e) => return SimpleResult::Err(e.to_string())
     };
-    find_text_recursively(matcher, targets, max_depth, encoding, size_limit, cancellation, &tx);
+    find_text_recursively(matcher, targets, max_depth, charset, encoding, size_limit, cancellation, &tx);
     drop(tx);
     return handle.join()
         .map(|_| SimpleResult::Ok)
@@ -57,7 +54,8 @@ pub fn find_text_recursively(
     matcher: RegexMatcher,
     targets: Vec<RawPath>,
     max_depth: usize,
-    encoding: Option<(String, Encoding)>,
+    charset: String,
+    encoding: Encoding,
     size_limit: Option<u64>,
     cancellation: Arc<dyn CancellationState>,
     sender: &Sender<TextSearchProgress>,
@@ -78,7 +76,7 @@ pub fn find_text_recursively(
             }
             None => Ok(())
         }.and_then(|_| {
-            let (encoding, bom_offset) = resolve(encoding.clone(), path)?;
+            let (encoding, bom_offset) = resolve(encoding.clone(), &charset, path)?;
             matcher.search(path, encoding, bom_offset)
         }).map(|matches| match matches.is_empty() {
             true => TextSearchProgress::Skip,
@@ -92,19 +90,15 @@ pub fn find_text_recursively(
 }
 
 // tries to resolve UTF_16 to UTF_16LE or UTF_16BE
-fn resolve(encoding: Option<(String, Encoding)>, path: &Path) -> Rslt<(Option<Encoding>, u64)> {
-    let (charset, encoding) = match encoding {
-        None => return Ok((None, 0)),
-        Some(values) => values,
-    };
+fn resolve(encoding: Encoding, charset: &str, path: &Path) -> Rslt<(Encoding, u64)> {
     let len = charset.len();
     if len != 6 && len != 8 {
-        return Ok((Some(encoding), 0))
+        return Ok((encoding, 0))
     }
     let en_rs = EncodingRs::for_label(charset.as_bytes())
         .or_err(|| string(WRONG_CHARSET))?;
     if en_rs != UTF_16LE && en_rs != UTF_16BE {
-        return Ok((Some(encoding), 0))
+        return Ok((encoding, 0))
     }
     let mut file = File::open(path)?;
     let mut bytes = [0u8; 2];
@@ -127,7 +121,7 @@ fn resolve(encoding: Option<(String, Encoding)>, path: &Path) -> Rslt<(Option<En
         [0xFF, 0xFE] | [0xFE, 0xFF] => 3, // UTF-8 bytes
         _ => 0,
     };
-    return Ok((Some(encoding), bom_offset))
+    return Ok((encoding, bom_offset))
 }
 
 fn is_text_file(path: &Path) -> Rslt<bool> {

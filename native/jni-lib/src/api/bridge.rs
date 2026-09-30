@@ -186,7 +186,7 @@ pub fn find_text(
     targets: Vec<RawPath>,
     max_depth: u32,
     size_limit: Option<u64>,
-    charset: Option<String>,
+    charset: String,
     su_cmd: Option<SuCmd>,
     cancellation: Arc<dyn CancellationState>,
     collector: Arc<dyn TextSearchCollector>,
