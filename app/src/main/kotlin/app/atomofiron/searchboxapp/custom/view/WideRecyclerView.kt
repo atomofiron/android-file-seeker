@@ -1,12 +1,10 @@
 package app.atomofiron.searchboxapp.custom.view
 
 import android.content.Context
-import android.content.res.Configuration
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewParent
 import androidx.annotation.DimenRes
-import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.searchboxapp.utils.isLayoutRtl
 import com.google.android.material.appbar.AppBarLayout
@@ -14,6 +12,7 @@ import com.google.android.material.appbar.AppBarLayout
 class WideRecyclerView : RecyclerView {
 
     private var horizontalPadding = 0
+    private var parentView: View? = null
 
     constructor(context: Context) : super(context)
     constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
@@ -24,63 +23,69 @@ class WideRecyclerView : RecyclerView {
             0 -> 0
             else -> resources.getDimensionPixelSize(dimenId)
         }
+        tryUpdate(parentView ?: return)
     }
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        val parent = findParent()
-        tryUpdate(parent)
+        parentView = findParent()
+        tryUpdate(parentView ?: return)
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration?) {
-        super.onConfigurationChanged(newConfig)
-        val parent = findParent()
-        tryUpdate(parent)
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        parentView = null
     }
 
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
-        val parent = findParent()
-        tryUpdate(parent)
+        val parent = parentView ?: return
         val customWidthSpec = MeasureSpec.makeMeasureSpec(parent.measuredWidth, MeasureSpec.getMode(widthSpec))
         super.onMeasure(customWidthSpec, heightSpec)
+        tryUpdate(parent)
     }
 
-    override fun onLayout(changed: Boolean, l: Int, top: Int, r: Int, bottom: Int) {
-        val parent = findParent()
-        super.onLayout(changed, 0, top, parent.measuredWidth, bottom)
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        val parent = parentView ?: return
+        tryUpdate(parent)
+        when {
+            left == 0 && right == parent.measuredWidth -> super.onLayout(changed, left, top, right, bottom)
+            else -> super.layout(0, top, parent.measuredWidth, bottom)
+        }
     }
 
-    private fun findParent(): View = parent.findParent()
+    private fun findParent(): View? = parent?.findParent()
 
-    private fun ViewParent.findParent(): View = when (this) {
+    private fun ViewParent.findParent(): View? = when (this) {
         is AppBarLayout,
         is RecyclerView -> this
-        else -> parent.findParent()
+        else -> parent?.findParent()
     }
 
     private fun tryUpdate(parent: View) {
-        val ps = parent.paddingStart + horizontalPadding
-        val pe = parent.paddingEnd + horizontalPadding
-        if (ps != parent.paddingStart || pe != parent.paddingEnd) {
-            updatePadding(ps, pe)
-            updateLayoutParams<MarginLayoutParams> {
-                marginStart = -parent.paddingStart
-                marginEnd = -parent.paddingEnd
-            }
+        val dx = when {
+            this.parent === parent -> 0f
+            else -> -parent.paddingStart.toFloat() // this.parent is the child of parentView
+        }
+        val start = parent.paddingStart + horizontalPadding
+        val end = parent.paddingEnd + horizontalPadding
+        if (dx != translationX || start != paddingStart || end != paddingEnd) {
+            updatePadding(start, end)
+            translationX = dx
         }
     }
 
-    private fun View.updatePadding(paddingStart: Int, paddingEnd: Int) {
-        val child = takeIf { paddingStart != this.paddingStart }?.let {
-            findChildOnPaddingEdge()
+    private fun updatePadding(paddingStart: Int, paddingEnd: Int) {
+        if (paddingStart == this.paddingStart && paddingEnd == this.paddingEnd) {
+            return
         }
+        val child = findChildOnPaddingEdge()
         val position = child?.let { getChildLayoutPosition(it) }
         position?.let { postChildrenOffsetFix(position, child) }
         setPaddingRelative(paddingStart, paddingTop, paddingEnd, paddingBottom)
         position?.let { scrollToPosition(it) }
     }
 
-    private fun RecyclerView.findChildOnPaddingEdge(): View? {
+    private fun findChildOnPaddingEdge(): View? {
         var offset = 0
         while (offset < width) {
             val paddingEdge = when {
@@ -96,7 +101,7 @@ class WideRecyclerView : RecyclerView {
         return null
     }
 
-    private fun RecyclerView.postChildrenOffsetFix(position: Int, child: View) {
+    private fun postChildrenOffsetFix(position: Int, child: View) {
         val childOffset = child.start - paddingStart
         post {
             val holder = findViewHolderForLayoutPosition(position)
