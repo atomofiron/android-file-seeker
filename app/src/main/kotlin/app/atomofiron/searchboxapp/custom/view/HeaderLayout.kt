@@ -139,8 +139,12 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
     private fun updateSubBarAlpha(offset: Int) {
         val subBar = subBar ?: return
         val subHeight = subBar.height
-        val alpha = (subHeight + offset) / subHeight.toFloat()
-        subBar.alpha = Alpha.halfInvisible(alpha)
+        val alpha = Alpha.halfInvisible((subHeight + offset) / subHeight.toFloat())
+        when (subBar) {
+            is ViewGroup -> subBar.children
+                .forEach { it.alpha = alpha }
+            else -> subBar.alpha = alpha
+        }
     }
 
     private inner class LiftListener : LiftOnScrollProgressListener() {
