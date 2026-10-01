@@ -55,6 +55,7 @@ class SearchTaskHolder<Result : SearchResult>(
 
     override fun onBind(item: FinderStateItem.Task<Result>, position: Int) = binding.run {
         val task = item.task
+        setSelected(item.selected)
         params.setParams(task.query)
         statusText.setStatus(task.result, task.query.charset)
         action.isActivated = !task.isProgress

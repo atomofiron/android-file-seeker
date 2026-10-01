@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.finder.viewmodel
 
+import app.atomofiron.common.util.TaskId
 import app.atomofiron.common.util.flow.mapState
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
@@ -41,6 +42,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
     override val targets = MutableStateFlow<List<Node>>(mutableListOf())
     override val toggles = (if (isLocal) preferences.localSearchOptions else preferences.searchOptions).mapState(::EditOptions)
     private val localOptions: Flow<List<FinderStateItem>> = toggles.map { listOf<FinderStateItem>(it) }
+    private val selectedTask = MutableStateFlow<TaskId?>(null)
 
     private val firstItems = combine(
         query,
@@ -75,7 +77,7 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
     override val items = combine(
         firstItems,
         if (isLocal) localOptions else globalOptions,
-        tasks.map { task -> task?.reversed()?.map { FinderStateItem.Task(it, clickableIfEmpty = !isLocal) } },
+        combine(tasks, selectedTask, ::mapTasks),
     ) { first, options, tasks ->
         buildList {
             addAll(first)
@@ -85,6 +87,11 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
         }
     }
 
+    private fun mapTasks(tasks: List<Task>?, selected: TaskId?): List<FinderStateItem.Task<Result>>? {
+        return tasks?.reversed()?.map {
+            FinderStateItem.Task(it, clickableIfEmpty = !isLocal, selected = it.uniqueId == selected)
+        }
+    }
 
     private fun selectableCharsets(charsets: List<SupportedCharset>, selected: String?, options: EditOptions): List<SelectableCharset> {
         return charsets.map { SelectableCharset(it.name, selected = it.name == selected, enabled = options.contentSearch) }
@@ -114,5 +121,9 @@ class FinderItemsStateDelegate<Result : SearchResult, Task : SearchTask<Result>>
 
     override fun updateTargets(items: List<Node>) {
         targets.value = items
+    }
+
+    override fun setSelectedTask(id: TaskId?) {
+        selectedTask.value = id
     }
 }

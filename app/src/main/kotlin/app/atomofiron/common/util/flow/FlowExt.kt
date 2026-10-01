@@ -116,3 +116,5 @@ fun <T,R> StateFlow<T>.mapState(transform: (T) -> R): StateFlow<R> {
 }
 
 fun <T> StateFlow<T>?.orStub(value: T): StateFlow<T> = this ?: MutableStateFlow(value)
+
+fun <T> Flow<T>?.orEmpty(): Flow<T> = this ?: emptyFlow()

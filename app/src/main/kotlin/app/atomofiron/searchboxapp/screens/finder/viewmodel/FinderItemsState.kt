@@ -1,5 +1,6 @@
 package app.atomofiron.searchboxapp.screens.finder.viewmodel
 
+import app.atomofiron.common.util.TaskId
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import kotlinx.coroutines.flow.Flow
@@ -15,4 +16,5 @@ interface FinderItemsState {
 
     fun updateSearchQuery(value: String)
     fun updateTargets(items: List<Node>)
+    fun setSelectedTask(id: TaskId?)
 }

@@ -69,6 +69,7 @@ sealed class FinderStateItem(
     data class Task<R : SearchResult>(
         val task: SearchTask<R>,
         val clickableIfEmpty: Boolean,
+        val selected: Boolean = false,
     ) : FinderStateItem(FinderItemType.TASK, task.uniqueId + 100)
 
     data class Targets(val targets: List<Node>) : FinderStateItem(FinderItemType.TARGETS)

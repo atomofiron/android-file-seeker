@@ -4,6 +4,7 @@ import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.flow.DataFlow
 import app.atomofiron.common.util.flow.EventFlow
+import app.atomofiron.common.util.flow.orEmpty
 import app.atomofiron.common.util.flow.orStub
 import app.atomofiron.common.util.flow.set
 import app.atomofiron.fileseeker.R
@@ -55,7 +56,7 @@ class TextViewerViewState private constructor(
     charset = session?.charsetName.orStub(DefaultCharsetName),
     preferenceStore,
     charsets,
-    session?.tasks ?: emptyFlow(),
+    tasks = session?.tasks.orEmpty(),
 ) {
     val insertInQuery = EventFlow<String>()
 
@@ -188,6 +189,7 @@ class TextViewerViewState private constructor(
     fun hideTask() {
         currentTask.value = null
         matchingCursor.value = null
+        setSelectedTask(null)
     }
 
     fun showAlert(alert: Alert) {
@@ -197,6 +199,7 @@ class TextViewerViewState private constructor(
     fun trySelectTask(task: LocalSearchTask): Boolean {
         return (task.isEnded && task.count > 0 && task.error == null).also { isOk ->
             if (isOk) {
+                setSelectedTask(task.uniqueId)
                 currentTask.value = task
                 matchingCursor.value = null
                 status.run {
