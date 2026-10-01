@@ -23,6 +23,7 @@ private data class Cell(
     // these are volatile
     val columns: UInt,
     val rowId: Int,
+    val span: Int,
 )
 
 interface AdapterHolderListener {
@@ -63,10 +64,13 @@ class FlexSpanSizeLookup(
 
     override fun onBind(holder: Holder, position: Int) {
         val minWidth = holder.minWidth().ceilToInt()
-        val itemId = adapter.getItemId(position)
-        val cell = cells.getOrNull(position) ?: cache[itemId]
-        if (minWidth != cell?.width || position > cells.size) {
-            calcSize(position, minWidth)
+        val cell = cells.getOrNull(position)
+        when (true) {
+            (cell == null),
+            (cell.width != minWidth),
+            (cell.hungry != holder.hungry),
+            (cell.type != holder.itemViewType) -> calcSize(position, minWidth)
+            else -> Unit
         }
     }
 
@@ -77,6 +81,7 @@ class FlexSpanSizeLookup(
             columnWidth = availableArea / COLUMNS_INT
             portraitColumns = (portraitWidth / columnWidth).toUInt().coerceAtLeast(1u)
             invalidateSpanGroupIndexCache()
+            invalidateSpanIndexCache()
             for (i in cells.indices) calcSize(i)
             manager.requestLayout()
         }
@@ -94,7 +99,8 @@ class FlexSpanSizeLookup(
         val type: Int
         val hungry: Boolean
         val holder = holderAt(position)
-        val cached = cells.getOrNull(position) ?: cache[itemId]
+        val atPosition = cells.getOrNull(position)
+        val cached = atPosition ?: cache[itemId]
         if (holder != null) {
             minWidth = width ?: holder.minWidth().ceilToInt()
             type = holder.itemViewType
@@ -105,11 +111,14 @@ class FlexSpanSizeLookup(
             type = cached.type
             hungry = cached.hungry
         } else {
-            return COLUMNS_INT // otherwise ArrayIndexOutOfBoundsException: length=145; index=288 GridLayoutManager.getSpaceForSpanRange(1031)
+            // not bound and never measured: occupies the whole row like a hungry item, onBind() will recalculate it
+            minWidth = FILL_ROW.ceilToInt()
+            type = adapter.getItemViewType(position)
+            hungry = true
         }
         var rowId = when (position) {
             0 -> itemId.toInt()
-            else -> cells[position.dec()].rowId // todo IndexOutOfBoundsException: Index: 0, Size: 0
+            else -> cells.getOrNull(position.dec())?.rowId ?: itemId.toInt()
         }
         val consumed = consumed(rowId, position)
         var left = COLUMNS
@@ -122,23 +131,57 @@ class FlexSpanSizeLookup(
             rowId = itemId.toInt()
             //left = COLUMNS
         }
-        val cell = Cell(minWidth, type, hungry, columns, rowId)
+        val cell = Cell(minWidth, type, hungry, columns, rowId, UNDEFINED)
         when {
             position < cells.size -> cells[position] = cell
             else -> cells.add(position, cell)
         }
-        cache[itemId] = cell
+        val span = calcSpan(rowId, position, consumed + columns, columns)
+        val filled = cell.copy(span = span)
+        cells[position] = filled
+        cache[itemId] = filled
+        if (atPosition != null && atPosition.span != span) {
+            repeatTrigger()
+        }
+        return span
+    }
+
+    private fun calcSpan(rowId: Int, position: Int, used: UInt, columns: UInt): Int {
         return when {
-            !isComplete(rowId) -> columns
+            !isComplete(rowId, position, used) -> columns
             availableArea <= portraitWidth && count(rowId) == 1 -> COLUMNS // consider like hungry
             else -> columns + calcFree(rowId, position)
         }.toInt()
     }
 
-    private fun isComplete(rowId: Int): Boolean {
+    private fun isComplete(rowId: Int, position: Int, used: UInt): Boolean {
         require(cells.size <= itemCount)
         require(cells.isNotEmpty())
-        return cells.size == itemCount || rowId != cells.last().rowId
+        return when {
+            used >= COLUMNS -> true // cannot accept anything more
+            cells.size == itemCount -> true
+            rowId != cells.last().rowId -> true
+            !nextFits(position, used) -> true
+            else -> false
+        }
+    }
+
+    private fun nextFits(position: Int, used: UInt): Boolean {
+        val next = position.inc()
+        if (next >= itemCount) {
+            return false // the last item closes its row
+        }
+        val columns = columnsAt(next) ?: return false // unknown item behaves like the hungry one, see calcSize
+        return used + columns <= COLUMNS
+    }
+
+    private fun columnsAt(position: Int): UInt? {
+        val holder = holderAt(position)
+        if (holder != null) {
+            return holder.minWidth().ceilToInt().toColumns(holder.hungry)
+        }
+        val cell = cells.getOrNull(position) ?: cache[adapter.getItemId(position)]
+        return cell?.columns
     }
 
     private fun count(rowId: Int): Int = cells.count { it.rowId == rowId }
@@ -151,16 +194,16 @@ class FlexSpanSizeLookup(
 
     private fun calcFree(rowId: Int, position: Int): UInt {
         val row = cells.filter { it.rowId == rowId }
-        val index = position - cells.indexOfFirst { it.rowId == rowId }
-        val cell = row[index]
-        val prevRowPosition = position.dec() - index
-        val prevRowCell = cells.getOrNull(prevRowPosition)
+        val first = cells.indexOfFirst { it.rowId == rowId }
+        val index = (position - first).coerceAtLeast(0)
+        val cell = cells.getOrNull(position) ?: return 0u
+        val prevRowCell = cells.getOrNull(first.dec())
         val hungry = when {
             cell.hungry -> row.count { it.hungry }.toUInt()
             row.size == 1 && prevRowCell?.let { it.type == cell.type } != true -> return 0u
             row.any { it.type != cell.type } -> return 0u
             // consider like hungry
-            row.size == 1 -> return calcFree(prevRowCell!!.rowId, prevRowPosition)
+            row.size == 1 -> return calcFree(prevRowCell!!.rowId, first.dec())
             else -> row.size.toUInt()
         }
         val free = COLUMNS - row.sumOf { it.columns }.coerceAtMost(COLUMNS)
@@ -183,38 +226,43 @@ class FlexSpanSizeLookup(
 
     private inner class ItemObserver : RecyclerView.AdapterDataObserver() {
 
-        override fun onChanged() = Unit
+        override fun onChanged() = invalidate(0)
 
-        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) = Unit
+        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+            invalidate(minOf(fromPosition, toPosition))
+        }
 
         override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-            cells.clear(positionStart, positionStart + itemCount)
+            invalidate(positionStart)
         }
 
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-            for (i in positionStart..<(positionStart + itemCount)) {
-                val cached = cache[adapter.getItemId(i)]
-                if (cached != null) {
-                    cells.add(i, cached)
-                } else {
-                    // don't clear from i
-                    break
-                }
-            }
+            invalidate(positionStart)
+        }
+
+        private fun invalidate(position: Int) {
+            cells.clear(position) // rowId of every following cell depends on the preceding ones
             repeatTrigger()
         }
     }
 
     private inner class RepeatTrigger : View.OnLayoutChangeListener {
 
-        val parent get() = recyclerView.parent as View
+        private var pending = false
 
-        override fun onLayoutChange(v: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
-            parent.removeOnLayoutChangeListener(this)
+        override fun onLayoutChange(view: View, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
+            view.removeOnLayoutChangeListener(this)
+            pending = false
+            invalidateSpanIndexCache()
             recyclerView.requestLayout()
         }
 
         operator fun invoke() {
+            if (pending) {
+                return
+            }
+            val parent = recyclerView.parent as? View ?: return
+            pending = true
             parent.addOnLayoutChangeListener(this)
         }
     }
