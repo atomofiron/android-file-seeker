@@ -3,11 +3,14 @@ package app.atomofiron.searchboxapp.di.dependencies.store
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import uniffi.native_lib.SupportedCharset
+import javax.inject.Inject
+import javax.inject.Singleton
 
 val DefaultCharset = Charsets.UTF_8
 val DefaultCharsetName = DefaultCharset.name()
 
-class SupportedCharsets {
+@Singleton
+class SupportedCharsets @Inject constructor() {
 
     val list: StateFlow<List<SupportedCharset>>
         field = MutableStateFlow(emptyList())

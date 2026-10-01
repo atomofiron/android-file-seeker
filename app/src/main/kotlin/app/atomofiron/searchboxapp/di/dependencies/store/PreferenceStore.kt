@@ -48,6 +48,7 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySuCmd
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTestField
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyUseSu
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyFolderVolumeUp
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySearchCharset
 import app.atomofiron.searchboxapp.utils.preferences.get
 import app.atomofiron.searchboxapp.utils.preferences.set
 import kotlinx.coroutines.CoroutineScope
@@ -101,6 +102,7 @@ class PreferenceStore @Inject constructor(
     val appUpdateCode = getFlow(KeyAppUpdateCode)
     val shownNotificationUpdateCode = getFlow(KeyShownNotificationUpdateCode)
     val maxDepthForSearch = getFlow(KeyMaxDepth)
+    val searchCharset = getFlow(KeySearchCharset)
     val hapticFeedback = getFlow(KeyHapticFeedback)
     val folderVolumeUp = getFlow(KeyFolderVolumeUp)
     val screenshotOperations = getFlow(KeyScreenshotOperations)
@@ -162,6 +164,10 @@ class PreferenceStore @Inject constructor(
 
     suspend fun setMaxDepthForSearch(value: Int) {
         edit { it[KeyMaxDepth] = value }
+    }
+
+    suspend fun setSearchCharset(value: String) {
+        edit { it[KeySearchCharset] = value }
     }
 
     suspend fun setAppLocale(value: AppLocale) {

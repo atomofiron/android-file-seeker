@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.utils.preferences
 
 import android.view.Gravity
 import androidx.datastore.preferences.core.Preferences
+import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharsetName
 import app.atomofiron.searchboxapp.model.finder.SearchOptions
 import app.atomofiron.searchboxapp.model.preference.AppLocale
 import app.atomofiron.searchboxapp.model.preference.AppOrientation
@@ -32,6 +33,7 @@ object PreferenceKeys {
     val KeyDeepBlack = PreferenceKey("pref_deep_black", false)
     val KeyMaxSize = PreferenceKey("pref_max_size", Const.DEFAULT_MAX_SIZE)
     val KeyMaxDepth = PreferenceKey("pref_max_depth", Const.DEFAULT_MAX_DEPTH)
+    val KeySearchCharset = PreferenceKey("pref_search_charset", DefaultCharsetName)
     val KeyUseSu = PreferenceKey("pref_use_su", false)
     val KeySuCmd = PreferenceKey("pref_su_cmd", "su -c", resetValue = "")
     val KeyExplorerItem = PreferenceKey("pref_explorer_item", ExplorerItemComposition.DEFAULT)

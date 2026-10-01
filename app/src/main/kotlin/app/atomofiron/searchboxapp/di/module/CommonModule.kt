@@ -15,7 +15,6 @@ import app.atomofiron.searchboxapp.di.dependencies.service.ApkService
 import app.atomofiron.searchboxapp.di.dependencies.service.AppUpdateService
 import app.atomofiron.searchboxapp.di.dependencies.store.AppUpdateStore
 import app.atomofiron.searchboxapp.di.dependencies.store.PreferenceStore
-import app.atomofiron.searchboxapp.di.dependencies.store.SupportedCharsets
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -58,14 +57,6 @@ class CommonModule {
         Android.Q -> BluetoothFilesObserverImpl(context, provider)
         else -> null
     }
-
-    @Provides
-    @Singleton
-    fun provideWebClient() = WebClient()
-
-    @Provides
-    @Singleton
-    fun provideSupportedCharsets() = SupportedCharsets()
 
     @Provides
     @Singleton

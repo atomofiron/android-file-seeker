@@ -3,8 +3,11 @@ package app.atomofiron.searchboxapp.android
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class WebClient : WebViewClient() {
+@Singleton
+class WebClient @Inject constructor()  : WebViewClient() {
 
     private var onFinished: (() -> Unit)? = null
 
