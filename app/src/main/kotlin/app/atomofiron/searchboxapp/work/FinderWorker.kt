@@ -233,9 +233,7 @@ class FinderWorker(
         var ended = toEnded(result.copy(error = error), stopped = stopped)
         try {
             val cache = SearchResultCache(ended.uniqueId, stopped, ended.query)
-            val id = db.put(cache).toInt()
-            val stored = FinderDao.store(id, ended.result)
-            if (!stored) db.drop(id)
+            val stored = db.store(cache, ended.result).isOk
             ended.copy(cached = stored)
         } catch (e: Exception) {
             if (error == null) ended = ended.copy(result = result.copy(error = NodeError.Message(e.toString())))

@@ -13,6 +13,7 @@ import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharsetName
 import app.atomofiron.searchboxapp.model.finder.GlobalSearchResult
 import app.atomofiron.searchboxapp.model.finder.SearchResultCache
 import app.atomofiron.searchboxapp.model.finder.SearchType
+import app.atomofiron.searchboxapp.utils.Rslt
 import java.io.File
 
 @Dao
@@ -36,6 +37,16 @@ interface FinderDao {
 
     @Query("DELETE FROM $RESULT WHERE id = :id")
     fun delete(id: TaskId) // don't use outside
+
+    fun store(item: SearchResultCache, result: GlobalSearchResult): Rslt<Int> {
+        val id = put(item).toInt()
+        return if (!Store.store(id, result)) {
+            delete(id)
+            Rslt.Err()
+        } else {
+            Rslt.Ok(id)
+        }
+    }
 
     fun read(id: TaskId) = Store.read(id)
 
@@ -68,7 +79,11 @@ private object Store {
 
     fun read(id: TaskId): GlobalSearchResult? {
         val file = file(id)
-        if (!file.exists() || file.length() > MAX_CACHE_BYTES) {
+        if (!file.exists()) {
+            return null
+        }
+        if (file.length() > MAX_CACHE_BYTES) {
+            file.delete()
             return null
         }
         val bytes = file.readBytes()
