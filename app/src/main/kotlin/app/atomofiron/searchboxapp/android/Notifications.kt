@@ -7,12 +7,14 @@ import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.app.Service
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import androidx.annotation.StringRes
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.app.NotificationManagerCompat.IMPORTANCE_DEFAULT
+import androidx.core.graphics.scale
 import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.NoIcon
 import app.atomofiron.common.util.withNotNull
@@ -22,6 +24,7 @@ import app.atomofiron.searchboxapp.model.other.UpdateNotification
 import app.atomofiron.searchboxapp.utils.Codes
 import app.atomofiron.searchboxapp.utils.canPostNotifications
 import app.atomofiron.searchboxapp.utils.immutable
+import kotlin.math.min
 
 object Notifications {
     const val CHANNEL_ID_UPDATE = "update_channel_id"
@@ -93,7 +96,8 @@ fun Context.showScreenshotOperations(ref: NodeRef) = notification(
     Notifications.CHANNEL_ID_OPERATIONS,
     R.string.channel_name_screenshot_operations,
 ) { context ->
-    val bitmap = BitmapFactory.decodeFile(ref.string)
+    val minWidth = resources.displayMetrics.run { min(widthPixels, heightPixels) }
+    val bitmap = decodeScreenshotThumbnail(ref.string, width = minWidth)
     val style = NotificationCompat.BigPictureStyle().bigPicture(bitmap)
     val flags = FLAG_UPDATE_CURRENT.immutable()
     val openIntent = PendingIntent.getActivity(context, ref.uniqueId + 1, Intents.openWith(context, ref, asSu = false), flags)
@@ -162,4 +166,35 @@ fun Notification.tryShow(id: Int, context: Context): Boolean {
         @SuppressLint("MissingPermission")
         if (it) NotificationManagerCompat.from(context).notify(id, this)
     }
+}
+
+private fun decodeScreenshotThumbnail(path: String, width: Int): Bitmap? {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    BitmapFactory.decodeFile(path, bounds)
+    val sourceWidth = bounds.outWidth
+    val sourceHeight = bounds.outHeight
+    if (sourceWidth <= 0 || sourceHeight <= 0) {
+        return null
+    }
+    val targetWidth = width.coerceIn(1, sourceWidth)
+    val targetHeight = (sourceHeight.toLong() * targetWidth / sourceWidth).toInt().coerceAtLeast(1)
+
+    var sampleSize = 1
+    while (sourceWidth / (sampleSize * 2) >= targetWidth && sourceHeight / (sampleSize * 2) >= targetHeight) {
+        sampleSize *= 2
+    }
+    val options = BitmapFactory.Options().apply {
+        inSampleSize = sampleSize
+        inPreferredConfig = Bitmap.Config.ARGB_8888
+    }
+    val decoded = BitmapFactory.decodeFile(path, options)
+        ?: return null
+    if (decoded.width == targetWidth && decoded.height == targetHeight) {
+        return decoded
+    }
+    val scaled = decoded.scale(targetWidth, targetHeight)
+    if (scaled !== decoded) {
+        decoded.recycle()
+    }
+    return scaled
 }
