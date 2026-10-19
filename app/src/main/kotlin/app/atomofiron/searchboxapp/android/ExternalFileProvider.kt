@@ -18,33 +18,31 @@ import app.atomofiron.searchboxapp.utils.Rslt
 import uniffi.native_lib.ReadResult
 import java.io.File
 import java.io.FileOutputStream
+import java.security.MessageDigest
 import java.security.SecureRandom
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
-import kotlin.LazyThreadSafetyMode.NONE
 
 private const val HMAC256 = "HmacSHA256"
 private const val TOKEN = "token"
 private const val AS_SU = "as_su"
 
-private val Hasher by lazy(NONE) {
-    Mac.getInstance(HMAC256).apply {
-        val sessionKey = SecureRandom().generateSeed(32)
-        init(SecretKeySpec(sessionKey, HMAC256))
-    }
+private val Hasher = Mac.getInstance(HMAC256).apply {
+    init(SecretKeySpec(SecureRandom().generateSeed(32), HMAC256))
 }
 
-fun File.getUriForExternalFile(asSu: Boolean): Uri {
-    val token = Hasher.doFinal(absolutePath.toByteArray())
+private fun sign(path: String): String = synchronized(Hasher) {
+    Hasher.doFinal(path.toByteArray())
         .joinToString("") { Const.HEX_BYTE.format(it) }
-    return Uri.Builder()
-        .scheme(Const.SCHEME_CONTENT)
-        .authority(BuildConfig.EXTERNAL_AUTHORITY)
-        .path(absolutePath)
-        .appendQueryParameter(TOKEN, token)
-        .appendQueryParameter(AS_SU, asSu.toString())
-        .build()
 }
+
+fun File.getUriForExternalFile(asSu: Boolean): Uri = Uri.Builder()
+    .scheme(Const.SCHEME_CONTENT)
+    .authority(BuildConfig.EXTERNAL_AUTHORITY)
+    .path(absolutePath)
+    .appendQueryParameter(TOKEN, sign(absolutePath))
+    .appendQueryParameter(AS_SU, asSu.toString())
+    .build()
 
 class ExternalFileProvider : ContentProvider() {
 
@@ -131,9 +129,8 @@ private fun Uri.verify(context: Context?) {
     val path = path
     path ?: return debugFail { "why" }
     val tokenGot = getQueryParameter(TOKEN)
-    val token = Hasher.doFinal(path.toByteArray())
-        .joinToString("") { Const.HEX_BYTE.format(it) }
-    if (tokenGot != token) {
+    val token = sign(path)
+    if (tokenGot == null || !MessageDigest.isEqual(tokenGot.toByteArray(), token.toByteArray())) {
         throw SecurityException(context?.getString(R.string.file_access_expired).toString())
     }
 }
