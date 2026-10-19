@@ -18,6 +18,7 @@ class ButtonPreference @JvmOverloads constructor(
         android.R.attr.preferenceStyle,
     )
 ) : Preference(context, attrs, defStyleRes) {
+
     private var buttonText = ""
     private val buttonClickListener = ::onButtonClick
 

@@ -2,6 +2,9 @@ package app.atomofiron.common.util
 
 import android.app.Activity
 import android.os.Build.VERSION_CODES
+import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.RelativeLayout
 import app.atomofiron.common.util.property.RoProperty
 import kotlin.collections.removeLast as dropLast
 
@@ -10,6 +13,7 @@ typealias StringSet = Set<String>
 
 fun <T> MutableList<T>.dropLast() = dropLast()
 
+typealias PreferenceId = androidx.preference.R.id
 typealias MaterialId = com.google.android.material.R.id
 typealias MaterialAttr = com.google.android.material.R.attr
 typealias AppCompatAttr = androidx.appcompat.R.attr
@@ -22,6 +26,10 @@ typealias TaskId = Int
 
 const val DoesNotMatterFalse = false
 const val NoIcon = 0
+
+typealias FrameLayoutParams = FrameLayout.LayoutParams
+typealias LinearLayoutParams = LinearLayout.LayoutParams
+typealias RelativeLayoutParams = RelativeLayout.LayoutParams
 
 fun <T> unsafeLazy(initializer: () -> T): Lazy<T> = lazy(LazyThreadSafetyMode.NONE, initializer)
 

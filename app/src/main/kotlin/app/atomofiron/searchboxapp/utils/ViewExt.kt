@@ -4,6 +4,7 @@ import android.content.res.Resources
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
+import androidx.core.view.children
 import app.atomofiron.common.util.property.MutableStrongProperty
 import app.atomofiron.common.util.property.StrongProperty
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -53,5 +54,18 @@ fun View.onResize(action: (View) -> Unit) {
         if (right - left != oldRight - oldLeft || bottom - top != oldBottom - oldTop) {
             action(view)
         }
+    }
+}
+
+fun <V : View, L : ViewGroup> L.completeChildren(
+    count: Int,
+    factory: L.() -> V,
+    init: V.(index: Int) -> Unit,
+) {
+    while (childCount > count) removeViewAt(0)
+    while (childCount < count) addView(factory())
+    children.forEachIndexed { index, view ->
+        @Suppress("UNCHECKED_CAST")
+        (view as V).init(index)
     }
 }

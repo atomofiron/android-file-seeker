@@ -9,7 +9,7 @@
     <PreferenceCategory
         app:title="@string/user_interface"
         >
-        <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
+        <app.atomofiron.searchboxapp.custom.preference.ChipPreference
             app:title="@string/pref_theme"
             app:key="pref_app_theme"
             app:entries="@array/theme_var"
@@ -21,14 +21,14 @@
             app:key="pref_deep_black"
             android:icon="@drawable/ic_black_hole"
             />
-        <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
+        <app.atomofiron.searchboxapp.custom.preference.ChipPreference
             app:title="@string/pref_orientation"
             app:key="pref_app_orientation"
             app:entries="@array/orientation_var"
             app:entryValues="@array/orientation_val"
             app:icon="@drawable/ic_screen_rotation"
             />
-        <app.atomofiron.searchboxapp.custom.preference.DropDownPreference
+        <app.atomofiron.searchboxapp.custom.preference.ChipPreference
             app:title="@string/pref_locale"
             app:key="pref_locale"
             app:entries="@array/locale_label"

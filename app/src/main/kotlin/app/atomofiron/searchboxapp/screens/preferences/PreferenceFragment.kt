@@ -28,7 +28,6 @@ import app.atomofiron.searchboxapp.custom.LayoutDelegate.addLayoutListener
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.overscroll.setupSpringOverscroll
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
-import app.atomofiron.searchboxapp.custom.preference.DropDownPreference
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.performHapticLite
@@ -77,7 +76,6 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         debugGroup.isVisible = viewState.withDebugGroup
 
         joystickPreference = findPreference(PreferenceKeys.KeyJoystick.name)
-        if (Android.T) findPreference<DropDownPreference>(PreferenceKeys.KeyLocale.name).interceptClicks()
     }
 
     override fun <T : Preference> findPreference(key: CharSequence): T = super.findPreference(key)!!
