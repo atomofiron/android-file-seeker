@@ -9,6 +9,7 @@ import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
 import app.atomofiron.common.util.extension.debugFail
+import app.atomofiron.common.util.extension.logE
 import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -65,20 +66,22 @@ class ExternalFileProvider : ContentProvider() {
             is Rslt.Err -> throw Exception("Open file error: ${result.message}")
         }
         Thread {
-            FileOutputStream(writeFd.fileDescriptor).use { out ->
-                while (true) when (val result = reader.next()) {
-                    is ReadResult.Ok -> out.write(result.v1)
-                    is ReadResult.End -> {
-                        out.flush()
-                        writeFd.close()
-                        break
-                    }
-                    is ReadResult.Err -> {
-                        out.flush()
-                        writeFd.close()
-                        throw Exception("Read file error: ${result.v1}")
+            try {
+                FileOutputStream(writeFd.fileDescriptor).use { out ->
+                    while (true) when (val result = reader.next()) {
+                        is ReadResult.Ok -> out.write(result.v1)
+                        is ReadResult.End -> {
+                            out.flush()
+                            break
+                        }
+                        is ReadResult.Err -> throw Exception("Read file error: ${result.v1}")
                     }
                 }
+            } catch (e: Exception) {
+                e.logE(e.stackTraceToString())
+            } finally {
+                runCatching { reader.close() }
+                runCatching { writeFd.close() }
             }
         }.start()
         return readFd
