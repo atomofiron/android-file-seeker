@@ -4,8 +4,8 @@ enum class AppLocale(val tag: String?) {
     System(null),
     En("en-US"),
     Ru("ru-RU"),
-    Sr("sr-Cyrl-RS"),
     SrLatn("sr-Latn-RS"),
+    Sr("sr-Cyrl-RS"),
     ;
     companion object {
         operator fun get(index: Int) = entries.find { it.ordinal == index }!!
