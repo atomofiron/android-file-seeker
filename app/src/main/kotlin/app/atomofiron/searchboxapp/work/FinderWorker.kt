@@ -110,7 +110,7 @@ class FinderWorker(
     private lateinit var task: GlobalSearchTask
     private val taskId = id.toKotlinUuid()
     private val cancellation = object : CancellationState {
-        override fun cancelled(): Boolean = !task.isProgress
+        override fun cancelled(): Boolean = ::task.isInitialized && !task.isProgress
     }
 
     @Inject
