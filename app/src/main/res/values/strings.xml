@@ -118,6 +118,9 @@
     <string name="unknown_error">Unknown error</string>
     <string name="error_file_was_changed">File was changed</string>
     <string name="error_file_gone">File doesn\'t exist</string>
+    <string name="error_archive_empty">Archive is empty</string>
+    <string name="error_file_size">Can\'t get file size: %1$s</string>
+    <string name="error_file_stream">Can\'t get file stream: %1$s</string>
     <string name="inaccessible">Inaccessible</string>
     <string name="empty">Empty</string>
     <string name="unknown">unknown</string>

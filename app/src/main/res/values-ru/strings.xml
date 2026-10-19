@@ -225,4 +225,7 @@
     <string name="dmitriy_pavlov">Дмитрий Павлов</string>
     <string name="file_access_expired">Доступ к файлу истёк</string>
     <string name="file_not_found">Файл не найден</string>
+    <string name="error_archive_empty">Архив пуст</string>
+    <string name="error_file_size">Не удалось получить размер файла: %1$s</string>
+    <string name="error_file_stream">Не удалось получить поток файла: %1$s</string>
 </resources>

@@ -4,9 +4,13 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageInstaller
+import android.provider.OpenableColumns
 import androidx.core.net.toUri
 import app.atomofiron.common.util.Android
+import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.Intents
+import app.atomofiron.searchboxapp.di.dependencies.store.AppResources
+import app.atomofiron.searchboxapp.di.dependencies.store.Strings
 import app.atomofiron.searchboxapp.model.explorer.NodeContent.AndroidApp
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
 import app.atomofiron.searchboxapp.utils.Const
@@ -16,6 +20,7 @@ import app.atomofiron.searchboxapp.utils.launch
 import app.atomofiron.searchboxapp.utils.launchable
 import app.atomofiron.searchboxapp.utils.toRslt
 import java.io.BufferedInputStream
+import java.io.File
 import java.io.FileInputStream
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -25,8 +30,9 @@ import javax.inject.Singleton
 @Singleton
 class ApkService @Inject constructor(
     private val context: Context,
+    private val resources: AppResources,
     private val installer: PackageInstaller,
-) {
+) : Strings by resources {
     fun install(ref: NodeRef, content: AndroidApp, action: String): Rslt<Unit> = try {
         when {
             content.splitApk -> installApks(ref, content, action)
@@ -41,7 +47,7 @@ class ApkService @Inject constructor(
         return ZipInputStream(BufferedInputStream(ref.stream())).use { stream ->
             install(stream.available().toLong(), action, installLocation = content.info?.installLocation) {
                 var entry: ZipEntry? = stream.nextEntry
-                    ?: return@install Rslt.Err("archive is empty")
+                    ?: return@install Rslt.Err(get(R.string.error_archive_empty))
                 while (entry != null) {
                     if (!entry.isDirectory && entry.name.endsWith(Const.DOT_APK, ignoreCase = true)) {
                         val name = entry.name.let { name -> stringId?.let { it + name } ?: name }
@@ -62,9 +68,8 @@ class ApkService @Inject constructor(
     }
 
     fun installApk(ref: NodeRef, action: String, stringId: String? = null, silently: Boolean = false, installLocation: Int? = null): Rslt<Unit> {
-        val stream = ref.stream()
-        stream ?: return Rslt.Err("unknown error")
-        val length = stream.available().toLong()
+        val length = ref.length() ?: return Rslt.Err(get(R.string.error_file_size, ref.string))
+        val stream = ref.stream() ?: return Rslt.Err(get(R.string.error_file_stream, ref.string))
         return install(length, action, silently, installLocation) {
             openWrite(stringId ?: "unused", 0, length).use { output ->
                 stream.use {
@@ -118,5 +123,13 @@ class ApkService @Inject constructor(
     private fun NodeRef.stream() = when {
         isContent() -> context.contentResolver.openInputStream(string.toUri())
         else -> FileInputStream(string)
+    }
+
+    private fun NodeRef.length(): Long? = when {
+        isContent() -> context.contentResolver
+            .query(string.toUri(), arrayOf(OpenableColumns.SIZE), null, null, null)
+            ?.use { cursor -> if (cursor.moveToFirst() && !cursor.isNull(0)) cursor.getLong(0) else -1L }
+            ?.takeIf { it > 0 }
+        else -> File(string).length().takeIf { it > 0 }
     }
 }

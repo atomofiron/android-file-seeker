@@ -9,14 +9,17 @@ import javax.inject.Singleton
 
 interface Strings {
     operator fun get(@StringRes resId: Int): String
+    fun get(@StringRes resId: Int, vararg values: Any): String
 }
 
 @Singleton
-class AppResources(resources: Resources) : MutableStrongProperty<Resources>(resources), Strings {
+class AppResources private constructor(resources: Resources) : MutableStrongProperty<Resources>(resources), Strings {
 
     @Inject constructor(context: Context) : this(context.resources)
 
     operator fun invoke() = value
 
-    override fun get(resId: Int) = value.getString(resId)
+    override fun get(resId: Int): String = value.getString(resId)
+
+    override fun get(resId: Int, vararg values: Any): String = value.getString(resId, values)
 }

@@ -225,4 +225,7 @@
     <string name="dmitriy_pavlov">Дмитриj Павлов</string>
     <string name="file_access_expired">Приступ фајлу је истекао</string>
     <string name="file_not_found">Фајл није пронађен</string>
+    <string name="error_archive_empty">Архива је празна</string>
+    <string name="error_file_size">Није могуће добити величину датотеке: %1$s</string>
+    <string name="error_file_stream">Није могуће добити ток датотеке: %1$s</string>
 </resources>
