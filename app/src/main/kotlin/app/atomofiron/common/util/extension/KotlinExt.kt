@@ -88,6 +88,11 @@ fun Long.pow(exp: Long): Long {
     return result
 }
 
+inline fun <R> R.runIf(predicate: Boolean, action: R.() -> R): R = when {
+    predicate -> action()
+    else -> this
+}
+
 inline fun <reified T : O, O> Any.takeIf(): T? = this as? T
 
 inline fun <T, C : Iterable<T?>> C.onEachNotNull(action: (T) -> Unit): C {

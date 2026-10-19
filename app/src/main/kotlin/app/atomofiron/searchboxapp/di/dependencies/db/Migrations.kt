@@ -1,6 +1,5 @@
 package app.atomofiron.searchboxapp.di.dependencies.db
 
-import android.content.Context
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import app.atomofiron.common.util.extension.decode
@@ -28,7 +27,7 @@ object Migrations {
             """)
         }
     }
-    fun from3to4(context: Context) = object : Migration(3, 4) {
+    fun from3to4() = object : Migration(3, 4) {
         override fun migrate(db: SupportSQLiteDatabase) {
             db.execIndentless("""
                 CREATE TABLE $TMP (

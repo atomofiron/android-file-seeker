@@ -1,15 +1,17 @@
 package app.atomofiron.searchboxapp.di.dependencies.db
 
 import android.content.Context
-import androidx.room.Database as DatabaseInfo
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import app.atomofiron.common.util.extension.runIf
+import app.atomofiron.fileseeker.BuildConfig.DEBUG
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.model.explorer.other.Deepest
 import app.atomofiron.searchboxapp.model.explorer.other.TabRootSorting
 import app.atomofiron.searchboxapp.model.finder.SearchResultCache
+import androidx.room.Database as DatabaseInfo
 
 @DatabaseInfo(
     entities = [Deepest::class, TabRootSorting::class, SearchResultCache::class],
@@ -24,8 +26,8 @@ abstract class Database : RoomDatabase() {
             Database::class.java,
             name = "db",
         ).addMigrations(Migrations.from2to3())
-            .addMigrations(Migrations.from3to4(context))
-            .fallbackToDestructiveMigration(app.atomofiron.fileseeker.BuildConfig.DEBUG)
+            .addMigrations(Migrations.from3to4())
+            .runIf(DEBUG) { fallbackToDestructiveMigration(true) }
             .build()
     }
     abstract fun explorer(): ExplorerDao
