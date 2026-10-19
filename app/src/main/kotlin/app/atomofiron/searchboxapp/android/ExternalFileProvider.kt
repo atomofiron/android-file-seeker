@@ -8,6 +8,7 @@ import android.database.MatrixCursor
 import android.net.Uri
 import android.os.ParcelFileDescriptor
 import android.provider.OpenableColumns
+import app.atomofiron.common.util.extension.coroutineScope
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.fileseeker.BuildConfig
@@ -22,10 +23,15 @@ import java.security.MessageDigest
 import java.security.SecureRandom
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private const val HMAC256 = "HmacSHA256"
 private const val TOKEN = "token"
 private const val AS_SU = "as_su"
+private const val MAX_PIPES = 8
+
+private val PipeScope = coroutineScope(Dispatchers.IO.limitedParallelism(MAX_PIPES))
 
 private val Hasher = Mac.getInstance(HMAC256).apply {
     init(SecretKeySpec(SecureRandom().generateSeed(32), HMAC256))
@@ -61,9 +67,13 @@ class ExternalFileProvider : ContentProvider() {
         val result = NativeBridge.readFile(NodeRef(path), asSu = true)
         val reader = when (result) {
             is Rslt.Ok -> result.value
-            is Rslt.Err -> throw Exception("Open file error: ${result.message}")
+            is Rslt.Err -> {
+                runCatching { readFd.close() }
+                runCatching { writeFd.close() }
+                throw Exception("Open file error: ${result.message}")
+            }
         }
-        Thread {
+        PipeScope.launch {
             try {
                 FileOutputStream(writeFd.fileDescriptor).use { out ->
                     while (true) when (val result = reader.next()) {
@@ -81,7 +91,7 @@ class ExternalFileProvider : ContentProvider() {
                 runCatching { reader.close() }
                 runCatching { writeFd.close() }
             }
-        }.start()
+        }
         return readFd
     }
 

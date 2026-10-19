@@ -4,7 +4,7 @@ import android.annotation.SuppressLint
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.util.extension.copy
-import app.atomofiron.common.util.extension.coroutineScope
+import app.atomofiron.common.util.extension.coroutineScopeCatching
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -21,7 +21,7 @@ class CoroutineListDiffer<I : Any>(
 ) {
     private val listeners = mutableListOf<ListListener<I>>()
     private var updated = mutableMapOf<Int, I>()
-    private val scope = coroutineScope(Dispatchers.Default)
+    private val scope = coroutineScopeCatching(Dispatchers.Default)
     private var counter = 0
     private var isCalculating = false
 

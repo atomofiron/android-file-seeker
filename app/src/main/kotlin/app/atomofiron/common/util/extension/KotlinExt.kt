@@ -230,13 +230,22 @@ private fun hash(a: Int, b: Int, c: Int = 0, d: Int = 0, e: Int = 0): Int {
 
 private fun Int.append(other: Int) = 31 * this + other
 
-fun coroutineScope(dispatcher: CoroutineDispatcher? = null): CoroutineScope {
+fun coroutineScopeCatching(dispatcher: CoroutineDispatcher? = null): CoroutineScope = coroutineScope(dispatcher, catching = true)
+
+fun coroutineScope(dispatcher: CoroutineDispatcher? = null): CoroutineScope = coroutineScope(dispatcher, catching = false)
+
+private fun coroutineScope(
+    dispatcher: CoroutineDispatcher?,
+    catching: Boolean,
+): CoroutineScope {
     var context: CoroutineContext = SupervisorJob()
     dispatcher?.let {
         context += dispatcher
     }
-    context += CoroutineExceptionHandler { _, throwable ->
-        throwable.logE(throwable.stackTraceToString())
+    if (catching) {
+        context += CoroutineExceptionHandler { _, throwable ->
+            throwable.logE(throwable.stackTraceToString())
+        }
     }
     return CoroutineScope(context)
 }

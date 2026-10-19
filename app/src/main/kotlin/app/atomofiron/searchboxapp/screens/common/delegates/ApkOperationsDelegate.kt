@@ -6,7 +6,7 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.UnreachableException
 import app.atomofiron.common.util.dialog.DialogConfig
 import app.atomofiron.common.util.dialog.DialogDelegate
-import app.atomofiron.common.util.extension.coroutineScope
+import app.atomofiron.common.util.extension.coroutineScopeCatching
 import app.atomofiron.common.util.extension.then
 import app.atomofiron.common.util.extension.withMain
 import app.atomofiron.fileseeker.R
@@ -54,7 +54,7 @@ class ApkOperationsDelegate @Inject constructor(
             onDismiss = { scope?.cancel() },
         ).update(content)
         updater ?: return
-        scope = coroutineScope()
+        scope = coroutineScopeCatching()
         val job = scope.launch {
             val forSignature = content.info != null
             var result = content.resolve(ref, contentResolver, signature = forSignature)
