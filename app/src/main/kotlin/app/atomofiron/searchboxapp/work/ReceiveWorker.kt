@@ -128,34 +128,26 @@ class ReceiveWorker(
                 updateProgress(received)
             }
         }
+        val nameMutex = Mutex()
         val deferred = files.map { (name, _, stream) ->
             async {
                 stream?.use { input ->
-                    var file = File(data.destination.string, name)
-                    var i = 1
-                    while (file.exists()) {
-                        val builder = StringBuilder(name)
-                        val index = when {
-                            name.contains('.') -> name.lastIndexOf('.')
-                            else -> name.length
-                        }
-                        builder.insert(index, "(${++i})")
-                        file = File(data.destination.string, builder.toString())
-                    }
-                    val output = FileOutputStream(file)
-                    val step = max(MB, input.available() / 100)
-                    var read = 0L
-                    input.writeTo(output) {
-                        read += it
-                        if (read >= step) {
-                            mutex.withLock {
-                                received += read
-                                read = 0
+                    val file = nameMutex.withLock { createFile(data.destination.string, name) }
+                    FileOutputStream(file).use { output ->
+                        val step = max(MB, input.available() / 100)
+                        var read = 0L
+                        input.writeTo(output) {
+                            read += it
+                            if (read >= step) {
+                                mutex.withLock {
+                                    received += read
+                                    read = 0
+                                }
                             }
                         }
-                    }
-                    mutex.withLock {
-                        received += read
+                        mutex.withLock {
+                            received += read
+                        }
                     }
                 } != null
             }
@@ -165,6 +157,18 @@ class ReceiveWorker(
         delay(Const.COMMON_DELAY)
         collecting.cancel()
         return Result.success()
+    }
+
+    private fun createFile(dir: String, name: String): File {
+        val index = name.lastIndexOf('.')
+        val stem = if (index < 0) name else name.take(index)
+        val extension = if (index < 0) "" else name.substring(index)
+        var file = File(dir, name)
+        var i = 1
+        while (!file.createNewFile()) {
+            file = File(dir, "$stem(${++i})$extension")
+        }
+        return file
     }
 
     private suspend fun toastShort(message: UniText) = toast(message, Toast.LENGTH_SHORT)
