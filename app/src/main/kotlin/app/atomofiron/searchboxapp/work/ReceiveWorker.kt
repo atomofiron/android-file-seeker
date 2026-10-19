@@ -94,17 +94,20 @@ class ReceiveWorker(
                     size = sizeIndex.takeIf { it >= 0 }?.let { cursor.getLong(it) } ?: 0L
                 }
             }
-            name = name ?: context.resources.formatDate().let {
+            val fallback = context.resources.formatDate().let {
                 val type = context.contentResolver.getType(uri)
                 val ext = MimeTypeMap.getSingleton().getExtensionFromMimeType(type)
                 "$it.${ext ?: "bin"}"
             }
+            val fileName = name?.let { File(it).name }
+                ?.takeUnless { it.isEmpty() || it == "." || it == ".." }
+                ?: fallback
             val stream = try {
                 context.contentResolver.openInputStream(uri)
             } catch (_: SecurityException) {
                 null
             }
-            Triple(name, size, stream)
+            Triple(fileName, size, stream)
         }
         dataRead()
         val totalSize = files.sumOf { (_, size, _) -> max(0, size) }
