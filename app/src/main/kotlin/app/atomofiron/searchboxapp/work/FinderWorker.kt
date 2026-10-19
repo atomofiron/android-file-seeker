@@ -29,8 +29,6 @@ import app.atomofiron.searchboxapp.di.DaggerInjector
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.store.FinderStore
-import app.atomofiron.searchboxapp.model.explorer.Node
-import app.atomofiron.searchboxapp.model.explorer.NodeContent
 import app.atomofiron.searchboxapp.model.explorer.NodeError
 import app.atomofiron.searchboxapp.model.explorer.NodeInfo
 import app.atomofiron.searchboxapp.model.explorer.NodeRef
@@ -45,7 +43,6 @@ import app.atomofiron.searchboxapp.model.finder.SearchType
 import app.atomofiron.searchboxapp.model.textviewer.MutableMatchMap
 import app.atomofiron.searchboxapp.screens.main.MainActivity
 import app.atomofiron.searchboxapp.utils.Codes
-import app.atomofiron.searchboxapp.utils.ExplorerUtils.resolveType
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeError
 import app.atomofiron.searchboxapp.utils.ExplorerUtils.toNodeMeta
 import app.atomofiron.searchboxapp.utils.Rslt
@@ -53,10 +50,12 @@ import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.ifCanNotice
 import app.atomofiron.searchboxapp.utils.mutate
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import uniffi.native_lib.CancellationState
 import uniffi.native_lib.CrcResult
@@ -65,6 +64,7 @@ import uniffi.native_lib.NameSearchProgress
 import uniffi.native_lib.TextSearchProgress
 import uniffi.native_lib.TypedMeta
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.uuid.toKotlinUuid
 
 @SuppressLint("InlinedApi")
@@ -118,7 +118,7 @@ class FinderWorker(
         DaggerInjector.appComponent.inject(this)
     }
 
-    private fun Params.searchText(type: Params.Text) {
+    private suspend fun Params.searchText(type: Params.Text) {
         val errors = GrowingList<String>()
         NativeBridge.findText(query, refs(), maxDepth = maxDepth, maxSize = type.maxSize, charset, asSu, cancellation) { match ->
             updateAsync {
@@ -159,7 +159,7 @@ class FinderWorker(
         )
     }
 
-    private fun Params.searchNames(type: Params.Names) {
+    private suspend fun Params.searchNames(type: Params.Names) {
         val errors = GrowingList<String>()
         NativeBridge.findNames(query, refs(), maxDepth, type.excludeDirs, asSu, cancellation) { match ->
             updateAsync {
@@ -217,7 +217,7 @@ class FinderWorker(
         }
     }
 
-    private fun Rslt<Unit>.apply() = updateAsync {
+    private suspend fun Rslt<Unit>.apply() = update {
         val error = err()?.toNodeError()
         val stopped = isStopping
         var ended = toEnded(result.copy(error = error), stopped = stopped)
@@ -235,24 +235,28 @@ class FinderWorker(
         val dataBuilder = Data.Builder()
         try {
             scope.launch {
-                debug { delay(1000) }
+                debug { delay(1000.milliseconds) }
                 when (val type = params.type) {
                     is Params.Text -> params.searchText(type)
                     is Params.Names -> params.searchNames(type)
                 }
             }.join()
         } catch (_: CancellationException) {
-            updateAsync {
-                when {
-                    task.isProgress -> copy(status = SearchStatus.Stopping)
-                    else -> task
+            withContext(NonCancellable) {
+                update {
+                    when {
+                        task.isProgress -> copy(status = SearchStatus.Stopping)
+                        else -> task
+                    }
                 }
             }
             dataBuilder.putBoolean(KEY_CANCELLED, true)
         } catch (e: Exception) {
             logE(e.toString())
-            updateAsync {
-                copy(result = result.copy(error = NodeError.Message(e.toString())))
+            withContext(NonCancellable) {
+                update {
+                    copy(result = result.copy(error = NodeError.Message(e.toString())))
+                }
             }
             dataBuilder.putString(KEY_EXCEPTION, e.toString())
         } finally {
@@ -260,10 +264,6 @@ class FinderWorker(
         }
         return Result.success(dataBuilder.build())
     }
-
-    private fun Meta.toNode() = Node(NodeRef(path), rootId = task.uniqueId, content = NodeContent.Unknown, meta = toNodeMeta())
-
-    private fun TypedMeta.toNode() = meta.toNode().resolveType(mime)
 
     override suspend fun getForegroundInfo(): ForegroundInfo {
         return ForegroundInfo(hashCode(), foregroundNotification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
