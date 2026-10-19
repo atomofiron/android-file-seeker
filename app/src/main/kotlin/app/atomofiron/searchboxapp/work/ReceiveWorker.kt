@@ -26,6 +26,7 @@ import app.atomofiron.searchboxapp.utils.tryOrNull
 import app.atomofiron.searchboxapp.utils.writeTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -35,9 +36,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import java.io.File
 import java.io.FileOutputStream
 import kotlin.math.max
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.uuid.Uuid
 import kotlin.uuid.toKotlinUuid
 
@@ -51,9 +54,14 @@ private suspend fun get(id: Uuid): WaitingGate = lock.withLock {
     gates.getOrPut(id) { WaitingGate() }
 }
 
-suspend fun OneTimeWorkRequest.waitForDataRead() = get(id.toKotlinUuid()).await()
+suspend fun OneTimeWorkRequest.waitForDataRead() = withTimeoutOrNull(30_000L.milliseconds) {
+    get(id.toKotlinUuid()).await()
+}
 
-private suspend fun ListenableWorker.dataRead() = get(id.toKotlinUuid()).finish()
+private suspend fun ListenableWorker.dataRead() {
+    lock.withLock { gates.remove(id.toKotlinUuid()) }?.finish()
+}
+
 class ReceiveWorker(
     private val context: Context,
     params: WorkerParameters,
@@ -69,10 +77,14 @@ class ReceiveWorker(
         if (withNotification) {
             updateProgress(RECEIVED_UNKNOWN)
         }
-        return coroutineScope {
-            withContext(Dispatchers.IO(threadLimit)) {
-                work()
+        return try {
+            coroutineScope {
+                withContext(Dispatchers.IO(threadLimit)) {
+                    work()
+                }
             }
+        } finally {
+            withContext(NonCancellable) { dataRead() }
         }
     }
 
