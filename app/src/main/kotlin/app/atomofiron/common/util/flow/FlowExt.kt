@@ -3,9 +3,11 @@ package app.atomofiron.common.util.flow
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.coroutineScope
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.time.Duration
 
 internal object NopCollector : FlowCollector<Any?> {
     override suspend fun emit(value: Any?) = Unit // does nothing
@@ -112,6 +114,23 @@ fun <T,R> StateFlow<T>.mapState(transform: (T) -> R): StateFlow<R> {
                 collector.emit(transformed)
             }
         }
+    }
+}
+
+/**
+ * Emits the first value immediately, then at most one value per [period], keeping the latest one.
+ *
+ * Values received during the pause replace each other, so the last of them is emitted when the pause ends.
+ */
+fun <T> Flow<T>.throttleAfterFirst(period: Duration): Flow<T> = channelFlow {
+    val values = Channel<T>(Channel.CONFLATED)
+    launch {
+        collect { values.send(it) }
+        values.close()
+    }
+    for (value in values) {
+        send(value)
+        delay(period)
     }
 }
 

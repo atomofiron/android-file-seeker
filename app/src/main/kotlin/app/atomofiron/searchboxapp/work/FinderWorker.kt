@@ -19,6 +19,7 @@ import app.atomofiron.common.util.extension.debug
 import app.atomofiron.common.util.extension.get
 import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.extension.put
+import app.atomofiron.common.util.flow.throttleAfterFirst
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.android.NativeBridge
 import app.atomofiron.searchboxapp.android.Notifications
@@ -51,7 +52,10 @@ import app.atomofiron.searchboxapp.utils.ifCanNotice
 import app.atomofiron.searchboxapp.utils.mutate
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.BufferOverflow.DROP_OLDEST
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
@@ -72,6 +76,7 @@ private const val UPDATING_FLAG = PendingIntent.FLAG_UPDATE_CURRENT or PendingIn
 
 private const val KEY_EXCEPTION = "KEY_EXCEPTION"
 private const val KEY_CANCELLED = "KEY_CANCELLED"
+private val PROGRESS_UPDATE_INTERVAL = 100.milliseconds
 
 class FinderWorker(
     private val context: Context,
@@ -101,6 +106,7 @@ class FinderWorker(
     }
 
     private val taskMutex = Mutex()
+    private val progress = MutableSharedFlow<GlobalSearchTask>(extraBufferCapacity = 1, onBufferOverflow = DROP_OLDEST)
     private lateinit var task: GlobalSearchTask
     private val taskId = id.toKotlinUuid()
     private val cancellation = object : CancellationState {
@@ -204,20 +210,24 @@ class FinderWorker(
         add("${ref.string}: ${meta.error}")
     }
 
-    private suspend inline fun update(transform: GlobalSearchTask.() -> GlobalSearchTask) {
-        taskMutex.withLock {
-            task = task.transform()
+    private suspend fun update(
+        force: Boolean = false,
+        transform: GlobalSearchTask.() -> GlobalSearchTask,
+    ) {
+        val updated = taskMutex.withLock { task.transform().also { task = it } }
+        when {
+            force -> store.addOrUpdate(updated)
+            else -> progress.emit(updated)
         }
-        store.addOrUpdate(task)
     }
 
     private fun updateAsync(transform: GlobalSearchTask.() -> GlobalSearchTask) {
         scope.launch {
-            update(transform)
+            update(transform = transform)
         }
     }
 
-    private suspend fun Rslt<Unit>.apply() = update {
+    private suspend fun Rslt<Unit>.apply() = update(force = true) {
         val error = err()?.toNodeError()
         val stopped = isStopping
         var ended = toEnded(result.copy(error = error), stopped = stopped)
@@ -235,6 +245,10 @@ class FinderWorker(
 
     private suspend fun work(params: Params): Result {
         val dataBuilder = Data.Builder()
+        val publisher = scope.launch {
+            progress.throttleAfterFirst(PROGRESS_UPDATE_INTERVAL)
+                .collect { store.addOrUpdate(it) }
+        }
         try {
             scope.launch {
                 debug { delay(1000.milliseconds) }
@@ -245,7 +259,7 @@ class FinderWorker(
             }.join()
         } catch (_: CancellationException) {
             withContext(NonCancellable) {
-                update {
+                update(force = true) {
                     when {
                         task.isProgress -> copy(status = SearchStatus.Stopping)
                         else -> task
@@ -256,12 +270,13 @@ class FinderWorker(
         } catch (e: Exception) {
             logE(e.toString())
             withContext(NonCancellable) {
-                update {
+                update(force = true) {
                     copy(result = result.copy(error = NodeError.Message(e.toString())))
                 }
             }
             dataBuilder.putString(KEY_EXCEPTION, e.toString())
         } finally {
+            publisher.cancel()
             context.ifCanNotice(::showNotification)
         }
         return Result.success(dataBuilder.build())
