@@ -30,7 +30,7 @@ class TextFieldPreference(context: Context, attrs: AttributeSet) : Preference(co
         summaryProvider = this
     }
 
-    override fun provideSummary(preference: TextFieldPreference): CharSequence? = value
+    override fun provideSummary(preference: TextFieldPreference): CharSequence = value
 
     override fun onGetDefaultValue(array: TypedArray, index: Int): String? = array.getString(index)
 

@@ -77,9 +77,9 @@ protobuf {
 dependencies {
     api(libs.androidx.appcompat)
     api(libs.androidx.datastore)
-    implementation(libs.kotlinx.core)
-    implementation(libs.kotlinx.core.android)
-    implementation(libs.kotlinx.protobuf)
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.core.android)
+    implementation(libs.protobuf)
     implementation(libs.protobuf.java)
     implementation(libs.protobuf.kotlin)
     implementation(libs.androidx.core.ktx)
@@ -252,5 +252,5 @@ fun prepare(vararg args: String) = ProcessBuilder(*args)
     .takeIf { it.waitFor() != 0 }
     ?.run { throw IllegalStateException(inputStream.bufferedReader().readText()) }
 
-prepare("rustup", "target", "add", *targets)
-prepare("cargo", "install", "cargo-ndk")
+//prepare("rustup", "target", "add", *targets)
+//prepare("cargo", "install", "cargo-ndk")

@@ -48,6 +48,7 @@ class ColorSchemeDelegate @Inject constructor() : CurtainApi.Adapter<CurtainApi.
 }
 
 private fun attrs() = listOf(
+    AppCompatAttr.colorAccent,
     AppCompatAttr.colorPrimary,
     MaterialAttr.colorOnPrimary,
     MaterialAttr.colorPrimaryContainer,

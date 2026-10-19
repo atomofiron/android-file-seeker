@@ -11,6 +11,7 @@ import android.graphics.PorterDuffXfermode
 import android.graphics.Shader.TileMode.CLAMP
 import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.RippleDrawable
+import android.os.SystemClock
 import android.util.AttributeSet
 import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -19,9 +20,9 @@ import androidx.core.graphics.withTranslation
 import androidx.core.view.isVisible
 import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.fileseeker.R
+import app.atomofiron.searchboxapp.custom.drawable.coloredContent
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.withAlpha
-import app.atomofiron.searchboxapp.custom.drawable.coloredContent
 import kotlin.math.cos
 
 private const val INDETERMINATE = -2f
@@ -132,7 +133,7 @@ class ProgressConstraintLayout @JvmOverloads constructor(
     }
 
     override fun onAnimationUpdate(animation: ValueAnimator) {
-        wave = (System.currentTimeMillis() % DURATION) / DURATION.toFloat()
+        wave = (SystemClock.elapsedRealtime() % DURATION) / DURATION.toFloat()
         invalidate()
     }
 
