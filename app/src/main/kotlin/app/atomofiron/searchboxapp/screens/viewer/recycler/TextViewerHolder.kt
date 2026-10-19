@@ -79,11 +79,11 @@ class TextViewerHolder(
             val skip = item.skipBytes()
             val bytesStart = (match.offset - item.offset - skip).toInt()
             val bytesEnd = (bytesStart + match.length.toInt())
-            val start = bytes.countChars(0, bytesStart)
             if (bytesStart < 0 || bytesEnd > bytes.size || bytesStart > bytesEnd) {
                 debugFail { "$bytesStart < 0 || $bytesEnd > ${bytes.size} || $bytesStart > $bytesEnd, text $text" }
                 continue
             }
+            val start = bytes.countChars(0, bytesStart)
             val length = bytes.countChars(bytesStart, bytesEnd)
             val end = start + length
             val forTheEntireLine = start == 0 && end == spannable.length
