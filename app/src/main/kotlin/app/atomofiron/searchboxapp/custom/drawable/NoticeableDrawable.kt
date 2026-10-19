@@ -10,13 +10,13 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
-import android.os.Build.VERSION_CODES.Q
 import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.alpha
+import app.atomofiron.common.util.Sdk
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.isRtl
@@ -140,7 +140,7 @@ class NoticeableDrawable(
 
     override fun setTintMode(tintMode: PorterDuff.Mode?) = drawable.setTintMode(tintMode)
 
-    @RequiresApi(Q)
+    @RequiresApi(Sdk.Q)
     override fun setTintBlendMode(blendMode: BlendMode?) = drawable.setTintBlendMode(blendMode)
 
     @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")

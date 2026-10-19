@@ -1,7 +1,6 @@
 package app.atomofiron.searchboxapp.model.preference
 
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.Q
+import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.extension.hash
 
 sealed class AppTheme(
@@ -34,7 +33,7 @@ sealed class AppTheme(
         private const val NAME_DARK = "dark"
 
         fun defaultName(): String = when {
-            SDK_INT >= Q -> NAME_SYSTEM
+            Android.Q -> NAME_SYSTEM
             else -> NAME_LIGHT
         }
 
@@ -43,7 +42,7 @@ sealed class AppTheme(
             NAME_LIGHT -> Light(deepBlack)
             NAME_DARK -> Dark(deepBlack)
             else -> when {
-                SDK_INT >= Q -> System(deepBlack)
+                Android.Q -> System(deepBlack)
                 else -> Light(deepBlack)
             }
         }

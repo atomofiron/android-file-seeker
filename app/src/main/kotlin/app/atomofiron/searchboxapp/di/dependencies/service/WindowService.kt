@@ -1,12 +1,11 @@
 package app.atomofiron.searchboxapp.di.dependencies.service
 
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.R
 import android.view.Window
 import android.view.WindowManager.LayoutParams.FLAG_SECURE
+import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.BuildConfig
-import app.atomofiron.searchboxapp.screens.main.di.AppStore
 import app.atomofiron.searchboxapp.screens.main.MainScope
+import app.atomofiron.searchboxapp.screens.main.di.AppStore
 import javax.inject.Inject
 
 @MainScope
@@ -36,12 +35,12 @@ class WindowService @Inject constructor(
 
     // эти ёбаные флаги тупо слетают
     private fun Window.getSystemBarsAppearance(): Int = when {
-        SDK_INT >= R -> insetsController?.systemBarsAppearance ?: 0
+        Android.R -> insetsController?.systemBarsAppearance ?: 0
         else -> 0
     }
 
     private fun Window.setSystemBarsAppearance(flags: Int) = when {
-        SDK_INT >= R -> insetsController?.setSystemBarsAppearance(flags, flags)
+        Android.R -> insetsController?.setSystemBarsAppearance(flags, flags)
         else -> Unit
     }
 }

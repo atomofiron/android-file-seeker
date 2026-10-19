@@ -9,8 +9,6 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.StateListDrawable
-import android.os.Build.VERSION.SDK_INT
-import android.os.Build.VERSION_CODES.R
 import android.view.MotionEvent
 import android.view.View
 import androidx.annotation.IntDef
@@ -18,6 +16,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ItemDecoration
 import androidx.recyclerview.widget.RecyclerView.OnItemTouchListener
+import app.atomofiron.common.util.Android
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -247,7 +246,7 @@ class FastScroller2(
                 mShowHideAnimator.start()
             }
         }
-        isShowingLayoutBounds = if (SDK_INT >= R) mRecyclerView.isShowingLayoutBounds else false
+        isShowingLayoutBounds = if (Android.R) mRecyclerView.isShowingLayoutBounds else false
     }
 
     @VisibleForTesting

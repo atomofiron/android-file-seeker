@@ -7,9 +7,9 @@ import android.graphics.ColorFilter
 import android.graphics.PixelFormat
 import android.graphics.Rect
 import android.graphics.drawable.Drawable
-import android.os.Build.VERSION_CODES
 import androidx.annotation.RequiresApi
 import androidx.core.graphics.withTranslation
+import app.atomofiron.common.util.Sdk
 
 fun Drawable.translated() = TranslateDrawable(this)
 
@@ -63,7 +63,7 @@ class TranslateDrawable(private val drawable: Drawable) : Drawable(), Drawable.C
 
     override fun setTintList(tint: ColorStateList?) = drawable.setTintList(tint)
 
-    @RequiresApi(VERSION_CODES.Q)
+    @RequiresApi(Sdk.Q)
     override fun setTintBlendMode(blendMode: BlendMode?) = drawable.setTintBlendMode(blendMode)
 
     override fun setVisible(visible: Boolean, restart: Boolean): Boolean {
@@ -73,7 +73,7 @@ class TranslateDrawable(private val drawable: Drawable) : Drawable(), Drawable.C
 
     override fun isStateful(): Boolean = drawable.isStateful
 
-    @RequiresApi(VERSION_CODES.S)
+    @RequiresApi(Sdk.S)
     override fun hasFocusStateSpecified(): Boolean = drawable.hasFocusStateSpecified()
 
     override fun invalidateDrawable(who: Drawable) {
