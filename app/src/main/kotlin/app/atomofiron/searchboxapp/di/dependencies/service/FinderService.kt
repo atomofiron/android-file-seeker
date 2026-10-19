@@ -29,6 +29,8 @@ import javax.inject.Singleton
 import kotlin.uuid.Uuid
 import kotlin.uuid.toJavaUuid
 
+private const val FINDER_WORK_TAG = "finder"
+
 @Singleton
 class FinderService @Inject constructor(
     scope: AppScope,
@@ -41,7 +43,7 @@ class FinderService @Inject constructor(
 ) {
 
     init {
-        workManager.cancelAllWork()
+        workManager.cancelAllWorkByTag(FINDER_WORK_TAG)
         explorerStore.deleted.collect(scope) {
             store.deleteResultFromTasks(it)
         }
@@ -76,6 +78,7 @@ class FinderService @Inject constructor(
         val params = FinderWorker.Params(uniqueId, query, type, maxDepth = maxDepth, charset = charset, targets = where.map { it.bytes }, asSu = asSu)
         val request = OneTimeWorkRequest.Builder(FinderWorker::class.java)
             .setInputData(Data(params))
+            .addTag(FINDER_WORK_TAG)
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .build()
         workManager.beginWith(request).enqueue()
