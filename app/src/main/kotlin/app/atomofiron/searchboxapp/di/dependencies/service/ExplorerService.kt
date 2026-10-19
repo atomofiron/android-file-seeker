@@ -744,7 +744,6 @@ class ExplorerService @Inject constructor(
                 findItem(item.uniqueId)
                     ?.takeIf { state?.isDeleting == true }
             }.let { items.addAll(it) }
-            onRemoving(items)
         }
         val files = items.filter { !it.isDirectory }
         val dirs = items.filter { it.isDirectory }
@@ -766,6 +765,9 @@ class ExplorerService @Inject constructor(
         }
         fileJob.join()
         dirJobs.joinAll()
+        if (deleted.isNotEmpty()) garden(key) {
+            if (onRemoving(deleted)) render()
+        }
         store.emitDeleted(deleted)
         mediaRootAffected?.let { mediaRoot ->
             garden {
