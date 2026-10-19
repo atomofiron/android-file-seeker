@@ -22,7 +22,7 @@ interface FinderDao {
         const val VERSION = 1
         const val DIR_NAME = "results"
 
-        fun store(id: TaskId, result: GlobalSearchResult) = Store.store(id, result)
+        fun store(id: TaskId, result: GlobalSearchResult): Boolean = Store.store(id, result)
     }
 
     @Query("SELECT * FROM $RESULT WHERE version = $VERSION order by id")
@@ -37,12 +37,6 @@ interface FinderDao {
     @Query("DELETE FROM $RESULT WHERE id = :id")
     fun delete(id: TaskId) // don't use outside
 
-    fun store(item: SearchResultCache, result: GlobalSearchResult): Int {
-        val id = put(item).toInt()
-        Store.store(id, result)
-        return id
-    }
-
     fun read(id: TaskId) = Store.read(id)
 
     fun drop(id: TaskId) {
@@ -53,23 +47,31 @@ interface FinderDao {
 
 private object Store {
 
+    private const val MAX_CACHE_BYTES = 64L * 1024 * 1024
+
     private val dir = File(AbstractApp.appContext.cacheDir, FinderDao.DIR_NAME)
 
     private fun file(id: TaskId) = File(dir, "$id.bin")
 
-    fun store(id: TaskId, result: GlobalSearchResult) {
+    fun store(id: TaskId, result: GlobalSearchResult): Boolean {
         dir.mkdirs()
-        val file = file(id)
-        file.createNewFile()
         val bytes = result.encode()
-        file.writeBytes(bytes)
+        val tmp = File(dir, "$id.bin.tmp")
+        tmp.writeBytes(bytes)
+        val dst = file(id)
+        if (!tmp.renameTo(dst)) {
+            tmp.delete()
+            dst.writeBytes(bytes)
+        }
+        return dst.exists()
     }
 
     fun read(id: TaskId): GlobalSearchResult? {
-        val bytes = file(id)
-            .takeIf { it.exists() }
-            ?.readBytes()
-            ?: return null
+        val file = file(id)
+        if (!file.exists() || file.length() > MAX_CACHE_BYTES) {
+            return null
+        }
+        val bytes = file.readBytes()
         return when {
             bytes.isLegacy() -> bytes.decodeOrNull<LegacyGlobalSearchResult2>()?.run {
                 val type = if (forText) SearchType.Text(DefaultCharsetName) else SearchType.Names

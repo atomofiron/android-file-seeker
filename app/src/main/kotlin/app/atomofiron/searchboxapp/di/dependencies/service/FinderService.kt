@@ -71,7 +71,8 @@ class FinderService @Inject constructor(
         }
         val result = GlobalSearchResult(if (config.contentSearch) SearchType.Text(charset) else SearchType.Names)
         val cache = SearchResultCache(stopped = false, params = query)
-        val uniqueId = dao.store(cache, result)
+        val uniqueId = dao.put(cache).toInt()
+        FinderDao.store(uniqueId, result)
         val params = FinderWorker.Params(uniqueId, query, type, maxDepth = maxDepth, charset = charset, targets = where.map { it.bytes }, asSu = asSu)
         val request = OneTimeWorkRequest.Builder(FinderWorker::class.java)
             .setInputData(Data(params))
