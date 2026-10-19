@@ -130,11 +130,9 @@ class ExplorerService @Inject constructor(
     private val updateRootTrigger = TriggerFlow<Unit>()
 
     init {
-        val suDefined = Job()
         io {
             garden { // lock due configuration
                 store.mainTabs.forEach { get(it) } // init
-                suDefined.join()
                 if (asSu) checkSu()
                 restoreSorting()
                 store.mainStorage.collectOn {
@@ -155,10 +153,6 @@ class ExplorerService @Inject constructor(
             combine(store.storages, preferences.asSu, updateRootTrigger) { volumes, asSu, _ ->
                 updateRootsAsync(volumes, asSu)
             }.collect()
-        }
-        preferences.suCmd[scope] = { cmd ->
-            NativeBridge.setSuCmd(cmd, binDir = context.filesDir.absolutePath)
-            suDefined.complete()
         }
         store.currentSorting[scope] = { (key, sorting) ->
             garden(key) { render() }
