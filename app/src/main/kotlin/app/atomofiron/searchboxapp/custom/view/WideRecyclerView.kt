@@ -38,14 +38,14 @@ class WideRecyclerView : RecyclerView {
     }
 
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
-        val parent = parentView ?: return
+        val parent = parentView ?: return super.onMeasure(widthSpec, heightSpec)
         val customWidthSpec = MeasureSpec.makeMeasureSpec(parent.measuredWidth, MeasureSpec.getMode(widthSpec))
         super.onMeasure(customWidthSpec, heightSpec)
         tryUpdate(parent)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        val parent = parentView ?: return
+        val parent = parentView ?: return super.onLayout(changed, left, top, right, bottom)
         tryUpdate(parent)
         when {
             left == 0 && right == parent.measuredWidth -> super.onLayout(changed, left, top, right, bottom)
