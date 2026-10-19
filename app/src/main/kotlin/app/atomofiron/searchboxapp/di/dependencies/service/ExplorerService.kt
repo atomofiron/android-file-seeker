@@ -574,18 +574,21 @@ class ExplorerService @Inject constructor(
     }
 
     suspend fun tryCopy(key: NodeTabKey, targets: List<Node>, dst: Node, withMoving: Boolean) {
-        if (withMoving) garden(key) {
-            if (onRemoving(targets)) render()
-        }
-        val items = targets.map {
+        val results = targets.map { target ->
             scope.async {
-                val to = it.mutate(ref = dst.ref + it.name)
-                tryCopy(key, it, to, withMoving, withNotice = false)
+                val to = target.mutate(ref = dst.ref + target.name)
+                target to tryCopy(key, target, to, withMoving, withNotice = false)
             }
         }.awaitAll()
-            .mapNotNull { it?.takeIf { it.error == null } }
+        val moved = results.filter { it.second?.error == null }
+        val items = moved.mapNotNull { it.second }
         when {
-            withMoving -> store.emitMoved(items)
+            withMoving -> {
+                if (moved.isNotEmpty()) garden(key) {
+                    if (onRemoving(moved.map { it.first })) render()
+                }
+                store.emitMoved(items)
+            }
             else -> store.emitCopied(items)
         }
     }
