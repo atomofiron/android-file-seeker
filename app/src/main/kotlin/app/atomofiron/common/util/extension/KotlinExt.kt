@@ -1,11 +1,14 @@
 package app.atomofiron.common.util.extension
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.CoroutineContext
 import kotlin.math.ceil
 
 inline fun <T> T.ctx(action: T.() -> Unit) = action()
@@ -221,3 +224,14 @@ private fun hash(a: Int, b: Int, c: Int = 0, d: Int = 0, e: Int = 0): Int {
 }
 
 private fun Int.append(other: Int) = 31 * this + other
+
+fun coroutineScope(dispatcher: CoroutineDispatcher? = null): CoroutineScope {
+    var context: CoroutineContext = SupervisorJob()
+    dispatcher?.let {
+        context += dispatcher
+    }
+    context += CoroutineExceptionHandler { _, throwable ->
+        throwable.logE(throwable.stackTraceToString())
+    }
+    return CoroutineScope(context)
+}
