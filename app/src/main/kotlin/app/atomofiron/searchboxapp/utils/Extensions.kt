@@ -206,3 +206,9 @@ fun RecyclerView.addFastScroll(inTheEnd: Boolean, callback: ((Action) -> Unit)? 
     inTheEnd = inTheEnd,
     callback = callback,
 )
+
+inline fun <reified E : Exception, R> tryOrNull(action: () -> R): R? = try {
+    action()
+} catch (_: E) {
+    null
+}

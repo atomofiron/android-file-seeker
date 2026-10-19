@@ -22,6 +22,7 @@ import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.utils.Const
 import app.atomofiron.searchboxapp.utils.canForegroundService
 import app.atomofiron.searchboxapp.utils.formatDate
+import app.atomofiron.searchboxapp.utils.tryOrNull
 import app.atomofiron.searchboxapp.utils.writeTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -102,12 +103,7 @@ class ReceiveWorker(
             val fileName = name?.let { File(it).name }
                 ?.takeUnless { it.isEmpty() || it == "." || it == ".." }
                 ?: fallback
-            val stream = try {
-                context.contentResolver.openInputStream(uri)
-            } catch (_: SecurityException) {
-                null
-            }
-            Triple(fileName, size, stream)
+            Triple(fileName, size, uri)
         }
         dataRead()
         val totalSize = files.sumOf { (_, size, _) -> max(0, size) }
@@ -129,8 +125,11 @@ class ReceiveWorker(
             }
         }
         val nameMutex = Mutex()
-        val deferred = files.map { (name, _, stream) ->
+        val deferred = files.map { (name, _, uri) ->
             async {
+                val stream = tryOrNull<Exception, _> {
+                    context.contentResolver.openInputStream(uri)
+                }
                 stream?.use { input ->
                     val file = nameMutex.withLock { createFile(data.destination.string, name) }
                     FileOutputStream(file).use { output ->
