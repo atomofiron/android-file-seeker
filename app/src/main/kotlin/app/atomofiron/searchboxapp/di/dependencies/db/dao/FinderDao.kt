@@ -48,7 +48,7 @@ interface FinderDao {
         }
     }
 
-    fun read(id: TaskId) = Store.read(id)
+    fun read(id: TaskId): GlobalSearchResult? = Store.read(id)
 
     fun drop(id: TaskId) {
         delete(id)

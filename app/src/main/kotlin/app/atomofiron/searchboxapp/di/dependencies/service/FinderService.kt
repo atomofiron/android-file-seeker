@@ -7,6 +7,7 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import app.atomofiron.common.util.extension.invoke
 import app.atomofiron.common.util.extension.launchOnDefault
+import app.atomofiron.common.util.extension.logE
 import app.atomofiron.common.util.extension.withIO
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.searchboxapp.di.dependencies.AppScope
@@ -30,6 +31,7 @@ import kotlin.uuid.Uuid
 import kotlin.uuid.toJavaUuid
 
 private const val FINDER_WORK_TAG = "finder"
+private const val RESTORE_BATCH_SIZE = 10
 
 @Singleton
 class FinderService @Inject constructor(
@@ -48,12 +50,27 @@ class FinderService @Inject constructor(
             store.deleteResultFromTasks(it)
         }
         scope.launchOnDefault {
-            val cached = dao.all().mapNotNull {
-                val result = dao.read(it.id)
-                    ?: return@mapNotNull null
-                GlobalSearchTask(query = it.params, result = result, uniqueId = it.id, status = SearchStatus.Ended(stopped = it.stopped), cached = true)
+            withIO {
+                for (chunk in dao.all().chunked(RESTORE_BATCH_SIZE)) {
+                    val restored = chunk.mapNotNull { cache ->
+                        val result = dao.read(cache.id)
+                        if (result == null) {
+                            logE("Cached result is missing: ${cache.id}")
+                            return@mapNotNull null
+                        }
+                        GlobalSearchTask(
+                            query = cache.params,
+                            result = result,
+                            uniqueId = cache.id,
+                            status = SearchStatus.Ended(stopped = cache.stopped),
+                            cached = true,
+                        )
+                    }
+                    if (restored.isNotEmpty()) {
+                        store.addAll(restored)
+                    }
+                }
             }
-            store.addAll(cached)
         }
     }
 
