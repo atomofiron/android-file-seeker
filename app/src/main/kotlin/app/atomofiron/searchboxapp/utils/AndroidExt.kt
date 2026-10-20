@@ -53,7 +53,6 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.extension.debugFail
-import app.atomofiron.common.util.extension.debugRequire
 import app.atomofiron.common.util.extension.unit
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.NodeContent
@@ -62,6 +61,7 @@ import app.atomofiron.searchboxapp.model.other.LabeledAction
 import app.atomofiron.searchboxapp.model.other.UniText
 import app.atomofiron.searchboxapp.model.other.get
 import app.atomofiron.searchboxapp.model.other.toUni
+import com.google.android.material.color.MaterialColors
 import com.google.android.material.slider.Slider
 import com.google.android.material.snackbar.Snackbar
 import java.io.File
@@ -82,7 +82,7 @@ fun Context.findResIdsByAttr(@AttrRes vararg attrs: Int): IntArray {
     return values
 }
 
-fun Context.getColorByAttr(@AttrRes attr: Int): Int = ContextCompat.getColor(this, findResIdByAttr(attr))
+fun Context.colorAttr(@AttrRes attr: Int): Int = MaterialColors.getColor(this, attr, Color.MAGENTA)
 
 fun Context.getAttr(attr: Int, fallbackAttr: Int): Int {
     val value = TypedValue()
@@ -339,17 +339,6 @@ fun Context.color(@ColorRes resId: Int): Int = ContextCompat.getColor(this, resI
 fun Resources.pxs(@DimenRes resId: Int): Int = getDimensionPixelSize(resId)
 
 fun Resources.pxf(@DimenRes resId: Int): Float = getDimension(resId)
-
-fun Context.colorAttr(@AttrRes attrId: Int): Int {
-    val typedValue = TypedValue()
-    debugRequire(theme.resolveAttribute(attrId, typedValue, true)) {
-        return Color.MAGENTA
-    }
-    return when (typedValue.resourceId) {
-        0 -> typedValue.data
-        else -> ContextCompat.getColor(this, typedValue.resourceId)
-    }
-}
 
 private val hsl = FloatArray(3)
 

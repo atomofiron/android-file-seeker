@@ -34,7 +34,6 @@ import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExtType
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.context
-import app.atomofiron.searchboxapp.utils.getColorByAttr
 import app.atomofiron.searchboxapp.utils.makeSnackbar
 import app.atomofiron.searchboxapp.utils.withAlpha
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -64,7 +63,7 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initViewModel(this, CurtainViewModel::class, savedInstanceState)
-        overlayColor = requireContext().getColorByAttr(R.attr.colorOverlay)
+        overlayColor = requireContext().colorAttr(R.attr.colorOverlay)
 
         when (savedInstanceState) {
             null -> stack.add(CurtainNode(viewState.initialId, view = null, isCancelable = true))

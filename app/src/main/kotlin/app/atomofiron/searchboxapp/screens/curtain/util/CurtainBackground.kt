@@ -15,15 +15,15 @@ import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.isDarkDeep
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
-import app.atomofiron.searchboxapp.utils.getColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 
 open class CurtainBackground(context: Context) : Drawable() {
 
     private val isDarkDeep = context.isDarkDeep()
     private val cornerRadius = context.resources.getDimension(R.dimen.corner_extra_large)
-    private val curtainColor = context.getColorByAttr(R.attr.colorBackground)
+    private val curtainColor = context.colorAttr(R.attr.colorBackground)
     private val strokeWidth = if (isDarkDeep) context.resources.getDimensionPixelSize(R.dimen.stroke_width) else 0
-    private val dragHandleColor = ColorUtils.setAlphaComponent(context.getColorByAttr(MaterialAttr.colorOnSurfaceVariant), 102)
+    private val dragHandleColor = ColorUtils.setAlphaComponent(context.colorAttr(MaterialAttr.colorOnSurfaceVariant), 102)
     private val dragHandleRect = RectF()
     private val dragHandleWidth = context.resources.getDimension(R.dimen.drag_handle_width)
     private val dragHandleMargin = context.resources.getDimension(R.dimen.drag_handle_margin)

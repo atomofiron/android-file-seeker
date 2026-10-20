@@ -13,7 +13,7 @@ import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.utils.Alpha
 import app.atomofiron.searchboxapp.utils.ExtType
-import app.atomofiron.searchboxapp.utils.getColorByAttr
+import app.atomofiron.searchboxapp.utils.colorAttr
 import lib.atomofiron.insets.ExtendedWindowInsets
 import lib.atomofiron.insets.ExtendedWindowInsets.Type
 import lib.atomofiron.insets.InsetsListener
@@ -22,7 +22,7 @@ import lib.atomofiron.insets.attachInsetsListener
 import kotlin.math.max
 
 private fun Context.getSystemBarsColor(): Int {
-    val color = getColorByAttr(R.attr.colorBackground)
+    val color = colorAttr(R.attr.colorBackground)
     return ColorUtils.setAlphaComponent(color, Alpha.LEVEL_67)
 }
 
