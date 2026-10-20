@@ -67,21 +67,6 @@ import com.google.android.material.snackbar.Snackbar
 import java.io.File
 import kotlin.math.min
 
-fun Context.findResIdByAttr(@AttrRes attr: Int): Int = findResIdsByAttr(attr)[0]
-
-fun Context.findResIdsByAttr(@AttrRes vararg attrs: Int): IntArray {
-    @SuppressLint("ResourceType")
-    val array = obtainStyledAttributes(attrs)
-
-    val values = IntArray(attrs.size)
-    for (i in attrs.indices) {
-        values[i] = array.getResourceId(i, 0)
-    }
-    array.recycle()
-
-    return values
-}
-
 fun Context.colorAttr(@AttrRes attr: Int): Int = MaterialColors.getColor(this, attr, Color.MAGENTA)
 
 fun Context.getAttr(attr: Int, fallbackAttr: Int): Int {
