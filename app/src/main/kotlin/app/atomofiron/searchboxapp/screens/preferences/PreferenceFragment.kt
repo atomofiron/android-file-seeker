@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.Alert
-import app.atomofiron.common.util.Android
 import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.flow.collect
@@ -55,10 +54,6 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         viewState.showDeepBlack.collect(lifecycleScope) {
             deepBlack.isVisible = it
         }
-        val hapticFeedback = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyHapticFeedback.name)
-        viewState.hapticFeedback.collect(lifecycleScope) {
-            hapticFeedback.isChecked = it
-        }
         val screenshotOps = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyScreenshotOperations.name)
         viewState.screenshotOpsError.collect(lifecycleScope) {
             screenshotOps.summary = it
@@ -68,9 +63,9 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         viewState.appUpdate.collect(lifecycleScope) {
             uppUpdate.bind(it)
         }
-        val asSu = findPreference<SwitchPreferenceCompat>(PreferenceKeys.KeyUseSu.name)
+        val suCmd = findPreference<Preference>(PreferenceKeys.KeySuCmd.name)
         viewState.asSu.collect(lifecycleScope) {
-            asSu.isChecked = it
+            suCmd.isVisible = it
         }
         val debugGroup = findPreference<PreferenceGroup>(PreferenceKeys.PREF_CATEGORY_DEBUG)
         debugGroup.isVisible = viewState.withDebugGroup
