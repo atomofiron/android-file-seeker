@@ -99,10 +99,11 @@ fun Throwable.forHumans() = "${this::class.simpleName}: $message"
 
 fun ViewParent.noClip() = (this as? ViewGroup)?.noClip()
 
-fun ViewGroup.noClip() {
+fun <V : ViewGroup> V.noClip(): V {
     clipToPadding = false
     clipChildren = false
     clipToOutline = false
+    return this
 }
 
 fun Float.coerceInRange(from: Float, to: Float) = when {

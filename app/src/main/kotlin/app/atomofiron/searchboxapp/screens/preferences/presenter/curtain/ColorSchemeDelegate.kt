@@ -6,15 +6,19 @@ import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
 import androidx.core.view.updatePaddingRelative
+import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.AppCompatAttr
+import app.atomofiron.common.util.noClip
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.CurtainColorSchemeBinding
+import app.atomofiron.searchboxapp.model.other.LabeledAction
 import app.atomofiron.searchboxapp.screens.curtain.model.CurtainId
 import app.atomofiron.searchboxapp.screens.curtain.util.CurtainApi
 import app.atomofiron.searchboxapp.screens.preferences.PreferenceScope
 import app.atomofiron.searchboxapp.utils.ExtType
+import app.atomofiron.searchboxapp.utils.showSnackbar
 import app.atomofiron.searchboxapp.utils.updateLayoutParams
 import lib.atomofiron.insets.insetsPadding
 import javax.inject.Inject
@@ -41,9 +45,16 @@ class ColorSchemeDelegate @Inject constructor() : CurtainApi.Adapter<CurtainApi.
                 true -> textView.setTextColor(Color.BLACK)
                 false -> textView.setTextColor(Color.WHITE)
             }
-            root.addView(textView)
+            colors.addView(textView)
             textView.updateLayoutParams(WRAP_CONTENT, WRAP_CONTENT)
         }
+        root.noClip()
+        normalSnackbar.noClip().showSnackbar(Alert("Message", important = true), LabeledAction("Action") {
+            controller?.showSnackbar(Alert("Message", important = true))
+        }, debug = true)
+        errorSnackbar.noClip().showSnackbar(Alert("Error", important = true, error = true), LabeledAction("Action") {
+            controller?.showSnackbar(Alert("Error", important = true, error = true))
+        }, debug = true)
     }
 }
 

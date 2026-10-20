@@ -19,7 +19,6 @@ import app.atomofiron.common.util.AppCompatAttr
 import app.atomofiron.common.util.MaterialDimen
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.isDarkTheme
-import app.atomofiron.fileseeker.BuildConfig
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentCurtainBinding
 import app.atomofiron.searchboxapp.model.other.LabeledAction
@@ -89,9 +88,6 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
                 root.isLongClickable = false
                 tryHide()
             }
-            root.setOnLongClickListener {
-                BuildConfig.DEBUG.also { if (it) showTestSnackbar() }
-            }
             root.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ -> updateSnackbarTranslation() }
             val layoutParams = curtainSheet.layoutParams as CoordinatorLayout.LayoutParams
             behavior = layoutParams.behavior as BottomSheetKeyboardBehavior
@@ -104,8 +100,6 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         transitionAnimator = TransitionAnimator(binding, ::updateSnackbarTranslation)
         viewState.onViewCollect()
     }
-
-    private fun showTestSnackbar() = showSnackbar(Alert("Boo", error = snackbarView.get() != null, important = true), LabeledAction(R.string.dismiss))
 
     override fun FragmentCurtainBinding.onApplyInsets() {
         root.insetsPadding(ExtType { barsWithCutout + joystickFlank }, start = true, top = true, end = true)
@@ -171,9 +165,9 @@ class CurtainFragment : DialogFragment(R.layout.fragment_curtain),
         val context = binding.context
         val snackbar = binding.root.makeSnackbar(alert, action)
         if (!context.isDarkTheme()) {
-            val background = context.colorAttr(if (alert.error) MaterialAttr.colorErrorContainer else MaterialAttr.colorSurface)
-            val text = context.colorAttr(if (alert.error) MaterialAttr.colorOnErrorContainer else MaterialAttr.colorOnSurface)
-            val action = context.colorAttr(if (alert.error) AppCompatAttr.colorError else AppCompatAttr.colorPrimaryDark)
+            val background = context.colorAttr(if (alert.error) AppCompatAttr.colorError else MaterialAttr.colorSurface)
+            val text = context.colorAttr(if (alert.error) MaterialAttr.colorOnError else MaterialAttr.colorOnSurface)
+            val action = context.colorAttr(if (alert.error) MaterialAttr.colorOnError else AppCompatAttr.colorPrimaryDark)
             val alpha = ResourcesCompat.getFloat(resources, MaterialDimen.mtrl_snackbar_background_overlay_color_alpha)
             val backgroundTint = MaterialColors.layer(text, background, alpha)
             snackbar

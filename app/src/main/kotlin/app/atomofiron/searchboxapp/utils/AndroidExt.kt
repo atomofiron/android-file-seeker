@@ -146,8 +146,14 @@ inline fun <reified T : Any> CoordinatorLayout.showSnackbar(
 fun CoordinatorLayout.showSnackbar(
     alert: Alert?,
     action: LabeledAction? = null,
+    debug: Boolean = false,
 ) = when (alert) {
-    is Alert.Uni -> makeSnackbar(alert, action).show()
+    is Alert.Uni -> makeSnackbar(alert, action).let {
+        when {
+            debug -> addView(it.view)
+            else -> it.show()
+        }
+    }
     else -> debugFail { alert.toString() }
 }
 
@@ -181,7 +187,7 @@ private fun CoordinatorLayout.makeSnackbar(
         if (error) {
             setBackgroundTint(view.context.colorAttr(AppCompatAttr.colorError))
             setTextColor(view.context.colorAttr(MaterialAttr.colorOnError))
-            setActionTextColor(view.context.colorAttr(MaterialAttr.colorErrorContainer))
+            setActionTextColor(view.context.colorAttr(MaterialAttr.colorOnError))
         }
         when {
             action != null -> setAction(resources[action.label]) { action.action?.invoke() }
