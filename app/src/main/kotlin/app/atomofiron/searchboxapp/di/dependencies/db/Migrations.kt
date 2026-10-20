@@ -2,7 +2,8 @@ package app.atomofiron.searchboxapp.di.dependencies.db
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
-import app.atomofiron.common.util.extension.decode
+import app.atomofiron.common.util.extension.decodeOrNull
+import app.atomofiron.common.util.extension.logE
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.ExplorerDao
 import app.atomofiron.searchboxapp.di.dependencies.db.dao.FinderDao
 import app.atomofiron.searchboxapp.di.dependencies.store.DefaultCharsetName
@@ -39,28 +40,39 @@ object Migrations {
                 )
             """)
             db.execIndentless("""
-                INSERT INTO $TMP (stopped, params, sorting, version)
-                SELECT stopped, params, '', version FROM ${FinderDao.RESULT}
+                INSERT INTO $TMP (id, stopped, params, sorting, version)
+                SELECT id, stopped, params, '', version FROM ${FinderDao.RESULT}
             """)
-            db.query("SELECT result FROM ${FinderDao.RESULT}").use { cursor ->
-                val resultIndex = cursor.getColumnIndexOrThrow("result")
+            val updateSorting = db.compileStatement("UPDATE $TMP SET sorting = ? WHERE id = ?")
+            val deleteRow = db.compileStatement("DELETE FROM $TMP WHERE id = ?")
+            try {
+                db.query("SELECT id, result FROM ${FinderDao.RESULT}").use { cursor ->
+                    val idIndex = cursor.getColumnIndexOrThrow("id")
+                    val resultIndex = cursor.getColumnIndexOrThrow("result")
 
-                var id = 0
-                while (cursor.moveToNext()) {
-                    id++
-                    val bytes = cursor.getBlob(resultIndex)
-
-                    val lr = bytes.decode<LegacyGlobalSearchResult>()
-                    val type = if (lr.forText) SearchType.Text(DefaultCharsetName) else SearchType.Names
-                    val result = GlobalSearchResult(type, lr.count, lr.countTotal, lr.matches, lr.errors, lr.generation)
-                    FinderDao.store(id, result)
-                    db.compileStatement("UPDATE $TMP SET sorting = ? WHERE id = ?").run {
-                        clearBindings()
-                        bindString(1, Converters.fromNodeSorting(lr.sorting))
-                        bindLong(2, id.toLong())
-                        executeUpdateDelete()
+                    while (cursor.moveToNext()) {
+                        val id = cursor.getInt(idIndex)
+                        val bytes = cursor.getBlob(resultIndex)
+                        val lr = bytes?.decodeOrNull<LegacyGlobalSearchResult>()
+                        if (lr == null) {
+                            logE("Migration 3->4: cached result $id is not readable")
+                            deleteRow.clearBindings()
+                            deleteRow.bindLong(1, id.toLong())
+                            deleteRow.executeUpdateDelete()
+                            continue
+                        }
+                        val type = if (lr.forText) SearchType.Text(DefaultCharsetName) else SearchType.Names
+                        val result = GlobalSearchResult(type, lr.count, lr.countTotal, lr.matches, lr.errors, lr.generation)
+                        FinderDao.store(id, result)
+                        updateSorting.clearBindings()
+                        updateSorting.bindString(1, Converters.fromNodeSorting(lr.sorting))
+                        updateSorting.bindLong(2, id.toLong())
+                        updateSorting.executeUpdateDelete()
                     }
                 }
+            } finally {
+                updateSorting.close()
+                deleteRow.close()
             }
             db.execSQL("DROP TABLE ${FinderDao.RESULT}")
             db.execSQL("ALTER TABLE $TMP RENAME TO ${FinderDao.RESULT}")
