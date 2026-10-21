@@ -36,6 +36,8 @@ import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
+import kotlin.math.sign
+import android.view.ViewGroup.LayoutParams as ViewGroupLayoutParams
 import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.GestureDirection as Direction
 import app.atomofiron.searchboxapp.screens.finder.fragment.keyboard.GestureTracking as Tracking
 
@@ -56,7 +58,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
     private val drawerListener = DrawerStateListenerImpl()
     private val focusListener = FocusChangeListener()
 
-    private var ignoreHorizontal = false
+    private var horizontalTarget: View? = null
     private var tracker = VelocityTracker.obtain()
     private var tracking: Tracking = Tracking.Unknown
     private var downPoint = PointF(0f, 0f)
@@ -147,7 +149,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         tracker.recycle()
     }
 
-    override fun addView(child: View, index: Int, params: ViewGroup.LayoutParams?) {
+    override fun addView(child: View, index: Int, params: ViewGroupLayoutParams?) {
         super.addView(child, index, params)
         child.findViewById<ViewGroup>(R.id.content)?.let {
             contentView = it
@@ -196,7 +198,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
         tracker.addMovement(event)
         when (event.action) {
             MotionEvent.ACTION_DOWN -> {
-                ignoreHorizontal = false
+                horizontalTarget = null
                 exiting = false
                 delegate.resetAnimation()
                 animHorizontal?.cancel()
@@ -217,7 +219,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
                     tracking.horizontal -> moveHorizontally(dx)
                     tracking.vertical -> moveVertically(dy)
                     skipForNow(distanceX, distanceY) -> Unit
-                    abs(distanceX) > abs(distanceY) && ignoreHorizontal -> tracking = Tracking.Skipping
+                    abs(distanceX) > abs(distanceY) && horizontalTarget?.canScrollHorizontally((-distanceX.sign).toInt()) == true -> tracking = Tracking.Skipping
                     abs(distanceX) > abs(distanceY) || horizontalCurrent != HorizontalStart -> {
                         val direction = when {
                             horizontalCurrent > HorizontalStart -> Direction.Right
@@ -274,7 +276,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     private fun skipForNow(distanceX: Float, distanceY: Float): Boolean = when {
         abs(distanceX) > DistanceThreshold || horizontalCurrent != HorizontalStart -> false
-        abs(distanceY) > DistanceThreshold || keyboardNow > keyboardMin && keyboardNow < keyboardMax -> false
+        abs(distanceY) > DistanceThreshold || keyboardNow in keyboardMin.inc()..<keyboardMax -> false
         else -> true
     }
 
@@ -285,7 +287,7 @@ class KeyboardRootDrawerLayout @JvmOverloads constructor(
 
     override fun onStartNestedScroll(child: View, target: View, @ScrollAxis axes: Int): Boolean {
         if (axes == SCROLL_AXIS_HORIZONTAL) {
-            ignoreHorizontal = true
+            horizontalTarget = target
         }
         return super.onStartNestedScroll(child, target, nestedScrollAxes)
     }
