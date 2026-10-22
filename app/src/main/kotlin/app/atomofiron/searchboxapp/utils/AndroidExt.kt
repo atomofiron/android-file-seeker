@@ -225,7 +225,9 @@ val View.isLayoutRtl: Boolean get() = layoutDirection == View.LAYOUT_DIRECTION_R
 
 fun View.isRtl(): Boolean = resources.isRtl()
 
-fun View.inflater(): LayoutInflater = LayoutInflater.from(context)
+fun Context.inflater(): LayoutInflater = LayoutInflater.from(this)
+
+fun View.inflater(): LayoutInflater = context.inflater()
 
 inline operator fun <reified P : LayoutParams> View.invoke() = layoutParams as P
 

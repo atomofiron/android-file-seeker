@@ -3,28 +3,26 @@ package app.atomofiron.searchboxapp.custom.preference
 import android.content.Context
 import android.content.res.TypedArray
 import android.util.AttributeSet
-import android.view.Gravity
+import android.view.Gravity.END
+import android.view.Gravity.START
 import android.view.View
-import android.view.View.OVER_SCROLL_NEVER
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
-import android.widget.HorizontalScrollView
-import android.widget.ImageView
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.LinearLayout
-import android.widget.RelativeLayout
-import android.widget.TextView
+import android.widget.LinearLayout.HORIZONTAL
+import android.widget.LinearLayout.VERTICAL
+import androidx.annotation.IdRes
 import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
 import androidx.preference.ListPreference
 import androidx.preference.PreferenceViewHolder
-import app.atomofiron.common.util.FrameLayoutParams
-import app.atomofiron.common.util.LinearLayoutParams
 import app.atomofiron.common.util.PreferenceId
-import app.atomofiron.common.util.RelativeLayoutParams
 import app.atomofiron.common.util.noClip
-import app.atomofiron.fileseeker.databinding.TextChipBinding
 import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.PreferenceChipBinding
+import app.atomofiron.fileseeker.databinding.TextChipBinding
 import app.atomofiron.searchboxapp.utils.completeChildren
 import app.atomofiron.searchboxapp.utils.inflater
 import app.atomofiron.searchboxapp.utils.updateMarginLayoutParams
@@ -37,25 +35,9 @@ class ChipPreference : ListPreference {
     constructor(context: Context, attrs: AttributeSet?, defStyleRes: Int) : super(context, attrs, defStyleRes)
     constructor(context: Context, attrs: AttributeSet?, defStyleRes: Int, defStyleAttr: Int) : super(context, attrs, defStyleRes, defStyleAttr)
 
-    private val scrollView = HorizontalScrollView(context)
-    private val layout = LinearLayout(context)
-    private val chipMargin = context.resources.getDimensionPixelSize(R.dimen.padding_half)
-    //private var interceptClicks = true
+    private lateinit var binding: PreferenceChipBinding
     private var clickListener: OnPreferenceClickListener? = null
-
-    init {
-        layout.orientation = LinearLayout.HORIZONTAL
-        layout.noClip()
-        scrollView.overScrollMode = OVER_SCROLL_NEVER
-        scrollView.isHorizontalScrollBarEnabled = false
-        scrollView.addView(layout)
-        scrollView.noClip()
-        val padding = layout.resources.getDimensionPixelSize(R.dimen.padding_mini)
-        layout.updatePaddingRelative(0, padding, 0, padding)
-        layout.updateLayoutParams<FrameLayoutParams> {
-            gravity = Gravity.END
-        }
-    }
+    private val chipMargin = context.resources.getDimensionPixelSize(R.dimen.padding_half)
 
     override fun getSummary(): CharSequence? = null
 
@@ -70,8 +52,12 @@ class ChipPreference : ListPreference {
         } else {
             holder.itemView.setOnClickListener { clickListener?.onPreferenceClick(this) }
         }
-        scrollView.parent ?: holder.init()
-        layout.bind()
+        if (!::binding.isInitialized) {
+            val itemView = holder.itemView as ViewGroup
+            binding = PreferenceChipBinding.inflate(context.inflater(), itemView, false)
+                .init(itemView)
+        }
+        binding.bind()
     }
 
     override fun setOnPreferenceClickListener(listener: OnPreferenceClickListener?) {
@@ -82,68 +68,59 @@ class ChipPreference : ListPreference {
 
     override fun persistString(value: String?) = callChangeListener(value) && super.persistString(value)
 
-    private fun PreferenceViewHolder.init() {
-        val body = (itemView as ViewGroup).getChildAt(1)
-        val defaultPadding = body.paddingTop
-        body.updatePaddingRelative(top = defaultPadding / 2, bottom = defaultPadding / 2)
-        val title = body.findViewById<TextView>(android.R.id.title)
-        val iconFrame = itemView.findViewById<LinearLayout>(PreferenceId.icon_frame)
-        iconFrame.run {
-            val icon = getChildAt(0) as ImageView
-            val iconCenter = paddingTop + icon.drawable.intrinsicHeight / 2
-            val titleCenter = body.paddingTop + title.lineHeight / 2
-            updateLayoutParams<LinearLayoutParams> {
-                topMargin = titleCenter - iconCenter
-                bottomMargin = topMargin
-                gravity = Gravity.TOP
-            }
+    private fun PreferenceChipBinding.init(itemView: ViewGroup): PreferenceChipBinding {
+        root.replaceFrom(itemView, PreferenceId.icon_frame)
+        root.replaceFrom(itemView, android.R.id.title)
+        root.noClip()
+        chips.noClip()
+        itemView.noClip()
+        itemView.removeAllViews()
+        itemView.addView(root)
+        root.updateLayoutParams {
+            width = MATCH_PARENT
+            height = WRAP_CONTENT
         }
-        (itemView as ViewGroup).noClip()
-        val summary = itemView.findViewById<View>(android.R.id.summary)
-        val container = summary.parent as RelativeLayout
-        container.removeView(summary)
-        container.addView(scrollView)
-        container.noClip()
+        return PreferenceChipBinding.bind(root)
+            .apply { syncLayout(itemView) }
+    }
+
+    private fun PreferenceChipBinding.syncLayout(itemView: ViewGroup) {
         var vertical: Boolean? = null
         itemView.addOnLayoutChangeListener { _, _, _, _, _, _, _, _, _ ->
-            val new = body.width < title.width + layout.width
-            if (new == vertical) {
-                return@addOnLayoutChangeListener
-            }
-            vertical = new
-            iconFrame.updateLayoutParams<LinearLayoutParams> {
-                gravity = if (vertical) Gravity.TOP else Gravity.CENTER_VERTICAL
-            }
-            title.updateLayoutParams<RelativeLayoutParams> {
-                removeRule(RelativeLayout.ALIGN_PARENT_TOP)
-                removeRule(RelativeLayout.CENTER_VERTICAL)
-                when {
-                    vertical -> addRule(RelativeLayout.ALIGN_PARENT_TOP)
-                    else -> addRule(RelativeLayout.CENTER_VERTICAL)
-                }
-            }
-            scrollView.updateLayoutParams<RelativeLayoutParams> {
-                width = MATCH_PARENT
-                removeRule(RelativeLayout.BELOW)
-                removeRule(RelativeLayout.END_OF)
-                when {
-                    vertical -> addRule(RelativeLayout.BELOW, android.R.id.title)
-                    else -> addRule(RelativeLayout.END_OF, android.R.id.title)
-                }
+            val new = root.width < iconAndTitle.width + chips.width
+            if (new != vertical) {
+                vertical = new
+                root.orientation = if (vertical) VERTICAL else HORIZONTAL
+                scrollView.updatePaddingRelative(start = if (vertical) iconFrame.width else 0)
+                scrollView.isFillViewport = !vertical
+                chips.gravity = if (vertical) START else END
             }
         }
     }
 
-    private fun LinearLayout.bind() {
+    private fun ViewGroup.replaceFrom(src: ViewGroup, @IdRes id: Int) {
+        val view = src.findViewById<View>(id)
+        (view.parent as ViewGroup).removeView(view)
+        val stub = findViewById<View>(id)
+        stub.layoutParams.width = view.layoutParams.width
+        stub.layoutParams.height = view.layoutParams.height
+        view.layoutParams = stub.layoutParams
+        (stub.parent as ViewGroup).run {
+            val index = indexOfChild(stub)
+            removeView(stub)
+            addView(view, index)
+        }
+    }
+
+    private fun PreferenceChipBinding.bind() {
         val selected = entryValues.indexOf(value)
-        completeChildren(entries, entryValues)
-        if (selected < 0) return
-        children.forEachIndexed { index, view ->
+        chips.completeChildren(entries, entryValues)
+        chips.children.forEachIndexed { index, view ->
             view as Chip
             view.isSelected = index == selected
         }
-        if (width == 0) post {
-            children.find { it.isSelected }?.let {
+        if (root.width == 0) root.post {
+            chips.children.find { it.isSelected }?.let {
                 val offset = chipMargin * 2
                 val itemLeft = it.left - offset - scrollView.scrollX
                 val itemRight = it.right + offset - scrollView.scrollX
@@ -159,7 +136,7 @@ class ChipPreference : ListPreference {
         entries: Array<out CharSequence>,
         entryValues: Array<out CharSequence>,
     ) {
-        val inflater = layout.inflater()
+        val inflater = context.inflater()
         completeChildren(
             count = entries.size,
             factory = { TextChipBinding.inflate(inflater, this, false).root },
