@@ -7,19 +7,24 @@ import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.model.explorer.Node
 import app.atomofiron.searchboxapp.screens.explorer.fragment.list.util.getIcon
 import app.atomofiron.searchboxapp.screens.explorer.fragment.roots.RootViewHolder.Companion.getTitle
+import app.atomofiron.searchboxapp.utils.updateMarginLayoutParams
 import com.google.android.material.chip.Chip
 
 class TargetHolder(
     parent: ViewGroup,
     private val output: TargetsHolder.FinderTargetsOutput,
-) : GeneralHolder<Node>(parent, R.layout.item_finder_target) {
+) : GeneralHolder<Node>(parent, R.layout.chip) {
 
-    private val chipView = itemView.findViewById<Chip>(R.id.item_chip_target)
+    private val chipView = itemView.findViewById<Chip>(R.id.chip)
 
     init {
         itemView.isClickable = false
         itemView.isFocusable = false
         chipView.setOnClickListener { output.onTargetClick(item, !chipView.isSelected) }
+        chipView.updateMarginLayoutParams {
+            marginStart = resources.getDimensionPixelSize(R.dimen.padding_mini)
+            marginEnd = marginStart
+        }
     }
 
     override fun onBind(item: Node, position: Int) {

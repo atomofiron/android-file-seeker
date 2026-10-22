@@ -108,8 +108,9 @@
 	<style name="CollapsingToolbarLayoutStyle.Amoled" parent="@style/Widget.Material3.CollapsingToolbar.Large" />
 
 	<style name="ChipStyle" parent="@style/Widget.Material3.Chip.Assist">
-		<item name="chipStrokeColor">?colorSurfaceVariant</item>
+		<item name="chipStrokeColor">?colorSecondaryContainer</item>
 		<item name="chipIconTint">@color/m3_chip_text_color</item>
+		<item name="android:textColor">@color/m3_chip_text_color</item>
 		<item name="chipMinTouchTargetSize">@dimen/chip_area</item>
 	</style>
 
