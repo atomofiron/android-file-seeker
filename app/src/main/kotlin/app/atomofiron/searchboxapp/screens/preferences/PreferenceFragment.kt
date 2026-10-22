@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.MATCH_PARENT
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.updatePadding
+import androidx.core.view.updatePaddingRelative
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -18,6 +19,7 @@ import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.AppCompatAttr
+import app.atomofiron.common.util.PreferenceId
 import app.atomofiron.common.util.extension.debugFail
 import app.atomofiron.common.util.flow.collect
 import app.atomofiron.common.util.flow.viewCollect
@@ -27,10 +29,13 @@ import app.atomofiron.searchboxapp.custom.LayoutDelegate.addLayoutListener
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
 import app.atomofiron.searchboxapp.custom.overscroll.setupSpringOverscroll
 import app.atomofiron.searchboxapp.custom.preference.AppUpdatePreference
+import app.atomofiron.searchboxapp.screens.common.SettingsBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.preferences.fragment.PreferenceFragmentDelegate
 import app.atomofiron.searchboxapp.utils.colorAttr
 import app.atomofiron.searchboxapp.utils.performHapticLite
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyAppTheme
+import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyDeepBlack
 import app.atomofiron.searchboxapp.utils.showSnackbar
 import com.google.android.material.appbar.AppBarLayout
 
@@ -50,7 +55,7 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         setPreferencesFromResource(R.xml.preferences, rootKey)
         preferenceDelegate.onCreatePreference(preferenceScreen)
 
-        val deepBlack = findPreference<Preference>(PreferenceKeys.KeyDeepBlack.name)
+        val deepBlack = findPreference<Preference>(KeyDeepBlack.name)
         viewState.showDeepBlack.collect(lifecycleScope) {
             deepBlack.isVisible = it
         }
@@ -81,8 +86,11 @@ class PreferenceFragment : PreferenceFragmentCompat(),
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view)
         (recyclerView.parent as ViewGroup).removeView(recyclerView)
         recyclerView.removeItemDecorationAt(0)
+        recyclerView.addItemDecoration(SettingsBackgroundDecorator(view.context, listOf(listOf(KeyAppTheme.name, KeyDeepBlack.name))))
         recyclerView.setupSpringOverscroll()
+        recyclerView.addOnChildAttachStateChangeListener(ItemAttachListener())
         recyclerView.isVerticalScrollBarEnabled = false
+        recyclerView.updatePaddingRelative(bottom = resources.getDimensionPixelSize(R.dimen.padding_common))
         recyclerView.layoutParams = CoordinatorLayout.LayoutParams(MATCH_PARENT, MATCH_PARENT).apply {
             behavior = AppBarLayout.ScrollingViewBehavior()
         }
@@ -136,4 +144,14 @@ class PreferenceFragment : PreferenceFragmentCompat(),
     }
 
     private fun onAlert(alert: Alert) = binding.snackbarContainer.showSnackbar(alert)
+
+    private class ItemAttachListener : RecyclerView.OnChildAttachStateChangeListener {
+
+        override fun onChildViewAttachedToWindow(view: View) {
+            val iconFrame = view.findViewById<View>(PreferenceId.icon_frame)
+            iconFrame.minimumWidth = view.paddingStart + view.resources.getDimensionPixelSize(R.dimen.icon_size)
+        }
+
+        override fun onChildViewDetachedFromWindow(view: View) = Unit
+    }
 }

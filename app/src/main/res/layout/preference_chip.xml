@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:gravity="center_vertical"
+    android:paddingVertical="@dimen/padding_half"
     >
     <LinearLayout
         android:id="@+id/icon_and_title"
@@ -12,7 +13,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:paddingVertical="@dimen/padding_mini"
         android:paddingEnd="@dimen/padding_half"
         >
         <LinearLayout

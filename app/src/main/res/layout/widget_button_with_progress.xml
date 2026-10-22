@@ -9,6 +9,7 @@
         android:id="@+id/widgetButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginVertical="@dimen/padding_half"
         />
     <app.atomofiron.searchboxapp.custom.view.MuonsView
         android:id="@+id/widgetProgress"

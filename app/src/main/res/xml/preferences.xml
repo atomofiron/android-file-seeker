@@ -8,6 +8,7 @@
         />
     <PreferenceCategory
         app:title="@string/user_interface"
+        app:iconSpaceReserved="false"
         >
         <app.atomofiron.searchboxapp.custom.preference.ChipPreference
             app:title="@string/pref_theme"
@@ -39,11 +40,13 @@
             app:title="@string/pref_explorer_item"
             app:key="pref_explorer_item"
             app:icon="@drawable/ic_folder"
+            app:widgetLayout="@layout/widget_forward"
             />
         <Preference
             app:title="@string/pref_joystick"
             app:key="pref_joystick"
             app:icon="@drawable/ic_esc_circle"
+            app:widgetLayout="@layout/widget_forward"
             />
         <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
             app:title="@string/pref_haptic_feedback"
@@ -60,6 +63,7 @@
     <PreferenceCategory
         android:key="pref_category_system"
         app:title="@string/pref_category_system"
+        app:iconSpaceReserved="false"
         >
         <Preference
             app:title="@string/pref_export_import"
@@ -86,6 +90,7 @@
     <PreferenceCategory
         android:key="pref_category_debug"
         app:title="@string/pref_category_debug"
+        app:iconSpaceReserved="false"
         >
         <app.atomofiron.searchboxapp.custom.preference.HapticSwitchPreference
             app:title="@string/pref_leak_canary"
@@ -94,6 +99,7 @@
         <Preference
             app:title="@string/pref_color_scheme"
             app:key="pref_color_scheme"
+            app:widgetLayout="@layout/widget_forward"
             />
     </PreferenceCategory>
 </PreferenceScreen>

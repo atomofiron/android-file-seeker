@@ -127,5 +127,13 @@
 	<style name="SnackbarStyle" parent="Widget.Material3.Snackbar">
 		<item name="shapeAppearance">?shapeAppearanceCornerExtraLarge</item>
 	</style>
-
+	<style
+		name="PreferenceCategoryTitleTextStyle"
+		tools:ignore="PrivateResource"
+		>
+		<item name="android:textAppearance">?attr/preferenceCategoryTitleTextAppearance</item>
+		<item name="android:textColor">?attr/preferenceCategoryTitleTextColor</item>
+		<item name="android:layout_marginBottom">@dimen/padding_half</item>
+		<item name="android:layout_marginStart">@dimen/padding_mini</item>
+	</style>
 </resources>

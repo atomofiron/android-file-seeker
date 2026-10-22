@@ -3,9 +3,11 @@ package app.atomofiron.searchboxapp.custom.preference
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.Button
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
 import androidx.preference.Preference
 import androidx.preference.PreferenceViewHolder
 import app.atomofiron.fileseeker.R
@@ -45,6 +47,9 @@ class AppUpdatePreference @JvmOverloads constructor(
         button = holder.itemView.findViewById(R.id.widgetButton)
         progress = holder.itemView.findViewById(R.id.widgetProgress)
         button.setOnClickListener(this)
+        holder.itemView.findViewById<View>(android.R.id.widget_frame).updateLayoutParams {
+            height = WRAP_CONTENT
+        }
         state.bindButton()
         state.bindProgress()
     }

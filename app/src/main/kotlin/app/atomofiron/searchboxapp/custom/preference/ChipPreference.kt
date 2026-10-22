@@ -2,6 +2,7 @@ package app.atomofiron.searchboxapp.custom.preference
 
 import android.content.Context
 import android.content.res.TypedArray
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.Gravity.END
 import android.view.Gravity.START
@@ -13,6 +14,7 @@ import android.widget.LinearLayout
 import android.widget.LinearLayout.HORIZONTAL
 import android.widget.LinearLayout.VERTICAL
 import androidx.annotation.IdRes
+import androidx.core.graphics.drawable.toDrawable
 import androidx.core.view.children
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePaddingRelative
@@ -21,8 +23,8 @@ import androidx.preference.PreferenceViewHolder
 import app.atomofiron.common.util.PreferenceId
 import app.atomofiron.common.util.noClip
 import app.atomofiron.fileseeker.R
+import app.atomofiron.fileseeker.databinding.ChipBinding
 import app.atomofiron.fileseeker.databinding.PreferenceChipBinding
-import app.atomofiron.fileseeker.databinding.TextChipBinding
 import app.atomofiron.searchboxapp.utils.completeChildren
 import app.atomofiron.searchboxapp.utils.inflater
 import app.atomofiron.searchboxapp.utils.updateMarginLayoutParams
@@ -47,7 +49,7 @@ class ChipPreference : ListPreference {
         super.onBindViewHolder(holder)
 
         if (clickListener == null) {
-            holder.itemView.background = null
+            holder.itemView.background = Color.TRANSPARENT.toDrawable() // null ruins children's visibility with itemView.outlineProvider
             holder.itemView.setOnClickListener(null)
         } else {
             holder.itemView.setOnClickListener { clickListener?.onPreferenceClick(this) }
@@ -69,11 +71,13 @@ class ChipPreference : ListPreference {
     override fun persistString(value: String?) = callChangeListener(value) && super.persistString(value)
 
     private fun PreferenceChipBinding.init(itemView: ViewGroup): PreferenceChipBinding {
-        root.replaceFrom(itemView, PreferenceId.icon_frame)
+        val iconFrame = root.replaceFrom(itemView, PreferenceId.icon_frame)
         root.replaceFrom(itemView, android.R.id.title)
+        iconFrame.updatePaddingRelative(top = 0, bottom = 0)
         root.noClip()
         chips.noClip()
         itemView.noClip()
+        itemView.setWillNotDraw(false)
         itemView.removeAllViews()
         itemView.addView(root)
         root.updateLayoutParams {
@@ -98,7 +102,7 @@ class ChipPreference : ListPreference {
         }
     }
 
-    private fun ViewGroup.replaceFrom(src: ViewGroup, @IdRes id: Int) {
+    private fun ViewGroup.replaceFrom(src: ViewGroup, @IdRes id: Int): View {
         val view = src.findViewById<View>(id)
         (view.parent as ViewGroup).removeView(view)
         val stub = findViewById<View>(id)
@@ -110,6 +114,7 @@ class ChipPreference : ListPreference {
             removeView(stub)
             addView(view, index)
         }
+        return view
     }
 
     private fun PreferenceChipBinding.bind() {
@@ -139,7 +144,7 @@ class ChipPreference : ListPreference {
         val inflater = context.inflater()
         completeChildren(
             count = entries.size,
-            factory = { TextChipBinding.inflate(inflater, this, false).root },
+            factory = { ChipBinding.inflate(inflater, this, false).root },
             init = { index ->
                 text = entries[index]
                 setOnClickListener { setValue(entryValues[index].toString()) }
