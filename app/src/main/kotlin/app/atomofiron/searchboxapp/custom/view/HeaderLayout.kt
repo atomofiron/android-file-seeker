@@ -71,8 +71,10 @@ class HeaderLayout : AppBarLayout, AppBarLayout.OnOffsetChangedListener {
         }
     }
 
+    override fun setLiftOnScroll(liftOnScroll: Boolean) = Unit
+
     fun pinToolbar(pin: Boolean) {
-        isLiftOnScroll = pin
+        super.setLiftOnScroll(pin)
         collapsing<LayoutParams> {
             scrollFlags = if (pin) SCR or EUC else SCR
         }
