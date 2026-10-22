@@ -10,7 +10,6 @@ import app.atomofiron.fileseeker.R
 class RootFragment : Fragment(R.layout.fragment_root),
     BaseFragment<RootFragment, RootViewState, RootPresenter, ViewBinding> by BaseFragmentImpl()
 {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         initViewModel(this, RootViewModel::class, savedInstanceState)

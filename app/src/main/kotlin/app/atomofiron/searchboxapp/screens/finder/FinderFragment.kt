@@ -28,7 +28,6 @@ import app.atomofiron.searchboxapp.utils.showSnackbar
 class FinderFragment : Fragment(R.layout.fragment_finder),
     BaseFragment<FinderFragment, FinderViewState, FinderPresenter, FragmentFinderBinding> by BaseFragmentImpl()
 {
-
     private lateinit var binding: FragmentFinderBinding
     private lateinit var finderAdapter: FinderAdapter<SearchResult>
     private lateinit var layoutManager: GridLayoutManager

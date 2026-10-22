@@ -4,15 +4,17 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24"
+    android:tint="?attr/colorControlNormal"
+    android:autoMirrored="true"
     >
     <path
         android:fillColor="@color/white"
-        android:pathData="M 8 3 a 1 1 0 0 0 -2 0 v 18 a 1 1 0 0 0 2 0 v -15 h 6 a 4 4 0 0 1 4 4 v 11 a 1 1 0 0 1 -2 0 v -11 a 2 2 0 0 0 -2 -2 h -6 z"
+        android:pathData="m 12 2 h -8 a 2 2 0 0 0 -2 2 v 16 a 2 2 0 0 0 2 2 h 16 a 2 2 0 0 0 2 -2 v -16 a 2 2 0 0 0 -2 -2 h -8 v 1 a 1 1 0 0 1 0 18 a 1 1 0 0 1 0 -18 z"
         />
     <path
-        android:strokeColor="@color/white"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:pathData="M 12 12 v 4 M 10 14 h 4"
+        android:fillColor="@color/white"
+        android:pathData="m 12 5 a 1 1 0 0 0 0 14 a 1 1 0 0 0 0 -14
+        m -2 10 h-2 a 1 1 0 0 1 -1 -1 v-4 a 1 1 0 0 1 1 -1 h2 l2.3-2.3q0.475-0.475 1.0875-0.2125q0.6125 0.2625 0.6125 0.9375 v 9.15q0 0.675-0.6125 0.9375q-0.6125 0.2625-1.0875-0.2125z
+        m7.5-3q0 1.05-0.475 1.9875q-0.475 0.9375-1.25 1.5375q-0.25 0.15-0.5125 0.0125q-0.2625-0.1375-0.2625-0.4375l0-6.25q0-0.3 0.2625-0.4375q0.2625-0.1375 0.5125 0.0125q0.775 0.625 1.25 1.575q0.475 0.95 0.475 2z"
         />
 </vector>
