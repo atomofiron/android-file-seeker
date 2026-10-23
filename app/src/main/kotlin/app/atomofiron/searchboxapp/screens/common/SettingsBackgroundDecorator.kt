@@ -6,7 +6,13 @@ import android.graphics.Canvas
 import android.graphics.Outline
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.PixelFormat
 import android.graphics.Rect
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
+import android.graphics.drawable.GradientDrawable.Orientation.BOTTOM_TOP
+import android.graphics.drawable.RippleDrawable
 import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.core.graphics.withTranslation
@@ -15,7 +21,6 @@ import androidx.preference.Preference
 import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceGroupAdapter
 import androidx.recyclerview.widget.RecyclerView
-import app.atomofiron.common.util.Android
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.utils.Size
@@ -46,16 +51,17 @@ class SettingsBackgroundDecorator(
         val next = parent.preferenceOf(view, 1)
         val first = previous?.parent !== group
         val last = next?.parent !== group
-        if (view.outlineProvider !is OutlineProvider) {
-            view.outlineProvider = OutlineProvider()
-            view.clipToOutline = true
-        }
         outRect.set(
             paddingHalf,
             offsetFor(first, preference.isMergedWith(previous)),
             paddingHalf,
             offsetFor(last, preference.isMergedWith(next)),
         )
+        val drawable = view.setTranslucentDrawable()
+        if (drawable != null && view.outlineProvider !is OutlineProvider) {
+            view.outlineProvider = OutlineProvider(drawable)
+            view.clipToOutline = true
+        }
     }
 
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
@@ -76,11 +82,25 @@ class SettingsBackgroundDecorator(
             val last = next?.parent !== group
             val topDistance = distanceBetween(previousChild, child)
             val bottomDistance = distanceBetween(child, nextChild)
-            canvas.draw(
-                child = child,
-                topRadius = radiiFor(first, topDistance),
-                bottomRadius = radiiFor(last, bottomDistance),
-            )
+            val drawable = child.getTranslucentDrawable()
+            if (drawable != null && child.outlineProvider !is OutlineProvider) {
+                child.outlineProvider = OutlineProvider(drawable)
+                child.clipToOutline = true
+                drawable.colors = intArrayOf(paint.color, paint.color)
+            }
+            val changed = item.updateRadii(child, radiiFor(first, topDistance), radiiFor(last, bottomDistance))
+            if (changed && drawable != null) {
+                drawable.cornerRadii = item.radii
+            } else if (changed) {
+                item.path.reset()
+                item.path.addRoundRect(0f, 0f, child.width.toFloat(), child.height.toFloat(), item.radii, Path.Direction.CW)
+            }
+            canvas.withTranslation(child.left.toFloat(), child.y) {
+                when (drawable) {
+                    null -> drawPath(item.path, paint)
+                    else -> drawable.draw(this)
+                }
+            }
         }
     }
 
@@ -123,43 +143,57 @@ class SettingsBackgroundDecorator(
         }
     }
 
-    private fun Canvas.draw(child: View, topRadius: Float, bottomRadius: Float) {
-        val outline = child.outlineProvider as OutlineProvider
-        outline.updateRadii(child, topRadius, bottomRadius)
-        withTranslation(child.left.toFloat(), child.y) {
-            drawPath(outline.path, paint)
+    private fun View.setTranslucentDrawable(): TranslucentGradientDrawable? {
+        return when (val drawable = background) {
+            is RippleDrawable -> drawable.findDrawableByLayerId(android.R.id.mask) as? TranslucentGradientDrawable
+                ?: TranslucentGradientDrawable(paint.color).also { new ->
+                    var index = drawable.findIndexByLayerId(android.R.id.mask)
+                    if (index < 0) {
+                        index = drawable.addLayer(new)
+                        drawable.setId(index, android.R.id.mask)
+                    }
+                    drawable.setDrawableByLayerId(android.R.id.mask, new)
+                }
+            is TranslucentGradientDrawable -> drawable
+            is ColorDrawable -> TranslucentGradientDrawable(paint.color)
+                .also { background = it }
+            null -> TranslucentGradientDrawable(paint.color)
+                .also { background = it }
+            else -> null
+        }
+    }
+
+    private fun View.getTranslucentDrawable(): TranslucentGradientDrawable? {
+        return when (val drawable = background) {
+            is RippleDrawable -> drawable.findDrawableByLayerId(android.R.id.mask) as? TranslucentGradientDrawable
+            is TranslucentGradientDrawable -> drawable
+            else -> null
         }
     }
 
     private class Item {
+
         var preference: Preference? = null
         val group: PreferenceGroup? get() = preference?.parent
-    }
-
-    private class OutlineProvider : ViewOutlineProvider() {
-
         val radii = FloatArray(8)
         val path = Path()
-
         private var size = Size()
 
-        @Suppress("DEPRECATION")
-        override fun getOutline(view: View, outline: Outline) = when {
-            Android.R -> outline.setPath(path)
-            else -> outline.setConvexPath(path)
-        }
-
-        fun updateRadii(view: View, top: Float, bottom: Float) {
+        fun updateRadii(view: View, top: Float, bottom: Float): Boolean {
             val new = Size(view.width, view.height)
             val changed = radii[0] != top || radii[4] != bottom || new != size
             for (i in radii.indices) {
                 radii[i] = if (i < 4) top else bottom
             }
-            if (changed) {
-                size = new
-                path.reset()
-                path.addRoundRect(0f, 0f, view.width.toFloat(), view.height.toFloat(), radii, Path.Direction.CW)
-            }
+            return changed
         }
+    }
+
+    private class OutlineProvider(private val drawable: Drawable) : ViewOutlineProvider() {
+        override fun getOutline(view: View, outline: Outline) = drawable.getOutline(outline)
+    }
+
+    private class TranslucentGradientDrawable(color: Int) : GradientDrawable(BOTTOM_TOP, intArrayOf(color, color)) {
+        override fun getOpacity(): Int = PixelFormat.TRANSLUCENT // to dodge the bug in android 5.0-8.1
     }
 }

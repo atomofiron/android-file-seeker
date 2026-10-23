@@ -77,7 +77,6 @@ class ChipPreference : ListPreference {
         root.noClip()
         chips.noClip()
         itemView.noClip()
-        itemView.setWillNotDraw(false)
         itemView.removeAllViews()
         itemView.addView(root)
         root.updateLayoutParams {
