@@ -31,7 +31,7 @@ class QueryFieldHolder(
 
     private val binding = ItemQueryFieldBinding.bind(itemView)
     private val textLayout = binding.queryField.box
-    val textField = binding.queryField.field
+    val textField: TextField = binding.queryField.field
     private var skipBindings = false
 
     init {
@@ -72,6 +72,17 @@ class QueryFieldHolder(
     override fun onAction(value: String, code: Int) {
         if (code == IME_ACTION_SEARCH && value.isNotEmpty()) {
             listener.onSearchClick(value)
+        }
+    }
+
+    fun replace(query: String) {
+        textField.setText(query)
+        textField.setSelection(query.length)
+    }
+
+    fun insert(value: String) {
+        textField.run {
+            text?.replace(selectionStart, selectionEnd, value)
         }
     }
 

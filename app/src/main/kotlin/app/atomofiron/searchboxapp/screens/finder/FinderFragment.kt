@@ -2,17 +2,15 @@ package app.atomofiron.searchboxapp.screens.finder
 
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.common.arch.BaseFragment
 import app.atomofiron.common.arch.BaseFragmentImpl
 import app.atomofiron.common.recycler.FlexSpanSizeLookup
 import app.atomofiron.common.util.Alert
 import app.atomofiron.common.util.flow.viewCollect
 import app.atomofiron.common.util.hideKeyboard
-import app.atomofiron.common.util.showKeyboard
 import app.atomofiron.fileseeker.R
 import app.atomofiron.fileseeker.databinding.FragmentFinderBinding
 import app.atomofiron.searchboxapp.custom.LayoutDelegate.apply
@@ -21,6 +19,7 @@ import app.atomofiron.searchboxapp.model.finder.SearchResult
 import app.atomofiron.searchboxapp.model.other.LabeledAction
 import app.atomofiron.searchboxapp.screens.common.SectionBackgroundDecorator
 import app.atomofiron.searchboxapp.screens.finder.adapter.FinderAdapter
+import app.atomofiron.searchboxapp.screens.finder.adapter.holder.QueryFieldHolder
 import app.atomofiron.searchboxapp.screens.finder.fragment.history.HistoryAdapter
 import app.atomofiron.searchboxapp.screens.finder.state.FinderStateItem
 import app.atomofiron.searchboxapp.utils.showSnackbar
@@ -105,24 +104,26 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
     private fun onStateChange(items: List<FinderStateItem>) = finderAdapter.submitList(items)
 
-    private fun findQueryField(): EditText? = view
-        ?.findViewById<View>(R.id.query_field)
-        ?.findViewById(R.id.field)
-
-    private fun onReplaceQuery(value: String) {
-        binding.drawer.close()
-        findQueryField()?.setText(value) ?: run {
-            binding.recyclerView.scrollToPosition(0)
-            binding.recyclerView.post {
-                findQueryField()?.setText(value)
-            }
+    private fun RecyclerView.runOnQueryField(
+        withScrolling: Boolean = true,
+        action: QueryFieldHolder.() -> Unit,
+    ) {
+        val view = getChildAt(0)
+        val holder = findContainingViewHolder(view) as? QueryFieldHolder
+        if (holder?.action() == null && withScrolling) {
+            scrollToPosition(0)
+            post { runOnQueryField(false, action) }
         }
     }
 
+    private fun onReplaceQuery(value: String) {
+        binding.drawer.close()
+        binding.recyclerView.runOnQueryField { replace(value) }
+    }
+
     private fun onInsertInQuery(value: String) {
-        findQueryField()?.run {
-            showKeyboard()
-            text.replace(selectionStart, selectionEnd, value)
+        binding.recyclerView.runOnQueryField {
+            insert(value)
         }
     }
 
