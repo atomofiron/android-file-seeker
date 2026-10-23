@@ -20,6 +20,7 @@ import androidx.core.view.children
 import androidx.preference.Preference
 import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceGroupAdapter
+import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
@@ -34,7 +35,7 @@ class SettingsBackgroundDecorator(
 ) : RecyclerView.ItemDecoration() {
 
     private val paint = Paint()
-    private val paddingHalf = context.resources.getDimensionPixelSize(R.dimen.padding_half)
+    private val padding = context.resources.getDimensionPixelSize(R.dimen.padding_half)
     private val edgeRadius = context.resources.getDimension(R.dimen.corner_extra)
     private val gap = context.resources.getDimension(R.dimen.padding_micro)
 
@@ -52,9 +53,9 @@ class SettingsBackgroundDecorator(
         val first = previous?.parent !== group
         val last = next?.parent !== group
         outRect.set(
-            paddingHalf,
+            padding,
             offsetFor(first, preference.isMergedWith(previous)),
-            paddingHalf,
+            padding,
             offsetFor(last, preference.isMergedWith(next)),
         )
         val drawable = view.setTranslucentDrawable()
@@ -138,6 +139,7 @@ class SettingsBackgroundDecorator(
         val preference = adapter.getItem(position) ?: return null
         return when {
             !preference.isVisible -> null
+            preference is PreferenceScreen -> preference
             preference is PreferenceGroup -> null
             else -> preference
         }
