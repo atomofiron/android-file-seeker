@@ -13,6 +13,8 @@ import kotlin.math.ceil
 
 inline fun <T> T.ctx(action: T.() -> Unit) = action()
 
+operator fun Boolean.plus(other: Boolean): Boolean = this || other
+
 operator fun CoroutineDispatcher.invoke(parallelism: Int) = Dispatchers.IO.limitedParallelism(parallelism)
 
 @Suppress("NOTHING_TO_INLINE")

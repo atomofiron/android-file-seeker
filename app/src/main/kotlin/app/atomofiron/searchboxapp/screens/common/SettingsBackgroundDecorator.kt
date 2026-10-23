@@ -21,6 +21,7 @@ import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceGroupAdapter
 import androidx.preference.PreferenceScreen
 import androidx.recyclerview.widget.RecyclerView
+import app.atomofiron.common.util.extension.plus
 import app.atomofiron.fileseeker.R
 import app.atomofiron.searchboxapp.custom.drawable.colorSurfaceContainer
 import app.atomofiron.searchboxapp.utils.Size
@@ -88,6 +89,7 @@ class SettingsBackgroundDecorator(
             val changed = item.updateRadii(child, radiiFor(first, topDistance), radiiFor(last, bottomDistance))
             if (changed && drawable != null) {
                 drawable.cornerRadii = item.radii
+                drawable.setBounds(0, 0, child.width, child.height)
             } else if (changed) {
                 item.path.reset()
                 item.path.addRoundRect(0f, 0f, child.width.toFloat(), child.height.toFloat(), item.radii, Path.Direction.CW)
@@ -186,10 +188,12 @@ class SettingsBackgroundDecorator(
 
         fun updateRadii(view: View, top: Float, bottom: Float): Boolean {
             val new = Size(view.width, view.height)
-            val changed = radii[0] != top || radii[4] != bottom || new != size
-            for (i in radii.indices) {
+            var changed = radii[0] != top || radii[4] != bottom
+            if (changed) for (i in radii.indices) {
                 radii[i] = if (i < 4) top else bottom
             }
+            changed += new != size
+            size = new
             return changed
         }
     }
