@@ -111,7 +111,12 @@ class FinderFragment : Fragment(R.layout.fragment_finder),
 
     private fun onReplaceQuery(value: String) {
         binding.drawer.close()
-        findQueryField()?.setText(value)
+        findQueryField()?.setText(value) ?: run {
+            binding.recyclerView.scrollToPosition(0)
+            binding.recyclerView.post {
+                findQueryField()?.setText(value)
+            }
+        }
     }
 
     private fun onInsertInQuery(value: String) {

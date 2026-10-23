@@ -17,7 +17,7 @@
 			android:layout_height="match_parent"
 			android:padding="@dimen/padding_semi"
 			android:maxWidth="@dimen/card_max_width"
-			android:scrollbarThumbVertical="@drawable/scroll_thumb"
+			android:scrollbars="none"
 			/>
 		<app.atomofiron.searchboxapp.custom.view.InsetsBackgroundView
 			android:id="@+id/insets_background"

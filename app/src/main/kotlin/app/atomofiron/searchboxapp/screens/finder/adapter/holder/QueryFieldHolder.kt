@@ -32,6 +32,7 @@ class QueryFieldHolder(
     private val binding = ItemQueryFieldBinding.bind(itemView)
     private val textLayout = binding.queryField.box
     val textField = binding.queryField.field
+    private var skipBindings = false
 
     init {
         binding.button.setOnClickListener {
@@ -60,7 +61,8 @@ class QueryFieldHolder(
     override fun minWidth(): Float = itemView.resources.getDimension(R.dimen.finder_query_field)
 
     override fun onBind(item: FinderStateItem.Query, position: Int) {
-        if (textField.text.toString() != item.query) {
+        if (!skipBindings) {
+            skipBindings = true
             textField.setText(item.query)
             textField.setSelection(item.query.length)
         }
@@ -103,7 +105,7 @@ class QueryFieldHolder(
         fun onReplaceClick(value: String)
     }
 
-    inner class TextChangeListener : TextWatcher {
+    private inner class TextChangeListener : TextWatcher {
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
         override fun afterTextChanged(s: Editable) {
