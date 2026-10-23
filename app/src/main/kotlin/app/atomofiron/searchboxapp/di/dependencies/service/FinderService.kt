@@ -51,7 +51,10 @@ class FinderService @Inject constructor(
         }
         scope.launchOnDefault {
             withIO {
-                for (chunk in dao.all().chunked(RESTORE_BATCH_SIZE)) {
+                val all = dao.all()
+                if (all.isEmpty()) {
+                    store.addAll(emptyList())
+                } else for (chunk in all.chunked(RESTORE_BATCH_SIZE)) {
                     val restored = chunk.mapNotNull { cache ->
                         val result = dao.read(cache.id)
                         if (result == null) {
