@@ -39,9 +39,9 @@ class SectionBackgroundDecorator(
     private val radii = FloatArray(RADII)
     private val paddingHalf = context.resources.getDimensionPixelSize(R.dimen.padding_half)
     private val paddingMini = context.resources.getDimension(R.dimen.padding_mini)
-    private val internalRadius = context.resources.getDimension(R.dimen.corner_nano)
+    private val innerRadius = context.resources.getDimension(R.dimen.corner_mini)
     private val edgeRadius = context.resources.getDimension(R.dimen.corner_extra)
-    private val innerSpace = (internalRadius / 2).roundToInt()
+    private val innerSpace = (innerRadius / 2).roundToInt()
 
     init {
         paint.style = Paint.Style.FILL
@@ -98,7 +98,8 @@ class SectionBackgroundDecorator(
         val reversed = parent.layoutManager?.isLayoutReversed ?: return
         var range: IntRange? = null
         var current: List<KClass<*>>? = null
-        var prev: List<KClass<*>>? = null
+        var previous: List<KClass<*>>? = null
+        var prevY = if (reversed) Int.MAX_VALUE else Int.MIN_VALUE
         for (child in parent.children) {
             val holder = parent.getChildViewHolder(child)
             val item = adapter.takeIf { holder.bindingAdapterPosition >= 0 }
@@ -107,9 +108,15 @@ class SectionBackgroundDecorator(
                 ?: continue
             val group = groups.findGroup(item)
             if (group == null || current != null && group !== current) {
-                range?.draw(canvas, parent, hasPrev = prev != null, hasNext = group != null, reversed)
+                val nextNext = if (reversed) child.run { y + height + marginBottom } else child.run { y - marginTop }
+                range?.draw(canvas, parent, hasPrev = previous != null, hasNext = group != null, reversed, prevY = prevY, nextY = nextNext.toInt())
+                prevY = when {
+                    range == null -> prevY
+                    reversed -> min(range.first, range.last)
+                    else -> max(range.first, range.last)
+                }
                 range = null
-                prev = current
+                previous = current
             }
             current = group
             group ?: continue
@@ -120,7 +127,8 @@ class SectionBackgroundDecorator(
                 else -> min(range.first, top)..max(range.last, bottom)
             }
         }
-        range?.draw(canvas, parent, hasPrev = prev != null, hasNext = false, reversed)
+        val nextY = if (reversed) Int.MIN_VALUE else Int.MAX_VALUE
+        range?.draw(canvas, parent, hasPrev = previous != null, hasNext = false, reversed, prevY = prevY, nextY = nextY)
     }
 
     private fun IntRange.draw(
@@ -129,21 +137,26 @@ class SectionBackgroundDecorator(
         hasPrev: Boolean,
         hasNext: Boolean,
         reversed: Boolean,
+        prevY: Int,
+        nextY: Int,
     ) {
         val hasTop = if (reversed) hasNext else hasPrev
         val hasBottom = if (reversed) hasPrev else hasNext
+        val topTop = min(nextY, prevY) + paddingMini
+        val bottomBottom = max(nextY, prevY) - paddingMini
         val left = parent.paddingLeft - paddingMini
         val right = parent.run { width - paddingRight } + paddingMini
         val top = start - paddingMini
         val bottom = last + paddingMini
-        val topRadius = if (hasTop) internalRadius else edgeRadius
-        radii.setTopRadius(topRadius)
-        val bottomRadius = if (hasBottom) internalRadius else edgeRadius
-        radii.setBottomRadius(bottomRadius)
+        val topRadius = if (hasTop) radius(top - topTop) else edgeRadius
+        val bottomRadius = if (hasBottom) radius(bottomBottom - bottom) else edgeRadius
+        radii.updateRadii(topRadius, bottomRadius)
         path.reset()
         path.addRoundRect(left, top, right, bottom, radii, Path.Direction.CW)
         canvas.drawPath(path, paint)
     }
+
+    private fun radius(distance: Float): Float = min(innerRadius + max(distance - innerSpace, 0f), edgeRadius)
 
     private fun ViewGroup.getFree(childIndex: Int): Int {
         val child = getChildAt(childIndex)
@@ -154,12 +167,10 @@ class SectionBackgroundDecorator(
         }
     }
 
-    private fun FloatArray.setTopRadius(value: Float) {
-        for (i in 0..<RADII / 2) set(i, value)
-    }
-
-    private fun FloatArray.setBottomRadius(value: Float) {
-        for (i in 4..<RADII) set(i, value)
+    private fun FloatArray.updateRadii(top: Float, bottom: Float) {
+        for (i in 0..<RADII) {
+            set(i, if (i < RADII / 2) top else bottom)
+        }
     }
 
     private fun List<List<KClass<*>>>.findGroup(item: Any?): List<KClass<*>>? {
