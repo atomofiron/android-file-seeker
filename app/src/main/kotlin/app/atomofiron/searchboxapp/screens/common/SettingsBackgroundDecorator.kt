@@ -16,7 +16,6 @@ import android.graphics.drawable.RippleDrawable
 import android.view.View
 import android.view.ViewOutlineProvider
 import androidx.core.graphics.withTranslation
-import androidx.core.view.children
 import androidx.preference.Preference
 import androidx.preference.PreferenceGroup
 import androidx.preference.PreferenceGroupAdapter
@@ -48,17 +47,26 @@ class SettingsBackgroundDecorator(
     override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         val preference = parent.preferenceOf(view) ?: return
         val group = preference.parent ?: return
-        val previous = parent.preferenceOf(view, -1)
-        val next = parent.preferenceOf(view, 1)
-        val first = previous?.parent !== group
-        val last = next?.parent !== group
+
+        val item = view.tag as? Item ?: Item(preference)
+        if (item.preference.key != preference.key) {
+            item.previous = null
+            item.next = null
+        }
+        item.preference = preference
+        item.previous = parent.preferenceOf(view, -1) ?: item.previous
+        item.next = parent.preferenceOf(view, 1) ?: item.next
+        view.tag = item
+
+        val first = item.previous?.parent !== group
+        val last = item.next?.parent !== group
         outRect.set(
             padding,
-            offsetFor(first, preference.isMergedWith(previous)),
+            offsetFor(first, preference.isMergedWith(item.previous)),
             padding,
-            offsetFor(last, preference.isMergedWith(next)),
+            offsetFor(last, preference.isMergedWith(item.next)),
         )
-        val drawable = view.setTranslucentDrawable()
+        val drawable = view.setTranslucentDrawable(paint.color)
         if (drawable != null && view.outlineProvider !is OutlineProvider) {
             view.outlineProvider = OutlineProvider(drawable)
             view.clipToOutline = true
@@ -66,29 +74,17 @@ class SettingsBackgroundDecorator(
     }
 
     override fun onDraw(canvas: Canvas, parent: RecyclerView, state: RecyclerView.State) {
-        for (child in parent.children) {
-            val item = child.tag as? Item ?: Item()
-            item.preference = parent.preferenceOf(child)
-            child.tag = item
-        }
         for (index in 0 until parent.childCount) {
-            val child = parent.getChildAt(index)
+            val child: View = parent.getChildAt(index)
             val item = child.tag as? Item ?: continue
             val group = item.group ?: continue
-            val previousChild = parent.getChildAt(index.dec())
-            val nextChild = parent.getChildAt(index.inc())
-            val previous = (previousChild?.tag as? Item)?.preference
-            val next = (nextChild?.tag as? Item)?.preference
-            val first = previous?.parent !== group
-            val last = next?.parent !== group
-            val topDistance = distanceBetween(previousChild, child)
-            val bottomDistance = distanceBetween(child, nextChild)
+            val previousChild: View? = parent.getChildAt(index.dec())
+            val nextChild: View? = parent.getChildAt(index.inc())
+            val first = group !== item.previous?.parent
+            val last = group !== item.next?.parent
+            val topDistance = distanceBetween(previousChild, child, edge = first, current = item.preference, other = item.previous)
+            val bottomDistance = distanceBetween(child, nextChild, edge = last, current = item.preference, other = item.next)
             val drawable = child.getTranslucentDrawable()
-            if (drawable != null && child.outlineProvider !is OutlineProvider) {
-                child.outlineProvider = OutlineProvider(drawable)
-                child.clipToOutline = true
-                drawable.colors = intArrayOf(paint.color, paint.color)
-            }
             val changed = item.updateRadii(child, radiiFor(first, topDistance), radiiFor(last, bottomDistance))
             if (changed && drawable != null) {
                 drawable.cornerRadii = item.radii
@@ -115,9 +111,17 @@ class SettingsBackgroundDecorator(
         else -> max(min(distance, edgeRadius), 0f)
     }
 
-    private fun distanceBetween(above: View?, below: View?): Float = when {
-        above == null || below == null -> edgeRadius
-        else -> below.y - above.y - above.height
+    private fun distanceBetween(
+        upper: View?,
+        lower: View?,
+        edge: Boolean,
+        current: Preference,
+        other: Preference?,
+    ): Float = when {
+        edge -> edgeRadius
+        upper != null && lower != null -> lower.y - upper.y - upper.height
+        current.isMergedWith(other) -> 0f
+        else -> gap
     }
 
     private fun Preference.isMergedWith(other: Preference?): Boolean {
@@ -133,11 +137,9 @@ class SettingsBackgroundDecorator(
     private fun RecyclerView.preferenceOf(view: View, step: Int = 0): Preference? {
         val adapter = adapter as? PreferenceGroupAdapter ?: return null
         val position = getChildAdapterPosition(view) + step
-        if (position !in 0 until adapter.itemCount) {
-            return null
-        }
-        val preference = adapter.getItem(position) ?: return null
+        val preference = adapter.getItem(position)
         return when {
+            preference == null -> null
             !preference.isVisible -> null
             preference is PreferenceScreen -> preference
             preference is PreferenceGroup -> null
@@ -145,10 +147,10 @@ class SettingsBackgroundDecorator(
         }
     }
 
-    private fun View.setTranslucentDrawable(): TranslucentGradientDrawable? {
+    private fun View.setTranslucentDrawable(color: Int): TranslucentGradientDrawable? {
         return when (val drawable = background) {
             is RippleDrawable -> drawable.findDrawableByLayerId(android.R.id.mask) as? TranslucentGradientDrawable
-                ?: TranslucentGradientDrawable(paint.color).also { new ->
+                ?: TranslucentGradientDrawable(color).also { new ->
                     var index = drawable.findIndexByLayerId(android.R.id.mask)
                     if (index < 0) {
                         index = drawable.addLayer(new)
@@ -157,9 +159,9 @@ class SettingsBackgroundDecorator(
                     drawable.setDrawableByLayerId(android.R.id.mask, new)
                 }
             is TranslucentGradientDrawable -> drawable
-            is ColorDrawable -> TranslucentGradientDrawable(paint.color)
+            is ColorDrawable -> TranslucentGradientDrawable(color)
                 .also { background = it }
-            null -> TranslucentGradientDrawable(paint.color)
+            null -> TranslucentGradientDrawable(color)
                 .also { background = it }
             else -> null
         }
@@ -173,10 +175,11 @@ class SettingsBackgroundDecorator(
         }
     }
 
-    private class Item {
+    private class Item(var preference: Preference) {
 
-        var preference: Preference? = null
-        val group: PreferenceGroup? get() = preference?.parent
+        val group: PreferenceGroup? get() = preference.parent
+        var previous: Preference? = null
+        var next: Preference? = null
         val radii = FloatArray(8)
         val path = Path()
         private var size = Size()
