@@ -16,7 +16,7 @@
 	<dimen name="corner_radius">16dp</dimen>
 	<dimen name="corner_semi">12dp</dimen>
 	<dimen name="corner_half">8dp</dimen>
-	<dimen name="corner_nano">4dp</dimen>
+	<dimen name="corner_mini">4dp</dimen>
 	<dimen name="icon_size">24dp</dimen>
 	<dimen name="icon_size_mini">16dp</dimen>
 	<dimen name="progress_common_size">24dp</dimen>
