@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:paddingVertical="@dimen/padding_semi"
     android:paddingStart="@dimen/padding_common"
-    android:paddingHorizontal="@dimen/padding_large"
+    android:paddingEnd="@dimen/padding_large"
     >
     <ImageView
         android:id="@+id/status_icon"
