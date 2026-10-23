@@ -17,6 +17,7 @@ import android.view.View
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.createBitmap
 import app.atomofiron.common.util.MaterialAttr
 import app.atomofiron.common.util.findBooleanByAttr
@@ -51,7 +52,7 @@ fun JoystickHaptic.effect(press: Boolean) = when (this) {
     JoystickHaptic.Heavy -> if (press) HAPTIC_HEAVY else HAPTIC_LITE
 }
 
-fun Context.joystickDefaultColor() = colorAttr(MaterialAttr.colorTertiaryContainer)
+fun Context.joystickDefaultColor() = colorAttr(MaterialAttr.colorPrimaryContainer)
 
 private class Override(
     val glowingColor: Int,
@@ -130,10 +131,10 @@ class JoystickView @JvmOverloads constructor(
 
         val black = ContextCompat.getColor(context, R.color.black)
         val white = ContextCompat.getColor(context, R.color.white)
-        val contrastBlack = black over circleColor
-        val contrastWhite = white over circleColor
+        val contrastBlack = ColorUtils.calculateContrast(black, circleColor)
+        val contrastWhite = ColorUtils.calculateContrast(white, circleColor)
         val iconColor = when {
-            !composition.overrideColor -> context.colorAttr(MaterialAttr.colorOnTertiaryContainer)
+            !composition.overrideColor -> context.colorAttr(MaterialAttr.colorOnPrimaryContainer)
             contrastBlack > contrastWhite -> black
             else -> white
         }
