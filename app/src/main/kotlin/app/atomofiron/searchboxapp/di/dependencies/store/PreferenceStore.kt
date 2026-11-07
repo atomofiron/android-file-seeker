@@ -2,9 +2,12 @@ package app.atomofiron.searchboxapp.di.dependencies.store
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.SharedPreferencesMigration
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStore
 import app.atomofiron.common.util.extension.launchOnMain
 import app.atomofiron.common.util.flow.StateFlowProperty
@@ -49,15 +52,12 @@ import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyTestField
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyUseSu
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeyFolderVolumeUp
 import app.atomofiron.searchboxapp.utils.preferences.PreferenceKeys.KeySearchCharset
-import app.atomofiron.searchboxapp.utils.preferences.get
-import app.atomofiron.searchboxapp.utils.preferences.set
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -66,6 +66,7 @@ import javax.inject.Singleton
 
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
     name = "preferences",
+    corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
     produceMigrations = { context ->
         listOf(SharedPreferencesMigration(context, context.packageName + "_preferences"))
     },
@@ -77,7 +78,8 @@ class PreferenceStore @Inject constructor(
     private val scope: AppScope,
 ) : DataStore<Preferences> by context.dataStore {
 
-    private lateinit var preferences: Preferences
+    @Volatile
+    private var preferences: Preferences = emptyPreferences()
 
     init {
         scope.launch {
@@ -90,10 +92,10 @@ class PreferenceStore @Inject constructor(
     val asSu = getFlow(KeyUseSu)
     val suCmd = getFlow(KeySuCmd)
     val specialCharacters = getFlow(KeySpecialCharacters, ::readCharacters)
-    val appOrientation = getFlow(KeyAppOrientation) { AppOrientation.entries[it.toInt()] }
+    val appOrientation = getFlow(KeyAppOrientation) { AppOrientation.entries.byOrdinal(it, AppOrientation.UNDEFINED) }
     val explorerItemComposition = getFlow(KeyExplorerItem) { ExplorerItemComposition(it) }
     val joystickComposition = getFlow(KeyJoystick) { JoystickComposition(it) }
-    var drawerGravity = getFlow(KeyDrawerGravity)
+    val drawerGravity = getFlow(KeyDrawerGravity)
     val testField = getNullableFlow(KeyTestField)
     val showSearchOptions = getFlow(KeyShowSearchOptions)
     val searchOptions = getFlow(KeySearchOptions, ::SearchOptionsImpl)
@@ -109,7 +111,6 @@ class PreferenceStore @Inject constructor(
     val eggHalloween = getFlow(KeyHalloween)
     val eggNewYear = getFlow(KeyNewYear)
     val eggClown = getFlow(KeyClown)
-    val appLocale = getFlow(KeyLocale) { AppLocale.entries[it.toInt()] } // don't pass any default value
     val appTheme = data.map {
         val appThemeMode = it[KeyAppTheme] ?: AppTheme.defaultName()
         val deepBlack = it[KeyDeepBlack] ?: false
@@ -122,79 +123,77 @@ class PreferenceStore @Inject constructor(
         }
     }
 
-    suspend fun setUseSu(value: Boolean) {
-        edit { it[KeyUseSu] = value }
+    suspend fun setUseSu(value: Boolean) = update {
+        it[KeyUseSu] = value
     }
 
-    suspend fun setDrawerGravity(value: Int) {
-        edit { it[KeyDrawerGravity] = value }
+    suspend fun setDrawerGravity(value: Int) = update {
+        it[KeyDrawerGravity] = value
     }
 
-    suspend fun setTestField(value: String?) {
-        edit { it[KeyTestField] = value }
+    suspend fun setTestField(value: String?) = update {
+        it[KeyTestField] = value
     }
 
-    suspend fun setShowSearchOptions(value: Boolean) {
-        edit { it[KeyShowSearchOptions] = value }
+    suspend fun setShowSearchOptions(value: Boolean) = update {
+        it[KeyShowSearchOptions] = value
     }
 
-    suspend fun setSearchOptions(value: SearchOptions) {
-        edit { it[KeySearchOptions] = value.toInt() }
+    suspend fun setSearchOptions(value: SearchOptions) = update {
+        it[KeySearchOptions] = value.toInt()
     }
 
-    suspend fun setLocalSearchOptions(value: LocalSearchOptions) {
-        edit { it[KeyLocalSearchOptions] = value.toInt() }
+    suspend fun setLocalSearchOptions(value: LocalSearchOptions) = update {
+        it[KeyLocalSearchOptions] = value.toInt()
     }
 
-    suspend fun setSpecialCharacters(value: Array<String>) {
-        edit { it[KeySpecialCharacters] = value.joinToString(separator = " ") }
+    suspend fun setSpecialCharacters(value: Array<String>) = update {
+        it[KeySpecialCharacters] = value.joinToString(separator = " ")
     }
 
-    suspend fun setMaxFileSizeForSearch(value: ByteSize) {
-        edit { it[KeyMaxSize] = value.persistable() }
+    suspend fun setMaxFileSizeForSearch(value: ByteSize) = update {
+        it[KeyMaxSize] = value.persistable()
     }
 
-    suspend fun setAppUpdateCode(value: Int) {
-        edit { it[KeyAppUpdateCode] = value }
+    suspend fun setAppUpdateCode(value: Int) = update {
+        it[KeyAppUpdateCode] = value
     }
 
-    suspend fun setShownNotificationUpdateCode(value: Int) {
-        edit { it[KeyShownNotificationUpdateCode] = value }
+    suspend fun setShownNotificationUpdateCode(value: Int) = update {
+        it[KeyShownNotificationUpdateCode] = value
     }
 
-    suspend fun setMaxDepthForSearch(value: Int) {
-        edit { it[KeyMaxDepth] = value }
+    suspend fun setMaxDepthForSearch(value: Int) = update {
+        it[KeyMaxDepth] = value
     }
 
     suspend fun setSearchCharset(value: String) {
-        edit { it[KeySearchCharset] = value }
+        update { it[KeySearchCharset] = value }
     }
 
-    suspend fun setAppLocale(value: AppLocale) {
-        edit { it[KeyLocale] = value.ordinal.toString() }
+    suspend fun setAppLocale(value: AppLocale) = update {
+        it[KeyLocale] = value.ordinal.toString()
     }
 
-    suspend fun setExplorerItemComposition(value: ExplorerItemComposition) {
-        edit { it[KeyExplorerItem] = value.flags }
+    suspend fun setExplorerItemComposition(value: ExplorerItemComposition) = update {
+        it[KeyExplorerItem] = value.flags
     }
 
-    suspend fun setJoystickComposition(value: JoystickComposition) {
-        edit { it[KeyJoystick] = value.data }
+    suspend fun setJoystickComposition(value: JoystickComposition) = update {
+        it[KeyJoystick] = value.data
     }
 
-    suspend fun setHapticFeedback(value: Boolean) {
-        edit { it[KeyHapticFeedback] = value }
+    suspend fun setHapticFeedback(value: Boolean) = update {
+        it[KeyHapticFeedback] = value
     }
 
-    suspend fun setEasterEggEnabled(egg: EasterEgg, value: Boolean) {
-        edit {
-            val key = when (egg) {
-                EasterEgg.Halloween -> KeyHalloween
-                EasterEgg.NewYear -> KeyNewYear
-                EasterEgg.Clown -> KeyClown
-            }
-            it[key] = value
+    suspend fun setEasterEggEnabled(egg: EasterEgg, value: Boolean) = update {
+        val key = when (egg) {
+            EasterEgg.Halloween -> KeyHalloween
+            EasterEgg.NewYear -> KeyNewYear
+            EasterEgg.Clown -> KeyClown
         }
+        it[key] = value
     }
 
     private fun readCharacters(value: String): Array<String> {
@@ -204,7 +203,7 @@ class PreferenceStore @Inject constructor(
     }
 
     private fun <V : Any> getFlow(key: PreferenceKey<V>): StateFlowProperty<V> {
-        return data.mapNotNull { it[key] ?: key.default }
+        return data.map { it[key] ?: key.default }
             .stateInProperty(scope, initial = key.default)
     }
 
@@ -214,7 +213,7 @@ class PreferenceStore @Inject constructor(
     }
 
     private fun <V : Any, E> getFlow(key: PreferenceKey<V>, transformation: (V) -> E): StateFlowProperty<E> {
-        return data.mapNotNull { (it[key] ?: key.default)
+        return data.map { (it[key] ?: key.default)
             .let(transformation) }
             .stateInProperty(scope, initial = transformation(key.default))
     }
@@ -229,4 +228,18 @@ class PreferenceStore @Inject constructor(
     operator fun <T> get(key: Preferences.Key<T>): T = preferences[key] ?: PreferenceKeys.default(key.name)
 
     operator fun <T : Any> get(key: PreferenceKey<T>): T = preferences[key] ?: key.default
+
+    private fun <E> List<E>.byOrdinal(value: String, default: E): E = getOrNull(value.toIntOrNull() ?: -1) ?: default
+
+    private suspend fun update(block: (MutablePreferences) -> Unit) {
+        preferences = edit(block)
+    }
 }
+
+private operator fun <T : Any> Preferences.get(key: PreferenceKey<T>) = get(key.key)
+
+private operator fun <T : Any> MutablePreferences.set(key: PreferenceKey<T>, value: T?) = when (value) {
+    null -> remove(key.key)
+    else -> set(key.key, value)
+}
+

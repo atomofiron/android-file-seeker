@@ -45,14 +45,14 @@ object PreferenceKeys {
     val KeyNewYear = PreferenceKey("pref_new_year", true)
     val KeyClown = PreferenceKey("pref_clown", true)
 
-    private val keys by lazy(LazyThreadSafetyMode.NONE) {
-        arrayOf(KeyDrawerGravity, KeyAppUpdateCode, KeyShownNotificationUpdateCode, KeyTestField, KeyShowSearchOptions, KeySearchOptions, KeyLocalSearchOptions, KeySpecialCharacters, KeyAppOrientation, KeyLocale, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeySuCmd, KeyExplorerItem, KeyJoystick, KeyHapticFeedback, KeyFolderVolumeUp, KeyScreenshotOperations)
-    }
+    private val keys = arrayOf(KeyDrawerGravity, KeyAppUpdateCode, KeyShownNotificationUpdateCode, KeyTestField, KeyShowSearchOptions, KeySearchOptions, KeyLocalSearchOptions, KeySpecialCharacters, KeyAppOrientation, KeyLocale, KeyAppTheme, KeyDeepBlack, KeyMaxSize, KeyMaxDepth, KeyUseSu, KeySuCmd, KeyExplorerItem, KeyJoystick, KeyHapticFeedback, KeyFolderVolumeUp, KeyScreenshotOperations, KeySearchCharset, KeyHalloween, KeyNewYear, KeyClown)
 
-    @Suppress("UNCHECKED_CAST") // omg it's an error in Kotlin 2.2
+    @Suppress("UNCHECKED_CAST")
     fun <T> default(key: String): T = keys.find { it.key.name == key }?.default as T
 
+    @Suppress("UNCHECKED_CAST")
     operator fun <T : Any> get(key: Preferences.Key<T>): PreferenceKey<T> = keys.find { it.key == key } as PreferenceKey<T>
 
+    @Suppress("UNCHECKED_CAST")
     fun <T : Any> get(key: String): PreferenceKey<T> = keys.find { it.name == key } as PreferenceKey<T>
 }

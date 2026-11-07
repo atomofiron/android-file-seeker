@@ -46,11 +46,11 @@ class LegacyPreferenceDataStore @Inject constructor(
         return store[longPreferencesKey(key)]
     }
 
-    override fun getString(key: String, defValue: String?): String? {
+    override fun getString(key: String, defValue: String?): String {
         return store[stringPreferencesKey(key)]
     }
 
-    override fun getStringSet(key: String, defValues: Set<String>?): Set<String>? {
+    override fun getStringSet(key: String, defValues: Set<String>?): Set<String> {
         return store[stringSetPreferencesKey(key)]
     }
 
