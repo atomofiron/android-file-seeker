@@ -1,63 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <animated-selector
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:aapt="http://schemas.android.com/aapt">
-
+    xmlns:aapt="http://schemas.android.com/aapt"
+    >
     <item
         android:id="@+id/unchecked"
         android:state_checked="false"
         android:drawable="@drawable/ic_check_box_empty"
         />
-
     <item
         android:id="@+id/checked"
         android:state_checked="true"
         android:drawable="@drawable/ic_check_box"
         />
-
     <transition
         android:fromId="@id/unchecked"
         android:toId="@id/checked"
         >
         <aapt:attr name="android:drawable">
             <animated-vector android:drawable="@drawable/ic_check_box_empty">
-
                 <target android:name="shape">
                     <aapt:attr name="android:animation">
-                        <objectAnimator
-                            android:duration="200"
-                            android:propertyName="pathData"
-                            android:valueFrom="@string/checkbox_unchecked"
-                            android:valueTo="@string/checkbox_checked"
-                            android:valueType="pathType"
-                            />
+                        <set android:ordering="sequentially">
+                            <objectAnimator
+                                android:duration="150"
+                                android:propertyName="pathData"
+                                android:valueFrom="@string/checkbox_unchecked"
+                                android:valueTo="@string/checkbox_middle"
+                                android:valueType="pathType"
+                                />
+                            <objectAnimator
+                                android:duration="150"
+                                android:propertyName="pathData"
+                                android:valueFrom="@string/checkbox_middle"
+                                android:valueTo="@string/checkbox_checked"
+                                android:valueType="pathType"
+                                />
+                        </set>
                     </aapt:attr>
                 </target>
-
             </animated-vector>
         </aapt:attr>
     </transition>
-
     <transition
         android:fromId="@id/checked"
         android:toId="@id/unchecked"
         >
         <aapt:attr name="android:drawable">
             <animated-vector android:drawable="@drawable/ic_check_box">
-
                 <target android:name="shape">
                     <aapt:attr name="android:animation">
-                        <objectAnimator
-                            android:duration="200"
-                            android:propertyName="pathData"
-                            android:valueFrom="@string/checkbox_checked"
-                            android:valueTo="@string/checkbox_unchecked"
-                            android:valueType="pathType"
-                            />
+                        <set android:ordering="sequentially">
+                            <objectAnimator
+                                android:duration="150"
+                                android:propertyName="pathData"
+                                android:valueFrom="@string/checkbox_checked"
+                                android:valueTo="@string/checkbox_middle"
+                                android:valueType="pathType"
+                                />
+                            <objectAnimator
+                                android:duration="150"
+                                android:propertyName="pathData"
+                                android:valueFrom="@string/checkbox_middle"
+                                android:valueTo="@string/checkbox_unchecked"
+                                android:valueType="pathType"
+                                />
+                        </set>
                     </aapt:attr>
                 </target>
             </animated-vector>
         </aapt:attr>
     </transition>
-
 </animated-selector>

@@ -5,6 +5,11 @@
         v 2
         m5.6 8.4l-2.15-2.15 a 0.7 0.7 0 0 0 -1.4 1.4 l2.85 2.85a 1 1 0 0 0 1.4 0l5.65-5.65a 0.7 0.7 0 0 0 -1.4 -1.4l-4.95 4.95z
     </string>
+    <string name="checkbox_middle" translatable="false">
+        M 5 3 h 14 a 2 2 0 0 1 2 2 v 14 a 2 2 0 0 1 -2 2 h -14 a 2 2 0 0 1 -2 -2 v -14 a 2 2 0 0 1 2 -2 z
+        v 2
+        m 7 6 l 0 0 a 1 1 0 0 0 -0.7 1.7 l 0 0 a 1 1 0 0 0 1.4 0 l 0 0 a 1 1 0 0 0 -0.7 -1.7 l 0 0 z
+    </string>
     <string name="checkbox_unchecked" translatable="false">
         M 5 3 h 14 a 2 2 0 0 1 2 2 v 14 a 2 2 0 0 1 -2 2 h -14 a 2 2 0 0 1 -2 -2 v -14 a 2 2 0 0 1 2 -2 z
         v 2
